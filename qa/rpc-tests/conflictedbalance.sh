@@ -24,8 +24,8 @@ fi
 
 set -f
 
-BITCOIND=${BITCOIND:-${1}/bitcoind}
-CLI=${BITCOINCLI:-${1}/bitcoin-cli}
+BITCOIND=${BITCOIND:-${1}/wisprd}
+CLI=${BITCOINCLI:-${1}/wispr-cli}
 
 DIR="${BASH_SOURCE%/*}"
 SENDANDWAIT="${DIR}/send.sh"

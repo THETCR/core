@@ -2,11 +2,11 @@
 # -*- mode: makefile; coding: utf-8 -*-
 
 #DEB_MAKE_CHECK_TARGET = test_wispr
-#build/bitcoind::
+#build/wisprd::
 #	$(if $(filter nocheck,$(DEB_BUILD_OPTIONS)),,src/test_wispr)
 
-DEB_INSTALL_EXAMPLES_bitcoind += debian/examples/*
-DEB_INSTALL_MANPAGES_bitcoind += debian/manpages/*
+DEB_INSTALL_EXAMPLES_wisprd += debian/examples/*
+DEB_INSTALL_MANPAGES_wisprd += debian/manpages/*
 
 %:
 	dh --with bash-completion $@

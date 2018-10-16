@@ -23,14 +23,14 @@ prog=wisprd
 lockfile=${BITCOIND_LOCKFILE-/var/lock/subsys/wisprd}
 
 # wisprd defaults to /usr/bin/wisprd, override with BITCOIND_BIN
-bitcoind=${BITCOIND_BIN-/usr/bin/wisprd}
+wisprd=${BITCOIND_BIN-/usr/bin/wisprd}
 
 # wisprd opts default to -disablewallet, override with BITCOIND_OPTS
-bitcoind_opts=${BITCOIND_OPTS}
+wisprd_opts=${BITCOIND_OPTS}
 
 start() {
     echo -n $"Starting $prog: "
-    daemon $DAEMONOPTS $bitcoind $bitcoind_opts
+    daemon $DAEMONOPTS $wisprd $wisprd_opts
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && touch $lockfile
