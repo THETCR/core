@@ -20,5 +20,6 @@ fi
 
 if [ "$TRAVIS_REPO_SLUG" = "WisprProject/core" -a "$TRAVIS_EVENT_TYPE" = "cron" ]; then
     #while read -r LINE; do travis_retry gpg --keyserver hkp://subset.pool.sks-keyservers.net --recv-keys $LINE; done < contrib/verify-commits/trusted-keys &&
-    #travis_wait 50 contrib/verify-commits/verify-commits.py;
+    travis_wait 50;
+#    travis_wait 50 contrib/verify-commits/verify-commits.py;
 fi
