@@ -15,10 +15,10 @@ fi
 #test/lint/git-subtree-check.sh src/univalue
 #test/lint/git-subtree-check.sh src/leveldb
 #test/lint/check-doc.py
-test/lint/check-rpc-mappings.py .
-test/lint/lint-all.sh
+#test/lint/check-rpc-mappings.py .
+#test/lint/lint-all.sh
 
 if [ "$TRAVIS_REPO_SLUG" = "WisprProject/core" -a "$TRAVIS_EVENT_TYPE" = "cron" ]; then
-    while read -r LINE; do travis_retry gpg --keyserver hkp://subset.pool.sks-keyservers.net --recv-keys $LINE; done < contrib/verify-commits/trusted-keys &&
-    travis_wait 50 contrib/verify-commits/verify-commits.py;
+    #while read -r LINE; do travis_retry gpg --keyserver hkp://subset.pool.sks-keyservers.net --recv-keys $LINE; done < contrib/verify-commits/trusted-keys &&
+    #travis_wait 50 contrib/verify-commits/verify-commits.py;
 fi
