@@ -120,6 +120,7 @@ BITCOIN_CORE_H = \
   compat/sanity.h \
   compressor.h \
   core_io.h \
+  primitives/zerocoin.h \
   crypter.h \
   denomination_functions.h \
   obfuscation.h \
