@@ -331,6 +331,7 @@ libbitcoin_consensus_a_SOURCES = \
   primitives/transaction.cpp \
   crypto/hmac_sha512.cpp \
   crypto/scrypt.cpp \
+  libzerocoin/bignum.h \
   crypto/sha1.cpp \
   crypto/sha256.cpp \
   crypto/sha512.cpp \
