@@ -330,7 +330,6 @@ libbitcoin_consensus_a_SOURCES = \
   primitives/deterministicmint.h \
   primitives/deterministicmint.cpp \
   primitives/zerocoin.h \
-  primitives/zerocoin.cpp \
   hash.cpp \
   hash.h \
   primitives/block.cpp \
@@ -391,6 +390,7 @@ libbitcoin_common_a_SOURCES = \
   amount.cpp \
   base58.cpp \
   bip38.cpp \
+  primitives/zerocoin.cpp \
   chainparams.cpp \
   coins.cpp \
   compressor.cpp \
@@ -463,8 +463,8 @@ endif
 wisprd_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
-  $(LIBUNIVALUE) \
   $(LIBBITCOIN_ZEROCOIN) \
+  $(LIBUNIVALUE) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_WALLET) \
   $(LIBBITCOIN_ZMQ) \
