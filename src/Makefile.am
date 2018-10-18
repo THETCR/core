@@ -327,18 +327,36 @@ crypto_libbitcoin_crypto_base_a_SOURCES = \
 libbitcoin_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_consensus_a_SOURCES = \
+  amount.h \
+  amount.cpp \
+  allocators.h \
   allocators.cpp \
-  primitives/block.cpp \
+  primitives/deterministicmint.h \
   primitives/deterministicmint.cpp \
-  primitives/transaction.cpp \
+  primitives/zerocoin.h \
   primitives/zerocoin.cpp \
   hash.cpp \
+  hash.h \
+  primitives/block.cpp \
+  primitives/block.h \
+  primitives/transaction.cpp \
+  primitives/transaction.h \
   pubkey.cpp \
-  script/script.cpp \
-  script/interpreter.cpp \
+  pubkey.h \
   script/bitcoinconsensus.cpp \
+  script/interpreter.cpp \
+  script/interpreter.h \
+  script/script.cpp \
+  script/script.h \
+  script/script_error.cpp \
+  script/script_error.h \
+  serialize.h \
+  tinyformat.h \
   uint256.cpp \
-  utilstrencodings.cpp
+  uint256.h \
+  utilstrencodings.cpp \
+  utilstrencodings.h \
+  version.h
 
 # libzerocoin library
 libzerocoin_libbitcoin_zerocoin_a_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS)
