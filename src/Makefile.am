@@ -120,6 +120,8 @@ BITCOIN_CORE_H = \
   compat/sanity.h \
   compressor.h \
   core_io.h \
+  primitives/block.h \
+  primitives/transaction.h \
   primitives/zerocoin.h \
   crypter.h \
   denomination_functions.h \
@@ -333,9 +335,7 @@ libbitcoin_consensus_a_SOURCES = \
   hash.cpp \
   hash.h \
   primitives/block.cpp \
-  primitives/block.h \
   primitives/transaction.cpp \
-  primitives/transaction.h \
   pubkey.cpp \
   pubkey.h \
   script/bitcoinconsensus.cpp \
