@@ -238,7 +238,6 @@ libbitcoin_server_a_SOURCES = \
   rpc/server.cpp \
   script/sigcache.cpp \
   sporkdb.cpp \
-  timedata.cpp \
   torcontrol.cpp \
   txdb.cpp \
   txmempool.cpp \
@@ -348,6 +347,7 @@ libbitcoin_consensus_a_SOURCES = \
   script/script_error.h \
   serialize.h \
   tinyformat.h \
+  timedata.cpp \
   uint256.cpp \
   uint256.h \
   utilstrencodings.cpp \
