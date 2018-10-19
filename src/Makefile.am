@@ -120,6 +120,7 @@ BITCOIN_CORE_H = \
   compat/sanity.h \
   compressor.h \
   core_io.h \
+  primitives/deterministicmint.h \
   primitives/block.h \
   primitives/transaction.h \
   primitives/zerocoin.h \
@@ -329,9 +330,8 @@ libbitcoin_consensus_a_SOURCES = \
   amount.cpp \
   allocators.h \
   allocators.cpp \
-  primitives/deterministicmint.h \
   primitives/deterministicmint.cpp \
-  primitives/zerocoin.h \
+  primitives/zerocoin.cpp \
   hash.cpp \
   hash.h \
   primitives/block.cpp \
@@ -391,6 +391,8 @@ libbitcoin_common_a_SOURCES = \
   amount.cpp \
   base58.cpp \
   bip38.cpp \
+  primitives/block.cpp \
+  primitives/transaction.cpp \
   primitives/zerocoin.cpp \
   chainparams.cpp \
   coins.cpp \
