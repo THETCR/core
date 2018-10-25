@@ -1,4 +1,4 @@
-packages:=boost openssl libevent zeromq
+packages:=boost openssl libevent zeromq gmp
 linux_packages_usb := libusb
 
 qt_native_packages = native_protobuf
