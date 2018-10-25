@@ -3,7 +3,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 bin_PROGRAMS += qt/particl-qt
-EXTRA_LIBRARIES += qt/libparticlqt.a
+EXTRA_LIBRARIES += qt/libwisprqt.a
 
 # bitcoin qt core #
 QT_TS = \
@@ -402,15 +402,15 @@ BITCOIN_RC = qt/res/bitcoin-qt-res.rc
 
 BITCOIN_QT_INCLUDES = -DQT_NO_KEYWORDS
 
-qt_libparticlqt_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
+qt_libwisprqt_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
   $(QT_INCLUDES) $(QT_DBUS_INCLUDES) $(PROTOBUF_CFLAGS) $(QR_CFLAGS)
-qt_libparticlqt_a_CXXFLAGS = $(AM_CXXFLAGS) $(QT_PIE_FLAGS)
-qt_libparticlqt_a_OBJCXXFLAGS = $(AM_OBJCXXFLAGS) $(QT_PIE_FLAGS)
+qt_libwisprqt_a_CXXFLAGS = $(AM_CXXFLAGS) $(QT_PIE_FLAGS)
+qt_libwisprqt_a_OBJCXXFLAGS = $(AM_OBJCXXFLAGS) $(QT_PIE_FLAGS)
 
-qt_libparticlqt_a_SOURCES = $(BITCOIN_QT_CPP) $(BITCOIN_QT_H) $(QT_FORMS_UI) \
+qt_libwisprqt_a_SOURCES = $(BITCOIN_QT_CPP) $(BITCOIN_QT_H) $(QT_FORMS_UI) \
   $(QT_QRC) $(QT_QRC_LOCALE) $(QT_TS) $(PROTOBUF_PROTO) $(RES_ICONS) $(RES_IMAGES) $(RES_MOVIES)
 
-nodist_qt_libparticlqt_a_SOURCES = $(QT_MOC_CPP) $(QT_MOC) $(PROTOBUF_CC) \
+nodist_qt_libwisprqt_a_SOURCES = $(QT_MOC_CPP) $(QT_MOC) $(PROTOBUF_CC) \
   $(PROTOBUF_H) $(QT_QRC_CPP) $(QT_QRC_LOCALE_CPP)
 
 # forms/foo.h -> forms/ui_foo.h
@@ -419,7 +419,7 @@ QT_FORMS_H=$(join $(dir $(QT_FORMS_UI)),$(addprefix ui_, $(notdir $(QT_FORMS_UI:
 # Most files will depend on the forms and moc files as includes. Generate them
 # before anything else.
 $(QT_MOC): $(QT_FORMS_H)
-$(qt_libparticlqt_a_OBJECTS) $(qt_particl_qt_OBJECTS) : | $(QT_MOC)
+$(qt_libwisprqt_a_OBJECTS) $(qt_particl_qt_OBJECTS) : | $(QT_MOC)
 
 #Generating these with a half-written protobuf header leads to wacky results.
 #This makes sure it's done.
@@ -438,7 +438,7 @@ endif
 if TARGET_WINDOWS
   qt_particl_qt_SOURCES += $(BITCOIN_RC)
 endif
-qt_particl_qt_LDADD = qt/libparticlqt.a $(LIBPARTICL_SERVER)
+qt_particl_qt_LDADD = qt/libwisprqt.a $(LIBPARTICL_SERVER)
 if ENABLE_WALLET
 qt_particl_qt_LDADD += $(LIBPARTICL_UTIL) $(LIBPARTICL_WALLET)
 endif
@@ -460,7 +460,7 @@ QT_QM=$(QT_TS:.ts=.qm)
 
 SECONDARY: $(QT_QM)
 
-$(srcdir)/qt/bitcoinstrings.cpp: $(libparticl_server_a_SOURCES) $(libparticl_wallet_a_SOURCES) $(libparticl_common_a_SOURCES) $(libparticl_zmq_a_SOURCES) $(libparticl_consensus_a_SOURCES) $(libparticl_util_a_SOURCES)
+$(srcdir)/qt/bitcoinstrings.cpp: $(libwispr_server_a_SOURCES) $(libwispr_wallet_a_SOURCES) $(libwispr_common_a_SOURCES) $(libwispr_zmq_a_SOURCES) $(libwispr_consensus_a_SOURCES) $(libwispr_util_a_SOURCES)
 	@test -n $(XGETTEXT) || echo "xgettext is required for updating translations"
 	$(AM_V_GEN) cd $(srcdir); XGETTEXT=$(XGETTEXT) PACKAGE_NAME="$(PACKAGE_NAME)" COPYRIGHT_HOLDERS="$(COPYRIGHT_HOLDERS)" COPYRIGHT_HOLDERS_SUBSTITUTION="$(COPYRIGHT_HOLDERS_SUBSTITUTION)" $(PYTHON) ../share/qt/extract_strings_qt.py $^
 
@@ -480,12 +480,12 @@ $(QT_QRC_CPP): $(QT_QRC) $(QT_FORMS_H) $(RES_ICONS) $(RES_IMAGES) $(RES_MOVIES) 
 	$(AM_V_GEN) QT_SELECT=$(QT_SELECT) $(RCC) -name bitcoin $< | \
 	  $(SED) -e '/^\*\*.*Created:/d' -e '/^\*\*.*by:/d' > $@
 
-CLEAN_QT = $(nodist_qt_libparticlqt_a_SOURCES) $(QT_QM) $(QT_FORMS_H) qt/*.gcda qt/*.gcno qt/temp_bitcoin_locale.qrc
+CLEAN_QT = $(nodist_qt_libwisprqt_a_SOURCES) $(QT_QM) $(QT_FORMS_H) qt/*.gcda qt/*.gcno qt/temp_bitcoin_locale.qrc
 
 CLEANFILES += $(CLEAN_QT)
 
 particl_qt_clean: FORCE
-	rm -f $(CLEAN_QT) $(qt_libparticlqt_a_OBJECTS) $(qt_particl_qt_OBJECTS) qt/particl-qt$(EXEEXT) $(LIBPARTICLQT)
+	rm -f $(CLEAN_QT) $(qt_libwisprqt_a_OBJECTS) $(qt_particl_qt_OBJECTS) qt/particl-qt$(EXEEXT) $(LIBPARTICLQT)
 
 particl_qt : qt/particl-qt$(EXEEXT)
 
