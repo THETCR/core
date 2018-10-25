@@ -21,6 +21,7 @@ class base_blob
 {
 protected:
     enum { WIDTH = BITS / 32 };
+    uint8_t data[WIDTH];
     uint32_t pn[WIDTH];
 
 public:
