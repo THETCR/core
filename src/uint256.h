@@ -35,6 +35,7 @@ public:
         for (int i = 0; i < WIDTH; i++)
             pn[i] = b.pn[i];
     }
+    inline int Compare(const base_blob& other) const { return memcmp(data, other.data, sizeof(data)); }
 
 
     bool IsNull() const
