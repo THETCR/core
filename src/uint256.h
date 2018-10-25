@@ -305,13 +305,21 @@ public:
     {
         return sizeof(pn);
     }
+    void Serialize(Stream& s) const
+    {
+        s.write((char*)data, sizeof(data));
+    }
 
     template <typename Stream>
     void Serialize(Stream& s, int nType, int nVersion) const
     {
         s.write((char*)pn, sizeof(pn));
     }
-
+    template<typename Stream>
+    void Unserialize(Stream& s)
+    {
+        s.read((char*)data, sizeof(data));
+    }
     template <typename Stream>
     void Unserialize(Stream& s, int nType, int nVersion)
     {
