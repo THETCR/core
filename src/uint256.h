@@ -21,6 +21,7 @@ class base_blob
 protected:
     static constexpr int WIDTH = BITS / 8;
     uint8_t data[WIDTH];
+    uint32_t pn[WIDTH];
 public:
     base_blob()
     {
