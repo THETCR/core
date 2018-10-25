@@ -1,18 +1,18 @@
-// Copyright (c) 2015 The Bitcoin Core developers
+// Copyright (c) 2015-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_ZMQ_ZMQPUBLISHNOTIFIER_H
 #define BITCOIN_ZMQ_ZMQPUBLISHNOTIFIER_H
 
-#include "zmqabstractnotifier.h"
+#include <zmq/zmqabstractnotifier.h>
 
 class CBlockIndex;
 
 class CZMQAbstractPublishNotifier : public CZMQAbstractNotifier
 {
 private:
-    uint32_t nSequence; // upcounting per message sequence number
+    uint32_t nSequence; //!< upcounting per message sequence number
 
 public:
 
@@ -24,44 +24,45 @@ public:
     */
     bool SendMessage(const char *command, const void* data, size_t size);
 
-    bool Initialize(void *pcontext);
-    void Shutdown();
+    bool Initialize(void *pcontext) override;
+    void Shutdown() override;
 };
 
 class CZMQPublishHashBlockNotifier : public CZMQAbstractPublishNotifier
 {
 public:
-    bool NotifyBlock(const CBlockIndex *pindex);
+    bool NotifyBlock(const CBlockIndex *pindex) override;
 };
 
 class CZMQPublishHashTransactionNotifier : public CZMQAbstractPublishNotifier
 {
 public:
-    bool NotifyTransaction(const CTransaction &transaction);
-};
-
-class CZMQPublishHashTransactionLockNotifier : public CZMQAbstractPublishNotifier
-{
-public:
-    bool NotifyTransactionLock(const CTransaction &transaction);
+    bool NotifyTransaction(const CTransaction &transaction) override;
 };
 
 class CZMQPublishRawBlockNotifier : public CZMQAbstractPublishNotifier
 {
 public:
-    bool NotifyBlock(const CBlockIndex *pindex);
+    bool NotifyBlock(const CBlockIndex *pindex) override;
 };
 
 class CZMQPublishRawTransactionNotifier : public CZMQAbstractPublishNotifier
 {
 public:
-    bool NotifyTransaction(const CTransaction &transaction);
+    bool NotifyTransaction(const CTransaction &transaction) override;
 };
 
-class CZMQPublishRawTransactionLockNotifier : public CZMQAbstractPublishNotifier
+class CZMQPublishHashWalletTransactionNotifier : public CZMQAbstractPublishNotifier
 {
 public:
-    bool NotifyTransactionLock(const CTransaction &transaction);
+    bool NotifyTransaction(const std::string &sWalletName, const CTransaction &transaction) override;
 };
+
+class CZMQPublishSMSGNotifier : public CZMQAbstractPublishNotifier
+{
+public:
+    bool NotifySecureMessage(const smsg::SecureMessage *psmsg, const uint160 &hash) override;
+};
+
 
 #endif // BITCOIN_ZMQ_ZMQPUBLISHNOTIFIER_H

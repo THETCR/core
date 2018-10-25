@@ -93,6 +93,13 @@
       </widget>
      </item>
      <item row="3" column="1">
+      <widget class="QCheckBox" name="toggleShowPasswordButton">
+       <property name="text">
+        <string>Show password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
       <widget class="QLabel" name="capsLabel">
        <property name="font">
         <font>
@@ -108,21 +115,15 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QCheckBox" name="anonymizationCheckBox">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="toolTip">
-        <string>Serves to disable the trivial sendmoney when OS account compromised. Provides no real security.</string>
-       </property>
+     <item row="5" column="0">
+      <widget class="QLabel" name="unlockForStakingOnlyLabel">
        <property name="text">
-        <string>For anonymization, automint, and staking only</string>
-       </property>
-       <property name="visible">
-        <bool>false</bool>
+        <string>Unlock For Staking Only</string>
        </property>
       </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QCheckBox" name="unlockForStakingOnlyCheckBox"/>
      </item>
     </layout>
    </item>

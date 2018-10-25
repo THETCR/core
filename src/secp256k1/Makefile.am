@@ -12,11 +12,9 @@ noinst_HEADERS =
 noinst_HEADERS += src/scalar.h
 noinst_HEADERS += src/scalar_4x64.h
 noinst_HEADERS += src/scalar_8x32.h
-noinst_HEADERS += src/scalar_low.h
 noinst_HEADERS += src/scalar_impl.h
 noinst_HEADERS += src/scalar_4x64_impl.h
 noinst_HEADERS += src/scalar_8x32_impl.h
-noinst_HEADERS += src/scalar_low_impl.h
 noinst_HEADERS += src/group.h
 noinst_HEADERS += src/group_impl.h
 noinst_HEADERS += src/num_gmp.h
@@ -42,8 +40,6 @@ noinst_HEADERS += src/field_5x52_asm_impl.h
 noinst_HEADERS += src/java/org_bitcoin_NativeSecp256k1.h
 noinst_HEADERS += src/java/org_bitcoin_Secp256k1Context.h
 noinst_HEADERS += src/util.h
-noinst_HEADERS += src/scratch.h
-noinst_HEADERS += src/scratch_impl.h
 noinst_HEADERS += src/testrand.h
 noinst_HEADERS += src/testrand_impl.h
 noinst_HEADERS += src/hash.h
@@ -81,7 +77,7 @@ libsecp256k1_jni_la_CPPFLAGS = -DSECP256K1_BUILD $(JNI_INCLUDES)
 
 noinst_PROGRAMS =
 if USE_BENCHMARK
-noinst_PROGRAMS += bench_verify bench_sign bench_internal bench_ecmult
+noinst_PROGRAMS += bench_verify bench_sign bench_internal
 bench_verify_SOURCES = src/bench_verify.c
 bench_verify_LDADD = libsecp256k1.la $(SECP_LIBS) $(SECP_TEST_LIBS) $(COMMON_LIB)
 bench_sign_SOURCES = src/bench_sign.c
@@ -89,9 +85,6 @@ bench_sign_LDADD = libsecp256k1.la $(SECP_LIBS) $(SECP_TEST_LIBS) $(COMMON_LIB)
 bench_internal_SOURCES = src/bench_internal.c
 bench_internal_LDADD = $(SECP_LIBS) $(COMMON_LIB)
 bench_internal_CPPFLAGS = -DSECP256K1_BUILD $(SECP_INCLUDES)
-bench_ecmult_SOURCES = src/bench_ecmult.c
-bench_ecmult_LDADD = $(SECP_LIBS) $(COMMON_LIB)
-bench_ecmult_CPPFLAGS = -DSECP256K1_BUILD $(SECP_INCLUDES)
 endif
 
 TESTS =
@@ -164,7 +157,6 @@ $(gen_context_BIN): $(gen_context_OBJECTS)
 $(libsecp256k1_la_OBJECTS): src/ecmult_static_context.h
 $(tests_OBJECTS): src/ecmult_static_context.h
 $(bench_internal_OBJECTS): src/ecmult_static_context.h
-$(bench_ecmult_OBJECTS): src/ecmult_static_context.h
 
 src/ecmult_static_context.h: $(gen_context_BIN)
 	./$(gen_context_BIN)
@@ -178,6 +170,30 @@ if ENABLE_MODULE_ECDH
 include src/modules/ecdh/Makefile.am.include
 endif
 
+if ENABLE_MODULE_SCHNORR
+include src/modules/schnorr/Makefile.am.include
+endif
+
 if ENABLE_MODULE_RECOVERY
 include src/modules/recovery/Makefile.am.include
+endif
+
+if ENABLE_MODULE_GENERATOR
+include src/modules/generator/Makefile.am.include
+endif
+
+if ENABLE_MODULE_RANGEPROOF
+include src/modules/rangeproof/Makefile.am.include
+endif
+
+if ENABLE_MODULE_MLSAG
+include src/modules/mlsag/Makefile.am.include
+endif
+
+if ENABLE_MODULE_WHITELIST
+include src/modules/whitelist/Makefile.am.include
+endif
+
+if ENABLE_MODULE_SURJECTIONPROOF
+include src/modules/surjection/Makefile.am.include
 endif

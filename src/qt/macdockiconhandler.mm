@@ -1,5 +1,5 @@
 // Copyright (c) 2011-2013 The Bitcoin Core developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "macdockiconhandler.h"
@@ -30,7 +30,7 @@ void setupDockClickHandler() {
     Class cls = objc_getClass("NSApplication");
     id appInst = objc_msgSend((id)cls, sel_registerName("sharedApplication"));
 
-    if (appInst != NULL) {
+    if (appInst != nullptr) {
         id delegate = objc_msgSend(appInst, sel_registerName("delegate"));
         Class delClass = (Class)objc_msgSend(delegate,  sel_registerName("class"));
         SEL shouldHandle = sel_registerName("applicationShouldHandleReopen:hasVisibleWindows:");
@@ -63,7 +63,7 @@ void MacDockIconHandler::setMainWindow(QMainWindow *window) {
 MacDockIconHandler::~MacDockIconHandler()
 {
     delete this->m_dummyWidget;
-    this->setMainWindow(NULL);
+    this->setMainWindow(nullptr);
 }
 
 QMenu *MacDockIconHandler::dockMenu()
@@ -124,5 +124,5 @@ void MacDockIconHandler::handleDockIconClickEvent()
         this->mainWindow->show();
     }
 
-    emit this->dockIconClicked();
+    Q_EMIT this->dockIconClicked();
 }

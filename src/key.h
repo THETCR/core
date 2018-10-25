@@ -1,23 +1,20 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2015-2018 The PIVX developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
+// Copyright (c) 2017 The Zcash developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef WISPR_KEY_H
-#define WISPR_KEY_H
+#ifndef BITCOIN_KEY_H
+#define BITCOIN_KEY_H
 
-#include "allocators.h"
-#include "serialize.h"
-#include "uint256.h"
-#include "pubkey.h"
+#include <pubkey.h>
+#include <serialize.h>
+#include <support/allocators/secure.h>
+#include <uint256.h>
 
 #include <stdexcept>
 #include <vector>
 
-class CPubKey;
-
-struct CExtPubKey;
 
 /**
  * secure_allocator is defined in allocators.h
@@ -54,7 +51,7 @@ private:
     //! The actual byte data
     std::vector<unsigned char, secure_allocator<unsigned char> > keydata;
 
-    //! Check whether the 32-byte array pointed to be vch is valid keydata.
+    //! Check whether the 32-byte array pointed to by vch is valid keydata.
     bool static Check(const unsigned char* vch);
 
 public:
@@ -72,6 +69,12 @@ public:
             memcmp(a.keydata.data(), b.keydata.data(), a.size()) == 0;
     }
 
+    friend bool operator<(const CKey& a, const CKey& b)
+    {
+        return a.fCompressed == b.fCompressed && a.size() == b.size() &&
+               memcmp(a.keydata.data(), b.keydata.data(), a.size()) < 0;
+    }
+
     //! Initialize using begin and end iterators to byte data.
     template <typename T>
     void Set(const T pbegin, const T pend, bool fCompressedIn)
@@ -85,26 +88,49 @@ public:
         } else {
             fValid = false;
         }
-}
+    }
+
+    void Set(const unsigned char *p, bool fCompressedIn)
+    {
+        if (Check(p))
+        {
+            memcpy(keydata.data(), p, keydata.size());
+            fValid = true;
+            fCompressed = fCompressedIn;
+        } else
+        {
+            fValid = false;
+        };
+    };
+
+    void Clear()
+    {
+        //memory_cleanse(vch, sizeof(vch));
+        memset(keydata.data(), 0, size());
+        fCompressed = true;
+        fValid = false;
+    };
 
     //! Simple read-only vector-like interface.
     unsigned int size() const { return (fValid ? keydata.size() : 0); }
     const unsigned char* begin() const { return keydata.data(); }
     const unsigned char* end() const { return keydata.data() + size(); }
+    unsigned char* begin_nc() { return keydata.data(); }
 
     //! Check whether this private key is valid.
     bool IsValid() const { return fValid; }
 
+    void SetFlags(bool fValidIn, bool fCompressedIn)
+    {
+        fValid = fValidIn;
+        fCompressed = fCompressedIn;
+    };
+
     //! Check whether the public key corresponding to this private key is (to be) compressed.
     bool IsCompressed() const { return fCompressed; }
 
-    //! Initialize from a CPrivKey (serialized OpenSSL private key data).
-    bool SetPrivKey(const CPrivKey& vchPrivKey, bool fCompressed);
-
     //! Generate a new private key using a cryptographic PRNG.
     void MakeNewKey(bool fCompressed);
-
-    uint256 GetPrivKey_256();
 
     /**
      * Convert the private key to a CPrivKey (serialized OpenSSL private key data).
@@ -119,10 +145,17 @@ public:
     CPubKey GetPubKey() const;
 
     /**
+     * Compute the ECDH exchange result using this private key and another public key.
+     */
+    uint256 ECDH(const CPubKey& pubkey) const;
+
+    CKey Add(const uint8_t *p) const;
+
+    /**
      * Create a DER-serialized signature.
      * The test_case parameter tweaks the deterministic nonce.
      */
-    bool Sign(const uint256& hash, std::vector<unsigned char>& vchSig, uint32_t test_case = 0) const;
+    bool Sign(const uint256& hash, std::vector<unsigned char>& vchSig, bool grind = true, uint32_t test_case = 0) const;
 
     /**
      * Create a compact signature (65 bytes), which allows reconstructing the used public key.
@@ -136,6 +169,8 @@ public:
     //! Derive BIP32 child key.
     bool Derive(CKey& keyChild, ChainCode &ccChild, unsigned int nChild, const ChainCode& cc) const;
 
+    bool Derive(CKey& keyChild, unsigned char ccChild[32], unsigned int nChild, const unsigned char cc[32]) const;
+
     /**
      * Verify thoroughly whether a private key and a public key match.
      * This is done using a different mechanism than just regenerating it.
@@ -145,10 +180,22 @@ public:
     //! Load private key and check that public key matches.
     bool Load(const CPrivKey& privkey, const CPubKey& vchPubKey, bool fSkipCheck);
 
-    //! Check whether an element of a signature (r or s) is valid.
-    static bool CheckSignatureElement(const unsigned char* vch, int len, bool half);
+    ADD_SERIALIZE_METHODS;
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream &s, Operation ser_action)
+    {
+        if (!ser_action.ForRead())
+        {
+            s.write((char*)&keydata[0], 32);
+        } else
+        {
+            s.read((char*)&keydata[0], 32);
+        };
+        READWRITE(fValid);
+        READWRITE(fCompressed);
+    };
 };
-
+/*
 struct CExtKey {
     unsigned char nDepth;
     unsigned char vchFingerprint[4];
@@ -169,9 +216,28 @@ struct CExtKey {
     void Decode(const unsigned char code[BIP32_EXTKEY_SIZE]);
     bool Derive(CExtKey& out, unsigned int nChild) const;
     CExtPubKey Neuter() const;
-    void SetMaster(const unsigned char* seed, unsigned int nSeedLen);
+    void SetSeed(const unsigned char* seed, unsigned int nSeedLen);
+    template <typename Stream>
+    void Serialize(Stream& s) const
+    {
+        unsigned int len = BIP32_EXTKEY_SIZE;
+        ::WriteCompactSize(s, len);
+        unsigned char code[BIP32_EXTKEY_SIZE];
+        Encode(code);
+        s.write((const char *)&code[0], len);
+    }
+    template <typename Stream>
+    void Unserialize(Stream& s)
+    {
+        unsigned int len = ::ReadCompactSize(s);
+        unsigned char code[BIP32_EXTKEY_SIZE];
+        if (len != BIP32_EXTKEY_SIZE)
+            throw std::runtime_error("Invalid extended key size\n");
+        s.read((char *)&code[0], len);
+        Decode(code);
+    }
 };
-
+*/
 /** Initialize the elliptic curve support. May not be called twice without calling ECC_Stop first. */
 void ECC_Start(void);
 
@@ -181,4 +247,4 @@ void ECC_Stop(void);
 /** Check that required EC support is available at runtime. */
 bool ECC_InitSanityCheck(void);
 
-#endif // WISPR_KEY_H
+#endif // BITCOIN_KEY_H

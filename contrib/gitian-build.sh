@@ -1,12 +1,13 @@
+#!/usr/bin/env bash
 # Copyright (c) 2016 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+export LC_ALL=C
 # What to do
 sign=false
 verify=false
 build=false
-setupenv=false
 
 # Systems to build
 linux=true
@@ -17,10 +18,11 @@ osx=true
 SIGNER=
 VERSION=
 commit=false
-url=https://github.com/WisprProject/core
+url=https://github.com/particl/particl-core
 proc=2
-mem=2000
+mem=3000
 lxc=true
+docker=false
 osslTarUrl=http://downloads.sourceforge.net/project/osslsigncode/osslsigncode/osslsigncode-1.7.1.tar.gz
 osslPatchUrl=https://bitcoincore.org/cfields/osslsigncode-Backports-to-1.7.1.patch
 scriptName=$(basename -- "$0")
@@ -31,27 +33,28 @@ commitFiles=true
 read -d '' usage <<- EOF
 Usage: $scriptName [-c|u|v|b|s|B|o|h|j|m|] signer version
 
-Run this script from the directory containing the wispr, gitian-builder, gitian.sigs, and wispr-detached-sigs.
+Run this script from the directory containing the particl, gitian-builder, gitian.sigs, and bitcoin-detached-sigs.
 
 Arguments:
 signer          GPG signer to sign each build assert file
-version        Version number, commit, or branch to build. If building a commit or branch, the -c option must be specified
+version         Version number, commit, or branch to build. If building a commit or branch, the -c option must be specified
 
 Options:
--c|--commit    Indicate that the version argument is for a commit or branch
--u|--url    Specify the URL of the repository. Default is https://github.com/WisprProject/core
--v|--verify     Verify the gitian build
--b|--build    Do a gitian build
--s|--sign    Make signed binaries for Windows and Mac OSX
--B|--buildsign    Build both signed and unsigned binaries
--o|--os        Specify which Operating Systems the build is for. Default is lwx. l for linux, w for windows, x for osx, a for aarch64
--j        Number of processes to use. Default 2
--m        Memory to allocate in MiB. Default 2000
+-c|--commit     Indicate that the version argument is for a commit or branch
+-u|--url        Specify the URL of the repository. Default is https://github.com/particl/particl-core
+-v|--verify     Verify the Gitian build
+-b|--build      Do a Gitian build
+-s|--sign       Make signed binaries for Windows and Mac OSX
+-B|--buildsign  Build both signed and unsigned binaries
+-o|--os         Specify which Operating Systems the build is for. Default is lwx. l for linux, w for windows, x for osx
+-j              Number of processes to use. Default 2
+-m              Memory to allocate in MiB. Default 2000
 --kvm           Use KVM instead of LXC
---setup         Setup the gitian building environment. Uses KVM. If you want to use lxc, use the --lxc option. Only works on Debian-based systems (Ubuntu, Debian)
+--docker        Use Docker instead of LXC
+--setup         Set up the Gitian building environment. Uses LXC. If you want to use KVM, use the --kvm option. Only works on Debian-based systems (Ubuntu, Debian)
 --detach-sign   Create the assert file for detached signing. Will not commit anything.
 --no-commit     Do not commit anything to git
--h|--help    Print this help message
+-h|--help       Print this help message
 EOF
 
 # Get options and arguments
@@ -78,21 +81,20 @@ while :; do
         -S|--signer)
         if [ -n "$2" ]
         then
-        SIGNER=$2
-        shift
+            SIGNER=$2
+            shift
         else
-        echo 'Error: "--signer" requires a non-empty argument.'
-        exit 1
+            echo 'Error: "--signer" requires a non-empty argument.'
+            exit 1
         fi
            ;;
         # Operating Systems
         -o|--os)
         if [ -n "$2" ]
         then
-        linux=false
-        windows=false
-        osx=false
-        aarch64=false
+            linux=false
+            windows=false
+            osx=false
         if [[ "$2" = *"l"* ]]
         then
             linux=true
@@ -105,61 +107,67 @@ while :; do
         then
             osx=true
         fi
-        if [[ "$2" = *"a"* ]]
-        then
-            aarch64=true
-        fi
         shift
         else
-        echo 'Error: "--os" requires an argument containing an l (for linux), w (for windows), x (for Mac OSX), or a (for aarch64)\n'
+        echo 'Error: "--os" requires an argument containing an l (for linux), w (for windows), or x (for Mac OSX)\n'
         exit 1
         fi
         ;;
-    # Help message
-    -h|--help)
-        echo "$usage"
-        exit 0
+        # Help message
+        -h|--help)
+            echo "$usage"
+            exit 0
         ;;
-    # Commit or branch
-    -c|--commit)
-        commit=true
-        ;;
-    # Number of Processes
-    -j)
+        # Commit or branch
+        -c|--commit)
+            commit=true
+            ;;
+        # Number of Processes
+        -j)
         if [ -n "$2" ]
         then
-        proc=$2
-        shift
+            proc=$2
+            shift
         else
-        echo 'Error: "-j" requires an argument'
-        exit 1
+            echo 'Error: "-j" requires an argument'
+            exit 1
         fi
         ;;
-    # Memory to allocate
-    -m)
-        if [ -n "$2" ]
-        then
-        mem=$2
-        shift
-        else
-        echo 'Error: "-m" requires an argument'
-        exit 1
-        fi
-        ;;
-    # URL
-    -u)
-        if [ -n "$2" ]
-        then
-        url=$2
-        shift
-        else
-        echo 'Error: "-u" requires an argument'
-        exit 1
-        fi
-        ;;
+        # Memory to allocate
+        -m)
+            if [ -n "$2" ]
+            then
+                mem=$2
+                shift
+            else
+                echo 'Error: "-m" requires an argument'
+                exit 1
+            fi
+            ;;
+        # URL
+        -u)
+            if [ -n "$2" ]
+            then
+                url=$2
+                shift
+            else
+                echo 'Error: "-u" requires an argument'
+                exit 1
+            fi
+            ;;
         # kvm
         --kvm)
             lxc=false
+            ;;
+        # docker
+        --docker)
+            if [[ $lxc = false ]]
+            then
+                echo 'Error: cannot have both kvm and docker'
+                exit 1
+            fi
+            lxc=false
+            docker=true
             ;;
         # Detach sign
         --detach-sign)
@@ -174,7 +182,7 @@ while :; do
         --setup)
             setup=true
             ;;
-    *)               # Default case: If no more options then break out of the loop.
+        *)               # Default case: If no more options then break out of the loop.
              break
     esac
     shift
@@ -185,7 +193,13 @@ if [[ $lxc = true ]]
 then
     export USE_LXC=1
     export LXC_BRIDGE=lxcbr0
-    sudo ifconfig lxcbr0 up 10.0.2.2
+    sudo ifconfig lxcbr0 10.0.3.2/24 up
+fi
+
+# Setup docker
+if [[ $docker = true ]]
+then
+    export USE_DOCKER=1
 fi
 
 # Check for OSX SDK
@@ -196,9 +210,9 @@ then
 fi
 
 # Get signer
-if [[ -n"$1" ]]
+if [[ -n "$1" ]]
 then
-    SIGNER=$1
+    SIGNER="$1"
     shift
 fi
 
@@ -211,7 +225,7 @@ then
 fi
 
 # Check that a signer is specified
-if [[ $SIGNER == "" ]]
+if [[ "$SIGNER" == "" ]]
 then
     echo "$scriptName: Missing signer."
     echo "Try $scriptName --help for more information"
@@ -237,23 +251,27 @@ echo ${COMMIT}
 if [[ $setup = true ]]
 then
     sudo apt-get install ruby apache2 git apt-cacher-ng python-vm-builder qemu-kvm qemu-utils
-    git clone https://github.com/WisprProject/gitian.sigs
-    git clone https://github.com/WisprProject/detached.sigs.git
+    git clone https://github.com/particl/gitian.sigs
+    git clone https://github.com/particl/particl-detached-sigs
     git clone https://github.com/devrandom/gitian-builder.git
     pushd ./gitian-builder
     if [[ -n "$USE_LXC" ]]
     then
         sudo apt-get install lxc
-        bin/make-base-vm --suite trusty --arch amd64 --lxc
+        bin/make-base-vm --suite bionic --arch amd64 --lxc
+    elif [[ -n "$USE_DOCKER" ]]
+    then
+        sudo apt-get install docker-ce
+        bin/make-base-vm --suite bionic --arch amd64 --docker
     else
-        bin/make-base-vm --suite trusty --arch amd64
+        bin/make-base-vm --suite bionic --arch amd64
     fi
     popd
 fi
 
 # Set up build
-pushd ./core
-git fetch
+pushd ./particl-core
+git fetch --tags
 git checkout ${COMMIT}
 popd
 
@@ -261,7 +279,7 @@ popd
 if [[ $build = true ]]
 then
     # Make output folder
-    mkdir -p ./core-binaries/${VERSION}
+    mkdir -p ./particl-binaries/${VERSION}
 
     # Build Dependencies
     echo ""
@@ -271,7 +289,7 @@ then
     mkdir -p inputs
     wget -N -P inputs $osslPatchUrl
     wget -N -P inputs $osslTarUrl
-    make -C ../core/depends download SOURCES_PATH=`pwd`/cache/common
+    make -C ../particl-core/depends download SOURCES_PATH=`pwd`/cache/common
 
     # Linux
     if [[ $linux = true ]]
@@ -279,9 +297,9 @@ then
         echo ""
         echo "Compiling ${VERSION} Linux"
         echo ""
-        ./bin/gbuild -j ${proc} -m ${mem} --commit core=${COMMIT} --url core=${url} ../core/contrib/gitian-descriptors/gitian-linux.yml
-        ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs/ ../core/contrib/gitian-descriptors/gitian-linux.yml
-        mv build/out/wispr-*.tar.gz build/out/src/wispr-*.tar.gz ../core-binaries/${VERSION}
+        ./bin/gbuild --allow-sudo -j ${proc} -m ${mem} --commit particl-core=${COMMIT} --url particl-core=${url} ../particl-core/contrib/gitian-descriptors/gitian-linux.yml
+        ./bin/gsign -p "$signProg" --signer "$SIGNER" --release ${VERSION}-linux --destination ../gitian.sigs/ ../particl-core/contrib/gitian-descriptors/gitian-linux.yml
+        mv build/out/particl-*.tar.gz build/out/src/particl-*.tar.gz ../particl-binaries/${VERSION}
     fi
     # Windows
     if [[ $windows = true ]]
@@ -289,10 +307,10 @@ then
         echo ""
         echo "Compiling ${VERSION} Windows"
         echo ""
-        ./bin/gbuild -j ${proc} -m ${mem} --commit core=${COMMIT} --url core=${url} ../core/contrib/gitian-descriptors/gitian-win.yml
-        ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../core/contrib/gitian-descriptors/gitian-win.yml
-        mv build/out/wispr-*-win-unsigned.tar.gz inputs/wispr-win-unsigned.tar.gz
-        mv build/out/wispr-*.zip build/out/wispr-*.exe ../core-binaries/${VERSION}
+        ./bin/gbuild -j ${proc} -m ${mem} --commit particl-core=${COMMIT} --url particl-core=${url} ../particl-core/contrib/gitian-descriptors/gitian-win.yml
+        ./bin/gsign -p "$signProg" --signer "$SIGNER" --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../particl-core/contrib/gitian-descriptors/gitian-win.yml
+        mv build/out/particl-*-win-unsigned.tar.gz inputs/particl-win-unsigned.tar.gz
+        mv build/out/particl-*.zip build/out/particl-*.exe ../particl-binaries/${VERSION}
     fi
     # Mac OSX
     if [[ $osx = true ]]
@@ -300,20 +318,10 @@ then
         echo ""
         echo "Compiling ${VERSION} Mac OSX"
         echo ""
-        ./bin/gbuild -j ${proc} -m ${mem} --commit core=${COMMIT} --url core=${url} ../core/contrib/gitian-descriptors/gitian-osx.yml
-        ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../core/contrib/gitian-descriptors/gitian-osx.yml
-        mv build/out/wispr-*-osx-unsigned.tar.gz inputs/wispr-osx-unsigned.tar.gz
-        mv build/out/wispr-*.tar.gz build/out/wispr-*.dmg ../core-binaries/${VERSION}
-    fi
-    # AArch64
-    if [[ $aarch64 = true ]]
-    then
-        echo ""
-        echo "Compiling ${VERSION} AArch64"
-        echo ""
-        ./bin/gbuild -j ${proc} -m ${mem} --commit core=${COMMIT} --url core=${url} ../core/contrib/gitian-descriptors/gitian-aarch64.yml
-        ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-aarch64 --destination ../gitian.sigs/ ../core/contrib/gitian-descriptors/gitian-aarch64.yml
-        mv build/out/wispr-*.tar.gz build/out/src/wispr-*.tar.gz ../core-binaries/${VERSION}
+        ./bin/gbuild -j ${proc} -m ${mem} --commit particl-core=${COMMIT} --url particl-core=${url} ../particl-core/contrib/gitian-descriptors/gitian-osx.yml
+        ./bin/gsign -p "$signProg" --signer "$SIGNER" --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../particl-core/contrib/gitian-descriptors/gitian-osx.yml
+        mv build/out/particl-*-osx-unsigned.tar.gz inputs/particl-osx-unsigned.tar.gz
+        mv build/out/particl-*.tar.gz build/out/particl-*.dmg ../particl-binaries/${VERSION}
     fi
     popd
 
@@ -324,10 +332,9 @@ then
         echo "Committing ${VERSION} Unsigned Sigs"
         echo ""
         pushd gitian.sigs
-        git add ${VERSION}-linux/${SIGNER}
-        git add ${VERSION}-aarch64/${SIGNER}
-        git add ${VERSION}-win-unsigned/${SIGNER}
-        git add ${VERSION}-osx-unsigned/${SIGNER}
+        git add ${VERSION}-linux/"${SIGNER}"
+        git add ${VERSION}-win-unsigned/"${SIGNER}"
+        git add ${VERSION}-osx-unsigned/"${SIGNER}"
         git commit -a -m "Add ${VERSION} unsigned sigs for ${SIGNER}"
         popd
     fi
@@ -341,39 +348,33 @@ then
     echo ""
     echo "Verifying v${VERSION} Linux"
     echo ""
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-linux ../core/contrib/gitian-descriptors/gitian-linux.yml
+    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-linux ../particl-core/contrib/gitian-descriptors/gitian-linux.yml
     # Windows
     echo ""
     echo "Verifying v${VERSION} Windows"
     echo ""
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-win-unsigned ../core/contrib/gitian-descriptors/gitian-win.yml
+    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-win-unsigned ../particl-core/contrib/gitian-descriptors/gitian-win.yml
     # Mac OSX
     echo ""
     echo "Verifying v${VERSION} Mac OSX"
     echo ""
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-unsigned ../core/contrib/gitian-descriptors/gitian-osx.yml
-    # AArch64
-    echo ""
-    echo "Verifying v${VERSION} AArch64"
-    echo ""
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-aarch64 ../core/contrib/gitian-descriptors/gitian-aarch64.yml
+    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-unsigned ../particl-core/contrib/gitian-descriptors/gitian-osx.yml
     # Signed Windows
     echo ""
     echo "Verifying v${VERSION} Signed Windows"
     echo ""
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-signed ../core/contrib/gitian-descriptors/gitian-osx-signer.yml
+    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-signed ../particl-core/contrib/gitian-descriptors/gitian-osx-signer.yml
     # Signed Mac OSX
     echo ""
     echo "Verifying v${VERSION} Signed Mac OSX"
     echo ""
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-signed ../core/contrib/gitian-descriptors/gitian-osx-signer.yml
+    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-signed ../particl-core/contrib/gitian-descriptors/gitian-osx-signer.yml
     popd
 fi
 
 # Sign binaries
 if [[ $sign = true ]]
 then
-
     pushd ./gitian-builder
     # Sign Windows
     if [[ $windows = true ]]
@@ -381,10 +382,10 @@ then
         echo ""
         echo "Signing ${VERSION} Windows"
         echo ""
-        ./bin/gbuild -i --commit signature=${COMMIT} ../core/contrib/gitian-descriptors/gitian-win-signer.yml
-        ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-win-signed --destination ../gitian.sigs/ ../core/contrib/gitian-descriptors/gitian-win-signer.yml
-        mv build/out/wispr-*win64-setup.exe ../core-binaries/${VERSION}
-        mv build/out/wispr-*win32-setup.exe ../core-binaries/${VERSION}
+        ./bin/gbuild -i --commit signature=${COMMIT} ../particl-core/contrib/gitian-descriptors/gitian-win-signer.yml
+        ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-win-signed --destination ../gitian.sigs/ ../particl-core/contrib/gitian-descriptors/gitian-win-signer.yml
+        mv build/out/particl-*win64-setup.exe ../particl-binaries/${VERSION}
+        mv build/out/particl-*win32-setup.exe ../particl-binaries/${VERSION}
     fi
     # Sign Mac OSX
     if [[ $osx = true ]]
@@ -392,9 +393,9 @@ then
         echo ""
         echo "Signing ${VERSION} Mac OSX"
         echo ""
-        ./bin/gbuild -i --commit signature=${COMMIT} ../core/contrib/gitian-descriptors/gitian-osx-signer.yml
-        ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-osx-signed --destination ../gitian.sigs/ ../core/contrib/gitian-descriptors/gitian-osx-signer.yml
-        mv build/out/wispr-osx-signed.dmg ../core-binaries/${VERSION}/wispr-${VERSION}-osx.dmg
+        ./bin/gbuild -i --commit signature=${COMMIT} ../particl-core/contrib/gitian-descriptors/gitian-osx-signer.yml
+        ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-osx-signed --destination ../gitian.sigs/ ../particl-core/contrib/gitian-descriptors/gitian-osx-signer.yml
+        mv build/out/particl-osx-signed.dmg ../particl-binaries/${VERSION}/particl-${VERSION}-osx.dmg
     fi
     popd
 

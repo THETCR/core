@@ -1,47 +1,78 @@
-WISPR Core integration/staging repository
+Particl Core integration/staging tree
 =====================================
 
-[![Build Status](https://travis-ci.org/WisprProject/core.svg?branch=master)](https://travis-ci.org/WisprProject/core) [![GitHub version](https://badge.fury.io/gh/WisprProject%2Fcore.svg)](https://badge.fury.io/gh/WisprProject%2core)
+[![Build Status](https://travis-ci.org/particl/particl-core.svg?branch=master)](https://travis-ci.org/particl/particl-core)
 
-Wispr is an experimental cryptocurrency which aims to bring a blockchain-backed secure messaging system, along with several other state-of-the-art blockchain features, as announced in our roadmap.<br>
-Forked off of [PIVX](https://github.com/PIVX-Project/PIVX), it's a fully Proof-of-Stake cryptocurrency with a fair reward system that encourages every type of user to stake and make the network more secure and efficient.
+https://particl.io
 
-- Anonymized transactions using the [_Zerocoin Protocol_](https://en.wikipedia.org/wiki/Zerocoin_protocol).
-- Fast transactions featuring guaranteed zero confirmation transactions, based on PIVX's _SwiftX_.
+What is Particl?
+----------------
 
-For more info, visit us at [wispr.tech](http://wispr.tech) or check out our ANN thread at [BitcoinTalk](https://bitcointalk.org/index.php?topic=4481839).
+An open source, decentralized privacy platform
+built for global person to person eCommerce.
 
-### Coin Specs
+For more information, as well as an immediately useable, binary version of
+the Particl Core software, see https://particl.io.
 
-<table>
-<tr><td>P2P Port</td><td>17000</td></tr>
-<tr><td>RPC Port</td><td>17001</td></tr>
-<tr><td>PoW Algo</td><td>Scrypt*</td></tr>
-<tr><td>PoS Algo</td><td>PoS 3.0</td></tr>
-<tr><td>Annual Inflation Rate</td><td>25%</td></tr>
-<tr><td>Max Reorganization Depth</td><td>500 blocks</td></tr>
-<tr><td>Block Time</td><td>60 Seconds</td></tr>
-<tr><td>Staking Block Reward</td><td>6 WSP</td></tr>
-<tr><td>Masternode Block Reward</td><td>4 WSP</td></tr>
-<tr><td>Min Tx Fee</td><td>0 WSP</td></tr>
-<tr><td>Difficulty Retargeting</td><td>Every Block</td></tr>
-<tr><td>Coin Maturity</td><td>100 blocks</td></tr>
-<tr><td>Confirmations</td><td>10</td></tr>
-<tr><td>Stake Confirmations</td><td>100</td></tr>
-<tr><td>Max Coin Supply</td><td>120,000,000 WSP</td></tr>
-<tr><td>Premine</td><td>25,125,000 WSP*</td></tr>
-</table>
 
-### Premine
-The initial coins were premined in a private PoW phase up to block 450. Each block held 125,000 coins and some blocks were PoS in order to make a total of 25,000,000 WSP. Due to mining calculations an extra 125,000 WSP was mined and later [burned](https://explorer.wispr.tech/tx/ccabff166654a078da5cda2aa758e1f801f14e8886c8b2fcc9e2d32126755fb9).<br>
-To find out how the premine was distributed, check our [ANN thread](https://bitcointalk.org/index.php?topic=2561885).
+Getting Started
+---------------
 
-### Building Wispr
-Check out <b>/doc</b> for specific OS build instructions.
+A new Particl wallet will need an HD master key loaded and an initial account
+derived before it will be functional.
 
-### Contributing
-Everyone is encouraged to contribute. This project generally follows [Bitcoin Core's development process](https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md), with more specific information coming soon about workflow.
+The GUI programs will guide you through the initial setup.
 
-### Join our community
-Want to get in touch or need any help? Come say hi to us on our active social platforms!<br>
-[Telegram](https://t.me/wisprchat) | [Discord](https://discord.gg/c7dvEXt) | [Twitter](http://twitter.com/WisprTech/) | [Facebook](https://facebook.com/WisprTech) | [Official Website](https://wispr.tech/)
+It is recommended to use a mnemonic passphrase.
+To generate a new passphrase see the mnemonic rpc command.
+Loading the new mnemonic with the extkeyimportmaster command will setup the
+master HD key and first account.
+
+To create an initial new HD master key and account from random data, start
+particld or particl-qt with the parameter: -createdefaultmasterkey.
+
+Remember to backup your passphrase and/or wallet.dat file!
+
+License
+-------
+
+Particl Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
+information or see https://opensource.org/licenses/MIT.
+
+Development Process
+-------------------
+
+The `master` branch is regularly built and tested, but is not guaranteed to be
+completely stable. [Tags](https://github.com/particl/particl-core/tags) are created
+regularly to indicate new official, stable release versions of Particl Core.
+
+The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Testing
+-------
+
+Testing and code review is the bottleneck for development; we get more pull
+requests than we can review and test on short notice. Please be patient and help out by testing
+other people's pull requests, and remember this is a security-critical project where any mistake might cost people
+lots of money.
+
+### Automated Testing
+
+Developers are strongly encouraged to write [unit tests](src/test/README.md) for new code, and to
+submit new unit tests for old code. Unit tests can be compiled and run
+(assuming they weren't disabled in configure) with: `make check`. Further details on running
+and extending unit tests can be found in [/src/test/README.md](/src/test/README.md).
+
+There are also [regression and integration tests](/test), written
+in Python, that are run automatically on the build server.
+These tests can be run (if the [test dependencies](/test) are installed) with: `test/functional/test_runner.py`
+
+The Travis CI system makes sure that every pull request is built for Windows, Linux, and macOS, and that unit/sanity tests are run automatically.
+
+### Manual Quality Assurance (QA) Testing
+
+Changes should be tested by somebody other than the developer who wrote the
+code. This is especially important for large or high-risk changes. It is useful
+to add a test plan to the pull request description if testing the changes is
+not straightforward.
+

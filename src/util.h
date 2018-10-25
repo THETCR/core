@@ -1,137 +1,133 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2018 The PIVX developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 /**
  * Server/client environment: argument handling, config file parsing,
- * logging, thread wrappers
+ * logging, thread wrappers, startup time
  */
 #ifndef BITCOIN_UTIL_H
 #define BITCOIN_UTIL_H
 
 #if defined(HAVE_CONFIG_H)
-#include "config/wispr-config.h"
+#include <config/bitcoin-config.h>
 #endif
 
-#include "compat.h"
-#include "tinyformat.h"
-#include "utiltime.h"
+#include <compat.h>
+#include <fs.h>
+#include <logging.h>
+#include <sync.h>
+#include <tinyformat.h>
+#include <utiltime.h>
+#include <utilmemory.h>
 
+#include <atomic>
 #include <exception>
 #include <map>
+#include <set>
 #include <stdint.h>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/thread/exceptions.hpp>
-#define CVOIDBEGIN(a)        ((const void*)&(a))
+#include <boost/signals2/signal.hpp>
+#include <boost/thread/condition_variable.hpp> // for boost::thread_interrupted
 
-//WISPR only features
+// Application startup time (used for uptime calculation)
+int64_t GetStartupTime();
 
-extern bool fMasterNode;
-extern bool fLiteMode;
-extern bool fEnableSwiftTX;
-extern int nSwiftTXDepth;
-extern int nZeromintPercentage;
-extern const int64_t AUTOMINT_DELAY;
-extern int nPreferredDenom;
-extern int nAnonymizeWisprAmount;
-extern int nLiquidityProvider;
-extern bool fEnableZeromint;
-extern int64_t enforceMasternodePaymentsTime;
-extern std::string strMasterNodeAddr;
-extern int keysLoaded;
-extern bool fSucessfullyLoaded;
-extern std::vector<int64_t> obfuScationDenominations;
-extern std::string strBudgetMode;
+/** Signals for translation. */
+class CTranslationInterface
+{
+public:
+    /** Translate a message to the native language of the user. */
+    boost::signals2::signal<std::string (const char* psz)> Translate;
+};
 
-extern std::map<std::string, std::string> mapArgs;
-extern std::map<std::string, std::vector<std::string> > mapMultiArgs;
-extern bool fDebug;
-extern bool fPrintToConsole;
-extern bool fPrintToDebugLog;
-extern bool fServer;
-extern std::string strMiscWarning;
-extern bool fLogTimestamps;
-extern bool fLogIPs;
-extern volatile bool fReopenDebugLog;
+extern bool fParticlMode;
+extern bool fParticlWallet;
+
+extern CTranslationInterface translationInterface;
+
+extern const char * const BITCOIN_CONF_FILENAME;
+extern const char * const BITCOIN_PID_FILENAME;
+
+/**
+ * Translation function: Call Translate signal on UI interface, which returns a boost::optional result.
+ * If no translation slot is registered, nothing is returned, and simply return the input.
+ */
+inline std::string _(const char* psz)
+{
+    boost::optional<std::string> rv = translationInterface.Translate(psz);
+    return rv ? (*rv) : psz;
+}
 
 void SetupEnvironment();
 bool SetupNetworking();
 
-/** Return true if log accepts specified category */
-bool LogAcceptCategory(const char* category);
-/** Send a string to the log output */
-int LogPrintStr(const std::string& str);
-
-#define LogPrintf(...) LogPrint(NULL, __VA_ARGS__)
-
-/**
- * When we switch to C++11, this can be switched to variadic templates instead
- * of this macro-based construction (see tinyformat.h).
- */
-#define MAKE_ERROR_AND_LOG_FUNC(n)                                                              \
-    /**   Print to debug.log if -debug=category switch is given OR category is NULL. */         \
-    template <TINYFORMAT_ARGTYPES(n)>                                                           \
-    static inline int LogPrint(const char* category, const char* format, TINYFORMAT_VARARGS(n)) \
-    {                                                                                           \
-        if (!LogAcceptCategory(category)) return 0;                                             \
-        return LogPrintStr(tfm::format(format, TINYFORMAT_PASSARGS(n)));                        \
-    }                                                                                           \
-    /**   Log error and return false */                                                         \
-    template <TINYFORMAT_ARGTYPES(n)>                                                           \
-    static inline bool error(const char* format, TINYFORMAT_VARARGS(n))                         \
-    {                                                                                           \
-        LogPrintStr(std::string("ERROR: ") + tfm::format(format, TINYFORMAT_PASSARGS(n)) + "\n");            \
-        return false;                                                                           \
-    }
-
-TINYFORMAT_FOREACH_ARGNUM(MAKE_ERROR_AND_LOG_FUNC)
-
-/**
- * Zero-arg versions of logging and error, these are not covered by
- * TINYFORMAT_FOREACH_ARGNUM
- */
-static inline int LogPrint(const char* category, const char* format)
+template<typename... Args>
+bool error(const char* fmt, const Args&... args)
 {
-    if (!LogAcceptCategory(category)) return 0;
-    return LogPrintStr(format);
-}
-static inline bool error(const char* format)
-{
-    LogPrintStr(std::string("ERROR: ") + format + "\n");
+    LogPrintf("ERROR: %s\n", tfm::format(fmt, args...));
     return false;
 }
 
-double double_safe_addition(double fValue, double fIncrement);
-double double_safe_multiplication(double fValue, double fmultiplicator);
-void PrintExceptionContinue(std::exception* pex, const char* pszThread);
-void ParseParameters(int argc, const char* const argv[]);
-void FileCommit(FILE* fileout);
-bool TruncateFile(FILE* file, unsigned int length);
+template<typename... Args>
+int errorN(int n, const char *fmt, const Args&... args)
+{
+    LogPrintf("ERROR: %s\n", tfm::format(fmt, args...));
+    return n;
+}
+
+template<typename... Args>
+int errorN(int n, std::string &s, const char *func, const char *fmt, const Args&... args)
+{
+    s = tfm::format(fmt, args...);
+    LogPrintf("ERROR: %s\n", std::string(func) + ": " + s);
+    return n;
+}
+
+
+void PrintExceptionContinue(const std::exception *pex, const char* pszThread);
+bool FileCommit(FILE *file);
+bool TruncateFile(FILE *file, unsigned int length);
 int RaiseFileDescriptorLimit(int nMinFD);
-void AllocateFileRange(FILE* file, unsigned int offset, unsigned int length);
-bool RenameOver(boost::filesystem::path src, boost::filesystem::path dest);
-bool TryCreateDirectory(const boost::filesystem::path& p);
-boost::filesystem::path GetDefaultDataDir();
-const boost::filesystem::path& GetDataDir(bool fNetSpecific = true);
-boost::filesystem::path GetConfigFile();
-boost::filesystem::path GetMasternodeConfigFile();
+void AllocateFileRange(FILE *file, unsigned int offset, unsigned int length);
+bool RenameOver(fs::path src, fs::path dest);
+bool LockDirectory(const fs::path& directory, const std::string lockfile_name, bool probe_only=false);
+bool DirIsWritable(const fs::path& directory);
+
+/** Release all directory locks. This is used for unit testing only, at runtime
+ * the global destructor will take care of the locks.
+ */
+void ReleaseDirectoryLocks();
+
+bool TryCreateDirectories(const fs::path& p);
+fs::path GetDefaultDataDir();
+const fs::path &GetBlocksDir(bool fNetSpecific = true);
+const fs::path &GetDataDir(bool fNetSpecific = true);
+void ClearDatadirCache();
+fs::path GetConfigFile(const std::string& confPath);
 #ifndef WIN32
-boost::filesystem::path GetPidFile();
-void CreatePidFile(const boost::filesystem::path& path, pid_t pid);
+fs::path GetPidFile();
+void CreatePidFile(const fs::path &path, pid_t pid);
 #endif
-void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map<std::string, std::vector<std::string> >& mapMultiSettingsRet);
 #ifdef WIN32
-boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
+fs::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 #endif
-boost::filesystem::path GetTempPath();
-void ShrinkDebugFile();
-void runCommand(std::string strCommand);
+
+void runCommand(const std::string& strCommand);
+
+/**
+ * Most paths passed as configuration arguments are treated as relative to
+ * the datadir if they are not absolute.
+ *
+ * @param path The path to be conditionally prefixed with datadir.
+ * @param net_specific Forwarded to GetDataDir().
+ * @return The normalized path.
+ */
+fs::path AbsPathForConfigVal(const fs::path& path, bool net_specific = true);
 
 inline bool IsSwitchChar(char c)
 {
@@ -142,50 +138,204 @@ inline bool IsSwitchChar(char c)
 #endif
 }
 
-/**
- * Return string argument or default value
- *
- * @param strArg Argument to get (e.g. "-foo")
- * @param default (e.g. "1")
- * @return command-line argument or default value
- */
-std::string GetArg(const std::string& strArg, const std::string& strDefault);
+namespace part
+{
+    void *memrchr(const void *s, int c, size_t n);
+
+    int memcmp_nta(const void *cs, const void *ct, size_t count);
+
+    void ReplaceStrInPlace(std::string &subject, const std::string search, const std::string replace);
+    bool IsStringBoolPositive(const std::string &value);
+    bool IsStringBoolNegative(const std::string &value);
+    bool GetStringBool(const std::string &value, bool &fOut);
+    bool IsStrOnlyDigits(const std::string &s);
+    std::string GetTimeString(int64_t timestamp, char *buffer, size_t nBuffer);
+    std::string BytesReadable(uint64_t nBytes);
+    bool stringsMatchI(const std::string &sString, const std::string &sFind, int type);
+    std::string &TrimQuotes(std::string &s);
+    std::string &LTrimWhitespace(std::string &s);
+    std::string &RTrimWhitespace(std::string &s);
+    std::string &TrimWhitespace(std::string &s);
+    int64_t strToEpoch(const char *input, bool fFillMax=false);
+    bool endsWith(const std::string &str, const std::string &suffix);
+}
+
+enum class OptionsCategory {
+    OPTIONS,
+    CONNECTION,
+    WALLET,
+    WALLET_DEBUG_TEST,
+    ZMQ,
+    DEBUG_TEST,
+    CHAINPARAMS,
+    NODE_RELAY,
+    BLOCK_CREATION,
+    RPC,
+    GUI,
+    COMMANDS,
+    REGISTER_COMMANDS,
+    SMSG,
+    PART_WALLET,
+    PART_STAKING,
+
+    HIDDEN // Always the last option to avoid printing these in the help
+};
+
+class ArgsManager
+{
+public:
+    friend class ArgsManagerHelper;
+
+    struct Arg
+    {
+        std::string m_help_param;
+        std::string m_help_text;
+        bool m_debug_only;
+
+        Arg(const std::string& help_param, const std::string& help_text, bool debug_only) : m_help_param(help_param), m_help_text(help_text), m_debug_only(debug_only) {};
+    };
+
+    mutable CCriticalSection cs_args;
+    std::map<std::string, std::vector<std::string>> m_override_args;
+    std::map<std::string, std::vector<std::string>> m_config_args;
+    std::string m_network;
+    std::set<std::string> m_network_only_args;
+    std::map<OptionsCategory, std::map<std::string, Arg>> m_available_args;
+
+    bool ReadConfigStream(std::istream& stream, std::string& error, bool ignore_invalid_keys = false);
+
+public:
+    ArgsManager();
+
+    /**
+     * Select the network in use
+     */
+    void SelectConfigNetwork(const std::string& network);
+
+    bool ParseParameters(int argc, const char* const argv[], std::string& error);
+    bool ReadConfigFiles(std::string& error, bool ignore_invalid_keys = false);
+
+    /**
+     * Log warnings for options in m_section_only_args when
+     * they are specified in the default section but not overridden
+     * on the command line or in a network-specific section in the
+     * config file.
+     */
+    void WarnForSectionOnlyArgs();
+
+    /**
+     * Return a vector of strings of the given argument
+     *
+     * @param strArg Argument to get (e.g. "-foo")
+     * @return command-line arguments
+     */
+    std::vector<std::string> GetArgs(const std::string& strArg) const;
+
+    /**
+     * Return true if the given argument has been manually set
+     *
+     * @param strArg Argument to get (e.g. "-foo")
+     * @return true if the argument has been set
+     */
+    bool IsArgSet(const std::string& strArg) const;
+
+    /**
+     * Return true if the argument was originally passed as a negated option,
+     * i.e. -nofoo.
+     *
+     * @param strArg Argument to get (e.g. "-foo")
+     * @return true if the argument was passed negated
+     */
+    bool IsArgNegated(const std::string& strArg) const;
+
+    /**
+     * Return string argument or default value
+     *
+     * @param strArg Argument to get (e.g. "-foo")
+     * @param strDefault (e.g. "1")
+     * @return command-line argument or default value
+     */
+    std::string GetArg(const std::string& strArg, const std::string& strDefault) const;
+
+    /**
+     * Return integer argument or default value
+     *
+     * @param strArg Argument to get (e.g. "-foo")
+     * @param nDefault (e.g. 1)
+     * @return command-line argument (0 if invalid number) or default value
+     */
+    int64_t GetArg(const std::string& strArg, int64_t nDefault) const;
+
+    /**
+     * Return boolean argument or default value
+     *
+     * @param strArg Argument to get (e.g. "-foo")
+     * @param fDefault (true or false)
+     * @return command-line argument or default value
+     */
+    bool GetBoolArg(const std::string& strArg, bool fDefault) const;
+
+    /**
+     * Set an argument if it doesn't already have a value
+     *
+     * @param strArg Argument to set (e.g. "-foo")
+     * @param strValue Value (e.g. "1")
+     * @return true if argument gets set, false if it already had a value
+     */
+    bool SoftSetArg(const std::string& strArg, const std::string& strValue);
+
+    /**
+     * Set a boolean argument if it doesn't already have a value
+     *
+     * @param strArg Argument to set (e.g. "-foo")
+     * @param fValue Value (e.g. false)
+     * @return true if argument gets set, false if it already had a value
+     */
+    bool SoftSetBoolArg(const std::string& strArg, bool fValue);
+
+    // Forces an arg setting. Called by SoftSetArg() if the arg hasn't already
+    // been set. Also called directly in testing.
+    void ForceSetArg(const std::string& strArg, const std::string& strValue);
+
+    /**
+     * Looks for -regtest, -testnet and returns the appropriate BIP70 chain name.
+     * @return CBaseChainParams::MAIN by default; raises runtime error if an invalid combination is given.
+     */
+    std::string GetChainName() const;
+
+    /**
+     * Add argument
+     */
+    void AddArg(const std::string& name, const std::string& help, const bool debug_only, const OptionsCategory& cat);
+
+    /**
+     * Add many hidden arguments
+     */
+    void AddHiddenArgs(const std::vector<std::string>& args);
+
+    /**
+     * Clear available arguments
+     */
+    void ClearArgs() { m_available_args.clear(); }
+
+    /**
+     * Get the help string
+     */
+    std::string GetHelpMessage() const;
+
+    /**
+     * Check whether we know of this arg
+     */
+    bool IsArgKnown(const std::string& key) const;
+};
+
+extern ArgsManager gArgs;
+
 
 /**
- * Return integer argument or default value
- *
- * @param strArg Argument to get (e.g. "-foo")
- * @param default (e.g. 1)
- * @return command-line argument (0 if invalid number) or default value
+ * @return true if help has been requested via a command-line arg
  */
-int64_t GetArg(const std::string& strArg, int64_t nDefault);
-
-/**
- * Return boolean argument or default value
- *
- * @param strArg Argument to get (e.g. "-foo")
- * @param default (true or false)
- * @return command-line argument or default value
- */
-bool GetBoolArg(const std::string& strArg, bool fDefault);
-
-/**
- * Set an argument if it doesn't already have a value
- *
- * @param strArg Argument to set (e.g. "-foo")
- * @param strValue Value (e.g. "1")
- * @return true if argument gets set, false if it already had a value
- */
-bool SoftSetArg(const std::string& strArg, const std::string& strValue);
-
-/**
- * Set a boolean argument if it doesn't already have a value
- *
- * @param strArg Argument to set (e.g. "-foo")
- * @param fValue Value (e.g. false)
- * @return true if argument gets set, false if it already had a value
- */
-bool SoftSetBoolArg(const std::string& strArg, bool fValue);
+bool HelpRequested(const ArgsManager& args);
 
 /**
  * Format a string to be used as group of options in help messages
@@ -204,31 +354,65 @@ std::string HelpMessageGroup(const std::string& message);
  */
 std::string HelpMessageOpt(const std::string& option, const std::string& message);
 
-void SetThreadPriority(int nPriority);
+/**
+ * Return the number of cores available on the current system.
+ * @note This does count virtual cores, such as those provided by HyperThreading.
+ */
+int GetNumCores();
+
 void RenameThread(const char* name);
 
 /**
  * .. and a wrapper that just calls func once
  */
-template <typename Callable>
-void TraceThread(const char* name, Callable func)
+template <typename Callable> void TraceThread(const char* name,  Callable func)
 {
-    std::string s = strprintf("wispr-%s", name);
+    std::string s = strprintf("particl-%s", name);
     RenameThread(s.c_str());
-    try {
+    try
+    {
         LogPrintf("%s thread start\n", name);
         func();
         LogPrintf("%s thread exit\n", name);
-    } catch (boost::thread_interrupted) {
+    }
+    catch (const boost::thread_interrupted&)
+    {
         LogPrintf("%s thread interrupt\n", name);
         throw;
-    } catch (std::exception& e) {
+    }
+    catch (const std::exception& e) {
         PrintExceptionContinue(&e, name);
         throw;
-    } catch (...) {
-        PrintExceptionContinue(NULL, name);
+    }
+    catch (...) {
+        PrintExceptionContinue(nullptr, name);
         throw;
     }
 }
+
+std::string CopyrightHolders(const std::string& strPrefix);
+
+/**
+ * On platforms that support it, tell the kernel the calling thread is
+ * CPU-intensive and non-interactive. See SCHED_BATCH in sched(7) for details.
+ *
+ * @return The return value of sched_setschedule(), or 1 on systems without
+ * sched_setschedule().
+ */
+int ScheduleBatchPriority(void);
+
+namespace util {
+
+//! Simplification of std insertion
+template <typename Tdst, typename Tsrc>
+inline void insert(Tdst& dst, const Tsrc& src) {
+    dst.insert(dst.begin(), src.begin(), src.end());
+}
+template <typename TsetT, typename Tsrc>
+inline void insert(std::set<TsetT>& dst, const Tsrc& src) {
+    dst.insert(src.begin(), src.end());
+}
+
+} // namespace util
 
 #endif // BITCOIN_UTIL_H

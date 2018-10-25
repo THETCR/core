@@ -1,20 +1,26 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_TRANSACTIONTABLEMODEL_H
 #define BITCOIN_QT_TRANSACTIONTABLEMODEL_H
 
-#include "bitcoinunits.h"
+#include <qt/bitcoinunits.h>
+#include <primitives/transaction.h>
 
 #include <QAbstractTableModel>
 #include <QStringList>
 
+#include <memory>
+
+namespace interfaces {
+class Handler;
+}
+
+class PlatformStyle;
 class TransactionRecord;
 class TransactionTablePriv;
 class WalletModel;
-
-class CWallet;
 
 /** UI model for the transaction table of a wallet.
  */
@@ -23,7 +29,7 @@ class TransactionTableModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    explicit TransactionTableModel(CWallet* wallet, WalletModel* parent = 0);
+    explicit TransactionTableModel(const PlatformStyle *platformStyle, WalletModel *parent = 0);
     ~TransactionTableModel();
 
     enum ColumnIndex {
@@ -32,7 +38,9 @@ public:
         Date = 2,
         Type = 3,
         ToAddress = 4,
-        Amount = 5
+        TypeIn = 5,
+        TypeOut = 6,
+        Amount = 7
     };
 
     /** Roles to get specific information from a transaction row.
@@ -55,50 +63,60 @@ public:
         LabelRole,
         /** Net amount of transaction */
         AmountRole,
-        /** Unique identifier */
-        TxIDRole,
         /** Transaction hash */
         TxHashRole,
+        /** Transaction data, hex-encoded */
+        TxHexRole,
+        /** Whole transaction as plain text */
+        TxPlainTextRole,
         /** Is transaction confirmed? */
         ConfirmedRole,
         /** Formatted amount, without brackets when unconfirmed */
         FormattedAmountRole,
+        /** Formatted amount, without brackets when unconfirmed */
+        FormattedAmountRoleA,
+        /** Formatted amount, without brackets when unconfirmed */
+        FormattedAmountRoleB,
         /** Transaction status (TransactionRecord::Status) */
-        StatusRole
+        StatusRole,
+        /** Unprocessed icon */
+        RawDecorationRole,
     };
 
-    int rowCount(const QModelIndex& parent) const;
-    int columnCount(const QModelIndex& parent) const;
-    QVariant data(const QModelIndex& index, int role) const;
+    int rowCount(const QModelIndex &parent) const;
+    int columnCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
-    bool processingQueuedTransactions() { return fProcessingQueuedTransactions; }
+    QModelIndex index(int row, int column, const QModelIndex & parent = QModelIndex()) const;
+    bool processingQueuedTransactions() const { return fProcessingQueuedTransactions; }
 
 private:
-    CWallet* wallet;
-    WalletModel* walletModel;
+    WalletModel *walletModel;
+    std::unique_ptr<interfaces::Handler> m_handler_transaction_changed;
+    std::unique_ptr<interfaces::Handler> m_handler_show_progress;
     QStringList columns;
-    TransactionTablePriv* priv;
+    TransactionTablePriv *priv;
     bool fProcessingQueuedTransactions;
+    const PlatformStyle *platformStyle;
 
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();
 
-    QString lookupAddress(const std::string& address, bool tooltip) const;
-    QVariant addressColor(const TransactionRecord* wtx) const;
-    QString formatTxStatus(const TransactionRecord* wtx) const;
-    QString formatTxDate(const TransactionRecord* wtx) const;
-    QString formatTxType(const TransactionRecord* wtx) const;
-    QString formatTxToAddress(const TransactionRecord* wtx, bool tooltip) const;
-    QString formatTxAmount(const TransactionRecord* wtx, bool showUnconfirmed = true, BitcoinUnits::SeparatorStyle separators = BitcoinUnits::separatorStandard) const;
-    QString formatTooltip(const TransactionRecord* rec) const;
-    QVariant txStatusDecoration(const TransactionRecord* wtx) const;
-    QVariant txWatchonlyDecoration(const TransactionRecord* wtx) const;
-    QVariant txAddressDecoration(const TransactionRecord* wtx) const;
+    QString lookupAddress(const std::string &address, bool tooltip) const;
+    QVariant addressColor(const TransactionRecord *wtx) const;
+    QString formatTxStatus(const TransactionRecord *wtx) const;
+    QString formatTxDate(const TransactionRecord *wtx) const;
+    QString formatTxType(const TransactionRecord *wtx) const;
+    QString formatTxToAddress(const TransactionRecord *wtx, bool tooltip) const;
+    QString formatTxAmount(const TransactionRecord *wtx, bool showUnconfirmed=true, BitcoinUnits::SeparatorStyle separators=BitcoinUnits::separatorStandard) const;
+    QString formatTooltip(const TransactionRecord *rec) const;
+    QVariant txStatusDecoration(const TransactionRecord *wtx) const;
+    QVariant txWatchonlyDecoration(const TransactionRecord *wtx) const;
+    QVariant txAddressDecoration(const TransactionRecord *wtx) const;
 
-public slots:
+public Q_SLOTS:
     /* New transaction, or transaction changed status */
-    void updateTransaction(const QString& hash, int status, bool showTransaction);
+    void updateTransaction(const QString &hash, int status, bool showTransaction);
     void updateConfirmations();
     void updateDisplayUnit();
     /** Updates the column title to "Amount (DisplayUnit)" and emits headerDataChanged() signal for table headers to react. */
