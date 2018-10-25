@@ -26,6 +26,20 @@ public:
     {
         memset(data, 0, sizeof(data));
     }
+    base_blob& operator=(const base_blob& b)
+    {
+        for (int i = 0; i < WIDTH; i++)
+            pn[i] = b.pn[i];
+        return *this;
+    }
+    base_blob& operator=(uint64_t b)
+    {
+        pn[0] = (unsigned int)b;
+        pn[1] = (unsigned int)(b >> 32);
+        for (int i = 2; i < WIDTH; i++)
+            pn[i] = 0;
+        return *this;
+    }
 
     explicit base_blob(const std::vector<unsigned char>& vch);
     explicit base_blob(const uint8_t *p, size_t l);
