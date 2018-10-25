@@ -9,7 +9,7 @@
   </PropertyGroup>
   <Target Name="CopyConfig"
           Inputs="$(MSBuildThisFileDirectory)bitcoin_config.h"
-          Outputs="$(MSBuildThisFileDirectory)..\src\config\bitcoin-config.h">
-      <Copy SourceFiles="$(MSBuildThisFileDirectory)bitcoin_config.h" DestinationFiles="$(MSBuildThisFileDirectory)..\src\config\bitcoin-config.h" />
+          Outputs="$(MSBuildThisFileDirectory)..\src\config\wispr-config.h">
+      <Copy SourceFiles="$(MSBuildThisFileDirectory)bitcoin_config.h" DestinationFiles="$(MSBuildThisFileDirectory)..\src\config\wispr-config.h" />
   </Target>
 </Project>
