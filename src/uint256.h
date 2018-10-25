@@ -305,6 +305,8 @@ public:
     {
         return sizeof(pn);
     }
+
+    template <typename Stream>
     void Serialize(Stream& s) const
     {
         s.write((char*)data, sizeof(data));
