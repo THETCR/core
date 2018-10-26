@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <crypto/common.h>
 
 /** Template base class for unsigned big integers. */
 template <unsigned int BITS>
