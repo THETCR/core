@@ -33,7 +33,11 @@
 
 #include <boost/signals2/signal.hpp>
 #include <boost/thread/condition_variable.hpp> // for boost::thread_interrupted
+//Dash only features
 
+extern bool fMasternodeMode;
+extern bool fLiteMode;
+extern int nWalletBackups;
 // Application startup time (used for uptime calculation)
 int64_t GetStartupTime();
 
