@@ -18,9 +18,9 @@
 
 static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
 
-static const uint8_t PARTICL_BLOCK_VERSION = 0xA0;
-static const uint8_t PARTICL_TXN_VERSION = 0xA0;
-static const uint8_t MAX_PARTICL_TXN_VERSION = 0xBF;
+static const uint8_t WISPR_BLOCK_VERSION = 0xA0;
+static const uint8_t WISPR_TXN_VERSION = 0xA0;
+static const uint8_t MAX_WISPR_TXN_VERSION = 0xBF;
 static const uint8_t BTC_TXN_VERSION = 0x02;
 
 
@@ -55,7 +55,7 @@ enum DataOutputTypes
 
 inline bool IsParticlTxVersion(int nVersion)
 {
-    return (nVersion & 0xFF) >= PARTICL_TXN_VERSION;
+    return (nVersion & 0xFF) >= WISPR_TXN_VERSION;
 }
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
@@ -610,7 +610,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     tx.nVersion = 0;
     s >> bv;
 
-    if (bv >= PARTICL_TXN_VERSION)
+    if (bv >= WISPR_TXN_VERSION)
     {
         tx.nVersion = bv;
 
@@ -762,14 +762,14 @@ class CTransaction
 public:
     // Default transaction version.
     static const int32_t CURRENT_VERSION=2;
-    static const int32_t CURRENT_PARTICL_VERSION=0xA0;
+    static const int32_t CURRENT_WISPR_VERSION=0xA0;
 
     // Changing the default transaction version requires a two step process: first
     // adapting relay policy by bumping MAX_STANDARD_VERSION, and then later date
     // bumping the default CURRENT_VERSION at which point both CURRENT_VERSION and
     // MAX_STANDARD_VERSION will be equal.
     static const int32_t MAX_STANDARD_VERSION=2;
-    static const int32_t MAX_STANDARD_PARTICL_VERSION=0xA0;
+    static const int32_t MAX_STANDARD_WISPR_VERSION=0xA0;
 
     // The local variables are made const to prevent unintended modification
     // without updating the cached hash value. However, CTransaction is not

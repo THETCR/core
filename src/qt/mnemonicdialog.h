@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PARTICL_QT_MNEMONICDIALOG_H
-#define PARTICL_QT_MNEMONICDIALOG_H
+#ifndef WISPR_QT_MNEMONICDIALOG_H
+#define WISPR_QT_MNEMONICDIALOG_H
 
 #include <QDialog>
 #include <QThread>
@@ -59,4 +59,4 @@ private:
     Ui::MnemonicDialog *ui;
 };
 
-#endif // PARTICL_QT_MNEMONICDIALOG_H
+#endif // WISPR_QT_MNEMONICDIALOG_H

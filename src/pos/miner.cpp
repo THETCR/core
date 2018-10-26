@@ -148,7 +148,7 @@ bool ImportOutputs(CBlockTemplate *pblocktemplate, int nHeight)
         return error("%s - Can't open file, strerror: %s.", __func__, strerror(errno));
 
     CMutableTransaction txn;
-    txn.nVersion = PARTICL_TXN_VERSION;
+    txn.nVersion = WISPR_TXN_VERSION;
     txn.SetType(TXN_COINBASE);
     txn.nLockTime = 0;
     txn.vin.push_back(CTxIn()); // null prevout

@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PARTICL_SMSG_DB_H
-#define PARTICL_SMSG_DB_H
+#ifndef WISPR_SMSG_DB_H
+#define WISPR_SMSG_DB_H
 
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
@@ -73,4 +73,4 @@ public:
 
 } // namespace smsg
 
-#endif // PARTICL_SMSG_DB_H
+#endif // WISPR_SMSG_DB_H

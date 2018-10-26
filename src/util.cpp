@@ -82,8 +82,8 @@
 // Application startup time (used for uptime calculation)
 const int64_t nStartupTime = GetTime();
 
-const char * const BITCOIN_CONF_FILENAME = "particl.conf";
-const char * const BITCOIN_PID_FILENAME = "particld.pid";
+const char * const BITCOIN_CONF_FILENAME = "wispr.conf";
+const char * const BITCOIN_PID_FILENAME = "wisprd.pid";
 
 bool fParticlMode = true;
 bool fParticlWallet = false;
@@ -908,7 +908,7 @@ static std::string FormatException(const std::exception* pex, const char* pszThr
     char pszModule[MAX_PATH] = "";
     GetModuleFileNameA(nullptr, pszModule, sizeof(pszModule));
 #else
-    const char* pszModule = "particl";
+    const char* pszModule = "wispr";
 #endif
     if (pex)
         return strprintf(
@@ -930,7 +930,7 @@ fs::path GetDefaultDataDir()
     // Windows < Vista: C:\Documents and Settings\Username\Application Data\Particl
     // Windows >= Vista: C:\Users\Username\AppData\Roaming\Particl
     // Mac: ~/Library/Application Support/Particl
-    // Unix: ~/.particl
+    // Unix: ~/.wispr
 #ifdef WIN32
     // Windows
     return GetSpecialFolderPath(CSIDL_APPDATA) / "Particl";
@@ -946,7 +946,7 @@ fs::path GetDefaultDataDir()
     return pathRet / "Library/Application Support/Particl";
 #else
     // Unix
-    return pathRet / ".particl";
+    return pathRet / ".wispr";
 #endif
 #endif
 }

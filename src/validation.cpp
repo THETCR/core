@@ -2109,7 +2109,7 @@ static bool WriteUndoDataForBlock(const CBlockUndo& blockundo, CValidationState&
 static CCheckQueue<CScriptCheck> scriptcheckqueue(128);
 
 void ThreadScriptCheck() {
-    RenameThread("particl-scriptch");
+    RenameThread("wispr-scriptch");
     scriptcheckqueue.Thread();
 }
 
@@ -2765,7 +2765,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     } else
     {
         CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus());
-        if (block.vtx[0]->GetValueOut() > blockReward) // particl coins are imported as coinbase txns
+        if (block.vtx[0]->GetValueOut() > blockReward) // wispr coins are imported as coinbase txns
             return state.DoS(100,
                              error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
                                    block.vtx[0]->GetValueOut(), blockReward),
@@ -3084,7 +3084,7 @@ void UpdateTip(const CBlockIndex *pindexNew, const CChainParams& chainParams) {
         {
             if (fParticlMode)
             {
-                if (pindex->nVersion > PARTICL_BLOCK_VERSION)
+                if (pindex->nVersion > WISPR_BLOCK_VERSION)
                     ++nUpgraded;
             } else
             {

@@ -149,7 +149,7 @@ LRESULT APIENTRY MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 int CreateMessageWindow()
 {
-    // Create a message-only window to intercept WM_CLOSE events from particld
+    // Create a message-only window to intercept WM_CLOSE events from wisprd
 
     WNDCLASSEX WindowClassEx;
     ZeroMemory(&WindowClassEx, sizeof(WNDCLASSEX));
@@ -226,7 +226,7 @@ int CloseMessageWindow()
 bool ShutdownRequestedMainThread()
 {
 #ifdef WIN32
-    // Only particld will create a hidden window to receive messages
+    // Only wisprd will create a hidden window to receive messages
     while (winHwnd && PeekMessage(&winMsg, 0, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&winMsg);
@@ -294,7 +294,7 @@ void Shutdown()
     /// for example if the data directory was found to be locked.
     /// Be sure that anything that writes files or flushes caches only does this if the respective
     /// module was initialized.
-    RenameThread("particl-shutoff");
+    RenameThread("wispr-shutoff");
     mempool.AddTransactionsUpdated(1);
 
 
@@ -676,8 +676,8 @@ void SetupServerArgs()
 
 std::string LicenseInfo()
 {
-    const std::string URL_SOURCE_CODE = "<https://github.com/particl/particl-core>";
-    const std::string URL_WEBSITE = "<https://particl.io/>";
+    const std::string URL_SOURCE_CODE = "<https://github.com/wispr/wispr-core>";
+    const std::string URL_WEBSITE = "<https://wispr.io/>";
 
     return CopyrightHolders(_("Copyright (C)")) + "\n" +
            "\n" +
@@ -782,7 +782,7 @@ static void CleanupBlockRevFiles()
 static void ThreadImport(std::vector<fs::path> vImportFiles)
 {
     const CChainParams& chainparams = Params();
-    RenameThread("particl-loadblk");
+    RenameThread("wispr-loadblk");
     ScheduleBatchPriority();
 
     fBusyImporting = true;

@@ -105,9 +105,9 @@ static int AppInitRawTx(int argc, char* argv[])
 
     if (argc < 2 || HelpRequested(gArgs)) {
         // First part of help message is specific to this utility
-        std::string strUsage = PACKAGE_NAME " particl-tx utility version " + FormatFullVersion() + "\n\n" +
-            "Usage:  particl-tx [options] <hex-tx> [commands]  Update hex-encoded bitcoin transaction\n" +
-            "or:     particl-tx [options] -create [commands]   Create hex-encoded bitcoin transaction\n" +
+        std::string strUsage = PACKAGE_NAME " wispr-tx utility version " + FormatFullVersion() + "\n\n" +
+            "Usage:  wispr-tx [options] <hex-tx> [commands]  Update hex-encoded bitcoin transaction\n" +
+            "or:     wispr-tx [options] -create [commands]   Create hex-encoded bitcoin transaction\n" +
             "\n";
         strUsage += gArgs.GetHelpMessage();
 
@@ -200,7 +200,7 @@ static CAmount ExtractAndValidateValue(const std::string& strValue)
 static void MutateTxVersion(CMutableTransaction& tx, const std::string& cmdVal)
 {
     int64_t newVersion;
-    if (!ParseInt64(cmdVal, &newVersion) || newVersion < 1 || newVersion > CTransaction::MAX_STANDARD_PARTICL_VERSION)
+    if (!ParseInt64(cmdVal, &newVersion) || newVersion < 1 || newVersion > CTransaction::MAX_STANDARD_WISPR_VERSION)
         throw std::runtime_error("Invalid TX version requested: '" + cmdVal + "'");
 
     if (!tx.IsParticlVersion() && IsParticlTxVersion(newVersion))
@@ -786,7 +786,7 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
 static void MutateTxAddOutBlind(CMutableTransaction& tx, const std::string& strInput)
 {
     if (!tx.IsParticlVersion())
-        throw std::runtime_error("tx not particl version.");
+        throw std::runtime_error("tx not wispr version.");
     // separate COMMITMENT:SCRIPT:RANGEPROOF[:DATA]
     std::vector<std::string> vStrInputParts;
     boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
@@ -832,7 +832,7 @@ static void MutateTxAddOutBlind(CMutableTransaction& tx, const std::string& strI
 static void MutateTxAddOutDataType(CMutableTransaction& tx, const std::string& strInput)
 {
     if (!tx.IsParticlVersion())
-        throw std::runtime_error("tx not particl version.");
+        throw std::runtime_error("tx not wispr version.");
     if (!IsHex(strInput))
         throw std::runtime_error("invalid TX output data");
 
@@ -979,7 +979,7 @@ static int CommandLineRawTx(int argc, char* argv[])
         }
 
         CMutableTransaction tx;
-        tx.nVersion = CTransaction::CURRENT_PARTICL_VERSION;
+        tx.nVersion = CTransaction::CURRENT_WISPR_VERSION;
         int startArg;
 
         if (!fCreateBlank) {

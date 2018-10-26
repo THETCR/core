@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file license.txt or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PARTICL_ANON_H
-#define PARTICL_ANON_H
+#ifndef WISPR_ANON_H
+#define WISPR_ANON_H
 
 #include <inttypes.h>
 
@@ -31,4 +31,4 @@ bool RollBackRCTIndex(int64_t nLastValidRCTOutput, int64_t nExpectErase, std::se
 
 bool RewindToCheckpoint(int nCheckPointHeight, int &nBlocks, std::string &sError);
 
-#endif  // PARTICL_ANON_H
+#endif  // WISPR_ANON_H

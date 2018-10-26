@@ -172,7 +172,7 @@
         <translation>Kinnita rahakoti krüpteerimine.</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
         <translation>Hoiatus:Kui sa krüpteerid oma rahakoti ja kaotad salafraasi, siis sa&lt;b&gt;KAOTAD OMA BITCOINID&lt;/b&gt;!</translation>
     </message>
     <message>
@@ -370,12 +370,12 @@
         <translation>Vahelehe tööriistariba</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and particl: URIs)</source>
-        <translation>Loo maksepäring (genereerib QR koodid ja particli: URId)</translation>
+        <source>Request payments (generates QR codes and wispr: URIs)</source>
+        <translation>Loo maksepäring (genereerib QR koodid ja wispri: URId)</translation>
     </message>
     <message>
-        <source>Open a particl: URI or payment request</source>
-        <translation>Ava particli: URI või maksepäring</translation>
+        <source>Open a wispr: URI or payment request</source>
+        <translation>Ava wispri: URI või maksepäring</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>

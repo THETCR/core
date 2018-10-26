@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PARTICL_USBDEVICE_LEDGERDEVICE_H
-#define PARTICL_USBDEVICE_LEDGERDEVICE_H
+#ifndef WISPR_USBDEVICE_LEDGERDEVICE_H
+#define WISPR_USBDEVICE_LEDGERDEVICE_H
 
 #include <usbdevice/usbdevice.h>
 
@@ -35,4 +35,4 @@ public:
 
 } // usb_device
 
-#endif // PARTICL_USBDEVICE_LEDGERDEVICE_H
+#endif // WISPR_USBDEVICE_LEDGERDEVICE_H

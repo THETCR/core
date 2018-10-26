@@ -973,7 +973,7 @@ static UniValue extkey(const JSONRPCRequest &request)
         } else {
             if (!eKey58.IsValid(CChainParams::EXT_SECRET_KEY)
                 && !eKey58.IsValid(CChainParams::EXT_PUBLIC_KEY_BTC)) {
-                throw JSONRPCError(RPC_INVALID_PARAMETER, "Import failed - Key must begin with a particl prefix.");
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "Import failed - Key must begin with a wispr prefix.");
             }
         }
 
@@ -1672,7 +1672,7 @@ static UniValue getnewextaddress(const JSONRPCRequest &request)
             "3. bech32              (bool, optional, default=false) Use Bech32 encoding.\n"
             "4. hardened            (bool, optional, default=false) Derive a hardened key.\n"
             "\nResult:\n"
-            "\"address\"              (string) The new particl extended address\n"
+            "\"address\"              (string) The new wispr extended address\n"
             "\nExamples:\n"
             + HelpExampleCli("getnewextaddress", "")
             + HelpExampleRpc("getnewextaddress", ""));
@@ -1741,7 +1741,7 @@ static UniValue getnewstealthaddress(const JSONRPCRequest &request)
             "4. bech32              (bool, optional, default=false) Use Bech32 encoding.\n"
             "5. makeV2              (bool, optional, default=false) Generate an address from the same method used for hardware wallets.\n"
             "\nResult:\n"
-            "\"address\"              (string) The new particl stealth address\n"
+            "\"address\"              (string) The new wispr stealth address\n"
             "\nExamples:\n"
             + HelpExampleCli("getnewstealthaddress", "\"lblTestSxAddrPrefix\" 3 \"0b101\"")
             + HelpExampleRpc("getnewstealthaddress", "\"lblTestSxAddrPrefix\", 3, \"0b101\""));
@@ -1815,7 +1815,7 @@ static UniValue importstealthaddress(const JSONRPCRequest &request)
             "           Stealth addresses with prefixes will scan only incoming stealth transactions with a matching prefix.\n"
             "6. bech32              (bool, optional) Use Bech32 encoding.\n"
             "\nResult:\n"
-            "\"address\"              (string) The new particl stealth address\n"
+            "\"address\"              (string) The new wispr stealth address\n"
             "\nExamples:\n"
             + HelpExampleCli("importstealthaddress", "scan_secret spend_secret \"label\" 3 \"0b101\"")
             + HelpExampleRpc("importstealthaddress", "scan_secret, spend_secret, \"label\", 3, \"0b101\""));
@@ -2042,7 +2042,7 @@ static UniValue liststealthaddresses(const JSONRPCRequest &request)
             "    ]\n"
             "  }...\n"
             "]\n"
-            "\"address\"              (string) The new particl stealth address\n"
+            "\"address\"              (string) The new wispr stealth address\n"
             "\nExamples:\n"
             + HelpExampleCli("liststealthaddresses", "")
             + HelpExampleRpc("liststealthaddresses", ""));
@@ -2136,7 +2136,7 @@ static UniValue scanchain(const JSONRPCRequest &request)
 
     if (!IsDeprecatedRPCEnabled("scanchain")) {
         throw JSONRPCError(RPC_METHOD_DEPRECATED, "scanchain is deprecated and will be fully removed in v0.18. "
-            "To use scanchain in v0.17, restart particld with -deprecatedrpc=scanchain.\n"
+            "To use scanchain in v0.17, restart wisprd with -deprecatedrpc=scanchain.\n"
             "Projects should transition to using rescanblockchain before upgrading to v0.18");
     }
 
@@ -3758,8 +3758,8 @@ static UniValue getstakinginfo(const JSONRPCRequest &request)
             "  \"staking\": true|false,         (boolean) if this wallet is staking or not\n"
             "  \"errors\": \"...\"              (string) any error messages\n"
             "  \"percentyearreward\": xxxxxxx,  (numeric) current stake reward percentage\n"
-            "  \"moneysupply\": xxxxxxx,        (numeric) the total amount of particl in the network\n"
-            "  \"reserve\": xxxxxxx,            (numeric) the total amount of particl in the network\n"
+            "  \"moneysupply\": xxxxxxx,        (numeric) the total amount of wispr in the network\n"
+            "  \"reserve\": xxxxxxx,            (numeric) the total amount of wispr in the network\n"
             "  \"walletfoundationdonationpercent\": xxxxxxx,\n    (numeric) user set percentage of the block reward ceded to the foundation\n"
             "  \"foundationdonationpercent\": xxxxxxx,\n    (numeric) network enforced percentage of the block reward ceded to the foundation\n"
             "  \"foundationdonationpercent\": xxxxxxx,\n    (numeric) network enforced percentage of the block reward ceded to the foundation\n"
@@ -4001,9 +4001,9 @@ static UniValue listunspentanon(const JSONRPCRequest &request)
             "\nArguments:\n"
             "1. minconf          (numeric, optional, default=1) The minimum confirmations to filter\n"
             "2. maxconf          (numeric, optional, default=9999999) The maximum confirmations to filter\n"
-            "3. \"addresses\"    (string) A json array of particl addresses to filter\n"
+            "3. \"addresses\"    (string) A json array of wispr addresses to filter\n"
             "    [\n"
-            "      \"address\"   (string) particl address\n"
+            "      \"address\"   (string) wispr address\n"
             "      ,...\n"
             "    ]\n"
             "4. include_unsafe (bool, optional, default=true) Include outputs that are not safe to spend\n"
@@ -4024,7 +4024,7 @@ static UniValue listunspentanon(const JSONRPCRequest &request)
             "  {\n"
             "    \"txid\" : \"txid\",          (string) the transaction id \n"
             "    \"vout\" : n,               (numeric) the vout value\n"
-            "    \"address\" : \"address\",    (string) the particl address\n"
+            "    \"address\" : \"address\",    (string) the wispr address\n"
             "    \"label\" : \"label\",        (string) The associated label, or \"\" for the default label\n"
             //"    \"scriptPubKey\" : \"key\",   (string) the script key\n"
             "    \"amount\" : x.xxx,         (numeric) the transaction output amount in " + CURRENCY_UNIT + "\n"
@@ -4207,9 +4207,9 @@ static UniValue listunspentblind(const JSONRPCRequest &request)
             "\nArguments:\n"
             "1. minconf          (numeric, optional, default=1) The minimum confirmations to filter\n"
             "2. maxconf          (numeric, optional, default=9999999) The maximum confirmations to filter\n"
-            "3. \"addresses\"      (string) A json array of particl addresses to filter\n"
+            "3. \"addresses\"      (string) A json array of wispr addresses to filter\n"
             "    [\n"
-            "      \"address\"   (string) particl address\n"
+            "      \"address\"   (string) wispr address\n"
             "      ,...\n"
             "    ]\n"
             "4. include_unsafe (bool, optional, default=true) Include outputs that are not safe to spend\n"
@@ -4229,7 +4229,7 @@ static UniValue listunspentblind(const JSONRPCRequest &request)
             "  {\n"
             "    \"txid\" : \"txid\",          (string) the transaction id \n"
             "    \"vout\" : n,               (numeric) the vout value\n"
-            "    \"address\" : \"address\",    (string) the particl address\n"
+            "    \"address\" : \"address\",    (string) the wispr address\n"
             "    \"label\" : \"label\",        (string) The associated label, or \"\" for the default label\n"
             "    \"scriptPubKey\" : \"key\",   (string) the script key\n"
             "    \"amount\" : x.xxx,         (numeric) the transaction output amount in " + CURRENCY_UNIT + "\n"
@@ -4873,7 +4873,7 @@ static std::string SendHelp(CHDWallet *pwallet, OutputTypes typeIn, OutputTypes 
     rv += HelpRequiringPassphrase(pwallet);
 
     rv +=   "\nArguments:\n"
-            "1. \"address\"     (string, required) The particl address to send to.\n"
+            "1. \"address\"     (string, required) The wispr address to send to.\n"
             "2. \"amount\"      (numeric or string, required) The amount in " + CURRENCY_UNIT + " to send. eg 0.1\n"
             "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
             "                            This is not part of the transaction, just kept in your wallet.\n"
@@ -5012,7 +5012,7 @@ UniValue sendtypeto(const JSONRPCRequest &request)
             "1. \"typein\"          (string, required) part/blind/anon\n"
             "2. \"typeout\"         (string, required) part/blind/anon\n"
             "3. \"outputs\"         (json, required) Array of output objects\n"
-            "    3.1 \"address\"    (string, required) The particl address to send to.\n"
+            "    3.1 \"address\"    (string, required) The wispr address to send to.\n"
             "    3.2 \"amount\"     (numeric or string, required) The amount in " + CURRENCY_UNIT + " to send. eg 0.1\n"
             "    3.x \"narr\"       (string, optional) Up to 24 character narration sent with the transaction.\n"
             "    3.x \"subfee\"     (boolean, optional, default=false) The fee will be deducted from the amount being sent.\n"
@@ -6405,7 +6405,7 @@ static UniValue createrawparttransaction(const JSONRPCRequest& request)
             "2. \"outputs\"               (array, required) A json array of json objects\n"
             "     [\n"
             "       {\n"
-            "         \"address\": \"str\"          (string, required) The particl address\n"
+            "         \"address\": \"str\"          (string, required) The wispr address\n"
             "         \"amount\": x.xxx           (numeric or string, required) The numeric value (can be string) in " + CURRENCY_UNIT + " of the output\n"
             "         \"data\": \"hex\",            (string, required) The key is \"data\", the value is hex encoded data\n"
             "         \"script\": \"str\",          (string, optional) Specify script directly.\n"
@@ -6445,7 +6445,7 @@ static UniValue createrawparttransaction(const JSONRPCRequest& request)
     UniValue outputs = request.params[1].get_array();
 
     CMutableTransaction rawTx;
-    rawTx.nVersion = PARTICL_TXN_VERSION;
+    rawTx.nVersion = WISPR_TXN_VERSION;
 
 
     if (!request.params[2].isNull()) {
@@ -6730,7 +6730,7 @@ static UniValue fundrawtransactionfrom(const JSONRPCRequest& request)
             "   }\n"
             "5. \"options\"             (object, optional)\n"
             "   {\n"
-            "     \"changeAddress\"          (string, optional, default pool address) The particl address to receive the change\n"
+            "     \"changeAddress\"          (string, optional, default pool address) The wispr address to receive the change\n"
             "     \"changePosition\"         (numeric, optional, default random) The index of the change output\n"
             "     \"change_type\"            (string, optional) The output type to use. Only valid if changeAddress is not specified. Options are \"legacy\", \"p2sh-segwit\", and \"bech32\". Default is set by -changetype.\n"
             "     \"includeWatching\"        (boolean, optional, default false) Also select inputs which are watch only\n"
@@ -6813,7 +6813,7 @@ static UniValue fundrawtransactionfrom(const JSONRPCRequest& request)
             CTxDestination dest = DecodeDestination(options["changeAddress"].get_str());
 
             if (!IsValidDestination(dest)) {
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "changeAddress must be a valid particl address");
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "changeAddress must be a valid wispr address");
             }
 
             coinControl.destChange = dest;
@@ -6874,7 +6874,7 @@ static UniValue fundrawtransactionfrom(const JSONRPCRequest& request)
 
     // parse hex string from parameter
     CMutableTransaction tx;
-    tx.nVersion = PARTICL_TXN_VERSION;
+    tx.nVersion = WISPR_TXN_VERSION;
     if (!DecodeHexTx(tx, request.params[1].get_str(), true)) {
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
     }

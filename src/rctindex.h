@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PARTICL_RCTINDEX_H
-#define PARTICL_RCTINDEX_H
+#ifndef WISPR_RCTINDEX_H
+#define WISPR_RCTINDEX_H
 
 #include <primitives/transaction.h>
 
@@ -38,5 +38,5 @@ public:
 };
 
 
-#endif // PARTICL_RCTINDEX_H
+#endif // WISPR_RCTINDEX_H
 

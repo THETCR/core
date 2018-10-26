@@ -3839,7 +3839,7 @@ int CSMSG::FundMsg(SecureMessage &smsg, std::string &sError, bool fTestFee, CAmo
     if (0 != HashMsg(smsg, smsg.pPayload, smsg.nPayload-32, msgId))
         return errorN(SMSG_GENERAL_ERROR, sError, __func__, "Message hash failed.");
 
-    txFund.nVersion = PARTICL_TXN_VERSION;
+    txFund.nVersion = WISPR_TXN_VERSION;
 
     size_t nMsgBytes = SMSG_HDR_LEN + smsg.nPayload;
 

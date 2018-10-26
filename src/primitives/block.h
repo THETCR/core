@@ -69,7 +69,7 @@ public:
 
     bool IsParticlVersion() const
     {
-        return nVersion == PARTICL_BLOCK_VERSION;
+        return nVersion == WISPR_BLOCK_VERSION;
     }
 
     int64_t GetBlockTime() const
@@ -135,7 +135,7 @@ public:
         READWRITEAS(CBlockHeader, *this);
         READWRITE(vtx);
 
-        if (nVersion == PARTICL_BLOCK_VERSION)
+        if (nVersion == WISPR_BLOCK_VERSION)
             READWRITE(vchBlockSig);
     }
 

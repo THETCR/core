@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PARTICL_USBDEVICE_TREZORDEVICE_H
-#define PARTICL_USBDEVICE_TREZORDEVICE_H
+#ifndef WISPR_USBDEVICE_TREZORDEVICE_H
+#define WISPR_USBDEVICE_TREZORDEVICE_H
 
 #include <usbdevice/usbdevice.h>
 
@@ -24,4 +24,4 @@ public:
 
 } // usb_device
 
-#endif // PARTICL_USBDEVICE_TREZORDEVICE_H
+#endif // WISPR_USBDEVICE_TREZORDEVICE_H
