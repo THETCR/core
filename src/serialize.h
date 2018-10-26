@@ -241,7 +241,37 @@ template<typename Stream> inline void Unserialize(Stream& s, Span<unsigned char>
 template<typename Stream> inline void Serialize(Stream& s, bool a)    { char f=a; ser_writedata8(s, f); }
 template<typename Stream> inline void Unserialize(Stream& s, bool& a) { char f=ser_readdata8(s); a=f; }
 
+/**
+ * vector
+ * vectors of unsigned char are a special case and are intended to be serialized as a single opaque blob.
+ */
+template <typename T, typename A>
+unsigned int GetSerializeSize_impl(const std::vector<T, A>& v, int nType, int nVersion, const unsigned char&);
+template <typename T, typename A, typename V>
+unsigned int GetSerializeSize_impl(const std::vector<T, A>& v, int nType, int nVersion, const V&);
+template <typename T, typename A>
+inline unsigned int GetSerializeSize(const std::vector<T, A>& v, int nType, int nVersion);
+template <typename Stream, typename T, typename A>
+void Serialize_impl(Stream& os, const std::vector<T, A>& v, int nType, int nVersion, const unsigned char&);
+template <typename Stream, typename T, typename A, typename V>
+void Serialize_impl(Stream& os, const std::vector<T, A>& v, int nType, int nVersion, const V&);
+template <typename Stream, typename T, typename A>
+inline void Serialize(Stream& os, const std::vector<T, A>& v, int nType, int nVersion);
+template <typename Stream, typename T, typename A>
+void Unserialize_impl(Stream& is, std::vector<T, A>& v, int nType, int nVersion, const unsigned char&);
+template <typename Stream, typename T, typename A, typename V>
+void Unserialize_impl(Stream& is, std::vector<T, A>& v, int nType, int nVersion, const V&);
+template <typename Stream, typename T, typename A>
+inline void Unserialize(Stream& is, std::vector<T, A>& v, int nType, int nVersion);
 
+/**
+ * others derived from vector
+ */
+extern inline unsigned int GetSerializeSize(const CScript& v, int nType, int nVersion);
+template <typename Stream>
+void Serialize(Stream& os, const CScript& v, int nType, int nVersion);
+template <typename Stream>
+void Unserialize(Stream& is, CScript& v, int nType, int nVersion);
 
 
 // Serializatin for libzerocoin::CoinDenomination
