@@ -163,7 +163,18 @@ inline float ser_uint32_to_float(uint32_t y)
     tmp.y = y;
     return tmp.x;
 }
-
+inline unsigned int GetSerializeSize(signed char a, int, int = 0) { return sizeof(a); }
+inline unsigned int GetSerializeSize(unsigned char a, int, int = 0) { return sizeof(a); }
+inline unsigned int GetSerializeSize(signed short a, int, int = 0) { return sizeof(a); }
+inline unsigned int GetSerializeSize(unsigned short a, int, int = 0) { return sizeof(a); }
+inline unsigned int GetSerializeSize(signed int a, int, int = 0) { return sizeof(a); }
+inline unsigned int GetSerializeSize(unsigned int a, int, int = 0) { return sizeof(a); }
+inline unsigned int GetSerializeSize(signed long a, int, int = 0) { return sizeof(a); }
+inline unsigned int GetSerializeSize(unsigned long a, int, int = 0) { return sizeof(a); }
+inline unsigned int GetSerializeSize(signed long long a, int, int = 0) { return sizeof(a); }
+inline unsigned int GetSerializeSize(unsigned long long a, int, int = 0) { return sizeof(a); }
+inline unsigned int GetSerializeSize(float a, int, int = 0) { return sizeof(a); }
+inline unsigned int GetSerializeSize(double a, int, int = 0) { return sizeof(a); }
 /**
  * others derived from vector
  */
