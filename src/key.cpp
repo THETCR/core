@@ -206,7 +206,14 @@ CKey CKey::Add(const uint8_t *p) const {
         result.SetFlags(false, true);
     return result;
 }
-
+bool CKey::SetPrivKey(const CPrivKey& privkey, bool fCompressedIn)
+{
+    if (!ec_privkey_import_der(secp256k1_context_sign, (unsigned char*)begin(), &privkey[0], privkey.size()))
+        return false;
+    fCompressed = fCompressedIn;
+    fValid = true;
+    return true;
+}
 // Check that the sig has a low R value and will be less than 71 bytes
 bool SigHasLowR(const secp256k1_ecdsa_signature* sig)
 {
