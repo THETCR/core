@@ -264,15 +264,6 @@ void Unserialize_impl(Stream& is, std::vector<T, A>& v, int nType, int nVersion,
 template <typename Stream, typename T, typename A>
 inline void Unserialize(Stream& is, std::vector<T, A>& v, int nType, int nVersion);
 
-/**
- * others derived from vector
- */
-extern inline unsigned int GetSerializeSize(const CScript& v, int nType, int nVersion);
-template <typename Stream>
-void Serialize(Stream& os, const CScript& v, int nType, int nVersion);
-template <typename Stream>
-void Unserialize(Stream& is, CScript& v, int nType, int nVersion);
-
 
 // Serializatin for libzerocoin::CoinDenomination
 inline unsigned int GetSerializeSize(libzerocoin::CoinDenomination a, int, int = 0) { return sizeof(libzerocoin::CoinDenomination); }
