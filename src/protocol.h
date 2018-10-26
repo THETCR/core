@@ -383,6 +383,28 @@ enum GetDataMsg
     MSG_WITNESS_BLOCK = MSG_BLOCK | MSG_WITNESS_FLAG, //!< Defined in BIP144
     MSG_WITNESS_TX = MSG_TX | MSG_WITNESS_FLAG,       //!< Defined in BIP144
     MSG_FILTERED_WITNESS_BLOCK = MSG_FILTERED_BLOCK | MSG_WITNESS_FLAG,
+
+    // Dash message types
+    // NOTE: declare non-implmented here, we must keep this enum consistent and backwards compatible
+    MSG_TXLOCK_REQUEST = 5,
+    MSG_TXLOCK_VOTE = 6,
+    MSG_SPORK = 7,
+    MSG_MASTERNODE_PAYMENT_VOTE = 8,
+    MSG_MASTERNODE_PAYMENT_BLOCK = 9, // reusing, was MSG_MASTERNODE_SCANNING_ERROR previousely, was NOT used in 12.0
+    MSG_BUDGET_VOTE = 10, // deprecated since 12.1
+    MSG_BUDGET_PROPOSAL = 11, // deprecated since 12.1
+    MSG_BUDGET_FINALIZED = 12, // deprecated since 12.1
+    MSG_BUDGET_FINALIZED_VOTE = 13, // deprecated since 12.1
+    MSG_MASTERNODE_QUORUM = 14, // not implemented
+    MSG_MASTERNODE_ANNOUNCE = 15,
+    MSG_MASTERNODE_PING = 16,
+    MSG_DSTX = 17,
+    MSG_GOVERNANCE_OBJECT = 18,
+    MSG_GOVERNANCE_OBJECT_VOTE = 19,
+    MSG_MASTERNODE_VERIFY = 20,
+    // Nodes may always request a MSG_CMPCT_BLOCK in a getdata, however,
+    // MSG_CMPCT_BLOCK should not appear in any invs except as a part of getdata.
+//    MSG_CMPCT_BLOCK = 20, //!< Defined in BIP152
 };
 
 /** inv message data */
