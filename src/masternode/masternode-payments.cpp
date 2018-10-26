@@ -11,7 +11,7 @@
 #include "messagesigner.h"
 #include "netfulfilledman.h"
 #include "netmessagemaker.h"
-#include "spork.h"
+#include "spork/spork.h"
 #include "util.h"
 
 #include <boost/lexical_cast.hpp>

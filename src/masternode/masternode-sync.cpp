@@ -12,7 +12,7 @@
 #include "masternodeman.h"
 #include "netfulfilledman.h"
 #include "netmessagemaker.h"
-#include "spork.h"
+#include "spork/spork.h"
 #include "ui_interface.h"
 #include "util.h"
 
