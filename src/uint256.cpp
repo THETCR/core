@@ -20,8 +20,6 @@ base_blob<BITS>::base_blob(const std::string& str)
 template <unsigned int BITS>
 base_blob<BITS>::base_blob(const std::vector<unsigned char>& vch)
 {
-    if (vch.size() != sizeof(pn))
-        throw uint_error("Converting vector of wrong size to base_blob");
     memcpy(pn, &vch[0], sizeof(pn));
 }
 
@@ -95,8 +93,6 @@ base_blob<BITS>& base_blob<BITS>::operator/=(const base_blob& b)
     *this = 0;                   // the quotient.
     int num_bits = num.bits();
     int div_bits = div.bits();
-    if (div_bits == 0)
-        throw uint_error("Division by zero");
     if (div_bits > num_bits) // the result is certainly 0.
         return *this;
     int shift = num_bits - div_bits;
