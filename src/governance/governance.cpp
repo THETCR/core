@@ -297,7 +297,6 @@ void CGovernanceManager::CheckOrphanVotes(CGovernanceObject& govobj, CGovernance
 
 void CGovernanceManager::AddGovernanceObject(CGovernanceObject& govobj, CConnman& connman, CNode* pfrom)
 {
-    DBG( std::cout << "CGovernanceManager::AddGovernanceObject START" << std::endl; );
 
     uint256 nHash = govobj.GetHash();
     std::string strHash = nHash.ToString();
@@ -329,13 +328,13 @@ void CGovernanceManager::AddGovernanceObject(CGovernanceObject& govobj, CConnman
 
     // SHOULD WE ADD THIS OBJECT TO ANY OTHER MANANGERS?
 
-    DBG( std::cout << "CGovernanceManager::AddGovernanceObject Before trigger block, GetDataAsPlainString = "
-              << govobj.GetDataAsPlainString()
-              << ", nObjectType = " << govobj.nObjectType
-              << std::endl; );
+//    DBG( std::cout << "CGovernanceManager::AddGovernanceObject Before trigger block, GetDataAsPlainString = "
+//              << govobj.GetDataAsPlainString()
+//              << ", nObjectType = " << govobj.nObjectType
+//              << std::endl; );
 
     if (govobj.nObjectType == GOVERNANCE_OBJECT_TRIGGER) {
-        DBG( std::cout << "CGovernanceManager::AddGovernanceObject Before AddNewTrigger" << std::endl; );
+//        DBG( std::cout << "CGovernanceManager::AddGovernanceObject Before AddNewTrigger" << std::endl; );
         if (!triggerman.AddNewTrigger(nHash)) {
 //            LogPrint("gobject", "CGovernanceManager::AddGovernanceObject -- undo adding invalid trigger object: hash = %s\n", nHash.ToString());
             CGovernanceObject& objref = objpair.first->second;
@@ -345,7 +344,7 @@ void CGovernanceManager::AddGovernanceObject(CGovernanceObject& govobj, CConnman
             }
             return;
         }
-        DBG( std::cout << "CGovernanceManager::AddGovernanceObject After AddNewTrigger" << std::endl; );
+//        DBG( std::cout << "CGovernanceManager::AddGovernanceObject After AddNewTrigger" << std::endl; );
     }
 
 //    LogPrintf("CGovernanceManager::AddGovernanceObject -- %s new, received from %s\n", strHash, pfrom? pfrom->GetAddrName() : "NULL");
@@ -361,7 +360,7 @@ void CGovernanceManager::AddGovernanceObject(CGovernanceObject& govobj, CConnman
     CGovernanceException exception;
     CheckOrphanVotes(govobj, exception, connman);
 
-    DBG( std::cout << "CGovernanceManager::AddGovernanceObject END" << std::endl; );
+//    DBG( std::cout << "CGovernanceManager::AddGovernanceObject END" << std::endl; );
 }
 
 void CGovernanceManager::UpdateCachesAndClean()
