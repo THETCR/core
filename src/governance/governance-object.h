@@ -8,9 +8,9 @@
 //#define ENABLE_bitcoin_DEBUG
 
 #include "cachemultimap.h"
-#include "governance-exceptions.h"
-#include "governance-vote.h"
-#include "governance-votedb.h"
+#include "governance/governance-exceptions.h"
+#include "governance/governance-vote.h"
+#include "governance/governance-votedb.h"
 #include "key.h"
 #include "net.h"
 #include "sync.h"

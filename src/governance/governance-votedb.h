@@ -8,7 +8,7 @@
 #include <list>
 #include <map>
 
-#include "governance-vote.h"
+#include "governance/governance-vote.h"
 #include "serialize.h"
 #include "streams.h"
 #include "uint256.h"

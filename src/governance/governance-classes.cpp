@@ -5,7 +5,7 @@
 //#define ENABLE_bitcoin_DEBUG
 
 #include "core_io.h"
-#include "governance-classes.h"
+#include "governance/governance-classes.h"
 #include "init.h"
 #include "validation.h"
 #include "utilstrencodings.h"

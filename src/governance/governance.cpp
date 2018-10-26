@@ -3,11 +3,11 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "consensus/validation.h"
-#include "governance.h"
-#include "governance-object.h"
-#include "governance-validators.h"
-#include "governance-vote.h"
-#include "governance-classes.h"
+#include "governance/governance.h"
+#include "governance/governance-object.h"
+#include "governance/governance-validators.h"
+#include "governance/governance-vote.h"
+#include "governance/governance-classes.h"
 #include "net_processing.h"
 #include "netmessagemaker.h"
 #include "masternode.h"

@@ -12,9 +12,9 @@
 #include "cachemultimap.h"
 #include "chain.h"
 #include <chainparams.h>
-#include "governance-exceptions.h"
-#include "governance-object.h"
-#include "governance-vote.h"
+#include "governance/governance-exceptions.h"
+#include "governance/governance-object.h"
+#include "governance/governance-vote.h"
 #include "net.h"
 #include "sync.h"
 #include "timedata.h"
