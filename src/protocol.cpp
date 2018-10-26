@@ -41,6 +41,36 @@ const char *SENDCMPCT="sendcmpct";
 const char *CMPCTBLOCK="cmpctblock";
 const char *GETBLOCKTXN="getblocktxn";
 const char *BLOCKTXN="blocktxn";
+// Dash message types
+const char *TXLOCKREQUEST="ix";
+const char *TXLOCKVOTE="txlvote";
+const char *SPORK="spork";
+const char *GETSPORKS="getsporks";
+const char *MASTERNODEPAYMENTVOTE="mnw";
+const char *MASTERNODEPAYMENTBLOCK="mnwb";
+const char *MASTERNODEPAYMENTSYNC="mnget";
+const char *MNBUDGETSYNC="mnvs"; // deprecated since 12.1
+const char *MNBUDGETVOTE="mvote"; // deprecated since 12.1
+const char *MNBUDGETPROPOSAL="mprop"; // deprecated since 12.1
+const char *MNBUDGETFINAL="fbs"; // deprecated since 12.1
+const char *MNBUDGETFINALVOTE="fbvote"; // deprecated since 12.1
+const char *MNQUORUM="mn quorum"; // not implemented
+const char *MNANNOUNCE="mnb";
+const char *MNPING="mnp";
+const char *DSACCEPT="dsa";
+const char *DSVIN="dsi";
+const char *DSFINALTX="dsf";
+const char *DSSIGNFINALTX="dss";
+const char *DSCOMPLETE="dsc";
+const char *DSSTATUSUPDATE="dssu";
+const char *DSTX="dstx";
+const char *DSQUEUE="dsq";
+const char *DSEG="dseg";
+const char *SYNCSTATUSCOUNT="ssc";
+const char *MNGOVERNANCESYNC="govsync";
+const char *MNGOVERNANCEOBJECT="govobj";
+const char *MNGOVERNANCEOBJECTVOTE="govobjvote";
+const char *MNVERIFY="mnv";
 } // namespace NetMsgType
 
 /** All known message types. Keep this in the same order as the list of
