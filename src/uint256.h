@@ -353,7 +353,15 @@ public:
     uint256(uint64_t b) : base_blob<256>(b) {}
     explicit uint256(const std::string& str) : base_blob<256>(str) {}
     explicit uint256(const std::vector<unsigned char>& vch) : base_blob<256>(vch) {}
-
+    /** A cheap hash function that just returns 64 bits from the result, it can be
+     * used when the contents are considered uniformly random. It is not appropriate
+     * when the value can easily be influenced from outside as e.g. a network adversary could
+     * provide values to trigger worst-case behavior.
+     */
+    uint64_t GetCheapHash() const
+    {
+        return ReadLE64(data);
+    }
     /**
      * The "compact" format is a representation of a whole
      * number N using an unsigned 32bit number similar to a
