@@ -163,6 +163,10 @@ inline float ser_uint32_to_float(uint32_t y)
     tmp.y = y;
     return tmp.x;
 }
+inline unsigned int GetSerializeSize(char a, int, int = 0)
+{
+    return sizeof(a);
+}
 inline unsigned int GetSerializeSize(signed char a, int, int = 0) { return sizeof(a); }
 inline unsigned int GetSerializeSize(unsigned char a, int, int = 0) { return sizeof(a); }
 inline unsigned int GetSerializeSize(signed short a, int, int = 0) { return sizeof(a); }
