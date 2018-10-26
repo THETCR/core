@@ -28,6 +28,7 @@
 #include <libzerocoin/SpendType.h>
 
 static const unsigned int MAX_SIZE = 0x02000000;
+class CScript;
 
 /**
  * Dummy data type to identify deserializing constructors.
