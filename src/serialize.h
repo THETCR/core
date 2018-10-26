@@ -24,6 +24,9 @@
 #include <prevector.h>
 #include <span.h>
 
+#include <libzerocoin/Denominations.h>
+#include <libzerocoin/SpendType.h>
+
 static const unsigned int MAX_SIZE = 0x02000000;
 
 /**
