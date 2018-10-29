@@ -33,6 +33,55 @@ class CScript;
 static const unsigned int MAX_SIZE = 0x02000000;
 
 /**
+ * Used to bypass the rule against non-const reference to temporary
+ * where it makes sense with wrappers such as CFlatData or CTxDB
+ */
+template <typename T>
+inline T& REF(const T& val)
+{
+    return const_cast<T&>(val);
+}
+
+/**
+ * Used to acquire a non-const pointer "this" to generate bodies
+ * of const serialization operations from a template
+ */
+template <typename T>
+inline T* NCONST_PTR(const T* val)
+{
+    return const_cast<T*>(val);
+}
+
+/**
+ * Get begin pointer of vector (non-const version).
+ * @note These functions avoid the undefined case of indexing into an empty
+ * vector, as well as that of indexing after the end of the vector.
+ */
+template <class T, class TAl>
+inline T* begin_ptr(std::vector<T, TAl>& v)
+{
+    return v.empty() ? NULL : &v[0];
+}
+/** Get begin pointer of vector (const version) */
+template <class T, class TAl>
+inline const T* begin_ptr(const std::vector<T, TAl>& v)
+{
+    return v.empty() ? NULL : &v[0];
+}
+/** Get end pointer of vector (non-const version) */
+template <class T, class TAl>
+inline T* end_ptr(std::vector<T, TAl>& v)
+{
+    return v.empty() ? NULL : (&v[0] + v.size());
+}
+/** Get end pointer of vector (const version) */
+template <class T, class TAl>
+inline const T* end_ptr(const std::vector<T, TAl>& v)
+{
+    return v.empty() ? NULL : (&v[0] + v.size());
+}
+
+/**
  * Dummy data type to identify deserializing constructors.
  *
  * By convention, a constructor of a type T with signature
@@ -639,6 +688,12 @@ BigEndian<I> WrapBigEndian(I& n) { return BigEndian<I>(n); }
  */
 template<typename Stream, typename C> void Serialize(Stream& os, const std::basic_string<C>& str);
 template<typename Stream, typename C> void Unserialize(Stream& is, std::basic_string<C>& str);
+template <typename C>
+unsigned int GetSerializeSize(const std::basic_string<C>& str, int, int = 0);
+template <typename Stream, typename C>
+void Serialize(Stream& os, const std::basic_string<C>& str, int, int = 0);
+template <typename Stream, typename C>
+void Unserialize(Stream& is, std::basic_string<C>& str, int, int = 0);
 
 /**
  * prevector
@@ -661,7 +716,24 @@ template<typename Stream, typename T, typename A> inline void Serialize(Stream& 
 template<typename Stream, typename T, typename A> void Unserialize_impl(Stream& is, std::vector<T, A>& v, const unsigned char&);
 template<typename Stream, typename T, typename A, typename V> void Unserialize_impl(Stream& is, std::vector<T, A>& v, const V&);
 template<typename Stream, typename T, typename A> inline void Unserialize(Stream& is, std::vector<T, A>& v);
-
+template <typename T, typename A>
+unsigned int GetSerializeSize_impl(const std::vector<T, A>& v, int nType, int nVersion, const unsigned char&);
+template <typename T, typename A, typename V>
+unsigned int GetSerializeSize_impl(const std::vector<T, A>& v, int nType, int nVersion, const V&);
+template <typename T, typename A>
+inline unsigned int GetSerializeSize(const std::vector<T, A>& v, int nType, int nVersion);
+template <typename Stream, typename T, typename A>
+void Serialize_impl(Stream& os, const std::vector<T, A>& v, int nType, int nVersion, const unsigned char&);
+template <typename Stream, typename T, typename A, typename V>
+void Serialize_impl(Stream& os, const std::vector<T, A>& v, int nType, int nVersion, const V&);
+template <typename Stream, typename T, typename A>
+inline void Serialize(Stream& os, const std::vector<T, A>& v, int nType, int nVersion);
+template <typename Stream, typename T, typename A>
+void Unserialize_impl(Stream& is, std::vector<T, A>& v, int nType, int nVersion, const unsigned char&);
+template <typename Stream, typename T, typename A, typename V>
+void Unserialize_impl(Stream& is, std::vector<T, A>& v, int nType, int nVersion, const V&);
+template <typename Stream, typename T, typename A>
+inline void Unserialize(Stream& is, std::vector<T, A>& v, int nType, int nVersion);
 /**
  * pair
  */
