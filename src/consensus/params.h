@@ -87,6 +87,23 @@ struct Params {
     uint256 defaultAssumeValid;
 
     int nMinRCTOutputDepth;
+    //DASH
+    int nMasternodePaymentsStartBlock;
+    int nMasternodePaymentsIncreaseBlock;
+    int nMasternodePaymentsIncreasePeriod; // in blocks
+    int nInstantSendConfirmationsRequired; // in blocks
+    int nInstantSendKeepLock; // in blocks
+    int nBudgetPaymentsStartBlock;
+    int nBudgetPaymentsCycleBlocks;
+    int nBudgetPaymentsWindowBlocks;
+    int nSuperblockStartBlock;
+    uint256 nSuperblockStartHash;
+    int nSuperblockCycle; // in blocks
+    int nGovernanceMinQuorum; // Min absolute vote count to trigger an action
+    int nGovernanceFilterElements;
+    int nMasternodeMinimumConfirmations;
+    /** Block height at which DIP0001 becomes active */
+    int DIP0001Height;
 };
 } // namespace Consensus
 
