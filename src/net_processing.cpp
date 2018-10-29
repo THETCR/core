@@ -32,6 +32,18 @@
 
 #include <memory>
 
+#include <spork/spork.h>
+#include <governance/governance.h>
+#include <instantx.h>
+#include <masternode/masternode-payments.h>
+#include <masternode/masternode-sync.h>
+#include <masternode/masternodeman.h>
+#ifdef ENABLE_WALLET
+#include <obfuscation/privatesend-client.h>
+#endif // ENABLE_WALLET
+#include <obfuscation/privatesend-server.h>
+
+#include <boost/thread.hpp>
 #if defined(NDEBUG)
 # error "Bitcoin cannot be compiled without assertions."
 #endif
