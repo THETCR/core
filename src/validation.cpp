@@ -1415,6 +1415,15 @@ CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
 
     return ret;
 }
+bool GetBlockHash(uint256& hashRet, int nBlockHeight)
+{
+    LOCK(cs_main);
+    if(chainActive.Tip() == NULL) return false;
+    if(nBlockHeight < -1 || nBlockHeight > chainActive.Height()) return false;
+    if(nBlockHeight == -1) nBlockHeight = chainActive.Height();
+    hashRet = chainActive[nBlockHeight]->GetBlockHash();
+    return true;
+}
 int GetNumPeers()
 {
     //return g_connman->GetNodeCount(CConnman::CONNECTIONS_IN); // doesn't seem accurate

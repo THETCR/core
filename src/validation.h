@@ -331,6 +331,13 @@ bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams,
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams);
 CAmount GetBlockSubsidy(int nBits, int nHeight, const Consensus::Params& consensusParams, bool fSuperblockPartOnly = false);
 CAmount GetMasternodePayment(int nHeight, CAmount blockValue);
+
+/**
+ * Return true if hash can be found in chainActive at nBlockHeight height.
+ * Fills hashRet with found hash, if no nBlockHeight is specified - chainActive.Height() is used.
+ */
+bool GetBlockHash(uint256& hashRet, int nBlockHeight = -1);
+
 /** Guess verification progress (as a fraction between 0.0=genesis and 1.0=current tip). */
 double GuessVerificationProgress(const ChainTxData& data, const CBlockIndex* pindex);
 
