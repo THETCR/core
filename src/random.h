@@ -129,6 +129,9 @@ public:
     static constexpr uint64_t min() { return 0; }
     static constexpr uint64_t max() { return std::numeric_limits<uint64_t>::max(); }
     inline uint64_t operator()() { return rand64(); }
+    uint32_t operator()(uint32_t nMax) {
+        return randbits(nMax);
+    }
 };
 
 /* Number of random bytes returned by GetOSRand.
