@@ -186,6 +186,7 @@ public:
     void RegisterWithMempoolSignals(CTxMemPool& pool);
     /** Unregister with mempool */
     void UnregisterWithMempoolSignals(CTxMemPool& pool);
+    static const int SYNC_TRANSACTION_NOT_IN_BLOCK = -1;
 
     void UpdatedBlockTip(const CBlockIndex *, const CBlockIndex *, bool fInitialDownload);
     virtual void NotifyTransactionLock(const CTransaction &tx) {}
