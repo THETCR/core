@@ -2,23 +2,23 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "activemasternode.h"
-#include "addrman.h"
-#include "clientversion.h"
-#include "governance.h"
-#include "masternode-payments.h"
-#include "masternode-sync.h"
-#include "masternodeman.h"
-#include "messagesigner.h"
-#include "netfulfilledman.h"
-#include "netmessagemaker.h"
+#include <masternode/activemasternode.h>
+#include <addrman.h>
+#include <clientversion.h>
+#include <governance/governance.h>
+#include <masternode/masternode-payments.h>
+#include <masternode/masternode-sync.h>
+#include <masternode/masternodeman.h>
+#include <messagesigner.h>
+#include <netfulfilledman.h>
+#include <netmessagemaker.h>
 #ifdef ENABLE_WALLET
-#include "privatesend-client.h"
+#include <obfuscation/privatesend-client.h>
 #endif // ENABLE_WALLET
-#include "script/standard.h"
-#include "ui_interface.h"
-#include "util.h"
-#include "warnings.h"
+#include <script/standard.h>
+#include <ui_interface.h>
+#include <util.h>
+#include <warnings.h>
 
 /** Masternode manager */
 CMasternodeMan mnodeman;

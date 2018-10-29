@@ -5,8 +5,8 @@
 #ifndef MASTERNODEMAN_H
 #define MASTERNODEMAN_H
 
-#include "masternode.h"
-#include "sync.h"
+#include <masternode/masternode.h>
+#include <sync.h>
 
 class CMasternodeMan;
 class CConnman;

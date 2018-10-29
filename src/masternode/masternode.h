@@ -5,9 +5,9 @@
 #ifndef MASTERNODE_H
 #define MASTERNODE_H
 
-#include "key.h"
-#include "validation.h"
-#include "spork/spork.h"
+#include <key.h>
+#include <validation.h>
+#include <spork/spork.h>
 
 class CMasternode;
 class CMasternodeBroadcast;

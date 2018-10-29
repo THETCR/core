@@ -2,19 +2,19 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "activemasternode.h"
-#include "base58.h"
-#include "clientversion.h"
-#include "init.h"
-#include "netbase.h"
-#include "masternode.h"
-#include "masternode-payments.h"
-#include "masternode-sync.h"
-#include "masternodeman.h"
-#include "messagesigner.h"
-#include "script/standard.h"
-#include "util.h"
-#include "shutdown.h"
+#include <masternode/activemasternode.h>
+#include <base58.h>
+#include <clientversion.h>
+#include <init.h>
+#include <netbase.h>
+#include <masternode/masternode.h>
+#include <masternode/masternode-payments.h>
+#include <masternode/masternode-sync.h>
+#include <masternode/masternodeman.h>
+#include <messagesigner.h>
+#include <script/standard.h>
+#include <util.h>
+#include <shutdown.h>
 #ifdef ENABLE_WALLET
 #include "wallet/wallet.h"
 #endif // ENABLE_WALLET
