@@ -137,6 +137,7 @@ BITCOIN_CORE_H = \
   index/txindex.h \
   indirectmap.h \
   init.h \
+  instantx.h \
   anon.h \
   blind.h \
   interfaces/handler.h \
@@ -297,6 +298,7 @@ libwispr_server_a_SOURCES = \
   index/base.cpp \
   index/txindex.cpp \
   init.cpp \
+  instantx.cpp \
   dbwrapper.cpp \
   governance/governance.cpp \
   governance/governance-classes.cpp \
