@@ -273,7 +273,9 @@ BITCOIN_CORE_H = \
   insight/timestampindex.h \
   insight/csindex.h \
   insight/insight.h \
-  insight/rpc.h
+  insight/rpc.h \
+  primitives/deterministicmint.h \
+  primitives/zerocoin.h
 
 
 obj/build.h: FORCE
@@ -489,11 +491,9 @@ libwispr_consensus_a_SOURCES = \
   primitives/block.cpp \
   primitives/block.h \
   primitives/deterministicmint.cpp \
-  primitives/deterministicmint.h \
   primitives/transaction.cpp \
   primitives/transaction.h \
   primitives/zerocoin.cpp \
-  primitives/zerocoin.h \
   pubkey.cpp \
   pubkey.h \
   script/wisprconsensus.cpp \
