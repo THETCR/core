@@ -19,6 +19,9 @@
 /* Build revision */
 #define CLIENT_VERSION_REVISION 99
 
+/* WISPR version */
+#define CLIENT_VERSION_WISPR 4
+
 /* Copyright holder(s) before %s replacement */
 #define COPYRIGHT_HOLDERS "The %s developers"
 
