@@ -1139,6 +1139,7 @@ public:
     virtual bool SetAddressBook(const CTxDestination& address, const std::string& strName, const std::string& purpose, bool fBech32=false);
 
     virtual bool DelAddressBook(const CTxDestination& address);
+    bool UpdatedTransaction(const uint256 &hashTx);
 
     const std::string& GetLabelName(const CScript& scriptPubKey) const;
 
