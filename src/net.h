@@ -443,7 +443,7 @@ public:
     bool fMsgProcWake;
 
     std::condition_variable condMsgProc;
-    Mutex mutexMsgProc;
+    std::mutex mutexMsgProc;
     std::atomic<bool> flagInterruptMsgProc;
 
     CThreadInterrupt interruptNet;
