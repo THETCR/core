@@ -4080,7 +4080,33 @@ unsigned int CWallet::ComputeTimeSmart(const CWalletTx& wtx) const
     }
     return nTimeSmart;
 }
+bool CWallet::GetMasternodeOutpointAndKeys(COutPoint& outpointRet, CPubKey& pubKeyRet, CKey& keyRet, const std::string& strTxHash, const std::string& strOutputIndex)
+{
+    // wait for reindex and/or import to finish
+    if (fImporting || fReindex) return false;
 
+    // Find possible candidates
+    std::vector<COutput> vPossibleCoins;
+    AvailableCoins(vPossibleCoins, true, NULL, false, ONLY_1000);
+    if(vPossibleCoins.empty()) {
+        LogPrintf("CWallet::GetMasternodeOutpointAndKeys -- Could not locate any valid masternode vin\n");
+        return false;
+    }
+
+    if(strTxHash.empty()) // No output specified, select the first one
+        return GetOutpointAndKeysFromOutput(vPossibleCoins[0], outpointRet, pubKeyRet, keyRet);
+
+    // Find specific outpoint
+    uint256 txHash = uint256S(strTxHash);
+    int nOutputIndex = atoi(strOutputIndex);
+
+    for (const auto& out : vPossibleCoins)
+        if(out.tx->GetHash() == txHash && out.i == nOutputIndex) // found it!
+            return GetOutpointAndKeysFromOutput(out, outpointRet, pubKeyRet, keyRet);
+
+    LogPrintf("CWallet::GetMasternodeOutpointAndKeys -- Could not locate specified masternode vin\n");
+    return false;
+}
 bool CWallet::AddDestData(const CTxDestination &dest, const std::string &key, const std::string &value)
 {
     if (boost::get<CNoDestination>(&dest))

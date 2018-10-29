@@ -932,7 +932,8 @@ public:
     void UnlockCoin(const COutPoint& output);
     void UnlockAllCoins() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
     void ListLockedCoins(std::vector<COutPoint>& vOutpts) const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
-
+    /// Get 1000DASH output and keys which can be used for the Masternode
+    bool GetMasternodeOutpointAndKeys(COutPoint& outpointRet, CPubKey& pubKeyRet, CKey& keyRet, const std::string& strTxHash = "", const std::string& strOutputIndex = "");
     /*
      * Rescan abort properties
      */
