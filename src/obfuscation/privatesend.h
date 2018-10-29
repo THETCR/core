@@ -5,13 +5,13 @@
 #ifndef PRIVATESEND_H
 #define PRIVATESEND_H
 
-#include "chain.h"
-#include "chainparams.h"
-#include "primitives/transaction.h"
-#include "pubkey.h"
-#include "sync.h"
-#include "tinyformat.h"
-#include "timedata.h"
+#include <chain.h>
+#include <chainparams.h>
+#include <primitives/transaction.h>
+#include <pubkey.h>
+#include <sync.h>
+#include <tinyformat.h>
+#include <timedata.h>
 #include <shutdown.h>
 
 class CPrivateSend;

@@ -1,23 +1,23 @@
 // Copyright (c) 2014-2017 The bitcoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#include "privatesend.h"
+#include <obfuscation/privatesend.h>
 
-#include "activemasternode.h"
-#include "consensus/validation.h"
-#include "governance.h"
-#include "init.h"
-#include "instantx.h"
-#include "masternode-payments.h"
-#include "masternode-sync.h"
-#include "masternodeman.h"
-#include "messagesigner.h"
-#include "netfulfilledman.h"
-#include "netmessagemaker.h"
-#include "script/sign.h"
-#include "txmempool.h"
-#include "util.h"
-#include "utilmoneystr.h"
+#include <masternode/activemasternode.h>
+#include <consensus/validation.h>
+#include <governance/governance.h>
+#include <init.h>
+#include <instantx.h>
+#include <masternode/masternode-payments.h>
+#include <masternode/masternode-sync.h>
+#include <masternode/masternodeman.h>
+#include <messagesigner.h>
+#include <netfulfilledman.h>
+#include <netmessagemaker.h>
+#include <script/sign.h>
+#include <txmempool.h>
+#include <util.h>
+#include <utilmoneystr.h>
 
 #include <boost/lexical_cast.hpp>
 
