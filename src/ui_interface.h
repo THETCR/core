@@ -124,8 +124,6 @@ public:
     ADD_SIGNALS_DECL_WRAPPER(NotifyWaitingForDevice, void, bool);
     /** Additional data sync progress changed */
     ADD_SIGNALS_DECL_WRAPPER(NotifyAdditionalDataSyncProgressChanged, void, double);
-    /** Waiting for device input. */
-    ADD_SIGNALS_DECL_WRAPPER(NotifyWaitingForDevice, void, bool);
 };
 
 /** Show warning message **/
