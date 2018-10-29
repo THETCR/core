@@ -981,6 +981,15 @@ struct CMutableTransaction
         }
         return false;
     }
+    friend bool operator==(const CMutableTransaction& a, const CMutableTransaction& b)
+    {
+        return a.GetHash() == b.GetHash();
+    }
+
+    friend bool operator!=(const CMutableTransaction& a, const CMutableTransaction& b)
+    {
+        return !(a == b);
+    }
 };
 
 typedef std::shared_ptr<const CTransaction> CTransactionRef;

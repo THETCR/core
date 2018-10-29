@@ -144,6 +144,11 @@ public:
     }
 
     void UpdateVersionBitsParameters(Consensus::DeploymentPos d, int64_t nStartTime, int64_t nTimeout);
+    //DASH
+    /** Allow nodes with the same address and multiple ports */
+    bool AllowMultiplePorts() const { return fAllowMultiplePorts; }
+    int PoolMaxTransactions() const { return nPoolMaxTransactions; }
+    const std::string& SporkAddress() const { return strSporkAddress; }
 protected:
     CChainParams() {}
 
@@ -187,6 +192,13 @@ protected:
     CCheckpointData checkpointData;
     ChainTxData chainTxData;
     bool m_fallback_fee_enabled;
+
+    //DASH
+    bool fAllowMultiplePorts;
+    bool fAllowMultipleAddressesFromGroup;
+    int nPoolMaxTransactions;
+    std::string strSporkAddress;
+
 };
 
 /**
