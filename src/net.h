@@ -28,6 +28,7 @@
 #include <thread>
 #include <memory>
 #include <condition_variable>
+#include <mutex>
 
 #ifndef WIN32
 #include <arpa/inet.h>
