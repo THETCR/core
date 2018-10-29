@@ -480,7 +480,17 @@ static void LogConnectFailure(bool manual_connection, const char* fmt, const Arg
         LogPrint(BCLog::NET, "%s\n", error_message);
     }
 }
+bool ConnectSocket(const CService &addrDest, SOCKET& hSocketRet, int nTimeout, bool *outProxyConnectionFailed)
+{
+    proxyType proxy;
+    if (outProxyConnectionFailed)
+        *outProxyConnectionFailed = false;
 
+    if (GetProxy(addrDest.GetNetwork(), proxy))
+        return ConnectThroughProxy(proxy, addrDest.ToStringIP(), addrDest.GetPort(), hSocketRet, nTimeout, outProxyConnectionFailed);
+    else // no proxy needed (none set for target network)
+        return ConnectSocketDirectly(addrDest, hSocketRet, nTimeout, true);
+}
 bool ConnectSocketDirectly(const CService &addrConnect, const SOCKET& hSocket, int nTimeout, bool manual_connection)
 {
     struct sockaddr_storage sockaddr;
