@@ -33,26 +33,6 @@ class CScript;
 static const unsigned int MAX_SIZE = 0x02000000;
 
 /**
- * Used to bypass the rule against non-const reference to temporary
- * where it makes sense with wrappers such as CFlatData or CTxDB
- */
-template <typename T>
-inline T& REF(const T& val)
-{
-    return const_cast<T&>(val);
-}
-
-/**
- * Used to acquire a non-const pointer "this" to generate bodies
- * of const serialization operations from a template
- */
-template <typename T>
-inline T* NCONST_PTR(const T* val)
-{
-    return const_cast<T*>(val);
-}
-
-/**
  * Get begin pointer of vector (non-const version).
  * @note These functions avoid the undefined case of indexing into an empty
  * vector, as well as that of indexing after the end of the vector.
