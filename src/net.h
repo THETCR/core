@@ -206,10 +206,16 @@ public:
     void ReleaseNodeVector(const std::vector<CNode*>& vecNodes);
 
     bool ForNode(NodeId id, std::function<bool(CNode* pnode)> func);
-
     void PushMessage(CNode* pnode, CSerializedNetMsg&& msg);
 
     //DASH
+    bool ForNode(const CService& addr, std::function<bool(const CNode* pnode)> cond, std::function<bool(CNode* pnode)> func);
+
+    template<typename Callable>
+    bool ForNode(const CService& addr, Callable&& func)
+    {
+        return ForNode(addr, FullyConnectedOnly, func);
+    }
     bool IsMasternodeOrDisconnectRequested(const CService& addr);
 
     template<typename Condition, typename Callable>
