@@ -187,6 +187,9 @@ public:
     bool CheckIncomingNonce(uint64_t nonce);
     void RelayTransaction(const CTransaction& tx);
     void RelayInv(CInv &inv, const int minProtoVersion = MIN_PEER_PROTO_VERSION);
+    std::vector<CNode*> CopyNodeVector(std::function<bool(const CNode* pnode)> cond);
+    std::vector<CNode*> CopyNodeVector();
+    void ReleaseNodeVector(const std::vector<CNode*>& vecNodes);
 
     bool ForNode(NodeId id, std::function<bool(CNode* pnode)> func);
 
