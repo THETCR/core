@@ -209,6 +209,7 @@ public:
 
     bool ForNode(NodeId id, std::function<bool(CNode* pnode)> func);
     void PushMessage(CNode* pnode, CSerializedNetMsg&& msg);
+    bool ForNode(NodeId id, std::function<bool(const CNode* pnode)> cond, std::function<bool(CNode* pnode)> func);
 
     //DASH
     bool ForNode(const CService& addr, std::function<bool(const CNode* pnode)> cond, std::function<bool(CNode* pnode)> func);
