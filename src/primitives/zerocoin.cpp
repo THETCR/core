@@ -4,6 +4,7 @@
 
 #include <primitives/zerocoin.h>
 
+#include <key.h>
 #include <hash.h>
 #include <streams.h>
 #include <util.h>
