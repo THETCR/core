@@ -722,7 +722,7 @@ static void BlockNotifyCallback(bool initialSync, const CBlockIndex *pBlockIndex
 
 static bool fHaveGenesis = false;
 static CWaitableCriticalSection cs_GenesisWait;
-static CConditionVariable condvar_GenesisWait;
+static std::condition_variable condvar_GenesisWait;
 
 static void BlockNotifyGenesisWait(bool, const CBlockIndex *pBlockIndex)
 {
@@ -1927,7 +1927,7 @@ bool AppInitMain()
         // ThreadImport getting started, so instead we just wait on a timer to
         // check ShutdownRequested() regularly.
         while (!fHaveGenesis && !ShutdownRequestedMainThread()) {
-            g_genesis_wait_cv.wait_for(lock, std::chrono::milliseconds(500));
+            condvar_GenesisWait.wait_for(lock, std::chrono::milliseconds(500));
         }
         uiInterface.NotifyBlockTip_disconnect(BlockNotifyGenesisWait);
     }
