@@ -2,9 +2,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <primitives/deterministicmint.h>
 #include <libzerocoin/Coin.h>
 #include <tinyformat.h>
-#include "deterministicmint.h"
 
 using namespace libzerocoin;
 

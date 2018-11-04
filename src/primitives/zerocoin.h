@@ -7,10 +7,10 @@
 
 #include <amount.h>
 #include <limits.h>
-#include "libzerocoin/bignum.h"
-#include "libzerocoin/Denominations.h"
-#include "key.h"
-#include "serialize.h"
+#include <libzerocoin/bignum.h>
+#include <libzerocoin/Denominations.h>
+#include <key.h>
+#include <serialize.h>
 
 //struct that is safe to store essential mint data, without holding any information that allows for actual spending (serial, randomness, private key)
 struct CMintMeta
