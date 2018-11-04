@@ -52,6 +52,17 @@
 #ifdef ENABLE_WALLET
 #include <wallet/hdwallet.h>
 #endif
+#include <masternode/masternode-payments.h>
+#include <masternode/masternode-sync.h>
+#include <masternode/masternodeman.h>
+#include <masternode/masternodeconfig.h>
+#include <messagesigner.h>
+#include <netfulfilledman.h>
+#ifdef ENABLE_WALLET
+#include <obfuscation/privatesend-client.h>
+#endif // ENABLE_WALLET
+#include <obfuscation/privatesend-server.h>
+#include <spork/spork.h>
 #if ENABLE_USBDEVICE
 #include <usbdevice/rpcusbdevice.h>
 #include <usbdevice/usbdevice.h>
