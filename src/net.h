@@ -210,6 +210,8 @@ public:
     void PushMessage(CNode* pnode, CSerializedNetMsg&& msg);
 
     //DASH
+    bool IsMasternodeOrDisconnectRequested(const CService& addr);
+
     template<typename Condition, typename Callable>
     bool ForEachNodeContinueIf(const Condition& cond, Callable&& func)
     {
@@ -340,6 +342,7 @@ public:
     int GetExtraOutboundCount();
 
     bool AddNode(const std::string& node);
+    bool AddPendingMasternode(const CService& addr);
     bool RemoveAddedNode(const std::string& node);
     std::vector<AddedNodeInfo> GetAddedNodeInfo();
 
