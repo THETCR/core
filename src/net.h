@@ -262,6 +262,16 @@ public:
                 func(node);
         }
     };
+    //DASH
+    template<typename Condition, typename Callable>
+    void ForEachNode(const Condition& cond, Callable&& func) const
+    {
+        LOCK(cs_vNodes);
+        for (auto&& node : vNodes) {
+            if (cond(node))
+                func(node);
+        }
+    };
 
     template<typename Callable, typename CallableAfter>
     void ForEachNodeThen(Callable&& pre, CallableAfter&& post)
