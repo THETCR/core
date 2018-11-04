@@ -212,6 +212,11 @@ public:
 
     //DASH
     bool ForNode(const CService& addr, std::function<bool(const CNode* pnode)> cond, std::function<bool(CNode* pnode)> func);
+    template<typename Callable>
+    bool ForNode(NodeId id, Callable&& func)
+    {
+        return ForNode(id, FullyConnectedOnly, func);
+    }
 
     template<typename Callable>
     bool ForNode(const CService& addr, Callable&& func)
@@ -359,6 +364,7 @@ public:
     void GetNodeStats(std::vector<CNodeStats>& vstats);
     bool DisconnectNode(const std::string& node);
     bool DisconnectNode(NodeId id);
+    unsigned int GetSendBufferSize() const;
 
     ServiceFlags GetLocalServices() const;
     void SetLocalServices(ServiceFlags f);
@@ -737,6 +743,8 @@ public:
     std::atomic<int64_t> nLastRecv;
     const int64_t nTimeConnected;
     std::atomic<int64_t> nTimeOffset;
+    std::atomic<int64_t> nLastWarningTime;
+    std::atomic<int> nNumWarningsSkipped;
     // Address of this peer
     const CAddress addr;
     // Bind address of our side of the connection
