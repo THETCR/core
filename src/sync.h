@@ -11,7 +11,8 @@
 #include <condition_variable>
 #include <thread>
 #include <mutex>
-
+#include <boost/thread/condition_variable.hpp>
+#include <boost/thread/locks.hpp>
 
 ////////////////////////////////////////////////
 //                                            //
@@ -100,18 +101,17 @@ return PARENT::try_lock();
 using UniqueLock = std::unique_lock<PARENT>;
 };
 
-typedef CCriticalSection CDynamicCriticalSection;
 /**
  * Wrapped mutex: supports recursive locking, but no waiting
  * TODO: We should move away from using the recursive lock by default.
  */
 typedef AnnotatedMixin<std::recursive_mutex> CCriticalSection;
-
+typedef CCriticalSection CDynamicCriticalSection;
 /** Wrapped mutex: supports waiting but not recursive locking */
 typedef AnnotatedMixin<std::mutex> Mutex;
 
 /** Wrapped boost mutex: supports waiting but not recursive locking */
-typedef AnnotatedMixin<boost::mutex> CWaitableCriticalSection;
+typedef AnnotatedMixin<std::mutex> CWaitableCriticalSection;
 
 /** Just a typedef for boost::condition_variable, can be wrapped later if desired */
 typedef boost::condition_variable CConditionVariable;
