@@ -273,7 +273,9 @@ BITCOIN_CORE_H = \
   insight/timestampindex.h \
   insight/csindex.h \
   insight/insight.h \
-  insight/rpc.h
+  insight/rpc.h \
+  primitives/deterministicmint.h \
+  primitives/zerocoin.h
 
 
 obj/build.h: FORCE
@@ -420,6 +422,8 @@ libwispr_wallet_a_SOURCES = \
   key/stealth.cpp \
   pos/miner.cpp \
   policy/rbf.cpp \
+  primitives/deterministicmint.cpp \
+  primitives/zerocoin.cpp \
   obfuscation/privatesend-client.cpp \
   obfuscation/privatesend-util.cpp \
   wallet/walletutil.cpp \
@@ -488,12 +492,8 @@ libwispr_consensus_a_SOURCES = \
   prevector.h \
   primitives/block.cpp \
   primitives/block.h \
-  primitives/deterministicmint.cpp \
-  primitives/deterministicmint.h \
   primitives/transaction.cpp \
   primitives/transaction.h \
-  primitives/zerocoin.cpp \
-  primitives/zerocoin.h \
   pubkey.cpp \
   pubkey.h \
   script/wisprconsensus.cpp \
@@ -552,6 +552,8 @@ libwispr_common_a_SOURCES = \
   anon.cpp \
   blind.cpp \
   key.cpp \
+  primitives/deterministicmint.cpp \
+  primitives/zerocoin.cpp \
   key/keyutil.cpp \
   key/extkey.cpp \
   key/stealth.cpp \
