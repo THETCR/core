@@ -691,7 +691,9 @@ public:
     //    unless it loads a bloom filter.
     bool fRelayTxes; //protected by cs_filter
     bool fSentAddr;
+    bool fMasternode;
     CSemaphoreGrant grantOutbound;
+    CSemaphoreGrant grantMasternodeOutbound;
     CCriticalSection cs_filter;
     std::unique_ptr<CBloomFilter> pfilter;
     std::atomic<int> nRefCount;
