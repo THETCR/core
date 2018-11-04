@@ -101,7 +101,8 @@ public:
 
 /** Wrapped mutex: supports waiting but not recursive locking */
 typedef AnnotatedMixin<std::mutex> CWaitableCriticalSection;
-
+/** Wrapped mutex: supports waiting but not recursive locking */
+typedef AnnotatedMixin<std::mutex> Mutex;
 /** Just a typedef for std::condition_variable, can be wrapped later if desired */
 typedef std::condition_variable CConditionVariable;
 
