@@ -421,7 +421,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
             return error("CheckProofOfStake() : INFO: read txPrev failed");
 
         //verify signature and script
-        if (!VerifyScript(txin.scriptSig, txPrev->vout[txin.prevout.n].scriptPubKey, SCRIPT_VERIFY_NONE, TransactionSignatureChecker(&tx, 0)))
+        if (!VerifyScript(txin.scriptSig, txPrev->vout[txin.prevout.n].scriptPubKey, txin.scriptWitness, SCRIPT_VERIFY_NONE, TransactionSignatureChecker(&tx, 0)))
             return error("CheckProofOfStake() : VerifySignature failed on coinstake %s", tx.GetHash().ToString().c_str());
 
         CWspStake* wspInput = new CWspStake();
@@ -442,8 +442,8 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
     bnTargetPerCoinDay.SetCompact(block.nBits);
     CBlockIndex* pindexOld = mapBlockIndex.at(block.hashPrevBlock);
     uint64_t nStakeModifier = 0;
-    CValidationState state;
-    int64_t nValueIn = txPrev.vout[txin.prevout.n].nValue;
+//    CValidationState state;
+    int64_t nValueIn = txPrev->vout[txin.prevout.n].nValue;
     unsigned int nBlockFromTime = blockprev.nTime;
     unsigned int nTxTime = block.nTime;
     if (!stake->GetModifier(nStakeModifier))
