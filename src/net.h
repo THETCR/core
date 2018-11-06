@@ -225,6 +225,12 @@ public:
     {
         return ForNode(addr, FullyConnectedOnly, func);
     }
+    bool IsConnected(const CService& addr, std::function<bool(const CNode* pnode)> cond)
+    {
+        return ForNode(addr, cond, [](CNode* pnode){
+            return true;
+        });
+    }
     bool IsMasternodeOrDisconnectRequested(const CService& addr);
 
     template<typename Condition, typename Callable>
