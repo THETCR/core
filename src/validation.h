@@ -33,6 +33,8 @@
 
 class CBlockIndex;
 class CBlockTreeDB;
+class CZerocoinDB;
+class CSporkDB;
 class CChainParams;
 class CCoinsViewDB;
 class CInv;
@@ -580,11 +582,13 @@ extern std::unique_ptr<CCoinsViewCache> pcoinsTip;
 
 /** Global variable that points to the active block tree (protected by cs_main) */
 extern std::unique_ptr<CBlockTreeDB> pblocktree;
+
 /** Global variable that points to the zerocoin database (protected by cs_main) */
-extern CZerocoinDB* zerocoinDB;
+extern std::unique_ptr<CZerocoinDB> zerocoinDB;
 
 /** Global variable that points to the spork database (protected by cs_main) */
-extern CSporkDB* pSporkDB;
+extern std::unique_ptr<CSporkDB> pSporkDB;
+
 /**
  * Return the spend height, which is one more than the inputs.GetBestBlock().
  * While checking, GetBestBlock() refers to the parent block. (protected by cs_main)
