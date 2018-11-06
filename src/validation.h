@@ -152,6 +152,7 @@ inline int64_t FutureDrift(int64_t nTime) { return nTime + 15; } // FutureDriftV
 static const int DEFAULT_STOPATHEIGHT = 0;
 
 static bool fVerifyingDB = false;
+extern unsigned int nStakeMinAge;
 
 
 struct BlockHasher

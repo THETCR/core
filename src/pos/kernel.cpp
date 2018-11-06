@@ -62,11 +62,6 @@ unsigned int GetTargetSpacing() {
     return 64;
 }
 unsigned int GetStakeMinAge(){
-    bool newVersion = chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT();
-    if(newVersion){
-        return nStakeMinAgeV2;
-
-    }
     return nStakeMinAge;
 }
 // Hard checkpoints of stake modifiers to ensure they are deterministic

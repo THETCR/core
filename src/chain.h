@@ -373,6 +373,47 @@ public:
     {
         nFlags |= BLOCK_PROOF_OF_STAKE;
     }
+//WISPR
+    bool IsProofOfWork() const
+    {
+        return !(nFlags & BLOCK_PROOF_OF_STAKE);
+    }
+
+    unsigned int GetStakeEntropyBit() const
+    {
+        unsigned int nEntropyBit = ((GetBlockHash().Get64()) & 1);
+        if (GetBoolArg("-printstakemodifier", false))
+            LogPrintf("GetStakeEntropyBit: nHeight=%u hashBlock=%s nEntropyBit=%u\n", nHeight, GetBlockHash().ToString().c_str(), nEntropyBit);
+
+        return nEntropyBit;
+    }
+
+    bool SetStakeEntropyBit(unsigned int nEntropyBit)
+    {
+        if (nEntropyBit > 1)
+            return false;
+        nFlags |= (nEntropyBit ? BLOCK_STAKE_ENTROPY : 0);
+        return true;
+    }
+
+    bool GeneratedStakeModifier() const
+    {
+        return (nFlags & BLOCK_STAKE_MODIFIER);
+    }
+
+    void SetStakeModifier(uint64_t nModifier, bool fGeneratedStakeModifier)
+    {
+        nStakeModifier = nModifier;
+        if (fGeneratedStakeModifier)
+            nFlags |= BLOCK_STAKE_MODIFIER;
+    }
+
+    /**
+     * Returns true if there are nRequired or more blocks of minVersion or above
+     * in the last Params().ToCheckBlockUpgradeMajority() blocks, starting at pstart
+     * and going backwards.
+     */
+    static bool IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired);
 
     static constexpr int nMedianTimeSpan = 11;
 
