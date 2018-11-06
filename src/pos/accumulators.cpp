@@ -439,7 +439,7 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
     if (!zerocoinDB->ReadCoinMint(coin.getValue(), txid))
         return error("%s failed to read mint from db", __func__);
 
-    CTransaction txMinted;
+    CTransactionRef txMinted;
     uint256 hashBlock;
     if (!GetTransaction(txid, txMinted, Params().GetConsensus(), hashBlock))
         return error("%s failed to read tx", __func__);
