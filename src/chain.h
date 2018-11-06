@@ -217,7 +217,7 @@ public:
 
     // proof-of-stake specific fields
     unsigned int nFlags;  // pos: block index flags
-    uint256 nStakeModifier; // hash modifier for proof-of-stake
+    uint64_t nStakeModifier; // hash modifier for proof-of-stake
     uint256 bnStakeModifierV2;
     COutPoint prevoutStake;
     //uint256 hashProof;
