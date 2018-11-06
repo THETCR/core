@@ -274,7 +274,7 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
 
         //grab mints from this block
         CBlock block;
-        if(!ReadBlockFromDisk(block, pindex))
+        if(!ReadBlockFromDisk(block, pindex, Params().GetConsensus()))
             return error("%s: failed to read block from disk", __func__);
 
         std::list<PublicCoin> listPubcoins;
@@ -370,7 +370,7 @@ int AddBlockMintsToAccumulator(const libzerocoin::PublicCoin& coin, const int nH
     if (pindex->MintedDenomination(coin.getDenomination())) {
         //grab mints from this block
         CBlock block;
-        if(!ReadBlockFromDisk(block, pindex))
+        if(!ReadBlockFromDisk(block, pindex, Params().GetConsensus()))
             return error("%s: failed to read block from disk while adding pubcoins to witness", __func__);
 
         list<PublicCoin> listPubcoins;

@@ -262,7 +262,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                 if (!setAddedTx.count(txHash)) {
                     CBlock block;
                     CWalletTx wtx(pwalletMain, tx);
-                    if (pindex && ReadBlockFromDisk(block, pindex))
+                    if (pindex && ReadBlockFromDisk(block, pindex, Params().GetConsensus()))
                         wtx.SetMerkleBranch(block);
 
                     //Fill out wtx so that a transaction record can be created
