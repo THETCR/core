@@ -2019,29 +2019,38 @@ bool CConnman::OpenMasternodeConnection(const CAddress &addrConnect) {
     return OpenNetworkConnection(addrConnect, false, NULL, NULL, false, false, false, true);
 }
 // if successful, this moves the passed grant to the constructed node
-void CConnman::OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound, const char *pszDest, bool fOneShot, bool fFeeler, bool manual_connection, bool fConnectToMasternode)
+bool CConnman::OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound, const char *pszDest, bool fOneShot, bool fFeeler, bool manual_connection, bool fConnectToMasternode)
 {
     //
     // Initiate outbound network connection
     //
     if (interruptNet) {
-        return;
+        return false;
     }
     if (!fNetworkActive) {
-        return;
+        return false;
     }
     if (!pszDest) {
-        if (IsLocal(addrConnect) ||
+        // banned or exact match?
+        if (IsBanned(addrConnect) || FindNode(addrConnect.ToStringIPPort()))
+            return false;
+        // local and not a connection to itself?
+        bool fAllowLocal = Params().AllowMultiplePorts() && addrConnect.GetPort() != GetListenPort();
+        if (!fAllowLocal && IsLocal(addrConnect) ||
             FindNode(static_cast<CNetAddr>(addrConnect)) || IsBanned(addrConnect) ||
             FindNode(addrConnect.ToStringIPPort()))
-            return;
+            return false;
+        // if multiple ports for same IP are allowed, search for IP:PORT match, otherwise search for IP-only match
+        if ((!Params().AllowMultiplePorts() && FindNode((CNetAddr)addrConnect)) ||
+            (Params().AllowMultiplePorts() && FindNode((CService)addrConnect)))
+            return false;
     } else if (FindNode(std::string(pszDest)))
-        return;
+        return false;
 
     CNode* pnode = ConnectNode(addrConnect, pszDest, fCountFailure, manual_connection);
 
     if (!pnode)
-        return;
+        return false;
     if (grantOutbound)
         grantOutbound->MoveTo(pnode->grantOutbound);
     if (fOneShot)
@@ -2058,6 +2067,7 @@ void CConnman::OpenNetworkConnection(const CAddress& addrConnect, bool fCountFai
         LOCK(cs_vNodes);
         vNodes.push_back(pnode);
     }
+    return true;
 }
 
 void CConnman::ThreadMessageHandler()
