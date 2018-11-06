@@ -31,6 +31,8 @@
 
 #include <atomic>
 
+#include <libzerocoin/CoinSpend.h>
+
 class CBlockIndex;
 class CBlockTreeDB;
 class CZerocoinDB;
