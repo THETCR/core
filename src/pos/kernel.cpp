@@ -23,13 +23,13 @@
 #include <boost/assign/list_of.hpp>
 
 #include <db.h>
-#include <kernel.h>
-#include <spork.h>
+#include <pos/kernel.h>
+#include <spork/spork.h>
 #include <script/interpreter.h>
 #include <timedata.h>
 #include <util.h>
-#include <stakeinput.h>
-#include <zwspchain.h>
+#include <wallet/stakeinput.h>
+#include <zerocoin/zwspchain.h>
 
 using namespace std;
 
