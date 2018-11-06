@@ -20,6 +20,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <leveldbwrapper.h>
+#include <primitives/zerocoin.h>
 
 class CBlockIndex;
 class CCoinsViewDBCursor;
@@ -138,6 +140,7 @@ public:
 
     //bool WriteRCTOutputBatch(std::vector<std::pair<int64_t, CAnonOutput> > &vao);
 };
+
 /** Zerocoin database (zerocoin/) */
 class CZerocoinDB : public CLevelDBWrapper
 {
