@@ -213,14 +213,14 @@ bool CScript::IsZerocoinMint() const
 {
     //fast test for Zerocoin Mint CScripts
     return (this->size() > 0 &&
-            this->at(0) == OP_ZEROCOINMINT);
+            (*this)[0] == OP_ZEROCOINMINT);
 }
 bool CScript::IsZerocoinSpend() const
 {
     if (this->empty())
         return false;
 
-    return (this->at(0) == OP_ZEROCOINSPEND);
+    return ((*this)[0] == OP_ZEROCOINSPEND);
 }
 
 bool CScript::IsPayToScriptHashAny(bool fIsTxCoinstake) const
