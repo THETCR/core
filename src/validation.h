@@ -151,6 +151,8 @@ inline int64_t FutureDrift(int64_t nTime) { return nTime + 15; } // FutureDriftV
 /** Default for -stopatheight */
 static const int DEFAULT_STOPATHEIGHT = 0;
 
+extern static bool fVerifyingDB = false;
+
 
 struct BlockHasher
 {
