@@ -39,6 +39,8 @@ file(GLOB SOURCE_FILES
         src/leveldb/include/*.h
         src/obfuscation/*.h
         src/obfuscation/*.cpp
+        src/libzerocoin/*.h
+        src/libzerocoin/*.cpp
         src/policy/*.cpp
         src/policy/*.h
         src/primitives/*.cpp
