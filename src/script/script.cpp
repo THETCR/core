@@ -140,6 +140,9 @@ const char* GetOpName(opcodetype opcode)
     case OP_ISCOINSTAKE            : return "OP_ISCOINSTAKE";
     case OP_NOP10                  : return "OP_NOP10";
 
+    // zerocoin
+    case OP_ZEROCOINMINT           : return "OP_ZEROCOINMINT";
+    case OP_ZEROCOINSPEND          : return "OP_ZEROCOINSPEND";
 
     case OP_INVALIDOPCODE          : return "OP_INVALIDOPCODE";
 

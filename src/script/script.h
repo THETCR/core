@@ -182,6 +182,10 @@ enum opcodetype
     OP_ISCOINSTAKE = OP_NOP9,
     OP_NOP10 = 0xb9,
 
+    // zerocoin
+    OP_ZEROCOINMINT = 0xc1,
+    OP_ZEROCOINSPEND = 0xc2,
+
     OP_INVALIDOPCODE = 0xff,
 };
 
