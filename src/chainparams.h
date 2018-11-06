@@ -144,11 +144,25 @@ public:
     }
 
     void UpdateVersionBitsParameters(Consensus::DeploymentPos d, int64_t nStartTime, int64_t nTimeout);
+
     //DASH
     /** Allow nodes with the same address and multiple ports */
     bool AllowMultiplePorts() const { return fAllowMultiplePorts; }
     int PoolMaxTransactions() const { return nPoolMaxTransactions; }
     const std::string& SporkAddress() const { return strSporkAddress; }
+    //WISPR
+    int NEW_PROTOCOLS_STARTHEIGHT() const { return nNewProtocolStartHeight; }
+    int NEW_PROTOCOLS_STARTTIME() const { return nNewProtocolStartTime; }
+    /** Zerocoin **/
+    std::string Zerocoin_Modulus() const { return zerocoinModulus; }
+    libzerocoin::ZerocoinParams* Zerocoin_Params(bool useModulusV1) const;
+    int Zerocoin_MaxSpendsPerTransaction() const { return nMaxZerocoinSpendsPerTransaction; }
+    CAmount Zerocoin_MintFee() const { return nMinZerocoinMintFee; }
+    int Zerocoin_MintRequiredConfirmations() const { return nMintRequiredConfirmations; }
+    int Zerocoin_RequiredAccumulation() const { return nRequiredAccumulation; }
+    int Zerocoin_DefaultSpendSecurity() const { return nDefaultSecurityLevel; }
+    int Zerocoin_HeaderVersion() const { return nZerocoinHeaderVersion; }
+    int Zerocoin_RequiredStakeDepth() const { return nZerocoinRequiredStakeDepth; }
 protected:
     CChainParams() {}
 
@@ -198,6 +212,24 @@ protected:
     bool fAllowMultipleAddressesFromGroup;
     int nPoolMaxTransactions;
     std::string strSporkAddress;
+
+    //WISPR
+    std::string strObfuscationPoolDummyAddress;
+    int64_t nStartMasternodePayments;
+    std::string zerocoinModulus;
+    int nMaxZerocoinSpendsPerTransaction;
+    CAmount nMinZerocoinMintFee;
+    int nMintRequiredConfirmations;
+    int nRequiredAccumulation;
+    int nDefaultSecurityLevel;
+    int nZerocoinHeaderVersion;
+    int64_t nBudget_Fee_Confirmations;
+    int nZerocoinStartHeight;
+    int nNewProtocolStartHeight;
+    int nZerocoinStartTime;
+    int nNewProtocolStartTime;
+    int nZerocoinRequiredStakeDepth;
+    uint256 bnProofOfStakeLimit;
 
 };
 
