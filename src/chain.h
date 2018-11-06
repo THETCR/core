@@ -17,6 +17,8 @@
 enum eBlockFlags
 {
     BLOCK_PROOF_OF_STAKE            = (1 << 0),
+    BLOCK_STAKE_ENTROPY             = (1 << 1),  // entropy bit for stake modifier
+    BLOCK_STAKE_MODIFIER            = (1 << 2), // regenerated stake modifier
     BLOCK_FAILED_DUPLICATE_STAKE    = (1 << 3),
     BLOCK_DELAYED                   = (1 << 4),
     BLOCK_ACCEPTED                  = (1 << 5),
@@ -382,9 +384,6 @@ public:
     unsigned int GetStakeEntropyBit() const
     {
         unsigned int nEntropyBit = ((GetBlockHash().Get64()) & 1);
-        if (GetBoolArg("-printstakemodifier", false))
-            LogPrintf("GetStakeEntropyBit: nHeight=%u hashBlock=%s nEntropyBit=%u\n", nHeight, GetBlockHash().ToString().c_str(), nEntropyBit);
-
         return nEntropyBit;
     }
 
