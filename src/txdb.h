@@ -21,8 +21,10 @@
 #include <utility>
 #include <vector>
 #include <leveldbwrapper.h>
+#include <validation.h>
 #include <primitives/zerocoin.h>
 
+class CCoins;
 class CBlockIndex;
 class CCoinsViewDBCursor;
 class uint256;
