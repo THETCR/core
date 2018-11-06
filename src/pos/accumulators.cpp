@@ -2,15 +2,15 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "accumulators.h"
-#include "accumulatormap.h"
-#include "chainparams.h"
-#include "main.h"
-#include "txdb.h"
-#include "init.h"
-#include "spork.h"
-#include "accumulatorcheckpoints.h"
-#include "zwspchain.h"
+#include <pos/accumulators.h>
+#include <pos/accumulatormap.h>
+#include <chainparams.h>
+#include <validation.h>
+#include <txdb.h>
+#include <init.h>
+#include <spork/spork.h>
+#include <pos/accumulatorcheckpoints.h>
+#include <zerocoin/zwspchain.h>
 
 using namespace libzerocoin;
 

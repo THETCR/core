@@ -2,11 +2,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "accumulatormap.h"
-#include "accumulators.h"
-#include "main.h"
-#include "txdb.h"
-#include "libzerocoin/Denominations.h"
+#include <pos/accumulatormap.h>
+#include <pos/accumulators.h>
+#include <validation.h>
+#include <txdb.h>
+#include <libzerocoin/Denominations.h>
 
 using namespace libzerocoin;
 using namespace std;
