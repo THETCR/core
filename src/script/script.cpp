@@ -209,6 +209,12 @@ bool CScript::IsPayToPublicKeyHash() const
         (*this)[23] == OP_EQUALVERIFY &&
         (*this)[24] == OP_CHECKSIG);
 }
+bool CScript::IsZerocoinMint() const
+{
+    //fast test for Zerocoin Mint CScripts
+    return (this->size() > 0 &&
+            this->at(0) == OP_ZEROCOINMINT);
+}
 
 bool CScript::IsPayToScriptHashAny(bool fIsTxCoinstake) const
 {
