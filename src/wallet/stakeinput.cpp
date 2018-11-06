@@ -165,7 +165,7 @@ bool CZWspStake::MarkSpent(CWallet *pwallet, const uint256& txid)
 }
 
 //!WSP Stake
-bool CWspStake::SetInput(CTransaction txPrev, unsigned int n)
+bool CWspStake::SetInput(CTransactionRef txPrev, unsigned int n)
 {
     this->txFrom = txPrev;
     this->nPosition = n;
