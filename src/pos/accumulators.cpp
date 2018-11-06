@@ -11,6 +11,7 @@
 #include <spork/spork.h>
 #include <pos/accumulatorcheckpoints.h>
 #include <zerocoin/zwspchain.h>
+#include <shutdown.h>
 
 using namespace libzerocoin;
 
@@ -137,7 +138,7 @@ bool LoadAccumulatorValuesFromDB(const uint256 nCheckpoint)
         if (!zerocoinDB->ReadAccumulatorValue(nChecksum, bnValue)) {
             if (!count(listAccCheckpointsNoDB.begin(), listAccCheckpointsNoDB.end(), nCheckpoint))
                 listAccCheckpointsNoDB.push_back(nCheckpoint);
-            LogPrint("zero", "%s : Missing databased value for checksum %d", __func__, nChecksum);
+//            LogPrint("zero", "%s : Missing databased value for checksum %d", __func__, nChecksum);
             return false;
         }
         mapAccumulatorValues.insert(make_pair(nChecksum, bnValue));
@@ -281,7 +282,7 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
             return error("%s: failed to get zerocoin mintlist from block %d", __func__, pindex->nHeight);
 
         nTotalMintsFound += listPubcoins.size();
-        LogPrint("zero", "%s found %d mints\n", __func__, listPubcoins.size());
+//        LogPrint("zero", "%s found %d mints\n", __func__, listPubcoins.size());
 
         //add the pubcoins to accumulator
         for (const PublicCoin& pubcoin : listPubcoins) {
@@ -297,7 +298,7 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
     else
         nCheckpoint = mapAccumulators.GetCheckpoint();
 
-    LogPrint("zero", "%s checkpoint=%s\n", __func__, nCheckpoint.GetHex());
+//    LogPrint("zero", "%s checkpoint=%s\n", __func__, nCheckpoint.GetHex());
     return true;
 }
 
@@ -420,7 +421,7 @@ bool GetAccumulatorValue(int& nHeight, const libzerocoin::CoinDenomination denom
 
 bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator, AccumulatorWitness& witness, int nSecurityLevel, int& nMintsAdded, string& strError, CBlockIndex* pindexCheckpoint)
 {
-    LogPrint("zero", "%s: generating\n", __func__);
+//    LogPrint("zero", "%s: generating\n", __func__);
     int nLockAttempts = 0;
     while (nLockAttempts < 100) {
         TRY_LOCK(cs_main, lockMain);
@@ -433,7 +434,7 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
     }
     if (nLockAttempts == 100)
         return error("%s: could not get lock on cs_main", __func__);
-    LogPrint("zero", "%s: after lock\n", __func__);
+//    LogPrint("zero", "%s: after lock\n", __func__);
     uint256 txid;
     if (!zerocoinDB->ReadCoinMint(coin.getValue(), txid))
         return error("%s failed to read mint from db", __func__);
@@ -523,7 +524,7 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
 
     // calculate how many mints of this denomination existed in the accumulator we initialized
     nMintsAdded += ComputeAccumulatedCoins(nAccStartHeight, coin.getDenomination());
-    LogPrint("zero", "%s : %d mints added to witness\n", __func__, nMintsAdded);
+//    LogPrint("zero", "%s : %d mints added to witness\n", __func__, nMintsAdded);
 
     return true;
 }
