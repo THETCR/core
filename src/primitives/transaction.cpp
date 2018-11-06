@@ -274,3 +274,39 @@ std::string CMutableTransaction::ToString() const
         str += "    " + vout[i].ToString() + "\n";
     return str;
 }
+CAmount CTransaction::GetZerocoinMinted() const
+{
+    for (const CTxOut& txOut : vout) {
+        if(!txOut.scriptPubKey.IsZerocoinMint())
+            continue;
+
+        return txOut.nValue;
+    }
+
+    return  CAmount(0);
+}
+CAmount CTransaction::GetZerocoinSpent() const
+{
+    if(!IsZerocoinSpend())
+        return 0;
+
+    CAmount nValueOut = 0;
+    for (const CTxIn& txin : vin) {
+        if(!txin.scriptSig.IsZerocoinSpend())
+            continue;
+
+        nValueOut += txin.nSequence * COIN;
+    }
+
+    return nValueOut;
+}
+
+int CTransaction::GetZerocoinMintCount() const
+{
+    int nCount = 0;
+    for (const CTxOut& out : vout) {
+        if (out.scriptPubKey.IsZerocoinMint())
+            nCount++;
+    }
+    return nCount;
+}
