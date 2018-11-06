@@ -220,9 +220,14 @@ public:
     //uint256 hashProof;
     CAmount nMoneySupply;
     int64_t nAnonOutputs; // last index
+    unsigned int nStakeModifierChecksum; // checksum of index; in-memeory only
+    unsigned int nStakeTime;
+    uint256 hashProofOfStake;
 
     //! Verification status of this block. See enum BlockStatus
     uint32_t nStatus;
+
+    int64_t nMint;
 
     //! block header
     int32_t nVersion;
@@ -231,9 +236,14 @@ public:
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
+    uint256 nAccumulatorCheckpoint;
 
     //! (memory only) Sequential id assigned to distinguish order in which blocks are received.
     int32_t nSequenceId;
+
+    //! zerocoin specific fields
+    std::map<libzerocoin::CoinDenomination, int64_t> mapZerocoinSupply;
+    std::vector<libzerocoin::CoinDenomination> vMintDenominationsInBlock;
 
     //! (memory only) Maximum nTime in the chain up to and including this block.
     unsigned int nTimeMax;
@@ -257,8 +267,11 @@ public:
         nFlags = 0;
         bnStakeModifier = uint256();
         prevoutStake.SetNull();
+        nStakeModifierChecksum = 0;
+        nStakeTime = 0;
         //hashProof = uint256();
 
+        nMint = 0;
         nMoneySupply = 0;
         nAnonOutputs = 0;
 
@@ -268,6 +281,12 @@ public:
         nTime                   = 0;
         nBits                   = 0;
         nNonce                  = 0;
+        nAccumulatorCheckpoint = 0;
+        // Start supply of each denomination with 0s
+        for (auto& denom : libzerocoin::zerocoinDenomList) {
+            mapZerocoinSupply.insert(make_pair(denom, 0));
+        }
+        vMintDenominationsInBlock.clear();
     }
 
     CBlockIndex()
@@ -285,6 +304,8 @@ public:
         nTime                   = block.nTime;
         nBits                   = block.nBits;
         nNonce                  = block.nNonce;
+        if(block.nVersion > 7)
+            nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
     }
 
     CDiskBlockPos GetBlockPos() const {
@@ -318,7 +339,10 @@ public:
         block.nNonce                = nNonce;
         return block;
     }
-
+    bool MintedDenomination(libzerocoin::CoinDenomination denom) const
+    {
+        return std::find(vMintDenominationsInBlock.begin(), vMintDenominationsInBlock.end(), denom) != vMintDenominationsInBlock.end();
+    }
     uint256 GetBlockHash() const
     {
         return *phashBlock;
@@ -462,6 +486,13 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+        if(this->nVersion > 7) {
+            READWRITE(nAccumulatorCheckpoint);
+            READWRITE(mapZerocoinSupply);
+            READWRITE(vMintDenominationsInBlock);
+        }else{
+            READWRITE(bnStakeModifierV2);
+        }
     }
 
     uint256 GetBlockHash() const
@@ -474,6 +505,7 @@ public:
         block.nTime                 = nTime;
         block.nBits                 = nBits;
         block.nNonce                = nNonce;
+        block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
         return block.GetHash();
     }
 
