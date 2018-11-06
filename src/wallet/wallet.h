@@ -904,6 +904,8 @@ public:
 
     std::set<COutPoint> setLockedCoins;
 
+    int64_t nKeysLeftSinceAutoBackup;
+
     virtual const CWalletTx* GetWalletTx(const uint256& hash) const;
 
     //! check whether we are allowed to upgrade (or already support) to the named feature

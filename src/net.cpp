@@ -2015,7 +2015,9 @@ void CConnman::ThreadOpenAddedConnections()
             return;
     }
 }
-
+bool CConnman::OpenMasternodeConnection(const CAddress &addrConnect) {
+    return OpenNetworkConnection(addrConnect, false, NULL, NULL, false, false, false, true);
+}
 // if successful, this moves the passed grant to the constructed node
 void CConnman::OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound, const char *pszDest, bool fOneShot, bool fFeeler, bool manual_connection)
 {
