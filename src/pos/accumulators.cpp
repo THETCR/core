@@ -441,7 +441,7 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
 
     CTransaction txMinted;
     uint256 hashBlock;
-    if (!GetTransaction(txid, txMinted, hashBlock))
+    if (!GetTransaction(txid, txMinted, Params().GetConsensus(), hashBlock))
         return error("%s failed to read tx", __func__);
 
     int nHeightTest;
