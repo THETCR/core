@@ -2578,7 +2578,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
 
     if (block.IsProofOfStake()) {
-        pindex->bnStakeModifier = ComputeStakeModifierV2(pindex->pprev, pindex->prevoutStake.hash);
+        pindex->nStakeModifier = ComputeStakeModifierV2(pindex->pprev, pindex->prevoutStake.hash);
         setDirtyBlockIndex.insert(pindex);
 
         uint256 hashProof, targetProofOfStake;
@@ -5187,7 +5187,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         pindex->SetProofOfStake();
         pindex->prevoutStake = pblock->vtx[0]->vin[0].prevout;
         if (!pindex->pprev
-            || (pindex->pprev->bnStakeModifier.IsNull()
+            || (pindex->pprev->nStakeModifier.IsNull()
                 && pindex->pprev->GetBlockHash() != chainparams.GetConsensus().hashGenesisBlock)) {
             // Block received out of order
             if (fParticlMode && !IsInitialBlockDownload()) {
@@ -5200,7 +5200,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
                 return DelayBlock(pblock, state);
             }
         } else {
-            pindex->bnStakeModifier = ComputeStakeModifierV2(pindex->pprev, pindex->prevoutStake.hash);
+            pindex->nStakeModifier = ComputeStakeModifierV2(pindex->pprev, pindex->prevoutStake.hash);
         }
         pindex->nFlags &= ~BLOCK_DELAYED;
         setDirtyBlockIndex.insert(pindex);

@@ -215,7 +215,7 @@ public:
 
     // proof-of-stake specific fields
     unsigned int nFlags;  // pos: block index flags
-    uint256 bnStakeModifier; // hash modifier for proof-of-stake
+    uint256 nStakeModifier; // hash modifier for proof-of-stake
     uint256 bnStakeModifierV2;
     COutPoint prevoutStake;
     //uint256 hashProof;
@@ -266,7 +266,7 @@ public:
         nTimeMax = 0;
 
         nFlags = 0;
-        bnStakeModifier = uint256();
+        nStakeModifier = uint256();
         prevoutStake.SetNull();
         nStakeModifierChecksum = 0;
         nStakeTime = 0;
@@ -470,7 +470,7 @@ public:
 
 
         READWRITE(nFlags);
-        READWRITE(bnStakeModifier);
+        READWRITE(nStakeModifier);
         READWRITE(prevoutStake);
         //READWRITE(hashProof);
         READWRITE(nMoneySupply);
