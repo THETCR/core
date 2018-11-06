@@ -5,7 +5,7 @@
 #ifndef WISPR_STAKEINPUT_H
 #define WISPR_STAKEINPUT_H
 
-#include <stream.h>
+#include <streams.h>
 
 class CKeyStore;
 class CWallet;
