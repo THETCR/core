@@ -62,6 +62,8 @@ file(GLOB SOURCE_FILES
         src/wallet/test/*.cpp
         src/wallet/*.cpp
         src/wallet/*.h
+        src/zerocoin/*.cpp
+        src/zerocoin/*.h
         src/zmq/*.cpp
         src/zmq/*.h
         src/*.cpp
