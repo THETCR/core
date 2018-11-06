@@ -340,13 +340,7 @@ bool stakeTargetHit(uint256 hashProofOfStake, int64_t nValueIn, uint256 bnTarget
     // Now check if proof-of-stake hash meets target protocol
     return hashProofOfStake < (bnCoinDayWeight * bnTargetPerCoinDay);
 }
-bool stakeTargetHitOld(uint256 hashProofOfStake, uint256 bnTargetPerCoinDay) {
-    if (hashProofOfStake > bnTargetPerCoinDay)
-        return false;
-
-    return true;
-}
-bool CheckStakeV2(const CDataStream& ssUniqueID, CAmount nValueIn, const uint64_t nStakeModifier, const uint256& bnTarget,
+bool CheckStake(const CDataStream& ssUniqueID, CAmount nValueIn, const uint64_t nStakeModifier, const uint256& bnTarget,
                   unsigned int nTimeBlockFrom, unsigned int& nTimeTx, uint256& hashProofOfStake)
 {
     CDataStream ss(SER_GETHASH, 0);
@@ -355,59 +349,6 @@ bool CheckStakeV2(const CDataStream& ssUniqueID, CAmount nValueIn, const uint64_
 //    LogPrintf("%s: modifier:%d nTimeBlockFrom:%d nTimeTx:%d hash:%s\n", __func__, nStakeModifier, nTimeBlockFrom, nTimeTx, hashProofOfStake.ToString());
 
     return stakeTargetHit(hashProofOfStake, nValueIn, bnTarget);
-}
-bool CheckStakeV1(unsigned int nTxPrevTime, const COutPoint &prevout,
-                  unsigned int nTimeTx, uint256 &hashProofOfStake, int64_t nValueIn, CBlockIndex *pindexPrev,
-                  unsigned int nBits, bool fDebug = false) {
-
-    string function = __func__;
-//    LogPrintf(
-//            "%s :nTimeTxPrev=%u nTimeTx=%u\n", function, nTxPrevTime, nTimeTx);
-
-    if (nTimeTx < nTxPrevTime)  // Transaction timestamp violation
-        return error("CheckStakeV1() : nTime violation");
-
-    // Base target
-    uint256 bnTarget;
-    uint256 bnTargetOld;
-    bnTarget.SetCompact(nBits);
-    bnTargetOld.SetCompact(nBits);
-
-    // Weighted target
-    //int64_t nValueIn = txPrev.vout[prevout.n].nValue;
-    uint256 bnWeight = uint256(nValueIn);
-    bnTarget *= bnWeight;
-
-//    uint256 targetProofOfStake = bnTarget;
-
-    uint64_t nStakeModifier = pindexPrev->nStakeModifier;
-    uint256 bnStakeModifierV2 = pindexPrev->bnStakeModifierV2;
-    int nStakeModifierHeight = pindexPrev->nHeight;
-
-    // Calculate hash
-    CDataStream ss(SER_GETHASH, 0);
-    ss << bnStakeModifierV2;
-    ss << nTxPrevTime << prevout.hash << prevout.n << nTimeTx;
-    hashProofOfStake = Hash(ss.begin(), ss.end());
-
-    if(fDebug) {
-        LogPrintf("%s : Checking block at height=%ds\n",
-                  function, (nStakeModifierHeight + 1));
-        LogPrintf(
-                "%s : height=%ds, using modifier %016x, bnStakeModifierV2 %s\n nTimeTxPrev=%u nPrevout=%u "
-                "nTimeTx=%u, nBits = %08x, modifier checksum %016x, prevoutHash=%s \n hashProofOfStake=%s\n", function,
-                nStakeModifierHeight, nStakeModifier,
-                bnStakeModifierV2.ToString(), nTxPrevTime,
-                prevout.n, nTimeTx, nBits, pindexPrev->nStakeModifierChecksum, prevout.hash.ToString(),
-                hashProofOfStake.ToString());
-        LogPrintf(
-                "%s :  bnTarget=%s \n bnCoinDayWeight=%s \n bnTarget * bnCoinDayWeight=%s \n",
-                function,
-                bnTargetOld.ToString(), bnWeight.ToString(),
-                bnTarget.ToString());
-    }
-
-    return stakeTargetHitOld(hashProofOfStake, bnTarget);
 }
 
 bool Stake(CStakeInput* stakeInput, unsigned int nBits, unsigned int nTimeBlockFrom, unsigned int& nTimeTx, uint256& hashProofOfStake)
@@ -508,19 +449,12 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
     int64_t nValueIn = txPrev.vout[txin.prevout.n].nValue;
     unsigned int nBlockFromTime = blockprev.nTime;
     unsigned int nTxTime = block.nTime;
-    if (block.nVersion > 7) {
-        if (!stake->GetModifier(nStakeModifier))
-            return error("%s failed to get modifier for stake input\n", __func__);
-        if(!CheckStakeV2(stake->GetUniqueness(), stake->GetValue(), nStakeModifier, bnTargetPerCoinDay, nBlockFromTime,
-                         nTxTime, hashProofOfStake)){
-            return error("CheckProofOfStake() : INFO: check kernel failed on coinstake %s, hashProof=%s \n",
-                         tx.GetHash().ToString(), hashProofOfStake.ToString());
-        }
-    } else {
-        if (!CheckStakeV1(txPrev.nTime, txin.prevout, tx.nTime, hashProofOfStake, nValueIn, pindexOld, block.nBits)) {
-            return error("CheckProofOfStake() : INFO: old bnStakeModifierV2 check kernel failed on coinstake %s, hashProof=%s \n",
-                         tx.GetHash().ToString(), hashProofOfStake.ToString());
-        }
+    if (!stake->GetModifier(nStakeModifier))
+        return error("%s failed to get modifier for stake input\n", __func__);
+    if(!CheckStake(stake->GetUniqueness(), stake->GetValue(), nStakeModifier, bnTargetPerCoinDay, nBlockFromTime,
+                     nTxTime, hashProofOfStake)){
+        return error("CheckProofOfStake() : INFO: check kernel failed on coinstake %s, hashProof=%s \n",
+                     tx.GetHash().ToString(), hashProofOfStake.ToString());
     }
     return true;
 }
