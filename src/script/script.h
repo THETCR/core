@@ -543,6 +543,8 @@ public:
     bool IsPayToPublicKeyHash() const;
     bool IsPayToScriptHashAny(bool fIsTxCoinstake) const;
     bool IsPayToScriptHash() const;
+    bool IsZerocoinMint() const;
+    bool IsZerocoinSpend() const;
     bool MatchPayToScriptHash(size_t ofs) const;
     bool MatchPayToPublicKeyHash(size_t ofs) const;
     bool IsPayToPublicKeyHash256() const;
