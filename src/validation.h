@@ -580,7 +580,11 @@ extern std::unique_ptr<CCoinsViewCache> pcoinsTip;
 
 /** Global variable that points to the active block tree (protected by cs_main) */
 extern std::unique_ptr<CBlockTreeDB> pblocktree;
+/** Global variable that points to the zerocoin database (protected by cs_main) */
+extern CZerocoinDB* zerocoinDB;
 
+/** Global variable that points to the spork database (protected by cs_main) */
+extern CSporkDB* pSporkDB;
 /**
  * Return the spend height, which is one more than the inputs.GetBestBlock().
  * While checking, GetBestBlock() refers to the parent block. (protected by cs_main)
