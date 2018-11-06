@@ -268,7 +268,7 @@ public:
         nTimeMax = 0;
 
         nFlags = 0;
-        nStakeModifier = uint256();
+        nStakeModifier = 0;
         prevoutStake.SetNull();
         nStakeModifierChecksum = 0;
         nStakeTime = 0;
