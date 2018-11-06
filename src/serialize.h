@@ -1306,7 +1306,12 @@ size_t GetSerializeSize(const S& s, const T& t)
 {
     return (CSizeComputer(s.GetType(), s.GetVersion()) << t).size();
 }
-
+template <typename T>
+unsigned int GetSerializeSize(const T& obj)
+{
+    // Tells the size of the object if serialized to this stream
+    return ::GetSerializeSize(obj, nType, nVersion);
+}
 template <typename S, typename... T>
 size_t GetSerializeSizeMany(const S& s, const T&... t)
 {
