@@ -28,6 +28,7 @@ public:
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
+    uint256 nAccumulatorCheckpoint;
 
 
     CBlockHeader()
@@ -47,6 +48,9 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+        //zerocoin active, header changes to include accumulator checksum
+        if(nVersion > 7)
+            READWRITE(nAccumulatorCheckpoint);
     }
 
     void SetNull()
