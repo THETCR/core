@@ -968,4 +968,20 @@ public:
     int GetVersion() const { return nVersion; }
 };
 
+
+//NEW
+
+template<typename Stream, typename... Args>
+inline void SerReadWriteMany(Stream& s, CSerActionSerialize ser_action, const Args&... args)
+{
+    ::SerializeMany(s, args...);
+}
+
+template<typename Stream, typename... Args>
+inline void SerReadWriteMany(Stream& s, CSerActionUnserialize ser_action, Args&&... args)
+{
+    ::UnserializeMany(s, args...);
+}
+
+
 #endif // WISPR_SERIALIZE_H
