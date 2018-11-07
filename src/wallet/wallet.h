@@ -1043,7 +1043,8 @@ public:
     CAmount GetImmatureWatchOnlyBalance() const;
     virtual CAmount GetLegacyBalance(const isminefilter& filter, int minDepth, const std::string* account) const;
     virtual CAmount GetAvailableBalance(const CCoinControl* coinControl = nullptr) const;
-
+    bool GetBudgetSystemCollateralTX(CTransactionRef& tx, uint256 hash, CAmount amount, bool fUseInstantSend);
+    bool GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, CAmount amount, bool fUseInstantSend);
     OutputType TransactionChangeType(OutputType change_type, const std::vector<CRecipient>& vecSend);
 
     /**
