@@ -970,6 +970,29 @@ public:
 
 
 //NEW
+template<typename Stream>
+void SerializeMany(Stream& s)
+{
+}
+
+template<typename Stream, typename Arg, typename... Args>
+void SerializeMany(Stream& s, const Arg& arg, const Args&... args)
+{
+    ::Serialize(s, arg);
+    ::SerializeMany(s, args...);
+}
+
+template<typename Stream>
+inline void UnserializeMany(Stream& s)
+{
+}
+
+template<typename Stream, typename Arg, typename... Args>
+inline void UnserializeMany(Stream& s, Arg&& arg, Args&&... args)
+{
+    ::Unserialize(s, arg);
+    ::UnserializeMany(s, args...);
+}
 
 template<typename Stream, typename... Args>
 inline void SerReadWriteMany(Stream& s, CSerActionSerialize ser_action, const Args&... args)
@@ -982,6 +1005,12 @@ inline void SerReadWriteMany(Stream& s, CSerActionUnserialize ser_action, Args&&
 {
     ::UnserializeMany(s, args...);
 }
-
+template <typename... T>
+size_t GetSerializeSizeMany(int nVersion, const T&... t)
+{
+    CSizeComputer sc(nVersion);
+    SerializeMany(sc, t...);
+    return sc.size();
+}
 
 #endif // WISPR_SERIALIZE_H
