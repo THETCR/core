@@ -277,15 +277,15 @@ std::string ReindexZerocoinDB()
         }
 
         for (const CTransactionRef& tx : block.vtx) {
-            for (unsigned int i = 0; i < tx.vin.size(); i++) {
-                if (tx.IsCoinBase())
+            for (unsigned int i = 0; i < tx->vin.size(); i++) {
+                if (tx->IsCoinBase())
                     break;
 
-                if (tx.ContainsZerocoins()) {
-                    uint256 txid = tx.GetHash();
+                if (tx->ContainsZerocoins()) {
+                    uint256 txid = tx->GetHash();
                     //Record Serials
-                    if (tx.IsZerocoinSpend()) {
-                        for (auto& in : tx.vin) {
+                    if (tx->IsZerocoinSpend()) {
+                        for (auto& in : tx->vin) {
                             if (!in.scriptSig.IsZerocoinSpend())
                                 continue;
 
@@ -295,8 +295,8 @@ std::string ReindexZerocoinDB()
                     }
 
                     //Record mints
-                    if (tx.IsZerocoinMint()) {
-                        for (auto& out : tx.vout) {
+                    if (tx->IsZerocoinMint()) {
+                        for (auto& out : tx->vout) {
                             if (!out.IsZerocoinMint())
                                 continue;
 
