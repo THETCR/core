@@ -8161,7 +8161,7 @@ bool CHDWallet::SignTransaction(CMutableTransaction &tx)
 }
 
 bool CHDWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransactionRef& tx, CReserveKey& reservekey, CAmount& nFeeRet,
-                                int& nChangePosInOut, std::string& strFailReason, const CCoinControl& coin_control, bool sign)
+                                int& nChangePosInOut, std::string& strFailReason, const CCoinControl& coin_control, bool sign, AvailableCoinsType nCoinType, bool fUseInstantSend)
 {
     WalletLogPrintf("CHDWallet %s\n", __func__);
 
