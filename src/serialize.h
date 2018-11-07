@@ -219,7 +219,8 @@ template<typename X> const X& ReadWriteAsHelper(const X& x) { return x; }
 //#define READWRITE(obj) (::SerReadWrite(s, (obj), nType, nVersion, ser_action))
 #define READWRITE(...) (::SerReadWriteMany(s, ser_action, __VA_ARGS__))
 #define READWRITEAS(type, obj) (::SerReadWriteMany(s, ser_action, ReadWriteAsHelper<type>(obj)))
-
+#define WRITEDATA(s, obj) s.write((char*)&(obj), sizeof(obj))
+#define READDATA(s, obj) s.read((char*)&(obj), sizeof(obj))
 /**
  * Implement three methods for serializable objects. These are actually wrappers over
  * "SerializationOp" template, which implements the body of each class' serialization
