@@ -2610,7 +2610,8 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         setDirtyBlockIndex.insert(pindex);
 
         uint256 hashProof, targetProofOfStake;
-        if (!CheckProofOfStake(state, pindex->pprev, *block.vtx[0], block.nTime, block.nBits, hashProof, targetProofOfStake)) {
+        unique_ptr<CStakeInput> stake;
+        if (!CheckProofOfStake(block, hashProof, stake)) {
             return error("%s: Check proof of stake failed.", __func__);
         }
     }
@@ -4737,12 +4738,12 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
             }
 
             uint256 hashProof, targetProofOfStake;
-
+            unique_ptr<CStakeInput> stake;
             // Blocks are connected at end of import / reindex
             // CheckProofOfStake is run again during connectblock
             if (!IsInitialBlockDownload() // checks (!fImporting && !fReindex)
                 && (!accept_block || chainActive.Height() > (int)Params().GetStakeMinConfirmations())
-                && !CheckProofOfStake(state, pindexPrev, *block.vtx[0], block.nTime, block.nBits, hashProof, targetProofOfStake)) {
+                && !CheckProofOfStake(block, hashProof, stake)) {
                 return error("ContextualCheckBlock(): check proof-of-stake failed for block %s\n", block.GetHash().ToString());
             }
         } else
@@ -5215,7 +5216,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         pindex->SetProofOfStake();
         pindex->prevoutStake = pblock->vtx[0]->vin[0].prevout;
         if (!pindex->pprev
-            || (pindex->pprev->nStakeModifier.IsNull()
+            || (pindex->pprev->bnStakeModifierV2.IsNull()
                 && pindex->pprev->GetBlockHash() != chainparams.GetConsensus().hashGenesisBlock)) {
             // Block received out of order
             if (fParticlMode && !IsInitialBlockDownload()) {
