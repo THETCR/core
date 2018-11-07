@@ -2892,7 +2892,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
         LOCK2(cs_main, cs_wallet);
         {
             std::vector<COutput> vAvailableCoins;
-            AvailableCoins(vAvailableCoins, true, coinControl, false, nCoinType, fUseInstantSend);
+            AvailableCoins(vAvailableCoins, true, &coin_control, false, nCoinType, fUseInstantSend);
             int nInstantSendConfirmationsRequired = Params().GetConsensus().nInstantSendConfirmationsRequired;
             CoinSelectionParams coin_selection_params; // Parameters for coin selection, init with dummy
 
