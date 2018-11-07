@@ -71,6 +71,7 @@ public:
 
     explicit base_blob(const std::string& str);
     explicit base_blob(const std::vector<unsigned char>& vch);
+    explicit base_blob(const uint8_t *p, size_t l);
 
     bool operator!() const
     {
