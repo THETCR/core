@@ -3,13 +3,13 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <primitives/deterministicmint.h>
-#include "zwsptracker.h"
-#include "util.h"
-#include "sync.h"
-#include "main.h"
-#include "txdb.h"
-#include "../wallet/walletdb.h"
-#include "accumulators.h"
+#include <zerocoin/zwsptracker.h>
+#include <util.h>
+#include <sync.h>
+#include <validation.h>
+#include <txdb.h>
+#include <wallet/walletdb.h>
+#include <pos/accumulators.h>
 
 using namespace std;
 

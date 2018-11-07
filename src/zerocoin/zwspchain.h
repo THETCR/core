@@ -5,9 +5,9 @@
 #ifndef WISPR_ZWSPCHAIN_H
 #define WISPR_ZWSPCHAIN_H
 
-#include "libzerocoin/Coin.h"
-#include "libzerocoin/Denominations.h"
-#include "libzerocoin/CoinSpend.h"
+#include <libzerocoin/Coin.h>
+#include <libzerocoin/CoinSpend.h>
+#include <libzerocoin/Denominations.h>
 #include <list>
 #include <string>
 

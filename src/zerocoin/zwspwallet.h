@@ -6,10 +6,10 @@
 #define WISPR_ZWSPWALLET_H
 
 #include <map>
-#include "libzerocoin/Coin.h"
-#include "mintpool.h"
-#include "uint256.h"
-#include "primitives/zerocoin.h"
+#include <libzerocoin/Coin.h>
+#include <mintpool.h>
+#include <uint256.h>
+#include <primitives/zerocoin.h>
 
 class CDeterministicMint;
 

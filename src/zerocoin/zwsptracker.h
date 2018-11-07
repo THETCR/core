@@ -5,7 +5,7 @@
 #ifndef WISPR_ZWSPTRACKER_H
 #define WISPR_ZWSPTRACKER_H
 
-#include "primitives/zerocoin.h"
+#include <primitives/zerocoin.h>
 #include <list>
 
 class CDeterministicMint;

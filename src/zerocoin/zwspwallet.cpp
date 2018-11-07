@@ -2,14 +2,14 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "zwspwallet.h"
-#include "main.h"
-#include "txdb.h"
-#include "../wallet/walletdb.h"
-#include "init.h"
-#include "../wallet/wallet.h"
-#include "primitives/deterministicmint.h"
-#include "zwspchain.h"
+#include <zerocoin/zwspwallet.h>
+#include <validation.h>
+#include <txdb.h>
+#include <wallet/walletdb.h>
+#include <init.h>
+#include <wallet/wallet.h>
+#include <zerocoin/zwspchain.h>
+#include <primitives/deterministicmint.h>
 
 using namespace libzerocoin;
 

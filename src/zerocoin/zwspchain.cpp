@@ -2,11 +2,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "zwspchain.h"
-#include "invalid.h"
-#include "main.h"
-#include "txdb.h"
-#include "ui_interface.h"
+#include <zerocoin/zwspchain.h>
+#include <invalid.h>
+#include <validation.h>
+#include <txdb.h>
+#include <ui_interface.h>
 
 // 6 comes from OPCODE (1) + vch.size() (1) + BIGNUM size (4)
 #define SCRIPT_OFFSET 6
