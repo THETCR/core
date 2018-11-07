@@ -228,10 +228,10 @@ UniValue gobject(const JSONRPCRequest& request)
 
         bool fMnFound = mnodeman.Has(activeMasternode.outpoint);
 
-        DBG( std::cout << "gobject: submit activeMasternode.pubKeyMasternode = " << activeMasternode.pubKeyMasternode.GetHash().ToString()
-             << ", outpoint = " << activeMasternode.outpoint.ToStringShort()
-             << ", params.size() = " << request.params.size()
-             << ", fMnFound = " << fMnFound << std::endl; );
+//        DBG( std::cout << "gobject: submit activeMasternode.pubKeyMasternode = " << activeMasternode.pubKeyMasternode.GetHash().ToString()
+//             << ", outpoint = " << activeMasternode.outpoint.ToStringShort()
+//             << ", params.size() = " << request.params.size()
+//             << ", fMnFound = " << fMnFound << std::endl; );
 
         // ASSEMBLE NEW GOVERNANCE OBJECT FROM USER PARAMETERS
 
@@ -257,11 +257,11 @@ UniValue gobject(const JSONRPCRequest& request)
 
         CGovernanceObject govobj(hashParent, nRevision, nTime, txidFee, strDataHex);
 
-        DBG( std::cout << "gobject: submit "
-             << " GetDataAsPlainString = " << govobj.GetDataAsPlainString()
-             << ", hash = " << govobj.GetHash().GetHex()
-             << ", txidFee = " << txidFee.GetHex()
-             << std::endl; );
+//        DBG( std::cout << "gobject: submit "
+//             << " GetDataAsPlainString = " << govobj.GetDataAsPlainString()
+//             << ", hash = " << govobj.GetHash().GetHex()
+//             << ", txidFee = " << txidFee.GetHex()
+//             << std::endl; );
 
         if(govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
             CProposalValidator validator(strDataHex);
