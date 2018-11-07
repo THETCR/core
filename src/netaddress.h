@@ -94,7 +94,7 @@ class CNetAddr
         ADD_SERIALIZE_METHODS;
 
         template <typename Stream, typename Operation>
-        inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        inline void SerializationOp(Stream& s, Operation ser_action) {
             READWRITE(ip);
         }
 
@@ -131,7 +131,7 @@ class CSubNet
         ADD_SERIALIZE_METHODS;
 
         template <typename Stream, typename Operation>
-        inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        inline void SerializationOp(Stream& s, Operation ser_action) {
             READWRITE(network);
             READWRITE(netmask);
             READWRITE(valid);
@@ -166,7 +166,7 @@ class CService : public CNetAddr
         ADD_SERIALIZE_METHODS;
 
         template <typename Stream, typename Operation>
-        inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        inline void SerializationOp(Stream& s, Operation ser_action) {
             READWRITE(ip);
             READWRITE(WrapBigEndian(port));
         }
