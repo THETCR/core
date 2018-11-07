@@ -35,6 +35,9 @@
 #include <utility>
 #include <vector>
 
+#include <obfuscation/privatesend.h>
+
+
 bool AddWallet(const std::shared_ptr<CWallet>& wallet);
 bool RemoveWallet(const std::shared_ptr<CWallet>& wallet);
 bool HasWallets();
