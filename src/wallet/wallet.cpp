@@ -33,6 +33,12 @@
 #include <assert.h>
 #include <future>
 
+#include <governance/governance.h>
+#include <instantx.h>
+#include <keepass.h>
+#include <obfuscation/privatesend-client.h>
+#include <spork/spork.h>
+
 #include <boost/algorithm/string/replace.hpp>
 
 #include <wallet/hdwallet.h>
