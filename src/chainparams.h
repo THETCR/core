@@ -219,6 +219,7 @@ protected:
 
     //WISPR
     int nMasternodeCountDrift;
+    int nMaturity;
     CAmount nMaxMoneyOut;
     std::string strObfuscationPoolDummyAddress;
     int64_t nStartMasternodePayments;
