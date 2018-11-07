@@ -31,6 +31,7 @@
 
 #include <atomic>
 
+#include <primitives/zerocoin.h>
 #include <libzerocoin/CoinSpend.h>
 
 class CBlockIndex;
