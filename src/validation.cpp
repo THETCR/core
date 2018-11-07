@@ -52,6 +52,7 @@
 
 #include <future>
 #include <sstream>
+#include <libzerocoin/Denominations.h>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/thread.hpp>
@@ -62,6 +63,10 @@
 
 #define MICRO 0.000001
 #define MILLI 0.001
+
+using namespace boost;
+using namespace std;
+using namespace libzerocoin;
 
 /**
  * Global state
