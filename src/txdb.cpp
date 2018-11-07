@@ -782,8 +782,9 @@ bool CZerocoinDB::WipeCoins(std::string strType)
     }
 
     for (auto& hash : setDelete) {
-        if (!Erase(make_pair(type, hash)))
-//            LogPrintf("%s: error failed to delete %s\n", __func__, hash.GetHex());
+        if (!Erase(make_pair(type, hash))) {
+            LogPrintf("%s: error failed to delete %s\n", __func__, hash.GetHex());
+        }
     }
 
     return true;
