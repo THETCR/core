@@ -16,7 +16,7 @@
 
 bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomination denom, vector<CBigNum>& vValues)
 {
-    for (const CTransaction& tx : block.vtx) {
+    for (const CTransactionRef& tx : block.vtx) {
         if(!tx.IsZerocoinMint())
             continue;
 
