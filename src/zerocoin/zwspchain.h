@@ -15,7 +15,7 @@ class CBlock;
 class CBigNum;
 struct CMintMeta;
 class CTransaction;
-class CTransactionRef;
+typedef CTransactionRef;
 class CTxIn;
 class CTxOut;
 class CValidationState;
