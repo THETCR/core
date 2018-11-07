@@ -131,8 +131,8 @@ struct FeeCalculation
     int returnedTarget = 0;
 };
 
-static const double INF_FEERATE = MAX_MONEY;
-static const double INF_PRIORITY = 1e9 * MAX_MONEY;
+static constexpr double INF_FEERATE = MAX_MONEY;
+static constexpr double INF_PRIORITY = 1e9 * MAX_MONEY;
 /**
  *  We want to be able to estimate feerates that are needed on tx's to be included in
  * a certain number of blocks.  Every time a block is added to the best chain, this class records
