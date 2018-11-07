@@ -84,13 +84,13 @@ bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>&
 bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMints, bool fFilterInvalid)
 {
     for (const CTransactionRef& tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if(!tx->IsZerocoinMint())
             continue;
 
         // Filter out mints that have used invalid outpoints
         if (fFilterInvalid) {
             bool fValid = true;
-            for (const CTxIn& in : tx.vin) {
+            for (const CTxIn& in : tx->vin) {
                 if (!ValidOutPoint(in.prevout, INT_MAX)) {
                     fValid = false;
                     break;
@@ -100,13 +100,13 @@ bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMin
                 continue;
         }
 
-        uint256 txHash = tx.GetHash();
-        for (unsigned int i = 0; i < tx.vout.size(); i++) {
+        uint256 txHash = tx->GetHash();
+        for (unsigned int i = 0; i < tx->vout.size(); i++) {
             //Filter out mints that use invalid outpoints - edge case: invalid spend with minted change
             if (fFilterInvalid && !ValidOutPoint(COutPoint(txHash, i), INT_MAX))
                 break;
 
-            const CTxOut txOut = tx.vout[i];
+            const CTxOut txOut = tx->vout[i];
             if(!txOut.scriptPubKey.IsZerocoinMint())
                 continue;
 
@@ -118,7 +118,7 @@ bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMin
             //version should not actually matter here since it is just a reference to the pubcoin, not to the privcoin
             uint8_t version = 1;
             CZerocoinMint mint = CZerocoinMint(pubCoin.getDenomination(), pubCoin.getValue(), 0, 0, false, version, nullptr);
-            mint.SetTxHash(tx.GetHash());
+            mint.SetTxHash(tx->GetHash());
             vMints.push_back(mint);
         }
     }
