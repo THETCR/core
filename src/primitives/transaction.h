@@ -580,7 +580,10 @@ public:
     {
         return !(a == b);
     }
-
+    bool IsZerocoinMint() const
+    {
+        return !scriptPubKey.empty() && scriptPubKey.IsZerocoinMint();
+    }
     std::string ToString() const;
 };
 
