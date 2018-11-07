@@ -205,11 +205,11 @@ UniValue gobject(const JSONRPCRequest& request)
             throw JSONRPCError(RPC_INTERNAL_ERROR, "CommitTransaction failed! Reason given: " + state.GetRejectReason());
         }
 
-        DBG( std::cout << "gobject: prepare "
-             << " GetDataAsPlainString = " << govobj.GetDataAsPlainString()
-             << ", hash = " << govobj.GetHash().GetHex()
-             << ", txidFee = " << wtx.GetHash().GetHex()
-             << std::endl; );
+//        DBG( std::cout << "gobject: prepare "
+//             << " GetDataAsPlainString = " << govobj.GetDataAsPlainString()
+//             << ", hash = " << govobj.GetHash().GetHex()
+//             << ", txidFee = " << wtx.GetHash().GetHex()
+//             << std::endl; );
 
         return wtx.GetHash().ToString();
     }
