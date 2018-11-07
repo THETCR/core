@@ -234,22 +234,6 @@ template<typename X> const X& ReadWriteAsHelper(const X& x) { return x; }
     template<typename Stream>                                                         \
     void Unserialize(Stream& s) {                                                     \
         SerializationOp(s, CSerActionUnserialize());                                  \
-    }                                                                                 \
-    size_t GetSerializeSize(int nType, int nVersion) const                            \
-    {                                                                                 \
-        CSizeComputer s(nType, nVersion);                                             \
-        NCONST_PTR(this)->SerializationOp(s, CSerActionSerialize(), nType, nVersion); \
-        return s.size();                                                              \
-    }                                                                                 \
-    template <typename Stream>                                                        \
-    void Serialize(Stream& s, int nType, int nVersion) const                          \
-    {                                                                                 \
-        NCONST_PTR(this)->SerializationOp(s, CSerActionSerialize(), nType, nVersion); \
-    }                                                                                 \
-    template <typename Stream>                                                        \
-    void Unserialize(Stream& s, int nType, int nVersion)                              \
-    {                                                                                 \
-        SerializationOp(s, CSerActionUnserialize(), nType, nVersion);                 \
     }
 
 #ifndef CHAR_EQUALS_INT8
