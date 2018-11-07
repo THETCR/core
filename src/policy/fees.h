@@ -187,6 +187,9 @@ private:
      */
     static constexpr double FEE_SPACING = 1.05;
 
+    static const double INF_FEERATE = MAX_MONEY;
+    static const double INF_PRIORITY = 1e9 * MAX_MONEY;
+
 public:
     /** Create new BlockPolicyEstimator and initialize stats tracking classes with default values */
     CBlockPolicyEstimator();
