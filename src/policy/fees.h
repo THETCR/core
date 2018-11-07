@@ -218,6 +218,19 @@ public:
      */
     CFeeRate estimateRawFee(int confTarget, double successThreshold, FeeEstimateHorizon horizon, EstimationResult *result = nullptr) const;
 
+    /** Return a priority estimate.
+ *  DEPRECATED
+ *  Returns -1
+ */
+    double estimatePriority(int confTarget);
+
+    /** Estimate priority needed to get be included in a block within
+     *  confTarget blocks.
+     *  DEPRECATED
+     *  Returns -1 unless mempool is currently limited then returns INF_PRIORITY
+     *  answerFoundAtTarget is set to confTarget
+     */
+    double estimateSmartPriority(int confTarget, int *answerFoundAtTarget, const CTxMemPool& pool);
     /** Write estimation data to a file */
     bool Write(CAutoFile& fileout) const;
 
