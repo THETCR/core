@@ -20,6 +20,9 @@
 
 #include <boost/thread.hpp>
 
+using namespace std;
+using namespace libzerocoin;
+
 static const char DB_COIN = 'C';
 static const char DB_COINS = 'c';
 static const char DB_BLOCK_FILES = 'f';
