@@ -689,6 +689,16 @@ public:
     boost::signals2::signal<void (CTransactionRef)> NotifyEntryAdded;
     boost::signals2::signal<void (CTransactionRef, MemPoolRemovalReason)> NotifyEntryRemoved;
 
+    //!WISPR
+    /** Estimate priority needed to get into the next nBlocks
+ *  If no answer can be given at nBlocks, return an estimate
+ *  at the lowest number of blocks where one can be given
+ */
+    double estimateSmartPriority(int nBlocks, int *answerFoundAtBlocks = NULL) const;
+
+    /** Estimate priority needed to get into the next nBlocks */
+    double estimatePriority(int nBlocks) const;
+
 private:
     /** UpdateForDescendants is used by UpdateTransactionsFromBlock to update
      *  the descendants for a single transaction that has been added to the

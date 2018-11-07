@@ -1017,6 +1017,16 @@ void CTxMemPool::queryHashes(std::vector<uint256>& vtxid)
         vtxid.push_back(it->GetTx().GetHash());
     }
 }
+double CTxMemPool::estimatePriority(int nBlocks) const
+{
+    LOCK(cs);
+    return minerPolicyEstimator->estimatePriority(nBlocks);
+}
+double CTxMemPool::estimateSmartPriority(int nBlocks, int *answerFoundAtBlocks) const
+{
+    LOCK(cs);
+    return minerPolicyEstimator->estimateSmartPriority(nBlocks, answerFoundAtBlocks, *this);
+}
 
 static TxMempoolInfo GetInfo(CTxMemPool::indexed_transaction_set::const_iterator it) {
     return TxMempoolInfo{it->GetSharedTx(), it->GetTime(), CFeeRate(it->GetFee(), it->GetTxSize()), it->GetModifiedFee() - it->GetFee()};
