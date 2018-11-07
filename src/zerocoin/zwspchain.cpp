@@ -373,10 +373,10 @@ std::list<libzerocoin::CoinDenomination> ZerocoinSpendListFromBlock(const CBlock
 {
     std::list<libzerocoin::CoinDenomination> vSpends;
     for (const CTransactionRef& tx : block.vtx) {
-        if (!tx.IsZerocoinSpend())
+        if (!tx->IsZerocoinSpend())
             continue;
 
-        for (const CTxIn& txin : tx.vin) {
+        for (const CTxIn& txin : tx->vin) {
             if (!txin.scriptSig.IsZerocoinSpend())
                 continue;
 
