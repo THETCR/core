@@ -277,16 +277,16 @@ template<typename Stream> inline void Unserialize(Stream& s, bool& a) { char f=s
 
 
 // Serializatin for libzerocoin::CoinDenomination
-inline unsigned int GetSerializeSize(libzerocoin::CoinDenomination a, int, int = 0) { return sizeof(libzerocoin::CoinDenomination); }
+inline unsigned int GetSerializeSize(libzerocoin::CoinDenomination a) { return sizeof(libzerocoin::CoinDenomination); }
 template <typename Stream>
-inline void Serialize(Stream& s, libzerocoin::CoinDenomination a, int, int = 0)
+inline void Serialize(Stream& s, libzerocoin::CoinDenomination a)
 {
     int f = libzerocoin::ZerocoinDenominationToInt(a);
     WRITEDATA(s, f);
 }
 
 template <typename Stream>
-inline void Unserialize(Stream& s, libzerocoin::CoinDenomination& a, int, int = 0)
+inline void Unserialize(Stream& s, libzerocoin::CoinDenomination& a)
 {
     int f=0;
     READDATA(s, f);
@@ -294,16 +294,16 @@ inline void Unserialize(Stream& s, libzerocoin::CoinDenomination& a, int, int = 
 }
 
 // Serialization for libzerocoin::SpendType
-inline unsigned int GetSerializedSize(libzerocoin::SpendType a, int, int = 0) { return sizeof(libzerocoin::SpendType); }
+inline unsigned int GetSerializedSize(libzerocoin::SpendType a) { return sizeof(libzerocoin::SpendType); }
 template <typename Stream>
-inline void Serialize(Stream& s, libzerocoin::SpendType a, int, int = 0)
+inline void Serialize(Stream& s, libzerocoin::SpendType a)
 {
     uint8_t f = static_cast<uint8_t>(a);
     WRITEDATA(s, f);
 }
 
 template <typename Stream>
-inline void Unserialize(Stream& s, libzerocoin::SpendType & a, int, int = 0)
+inline void Unserialize(Stream& s, libzerocoin::SpendType & a)
 {
     uint8_t f=0;
     READDATA(s, f);
