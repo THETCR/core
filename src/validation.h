@@ -203,7 +203,7 @@ extern uint64_t nLastBlockSize;
 extern uint64_t nLastBlockWeight;
 extern const std::string strMessageMagic;
 extern CWaitableCriticalSection g_best_block_mutex;
-extern CConditionVariable g_best_block_cv;
+extern std::condition_variable g_best_block_cv;
 extern uint256 g_best_block;
 extern std::atomic_bool fImporting;
 extern bool fSkipRangeproof;
