@@ -15,7 +15,7 @@
 #include <ui_interface.h>
 #include <validation.h>
 #include <insight/insight.h>
-
+#include <pos/accumulators.h>
 #include <stdint.h>
 
 #include <boost/thread.hpp>
@@ -683,7 +683,7 @@ bool CZerocoinDB::WriteCoinMintBatch(const std::vector<std::pair<libzerocoin::Pu
         ++count;
     }
 
-    LogPrint("zero", "Writing %u coin mints to db.\n", (unsigned int)count);
+//    LogPrint("zero", "Writing %u coin mints to db.\n", (unsigned int)count);
     return WriteBatch(batch, true);
 }
 
@@ -716,7 +716,7 @@ bool CZerocoinDB::WriteCoinSpendBatch(const std::vector<std::pair<libzerocoin::C
         ++count;
     }
 
-    LogPrint("zero", "Writing %u coin spends to db.\n", (unsigned int)count);
+//    LogPrint("zero", "Writing %u coin spends to db.\n", (unsigned int)count);
     return WriteBatch(batch, true);
 }
 
@@ -780,7 +780,7 @@ bool CZerocoinDB::WipeCoins(std::string strType)
 
     for (auto& hash : setDelete) {
         if (!Erase(make_pair(type, hash)))
-            LogPrintf("%s: error failed to delete %s\n", __func__, hash.GetHex());
+//            LogPrintf("%s: error failed to delete %s\n", __func__, hash.GetHex());
     }
 
     return true;
@@ -788,7 +788,7 @@ bool CZerocoinDB::WipeCoins(std::string strType)
 
 bool CZerocoinDB::WriteAccumulatorValue(const uint32_t& nChecksum, const CBigNum& bnValue)
 {
-    LogPrint("zero","%s : checksum:%d val:%s\n", __func__, nChecksum, bnValue.GetHex());
+//    LogPrint("zero","%s : checksum:%d val:%s\n", __func__, nChecksum, bnValue.GetHex());
     return Write(make_pair('2', nChecksum), bnValue);
 }
 
@@ -799,6 +799,6 @@ bool CZerocoinDB::ReadAccumulatorValue(const uint32_t& nChecksum, CBigNum& bnVal
 
 bool CZerocoinDB::EraseAccumulatorValue(const uint32_t& nChecksum)
 {
-    LogPrint("zero", "%s : checksum:%d\n", __func__, nChecksum);
+//    LogPrint("zero", "%s : checksum:%d\n", __func__, nChecksum);
     return Erase(make_pair('2', nChecksum));
 }
