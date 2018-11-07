@@ -48,6 +48,10 @@
 #include <anon.h>
 #include <rctindex.h>
 #include <insight/insight.h>
+#include <zerocoin/zwspchain.h>
+#include <instantx.h>
+#include <masternode/masternodeman.h>
+#include <masternode/masternode-payments.h>
 
 #include <secp256k1_rangeproof.h>
 
@@ -4615,10 +4619,10 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
 
     return true;
 }
-bool IsTransactionInChain(const uint256& txId, int& nHeightTx, CTransaction& tx)
+bool IsTransactionInChain(const uint256& txId, int& nHeightTx, CTransactionRef& tx)
 {
     uint256 hashBlock;
-    if (!GetTransaction(txId, tx, hashBlock, true))
+    if (!GetTransaction(txId, tx, Params().GetConsensus(), hashBlock, true))
         return false;
     if (!IsBlockHashInChain(hashBlock))
         return false;
@@ -4629,7 +4633,7 @@ bool IsTransactionInChain(const uint256& txId, int& nHeightTx, CTransaction& tx)
 
 bool IsTransactionInChain(const uint256& txId, int& nHeightTx)
 {
-    CTransaction tx;
+    CTransactionRef tx;
     return IsTransactionInChain(txId, nHeightTx, tx);
 }
 /** NOTE: This function is not currently invoked by ConnectBlock(), so we
