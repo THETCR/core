@@ -2606,7 +2606,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
 
     if (block.IsProofOfStake()) {
-        pindex->nStakeModifier = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
+        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
         setDirtyBlockIndex.insert(pindex);
 
         uint256 hashProof, targetProofOfStake;
@@ -5228,7 +5228,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
                 return DelayBlock(pblock, state);
             }
         } else {
-            pindex->nStakeModifier = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
+            pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
         }
         pindex->nFlags &= ~BLOCK_DELAYED;
         setDirtyBlockIndex.insert(pindex);
