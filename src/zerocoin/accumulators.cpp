@@ -2,14 +2,14 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <pos/accumulators.h>
-#include <pos/accumulatormap.h>
+#include <zerocoin/accumulators.h>
+#include <zerocoin/accumulatormap.h>
 #include <chainparams.h>
 #include <validation.h>
 #include <txdb.h>
 #include <init.h>
 #include <spork/spork.h>
-#include <pos/accumulatorcheckpoints.h>
+#include <zerocoin/accumulatorcheckpoints.h>
 #include <zerocoin/zwspchain.h>
 #include <shutdown.h>
 

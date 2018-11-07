@@ -189,9 +189,9 @@ BITCOIN_CORE_H = \
   policy/policy.h \
   policy/rbf.h \
   pow.h \
-  pos/accumulatorcheckpoints.h \
-  pos/accumulatormap.h \
-  pos/accumulators.h \
+  zerocoin/accumulatorcheckpoints.h \
+  zerocoin/accumulatormap.h \
+  zerocoin/accumulators.h \
   pos/kernel.h \
   pos/miner.h \
   protocol.h \
@@ -326,9 +326,9 @@ libwispr_server_a_SOURCES = \
   obfuscation/privatesend.cpp \
   obfuscation/privatesend-server.cpp \
   pow.cpp \
-  pos/accumulatorcheckpoints.cpp \
-  pos/accumulatormap.cpp \
-  pos/accumulators.cpp \
+  zerocoin/accumulatorcheckpoints.cpp \
+  zerocoin/accumulatormap.cpp \
+  zerocoin/accumulators.cpp \
   pos/kernel.cpp \
   rest.cpp \
   rpc/anon.cpp \

@@ -43,7 +43,7 @@
 #include <warnings.h>
 #include <smsg/smessage.h>
 #include <pos/kernel.h>
-#include <pos/accumulators.h>
+#include "zerocoin/accumulators.h"
 #include <blind.h>
 #include <anon.h>
 #include <rctindex.h>

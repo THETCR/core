@@ -15,7 +15,7 @@
 #include <ui_interface.h>
 #include <validation.h>
 #include <insight/insight.h>
-#include <pos/accumulators.h>
+#include "zerocoin/accumulators.h"
 #include <stdint.h>
 
 #include <boost/thread.hpp>

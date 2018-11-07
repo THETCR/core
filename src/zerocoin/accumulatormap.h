@@ -7,7 +7,7 @@
 
 #include <libzerocoin/Accumulator.h>
 #include <libzerocoin/Coin.h>
-#include <pos/accumulatorcheckpoints.h>
+#include <zerocoin/accumulatorcheckpoints.h>
 
 //A map with an accumulator for each denomination
 class AccumulatorMap

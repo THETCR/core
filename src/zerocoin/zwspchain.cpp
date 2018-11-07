@@ -4,7 +4,7 @@
 
 #include <zerocoin/zwspchain.h>
 #include <invalid.h>
-#include <consensus/params.h>
+#include <chainparams.h>
 #include <validation.h>
 #include <txdb.h>
 #include <ui_interface.h>

@@ -9,7 +9,7 @@
 #include <libzerocoin/Coin.h>
 #include <libzerocoin/Denominations.h>
 #include <primitives/zerocoin.h>
-#include <pos/accumulatormap.h>
+#include <zerocoin/accumulatormap.h>
 #include <chain.h>
 #include <uint256.h>
 

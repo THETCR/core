@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <pos/accumulatormap.h>
-#include <pos/accumulators.h>
+#include <zerocoin/accumulatormap.h>
+#include <zerocoin/accumulators.h>
 #include <validation.h>
 #include <txdb.h>
 #include <libzerocoin/Denominations.h>
