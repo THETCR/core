@@ -54,7 +54,7 @@ struct CCoin {
     explicit CCoin(Coin&& in) : nHeight(in.nHeight), out(std::move(in.out)) {}
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
         uint32_t nTxVerDummy = 0;
         READWRITE(nTxVerDummy);

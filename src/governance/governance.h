@@ -136,7 +136,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
         READWRITE(vecTimestamps);
         READWRITE(nDataStart);
@@ -162,7 +162,7 @@ public: // Types
         ADD_SERIALIZE_METHODS;
 
         template <typename Stream, typename Operation>
-        inline void SerializationOp(Stream& s, Operation ser_action)
+        inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
         {
             READWRITE(triggerBuffer);
             READWRITE(fStatusOK);
@@ -333,7 +333,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         LOCK(cs);
         std::string strVersion;
         if(ser_action.ForRead()) {

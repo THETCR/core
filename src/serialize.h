@@ -226,14 +226,6 @@ template<typename X> const X& ReadWriteAsHelper(const X& x) { return x; }
  * added as members.
  */
 #define ADD_SERIALIZE_METHODS                                                         \
-    template<typename Stream>                                                         \
-    void Serialize(Stream& s) const {                                                 \
-        NCONST_PTR(this)->SerializationOp(s, CSerActionSerialize());                  \
-    }                                                                                 \
-    template<typename Stream>                                                         \
-    void Unserialize(Stream& s) {                                                     \
-        SerializationOp(s, CSerActionUnserialize());                                  \
-    }                                                                                 \
     size_t GetSerializeSize(int nType, int nVersion) const                            \
     {                                                                                 \
         CSizeComputer s(nType, nVersion);                                             \
@@ -250,6 +242,7 @@ template<typename X> const X& ReadWriteAsHelper(const X& x) { return x; }
     {                                                                                 \
         SerializationOp(s, CSerActionUnserialize(), nType, nVersion);                 \
     }
+
 
 #ifndef CHAR_EQUALS_INT8
 template<typename Stream> inline void Serialize(Stream& s, char a    ) { ser_writedata8(s, a); } // TODO Get rid of bare char
