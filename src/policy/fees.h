@@ -131,6 +131,8 @@ struct FeeCalculation
     int returnedTarget = 0;
 };
 
+static const double INF_FEERATE = MAX_MONEY;
+static const double INF_PRIORITY = 1e9 * MAX_MONEY;
 /**
  *  We want to be able to estimate feerates that are needed on tx's to be included in
  * a certain number of blocks.  Every time a block is added to the best chain, this class records
@@ -186,9 +188,6 @@ private:
      * Therefore it makes sense to exponentially space the buckets
      */
     static constexpr double FEE_SPACING = 1.05;
-
-    static const double INF_FEERATE = MAX_MONEY;
-    static const double INF_PRIORITY = 1e9 * MAX_MONEY;
 
 public:
     /** Create new BlockPolicyEstimator and initialize stats tracking classes with default values */
