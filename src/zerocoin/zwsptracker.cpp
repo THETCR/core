@@ -379,7 +379,7 @@ bool CzWSPTracker::UpdateStatusInternal(const std::set<uint256>& setMempool, CMi
     bool isUsed = isPendingSpend || isConfirmedSpend;
 
     if (!mint.nHeight || !isMintInChain || isUsed != mint.isUsed) {
-        CTransaction tx;
+        CTransactionRef tx;
         uint256 hashBlock;
 
         // Txid will be marked 0 if there is no knowledge of the final tx hash yet
@@ -397,7 +397,7 @@ bool CzWSPTracker::UpdateStatusInternal(const std::set<uint256>& setMempool, CMi
             return true;
 
         // Check the transaction associated with this mint
-        if (!IsInitialBlockDownload() && !GetTransaction(mint.txid, tx, hashBlock, true)) {
+        if (!IsInitialBlockDownload() && !GetTransaction(mint.txid, tx, Params().GetConsensus(), hashBlock, true)) {
             LogPrintf("%s : Failed to find tx for mint txid=%s\n", __func__, mint.txid.GetHex());
             mint.isArchived = true;
             Archive(mint);

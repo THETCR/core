@@ -138,9 +138,9 @@ void FindMints(std::vector<CMintMeta> vMintsToFind, std::vector<CMintMeta>& vMin
         }
 
         // make sure the txhash and block height meta data are correct for this mint
-        CTransaction tx;
+        CTransactionRef tx;
         uint256 hashBlock;
-        if (!GetTransaction(txHash, tx, hashBlock, true)) {
+        if (!GetTransaction(txHash, tx, Params().GetConsensus(), hashBlock, true)) {
             LogPrintf("%s : cannot find tx %s\n", __func__, txHash.GetHex());
             vMissingMints.push_back(meta);
             continue;
@@ -157,9 +157,9 @@ void FindMints(std::vector<CMintMeta> vMintsToFind, std::vector<CMintMeta>& vMin
         bool fSpent = zerocoinDB->ReadCoinSpend(meta.hashSerial, hashTxSpend);
 
         //if marked as spent, check that it actually made it into the chain
-        CTransaction txSpend;
+        CTransactionRef txSpend;
         uint256 hashBlockSpend;
-        if (fSpent && !GetTransaction(hashTxSpend, txSpend, hashBlockSpend, true)) {
+        if (fSpent && !GetTransaction(hashTxSpend, txSpend, Params().GetConsensus(), hashBlockSpend, true)) {
             LogPrintf("%s : cannot find spend tx %s\n", __func__, hashTxSpend.GetHex());
             meta.isUsed = false;
             vMintsToUpdate.push_back(meta);
@@ -240,11 +240,11 @@ bool IsSerialInBlockchain(const CBigNum& bnSerial, int& nHeightTx)
 
 bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend)
 {
-    CTransaction tx;
+    CTransactionRef tx;
     return IsSerialInBlockchain(hashSerial, nHeightTx, txidSpend, tx);
 }
 
-bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend, CTransaction& tx)
+bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend, CTransactionRef& tx)
 {
     txidSpend = 0;
     // if not in zerocoinDB then its not in the blockchain
