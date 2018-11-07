@@ -110,7 +110,10 @@ public:
 
     bool CheckImportCoinbase(int nHeight, uint256 &hash) const;
     uint32_t GetLastImportHeight() const { return nLastImportHeight; }
-
+    int COINBASE_MATURITY() const { return nMaturity; }
+    CAmount MaxMoneyOut() const { return nMaxMoneyOut; }
+    /** The masternode count that we will allow the see-saw reward payments to be off by */
+    int MasternodeCountDrift() const { return nMasternodeCountDrift; }
     const CBlock& GenesisBlock() const { return genesis; }
     /** Default value for -checkmempool and -checkblockindex argument */
     bool DefaultConsistencyChecks() const { return fDefaultConsistencyChecks; }
@@ -215,6 +218,8 @@ protected:
     std::string strSporkAddress;
 
     //WISPR
+    int nMasternodeCountDrift;
+    CAmount nMaxMoneyOut;
     std::string strObfuscationPoolDummyAddress;
     int64_t nStartMasternodePayments;
     std::string zerocoinModulus;

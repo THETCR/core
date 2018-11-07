@@ -339,6 +339,7 @@ bool GetTransaction(const uint256 &hash, CTransactionRef &txOut, const Consensus
  * validationinterface callback.
  */
 bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams, std::shared_ptr<const CBlock> pblock = std::shared_ptr<const CBlock>());
+double ConvertBitsToDouble(unsigned int nBits);
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams);
 CAmount GetBlockSubsidy(int nBits, int nHeight, const Consensus::Params& consensusParams, bool fSuperblockPartOnly = false);
 CAmount GetMasternodePayment(int nHeight, CAmount blockValue);
