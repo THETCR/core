@@ -8,6 +8,7 @@
 #include <libzerocoin/Coin.h>
 #include <libzerocoin/CoinSpend.h>
 #include <libzerocoin/Denominations.h>
+#include <primitives/transaction.h>
 #include <list>
 #include <string>
 
@@ -15,7 +16,6 @@ class CBlock;
 class CBigNum;
 struct CMintMeta;
 class CTransaction;
-typedef CTransactionRef;
 class CTxIn;
 class CTxOut;
 class CValidationState;
