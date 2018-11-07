@@ -88,6 +88,8 @@ enum {
 };
 
 #define READWRITE(obj) (::SerReadWrite(s, (obj), nType, nVersion, ser_action))
+#define READWRITEAS(type, obj) (::SerReadWriteMany(s, ser_action, ReadWriteAsHelper<type>(obj)))
+
 
 /**
  * Implement three methods for serializable objects. These are actually wrappers over
@@ -963,6 +965,7 @@ public:
     {
         return nSize;
     }
+    int GetVersion() const { return nVersion; }
 };
 
 #endif // WISPR_SERIALIZE_H
