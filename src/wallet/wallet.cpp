@@ -3117,8 +3117,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
 
                 // Allow to override the default confirmation target over the CoinControl instance
                 int currentConfirmationTarget = nTxConfirmTarget;
-                if (coinControl && coinControl->nConfirmTarget > 0)
-                    currentConfirmationTarget = coinControl->nConfirmTarget;
+                if (coin_control && coin_control.nConfirmTarget > 0)
+                    currentConfirmationTarget = coin_control.nConfirmTarget;
                 // Can we complete this as a free transaction?
                 // Note: InstantSend transaction can't be a free one
                 if (!fUseInstantSend && fSendFreeTransactions && nBytes <= MAX_FREE_TRANSACTION_CREATE_SIZE)
@@ -3134,14 +3134,14 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
 //                        break;
                 }
                 CAmount nFeeNeeded = std::max(nFeePay, GetMinimumFee(nBytes, currentConfirmationTarget, mempool));
-                if (coin_control && nFeeNeeded > 0 && &coin_control->nMinimumTotalFee > nFeeNeeded) {
-                    nFeeNeeded = &coin_control->nMinimumTotalFee;
+                if (coin_control && nFeeNeeded > 0 && coin_control.nMinimumTotalFee > nFeeNeeded) {
+                    nFeeNeeded = coin_control.nMinimumTotalFee;
                 }
                 if(fUseInstantSend) {
                     nFeeNeeded = std::max(nFeeNeeded, CTxLockRequest(txNew).GetMinFee());
                 }
-                if (coin_control && &coin_control->fOverrideFeeRate)
-                    nFeeNeeded = &coin_control->nFeeRate.GetFee(nBytes);
+                if (coin_control && coin_control.fOverrideFeeRate)
+                    nFeeNeeded = coin_control.nFeeRate.GetFee(nBytes);
 
                 // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
                 // because we must be at the maximum allowed fee.
