@@ -3081,8 +3081,18 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                 vecTxDSInTmp.clear();
                 for (const auto& coin : setCoins) {
                     CTxIn txin = CTxIn(coin.outpoint,CScript());
+                    CAmount nCredit = coin.first->tx->vout[coin.second].nValue;
                     vecTxDSInTmp.push_back(CTxDSIn(txin, coin.first->tx->vout[coin.second].scriptPubKey));
                     txNew.vin.push_back(txin);
+                    //The coin age after the next block (depth+1) is used instead of the current,
+                    //reflecting an assumption the user would accept a bit more delay for
+                    //a chance at a free transaction.
+                    //But mempool inputs might still be in the mempool, so their age stays 0
+                    int age = coin.first->GetDepthInMainChain();
+                    assert(age >= 0);
+                    if (age != 0)
+                        age += 1;
+                    dPriority += (double)nCredit * age;
                 }
 
                 if (bBIP69Enabled) {
@@ -3103,6 +3113,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                     strFailReason = _("Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.");
                     return false;
                 }
+                dPriority = txNewConst.ComputePriority(dPriority, nBytes);
+
                 // Allow to override the default confirmation target over the CoinControl instance
                 int currentConfirmationTarget = nTxConfirmTarget;
                 if (coinControl && coinControl->nConfirmTarget > 0)
