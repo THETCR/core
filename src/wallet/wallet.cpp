@@ -3081,8 +3081,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                 vecTxDSInTmp.clear();
                 for (const auto& coin : setCoins) {
                     CTxIn txin = CTxIn(coin.outpoint,CScript());
-                    CAmount nCredit = coin.first->tx->vout[coin.second].nValue;
-                    vecTxDSInTmp.push_back(CTxDSIn(txin, coin.first->tx->vout[coin.second].scriptPubKey));
+                    CAmount nCredit = coin->txout.nValue;
+                    vecTxDSInTmp.push_back(CTxDSIn(txin, coin->txout.scriptPubKey));
                     txNew.vin.push_back(txin);
                     //The coin age after the next block (depth+1) is used instead of the current,
                     //reflecting an assumption the user would accept a bit more delay for
