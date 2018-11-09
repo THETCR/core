@@ -3118,8 +3118,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
 
                 // Allow to override the default confirmation target over the CoinControl instance
                 int currentConfirmationTarget = nTxConfirmTarget;
-                if (coin_control && coin_control.nConfirmTarget > 0)
-                    currentConfirmationTarget = coin_control.nConfirmTarget;
+                if (coin_control && coin_control.m_confirm_target > 0)
+                    currentConfirmationTarget = coin_control.m_confirm_target;
                 // Can we complete this as a free transaction?
                 // Note: InstantSend transaction can't be a free one
                 if (!fUseInstantSend && fSendFreeTransactions && nBytes <= MAX_FREE_TRANSACTION_CREATE_SIZE)
