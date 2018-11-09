@@ -3232,7 +3232,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                     //a chance at a free transaction.
                     //But mempool inputs might still be in the mempool, so their age stays 0
 //                    const CWalletTx *pcoin = &walletEntry.second;
-                    CWalletTx &wTx = this.GetWalletTx(txin.prevout.hash);
+                    CWalletTx &wTx = this->GetWalletTx(txin.prevout.hash);
                     int age = wTx.GetDepthInMainChain();
                     assert(age >= 0);
                     if (age != 0)
