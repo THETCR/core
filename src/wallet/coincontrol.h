@@ -48,6 +48,8 @@ public:
     //! Override automatic min/max checks on fee, m_feerate must be set if true
     bool fOverrideFeeRate;
 
+    bool fUsePrivateSend;
+    bool fUseInstantSend;
     //! Minimum absolute fee (not per kilobyte)
     CAmount nMinimumTotalFee;
     //! Override the wallet's m_pay_tx_fee if set
