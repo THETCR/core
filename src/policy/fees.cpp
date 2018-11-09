@@ -572,7 +572,7 @@ CFeeRate CBlockPolicyEstimator::estimateFee(int confTarget)
     if (confTarget <= 1 || (unsigned int)confTarget > fS.GetMaxConfirms())
         return CFeeRate(0);
 
-    double median = feeStats.EstimateMedianVal(confTarget, SUFFICIENT_FEETXS, MIN_SUCCESS_PCT, true, nBestSeenHeight);
+    double median = fS.EstimateMedianVal(confTarget, SUFFICIENT_FEETXS, MIN_SUCCESS_PCT, true, nBestSeenHeight);
 
     if (median < 0)
         return CFeeRate(0);
@@ -582,10 +582,11 @@ CFeeRate CBlockPolicyEstimator::estimateFee(int confTarget)
 
 CFeeRate CBlockPolicyEstimator::estimateSmartFee(int confTarget, int *answerFoundAtTarget, const CTxMemPool& pool)
 {
+    TxConfirmStats fS = *feeStats;
     if (answerFoundAtTarget)
         *answerFoundAtTarget = confTarget;
     // Return failure if trying to analyze a target we're not tracking
-    if (confTarget <= 0 || (unsigned int)confTarget > feeStats.GetMaxConfirms())
+    if (confTarget <= 0 || (unsigned int)confTarget > fS.GetMaxConfirms())
         return CFeeRate(0);
 
     // It's not possible to get reasonable estimates for confTarget of 1
@@ -593,8 +594,8 @@ CFeeRate CBlockPolicyEstimator::estimateSmartFee(int confTarget, int *answerFoun
         confTarget = 2;
 
     double median = -1;
-    while (median < 0 && (unsigned int)confTarget <= feeStats.GetMaxConfirms()) {
-        median = feeStats.EstimateMedianVal(confTarget++, SUFFICIENT_FEETXS, MIN_SUCCESS_PCT, true, nBestSeenHeight);
+    while (median < 0 && (unsigned int)confTarget <= fS.GetMaxConfirms()) {
+        median = fS.EstimateMedianVal(confTarget++, SUFFICIENT_FEETXS, MIN_SUCCESS_PCT, true, nBestSeenHeight);
     }
 
     if (answerFoundAtTarget)
