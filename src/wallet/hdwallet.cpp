@@ -10315,7 +10315,7 @@ void CHDWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, con
 };
 
 bool CHDWallet::SelectCoins(const std::vector<COutput>& vAvailableCoins, const CAmount& nTargetValue,
-    std::set<CInputCoin>& setCoinsRet, CAmount& nValueRet, const CCoinControl& coin_control, CoinSelectionParams& coin_selection_params, bool& bnb_used) const
+    std::set<CInputCoin>& setCoinsRet, CAmount& nValueRet, const CCoinControl& coin_control, CoinSelectionParams& coin_selection_params, bool& bnb_used, AvailableCoinsType nCoinType, bool fUseInstantSend) const
 {
     std::vector<COutput> vCoins(vAvailableCoins);
 
