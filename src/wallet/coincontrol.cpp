@@ -25,4 +25,8 @@ void CCoinControl::SetNull()
     nCoinType = OUTPUT_STANDARD;
     fHaveAnonOutputs = false;
     m_extrafee = 0;
+
+    //TODO REPLACE WITH m_confirm_target
+    nConfirmTarget = 0;
+
 }

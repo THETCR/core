@@ -56,6 +56,8 @@ public:
     boost::optional<CFeeRate> m_feerate;
     //! Override the default confirmation target if set
     boost::optional<unsigned int> m_confirm_target;
+    //! Override the default confirmation target, 0 = use default
+    int nConfirmTarget;
     //! Override the wallet's m_signal_rbf if set
     boost::optional<bool> m_signal_bip125_rbf;
     //! Avoid partial use of funds sent to a given address
