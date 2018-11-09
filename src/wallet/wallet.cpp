@@ -3531,7 +3531,8 @@ bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, CAmount a
     vecSend.push_back((CRecipient){scriptChange, amount, false});
 
     CCoinControl *coinControl=NULL;
-    bool success = CreateTransaction(vecSend, tx.tx, reservekey, nFeeRet, nChangePosRet, strFail, coinControl, true, ALL_COINS, fUseInstantSend);
+    CTransactionRef txR = tx.tx;
+    bool success = CreateTransaction(vecSend, txR, reservekey, nFeeRet, nChangePosRet, strFail, coinControl, true, ALL_COINS, fUseInstantSend);
     if(!success){
         LogPrintf("CWallet::GetBudgetSystemCollateralTX -- Error: %s\n", strFail);
         return false;
