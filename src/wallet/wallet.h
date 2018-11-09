@@ -976,7 +976,12 @@ public:
      */
     virtual bool SelectCoinsMinConf(const CAmount& nTargetValue, const CoinEligibilityFilter& eligibility_filter, std::vector<OutputGroup> groups,
         std::set<CInputCoin>& setCoinsRet, CAmount& nValueRet, const CoinSelectionParams& coin_selection_params, bool& bnb_used, bool fUseInstantSend = false) const;
+    // get the PrivateSend chain depth for a given input
+    int GetRealOutpointPrivateSendRounds(const COutPoint& outpoint, int nRounds) const;
+    // respect current settings
+    int GetOutpointPrivateSendRounds(const COutPoint& outpoint) const;
 
+    bool IsDenominated(const COutPoint& outpoint) const;
     virtual bool IsSpent(const uint256& hash, unsigned int n) const;
     std::vector<OutputGroup> GroupOutputs(const std::vector<COutput>& outputs, bool single_coin) const;
 
