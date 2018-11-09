@@ -3178,7 +3178,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                     //over pay for denominated transactions
                     if (nCoinType == ONLY_DENOMINATED) {
                         nFeeRet += nChange;
-                        wtxNew.mapValue["DS"] = "1";
+                        tx.mapValue["DS"] = "1";
                         // recheck skipped denominations during next mixing
                         privateSendClient.ClearSkippedDenominations();
                     } else {
@@ -3245,6 +3245,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                     strFailReason = _("Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.");
                     return false;
                 }
+                CTransaction txNewConst(txNew);
                 dPriority = txNewConst.ComputePriority(dPriority, nBytes);
 
                 // Allow to override the default confirmation target over the CoinControl instance
@@ -3273,8 +3274,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                     nFeeNeeded = std::max(nFeeNeeded, CTxLockRequest(txNew).GetMinFee());
                 }
                 if (coin_control.fOverrideFeeRate)
-                    CFeeRate mFeeRate = *coin_control.m_feerate;
-                    nFeeNeeded = mFeeRate.GetFee(nBytes);
+//                    CFeeRate mFeeRate = *coin_control.m_feerate;
+                    nFeeNeeded = CFeeRate::GetFee(nBytes);
 
                 // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
                 // because we must be at the maximum allowed fee.
