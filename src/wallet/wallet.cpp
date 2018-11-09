@@ -2588,7 +2588,7 @@ const CTxOut& CWallet::FindNonChangeParentOutput(const CTransaction& tx, int out
 }
 
 bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, const CoinEligibilityFilter& eligibility_filter, std::vector<OutputGroup> groups,
-                                 std::set<CInputCoin>& setCoinsRet, CAmount& nValueRet, const CoinSelectionParams& coin_selection_params, bool& bnb_used) const
+                                 std::set<CInputCoin>& setCoinsRet, CAmount& nValueRet, const CoinSelectionParams& coin_selection_params, bool& bnb_used, bool fUseInstantSend) const
 {
     setCoinsRet.clear();
     nValueRet = 0;
@@ -3162,13 +3162,13 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
 //                        break;
                 }
                 CAmount nFeeNeeded = std::max(nFeePay, GetMinimumFee(nBytes, currentConfirmationTarget, mempool));
-                if (coin_control && nFeeNeeded > 0 && coin_control.nMinimumTotalFee > nFeeNeeded) {
+                if (nFeeNeeded > 0 && coin_control.nMinimumTotalFee > nFeeNeeded) {
                     nFeeNeeded = coin_control.nMinimumTotalFee;
                 }
                 if(fUseInstantSend) {
                     nFeeNeeded = std::max(nFeeNeeded, CTxLockRequest(txNew).GetMinFee());
                 }
-                if (coin_control && coin_control.fOverrideFeeRate)
+                if (coin_control.fOverrideFeeRate)
                     nFeeNeeded = coin_control.m_feerate.GetFee(nBytes);
 
                 // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
