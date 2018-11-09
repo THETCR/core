@@ -3189,8 +3189,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                     //over pay for denominated transactions
                     if (nCoinType == ONLY_DENOMINATED) {
                         nFeeRet += nChange;
-                        CWalletTx &wTx = mapWallet.at(txin.prevout.hash);
-                        wTx.mapValue["DS"] = "1";
+//                        wTx.mapValue["DS"] = "1";
                         // recheck skipped denominations during next mixing
                         privateSendClient.ClearSkippedDenominations();
                     } else {
@@ -3233,7 +3232,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                     //a chance at a free transaction.
                     //But mempool inputs might still be in the mempool, so their age stays 0
 //                    const CWalletTx *pcoin = &walletEntry.second;
-                    CWalletTx &wTx = mapWallet.at(txin.prevout.hash);
+                    CWalletTx &wTx = pwallet->GetWalletTx(txin.prevout.hash);
                     int age = wTx.GetDepthInMainChain();
                     assert(age >= 0);
                     if (age != 0)
@@ -3273,7 +3272,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                     // Not enough fee: enough priority?
                     double dPriorityNeeded = mempool.estimateSmartPriority(currentConfirmationTarget);
                     // Require at least hard-coded AllowFree.
-                    if (dPriority >= dPriorityNeeded && AllowFree(dPriority))
+                    if (dPriority >= dPriorityNeeded && ::mempool.AllowFree(dPriority))
                         break;
 
                     // Small enough, and priority high enough, to send for free
