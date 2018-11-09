@@ -2971,6 +2971,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                 if (nSubtractFeeFromAmount == 0)
                     nValueToSelect += nFeeRet;
 
+                double dPriority = 0;
                 // vouts to the payees
                 coin_selection_params.tx_noinputs_size = 11; // Static vsize overhead + outputs vsize. 4 nVersion, 4 nLocktime, 1 input count, 1 output count, 1 witness overhead (dummy, flag, stack size)
                 for (const auto& recipient : vecSend)
@@ -3081,8 +3082,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                 vecTxDSInTmp.clear();
                 for (const auto& coin : setCoins) {
                     CTxIn txin = CTxIn(coin.outpoint,CScript());
-                    CAmount nCredit = coin->txout.nValue;
-                    vecTxDSInTmp.push_back(CTxDSIn(txin, coin->txout.scriptPubKey));
+                    CAmount nCredit = coin.txout.nValue;
+                    vecTxDSInTmp.push_back(CTxDSIn(txin, coin.txout.scriptPubKey));
                     txNew.vin.push_back(txin);
                     //The coin age after the next block (depth+1) is used instead of the current,
                     //reflecting an assumption the user would accept a bit more delay for
