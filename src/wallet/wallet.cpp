@@ -2785,7 +2785,8 @@ bool CWallet::SelectCoins(const std::vector<COutput>& vAvailableCoins, const CAm
                     // make sure it's actually anonymized
                     if(nRounds < privateSendClient.nPrivateSendRounds) continue;
                     nValueRet += nDenom;
-                    setCoinsRet.insert(std::make_pair(out.tx, out.i));
+//                    setCoinsRet.insert(std::make_pair(out.tx, out.i));
+                    setCoinsRet.insert(out.GetInputCoin());
                 }
             }
         }
