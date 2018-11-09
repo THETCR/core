@@ -3189,7 +3189,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                     //over pay for denominated transactions
                     if (nCoinType == ONLY_DENOMINATED) {
                         nFeeRet += nChange;
-                        tx.mapValue["DS"] = "1";
+                        CWalletTx &wTx = mapWallet.at(txin.prevout.hash);
+                        wTx.mapValue["DS"] = "1";
                         // recheck skipped denominations during next mixing
                         privateSendClient.ClearSkippedDenominations();
                     } else {
