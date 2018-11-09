@@ -3272,7 +3272,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                     // Not enough fee: enough priority?
                     double dPriorityNeeded = mempool.estimateSmartPriority(currentConfirmationTarget);
                     // Require at least hard-coded AllowFree.
-                    if (dPriority >= dPriorityNeeded && ::mempool.AllowFree(dPriority))
+                    if (dPriority >= dPriorityNeeded && AllowFree(dPriority))
                         break;
 
                     // Small enough, and priority high enough, to send for free

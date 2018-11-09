@@ -37,6 +37,17 @@ enum eMemPoolFlags
     MPE_CT                 = (1 << 1),
     MPE_RINGCT             = (1 << 2),
 };
+inline double AllowFreeThreshold()
+{
+    return COIN * 144 / 250;
+}
+
+inline bool AllowFree(double dPriority)
+{
+    // Large (in bytes) low-priority (new, small-coin) transactions
+    // need a fee.
+    return dPriority > AllowFreeThreshold();
+}
 
 
 /** Fake height value used in Coin to signify they are only in the memory pool (since 0.8) */
