@@ -565,9 +565,11 @@ CBlockPolicyEstimator::~CBlockPolicyEstimator()
 }
 CFeeRate CBlockPolicyEstimator::estimateFee(int confTarget)
 {
+
+    TxConfirmStats fS = *feeStats;
     // Return failure if trying to analyze a target we're not tracking
     // It's not possible to get reasonable estimates for confTarget of 1
-    if (confTarget <= 1 || (unsigned int)confTarget > *feeStats.GetMaxConfirms())
+    if (confTarget <= 1 || (unsigned int)confTarget > fS.GetMaxConfirms())
         return CFeeRate(0);
 
     double median = feeStats.EstimateMedianVal(confTarget, SUFFICIENT_FEETXS, MIN_SUCCESS_PCT, true, nBestSeenHeight);
