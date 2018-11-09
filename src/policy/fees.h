@@ -161,7 +161,7 @@ private:
     static constexpr double LONG_DECAY = .99931;
 
     /** Require greater than 95% of X feerate transactions to be confirmed within Y blocks for X to be big enough */
-    static const double MIN_SUCCESS_PCT = .95;
+    static constexpr double MIN_SUCCESS_PCT = .95;
     /** Require greater than 60% of X feerate transactions to be confirmed within Y/2 blocks*/
     static constexpr double HALF_SUCCESS_PCT = .6;
     /** Require greater than 85% of X feerate transactions to be confirmed within Y blocks*/
