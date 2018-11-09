@@ -54,6 +54,7 @@ CAmount GetMinimumFee(unsigned int nTxBytes, unsigned int nConfirmTarget, const 
     return nFeeNeeded;
 }
 
+
 CFeeRate GetRequiredFeeRate(const CWallet& wallet)
 {
     return std::max(wallet.m_min_fee, ::minRelayTxFee);
