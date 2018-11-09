@@ -11758,7 +11758,7 @@ bool CHDWallet::CreateCoinStake(unsigned int nBits, int64_t nTime, int nBlockHei
         COutPoint prevoutStake = COutPoint(pcoin.first->GetHash(), pcoin.second);
 
         int64_t nBlockTime;
-        if (CheckKernel(pindexPrev, nBits, nTime, prevoutStake, &nBlockTime)) {
+        if (Stake(pindexPrev, nBits, nTime, prevoutStake, &nBlockTime)) {
             LOCK(cs_wallet);
             // Found a kernel
             if (LogAcceptCategory(BCLog::POS)) {
