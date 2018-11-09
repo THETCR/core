@@ -3273,7 +3273,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CTransac
                     nFeeNeeded = std::max(nFeeNeeded, CTxLockRequest(txNew).GetMinFee());
                 }
                 if (coin_control.fOverrideFeeRate)
-                    nFeeNeeded = *(coin_control.m_feerate).GetFee(nBytes);
+                    CFeeRate mFeeRate = *(coin_control.m_feerate);
+                    nFeeNeeded = mFeeRate.GetFee(nBytes);
 
                 // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
                 // because we must be at the maximum allowed fee.
