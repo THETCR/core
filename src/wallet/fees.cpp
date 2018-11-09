@@ -13,55 +13,9 @@
 #include <wallet/wallet.h>
 #include <anon.h>
 
-/**
- * Fees smaller than this (in duffs) are considered zero fee (for transaction creation)
- * Override with -mintxfee
- */
-CFeeRate CWallet::minTxFee = CFeeRate(DEFAULT_TRANSACTION_MINFEE);
-/**
- * If fee estimation does not have enough data to provide estimates, use this fee instead.
- * Has no effect if not using fee estimation
- * Override with -fallbackfee
- */
-CFeeRate CWallet::fallbackFee = CFeeRate(DEFAULT_FALLBACK_FEE);
 CAmount GetRequiredFee(const CWallet& wallet, unsigned int nTxBytes)
 {
     return GetRequiredFeeRate(wallet).GetFee(nTxBytes);
-}
-
-
-CAmount GetMinimumFee(const CWallet& wallet, unsigned int nTxBytes, const CCoinControl& coin_control, const CTxMemPool& pool, const CBlockPolicyEstimator& estimator, FeeCalculation* feeCalc)
-{
-    CAmount fee_needed = GetMinimumFeeRate(wallet, coin_control, pool, estimator, feeCalc).GetFee(nTxBytes);
-    // Always obey the maximum
-    if (fee_needed > maxTxFee) {
-        fee_needed = maxTxFee;
-        if (feeCalc) feeCalc->reason = FeeReason::MAXTXFEE;
-    }
-
-    // Particl
-    if (coin_control.fHaveAnonOutputs)
-        fee_needed *= ANON_FEE_MULTIPLIER;
-    fee_needed += coin_control.m_extrafee;
-    return fee_needed;
-}
-CAmount GetMinimumFee(unsigned int nTxBytes, unsigned int nConfirmTarget, const CTxMemPool& pool, CAmount targetFee)
-{
-    CAmount nFeeNeeded = targetFee;
-    // User didn't set: use -txconfirmtarget to estimate...
-    if (nFeeNeeded == 0) {
-        int estimateFoundTarget = nConfirmTarget;
-        nFeeNeeded = pool.estimateSmartFee(nConfirmTarget, &estimateFoundTarget).GetFee(nTxBytes);
-        // ... unless we don't have enough mempool data for estimatefee, then use fallbackFee
-        if (nFeeNeeded == 0)
-            nFeeNeeded = fallbackFee.GetFee(nTxBytes);
-    }
-    // prevent user from paying a fee below minRelayTxFee or minTxFee
-    nFeeNeeded = std::max(nFeeNeeded, GetRequiredFee(nTxBytes));
-    // But always obey the maximum
-    if (nFeeNeeded > maxTxFee)
-        nFeeNeeded = maxTxFee;
-    return nFeeNeeded;
 }
 
 
