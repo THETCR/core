@@ -366,6 +366,10 @@ public:
         Finalise();
     }
 
+    //WISPR
+    CzWSPWallet* zwalletMain;
+    std::unique_ptr<CzWSPTracker> zwspTracker;
+
     int Finalise();
     int FreeExtKeyMaps();
 
