@@ -32,6 +32,16 @@
 #include <wallet/fees.h>
 #include <walletinitinterface.h>
 #include <wallet/walletutil.h>
+
+
+#include <zerocoin/accumulators.h>
+#include <masternode/masternode-budget.h>
+#include <primitives/transaction.h>
+#include <script/script.h>
+#include <script/sign.h>
+#include <spork/spork.h>
+#include <pos/stakeinput.h>
+#include <instantx.h>
 #include <zerocoin/zwspchain.h>
 #include <zerocoin/zwspwallet.h>
 #include <obfuscation/denomination_functions.h>
