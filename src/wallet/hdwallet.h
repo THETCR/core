@@ -15,6 +15,10 @@
 
 #include <miner.h>
 
+#include <primitives/zerocoin.h>
+#include <zerocoin/zwsptracker.h>
+#include <zerocoin/zwspwallet.h>
+
 typedef std::map<CKeyID, CStealthKeyMetadata> StealthKeyMetaMap;
 typedef std::map<CKeyID, CExtKeyAccount*> ExtKeyAccountMap;
 typedef std::map<CKeyID, CStoredExtKey*> ExtKeyMap;
