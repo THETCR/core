@@ -284,6 +284,18 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int nBlockH
 //    LogPrintf("CMasternodePayments::FillBlockPayee -- Masternode payment %lld to %s\n", masternodePayment, address2.ToString());
 }
 
+void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, CAmount nFees, bool fProofOfStake, bool fZWSPStake)
+{
+    CBlockIndex* pindexPrev = chainActive.Tip();
+    if (!pindexPrev) return;
+
+    if (IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS) && budget.IsBudgetPaymentBlock(pindexPrev->nHeight + 1)) {
+        budget.FillBlockPayee(txNew, nFees, fProofOfStake);
+    } else {
+        masternodePayments.FillBlockPayee(txNew, nFees, fProofOfStake, fZWSPStake);
+    }
+}
+
 int CMasternodePayments::GetMinMasternodePaymentsProto() const {
     return sporkManager.IsSporkActive(SPORK_10_MASTERNODE_PAY_UPDATED_NODES)
             ? MIN_MASTERNODE_PAYMENT_PROTO_VERSION_2

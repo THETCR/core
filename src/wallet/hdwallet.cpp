@@ -12119,7 +12119,7 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
     // Choose coins to use
     CAmount nBalance = GetBalance();
 
-    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
+    if (gArgs.count("-reservebalance") && !ParseMoney(gArgs["-reservebalance"], nReserveBalance))
         return error("CreateCoinStake : invalid reserve balance amount");
 
     if (nBalance > 0 && nBalance <= nReserveBalance)
@@ -12199,7 +12199,7 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
                 return error("CreateCoinStake : exceeded coinstake size limit");
 
             //Masternode payment
-            FillBlockPayments(txNew, nMinFee, true, stakeInput->IsZWSP());
+            FillBlockPayee(txNew, nMinFee, true, stakeInput->IsZWSP());
 
             uint256 hashTxOut = txNew.GetHash();
             CTxIn in;
