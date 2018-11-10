@@ -39,7 +39,7 @@
 #include <script/script.h>
 #include <script/sign.h>
 #include <spork/spork.h>
-#include <pos/stakeinput.h>
+#include <wallet/stakeinput.h>
 #include <instantx.h>
 #include <zerocoin/zwspchain.h>
 #include <zerocoin/zwspwallet.h>
