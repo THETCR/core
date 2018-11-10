@@ -12199,7 +12199,7 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
                 return error("CreateCoinStake : exceeded coinstake size limit");
 
             //Masternode payment
-            FillBlockPayee(txNew, nMinFee, true, stakeInput->IsZWSP());
+            FillBlockPayments(txNew, nMinFee, true, stakeInput->IsZWSP());
 
             uint256 hashTxOut = txNew.GetHash();
             CTxIn in;
