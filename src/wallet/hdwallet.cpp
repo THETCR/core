@@ -40,6 +40,7 @@
 #include <script/sign.h>
 #include <spork/spork.h>
 #include <wallet/stakeinput.h>
+#include <masternode/masternode-payments.h>
 #include <instantx.h>
 #include <zerocoin/zwspchain.h>
 #include <zerocoin/zwspwallet.h>
@@ -12171,7 +12172,7 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
 
             // Calculate reward
             CAmount nReward;
-            nReward = GetBlockValue(chainActive.Height() + 1);
+            nReward = GetBlockSubsidy(chainActive.Height() + 1, Params().GetConsensus());
             nCredit += nReward;
 
             // Create the output transaction(s)
