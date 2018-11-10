@@ -12087,7 +12087,165 @@ bool CHDWallet::CreateCoinStake(unsigned int nBits, int64_t nTime, int nBlockHei
     // Successfully generated coinstake
     return true;
 };
+// WISPR: create coin stake transaction
+bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime)
+{
+    // The following split & combine thresholds are important to security
+    // Should not be adjusted if you don't understand the consequences
+    //int64_t nCombineThreshold = 0;
+    txNew.vin.clear();
+    txNew.vout.clear();
 
+    // Mark coin stake transaction
+    CScript scriptEmpty;
+    scriptEmpty.clear();
+    txNew.vout.push_back(CTxOut(0, scriptEmpty));
+
+    // Choose coins to use
+    CAmount nBalance = GetBalance();
+
+    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
+        return error("CreateCoinStake : invalid reserve balance amount");
+
+    if (nBalance > 0 && nBalance <= nReserveBalance)
+        return false;
+
+    // Get the list of stakable inputs
+    std::list<std::unique_ptr<CStakeInput> > listInputs;
+    if (!SelectStakeCoins(listInputs, nBalance - nReserveBalance))
+        return false;
+
+    if (listInputs.empty())
+        return false;
+
+    if (GetAdjustedTime() - chainActive.Tip()->GetBlockTime() < 60)
+        MilliSleep(10000);
+
+    CAmount nCredit;
+    CScript scriptPubKeyKernel;
+    bool fKernelFound = false;
+    for (std::unique_ptr<CStakeInput>& stakeInput : listInputs) {
+        nCredit = 0;
+        // Make sure the wallet is unlocked and shutdown hasn't been requested
+        if (IsLocked() || ShutdownRequested())
+            return false;
+
+        //make sure that enough time has elapsed between
+        CBlockIndex* pindex = stakeInput->GetIndexFrom();
+        if (!pindex || pindex->nHeight < 1) {
+            LogPrintf("*** no pindexfrom\n");
+            continue;
+        }
+
+        // Read block header
+        CBlockHeader block = pindex->GetBlockHeader();
+        uint256 hashProofOfStake = 0;
+        nTxNewTime = GetAdjustedTime();
+
+        //iterates each utxo inside of CheckStakeKernelHash()
+        if (Stake(stakeInput.get(), nBits, block.GetBlockTime(), nTxNewTime, hashProofOfStake)) {
+            LOCK(cs_main);
+            //Double check that this will pass time requirements
+            if (nTxNewTime <= chainActive.Tip()->GetMedianTimePast()) {
+                LogPrintf("CreateCoinStake() : kernel found, but it is too far in the past \n");
+                continue;
+            }
+
+            // Found a kernel
+            LogPrintf("CreateCoinStake : kernel found\n");
+            nCredit += stakeInput->GetValue();
+
+            // Calculate reward
+            CAmount nReward;
+            nReward = GetBlockValue(chainActive.Height() + 1);
+            nCredit += nReward;
+
+            // Create the output transaction(s)
+            vector<CTxOut> vout;
+            if (!stakeInput->CreateTxOuts(this, vout, nCredit)) {
+                LogPrintf("%s : failed to get scriptPubKey\n", __func__);
+                continue;
+            }
+            txNew.vout.insert(txNew.vout.end(), vout.begin(), vout.end());
+
+            CAmount nMinFee = 0;
+            if (!stakeInput->IsZWSP()) {
+                // Set output amount
+                if (txNew.vout.size() == 3) {
+                    txNew.vout[1].nValue = ((nCredit - nMinFee) / 2 / CENT) * CENT;
+                    txNew.vout[2].nValue = nCredit - nMinFee - txNew.vout[1].nValue;
+                } else
+                    txNew.vout[1].nValue = nCredit - nMinFee;
+            }
+
+            // Limit size
+            unsigned int nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
+            if (nBytes >= DEFAULT_BLOCK_MAX_SIZE / 5)
+                return error("CreateCoinStake : exceeded coinstake size limit");
+
+            //Masternode payment
+            FillBlockPayee(txNew, nMinFee, true, stakeInput->IsZWSP());
+
+            uint256 hashTxOut = txNew.GetHash();
+            CTxIn in;
+            if (!stakeInput->CreateTxIn(this, in, hashTxOut)) {
+                LogPrintf("%s : failed to create TxIn\n", __func__);
+                txNew.vin.clear();
+                txNew.vout.clear();
+                continue;
+            }
+            txNew.vin.emplace_back(in);
+
+            //Mark mints as spent
+            if (stakeInput->IsZWSP()) {
+                CZWspStake* z = (CZWspStake*)stakeInput.get();
+                if (!z->MarkSpent(this, txNew.GetHash()))
+                    return error("%s: failed to mark mint as used\n", __func__);
+            }
+
+            fKernelFound = true;
+            break;
+        }
+        if (fKernelFound)
+            break; // if kernel is found stop searching
+    }
+    if (!fKernelFound)
+        return false;
+
+    // Sign for WSP
+    int nIn = 0;
+    if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
+        for (CTxIn txIn : txNew.vin) {
+            const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
+            if (!SignSignature(*this, *wtx, txNew, nIn++))
+                return error("CreateCoinStake : failed to sign coinstake");
+        }
+    } else {
+        //Update the mint database with tx hash and height
+        for (const CTxOut& out : txNew.vout) {
+            if (!out.IsZerocoinMint())
+                continue;
+
+            libzerocoin::PublicCoin pubcoin(Params().Zerocoin_Params(false));
+            CValidationState state;
+            if (!TxOutToPublicCoin(out, pubcoin, state))
+                return error("%s: extracting pubcoin from txout failed", __func__);
+
+            uint256 hashPubcoin = GetPubCoinHash(pubcoin.getValue());
+            if (!zwspTracker->HasPubcoinHash(hashPubcoin))
+                return error("%s: could not find pubcoinhash %s in tracker", __func__, hashPubcoin.GetHex());
+
+            CMintMeta meta = zwspTracker->GetMetaFromPubcoin(hashPubcoin);
+            meta.txid = txNew.GetHash();
+            meta.nHeight = chainActive.Height() + 1;
+            if (!zwspTracker->UpdateState(meta))
+                return error("%s: failed to update metadata in tracker", __func__);
+        }
+    }
+
+    // Successfully generated coinstake
+    return true;
+}
 bool CHDWallet::SignBlock(CBlockTemplate *pblocktemplate, int nHeight, int64_t nSearchTime)
 {
     if (LogAcceptCategory(BCLog::POS)) {
@@ -12112,7 +12270,8 @@ bool CHDWallet::SignBlock(CBlockTemplate *pblocktemplate, int nHeight, int64_t n
     }
 
     CMutableTransaction txCoinStake;
-    if (CreateCoinStake(pblock->nBits, nSearchTime, nHeight, nFees, txCoinStake, key)) {
+//    CreateCoinStake(pblock->nBits, nSearchTime, nHeight, nFees, txCoinStake, key)
+    if (CreateCoinStake(*this, pblock->nBits, nSearchTime - nLastCoinStakeSearchTime, txCoinStake, pblock->nTime)) {
         if (LogAcceptCategory(BCLog::POS)) {
             WalletLogPrintf("%s: Kernel found.\n", __func__);
         }
