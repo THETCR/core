@@ -7,7 +7,7 @@
 
 #include <map>
 #include <libzerocoin/Coin.h>
-#include <mintpool.h>
+#include <zerocoin/mintpool.h>
 #include <uint256.h>
 #include <primitives/zerocoin.h>
 

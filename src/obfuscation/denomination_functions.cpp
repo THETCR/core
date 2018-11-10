@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "denomination_functions.h"
+#include <obfuscation/denomination_functions.h>
 
 using namespace libzerocoin;
 
