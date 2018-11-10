@@ -32,6 +32,7 @@
 #include <wallet/fees.h>
 #include <walletinitinterface.h>
 #include <wallet/walletutil.h>
+#include <zerocoin/zwspchain.h>
 
 #if ENABLE_USBDEVICE
 #include <usbdevice/usbdevice.h>
