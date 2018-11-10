@@ -35,7 +35,6 @@
 
 
 #include <zerocoin/accumulators.h>
-#include <masternode/masternode-budget.h>
 #include <primitives/transaction.h>
 #include <script/script.h>
 #include <script/sign.h>
