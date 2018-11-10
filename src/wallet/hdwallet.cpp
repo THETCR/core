@@ -33,6 +33,10 @@
 #include <walletinitinterface.h>
 #include <wallet/walletutil.h>
 #include <zerocoin/zwspchain.h>
+#include <zerocoin/zwspwallet.h>
+#include <obfuscation/denomination_functions.h>
+#include <libzerocoin/Denominations.h>
+#include <primitives/deterministicmint.h>
 
 #if ENABLE_USBDEVICE
 #include <usbdevice/usbdevice.h>
