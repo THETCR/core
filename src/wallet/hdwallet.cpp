@@ -12119,7 +12119,7 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
     // Choose coins to use
     CAmount nBalance = GetBalance();
 
-    if (gArgs.count("-reservebalance") && !ParseMoney(gArgs["-reservebalance"], nReserveBalance))
+    if (nReserveBalance && !ParseMoney(nReserveBalance, nReserveBalance))
         return error("CreateCoinStake : invalid reserve balance amount");
 
     if (nBalance > 0 && nBalance <= nReserveBalance)
