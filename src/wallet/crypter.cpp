@@ -380,7 +380,7 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
 }
 bool CCryptoKeyStore::AddDeterministicSeed(CHDWallet *pwallet, const uint256& seed)
 {
-    CHDWalletDB db(pwallet->strWalletFile);
+    CHDWalletDB db(pwallet->GetDBHandle());
     string strErr;
     uint256 hashSeed = Hash(seed.begin(), seed.end());
 
@@ -415,7 +415,7 @@ bool CCryptoKeyStore::AddDeterministicSeed(CHDWallet *pwallet, const uint256& se
 bool CCryptoKeyStore::GetDeterministicSeed(CHDWallet *pwallet, const uint256& hashSeed, uint256& seedOut)
 {
 
-    CHDWalletDB db(pwallet->strWalletFile);
+    CHDWalletDB db(pwallet->GetDBHandle());
     string strErr;
     if (IsCrypted()) {
         if(!IsLocked()) { //if we have password
