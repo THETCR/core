@@ -38,3 +38,18 @@ bool CBlock::IsZerocoinStake() const
     CTransaction t = *vtx[1];
     return IsProofOfStake() && t.IsZerocoinSpend();
 }
+std::vector<uint256> CBlock::GetMerkleBranch(int nIndex) const
+{
+    if (vMerkleTree.empty())
+        BuildMerkleTree();
+    std::vector<uint256> vMerkleBranch;
+    int j = 0;
+    for (int nSize = vtx.size(); nSize > 1; nSize = (nSize + 1) / 2)
+    {
+        int i = std::min(nIndex^1, nSize-1);
+        vMerkleBranch.push_back(vMerkleTree[j+i]);
+        nIndex >>= 1;
+        j += nSize;
+    }
+    return vMerkleBranch;
+}

@@ -165,6 +165,8 @@ public:
     }
 
     std::string ToString() const;
+    std::vector<uint256> GetMerkleBranch(int nIndex) const;
+
 };
 
 /** Describes a place in the block chain to another node such that if the
