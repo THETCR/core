@@ -5824,8 +5824,8 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
         // create dummy data output only and pay everything as a fee
         txCollateral.vout.push_back(CTxOut(0, CScript() << OP_RETURN));
     }
-
-    if (!SignSignature(*this, txdsinCollateral.prevPubKey, txCollateral, 0)) {
+    const CKeyStore& keystore = *this;
+    if (!SignSignature(keystore, txdsinCollateral.prevPubKey, txCollateral, 0, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
         strReason = "Unable to sign collateral transaction!";
         return false;
     }
