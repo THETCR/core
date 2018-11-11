@@ -146,7 +146,7 @@ public:
     }
 
     bool IsCrypted() const { return fUseCrypto; }
-    virtual bool IsLocked() const;
+//    virtual bool IsLocked() const;
     virtual bool IsLocked(bool fForMixing = false) const;
     virtual bool Lock();
 

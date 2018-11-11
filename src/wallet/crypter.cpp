@@ -152,14 +152,14 @@ bool CCryptoKeyStore::SetCrypted()
     return true;
 }
 
-bool CCryptoKeyStore::IsLocked() const
-{
-    if (!IsCrypted()) {
-        return false;
-    }
-    LOCK(cs_KeyStore);
-    return vMasterKey.empty();
-}
+//bool CCryptoKeyStore::IsLocked() const
+//{
+//    if (!IsCrypted()) {
+//        return false;
+//    }
+//    LOCK(cs_KeyStore);
+//    return vMasterKey.empty();
+//}
 // This function should be used in a different combinations to determine
 // if CCryptoKeyStore is fully locked so that no operations requiring access
 // to private keys are possible:
