@@ -16,8 +16,8 @@ using namespace libzerocoin;
 CzWSPWallet::CzWSPWallet(std::string strWalletFile)
 {
     this->strWalletFile = strWalletFile;
-    CHDWallet *(pwalletMain)(strWalletFile);
-    CHDWalletDB walletdb(pwalletMain->GetDBHandle());
+    CHDWallet pwalletMain(strWalletFile);
+    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
 
     uint256 hashSeed;
     bool fFirstRun = !walletdb.ReadCurrentSeedHash(hashSeed);
@@ -29,7 +29,7 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
             //Update to new format, erase old
             seedMaster = seed;
             hashSeed = Hash(seed.begin(), seed.end());
-            if (pwalletMain->AddDeterministicSeed(seed)) {
+            if (pwalletMain.AddDeterministicSeed(seed)) {
                 if (walletdb.EraseZWSPSeed_deprecated()) {
                     LogPrintf("%s: Updated zWSP seed databasing\n", __func__);
                     fFirstRun = false;
@@ -41,7 +41,7 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
     }
 
     //Don't try to do anything if the wallet is locked.
-    if (pwalletMain->IsLocked()) {
+    if (pwalletMain.IsLocked()) {
         seedMaster = 0;
         nCountLastUsed = 0;
         this->mintPool = CMintPool();
@@ -57,7 +57,7 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
         seed = key.GetPrivKey_256();
         seedMaster = seed;
         LogPrintf("%s: first run of zwsp wallet detected, new seed generated. Seedhash=%s\n", __func__, Hash(seed.begin(), seed.end()).GetHex());
-    } else if (!pwalletMain->GetDeterministicSeed(hashSeed, seed)) {
+    } else if (!pwalletMain.GetDeterministicSeed(hashSeed, seed)) {
         LogPrintf("%s: failed to get deterministic seed for hashseed %s\n", __func__, hashSeed.GetHex());
         return;
     }
@@ -72,11 +72,12 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
 bool CzWSPWallet::SetMasterSeed(const uint256& seedMaster, bool fResetCount)
 {
 
-    CHDWalletDB walletdb(GetDBHandle());
-    if (pwalletMain->IsLocked())
+    CHDWallet pwalletMain(this->strWalletFile);
+    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
+    if (pwalletMain.IsLocked())
         return false;
 
-    if (seedMaster != 0 && !pwalletMain->AddDeterministicSeed(seedMaster)) {
+    if (seedMaster != 0 && !pwalletMain.AddDeterministicSeed(seedMaster)) {
         return error("%s: failed to set master seed.", __func__);
     }
 
@@ -204,7 +205,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
             if (ShutdownRequested())
                 return;
 
-            if (pwalletMain->zwspTracker->HasPubcoinHash(pMint.first)) {
+            if (pwalletMain.zwspTracker.HasPubcoinHash(pMint.first)) {
                 mintPool.Remove(pMint.first);
                 continue;
             }
@@ -268,7 +269,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
 
                     //Fill out wtx so that a transaction record can be created
                     wtx.nTimeReceived = pindex->GetBlockTime();
-                    pwalletMain->AddToWallet(wtx);
+                    pwalletMain.AddToWallet(wtx);
                     setAddedTx.insert(txHash);
                 }
 
@@ -324,11 +325,11 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
             wtx.SetMerkleBranch(block);
 
         wtx.nTimeReceived = pindex->nTime;
-        pwalletMain->AddToWallet(wtx);
+        pwalletMain.AddToWallet(wtx);
     }
 
     // Add to zwspTracker which also adds to database
-    pwalletMain->zwspTracker->Add(dMint, true);
+    pwalletMain.zwspTracker->Add(dMint, true);
     
     //Update the count if it is less than the mint's count
     if (nCountLastUsed < pMint.second) {
