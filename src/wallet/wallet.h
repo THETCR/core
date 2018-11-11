@@ -927,7 +927,7 @@ public:
      * if they are not ours
      */
     virtual bool SelectCoins(const std::vector<COutput>& vAvailableCoins, const CAmount& nTargetValue, std::set<CInputCoin>& setCoinsRet, CAmount& nValueRet,
-                    const CCoinControl& coin_control, CoinSelectionParams& coin_selection_params, bool& bnb_used, AvailableCoinsType nCoinType=ALL_COINS, bool fUseInstantSend = true) const;
+                    const CCoinControl& coin_control, CoinSelectionParams& coin_selection_params, bool& bnb_used, AvailableCoinsType nCoinType=ALL_COINS, bool useIX = true) const;
 
     /** Get a name for this wallet for logging/debugging purposes.
      */
