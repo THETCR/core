@@ -12137,7 +12137,7 @@ bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listI
             nAmountSelected += ref.vout[out.i].nValue;
 
             std::unique_ptr<CWspStake> input(new CWspStake());
-            input->SetInput(*out.tx->tx, out.i);
+            input->SetInput(ref, out.i);
             listInputs.emplace_back(std::move(input));
         }
     }
@@ -12607,7 +12607,8 @@ CScript GetLargestContributor(set<pair<const CWalletTx*, unsigned int> >& setCoi
 {
     map<CScript, CAmount> mapScriptsOut;
     for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-        CTxOut out = coin.first->vout[coin.second];
+        CTransactionRef ref = *coin.first;
+        CTxOut out = ref.vout[coin.second];
         mapScriptsOut[out.scriptPubKey] += out.nValue;
     }
 
