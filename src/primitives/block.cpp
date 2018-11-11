@@ -35,5 +35,5 @@ std::string CBlock::ToString() const
 }
 bool CBlock::IsZerocoinStake() const
 {
-    return IsProofOfStake() && vtx[1].IsZerocoinSpend();
+    return IsProofOfStake() && *vtx[1].IsZerocoinSpend();
 }
