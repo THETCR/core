@@ -33,6 +33,7 @@
 #include <assert.h>
 #include <future>
 
+#include <zerocoin/accumulators.h>
 #include <governance/governance.h>
 #include <instantx.h>
 #include <keepass.h>
