@@ -20,6 +20,11 @@
 #include <utility>
 #include <vector>
 
+#include <primitives/zerocoin.h>
+#include <libzerocoin/Accumulator.h>
+#include <libzerocoin/Denominations.h>
+#include <zerocoin/zwsptracker.h>
+
 /*
 prefixes
     name

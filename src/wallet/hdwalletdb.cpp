@@ -6,6 +6,7 @@
 #include <wallet/hdwallet.h>
 
 #include <serialize.h>
+#include <primitives/deterministicmint.h>
 
 class PackKey
 {
