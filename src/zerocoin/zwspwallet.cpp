@@ -152,7 +152,7 @@ void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
 
         mintPool.Add(bnValue, i);
         CHDWallet pwalletMain(this->strWalletFile);
-        CHDWalletDB walletdb(pwalletMain.GetDBHandle()).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
+        CHDWalletDB(pwalletMain.GetDBHandle()).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
 //        CHDWalletDB(strWalletFile).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
         LogPrintf("%s : %s count=%d\n", __func__, bnValue.GetHex().substr(0, 6), i);
     }
