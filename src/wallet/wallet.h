@@ -35,6 +35,7 @@
 #include <utility>
 #include <vector>
 
+#include <wallet/crypter.h>
 #include <primitives/zerocoin.h>
 #include <zerocoin/zwsptracker.h>
 #include <zerocoin/zwspwallet.h>
@@ -359,6 +360,7 @@ public:
      *  0  : in memory pool, waiting to be included in a block
      * >=1 : this many blocks deep in the main chain
      */
+    int GetDepthInMainChainCached() const;
     int GetDepthInMainChain(const CBlockIndex* &pindexRet, bool enableIX = true) const;
     int GetDepthInMainChain(bool enableIX = true) const { const CBlockIndex *pindexRet; return GetDepthInMainChain(pindexRet, enableIX); }
     bool IsInMainChain() const { return GetDepthInMainChain() > 0; }
@@ -823,7 +825,6 @@ private:
     friend class WalletRescanReserver;
 
     WalletBatch *encrypted_batch = nullptr;
-    std::string strWalletFile;
 
     //! the current wallet version: clients below this version are not able to load the wallet
     int nWalletVersion = FEATURE_BASE;
@@ -1404,6 +1405,7 @@ public:
     };
 
     //!WISPR
+    const std::string strWalletFile;
     CzWSPWallet* zwalletMain;
     std::unique_ptr<CzWSPTracker> zwspTracker;
     CAmount GetDenominatedBalance(bool unconfirmed=false) const;

@@ -36,6 +36,7 @@
 
 
 #include <txdb.h>
+#include <utiltime.h>
 #include <wallet/walletdb.h>
 #include <zerocoin/accumulators.h>
 #include <primitives/transaction.h>
@@ -5996,6 +5997,14 @@ bool CWallet::ConvertList(std::vector<CTxIn> vecTxIn, std::vector<CAmount>& vecA
     }
     return true;
 }
+struct CompareByAmount
+{
+    bool operator()(const CompactTallyItem& t1,
+                    const CompactTallyItem& t2) const
+    {
+        return t1.nAmount > t2.nAmount;
+    }
+};
 bool CWallet::SelectCoinsGrouppedByAddresses(std::vector<CompactTallyItem>& vecTallyRet, bool fSkipDenominated, bool fAnonymizable, bool fSkipUnconfirmed) const
 {
     LOCK2(cs_main, cs_wallet);
