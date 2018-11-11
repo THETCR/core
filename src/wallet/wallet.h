@@ -125,6 +125,27 @@ enum WalletFlags : uint64_t {
     // will enforce the rule that the wallet can't contain any private keys (only watch-only/pubkeys)
     WALLET_FLAG_DISABLE_PRIVATE_KEYS = (1ULL << 32),
 };
+// Possible states for zWSP send
+enum ZerocoinSpendStatus {
+    ZWSP_SPEND_OKAY = 0,                            // No error
+    ZWSP_SPEND_ERROR = 1,                           // Unspecified class of errors, more details are (hopefully) in the returning text
+    ZWSP_WALLET_LOCKED = 2,                         // Wallet was locked
+    ZWSP_COMMIT_FAILED = 3,                         // Commit failed, reset status
+    ZWSP_ERASE_SPENDS_FAILED = 4,                   // Erasing spends during reset failed
+    ZWSP_ERASE_NEW_MINTS_FAILED = 5,                // Erasing new mints during reset failed
+    ZWSP_TRX_FUNDS_PROBLEMS = 6,                    // Everything related to available funds
+    ZWSP_TRX_CREATE = 7,                            // Everything related to create the transaction
+    ZWSP_TRX_CHANGE = 8,                            // Everything related to transaction change
+    ZWSP_TXMINT_GENERAL = 9,                        // General errors in MintToTxIn
+    ZWSP_INVALID_COIN = 10,                         // Selected mint coin is not valid
+    ZWSP_FAILED_ACCUMULATOR_INITIALIZATION = 11,    // Failed to initialize witness
+    ZWSP_INVALID_WITNESS = 12,                      // Spend coin transaction did not verify
+    ZWSP_BAD_SERIALIZATION = 13,                    // Transaction verification failed
+    ZWSP_SPENT_USED_ZWSP = 14,                      // Coin has already been spend
+    ZWSP_TX_TOO_LARGE = 15,                          // The transaction is larger than the max tx size
+    ZWSP_SPEND_V1_SEC_LEVEL                         // Spend is V1 and security level is not set to 100
+};
+
 enum AvailableCoinsType
 {
     ALL_COINS,
