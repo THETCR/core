@@ -25,6 +25,7 @@ std::map<int, int64_t> mapSporkDefaults = {
         {SPORK_9_SUPERBLOCKS_ENABLED,            4070908800ULL}, // OFF
         {SPORK_10_MASTERNODE_PAY_UPDATED_NODES,  4070908800ULL}, // OFF
         {SPORK_12_RECONSIDER_BLOCKS,             0},             // 0 BLOCKS
+        {SPORK_13_ENABLE_SUPERBLOCKS,            4070908800ULL}, // OFF
         {SPORK_14_REQUIRE_SENTINEL_FLAG,         4070908800ULL}, // OFF
 };
 
