@@ -121,6 +121,7 @@ public:
         SetNull();
         *(static_cast<CBlockHeader*>(this)) = header;
     }
+    bool IsZerocoinStake() const;
 
     bool IsProofOfStake() const
     {

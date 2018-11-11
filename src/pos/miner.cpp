@@ -21,6 +21,8 @@
 
 #include <stdint.h>
 
+#include <zerocoin/zwspchain.h>
+
 typedef CWallet* CWalletRef;
 std::vector<StakeThread*> vStakeThreads;
 

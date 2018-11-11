@@ -12418,7 +12418,13 @@ bool CHDWallet::SignBlock(CBlockTemplate *pblocktemplate, int nHeight, int64_t n
 
     return false;
 };
+bool CHDWallet::SignBlockWithKey(CBlock& block, const CKey& key)
+{
+    if (!key.Sign(block.GetHash(), block.vchBlockSig))
+        return error("%s: failed to sign block hash with key", __func__);
 
+    return true;
+}
 int LoopExtKeysInDB(CHDWallet *pwallet, bool fInactive, bool fInAccount, LoopExtKeyCallback &callback)
 {
     AssertLockHeld(pwallet->cs_wallet);
