@@ -8,6 +8,7 @@
 #include <masternode/masternode.h>
 #include <obfuscation/privatesend.h>
 #include <wallet/wallet.h>
+#include <wallet/hdwallet.h>
 #include <obfuscation/privatesend-util.h>
 
 class CPrivateSendClient;
