@@ -268,7 +268,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
 
                 if (!setAddedTx.count(txHash)) {
                     CBlock block;
-                    CWalletTx wtx(*pwalletMain, tx);
+                    CWalletTx wtx(&pwalletMain, tx);
                     if (pindex && ReadBlockFromDisk(block, pindex, Params().GetConsensus()))
                         wtx.SetMerkleBranch(block);
 
