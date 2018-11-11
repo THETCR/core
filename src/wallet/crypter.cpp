@@ -160,7 +160,34 @@ bool CCryptoKeyStore::IsLocked() const
     LOCK(cs_KeyStore);
     return vMasterKey.empty();
 }
+// This function should be used in a different combinations to determine
+// if CCryptoKeyStore is fully locked so that no operations requiring access
+// to private keys are possible:
+//      IsLocked(true)
+// or if CCryptoKeyStore's private keys are available for mixing only:
+//      !IsLocked(true) && IsLocked()
+// or if they are available for everything:
+//      !IsLocked()
+bool CCryptoKeyStore::IsLocked(bool fForMixing) const
+{
+    if (!IsCrypted())
+        return false;
+    bool result;
+    {
+        LOCK(cs_KeyStore);
+        result = vMasterKey.empty();
+    }
+    // fForMixing   fOnlyMixingAllowed  return
+    // ---------------------------------------
+    // true         true                result
+    // true         false               result
+    // false        true                true
+    // false        false               result
 
+    if(!fForMixing && fOnlyMixingAllowed) return true;
+
+    return result;
+}
 bool CCryptoKeyStore::Lock()
 {
     if (!SetCrypted())

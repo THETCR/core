@@ -147,6 +147,7 @@ public:
 
     bool IsCrypted() const { return fUseCrypto; }
     virtual bool IsLocked() const;
+    virtual bool IsLocked(bool fForMixing = false) const;
     virtual bool Lock();
 
     virtual bool AddCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
