@@ -210,7 +210,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
             if (ShutdownRequested())
                 return;
 
-            if (pwalletMain.zwspTracker.HasPubcoinHash(pMint.first)) {
+            if (pwalletMain.zwspTracker->HasPubcoinHash(pMint.first)) {
                 mintPool.Remove(pMint.first);
                 continue;
             }
@@ -268,7 +268,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
 
                 if (!setAddedTx.count(txHash)) {
                     CBlock block;
-                    CWalletTx wtx(pwalletMain, tx);
+                    CWalletTx wtx(*pwalletMain, tx);
                     if (pindex && ReadBlockFromDisk(block, pindex, Params().GetConsensus()))
                         wtx.SetMerkleBranch(block);
 
