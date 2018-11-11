@@ -12737,8 +12737,9 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
     // Sign if these are wispr outputs - NOTE that zWSP outputs are signed later in SoK
     if (!isZCSpendChange) {
         int nIn = 0;
+        const CKeyStore& keystore = *this;
         for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-            if (!SignSignature(*this, *coin.first, txNew, nIn++)) {
+            if (!SignSignature(keystore, *coin.first, txNew, nIn++)) {
                 strFailReason = _("Signing transaction failed");
                 return false;
             }
