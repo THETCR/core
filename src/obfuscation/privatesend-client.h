@@ -12,6 +12,7 @@
 
 class CPrivateSendClient;
 class CConnman;
+class CTransactionRecord;
 
 static const int DENOMS_COUNT_MAX                   = 100;
 
