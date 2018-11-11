@@ -12731,8 +12731,10 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
     CAmount nTotalValue = (isZCSpendChange ? nValue : (nValue + nFee));
 
     // check for a zerocoinspend that mints the change
+    CoinSelectionParams coin_selection_params; // Parameters for coin selection, init with dummy
     CAmount nValueIn = 0;
     set<pair<const CWalletTx*, unsigned int> > setCoins;
+    bool bnb_used;
     if (isZCSpendChange) {
         nValueIn = nValue;
     } else {
@@ -12744,7 +12746,6 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
             strFailReason = _("Insufficient or insufficient confirmed funds, you might need to wait a few minutes and try again.");
             return false;
         }
-
         // Fill vin
         for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins)
             txNew.vin.push_back(CTxIn(coin.first->GetHash(), coin.second));
