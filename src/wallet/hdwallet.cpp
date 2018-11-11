@@ -12119,8 +12119,8 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
     // Choose coins to use
     CAmount nBalance = GetBalance();
 
-    if (nReserveBalance && !ParseMoney(nReserveBalance, nReserveBalance))
-        return error("CreateCoinStake : invalid reserve balance amount");
+//    if (nReserveBalance && !ParseMoney(nReserveBalance, nReserveBalance))
+//        return error("CreateCoinStake : invalid reserve balance amount");
 
     if (nBalance > 0 && nBalance <= nReserveBalance)
         return false;
@@ -12232,7 +12232,7 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
     if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
         for (CTxIn txIn : txNew.vin) {
             const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
-            const CKeyStore& keystore = *pwallet;
+            const CKeyStore& keystore = *this;
             if (!SignSignature(keystore, *wtx, txNew, nIn++))
                 return error("CreateCoinStake : failed to sign coinstake");
         }
