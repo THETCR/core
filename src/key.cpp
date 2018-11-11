@@ -214,6 +214,13 @@ bool CKey::SetPrivKey(const CPrivKey& privkey, bool fCompressedIn)
     fValid = true;
     return true;
 }
+uint256 CKey::GetPrivKey_256()
+{
+    void* key = keydata.data();
+    uint256* key_256 = (uint256*)key;
+
+    return *key_256;
+}
 // Check that the sig has a low R value and will be less than 71 bytes
 bool SigHasLowR(const secp256k1_ecdsa_signature* sig)
 {

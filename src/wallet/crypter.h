@@ -173,6 +173,9 @@ public:
      * Note: Called without locks held.
      */
     boost::signals2::signal<void (CCryptoKeyStore* wallet)> NotifyStatusChanged;
+    //!WISPR
+    bool GetDeterministicSeed(const uint256& hashSeed, uint256& seed);
+    bool AddDeterministicSeed(const uint256& seed);
 };
 
 #endif // BITCOIN_WALLET_CRYPTER_H
