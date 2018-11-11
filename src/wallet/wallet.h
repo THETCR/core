@@ -972,13 +972,14 @@ public:
         if (!fParticlMode)
             m_min_fee = CFeeRate(DEFAULT_TRANSACTION_MINFEE_BTC);
     }
-    CWallet(std::string strWalletFileIn)
+    CWallet(const std::string& strWalletFileIn)
+            : strWalletFile(strWalletFileIn)
     {
 //        SetNull();
 
-        strWalletFile = strWalletFileIn;
         fFileBacked = true;
     }
+
     virtual ~CWallet()
     {
         delete encrypted_batch;
