@@ -12739,7 +12739,7 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
         // select UTXO's to use
         vector<COutput> vAvailableCoins;
 //        AvailableCoins(vAvailableCoins, true, coinControl, false, coin_type, useIX);
-        AvailableCoins(vAvailableCoins, true, coinControl, false, nObfuscationRoundsMin < 0 ? ONLY_NONDENOMINATED_NOT10000IFMN : ONLY_DENOMINATED);
+        AvailableCoins(vAvailableCoins, true, coinControl, false, ONLY_DENOMINATED);
         if (!SelectCoins(vAvailableCoins, nTotalValue, setCoins, nValueIn, *coinControl, coin_selection_params, bnb_used)) {
             strFailReason = _("Insufficient or insufficient confirmed funds, you might need to wait a few minutes and try again.");
             return false;

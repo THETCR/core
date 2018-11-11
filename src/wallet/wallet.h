@@ -153,6 +153,7 @@ enum AvailableCoinsType
     ONLY_NONDENOMINATED,
     ONLY_1000, // find masternode outputs including locked ones (use with caution)
     ONLY_PRIVATESEND_COLLATERAL,
+    ONLY_NONDENOMINATED_NOT10000IFMN, // ONLY_NONDENOMINATED and not 10000 WSP at the same time
     STAKABLE_COINS
 };
 struct CompactTallyItem
