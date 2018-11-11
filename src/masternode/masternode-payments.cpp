@@ -289,10 +289,10 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, CAmount nFe
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (!pindexPrev) return;
 
-    if (IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS) && budget.IsBudgetPaymentBlock(pindexPrev->nHeight + 1)) {
+    if (sporkManager.IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS) && budget.IsBudgetPaymentBlock(pindexPrev->nHeight + 1)) {
         budget.FillBlockPayee(txNew, nFees, fProofOfStake);
     } else {
-        masternodePayments.FillBlockPayee(txNew, nFees, fProofOfStake, fZWSPStake);
+        mnpayments.FillBlockPayee(txNew, nFees, fProofOfStake, fZWSPStake);
     }
 }
 
