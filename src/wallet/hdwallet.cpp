@@ -12566,7 +12566,7 @@ const CHDWallet *GetParticlWallet(const CKeyStore *win)
     return rv;
 };
 // Get a Map pairing the Denominations with the amount of Zerocoin for each Denomination
-std::map<libzerocoin::CoinDenomination, CAmount> CWallet::GetMyZerocoinDistribution() const
+std::map<libzerocoin::CoinDenomination, CAmount> CHDWallet::GetMyZerocoinDistribution() const
 {
     std::map<libzerocoin::CoinDenomination, CAmount> spread;
     for (const auto& denom : libzerocoin::zerocoinDenomList)
@@ -12687,7 +12687,7 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
         txNew.vout.push_back(outMint);
 
         //store as CZerocoinMint for later use
-        LogPrint("zero", "%s: new mint %s\n", __func__, dMint.ToString());
+//        LogPrint("zero", "%s: new mint %s\n", __func__, dMint.ToString());
         vDMints.emplace_back(dMint);
     }
 
