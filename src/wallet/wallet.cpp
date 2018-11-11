@@ -5095,8 +5095,8 @@ CScript GetLargestContributor(set<pair<const CWalletTx*, unsigned int> >& setCoi
 }
 bool CWallet::GetZerocoinKey(const CBigNum& bnSerial, CKey& key)
 {
-//    CWalletDB walletdb(strWalletFile);
-    CWalletDB walletdb(this->GetDBHandle());
+//    CHDWalletDB walletdb(strWalletFile);
+    CHDWalletDB walletdb(this->GetDBHandle());
 
     CZerocoinMint mint;
     if (!GetMint(GetSerialHash(bnSerial), mint))
@@ -5371,8 +5371,8 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLevel,
     nStatus = ZWSP_TRX_CREATE;
 
     // If not already given pre-selected mints, then select mints from the wallet
-//    CWalletDB walletdb(this->strWalletFile);
-    CWalletDB walletdb(this->GetDBHandle());
+//    CHDWalletDB walletdb(this->strWalletFile);
+    CHDWalletDB walletdb(this->GetDBHandle());
 
     set<CMintMeta> setMints;
     CAmount nValueSelected = 0;
@@ -5559,7 +5559,7 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLevel,
             uint256 txHash = txNew.GetHash();
             for (CZerocoinSpend spend : receipt.GetSpends()) {
                 spend.SetTxHash(txHash);
-                if (!CWalletDB(this->GetDBHandle()).WriteZerocoinSpendSerialEntry(spend)) {
+                if (!CHDWalletDB(this->GetDBHandle()).WriteZerocoinSpendSerialEntry(spend)) {
                     receipt.SetStatus(_("Failed to write coin serial number into wallet"), nStatus);
                 }
             }
@@ -5583,8 +5583,8 @@ string CWallet::ResetMintZerocoin()
 {
     long updates = 0;
     long deletions = 0;
-//    CWalletDB walletdb(this->strWalletFile);
-    CWalletDB walletdb(this->GetDBHandle());
+//    CHDWalletDB walletdb(this->strWalletFile);
+    CHDWalletDB walletdb(this->GetDBHandle());
 
     set<CMintMeta> setMints = zwspTracker->ListMints(false, false, true);
     vector<CMintMeta> vMintsToFind(setMints.begin(), setMints.end());
@@ -5616,8 +5616,8 @@ string CWallet::ResetMintZerocoin()
 string CWallet::ResetSpentZerocoin()
 {
     long removed = 0;
-//    CWalletDB walletdb(this->strWalletFile);
-    CWalletDB walletdb(this->GetDBHandle());
+//    CHDWalletDB walletdb(this->strWalletFile);
+    CHDWalletDB walletdb(this->GetDBHandle());
 
     set<CMintMeta> setMints = zwspTracker->ListMints(false, false, true);
     list<CZerocoinSpend> listSpends = walletdb.ListSpentCoins();
@@ -5673,8 +5673,8 @@ bool IsMintInChain(const uint256& hashPubcoin, uint256& txid, int& nHeight)
 
 void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, std::list<CDeterministicMint>& listDMintsRestored)
 {
-//    CWalletDB walletdb(this->strWalletFile);
-    CWalletDB walletdb(this->GetDBHandle());
+//    CHDWalletDB walletdb(this->strWalletFile);
+    CHDWalletDB walletdb(this->GetDBHandle());
 
     list<CZerocoinMint> listMints = walletdb.ListArchivedZerocoins();
     list<CDeterministicMint> listDMints = walletdb.ListArchivedDeterministicMints();
