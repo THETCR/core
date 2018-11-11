@@ -289,7 +289,7 @@ bool CHDWalletDB::WriteZerocoinSpendSerialEntry(const CZerocoinSpend& zerocoinSp
 }
 bool CHDWalletDB::EraseZerocoinSpendSerialEntry(const CBigNum& serialEntry)
 {
-    return Erase(make_pair(string("zcserial"), serialEntry));
+    return m_batch.Erase(make_pair(string("zcserial"), serialEntry));
 }
 
 bool CHDWalletDB::ReadZerocoinSpendSerialEntry(const CBigNum& bnSerial)
@@ -311,7 +311,7 @@ bool CHDWalletDB::ReadDeterministicMint(const uint256& hashPubcoin, CDeterminist
 
 bool CHDWalletDB::EraseDeterministicMint(const uint256& hashPubcoin)
 {
-    return Erase(make_pair(string("dzwsp"), hashPubcoin));
+    return m_batch.Erase(make_pair(string("dzwsp"), hashPubcoin));
 }
 
 bool CHDWalletDB::WriteZerocoinMint(const CZerocoinMint& zerocoinMint)
@@ -320,7 +320,7 @@ bool CHDWalletDB::WriteZerocoinMint(const CZerocoinMint& zerocoinMint)
     ss << zerocoinMint.GetValue();
     uint256 hash = Hash(ss.begin(), ss.end());
 
-    Erase(make_pair(string("zerocoin"), hash));
+    m_batch.Erase(make_pair(string("zerocoin"), hash));
     return m_batch.Write(make_pair(string("zerocoin"), hash), zerocoinMint, true);
 }
 
@@ -344,7 +344,7 @@ bool CHDWalletDB::EraseZerocoinMint(const CZerocoinMint& zerocoinMint)
     ss << zerocoinMint.GetValue();
     uint256 hash = Hash(ss.begin(), ss.end());
 
-    return Erase(make_pair(string("zerocoin"), hash));
+    return m_batch.Erase(make_pair(string("zerocoin"), hash));
 }
 
 bool CHDWalletDB::ArchiveMintOrphan(const CZerocoinMint& zerocoinMint)
@@ -358,7 +358,7 @@ bool CHDWalletDB::ArchiveMintOrphan(const CZerocoinMint& zerocoinMint)
         return false;
     }
 
-    if (!Erase(make_pair(string("zerocoin"), hash))) {
+    if (!m_batch.Erase(make_pair(string("zerocoin"), hash))) {
         LogPrintf("%s : failed to erase orphaned zerocoin mint\n", __func__);
         return false;
     }
@@ -371,7 +371,7 @@ bool CHDWalletDB::ArchiveDeterministicOrphan(const CDeterministicMint& dMint)
     if (!m_batch.Write(make_pair(string("dzco"), dMint.GetPubcoinHash()), dMint))
         return error("%s: write failed", __func__);
 
-    if (!Erase(make_pair(string("dzwsp"), dMint.GetPubcoinHash())))
+    if (!m_batch.Erase(make_pair(string("dzwsp"), dMint.GetPubcoinHash())))
         return error("%s: failed to erase", __func__);
 
     return true;
@@ -385,7 +385,7 @@ bool CHDWalletDB::UnarchiveDeterministicMint(const uint256& hashPubcoin, CDeterm
     if (!WriteDeterministicMint(dMint))
         return error("%s: failed to write deterministic mint", __func__);
 
-    if (!Erase(make_pair(string("dzco"), dMint.GetPubcoinHash())))
+    if (!m_batch.Erase(make_pair(string("dzco"), dMint.GetPubcoinHash())))
         return error("%s : failed to erase archived deterministic mint", __func__);
 
     return true;
