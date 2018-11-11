@@ -12301,12 +12301,12 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
         return false;
 
     // Sign for WSP
-    unsigned int nIn = 0;
+    int nIn = 0;
     if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
         for (CTxIn txIn : txNew.vin) {
 //            const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
             const CKeyStore& keystore = *this;
-            if (!SignSignature(keystore, scriptPubKeyKernel, txNew, nIn++))
+            if (!SignSignature(keystore, scriptPubKeyKernel, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY)))
                 return error("CreateCoinStake : failed to sign coinstake");
         }
     } else {
@@ -12739,7 +12739,7 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
         int nIn = 0;
         const CKeyStore& keystore = *this;
         for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-            if (!SignSignature(keystore, *coin.first, txNew, nIn++)) {
+            if (!SignSignature(keystore, *coin.first, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
                 strFailReason = _("Signing transaction failed");
                 return false;
             }
