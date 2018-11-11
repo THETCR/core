@@ -41,10 +41,10 @@ bool CzWSPTracker::Archive(CMintMeta& meta)
     if (mapSerialHashes.count(meta.hashSerial))
         mapSerialHashes.at(meta.hashSerial).isArchived = true;
 
-    CWalletDB walletdb(strWalletFile);
+    CHDWalletDB walletdb(strWalletFile);
     CZerocoinMint mint;
     if (walletdb.ReadZerocoinMint(meta.hashPubcoin, mint)) {
-        if (!CWalletDB(strWalletFile).ArchiveMintOrphan(mint))
+        if (!CHDWalletDB(strWalletFile).ArchiveMintOrphan(mint))
             return error("%s: failed to archive zerocoinmint", __func__);
     } else {
         //failed to read mint from DB, try reading deterministic
@@ -61,7 +61,7 @@ bool CzWSPTracker::Archive(CMintMeta& meta)
 
 bool CzWSPTracker::UnArchive(const uint256& hashPubcoin, bool isDeterministic)
 {
-    CWalletDB walletdb(strWalletFile);
+    CHDWalletDB walletdb(strWalletFile);
     if (isDeterministic) {
         CDeterministicMint dMint;
         if (!walletdb.UnarchiveDeterministicMint(hashPubcoin, dMint))
@@ -230,12 +230,12 @@ bool CzWSPTracker::UpdateZerocoinMint(const CZerocoinMint& mint)
     mapSerialHashes.at(hashSerial) = meta;
 
     //Write to db
-    return CWalletDB(strWalletFile).WriteZerocoinMint(mint);
+    return CHDWalletDB(strWalletFile).WriteZerocoinMint(mint);
 }
 
 bool CzWSPTracker::UpdateState(const CMintMeta& meta)
 {
-    CWalletDB walletdb(strWalletFile);
+    CHDWalletDB walletdb(strWalletFile);
 
     if (meta.isDeterministic) {
         CDeterministicMint dMint;
@@ -292,7 +292,7 @@ void CzWSPTracker::Add(const CDeterministicMint& dMint, bool isNew, bool isArchi
     mapSerialHashes[meta.hashSerial] = meta;
 
     if (isNew)
-        CWalletDB(strWalletFile).WriteDeterministicMint(dMint);
+        CHDWalletDB(strWalletFile).WriteDeterministicMint(dMint);
 }
 
 void CzWSPTracker::Add(const CZerocoinMint& mint, bool isNew, bool isArchived)
@@ -312,7 +312,7 @@ void CzWSPTracker::Add(const CZerocoinMint& mint, bool isNew, bool isArchived)
     mapSerialHashes[meta.hashSerial] = meta;
 
     if (isNew)
-        CWalletDB(strWalletFile).WriteZerocoinMint(mint);
+        CHDWalletDB(strWalletFile).WriteZerocoinMint(mint);
 }
 
 void CzWSPTracker::SetPubcoinUsed(const uint256& hashPubcoin, const uint256& txid)
@@ -430,7 +430,7 @@ bool CzWSPTracker::UpdateStatusInternal(const std::set<uint256>& setMempool, CMi
 
 std::set<CMintMeta> CzWSPTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, bool fUpdateStatus)
 {
-    CWalletDB walletdb(strWalletFile);
+    CHDWalletDB walletdb(strWalletFile);
     if (fUpdateStatus) {
         std::list<CZerocoinMint> listMintsDB = walletdb.ListMintedCoins();
         for (auto& mint : listMintsDB)

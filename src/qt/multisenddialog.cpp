@@ -152,7 +152,7 @@ void MultiSendDialog::on_addButton_clicked()
             model->updateAddressBookLabels(address.Get(), "(no label)", "send");
     }
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    CHDWalletDB walletdb(pwalletMain->strWalletFile);
     if(!walletdb.WriteMultiSend(pwalletMain->vMultiSend)) {
         ui->message->setProperty("status", "error");
         ui->message->style()->polish(ui->message);
@@ -174,7 +174,7 @@ void MultiSendDialog::on_deleteButton_clicked()
             fRemoved = true;
         }
     }
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    CHDWalletDB walletdb(pwalletMain->strWalletFile);
     if (!walletdb.EraseMultiSend(vMultiSendTemp))
         fRemoved = false;
     if (!walletdb.WriteMultiSend(pwalletMain->vMultiSend))
@@ -199,7 +199,7 @@ void MultiSendDialog::on_activateButton_clicked()
         pwalletMain->fMultiSendStake = ui->multiSendStakeCheckBox->isChecked();
         pwalletMain->fMultiSendMasternodeReward = ui->multiSendMasternodeCheckBox->isChecked();
 
-        CWalletDB walletdb(pwalletMain->strWalletFile);
+        CHDWalletDB walletdb(pwalletMain->strWalletFile);
         if (!walletdb.WriteMSettings(pwalletMain->fMultiSendStake, pwalletMain->fMultiSendMasternodeReward, pwalletMain->nLastMultiSendHeight))
             strRet = tr("MultiSend activated but writing settings to DB failed");
         else
@@ -215,7 +215,7 @@ void MultiSendDialog::on_disableButton_clicked()
 {
     QString strRet;
     pwalletMain->setMultiSendDisabled();
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    CHDWalletDB walletdb(pwalletMain->strWalletFile);
 
     if (!walletdb.WriteMSettings(false, false, pwalletMain->nLastMultiSendHeight))
         strRet = tr("MultiSend deactivated but writing settings to DB failed");
