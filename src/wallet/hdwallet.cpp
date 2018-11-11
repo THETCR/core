@@ -13091,7 +13091,7 @@ bool CHDWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLeve
 
             //turn the finalized transaction into a wallet transaction
             CWalletTx *wNew = new CWalletTx(this, MakeTransactionRef(std::move(txNew)));
-            wtxNew = &wNew;
+            wtxNew = *wNew;
 //            wtxNew = CWalletTx(this, txNew);
             wtxNew.fFromMe = true;
             wtxNew.fTimeReceivedIsTxTime = true;
