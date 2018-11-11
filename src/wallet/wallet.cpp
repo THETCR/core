@@ -6285,7 +6285,7 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block)
 
     // Locate the transaction
     for (nIndex = 0; nIndex < (int)block.vtx.size(); nIndex++)
-        if (block.vtx[nIndex] == *(CTransaction*)this)
+        if (block.vtx[nIndex] == *this)
     break;
     if (nIndex == (int)block.vtx.size()) {
         vMerkleBranch.clear();
@@ -6295,7 +6295,7 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block)
     }
 
     // Fill in merkle branch
-    vMerkleBranch = block.GetMerkleBranch(nIndex);
+    vMerkleBranch = BlockMerkleBranch(block, nIndex);
 
     // Is the tx in a block that's in the main chain
     BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
