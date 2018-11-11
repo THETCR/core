@@ -285,7 +285,7 @@ bool CHDWalletDB::EraseWalletSetting(const std::string &setting)
 //!WISPR
 bool CHDWalletDB::WriteZerocoinSpendSerialEntry(const CZerocoinSpend& zerocoinSpend)
 {
-    return Write(make_pair(string("zcserial"), zerocoinSpend.GetSerial()), zerocoinSpend, true);
+    return m_batch.Write(make_pair(string("zcserial"), zerocoinSpend.GetSerial()), zerocoinSpend, true);
 }
 bool CHDWalletDB::EraseZerocoinSpendSerialEntry(const CBigNum& serialEntry)
 {
@@ -295,18 +295,18 @@ bool CHDWalletDB::EraseZerocoinSpendSerialEntry(const CBigNum& serialEntry)
 bool CHDWalletDB::ReadZerocoinSpendSerialEntry(const CBigNum& bnSerial)
 {
     CZerocoinSpend spend;
-    return Read(make_pair(string("zcserial"), bnSerial), spend);
+    return m_batch.Read(make_pair(string("zcserial"), bnSerial), spend);
 }
 
 bool CHDWalletDB::WriteDeterministicMint(const CDeterministicMint& dMint)
 {
     uint256 hash = dMint.GetPubcoinHash();
-    return Write(make_pair(string("dzwsp"), hash), dMint, true);
+    return m_batch.Write(make_pair(string("dzwsp"), hash), dMint, true);
 }
 
 bool CHDWalletDB::ReadDeterministicMint(const uint256& hashPubcoin, CDeterministicMint& dMint)
 {
-    return Read(make_pair(string("dzwsp"), hashPubcoin), dMint);
+    return m_batch.Read(make_pair(string("dzwsp"), hashPubcoin), dMint);
 }
 
 bool CHDWalletDB::EraseDeterministicMint(const uint256& hashPubcoin)
@@ -321,7 +321,7 @@ bool CHDWalletDB::WriteZerocoinMint(const CZerocoinMint& zerocoinMint)
     uint256 hash = Hash(ss.begin(), ss.end());
 
     Erase(make_pair(string("zerocoin"), hash));
-    return Write(make_pair(string("zerocoin"), hash), zerocoinMint, true);
+    return m_batch.Write(make_pair(string("zerocoin"), hash), zerocoinMint, true);
 }
 
 bool CHDWalletDB::ReadZerocoinMint(const CBigNum &bnPubCoinValue, CZerocoinMint& zerocoinMint)
@@ -335,7 +335,7 @@ bool CHDWalletDB::ReadZerocoinMint(const CBigNum &bnPubCoinValue, CZerocoinMint&
 
 bool CHDWalletDB::ReadZerocoinMint(const uint256& hashPubcoin, CZerocoinMint& mint)
 {
-    return Read(make_pair(string("zerocoin"), hashPubcoin), mint);
+    return m_batch.Read(make_pair(string("zerocoin"), hashPubcoin), mint);
 }
 
 bool CHDWalletDB::EraseZerocoinMint(const CZerocoinMint& zerocoinMint)
@@ -353,7 +353,7 @@ bool CHDWalletDB::ArchiveMintOrphan(const CZerocoinMint& zerocoinMint)
     ss << zerocoinMint.GetValue();
     uint256 hash = Hash(ss.begin(), ss.end());;
 
-    if (!Write(make_pair(string("zco"), hash), zerocoinMint)) {
+    if (!m_batch.Write(make_pair(string("zco"), hash), zerocoinMint)) {
         LogPrintf("%s : failed to database orphaned zerocoin mint\n", __func__);
         return false;
     }
@@ -368,7 +368,7 @@ bool CHDWalletDB::ArchiveMintOrphan(const CZerocoinMint& zerocoinMint)
 
 bool CHDWalletDB::ArchiveDeterministicOrphan(const CDeterministicMint& dMint)
 {
-    if (!Write(make_pair(string("dzco"), dMint.GetPubcoinHash()), dMint))
+    if (!m_batch.Write(make_pair(string("dzco"), dMint.GetPubcoinHash()), dMint))
         return error("%s: write failed", __func__);
 
     if (!Erase(make_pair(string("dzwsp"), dMint.GetPubcoinHash())))
@@ -379,7 +379,7 @@ bool CHDWalletDB::ArchiveDeterministicOrphan(const CDeterministicMint& dMint)
 
 bool CHDWalletDB::UnarchiveDeterministicMint(const uint256& hashPubcoin, CDeterministicMint& dMint)
 {
-    if (!Read(make_pair(string("dzco"), hashPubcoin), dMint))
+    if (!m_batch.Read(make_pair(string("dzco"), hashPubcoin), dMint))
         return error("%s: failed to retrieve deterministic mint from archive", __func__);
 
     if (!WriteDeterministicMint(dMint))
@@ -393,14 +393,14 @@ bool CHDWalletDB::UnarchiveDeterministicMint(const uint256& hashPubcoin, CDeterm
 
 bool CHDWalletDB::UnarchiveZerocoinMint(const uint256& hashPubcoin, CZerocoinMint& mint)
 {
-    if (!Read(make_pair(string("zco"), hashPubcoin), mint))
+    if (!m_batch.Read(make_pair(string("zco"), hashPubcoin), mint))
         return error("%s: failed to retrieve zerocoinmint from archive", __func__);
 
     if (!WriteZerocoinMint(mint))
         return error("%s: failed to write zerocoinmint", __func__);
 
     uint256 hash = GetPubCoinHash(mint.GetValue());
-    if (!Erase(make_pair(string("zco"), hash)))
+    if (!m_batch.Erase(make_pair(string("zco"), hash)))
         return error("%s : failed to erase archived zerocoin mint", __func__);
 
     return true;
@@ -408,12 +408,12 @@ bool CHDWalletDB::UnarchiveZerocoinMint(const uint256& hashPubcoin, CZerocoinMin
 
 bool CHDWalletDB::WriteCurrentSeedHash(const uint256& hashSeed)
 {
-    return Write(string("seedhash"), hashSeed);
+    return m_batch.Write(string("seedhash"), hashSeed);
 }
 
 bool CHDWalletDB::ReadCurrentSeedHash(uint256& hashSeed)
 {
-    return Read(string("seedhash"), hashSeed);
+    return m_batch.Read(string("seedhash"), hashSeed);
 }
 
 bool CHDWalletDB::WriteZWSPSeed(const uint256& hashSeed, const vector<unsigned char>& seed)
@@ -421,7 +421,7 @@ bool CHDWalletDB::WriteZWSPSeed(const uint256& hashSeed, const vector<unsigned c
     if (!WriteCurrentSeedHash(hashSeed))
         return error("%s: failed to write current seed hash", __func__);
 
-    return Write(make_pair(string("dzs"), hashSeed), seed);
+    return m_batch.Write(make_pair(string("dzs"), hashSeed), seed);
 }
 
 bool CHDWalletDB::EraseZWSPSeed()
@@ -442,32 +442,32 @@ bool CHDWalletDB::EraseZWSPSeed()
 
 bool CHDWalletDB::EraseZWSPSeed_deprecated()
 {
-    return Erase(string("dzs"));
+    return m_batch.Erase(string("dzs"));
 }
 
 bool CHDWalletDB::ReadZWSPSeed(const uint256& hashSeed, vector<unsigned char>& seed)
 {
-    return Read(make_pair(string("dzs"), hashSeed), seed);
+    return m_batch.Read(make_pair(string("dzs"), hashSeed), seed);
 }
 
 bool CHDWalletDB::ReadZWSPSeed_deprecated(uint256& seed)
 {
-    return Read(string("dzs"), seed);
+    return m_batch.Read(string("dzs"), seed);
 }
 
 bool CHDWalletDB::WriteZWSPCount(const uint32_t& nCount)
 {
-    return Write(string("dzc"), nCount);
+    return m_batch.Write(string("dzc"), nCount);
 }
 
 bool CHDWalletDB::ReadZWSPCount(uint32_t& nCount)
 {
-    return Read(string("dzc"), nCount);
+    return m_batch.Read(string("dzc"), nCount);
 }
 
 bool CHDWalletDB::WriteMintPoolPair(const uint256& hashMasterSeed, const uint256& hashPubcoin, const uint32_t& nCount)
 {
-    return Write(make_pair(string("mintpool"), hashPubcoin), make_pair(hashMasterSeed, nCount));
+    return m_batch.Write(make_pair(string("mintpool"), hashPubcoin), make_pair(hashMasterSeed, nCount));
 }
 
 //! map with hashMasterSeed as the key, paired with vector of hashPubcoins and their count
