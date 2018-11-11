@@ -10,7 +10,7 @@
 #include <wallet/hdwallet.h>
 #include <zerocoin/zwspchain.h>
 #include <primitives/deterministicmint.h>
-
+#include <hash.h>
 using namespace libzerocoin;
 class CValidationState;
 
