@@ -131,7 +131,8 @@ enum AvailableCoinsType
     ONLY_DENOMINATED,
     ONLY_NONDENOMINATED,
     ONLY_1000, // find masternode outputs including locked ones (use with caution)
-    ONLY_PRIVATESEND_COLLATERAL
+    ONLY_PRIVATESEND_COLLATERAL,
+    STAKABLE_COINS
 };
 struct CompactTallyItem
 {
@@ -787,6 +788,7 @@ private:
     friend class WalletRescanReserver;
 
     WalletBatch *encrypted_batch = nullptr;
+    std::string strWalletFile;
 
     //! the current wallet version: clients below this version are not able to load the wallet
     int nWalletVersion = FEATURE_BASE;

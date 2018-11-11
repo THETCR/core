@@ -751,6 +751,7 @@ public:
     bool SetMintUnspent(const CBigNum& bnSerial);
     bool UpdateMint(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom);
     string GetUniqueWalletBackupName(bool fzwspAuto) const;
+    int nStakeSetUpdateTime = 300; // 5 minutes
 
 
     /** Zerocin entry changed.
