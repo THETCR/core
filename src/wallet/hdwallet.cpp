@@ -12635,11 +12635,16 @@ CAmount CHDWallet::GetZerocoinBalance(bool fMatureOnly) const
 CScript GetLargestContributor(set<pair<const CWalletTx*, unsigned int> >& setCoins)
 {
     map<CScript, CAmount> mapScriptsOut;
-    for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-        CTransaction ref = *coin.first;
-        CTxOut out = ref.vout[coin.second];
+    for (const auto& coin : setCoins) {
+        CTransaction ref = *coin.outpoint;
+        CTxOut out = ref.vout[coin.tx];
         mapScriptsOut[out.scriptPubKey] += out.nValue;
     }
+//    for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
+//        CTransaction ref = *coin.first;
+//        CTxOut out = ref.vout[coin.second];
+//        mapScriptsOut[out.scriptPubKey] += out.nValue;
+//    }
 
     CScript scriptLargest;
     CAmount nLargestContributor = 0;
