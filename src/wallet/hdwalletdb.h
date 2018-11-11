@@ -455,7 +455,7 @@ public:
 
     bool WriteZWSPCount(const uint32_t& nCount);
     bool ReadZWSPCount(uint32_t& nCount);
-    std::map<uint256, std::vector<pair<uint256, uint32_t> > > MapMintPool();
+    std::map<uint256, std::vector<std::pair<uint256, uint32_t> > > MapMintPool();
     bool WriteMintPoolPair(const uint256& hashMasterSeed, const uint256& hashPubcoin, const uint32_t& nCount);
 };
 
