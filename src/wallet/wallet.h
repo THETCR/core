@@ -630,6 +630,9 @@ public:
     bool AcceptToMemoryPool(const CAmount& nAbsurdFee, CValidationState& state);
 
     std::set<uint256> GetConflicts() const;
+
+    CAmount GetDenominatedCredit(bool unconfirmed, bool fUseCache=true) const;
+
 };
 
 class COutput
@@ -1413,6 +1416,7 @@ public:
     bool IsCollateralAmount(CAmount nInputAmount) const;
     int CountInputsWithAmount(CAmount nInputAmount);
     bool SelectCoinsGrouppedByAddresses(std::vector<CompactTallyItem>& vecTallyRet, bool fSkipDenominated = true, bool fAnonymizable = true, bool fSkipUnconfirmed = true) const;
+    bool GetCollateralTxDSIn(CTxDSIn& txdsinRet, CAmount& nValueRet) const;
 
     // Zerocoin additions
     CAmount GetZerocoinBalance(bool fMatureOnly) const;

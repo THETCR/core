@@ -6076,3 +6076,67 @@ bool CWallet::SelectCoinsGrouppedByAddresses(std::vector<CompactTallyItem>& vecT
 
     return vecTallyRet.size() > 0;
 }
+bool CWallet::GetCollateralTxDSIn(CTxDSIn& txdsinRet, CAmount& nValueRet) const
+{
+    LOCK2(cs_main, cs_wallet);
+
+    std::vector<COutput> vCoins;
+
+    AvailableCoins(vCoins);
+
+    for (const auto& out : vCoins)
+    {
+        if(CPrivateSend::IsCollateralAmount(out.tx->tx->vout[out.i].nValue))
+        {
+            txdsinRet = CTxDSIn(CTxIn(out.tx->tx->GetHash(), out.i), out.tx->tx->vout[out.i].scriptPubKey);
+            nValueRet = out.tx->tx->vout[out.i].nValue;
+            return true;
+        }
+    }
+
+    return false;
+}
+CAmount CWalletTx::GetDenominatedCredit(bool unconfirmed, bool fUseCache) const
+{
+    if (pwallet == 0)
+        return 0;
+
+    // Must wait until coinbase is safely deep enough in the chain before valuing it
+    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+        return 0;
+
+    int nDepth = GetDepthInMainChain(false);
+    if(nDepth < 0) return 0;
+
+    bool isUnconfirmed = IsTrusted() && nDepth == 0;
+    if(unconfirmed != isUnconfirmed) return 0;
+
+    if (fUseCache) {
+        if(unconfirmed && fDenomUnconfCreditCached)
+            return nDenomUnconfCreditCached;
+        else if (!unconfirmed && fDenomConfCreditCached)
+            return nDenomConfCreditCached;
+    }
+
+    CAmount nCredit = 0;
+    uint256 hashTx = GetHash();
+    for (unsigned int i = 0; i < tx->vout.size(); i++)
+    {
+        const CTxOut &txout = tx->vout[i];
+
+        if(pwallet->IsSpent(hashTx, i) || !CPrivateSend::IsDenominatedAmount(tx->vout[i].nValue)) continue;
+
+        nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
+        if (!MoneyRange(nCredit))
+            throw std::runtime_error(std::string(__func__) + ": value out of range");
+    }
+
+    if(unconfirmed) {
+        nDenomUnconfCreditCached = nCredit;
+        fDenomUnconfCreditCached = true;
+    } else {
+        nDenomConfCreditCached = nCredit;
+        fDenomConfCreditCached = true;
+    }
+    return nCredit;
+}

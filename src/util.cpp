@@ -1536,3 +1536,12 @@ std::string SafeIntVersionToString(uint32_t nVersion)
         return "invalid_version";
     }
 }
+boost::filesystem::path GetBackupsDir()
+{
+    namespace fs = boost::filesystem;
+
+    if (!gArgs.IsArgSet("-walletbackupsdir"))
+        return GetDataDir() / "backups";
+
+    return fs::absolute(gArgs.GetArg("-walletbackupsdir", ""));
+}
