@@ -289,6 +289,8 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
         return error("%s: value not in pool", __func__);
     pair<uint256, uint32_t> pMint = mintPool.Get(bnValue);
 
+    CHDWallet pwalletMain(this->strWalletFile);
+    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
     // Regenerate the mint
     uint512 seedZerocoin = GetZerocoinSeed(pMint.second);
     CBigNum bnValueGen;
