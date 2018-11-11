@@ -4929,19 +4929,37 @@ int CMerkleTx::GetDepthInMainChainCached() const
 
 };
 
-int CMerkleTx::GetDepthInMainChain() const
+int CMerkleTx::GetDepthInMainChain(const CBlockIndex* &pindexRet, bool enableIX) const
 {
+    int nResult;
+
     if (hashUnset())
-        return 0;
+        nResult = 0;
+    else {
+        AssertLockHeld(cs_main);
 
-    AssertLockHeld(cs_main);
+        // Find the block it claims to be in
+        BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
+        if (mi == mapBlockIndex.end())
+            nResult = 0;
+        else {
+            CBlockIndex* pindex = (*mi).second;
+            if (!pindex || !chainActive.Contains(pindex))
+                nResult = 0;
+            else {
+                pindexRet = pindex;
+                nResult = ((nIndex == -1) ? (-1) : 1) * (chainActive.Height() - pindex->nHeight + 1);
 
-    // Find the block it claims to be in
-    CBlockIndex* pindex = LookupBlockIndex(hashBlock);
-    if (!pindex || !chainActive.Contains(pindex))
-        return 0;
+                if (nResult == 0 && !mempool.exists(GetHash()))
+                    return -1; // Not in chain, not in mempool
+            }
+        }
+    }
 
-    return ((nIndex == -1) ? (-1) : 1) * (chainActive.Height() - pindex->nHeight + 1);
+    if(enableIX && nResult < 6 && instantsend.IsLockedInstantSendTransaction(GetHash()))
+        return nInstantSendDepth + nResult;
+
+    return nResult;
 }
 
 int CMerkleTx::GetBlocksToMaturity(const int *pdepth) const
@@ -6067,12 +6085,12 @@ bool CWallet::SelectCoinsGrouppedByAddresses(std::vector<CompactTallyItem>& vecT
     }
 
     // debug
-    if (LogAcceptCategory("selectcoins")) {
-        std::string strMessage = "SelectCoinsGrouppedByAddresses - vecTallyRet:\n";
-        for (const auto& item : vecTallyRet)
-            strMessage += strprintf("  %s %f\n", CBitcoinAddress(item.txdest).ToString().c_str(), float(item.nAmount)/COIN);
-        LogPrint("selectcoins", "%s", strMessage);
-    }
+//    if (LogAcceptCategory("selectcoins")) {
+//        std::string strMessage = "SelectCoinsGrouppedByAddresses - vecTallyRet:\n";
+//        for (const auto& item : vecTallyRet)
+//            strMessage += strprintf("  %s %f\n", CBitcoinAddress(item.txdest).ToString().c_str(), float(item.nAmount)/COIN);
+//        LogPrint("selectcoins", "%s", strMessage);
+//    }
 
     return vecTallyRet.size() > 0;
 }
@@ -6161,4 +6179,37 @@ CAmount CWallet::GetAnonymizedBalance() const
     }
 
     return nTotal;
+}
+CAmount CWalletTx::GetAnonymizedCredit(bool fUseCache) const
+{
+    if (pwallet == 0)
+        return 0;
+
+    // Must wait until coinbase is safely deep enough in the chain before valuing it
+    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+        return 0;
+
+    if (fUseCache && fAnonymizedCreditCached)
+        return nAnonymizedCreditCached;
+
+    CAmount nCredit = 0;
+    uint256 hashTx = GetHash();
+    for (unsigned int i = 0; i < tx->vout.size(); i++)
+    {
+        const CTxOut &txout = tx->vout[i];
+        const COutPoint outpoint = COutPoint(hashTx, i);
+
+        if(pwallet->IsSpent(hashTx, i) || !pwallet->IsDenominated(outpoint)) continue;
+
+        const int nRounds = pwallet->GetOutpointPrivateSendRounds(outpoint);
+        if(nRounds >= privateSendClient.nPrivateSendRounds){
+            nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
+            if (!MoneyRange(nCredit))
+                throw std::runtime_error(std::string(__func__) + ": value out of range");
+        }
+    }
+
+    nAnonymizedCreditCached = nCredit;
+    fAnonymizedCreditCached = true;
+    return nCredit;
 }

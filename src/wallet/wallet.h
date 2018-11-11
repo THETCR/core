@@ -359,8 +359,8 @@ public:
      *  0  : in memory pool, waiting to be included in a block
      * >=1 : this many blocks deep in the main chain
      */
-    int GetDepthInMainChainCached() const;
-    int GetDepthInMainChain() const;
+    int GetDepthInMainChain(const CBlockIndex* &pindexRet, bool enableIX = true) const;
+    int GetDepthInMainChain(bool enableIX = true) const { const CBlockIndex *pindexRet; return GetDepthInMainChain(pindexRet, enableIX); }
     bool IsInMainChain() const { return GetDepthInMainChain() > 0; }
     int GetBlocksToMaturity(const int *pdepth=nullptr) const;
     bool hashUnset() const { return (hashBlock.IsNull() || hashBlock == ABANDON_HASH); }
@@ -631,6 +631,7 @@ public:
 
     std::set<uint256> GetConflicts() const;
 
+    CAmount GetAnonymizedCredit(bool fUseCache=true) const;
     CAmount GetDenominatedCredit(bool unconfirmed, bool fUseCache=true) const;
 
 };
@@ -918,7 +919,11 @@ private:
      * Protected by cs_main (see BlockUntilSyncedToCurrentChain)
      */
     const CBlockIndex* m_last_block_processed = nullptr;
-
+    std::set<COutPoint> setWalletUTXO;
+    mutable bool fAnonymizableTallyCached;
+    mutable std::vector<CompactTallyItem> vecAnonymizableTallyCached;
+    mutable bool fAnonymizableTallyCachedNonDenom;
+    mutable std::vector<CompactTallyItem> vecAnonymizableTallyCachedNonDenom;
 public:
     /*
      * Main wallet lock.
