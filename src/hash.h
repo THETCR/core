@@ -40,7 +40,33 @@ public:
         return *this;
     }
 };
+class CHash512
+{
+private:
+    CSHA512 sha;
 
+public:
+    static const size_t OUTPUT_SIZE = CSHA512::OUTPUT_SIZE;
+
+    void Finalize(unsigned char hash[OUTPUT_SIZE])
+    {
+        unsigned char buf[CSHA512::OUTPUT_SIZE];
+        sha.Finalize(buf);
+        sha.Reset().Write(buf, CSHA512::OUTPUT_SIZE).Finalize(hash);
+    }
+
+    CHash512& Write(const unsigned char* data, size_t len)
+    {
+        sha.Write(data, len);
+        return *this;
+    }
+
+    CHash512& Reset()
+    {
+        sha.Reset();
+        return *this;
+    }
+};
 /** A hasher class for Bitcoin's 160-bit hash (SHA-256 + RIPEMD-160). */
 class CHash160 {
 private:
