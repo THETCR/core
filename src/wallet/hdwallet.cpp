@@ -12305,7 +12305,7 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
     if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
         for (CTxIn txIn : txNew.vin) {
 //            const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
-            if (!SignSignature(keystore, scriptPubKeyKernel, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY)))
+            if (!SignSignature(keystore, scriptPubKeyKernel, txNew, nIn++, nCredit, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY)))
                 return error("CreateCoinStake : failed to sign coinstake");
         }
     } else {
