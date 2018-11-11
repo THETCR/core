@@ -510,6 +510,29 @@ bool SignSignature(const SigningProvider &provider, const CTransaction& txFrom, 
     return SignSignature(provider, txout.scriptPubKey, txTo, nIn, txout.nValue, nHashType);
 }
 
+//!WISPR
+bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn, int nHashType)
+{
+    assert(nIn < txTo.vin.size());
+    CTxIn& txin = txTo.vin[nIn];
+
+    CTransaction txToConst(txTo);
+    TransactionSignatureCreator creator(&keystore, &txToConst, nIn, nHashType);
+
+    return ProduceSignature(creator, fromPubKey, txin.scriptSig);
+}
+
+bool SignSignature(const CKeyStore &keystore, const CTransaction& txFrom, CMutableTransaction& txTo, unsigned int nIn, int nHashType)
+{
+    assert(nIn < txTo.vin.size());
+    CTxIn& txin = txTo.vin[nIn];
+    assert(txin.prevout.n < txFrom.vout.size());
+    const CTxOut& txout = txFrom.vout[txin.prevout.n];
+
+    return SignSignature(keystore, txout.scriptPubKey, txTo, nIn, nHashType);
+}
+
+
 namespace {
 /** Dummy signature checker which accepts all signatures. */
 class DummySignatureChecker : public BaseSignatureChecker
