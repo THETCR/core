@@ -18,6 +18,7 @@
 
 #include <boost/foreach.hpp>
 #include <openssl/evp.h>
+#include <wallet/hdwallet.h>
 #include <wallet/hdwalletdb.h>
 
 int CCrypter::BytesToKeySHA512AES(const std::vector<unsigned char>& chSalt, const SecureString& strKeyData, int count, unsigned char *key,unsigned char *iv) const
