@@ -12733,7 +12733,8 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
     // check for a zerocoinspend that mints the change
     CoinSelectionParams coin_selection_params; // Parameters for coin selection, init with dummy
     CAmount nValueIn = 0;
-    set<pair<const CWalletTx*, unsigned int> > setCoins;
+//    set<pair<const CWalletTx*, unsigned int> > setCoins;
+    std::set<CInputCoin> setCoins;
     bool bnb_used;
     if (isZCSpendChange) {
         nValueIn = nValue;
@@ -12747,8 +12748,11 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
             return false;
         }
         // Fill vin
-        for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins)
-            txNew.vin.push_back(CTxIn(coin.first->GetHash(), coin.second));
+        for (const auto& coin : setCoins) {
+            txNew.vin.push_back(CTxIn(coin.outpoint,CScript()));
+        }
+//        for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins)
+//            txNew.vin.push_back(CTxIn(coin.first->GetHash(), coin.second));
     }
 
     //any change that is less than 0.0100000 will be ignored and given as an extra fee
@@ -12770,12 +12774,18 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
     if (!isZCSpendChange) {
         int nIn = 0;
         const CKeyStore& keystore = *this;
-        for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-            if (!SignSignature(keystore, *coin.first, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
+        for (const auto& coin : setCoins) {
+            if (!SignSignature(keystore, *coin.outpoint, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
                 strFailReason = _("Signing transaction failed");
                 return false;
             }
         }
+//        for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
+//            if (!SignSignature(keystore, *coin.first, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
+//                strFailReason = _("Signing transaction failed");
+//                return false;
+//            }
+//        }
     }
 
     return true;
