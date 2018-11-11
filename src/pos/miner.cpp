@@ -109,7 +109,7 @@ bool CheckStake(CBlock *pblock)
         CValidationState state;
 //        if (!CheckProofOfStake(state, mi->second, *pblock->vtx[0], pblock->nTime, pblock->nBits, proofHash, hashTarget)) {
         unique_ptr<CStakeInput> stake;
-        if (!CheckProofOfStake(pblock, proofHash, stake)) {
+        if (!CheckProofOfStake(*pblock, proofHash, stake)) {
             return error("%s: proof-of-stake checking failed.", __func__);
         }
         if (pblock->hashPrevBlock != chainActive.Tip()->GetBlockHash()) { // hashbestchain
@@ -469,7 +469,7 @@ void ThreadStakeMiner(size_t nThreadID, std::vector<std::shared_ptr<CWallet>> &v
                     LogPrintf("BitcoinMiner(): Signing new block with zWSP key failed \n");
                     continue;
                 }
-            }else if (pwallet->SignBlock(pblock, nBestHeight+1, nSearchTime))
+            }else if (pwallet->SignBlock(pblocktemplate, nBestHeight+1, nSearchTime))
             {
 //                CBlock *pblock = &pblocktemplate->block;
                 if (CheckStake(pblock))
