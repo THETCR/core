@@ -38,6 +38,11 @@
 #include <keepass.h>
 #include <obfuscation/privatesend-client.h>
 #include <spork/spork.h>
+#include <libzerocoin/Denominations.h>
+#include <primitives/deterministicmint.h>
+#include <spork/spork.h>
+#include <wallet/stakeinput.h>
+#include <masternode/masternode-payments.h>
 
 #include <boost/algorithm/string/replace.hpp>
 
@@ -4538,7 +4543,7 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(const std::string& name_,
     bool fFirstRun = true;
 
     std::shared_ptr<CWallet> walletInstance(fParticlMode
-        ? std::shared_ptr<CWallet>(new CWallet(name, WalletDatabase::Create(path)), ReleaseWallet)
+        ? std::shared_ptr<CWallet>(new CHDWallet(name, WalletDatabase::Create(path)), ReleaseWallet)
         : std::shared_ptr<CWallet>(new CWallet(name, WalletDatabase::Create(path)), ReleaseWallet));
 
     DBErrors nLoadWalletRet = walletInstance->LoadWallet(fFirstRun);
