@@ -12113,7 +12113,7 @@ bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listI
     if (gArgs.GetBoolArg("-wspstake", true)) {
         for (const COutput &out : vCoins) {
             //make sure not to outrun target amount
-            if (nAmountSelected + out.tx->vout[out.i].nValue > nTargetAmount)
+            if (nAmountSelected + out.tx->tx.vout[out.i].nValue > nTargetAmount)
                 continue;
 
             //if zerocoinspend, then use the block time
