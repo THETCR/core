@@ -8,12 +8,10 @@
 #include <masternode/masternode.h>
 #include <obfuscation/privatesend.h>
 #include <wallet/wallet.h>
-#include <wallet/hdwallet.h>
 #include <obfuscation/privatesend-util.h>
 
 class CPrivateSendClient;
 class CConnman;
-class CTransactionRecord;
 
 static const int DENOMS_COUNT_MAX                   = 100;
 
