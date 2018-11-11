@@ -363,6 +363,7 @@ public:
     int GetDepthInMainChainCached() const;
     int GetDepthInMainChain(const CBlockIndex* &pindexRet, bool enableIX = true) const;
     int GetDepthInMainChain(bool enableIX = true) const { const CBlockIndex *pindexRet; return GetDepthInMainChain(pindexRet, enableIX); }
+    int SetMerkleBranch(const CBlock& block);
     bool IsInMainChain() const { return GetDepthInMainChain() > 0; }
     int GetBlocksToMaturity(const int *pdepth=nullptr) const;
     bool hashUnset() const { return (hashBlock.IsNull() || hashBlock == ABANDON_HASH); }

@@ -328,7 +328,7 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
         CWalletTx wtx(pwalletMain, txSpend);
         CBlockIndex* pindex = chainActive[nHeightTx];
         CBlock block;
-        if (ReadBlockFromDisk(block, pindex))
+        if (ReadBlockFromDisk(block, pindex, Params().GetConsensus()))
             wtx.SetMerkleBranch(block);
 
         wtx.nTimeReceived = pindex->nTime;
