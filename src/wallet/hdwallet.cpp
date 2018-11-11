@@ -12951,7 +12951,7 @@ bool CHDWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLeve
         CTransaction txMint;
         uint256 hashBlock;
         bool fArchive = false;
-        if (!GetTransaction(mint.GetTxHash(), txMint, hashBlock)) {
+        if (!GetTransaction(mint.GetTxHash(), txMint, Params().GetConsensus(), hashBlock)) {
             receipt.SetStatus(_("Unable to find transaction containing mint"), nStatus);
             fArchive = true;
         } else if (mapBlockIndex.count(hashBlock) < 1) {
@@ -13143,7 +13143,7 @@ string CHDWallet::ResetSpentZerocoin()
     for (CZerocoinSpend spend : listSpends) {
         CTransaction tx;
         uint256 hashBlock = 0;
-        if (!GetTransaction(spend.GetTxHash(), tx, hashBlock)) {
+        if (!GetTransaction(spend.GetTxHash(), tx, Params().GetConsensus(), hashBlock)) {
             listUnconfirmedSpends.push_back(spend);
             continue;
         }
@@ -13178,7 +13178,7 @@ bool IsMintInChain(const uint256& hashPubcoin, uint256& txid, int& nHeight)
 
     uint256 hashBlock;
     CTransaction tx;
-    if (!GetTransaction(txid, tx, hashBlock))
+    if (!GetTransaction(txid, tx, Params().GetConsensus(), hashBlock))
         return false;
 
     if (!mapBlockIndex.count(hashBlock) || !chainActive.Contains(mapBlockIndex.at(hashBlock)))
