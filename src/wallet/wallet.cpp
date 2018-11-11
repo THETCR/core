@@ -33,16 +33,25 @@
 #include <assert.h>
 #include <future>
 
+
+
+#include <txdb.h>
 #include <zerocoin/accumulators.h>
-#include <governance/governance.h>
-#include <instantx.h>
-#include <keepass.h>
-#include <obfuscation/privatesend-client.h>
+#include <primitives/transaction.h>
+#include <script/script.h>
+#include <script/sign.h>
 #include <spork/spork.h>
-#include <libzerocoin/Denominations.h>
-#include <primitives/deterministicmint.h>
 #include <wallet/stakeinput.h>
 #include <masternode/masternode-payments.h>
+#include <instantx.h>
+#include <zerocoin/zwspchain.h>
+#include <zerocoin/zwspwallet.h>
+#include <obfuscation/denomination_functions.h>
+#include <obfuscation/privatesend-client.h>
+#include <libzerocoin/Denominations.h>
+#include <primitives/deterministicmint.h>
+#include <governance/governance.h>
+#include <keepass.h>
 
 #include <boost/algorithm/string/replace.hpp>
 
