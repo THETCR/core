@@ -454,7 +454,7 @@ void ThreadStakeMiner(size_t nThreadID, std::vector<std::shared_ptr<CWallet>> &v
             nWaitFor = nMinerSleep;
             fIsStaking = true;
             CBlock *pblock = &pblocktemplate->block;
-            CBlockTemplate *temp = *pblocktemplate;
+            CBlockTemplate temp = *pblocktemplate;
             if (pblock->IsZerocoinStake()) {
                 //Find the key associated with the zerocoin that is being staked
                 CTransaction t = *pblock->vtx[1];
