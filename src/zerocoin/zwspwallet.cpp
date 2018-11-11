@@ -16,7 +16,7 @@ using namespace libzerocoin;
 CzWSPWallet::CzWSPWallet(std::string strWalletFile)
 {
     this->strWalletFile = strWalletFile;
-    CHDWalletDB walletdb(GetDBHandle());
+    CHDWalletDB walletdb(strWalletFile);
 
     uint256 hashSeed;
     bool fFirstRun = !walletdb.ReadCurrentSeedHash(hashSeed);
