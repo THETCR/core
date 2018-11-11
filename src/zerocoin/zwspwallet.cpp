@@ -29,7 +29,7 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
             //Update to new format, erase old
             seedMaster = seed;
             hashSeed = Hash(seed.begin(), seed.end());
-            if (pwalletMain.AddDeterministicSeed(seed)) {
+            if (pwalletMain.AddDeterministicSeed(pwalletMain, seed)) {
                 if (walletdb.EraseZWSPSeed_deprecated()) {
                     LogPrintf("%s: Updated zWSP seed databasing\n", __func__);
                     fFirstRun = false;
@@ -57,7 +57,7 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
         seed = key.GetPrivKey_256();
         seedMaster = seed;
         LogPrintf("%s: first run of zwsp wallet detected, new seed generated. Seedhash=%s\n", __func__, Hash(seed.begin(), seed.end()).GetHex());
-    } else if (!pwalletMain.GetDeterministicSeed(hashSeed, seed)) {
+    } else if (!pwalletMain.GetDeterministicSeed(pwalletMain, hashSeed, seed)) {
         LogPrintf("%s: failed to get deterministic seed for hashseed %s\n", __func__, hashSeed.GetHex());
         return;
     }
