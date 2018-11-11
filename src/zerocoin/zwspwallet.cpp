@@ -5,9 +5,9 @@
 #include <zerocoin/zwspwallet.h>
 #include <validation.h>
 #include <txdb.h>
-#include <wallet/walletdb.h>
+#include <wallet/hdwalletdb.h>
 #include <init.h>
-#include <wallet/wallet.h>
+#include <wallet/hdwallet.h>
 #include <zerocoin/zwspchain.h>
 #include <primitives/deterministicmint.h>
 
@@ -16,7 +16,7 @@ using namespace libzerocoin;
 CzWSPWallet::CzWSPWallet(std::string strWalletFile)
 {
     this->strWalletFile = strWalletFile;
-    CWalletDB walletdb(strWalletFile);
+    CHDWalletDB walletdb(strWalletFile);
 
     uint256 hashSeed;
     bool fFirstRun = !walletdb.ReadCurrentSeedHash(hashSeed);
@@ -71,7 +71,7 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
 bool CzWSPWallet::SetMasterSeed(const uint256& seedMaster, bool fResetCount)
 {
 
-    CWalletDB walletdb(strWalletFile);
+    CHDWalletDB walletdb(strWalletFile);
     if (pwalletMain->IsLocked())
         return false;
 
@@ -149,7 +149,7 @@ void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
         SeedToZWSP(seedZerocoin, bnValue, bnSerial, bnRandomness, key);
 
         mintPool.Add(bnValue, i);
-        CWalletDB(strWalletFile).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
+        CHDWalletDB(strWalletFile).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
         LogPrintf("%s : %s count=%d\n", __func__, bnValue.GetHex().substr(0, 6), i);
     }
 }
@@ -157,7 +157,7 @@ void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
 // pubcoin hashes are stored to db so that a full accounting of mints belonging to the seed can be tracked without regenerating
 bool CzWSPWallet::LoadMintPoolFromDB()
 {
-    map<uint256, vector<pair<uint256, uint32_t> > > mapMintPool = CWalletDB(strWalletFile).MapMintPool();
+    map<uint256, vector<pair<uint256, uint32_t> > > mapMintPool = CHDWalletDB(strWalletFile).MapMintPool();
 
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
     for (auto& pair : mapMintPool[hashSeed])
@@ -183,7 +183,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
 {
     uint32_t nLastCountUsed = 0;
     bool found = true;
-    CWalletDB walletdb(strWalletFile);
+    CHDWalletDB walletdb(strWalletFile);
 
     set<uint256> setAddedTx;
     while (found) {
@@ -331,7 +331,7 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
     
     //Update the count if it is less than the mint's count
     if (nCountLastUsed < pMint.second) {
-        CWalletDB walletdb(strWalletFile);
+        CHDWalletDB walletdb(strWalletFile);
         nCountLastUsed = pMint.second;
         walletdb.WriteZWSPCount(nCountLastUsed);
     }
@@ -410,7 +410,7 @@ uint512 CzWSPWallet::GetZerocoinSeed(uint32_t n)
 void CzWSPWallet::UpdateCount()
 {
     nCountLastUsed++;
-    CWalletDB walletdb(strWalletFile);
+    CHDWalletDB walletdb(strWalletFile);
     walletdb.WriteZWSPCount(nCountLastUsed);
 }
 
