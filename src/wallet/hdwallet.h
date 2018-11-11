@@ -373,6 +373,7 @@ public:
     //WISPR
     CzWSPWallet* zwalletMain;
     std::unique_ptr<CzWSPTracker> zwspTracker;
+    bool SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount);
 
     int Finalise();
     int FreeExtKeyMaps();

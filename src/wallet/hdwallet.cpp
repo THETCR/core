@@ -12102,6 +12102,76 @@ bool CHDWallet::SelectCoinsForStaking(int64_t nTargetValue, int64_t nTime, int n
 //    // Successfully generated coinstake
 //    return true;
 //};
+bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount)
+{
+    LOCK(cs_main);
+    //Add WSP
+    vector<COutput> vCoins;
+    AvailableCoins(vCoins, true, NULL, false, STAKABLE_COINS);
+    CAmount nAmountSelected = 0;
+    if (gArgs.GetBoolArg("-wspstake", true)) {
+        for (const COutput &out : vCoins) {
+            //make sure not to outrun target amount
+            if (nAmountSelected + out.tx->vout[out.i].nValue > nTargetAmount)
+                continue;
+
+            //if zerocoinspend, then use the block time
+            int64_t nTxTime = out.tx->GetTxTime();
+            if (out.tx->IsZerocoinSpend()) {
+                if (!out.tx->IsInMainChain())
+                    continue;
+                nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
+            }
+
+            //check for min age
+            if (GetAdjustedTime() - nTxTime < GetStakeMinAge())
+                continue;
+
+            //check that it is matured
+            if (out.nDepth < (out.tx->IsCoinStake() ? Params().COINBASE_MATURITY() : 10))
+                continue;
+
+            //add to our stake set
+            nAmountSelected += out.tx->vout[out.i].nValue;
+
+            std::unique_ptr<CWspStake> input(new CWspStake());
+            input->SetInput((CTransaction) *out.tx, out.i);
+            listInputs.emplace_back(std::move(input));
+        }
+    }
+
+    //zWSP
+    if (gArgs.GetBoolArg("-zwspstake", true) && chainActive.Height() > Params().NEW_PROTOCOLS_STARTHEIGHT() && !IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
+        //Only update zWSP set once per update interval
+        bool fUpdate = false;
+        static int64_t nTimeLastUpdate = 0;
+        if (GetAdjustedTime() - nTimeLastUpdate > nStakeSetUpdateTime) {
+            fUpdate = true;
+            nTimeLastUpdate = GetAdjustedTime();
+        }
+
+        set<CMintMeta> setMints = zwspTracker->ListMints(true, true, fUpdate);
+        for (auto meta : setMints) {
+            if (meta.hashStake == 0) {
+                CZerocoinMint mint;
+                if (GetMint(meta.hashSerial, mint)) {
+                    uint256 hashStake = mint.GetSerialNumber().getuint256();
+                    hashStake = Hash(hashStake.begin(), hashStake.end());
+                    meta.hashStake = hashStake;
+                    zwspTracker->UpdateState(meta);
+                }
+            }
+            if (meta.nVersion < CZerocoinMint::STAKABLE_VERSION)
+                continue;
+            if (meta.nHeight < chainActive.Height() - Params().Zerocoin_RequiredStakeDepth()) {
+                std::unique_ptr<CZWspStake> input(new CZWspStake(meta.denom, meta.hashStake));
+                listInputs.emplace_back(std::move(input));
+            }
+        }
+    }
+
+    return true;
+}
 // WISPR: create coin stake transaction
 bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime)
 {

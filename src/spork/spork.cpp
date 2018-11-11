@@ -27,6 +27,8 @@ std::map<int, int64_t> mapSporkDefaults = {
         {SPORK_12_RECONSIDER_BLOCKS,             0},             // 0 BLOCKS
         {SPORK_13_ENABLE_SUPERBLOCKS,            4070908800ULL}, // OFF
         {SPORK_14_REQUIRE_SENTINEL_FLAG,         4070908800ULL}, // OFF
+        {SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2,    4070908800ULL}, // OFF
+        {SPORK_16_ZEROCOIN_MAINTENANCE_MODE,     4070908800ULL}, // OFF
 };
 
 void CSporkManager::ProcessSpork(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman& connman)
