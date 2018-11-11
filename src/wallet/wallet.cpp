@@ -6285,7 +6285,7 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block)
 
     // Locate the transaction
     for (nIndex = 0; nIndex < (int)block.vtx.size(); nIndex++)
-        if (block.vtx[nIndex] == *this)
+        if (block.vtx[nIndex] == this)
     break;
     if (nIndex == (int)block.vtx.size()) {
         vMerkleBranch.clear();
