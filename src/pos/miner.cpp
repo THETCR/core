@@ -456,7 +456,8 @@ void ThreadStakeMiner(size_t nThreadID, std::vector<std::shared_ptr<CWallet>> &v
             CBlock *pblock = &pblocktemplate->block;
             if (pblock->IsZerocoinStake()) {
                 //Find the key associated with the zerocoin that is being staked
-                libzerocoin::CoinSpend spend = TxInToZerocoinSpend(pblock->vtx[1].vin[0]);
+                CTransaction t = *pblock->vtx[1];
+                libzerocoin::CoinSpend spend = TxInToZerocoinSpend(t.vin[0]);
                 CBigNum bnSerial = spend.getCoinSerialNumber();
                 CKey key;
                 if (!pwallet->GetZerocoinKey(bnSerial, key)) {
@@ -469,7 +470,7 @@ void ThreadStakeMiner(size_t nThreadID, std::vector<std::shared_ptr<CWallet>> &v
                     LogPrintf("BitcoinMiner(): Signing new block with zWSP key failed \n");
                     continue;
                 }
-            }else if (pwallet->SignBlock(pblocktemplate, nBestHeight+1, nSearchTime))
+            }else if (pwallet->SignBlock(*pblocktemplate, nBestHeight+1, nSearchTime))
             {
 //                CBlock *pblock = &pblocktemplate->block;
                 if (CheckStake(pblock))
