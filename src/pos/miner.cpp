@@ -107,7 +107,9 @@ bool CheckStake(CBlock *pblock)
     {
         LOCK(cs_main);
         CValidationState state;
-        if (!CheckProofOfStake(state, mi->second, *pblock->vtx[0], pblock->nTime, pblock->nBits, proofHash, hashTarget)) {
+//        if (!CheckProofOfStake(state, mi->second, *pblock->vtx[0], pblock->nTime, pblock->nBits, proofHash, hashTarget)) {
+        unique_ptr<CStakeInput> stake;
+        if (!CheckProofOfStake(pblock, proofHash, stake)) {
             return error("%s: proof-of-stake checking failed.", __func__);
         }
         if (pblock->hashPrevBlock != chainActive.Tip()->GetBlockHash()) { // hashbestchain
