@@ -1264,7 +1264,7 @@ bool CPrivateSendClient::MakeCollateralAmounts(const CompactTallyItem& tallyItem
     if(!fTryDenominated && tallyItem.vecOutPoints.size() == 1 && CPrivateSend::IsDenominatedAmount(tallyItem.nAmount))
         return false;
 
-    CWalletTx wtx;
+    CTransactionRef wtx;
     CAmount nFeeRet = 0;
     int nChangePosRet = -1;
     std::string strFail = "";
@@ -1432,7 +1432,7 @@ bool CPrivateSendClient::CreateDenominated(const CompactTallyItem& tallyItem, bo
     for (const auto& outpoint : tallyItem.vecOutPoints)
         coinControl.Select(outpoint);
 
-    CWalletTx wtx;
+    CTransactionRef wtx;
     CAmount nFeeRet = 0;
     int nChangePosRet = -1;
     std::string strFail = "";
