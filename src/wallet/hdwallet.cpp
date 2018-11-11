@@ -12137,7 +12137,7 @@ bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listI
             nAmountSelected += ref.vout[out.i].nValue;
 
             std::unique_ptr<CWspStake> input(new CWspStake());
-            CTransactionRef tRef = &out.tx;
+            CTransactionRef *tRef = out.tx;
             input->SetInput(tRef, out.i);
             listInputs.emplace_back(std::move(input));
         }
