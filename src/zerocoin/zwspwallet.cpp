@@ -151,7 +151,9 @@ void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
         SeedToZWSP(seedZerocoin, bnValue, bnSerial, bnRandomness, key);
 
         mintPool.Add(bnValue, i);
-        CHDWalletDB(strWalletFile).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
+        CHDWallet pwalletMain(this->strWalletFile);
+        CHDWalletDB walletdb(pwalletMain.GetDBHandle()).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
+//        CHDWalletDB(strWalletFile).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
         LogPrintf("%s : %s count=%d\n", __func__, bnValue.GetHex().substr(0, 6), i);
     }
 }
@@ -159,7 +161,9 @@ void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
 // pubcoin hashes are stored to db so that a full accounting of mints belonging to the seed can be tracked without regenerating
 bool CzWSPWallet::LoadMintPoolFromDB()
 {
-    map<uint256, vector<pair<uint256, uint32_t> > > mapMintPool = CHDWalletDB(strWalletFile).MapMintPool();
+    CHDWallet pwalletMain(this->strWalletFile);
+    CHDWalletDB walletdb(pwalletMain.GetDBHandle())
+    map<uint256, vector<pair<uint256, uint32_t> > > mapMintPool = walletdb.MapMintPool();
 
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
     for (auto& pair : mapMintPool[hashSeed])
