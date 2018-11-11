@@ -430,7 +430,7 @@ bool CHDWalletDB::EraseZWSPSeed()
     if(!ReadCurrentSeedHash(hash)){
         return error("Failed to read a current seed hash");
     }
-    if(!WriteZWSPSeed(hash, ToByteVector(base_uint<256>(0) << 256))) {
+    if(!WriteZWSPSeed(hash, ToByteVector(base_blob<256>(0) << 256))) {
         return error("Failed to write empty seed to wallet");
     }
     if(!WriteCurrentSeedHash(0)) {
