@@ -162,7 +162,7 @@ void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
 bool CzWSPWallet::LoadMintPoolFromDB()
 {
     CHDWallet pwalletMain(this->strWalletFile);
-    CHDWalletDB walletdb(pwalletMain.GetDBHandle())
+    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
     map<uint256, vector<pair<uint256, uint32_t> > > mapMintPool = walletdb.MapMintPool();
 
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
