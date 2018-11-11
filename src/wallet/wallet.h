@@ -35,6 +35,9 @@
 #include <utility>
 #include <vector>
 
+#include <primitives/zerocoin.h>
+#include <zerocoin/zwsptracker.h>
+#include <zerocoin/zwspwallet.h>
 #include <obfuscation/privatesend.h>
 #include <spork/spork.h>
 #include <libzerocoin/Denominations.h>
@@ -1391,6 +1394,9 @@ public:
         LogPrintf(("%s " + fmt).c_str(), GetDisplayName(), parameters...);
     };
 
+    //!WISPR
+    CzWSPWallet* zwalletMain;
+    std::unique_ptr<CzWSPTracker> zwspTracker;
     bool MintableCoins();
     bool SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount);
     bool SelectCoinsDark(CAmount nValueMin, CAmount nValueMax, std::vector<CTxIn>& setCoinsRet, CAmount& nValueRet, int nObfuscationRoundsMin, int nObfuscationRoundsMax) const;
@@ -1401,6 +1407,8 @@ public:
     int CountInputsWithAmount(CAmount nInputAmount);
 
     // Zerocoin additions
+    CAmount GetZerocoinBalance(bool fMatureOnly) const;
+    std::map<libzerocoin::CoinDenomination, CAmount> GetMyZerocoinDistribution() const;
     bool CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransaction& txNew, vector<CDeterministicMint>& vDMints, CReserveKey* reservekey, int64_t& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl = NULL, const bool isZCSpendChange = false);
     bool CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLevel, CWalletTx& wtxNew, CReserveKey& reserveKey, CZerocoinSpendReceipt& receipt, vector<CZerocoinMint>& vSelectedMints, vector<CDeterministicMint>& vNewMints, bool fMintChange,  bool fMinimizeChange, CBitcoinAddress* address = NULL);
     bool MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, const uint256& hashTxOut, CTxIn& newTxIn, CZerocoinSpendReceipt& receipt, libzerocoin::SpendType spendType, CBlockIndex* pindexCheckpoint = nullptr);
