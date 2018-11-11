@@ -12948,7 +12948,7 @@ bool CHDWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLeve
         }
 
         //check that this mint made it into the blockchain
-        CTransaction txMint;
+        CTransactionRef txMint;
         uint256 hashBlock;
         bool fArchive = false;
         if (!GetTransaction(mint.GetTxHash(), txMint, Params().GetConsensus(), hashBlock)) {
@@ -13141,7 +13141,7 @@ string CHDWallet::ResetSpentZerocoin()
     list<CZerocoinSpend> listUnconfirmedSpends;
 
     for (CZerocoinSpend spend : listSpends) {
-        CTransaction tx;
+        CTransactionRef tx;
         uint256 hashBlock = 0;
         if (!GetTransaction(spend.GetTxHash(), tx, Params().GetConsensus(), hashBlock)) {
             listUnconfirmedSpends.push_back(spend);
@@ -13177,7 +13177,7 @@ bool IsMintInChain(const uint256& hashPubcoin, uint256& txid, int& nHeight)
         return false;
 
     uint256 hashBlock;
-    CTransaction tx;
+    CTransactionRef tx;
     if (!GetTransaction(txid, tx, Params().GetConsensus(), hashBlock))
         return false;
 
