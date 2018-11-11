@@ -3577,14 +3577,14 @@ int CHDWallet::AddStandardInputs(CWalletTx &wtx, CTransactionRecord &rtx,
                 coin_selection_params.effective_fee = nFeeRateNeeded;
                 nValueIn = 0;
                 setCoins.clear();
-                if (!SelectCoins(vAvailableCoins, nValueToSelect, setCoins, nValueIn, *coinControl, coin_selection_params, bnb_used)) {
-                // If BnB was used, it was the first pass. No longer the first pass and continue loop with knapsack.
-                    if (bnb_used) {
-                        coin_selection_params.use_bnb = false;
-                        continue;
-                    }
-                    return wserrorN(1, sError, __func__, _("Insufficient funds.").c_str());
-                }
+//                if (!SelectCoins(vAvailableCoins, nValueToSelect, setCoins, nValueIn, *coinControl, coin_selection_params, bnb_used)) {
+//                // If BnB was used, it was the first pass. No longer the first pass and continue loop with knapsack.
+//                    if (bnb_used) {
+//                        coin_selection_params.use_bnb = false;
+//                        continue;
+//                    }
+//                    return wserrorN(1, sError, __func__, _("Insufficient funds.").c_str());
+//                }
             }
 
             const CAmount nChange = nValueIn - nValueToSelect;
@@ -12635,16 +12635,11 @@ CAmount CHDWallet::GetZerocoinBalance(bool fMatureOnly) const
 CScript GetLargestContributor(set<pair<const CWalletTx*, unsigned int> >& setCoins)
 {
     map<CScript, CAmount> mapScriptsOut;
-    for (const auto& coin : setCoins) {
-        CTransaction ref = *coin.outpoint;
-        CTxOut out = ref.vout[coin.tx];
+    for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
+        CTransaction ref = *coin.first;
+        CTxOut out = ref.vout[coin.second];
         mapScriptsOut[out.scriptPubKey] += out.nValue;
     }
-//    for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-//        CTransaction ref = *coin.first;
-//        CTxOut out = ref.vout[coin.second];
-//        mapScriptsOut[out.scriptPubKey] += out.nValue;
-//    }
 
     CScript scriptLargest;
     CAmount nLargestContributor = 0;
@@ -12738,8 +12733,7 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
     // check for a zerocoinspend that mints the change
     CoinSelectionParams coin_selection_params; // Parameters for coin selection, init with dummy
     CAmount nValueIn = 0;
-//    set<pair<const CWalletTx*, unsigned int> > setCoins;
-    std::set<CInputCoin> setCoins;
+    set<pair<const CWalletTx*, unsigned int> > setCoins;
     bool bnb_used;
     if (isZCSpendChange) {
         nValueIn = nValue;
@@ -12753,11 +12747,8 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
             return false;
         }
         // Fill vin
-        for (const auto& coin : setCoins) {
-            txNew.vin.push_back(CTxIn(coin.outpoint,CScript()));
-        }
-//        for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins)
-//            txNew.vin.push_back(CTxIn(coin.first->GetHash(), coin.second));
+        for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins)
+            txNew.vin.push_back(CTxIn(coin.first->GetHash(), coin.second));
     }
 
     //any change that is less than 0.0100000 will be ignored and given as an extra fee
@@ -12779,18 +12770,12 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
     if (!isZCSpendChange) {
         int nIn = 0;
         const CKeyStore& keystore = *this;
-        for (const auto& coin : setCoins) {
-            if (!SignSignature(keystore, *coin.outpoint, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
+        for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
+            if (!SignSignature(keystore, *coin.first, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
                 strFailReason = _("Signing transaction failed");
                 return false;
             }
         }
-//        for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-//            if (!SignSignature(keystore, *coin.first, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
-//                strFailReason = _("Signing transaction failed");
-//                return false;
-//            }
-//        }
     }
 
     return true;
