@@ -34,6 +34,7 @@
 #include <wallet/walletutil.h>
 
 
+#include <txdb.h>
 #include <zerocoin/accumulators.h>
 #include <primitives/transaction.h>
 #include <script/script.h>
