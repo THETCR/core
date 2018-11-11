@@ -304,6 +304,7 @@ public:
     CTransactionRef tx;
     uint256 hashBlock;
     std::vector<uint256> vHashes; // used for abandoned stakes
+    std::vector<uint256> vMerkleBranch;
 
     /* An nIndex == -1 means that hashBlock (in nonzero) refers to the earliest
      * block in the chain we know this or any in-wallet dependency conflicts
