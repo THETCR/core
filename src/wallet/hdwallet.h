@@ -18,6 +18,7 @@
 #include <primitives/zerocoin.h>
 #include <zerocoin/zwsptracker.h>
 #include <zerocoin/zwspwallet.h>
+#include <wallet/stakeinput.h>
 
 typedef std::map<CKeyID, CStealthKeyMetadata> StealthKeyMetaMap;
 typedef std::map<CKeyID, CExtKeyAccount*> ExtKeyAccountMap;
