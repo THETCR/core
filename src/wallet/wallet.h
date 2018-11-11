@@ -945,6 +945,7 @@ public:
     typedef std::map<unsigned int, CMasterKey> MasterKeyMap;
     MasterKeyMap mapMasterKeys;
     unsigned int nMasterKeyMaxID = 0;
+    bool fFileBacked;
 
     /** Construct wallet with specified name and database implementation. */
     CWallet(std::string name, std::unique_ptr<WalletDatabase> database) : m_name(std::move(name)), database(std::move(database))
@@ -952,7 +953,13 @@ public:
         if (!fParticlMode)
             m_min_fee = CFeeRate(DEFAULT_TRANSACTION_MINFEE_BTC);
     }
+    CWallet(std::string strWalletFileIn)
+    {
+//        SetNull();
 
+        strWalletFile = strWalletFileIn;
+        fFileBacked = true;
+    }
     virtual ~CWallet()
     {
         delete encrypted_batch;

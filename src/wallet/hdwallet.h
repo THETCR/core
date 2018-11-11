@@ -365,13 +365,7 @@ class CHDWallet : public CWallet
 {
 public:
     CHDWallet(std::string name, std::unique_ptr<WalletDatabase> dbw_in) : CWallet(name, std::move(dbw_in)) {};
-    CHDWallet(std::string strWalletFileIn)
-    {
-        SetNull();
-
-        strWalletFile = strWalletFileIn;
-        fFileBacked = true;
-    }
+    CHDWallet(std::string strWalletFileIn) : CWallet(strWalletFileIn) {};
     ~CHDWallet()
     {
         Finalise();
