@@ -36,6 +36,11 @@
 #include <vector>
 
 #include <obfuscation/privatesend.h>
+#include <spork/spork.h>
+#include <libzerocoin/Denominations.h>
+#include <primitives/deterministicmint.h>
+#include <wallet/stakeinput.h>
+#include <masternode/masternode-payments.h>
 
 
 bool AddWallet(const std::shared_ptr<CWallet>& wallet);

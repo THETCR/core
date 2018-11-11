@@ -40,7 +40,6 @@
 #include <spork/spork.h>
 #include <libzerocoin/Denominations.h>
 #include <primitives/deterministicmint.h>
-#include <spork/spork.h>
 #include <wallet/stakeinput.h>
 #include <masternode/masternode-payments.h>
 
