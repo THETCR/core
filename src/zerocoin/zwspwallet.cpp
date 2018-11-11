@@ -12,6 +12,7 @@
 #include <primitives/deterministicmint.h>
 
 using namespace libzerocoin;
+class CValidationState;
 
 CzWSPWallet::CzWSPWallet(std::string strWalletFile)
 {
