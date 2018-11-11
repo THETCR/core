@@ -6,6 +6,8 @@
 #define WISPR_STAKEINPUT_H
 
 #include <streams.h>
+#include <vector>
+#include <primitives/zerocoin.h>
 
 class CKeyStore;
 class CWallet;
