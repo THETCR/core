@@ -91,7 +91,11 @@ prefixes
 
 class CTransactionRecord;
 class CStoredTransaction;
-
+class CDeterministicMint;
+class CZerocoinMint;
+class CZerocoinSpend;
+class uint160;
+class uint256;
 
 class CStealthKeyMetadata
 {
