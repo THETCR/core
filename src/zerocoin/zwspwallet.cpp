@@ -11,8 +11,10 @@
 #include <zerocoin/zwspchain.h>
 #include <primitives/deterministicmint.h>
 #include <hash.h>
+#include <consensus/validation.h>
+
+
 using namespace libzerocoin;
-class CValidationState;
 
 CzWSPWallet::CzWSPWallet(std::string strWalletFile)
 {
