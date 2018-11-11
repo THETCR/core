@@ -185,5 +185,15 @@ bool ConvertBits(const O& outfn, I it, I end) {
     }
     return true;
 }
+/** Reverse the endianess of a string */
+inline std::string ReverseEndianString(std::string in)
+{
+    std::string out = "";
+    unsigned int s = in.size();
+    for (unsigned int i = 0; i < s; i += 2) {
+        out += in.substr(s - i - 2, 2);
+    }
 
+    return out;
+}
 #endif // BITCOIN_UTILSTRENCODINGS_H
