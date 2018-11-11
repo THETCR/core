@@ -12231,11 +12231,10 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
     int nIn = 0;
     if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
         for (CTxIn txIn : txNew.vin) {
-            SignatureData sigdata;
-            if (!ProduceSignature(*this, MutableTransactionSignatureCreator(&txNew, nIn, vchAmount, SIGHASH_ALL), scriptPubKeyOut, sigdata)) {
-                return werror("%s: ProduceSignature failed to sign coinstake.", __func__);
-            }
-            UpdateInput(txNew.vin[nIn], sigdata);
+            const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
+            const CKeyStore& keystore = *pwallet;
+            if (!SignSignature(keystore, *wtx, txNew, nIn++))
+                return error("CreateCoinStake : failed to sign coinstake");
         }
     } else {
         //Update the mint database with tx hash and height
