@@ -12607,7 +12607,7 @@ CScript GetLargestContributor(set<pair<const CWalletTx*, unsigned int> >& setCoi
 {
     map<CScript, CAmount> mapScriptsOut;
     for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-        CTransactionRef ref = *coin.first;
+        CTransaction ref = *coin.first;
         CTxOut out = ref.vout[coin.second];
         mapScriptsOut[out.scriptPubKey] += out.nValue;
     }
