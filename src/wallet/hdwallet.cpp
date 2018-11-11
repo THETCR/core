@@ -3577,14 +3577,14 @@ int CHDWallet::AddStandardInputs(CWalletTx &wtx, CTransactionRecord &rtx,
                 coin_selection_params.effective_fee = nFeeRateNeeded;
                 nValueIn = 0;
                 setCoins.clear();
-//                if (!SelectCoins(vAvailableCoins, nValueToSelect, setCoins, nValueIn, *coinControl, coin_selection_params, bnb_used)) {
-//                // If BnB was used, it was the first pass. No longer the first pass and continue loop with knapsack.
-//                    if (bnb_used) {
-//                        coin_selection_params.use_bnb = false;
-//                        continue;
-//                    }
-//                    return wserrorN(1, sError, __func__, _("Insufficient funds.").c_str());
-//                }
+                if (!SelectCoins(vAvailableCoins, nValueToSelect, setCoins, nValueIn, *coinControl, coin_selection_params, bnb_used)) {
+                // If BnB was used, it was the first pass. No longer the first pass and continue loop with knapsack.
+                    if (bnb_used) {
+                        coin_selection_params.use_bnb = false;
+                        continue;
+                    }
+                    return wserrorN(1, sError, __func__, _("Insufficient funds.").c_str());
+                }
             }
 
             const CAmount nChange = nValueIn - nValueToSelect;
@@ -12740,12 +12740,13 @@ bool CHDWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTran
     } else {
         // select UTXO's to use
         vector<COutput> vAvailableCoins;
+        //TODO FIX
 //        AvailableCoins(vAvailableCoins, true, coinControl, false, coin_type, useIX);
-        AvailableCoins(vAvailableCoins, true, coinControl, false, ONLY_DENOMINATED);
-        if (!SelectCoins(vAvailableCoins, nTotalValue, setCoins, nValueIn, *coinControl, coin_selection_params, bnb_used)) {
-            strFailReason = _("Insufficient or insufficient confirmed funds, you might need to wait a few minutes and try again.");
-            return false;
-        }
+//        AvailableCoins(vAvailableCoins, true, coinControl, false, ONLY_DENOMINATED);
+//        if (!SelectCoins(vAvailableCoins, nTotalValue, setCoins, nValueIn, *coinControl, coin_selection_params, bnb_used)) {
+//            strFailReason = _("Insufficient or insufficient confirmed funds, you might need to wait a few minutes and try again.");
+//            return false;
+//        }
         // Fill vin
         for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins)
             txNew.vin.push_back(CTxIn(coin.first->GetHash(), coin.second));
