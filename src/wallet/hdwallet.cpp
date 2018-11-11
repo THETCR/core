@@ -46,6 +46,8 @@
 #include <zerocoin/zwspchain.h>
 #include <zerocoin/zwspwallet.h>
 #include <obfuscation/denomination_functions.h>
+#include <obfuscation/privatesend-client.h>
+
 #include <libzerocoin/Denominations.h>
 #include <primitives/deterministicmint.h>
 
