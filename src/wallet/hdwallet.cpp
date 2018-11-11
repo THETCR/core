@@ -12301,7 +12301,7 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
         return false;
 
     // Sign for WSP
-    int nIn = 0;
+    unsigned int nIn = 0;
     if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
         for (CTxIn txIn : txNew.vin) {
 //            const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
