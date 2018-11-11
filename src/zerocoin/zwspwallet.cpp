@@ -185,7 +185,8 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
 {
     uint32_t nLastCountUsed = 0;
     bool found = true;
-    CHDWalletDB walletdb(GetDBHandle());
+    CHDWallet pwalletMain(this->strWalletFile);
+    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
 
     set<uint256> setAddedTx;
     while (found) {
@@ -220,7 +221,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                 uint256 hashBlock;
                 CTransactionRef tx;
                 if (!GetTransaction(txHash, tx, Params().GetConsensus(), hashBlock, true)) {
-                    LogPrintf("%s : failed to get transaction for mint %s!\n", __func__, pMint.first.GetHex());
+//                    LogPrintf("%s : failed to get transaction for mint %s!\n", __func__, pMint.first.GetHex());
                     found = false;
                     nLastCountUsed = std::max(pMint.second, nLastCountUsed);
                     continue;
@@ -237,7 +238,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                     PublicCoin pubcoin(Params().Zerocoin_Params(false));
                     CValidationState state;
                     if (!TxOutToPublicCoin(out, pubcoin, state)) {
-                        LogPrintf("%s : failed to get mint from txout for %s!\n", __func__, pMint.first.GetHex());
+//                        LogPrintf("%s : failed to get mint from txout for %s!\n", __func__, pMint.first.GetHex());
                         continue;
                     }
 
@@ -252,7 +253,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                 }
 
                 if (!fFoundMint || denomination == ZQ_ERROR) {
-                    LogPrintf("%s : failed to get mint %s from tx %s!\n", __func__, pMint.first.GetHex(), tx.GetHash().GetHex());
+//                    LogPrintf("%s : failed to get mint %s from tx %s!\n", __func__, pMint.first.GetHex(), tx.GetHash().GetHex());
                     found = false;
                     break;
                 }
@@ -276,7 +277,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                 SetMintSeen(bnValue, pindex->nHeight, txHash, denomination);
                 nLastCountUsed = std::max(pMint.second, nLastCountUsed);
                 nCountLastUsed = std::max(nLastCountUsed, nCountLastUsed);
-                LogPrint("zero", "%s: updated count to %d\n", __func__, nCountLastUsed);
+//                LogPrint("zero", "%s: updated count to %d\n", __func__, nCountLastUsed);
             }
         }
     }
@@ -333,7 +334,7 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
     
     //Update the count if it is less than the mint's count
     if (nCountLastUsed < pMint.second) {
-        CHDWalletDB walletdb(GetDBHandle());
+//        CHDWalletDB walletdb(GetDBHandle());
         nCountLastUsed = pMint.second;
         walletdb.WriteZWSPCount(nCountLastUsed);
     }
@@ -412,7 +413,9 @@ uint512 CzWSPWallet::GetZerocoinSeed(uint32_t n)
 void CzWSPWallet::UpdateCount()
 {
     nCountLastUsed++;
-    CHDWalletDB walletdb(GetDBHandle());
+    CHDWallet pwalletMain(this->strWalletFile);
+    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
+//    CHDWalletDB walletdb(GetDBHandle());
     walletdb.WriteZWSPCount(nCountLastUsed);
 }
 
