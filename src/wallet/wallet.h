@@ -1403,6 +1403,7 @@ public:
     std::unique_ptr<CzWSPTracker> zwspTracker;
     CAmount GetDenominatedBalance(bool unconfirmed=false) const;
     CAmount GetAnonymizableBalance(bool fSkipDenominated = false, bool fSkipUnconfirmed = true) const;
+    CAmount GetAnonymizedBalance() const;
 
     CAmount GetNeedsToBeAnonymizedBalance(CAmount nMinBalance = 0) const;
     bool CreateCollateralTransaction(CMutableTransaction& txCollateral, std::string& strReason);
