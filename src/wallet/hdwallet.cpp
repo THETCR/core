@@ -11095,7 +11095,7 @@ std::set<uint256> CHDWallet::GetConflicts(const uint256 &txid) const
         return result;
     };
 
-    return CHDWallet::GetConflicts(txid);
+    return CWallet::GetConflicts(txid);
 }
 
 /* Mark a transaction (and it in-wallet descendants) as abandoned so its inputs may be respent. */
