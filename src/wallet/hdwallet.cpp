@@ -852,10 +852,10 @@ bool CHDWallet::LoadTxRecords(CHDWalletDB *pwdb)
     return true;
 };
 
-bool CHDWallet::IsLocked() const
+bool CHDWallet::IsLocked(bool fForMixing) const
 {
     LOCK(cs_wallet); // Lock cs_wallet to ensure any CHDWallet::Unlock has completed
-    return CCryptoKeyStore::IsLocked();
+    return CCryptoKeyStore::IsLocked(fForMixing);
 };
 
 bool CHDWallet::EncryptWallet(const SecureString &strWalletPassphrase)
