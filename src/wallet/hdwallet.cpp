@@ -12112,13 +12112,14 @@ bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listI
     CAmount nAmountSelected = 0;
     if (gArgs.GetBoolArg("-wspstake", true)) {
         for (const COutput &out : vCoins) {
+            CTransaction ref = (CTransaction) *out.tx;
             //make sure not to outrun target amount
-            if (nAmountSelected + out.tx->tx.vout[out.i].nValue > nTargetAmount)
+            if (nAmountSelected + ref.vout[out.i].nValue > nTargetAmount)
                 continue;
 
             //if zerocoinspend, then use the block time
             int64_t nTxTime = out.tx->GetTxTime();
-            if (out.tx->IsZerocoinSpend()) {
+            if (ref->IsZerocoinSpend()) {
                 if (!out.tx->IsInMainChain())
                     continue;
                 nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
@@ -12133,10 +12134,10 @@ bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listI
                 continue;
 
             //add to our stake set
-            nAmountSelected += out.tx->vout[out.i].nValue;
+            nAmountSelected += ref->vout[out.i].nValue;
 
             std::unique_ptr<CWspStake> input(new CWspStake());
-            input->SetInput((CTransaction) *out.tx, out.i);
+            input->SetInput(*out.tx, out.i);
             listInputs.emplace_back(std::move(input));
         }
     }
