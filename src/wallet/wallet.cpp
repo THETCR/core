@@ -5230,9 +5230,9 @@ bool CWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransa
     // Sign if these are wispr outputs - NOTE that zWSP outputs are signed later in SoK
     if (!isZCSpendChange) {
         int nIn = 0;
-        const CKeyStore& keystore = *this;
+//        const CKeyStore& keystore = *this;
         for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-            if (!SignSignature(keystore, *coin.first, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
+            if (!SignSignature(*this, *coin.first, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
                 strFailReason = _("Signing transaction failed");
                 return false;
             }
@@ -5824,10 +5824,10 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
         // create dummy data output only and pay everything as a fee
         txCollateral.vout.push_back(CTxOut(0, CScript() << OP_RETURN));
     }
-    const CKeyStore& keystore = *this;
+//    const CKeyStore& keystore = *this;
     unsigned int nIn = 0;
     //TODO FIX
-    if (!SignSignature(keystore, txdsinCollateral.prevPubKey, txCollateral, nIn, nValue, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
+    if (!SignSignature(*this, txdsinCollateral.prevPubKey, txCollateral, nIn, nValue, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
         strReason = "Unable to sign collateral transaction!";
         return false;
     }

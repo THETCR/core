@@ -511,28 +511,28 @@ bool SignSignature(const SigningProvider &provider, const CTransaction& txFrom, 
 }
 
 //!WISPR
-bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn, const std::vector<uint8_t>& amount, int nHashType)
-{
-    assert(nIn < txTo.vin.size());
-    CTxIn& txin = txTo.vin[nIn];
-
-//    CTransaction txToConst(txTo);
-    MutableTransactionSignatureCreator creator(&txTo, nIn, amount, nHashType);
-    SignatureData sigs;
-
-    return ProduceSignature(*keystore, creator, fromPubKey, sigs);
-}
-
-bool SignSignature(const CKeyStore &keystore, const CTransaction& txFrom, CMutableTransaction& txTo, unsigned int nIn, const CAmount amount, int nHashType)
-{
-    assert(nIn < txTo.vin.size());
-    CTxIn& txin = txTo.vin[nIn];
-    assert(txin.prevout.n < txFrom.vout.size());
-    const CTxOut& txout = txFrom.vout[txin.prevout.n];
-    std::vector<uint8_t> vamount(8);
-    memcpy(vamount.data(), &amount, 8);
-    return SignSignature(keystore, txout.scriptPubKey, txTo, nIn, vamount, nHashType);
-}
+//bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn, const std::vector<uint8_t>& amount, int nHashType)
+//{
+//    assert(nIn < txTo.vin.size());
+//    CTxIn& txin = txTo.vin[nIn];
+//
+////    CTransaction txToConst(txTo);
+//    MutableTransactionSignatureCreator creator(&txTo, nIn, amount, nHashType);
+//    SignatureData sigs;
+//
+//    return ProduceSignature(keystore, creator, fromPubKey, sigs);
+//}
+//
+//bool SignSignature(const CKeyStore &keystore, const CTransaction& txFrom, CMutableTransaction& txTo, unsigned int nIn, const CAmount amount, int nHashType)
+//{
+//    assert(nIn < txTo.vin.size());
+//    CTxIn& txin = txTo.vin[nIn];
+//    assert(txin.prevout.n < txFrom.vout.size());
+//    const CTxOut& txout = txFrom.vout[txin.prevout.n];
+//    std::vector<uint8_t> vamount(8);
+//    memcpy(vamount.data(), &amount, 8);
+//    return SignSignature(keystore, txout.scriptPubKey, txTo, nIn, vamount, nHashType);
+//}
 
 
 namespace {
