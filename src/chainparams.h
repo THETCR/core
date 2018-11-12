@@ -237,6 +237,8 @@ protected:
     int nNewProtocolStartTime;
     int nZerocoinRequiredStakeDepth;
     uint256 bnProofOfStakeLimit;
+    int nFulfilledRequestExpireTime;
+    int nLastPOWBlock;
 
 };
 
