@@ -416,7 +416,7 @@ bool CzWSPTracker::UpdateStatusInternal(const std::set<uint256>& setMempool, CMi
             LogPrintf("%s : Found orphaned mint txid=%s\n", __func__, mint.txid.GetHex());
             mint.isUsed = false;
             mint.nHeight = 0;
-            if (tx.IsCoinStake()) {
+            if (*tx.IsCoinStake()) {
                 mint.isArchived = true;
                 Archive(mint);
             }
