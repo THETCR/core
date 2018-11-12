@@ -196,6 +196,8 @@ BITCOIN_CORE_H = \
   pow.h \
   pos/kernel.h \
   pos/miner.h \
+  primitives/deterministicmint.h \
+  primitives/zerocoin.h \
   protocol.h \
   random.h \
   reverse_iterator.h \
@@ -281,9 +283,7 @@ BITCOIN_CORE_H = \
   insight/timestampindex.h \
   insight/csindex.h \
   insight/insight.h \
-  insight/rpc.h \
-  primitives/deterministicmint.h \
-  primitives/zerocoin.h
+  insight/rpc.h
 
 
 obj/build.h: FORCE
@@ -307,6 +307,7 @@ libwispr_server_a_SOURCES = \
   httpserver.cpp \
   index/base.cpp \
   index/txindex.cpp \
+  leveldbwrapper.cpp \
   init.cpp \
   instantx.cpp \
   dbwrapper.cpp \
@@ -432,6 +433,8 @@ libwispr_wallet_a_SOURCES = \
   wallet/hdwalletdb.cpp \
   wallet/rpchdwallet.cpp \
   wallet/stakeinput.cpp \
+  wallet/walletutil.cpp \
+  wallet/coinselection.cpp \
   blind.cpp \
   key/stealth.cpp \
   pos/miner.cpp \
@@ -440,8 +443,6 @@ libwispr_wallet_a_SOURCES = \
   primitives/zerocoin.cpp \
   obfuscation/privatesend-client.cpp \
   obfuscation/privatesend-util.cpp \
-  wallet/walletutil.cpp \
-  wallet/coinselection.cpp \
   zerocoin/mintpool.cpp \
   zerocoin/zwspwallet.cpp \
   zerocoin/zwsptracker.cpp \
@@ -598,6 +599,9 @@ libwispr_common_a_SOURCES = \
   validationinterface.cpp \
   versionbits.cpp \
   warnings.cpp \
+  zerocoin/accumulators.cpp \
+  zerocoin/accumulatorcheckpoints.cpp \
+  zerocoin/accumulatormap.cpp \
   $(BITCOIN_CORE_H)
 
 # util: shared between all executables.
