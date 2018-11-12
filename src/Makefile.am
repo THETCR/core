@@ -183,6 +183,7 @@ BITCOIN_CORE_H = \
   netfulfilledman.h \
   noui.h \
   outputtype.h \
+  obfuscation/denomination_functions.h \
   obfuscation/privatesend.h \
   obfuscation/privatesend-client.h \
   obfuscation/privatesend-server.h \
