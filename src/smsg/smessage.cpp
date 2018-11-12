@@ -69,7 +69,7 @@ Notes:
 #include <smsg/crypter.h>
 #include <smsg/db.h>
 
-extern void Misbehaving(NodeId nodeid, int howmuch, const std::string& message="");
+extern void Misbehaving(NodeId nodeid, int howmuch, const std::string& message);
 extern CChain &chainActive;
 extern CCriticalSection cs_main;
 
