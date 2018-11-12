@@ -520,7 +520,7 @@ bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CMutabl
     MutableTransactionSignatureCreator creator(&txTo, nIn, amount, nHashType);
     SignatureData sigs;
 
-    return ProduceSignature(keystore, creator, fromPubKey, sigs);
+    return ProduceSignature(&keystore, creator, fromPubKey, sigs);
 }
 
 bool SignSignature(const CKeyStore &keystore, const CTransaction& txFrom, CMutableTransaction& txTo, unsigned int nIn, const CAmount amount, int nHashType)
