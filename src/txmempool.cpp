@@ -1378,6 +1378,6 @@ void CTxMemPool::GetTransactions(std::set<uint256>& setTxid)
 
     LOCK(cs);
     for (indexed_transaction_set::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {
-        setTxid.insert((*it).first);
+        setTxid.insert(it->GetTx().GetHash());
     }
 }
