@@ -13,6 +13,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <vector>
 #include <libzerocoin/Coin.h>
 #include <libzerocoin/Commitment.h>
 #include <pubkey.h>
