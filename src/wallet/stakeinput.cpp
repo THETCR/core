@@ -6,6 +6,7 @@
 #include <chain.h>
 #include <primitives/deterministicmint.h>
 #include <validation.h>
+#include <kernel.h>
 #include <wallet/stakeinput.h>
 #include <wallet/wallet.h>
 

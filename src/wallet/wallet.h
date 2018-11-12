@@ -1408,6 +1408,7 @@ public:
     };
 
     //!WISPR
+    CAmount nStakeSplitThreshold;
     const std::string strWalletFile;
     CzWSPWallet* zwalletMain;
     std::unique_ptr<CzWSPTracker> zwspTracker;

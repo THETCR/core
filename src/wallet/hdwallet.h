@@ -769,7 +769,6 @@ public:
     // Staking Settings
     bool fStakingEnabled;
     CAmount nStakeCombineThreshold;
-    CAmount nStakeSplitThreshold;
     size_t nMaxStakeCombine = 3;
     int nWalletDevFundCedePercent;
     CBitcoinAddress rewardAddress;
