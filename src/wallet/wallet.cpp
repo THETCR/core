@@ -5232,7 +5232,7 @@ bool CWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransa
         int nIn = 0;
         const CKeyStore& keystore = *this;
         for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-            if (!SignSignature(keystore, *coin.first, txNew, nIn++, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
+            if (!SignSignature(keystore, *coin.first, txNew, nIn++, nChange, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) {
                 strFailReason = _("Signing transaction failed");
                 return false;
             }
