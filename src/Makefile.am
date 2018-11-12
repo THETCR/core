@@ -307,7 +307,6 @@ libwispr_server_a_SOURCES = \
   httpserver.cpp \
   index/base.cpp \
   index/txindex.cpp \
-  leveldbwrapper.cpp \
   init.cpp \
   instantx.cpp \
   dbwrapper.cpp \
