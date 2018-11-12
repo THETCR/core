@@ -166,7 +166,7 @@ bool CZWspStake::MarkSpent(CWallet *pwallet, const uint256& txid)
 }
 
 //!WSP Stake
-bool CWspStake::SetInput(CTransactionRef txPrev, unsigned int n)
+bool CWspStake::SetInput(CTransaction txPrev, unsigned int n)
 {
     this->txFrom = txPrev;
     this->nPosition = n;
@@ -251,7 +251,7 @@ CDataStream CWspStake::GetUniqueness()
 CBlockIndex* CWspStake::GetIndexFrom()
 {
     uint256 hashBlock = 0;
-    CTransaction tx;
+    CTransactionRef tx;
     if (GetTransaction(txFrom.GetHash(), tx, Params().GetConsensus(), hashBlock, true)) {
         // If the index is in the chain, then set it as the "index from"
         if (mapBlockIndex.count(hashBlock)) {

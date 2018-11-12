@@ -80,7 +80,7 @@ public:
         this->pindexFrom = nullptr;
     }
 
-    bool SetInput(CTransactionRef txPrev, unsigned int n);
+    bool SetInput(CTransaction txPrev, unsigned int n);
 
     CBlockIndex* GetIndexFrom() override;
     bool GetTxFrom(CTransaction& tx) override;
