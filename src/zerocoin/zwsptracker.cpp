@@ -46,7 +46,7 @@ bool CzWSPTracker::Archive(CMintMeta& meta)
     CHDWalletDB walletdb(pwalletMain.GetDBHandle());
     CZerocoinMint mint;
     if (walletdb.ReadZerocoinMint(meta.hashPubcoin, mint)) {
-        if (!CHDWalletDB(strWalletFile).ArchiveMintOrphan(mint))
+        if (!CHDWalletDB(pwalletMain.GetDBHandle()).ArchiveMintOrphan(mint))
             return error("%s: failed to archive zerocoinmint", __func__);
     } else {
         //failed to read mint from DB, try reading deterministic
