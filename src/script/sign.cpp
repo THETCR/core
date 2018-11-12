@@ -531,7 +531,7 @@ bool SignSignature(const CKeyStore &keystore, const CTransaction& txFrom, CMutab
     const CTxOut& txout = txFrom.vout[txin.prevout.n];
     std::vector<uint8_t> vamount(8);
     memcpy(vamount.data(), &amount, 8);
-    return SignSignature(keystore, txout.scriptPubKey, txTo, nIn, amount, nHashType);
+    return SignSignature(keystore, txout.scriptPubKey, txTo, nIn, vamount, nHashType);
 }
 
 
