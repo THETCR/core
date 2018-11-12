@@ -575,6 +575,14 @@ libwispr_common_a_SOURCES = \
   script/standard.cpp \
   spork/spork.cpp \
   spork/sporkdb.cpp \
+  timedata.cpp \
+  torcontrol.cpp \
+  txdb.cpp \
+  txmempool.cpp \
+  ui_interface.cpp \
+  validation.cpp \
+  validationinterface.cpp \
+  versionbits.cpp \
   warnings.cpp \
   $(BITCOIN_CORE_H)
 
