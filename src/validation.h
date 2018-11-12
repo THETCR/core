@@ -518,6 +518,10 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, const Consensus:
 bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams);
 bool ReadTransactionFromDiskBlock(const CBlockIndex *pindex, int nIndex, CTransactionRef &txOut);
 
+/** Reprocess a number of blocks to try and get on the correct chain again **/
+bool DisconnectBlocks(int blocks);
+void ReprocessBlocks(int nBlocks);
+
 bool ReadRawBlockFromDisk(std::vector<uint8_t>& block, const CDiskBlockPos& pos, const CMessageHeader::MessageStartChars& message_start);
 bool ReadRawBlockFromDisk(std::vector<uint8_t>& block, const CBlockIndex* pindex, const CMessageHeader::MessageStartChars& message_start);
 
