@@ -153,6 +153,7 @@ public:
     /** Allow nodes with the same address and multiple ports */
     bool AllowMultiplePorts() const { return fAllowMultiplePorts; }
     int PoolMaxTransactions() const { return nPoolMaxTransactions; }
+    int FulfilledRequestExpireTime() const { return nFulfilledRequestExpireTime; }
     const std::string& SporkAddress() const { return strSporkAddress; }
     //WISPR
     int NEW_PROTOCOLS_STARTHEIGHT() const { return nNewProtocolStartHeight; }
