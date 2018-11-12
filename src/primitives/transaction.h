@@ -804,6 +804,7 @@ public:
 
     /** Convert a CMutableTransaction into a CTransaction. */
     CTransaction(const CMutableTransaction &tx);
+    CTransaction& operator=(const CTransaction& tx);
     CTransaction(CMutableTransaction &&tx);
 
     template <typename Stream>
