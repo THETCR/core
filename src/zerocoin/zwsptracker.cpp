@@ -443,12 +443,12 @@ std::set<CMintMeta> CzWSPTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, 
         std::list<CZerocoinMint> listMintsDB = walletdb.ListMintedCoins();
         for (auto& mint : listMintsDB)
             Add(mint);
-        LogPrint("zero", "%s: added %d zerocoinmints from DB\n", __func__, listMintsDB.size());
+//        LogPrint("zero", "%s: added %d zerocoinmints from DB\n", __func__, listMintsDB.size());
 
         std::list<CDeterministicMint> listDeterministicDB = walletdb.ListDeterministicMints();
         for (auto& dMint : listDeterministicDB)
             Add(dMint);
-        LogPrint("zero", "%s: added %d dzwsp from DB\n", __func__, listDeterministicDB.size());
+//        LogPrint("zero", "%s: added %d dzwsp from DB\n", __func__, listDeterministicDB.size());
     }
 
     std::vector<CMintMeta> vOverWrite;
@@ -456,7 +456,7 @@ std::set<CMintMeta> CzWSPTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, 
     std::set<uint256> setMempool;
     {
         LOCK(mempool.cs);
-        mempool.getTransactions(setMempool);
+        mempool.GetTransactions(setMempool);
     }
 
     std::map<libzerocoin::CoinDenomination, int> mapMaturity = GetMintMaturityHeight();

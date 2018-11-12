@@ -1372,3 +1372,11 @@ void CTxMemPool::GetTransactionAncestry(const uint256& txid, size_t& ancestors, 
 }
 
 SaltedTxidHasher::SaltedTxidHasher() : k0(GetRand(std::numeric_limits<uint64_t>::max())), k1(GetRand(std::numeric_limits<uint64_t>::max())) {}
+void CTxMemPool::GetTransactions(std::set<uint256>& setTxid)
+{
+    setTxid.clear();
+
+    LOCK(cs);
+    for (map<uint256, CTxMemPoolEntry>::iterator mi = mapTx.begin(); mi != mapTx.end(); ++mi)
+        setTxid.insert((*mi).first);
+}
