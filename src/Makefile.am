@@ -167,6 +167,7 @@ BITCOIN_CORE_H = \
   logging.h \
   memusage.h \
   merkleblock.h \
+  messagesigner.h \
   miner.h \
   masternode/activemasternode.h \
   masternode/masternode.h \
@@ -179,6 +180,7 @@ BITCOIN_CORE_H = \
   netaddress.h \
   netbase.h \
   netmessagemaker.h \
+  netfulfilledman.h \
   noui.h \
   outputtype.h \
   obfuscation/privatesend.h \
@@ -190,9 +192,6 @@ BITCOIN_CORE_H = \
   policy/policy.h \
   policy/rbf.h \
   pow.h \
-  zerocoin/accumulatorcheckpoints.h \
-  zerocoin/accumulatormap.h \
-  zerocoin/accumulators.h \
   pos/kernel.h \
   pos/miner.h \
   protocol.h \
@@ -258,7 +257,13 @@ BITCOIN_CORE_H = \
   wallet/hdwallet.h \
   wallet/walletutil.h \
   wallet/coinselection.h \
+  wallet/stakeinput.h \
   warnings.h \
+  zerocoin/accumulatorcheckpoints.h \
+  zerocoin/accumulatorcheckpoints.json.h \
+  zerocoin/accumulatormap.h \
+  zerocoin/accumulators.h \
+  zerocoin/mintpool.h \
   zerocoin/zwspchain.h \
   zerocoin/zwsptracker.h \
   zerocoin/zwspwallet.h \
@@ -316,9 +321,11 @@ libwispr_server_a_SOURCES = \
   masternode/masternodeconfig.cpp \
   masternode/masternodeman.cpp \
   merkleblock.cpp \
+  messagesigner.cpp \
   miner.cpp \
   net.cpp \
   net_processing.cpp \
+  netfulfilledman.cpp \
   noui.cpp \
   outputtype.cpp \
   policy/fees.cpp \
@@ -406,6 +413,15 @@ endif
 libwispr_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libwispr_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_wallet_a_SOURCES = \
+  instantx.cpp \
+  obfuscation\denomination_functions.cpp \
+  masternode\activemasternode.cpp \
+  masternode\masternode.cpp \
+  masternode\masternode-budget.cpp \
+  masternode\masternode-payments.cpp \
+  masternode\masternode-sync.cpp \
+  masternode\masternodeconfig.cpp \
+  masternode\masternodeman.cpp \
   interfaces/wallet.cpp \
   wallet/coincontrol.cpp \
   wallet/crypter.cpp \
@@ -420,6 +436,7 @@ libwispr_wallet_a_SOURCES = \
   wallet/hdwallet.cpp \
   wallet/hdwalletdb.cpp \
   wallet/rpchdwallet.cpp \
+  wallet/stakeinput.cpp \
   blind.cpp \
   key/stealth.cpp \
   pos/miner.cpp \
@@ -430,6 +447,7 @@ libwispr_wallet_a_SOURCES = \
   obfuscation/privatesend-util.cpp \
   wallet/walletutil.cpp \
   wallet/coinselection.cpp \
+  zerocoin/mintpool.cpp \
   zerocoin/zwspwallet.cpp \
   zerocoin/zwsptracker.cpp \
   $(BITCOIN_CORE_H)
