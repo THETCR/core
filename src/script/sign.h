@@ -9,6 +9,7 @@
 #include <boost/optional.hpp>
 #include <hash.h>
 #include <pubkey.h>
+#include <keystore.h>
 #include <script/interpreter.h>
 #include <streams.h>
 
