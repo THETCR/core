@@ -9,12 +9,12 @@
 #include <boost/optional.hpp>
 #include <hash.h>
 #include <pubkey.h>
-#include <keystore.h>
 #include <script/interpreter.h>
 #include <streams.h>
 
 class CKey;
 class CKeyID;
+class CKeyStore;
 class CScript;
 class CScriptID;
 class CTransaction;
