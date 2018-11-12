@@ -53,6 +53,8 @@ file(GLOB SOURCE_FILES
         src/qt/*.h
         src/script/*.cpp
         src/script/*.h
+        src/spork/*.cpp
+        src/spork/*.h
         src/secp256k1/include/*.h
         src/smsg/*.h
         src/smsg/*.cpp
