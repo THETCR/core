@@ -511,6 +511,20 @@ bool SignSignature(const SigningProvider &provider, const CTransaction& txFrom, 
 }
 
 //!WISPR
+TransactionSignatureCreator::TransactionSignatureCreator(const CKeyStore* keystoreIn, const CTransaction* txToIn, unsigned int nInIn, int nHashTypeIn) : BaseSignatureCreator(keystoreIn), txTo(txToIn), nIn(nInIn), nHashType(nHashTypeIn), checker(txTo, nIn) {}
+
+bool TransactionSignatureCreator::CreateSig(std::vector<unsigned char>& vchSig, const CKeyID& address, const CScript& scriptCode) const
+{
+    CKey key;
+    if (!keystore->GetKey(address, key))
+        return false;
+
+    uint256 hash = SignatureHash(scriptCode, *txTo, nIn, nHashType);
+    if (!key.Sign(hash, vchSig))
+        return false;
+    vchSig.push_back((unsigned char)nHashType);
+    return true;
+}
 bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn, int nHashType)
 {
     assert(nIn < txTo.vin.size());
