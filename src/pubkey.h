@@ -220,6 +220,12 @@ public:
     bool Derive(CPubKey& pubkeyChild, ChainCode &ccChild, unsigned int nChild, const ChainCode& cc) const;
 
     bool Derive(CPubKey& pubkeyChild, unsigned char ccChild[32], unsigned int nChild, const unsigned char cc[32]) const;
+
+    std::vector<unsigned char> Raw() const
+    {
+        return std::vector<unsigned char>(vch, vch + size());
+    }
+
 };
 
 /** An encapsulated compressed public key. */
