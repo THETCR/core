@@ -196,8 +196,6 @@ BITCOIN_CORE_H = \
   pow.h \
   pos/kernel.h \
   pos/miner.h \
-  primitives/deterministicmint.h \
-  primitives/zerocoin.h \
   protocol.h \
   random.h \
   reverse_iterator.h \
@@ -283,7 +281,9 @@ BITCOIN_CORE_H = \
   insight/timestampindex.h \
   insight/csindex.h \
   insight/insight.h \
-  insight/rpc.h
+  insight/rpc.h \
+  primitives/deterministicmint.h \
+  primitives/zerocoin.h
 
 
 obj/build.h: FORCE
