@@ -425,7 +425,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
             return error("CheckProofOfStake() : VerifySignature failed on coinstake %s", tx.GetHash().ToString().c_str());
 
         CWspStake* wspInput = new CWspStake();
-        wspInput->SetInput(txPrev, txin.prevout.n);
+        wspInput->SetInput(*txPrev, txin.prevout.n);
         stake = std::unique_ptr<CStakeInput>(wspInput);
     }
 
