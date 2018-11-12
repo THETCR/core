@@ -197,7 +197,7 @@ BITCOIN_CORE_H = \
   pos/kernel.h \
   pos/miner.h \
   primitives/deterministicmint.h \
-  primitives/zerocoin.h
+  primitives/zerocoin.h \
   protocol.h \
   random.h \
   reverse_iterator.h \
