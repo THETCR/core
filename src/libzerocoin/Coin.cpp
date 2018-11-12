@@ -13,9 +13,9 @@
 
 #include <stdexcept>
 #include <iostream>
-#include "Coin.h"
-#include "Commitment.h"
-#include "pubkey.h"
+#include <libzerocoin/Coin.h>
+#include <libzerocoin/Commitment.h>
+#include <pubkey.h>
 
 namespace libzerocoin {
 

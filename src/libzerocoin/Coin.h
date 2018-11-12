@@ -13,12 +13,12 @@
 
 #ifndef COIN_H_
 #define COIN_H_
-#include "Denominations.h"
-#include "Params.h"
-#include "amount.h"
-#include "bignum.h"
-#include "util.h"
-#include "key.h"
+#include <libzerocoin/Denominations.h>
+#include <libzerocoin/Params.h>
+#include <amount.h>
+#include <libzerocoin/bignum.h>
+#include <util.h>
+#include <key.h>
 
 namespace libzerocoin
 {
