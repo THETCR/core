@@ -5,24 +5,21 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 //new includes
-//#include <pos/kernel.h>
 
-//#include <txdb.h>
-//#include <chainparams.h>
-//#include <serialize.h>
-//#include <streams.h>
-//#include <hash.h>
-//#include <script/interpreter.h>
-//#include <script/script.h>
-//#include <script/ismine.h> // valtype
-//#include <policy/policy.h>
-//#include <consensus/validation.h>
-//#include <coins.h>
+#include <txdb.h>
+#include <chainparams.h>
+#include <serialize.h>
+#include <streams.h>
+#include <hash.h>
+#include <script/script.h>
+#include <script/ismine.h> // valtype
+#include <policy/policy.h>
+#include <consensus/validation.h>
+#include <coins.h>
 
 //old includes
 #include <boost/assign/list_of.hpp>
 
-#include <db.h>
 #include <pos/kernel.h>
 #include <spork/spork.h>
 #include <script/interpreter.h>
