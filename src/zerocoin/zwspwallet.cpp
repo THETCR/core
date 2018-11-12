@@ -238,7 +238,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                 CoinDenomination denomination = CoinDenomination::ZQ_ERROR;
                 bool fFoundMint = false;
                 CBigNum bnValue = 0;
-                for (const CTxOut& out : *(CTransaction* tx).vout) {
+                for (const CTxOut& out : *((CTransaction*) tx).vout) {
                     if (!out.scriptPubKey.IsZerocoinMint())
                         continue;
 
