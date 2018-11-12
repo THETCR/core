@@ -416,13 +416,6 @@ libwispr_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_wallet_a_SOURCES = \
   instantx.cpp \
   obfuscation/denomination_functions.cpp \
-  masternode/activemasternode.cpp \
-  masternode/masternode.cpp \
-  masternode/masternode-budget.cpp \
-  masternode/masternode-payments.cpp \
-  masternode/masternode-sync.cpp \
-  masternode/masternodeconfig.cpp \
-  masternode/masternodeman.cpp \
   interfaces/wallet.cpp \
   wallet/coincontrol.cpp \
   wallet/crypter.cpp \
