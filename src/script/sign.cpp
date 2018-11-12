@@ -511,33 +511,16 @@ bool SignSignature(const SigningProvider &provider, const CTransaction& txFrom, 
 }
 
 //!WISPR
-TransactionSignatureCreator::TransactionSignatureCreator(const CTransaction* txToIn, unsigned int nInIn, int nHashTypeIn) : txTo(txToIn), nIn(nInIn), nHashType(nHashTypeIn), checker(txTo, nIn) {}
-
-bool TransactionSignatureCreator::CreateSig(const SigningProvider& provider, std::vector<unsigned char>& vchSig, const CKeyID& address, const CScript& scriptCode, SigVersion sigversion) const
-{
-    CKey key;
-    if (!provider.GetKey(address, key))
-        return false;
-
-    // Signing with uncompressed keys is disabled in witness scripts
-    if (sigversion == SigVersion::WITNESS_V0 && !key.IsCompressed())
-        return false;
-
-    uint256 hash = SignatureHash(scriptCode, *txTo, nIn, nHashType, amount, sigversion);
-    if (!key.Sign(hash, vchSig))
-        return false;
-    vchSig.push_back((unsigned char)nHashType);
-    return true;
-}
-bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn, int nHashType)
+bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn, const std::vector<uint8_t>& amount, int nHashType)
 {
     assert(nIn < txTo.vin.size());
     CTxIn& txin = txTo.vin[nIn];
 
-    CTransaction txToConst(txTo);
-    TransactionSignatureCreator creator(&keystore, &txToConst, nIn, nHashType);
+//    CTransaction txToConst(txTo);
+    MutableTransactionSignatureCreator creator(&txTo, nIn, amount, nHashType);
+    SignatureData sigs;
 
-    return ProduceSignature(creator, fromPubKey, txin.scriptSig);
+    return ProduceSignature(keystore, creator, fromPubKey, sigs);
 }
 
 bool SignSignature(const CKeyStore &keystore, const CTransaction& txFrom, CMutableTransaction& txTo, unsigned int nIn, int nHashType)
