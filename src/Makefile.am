@@ -433,8 +433,6 @@ libwispr_wallet_a_SOURCES = \
   wallet/hdwalletdb.cpp \
   wallet/rpchdwallet.cpp \
   wallet/stakeinput.cpp \
-  wallet/walletutil.cpp \
-  wallet/coinselection.cpp \
   blind.cpp \
   key/stealth.cpp \
   pos/miner.cpp \
@@ -443,6 +441,8 @@ libwispr_wallet_a_SOURCES = \
   primitives/zerocoin.cpp \
   obfuscation/privatesend-client.cpp \
   obfuscation/privatesend-util.cpp \
+  wallet/walletutil.cpp \
+  wallet/coinselection.cpp \
   zerocoin/mintpool.cpp \
   zerocoin/zwspwallet.cpp \
   zerocoin/zwsptracker.cpp \
@@ -599,9 +599,6 @@ libwispr_common_a_SOURCES = \
   validationinterface.cpp \
   versionbits.cpp \
   warnings.cpp \
-  zerocoin/accumulators.cpp \
-  zerocoin/accumulatorcheckpoints.cpp \
-  zerocoin/accumulatormap.cpp \
   $(BITCOIN_CORE_H)
 
 # util: shared between all executables.
