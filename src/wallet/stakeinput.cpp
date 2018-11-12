@@ -6,7 +6,7 @@
 #include <chain.h>
 #include <primitives/deterministicmint.h>
 #include <validation.h>
-#include <kernel.h>
+#include <pos/kernel.h>
 #include <wallet/stakeinput.h>
 #include <wallet/wallet.h>
 
@@ -252,7 +252,7 @@ CBlockIndex* CWspStake::GetIndexFrom()
 {
     uint256 hashBlock = 0;
     CTransaction tx;
-    if (GetTransaction(txFrom.GetHash(), tx, hashBlock, true)) {
+    if (GetTransaction(txFrom.GetHash(), tx, Params().GetConsensus(), hashBlock, true)) {
         // If the index is in the chain, then set it as the "index from"
         if (mapBlockIndex.count(hashBlock)) {
             CBlockIndex* pindex = mapBlockIndex.at(hashBlock);
