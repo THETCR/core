@@ -49,8 +49,25 @@
 #include <smsg/rpcsmessage.h>
 #include <insight/rpc.h>
 #include <pos/miner.h>
+
+//NEW
+#include <zerocoin/accumulatorcheckpoints.h>
+#include <zerocoin/accumulators.h>
+#include <invalid.h>
+#include <zerocoin/zwspchain.h>
+#include <base58.h>
 #ifdef ENABLE_WALLET
+#include <wallet/wallet.h>
 #include <wallet/hdwallet.h>
+#endif
+
+#include <masternode/activemasternode.h>
+#include <dsnotificationinterface.h>
+#include <flat-database.h>
+#include <governance/governance.h>
+#include <instantx.h>
+#ifdef ENABLE_WALLET
+#include <keepass.h>
 #endif
 #include <masternode/masternode-payments.h>
 #include <masternode/masternode-sync.h>
@@ -63,6 +80,15 @@
 #endif // ENABLE_WALLET
 #include <obfuscation/privatesend-server.h>
 #include <spork/spork.h>
+#include <spork/sporkdb.h>
+#include <warnings.h>
+
+#include <stdint.h>
+#include <stdio.h>
+#include <memory>
+//
+
+
 #if ENABLE_USBDEVICE
 #include <usbdevice/rpcusbdevice.h>
 #include <usbdevice/usbdevice.h>
@@ -1673,6 +1699,12 @@ bool AppInitMain()
                 pcoinsTip.reset();
                 pcoinsdbview.reset();
                 pcoinscatcher.reset();
+                zerocoinDB.reset();
+                pSporkDB.reset();
+
+                //PIVX specific: zerocoin and spork DB's
+                zerocoinDB = new CZerocoinDB(0, false, fReindex);
+                pSporkDB = new CSporkDB(0, false, false);
                 // new CBlockTreeDB tries to delete the existing file, which
                 // fails if it's still open from the previous loop. Close it first:
                 pblocktree.reset();

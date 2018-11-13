@@ -124,6 +124,8 @@ BITCOIN_CORE_H = \
   core_io.h \
   core_memusage.h \
   cuckoocache.h \
+  dsnotificationinterface.h \
+  flat-database.h \
   fs.h \
   governance/governance.h \
   governance/governance-classes.h \
@@ -304,6 +306,7 @@ libwispr_server_a_SOURCES = \
   blockencodings.cpp \
   chain.cpp \
   checkpoints.cpp \
+  dsnotificationinterface.cpp \
   consensus/tx_verify.cpp \
   httprpc.cpp \
   httpserver.cpp \
