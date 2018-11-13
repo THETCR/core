@@ -54,6 +54,8 @@
 #include <instantx.h>
 #include <masternode/masternodeman.h>
 #include <masternode/masternode-payments.h>
+#include <spork/spork.h>
+#include <spork/sporkdb.h>
 
 #include <secp256k1_rangeproof.h>
 
