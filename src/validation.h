@@ -630,6 +630,8 @@ extern std::unique_ptr<CZerocoinDB> zerocoinDB;
 
 /** Global variable that points to the spork database (protected by cs_main) */
 extern std::unique_ptr<CSporkDB> pSporkDB;
+extern std::atomic<bool> fDIP0001ActiveAtTip;
+
 
 /**
  * Return the spend height, which is one more than the inputs.GetBestBlock().
