@@ -69,11 +69,11 @@ $(LIBSECP256K1): $(wildcard secp256k1/src/*.h) $(wildcard secp256k1/src/*.c) $(w
 # But to build the less dependent modules first, we manually select their order here:
 EXTRA_LIBRARIES += \
   $(LIBWISPR_CRYPTO) \
+  $(LIBWISPR_ZEROCOIN) \
   $(LIBWISPR_UTIL) \
   $(LIBWISPR_COMMON) \
-  $(LIBWISPR_ZEROCOIN) \
-  $(LIBWISPR_SERVER) \
   $(LIBWISPR_CONSENSUS) \
+  $(LIBWISPR_SERVER) \
   $(LIBWISPR_CLI) \
   $(LIBWISPR_WALLET) \
   $(LIBWISPR_ZMQ) \
