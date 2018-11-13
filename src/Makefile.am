@@ -196,7 +196,9 @@ BITCOIN_CORE_H = \
   pow.h \
   pos/kernel.h \
   pos/miner.h \
+  primitives/block.h \
   primitives/deterministicmint.h \
+  primitives/transaction.h \
   primitives/zerocoin.h \
   protocol.h \
   random.h \
@@ -510,6 +512,8 @@ libwispr_consensus_a_SOURCES = \
   primitives/block.h \
   primitives/transaction.cpp \
   primitives/transaction.h \
+  primitives/deterministicmint.cpp \
+  primitives/zerocoin.cpp \
   pubkey.cpp \
   pubkey.h \
   script/wisprconsensus.cpp \
@@ -568,7 +572,9 @@ libwispr_common_a_SOURCES = \
   anon.cpp \
   blind.cpp \
   key.cpp \
+  primitives/block.cpp \
   primitives/deterministicmint.cpp \
+  primitives/transaction.cpp \
   primitives/zerocoin.cpp \
   key/keyutil.cpp \
   key/extkey.cpp \
