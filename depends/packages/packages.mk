@@ -13,6 +13,7 @@ wallet_packages=bdb
 
 upnp_packages=miniupnpc
 usb_packages=hidapi protobuf
+rapidcheck_packages = rapidcheck
 usb_native_packages=native_protobuf
 
 darwin_native_packages = native_biplist native_ds_store native_mac_alias
