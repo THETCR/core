@@ -31,7 +31,20 @@
 
 #include <atomic>
 
+#include <chain.h>
+#include <chainparams.h>
+#include <net.h>
+#include <pow.h>
+#include <primitives/block.h>
+#include <primitives/transaction.h>
 #include <primitives/zerocoin.h>
+#include <script/script.h>
+#include <script/sigcache.h>
+#include <script/standard.h>
+#include <tinyformat.h>
+#include <txmempool.h>
+#include <uint256.h>
+#include <undo.h>
 #include <libzerocoin/CoinSpend.h>
 
 class CBlockIndex;
