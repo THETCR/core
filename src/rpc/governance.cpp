@@ -4,6 +4,7 @@
 
 //#define ENABLE_bitcoin_DEBUG
 
+#include <core_io.h>
 #include <masternode/activemasternode.h>
 #include <consensus/validation.h>
 #include <governance/governance.h>
