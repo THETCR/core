@@ -23,6 +23,7 @@
 #include <pow.h>
 #include <primitives/block.h>
 #include <primitives/transaction.h>
+#include <primitives/zerocoin.h>
 #include <random.h>
 #include <reverse_iterator.h>
 #include <script/script.h>
@@ -43,7 +44,7 @@
 #include <warnings.h>
 #include <smsg/smessage.h>
 #include <pos/kernel.h>
-#include "zerocoin/accumulators.h"
+#include <zerocoin/accumulators.h>
 #include <blind.h>
 #include <anon.h>
 #include <rctindex.h>
@@ -266,6 +267,7 @@ size_t nCoinCacheUsage = 5000 * 300;
 uint64_t nPruneTarget = 0;
 int64_t nMaxTipAge = DEFAULT_MAX_TIP_AGE;
 bool fEnableReplacement = DEFAULT_ENABLE_REPLACEMENT;
+static bool fVerifyingDB = false;
 
 uint256 hashAssumeValid;
 arith_uint256 nMinimumChainWork;
@@ -6743,3 +6745,6 @@ bool CoinStakeCache::InsertCoinStake(const uint256 &blockHash, const CTransactio
     return true;
 };
 
+const bool VerifyingDB(){
+    return fVerifyingDB;
+}

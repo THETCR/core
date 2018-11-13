@@ -152,7 +152,6 @@ inline int64_t FutureDrift(int64_t nTime) { return nTime + 15; } // FutureDriftV
 /** Default for -stopatheight */
 static const int DEFAULT_STOPATHEIGHT = 0;
 
-static bool fVerifyingDB = false;
 extern unsigned int nStakeMinAge;
 
 
@@ -404,6 +403,7 @@ void UpdateCoins(const CTransaction& tx, CCoinsViewCache& inputs, int nHeight);
 
 //WISPR
 /** Context-independent validity checks */
+const bool VerifyingDB();
 bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fRejectBadUTXO, CValidationState& state);
 bool CheckZerocoinMint(const uint256& txHash, const CTxOut& txout, CValidationState& state, bool fCheckOnly = false);
 bool CheckZerocoinSpend(const CTransaction& tx, bool fVerifySignature, CValidationState& state);
