@@ -30,12 +30,12 @@ CAmount GetMinimumFee(const CWallet& wallet, unsigned int nTxBytes, const CCoinC
 * Estimate the minimum fee considering user set parameters
 * and the required fee
 */
-static CAmount GetMinimumFee(const CWallet& wallet, unsigned int nTxBytes, unsigned int nConfirmTarget, const CTxMemPool& pool);
+CAmount GetMinimumFee(const CWallet& wallet, unsigned int nTxBytes, unsigned int nConfirmTarget, const CTxMemPool& pool);
 /**
  * Estimate the minimum fee considering required fee and targetFee or if 0
  * then fee estimation for nConfirmTarget
  */
-static CAmount GetMinimumFee(const CWallet& wallet, unsigned int nTxBytes, unsigned int nConfirmTarget, const CTxMemPool& pool, CAmount targetFee);
+CAmount GetMinimumFee(const CWallet& wallet, unsigned int nTxBytes, unsigned int nConfirmTarget, const CTxMemPool& pool, CAmount targetFee);
 
 /**
  * Return the minimum required feerate taking into account the
