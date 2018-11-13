@@ -286,7 +286,6 @@ CScript COINBASE_FLAGS;
 
 const std::string strMessageMagic = "Bitcoin Signed Message:\n";
 
-extern bool IncomingBlockChecked(const CBlock &block, CValidationState &state);
 
 // Internal stuff
 namespace {
