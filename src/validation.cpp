@@ -17,6 +17,7 @@
 #include <cuckoocache.h>
 #include <hash.h>
 #include <index/txindex.h>
+#include <net_processing.h>
 #include <policy/fees.h>
 #include <policy/policy.h>
 #include <policy/rbf.h>
@@ -4935,7 +4936,7 @@ public:
 };
 std::list<DelayedBlock> list_delayed_blocks;
 
-extern void Misbehaving(NodeId nodeid, int howmuch, const std::string& message) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+//extern void Misbehaving(NodeId nodeid, int howmuch, const std::string& message) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 extern bool AddNodeHeader(NodeId node_id, const uint256 &hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 extern bool RemoveNodeHeader(const uint256 &hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 extern bool IncDuplicateHeaders(NodeId node_id) EXCLUSIVE_LOCKS_REQUIRED(cs_main);

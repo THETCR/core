@@ -49,6 +49,7 @@ Notes:
 #include <consensus/validation.h>
 #include <validation.h>
 #include <validationinterface.h>
+#include <net_processing.h>
 
 #include <sync.h>
 #include <random.h>
@@ -69,7 +70,7 @@ Notes:
 #include <smsg/crypter.h>
 #include <smsg/db.h>
 
-extern void Misbehaving(NodeId nodeid, int howmuch, const std::string& message);
+//extern void Misbehaving(NodeId nodeid, int howmuch, const std::string& message);
 extern CChain &chainActive;
 extern CCriticalSection cs_main;
 
