@@ -1699,12 +1699,11 @@ bool AppInitMain()
                 pcoinsTip.reset();
                 pcoinsdbview.reset();
                 pcoinscatcher.reset();
-                zerocoinDB.reset();
-                pSporkDB.reset();
 
                 //PIVX specific: zerocoin and spork DB's
-                *zerocoinDB = new CZerocoinDB(0, false, fReindex);
-                *pSporkDB = new CSporkDB(0, false, false);
+                zerocoinDB.reset(new CZerocoinDB(0, false, fReindex));
+                pSporkDB.reset(new CSporkDB(0, false, false));
+
                 // new CBlockTreeDB tries to delete the existing file, which
                 // fails if it's still open from the previous loop. Close it first:
                 pblocktree.reset();

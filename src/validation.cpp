@@ -284,8 +284,8 @@ std::atomic_bool g_is_mempool_loaded{false};
 
 /** Constant stuff for coinbase transactions we create: */
 CScript COINBASE_FLAGS;
-std::unique_ptr<CZerocoinDB> zerocoinDB = NULL;
-std::unique_ptr<CSporkDB> pSporkDB = NULL;
+std::unique_ptr<CZerocoinDB> zerocoinDB;
+std::unique_ptr<CSporkDB> pSporkDB;
 
 const std::string strMessageMagic = "Bitcoin Signed Message:\n";
 
