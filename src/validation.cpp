@@ -6745,6 +6745,6 @@ bool CoinStakeCache::InsertCoinStake(const uint256 &blockHash, const CTransactio
     return true;
 };
 
-const bool VerifyingDB(){
+bool VerifyingDB(){
     return fVerifyingDB;
 }
