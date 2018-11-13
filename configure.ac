@@ -1415,6 +1415,7 @@ if test x$bitcoin_enable_qt != xno; then
 fi
 
 AM_CONDITIONAL([ENABLE_ZMQ], [test "x$use_zmq" = "xyes"])
+
 # select bignum implementation
 case $set_bignum in
 gmp)
@@ -1568,8 +1569,8 @@ fi
 
 #ac_configure_args="${ac_configure_args} --disable-shared --with-pic --with-bignum=no --enable-module-recovery --disable-jni --enable-module-ecdh --enable-module-rangeproof --enable-module-generator --enable-module-mlsag --enable-experimental"
 #ac_configure_args="${ac_configure_args} --disable-shared --with-pic --with-bignum=no --enable-module-recovery --disable-jni --enable-module-ecdh --enable-module-rangeproof --enable-module-generator --enable-module-mlsag --enable-experimental --enable-endomorphism"
-#ac_configure_args="${ac_configure_args} --disable-shared --with-pic --with-bignum=auto --enable-module-recovery --disable-jni --enable-module-ecdh --enable-module-rangeproof --enable-module-generator --enable-module-mlsag --enable-experimental --enable-endomorphism"
-ac_configure_args="${ac_configure_args} --disable-shared --with-pic --enable-module-recovery"
+ac_configure_args="${ac_configure_args} --disable-shared --with-pic --with-bignum=yes --enable-module-recovery --disable-jni --enable-module-ecdh --enable-module-rangeproof --enable-module-generator --enable-module-mlsag --enable-experimental --enable-endomorphism"
+#ac_configure_args="${ac_configure_args} --disable-shared --with-pic --enable-module-recovery"
 
 AC_CONFIG_SUBDIRS([src/secp256k1])
 
@@ -1618,9 +1619,9 @@ echo "  build os      = $BUILD_OS"
 echo
 echo "  CC            = $CC"
 echo "  CFLAGS        = $CFLAGS"
-echo "  CPPFLAGS      = $DEBUG_CPPFLAGS $HARDENED_CPPFLAGS $CPPFLAGS"
+echo "  CPPFLAGS      = $CPPFLAGS $DEBUG_CPPFLAGS $HARDENED_CPPFLAGS"
 echo "  CXX           = $CXX"
 echo "  CXXFLAGS      = $DEBUG_CXXFLAGS $HARDENED_CXXFLAGS $WARN_CXXFLAGS $NOWARN_CXXFLAGS $ERROR_CXXFLAGS $GPROF_CXXFLAGS $CXXFLAGS"
-echo "  LDFLAGS       = $PTHREAD_CFLAGS $HARDENED_LDFLAGS $GPROF_LDFLAGS $LDFLAGS"
+echo "  LDFLAGS       = $LDFLAGS $PTHREAD_CFLAGS $HARDENED_LDFLAGS $GPROF_LDFLAGS"
 echo "  ARFLAGS       = $ARFLAGS"
 echo
