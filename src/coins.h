@@ -17,6 +17,7 @@
 #include <assert.h>
 #include <stdint.h>
 
+#include <undo.h>
 #include <unordered_map>
 #include <insight/addressindex.h>
 #include <insight/spentindex.h>
@@ -404,6 +405,7 @@ public:
 struct CCoinsCacheEntry
 {
     Coin coin; // The actual cached data.
+    CCoins coins; // The actual cached data.
     unsigned char flags;
 
     enum Flags {
