@@ -62,6 +62,7 @@
 #include <future>
 #include <sstream>
 #include <libzerocoin/Denominations.h>
+#include <invalid.h>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/thread.hpp>
@@ -1919,6 +1920,28 @@ void InitScriptExecutionCache() {
     size_t nElems = scriptExecutionCache.setup_bytes(nMaxCacheSize);
     LogPrintf("Using %zu MiB out of %zu/2 requested for script execution cache, able to store %zu elements\n",
             (nElems*sizeof(uint256)) >>20, (nMaxCacheSize*2)>>20, nElems);
+}
+bool ValidOutPoint(const COutPoint out, int nHeight)
+{
+    bool isInvalid = invalid_out::ContainsOutPoint(out);
+    return !isInvalid;
+}
+
+CAmount GetInvalidUTXOValue()
+{
+    CAmount nValue = 0;
+    for (auto out : invalid_out::setInvalidOutPoints) {
+        bool fSpent = false;
+        CCoinsViewCache cache(pcoinsTip.get());
+        const CCoins *coins = cache.AccessCoins(out.hash);
+        if(!coins || !coins->IsAvailable(out.n))
+            fSpent = true;
+
+        if (!fSpent)
+            nValue += coins->vout[out.n].nValue;
+    }
+
+    return nValue;
 }
 
 /**
@@ -4651,6 +4674,14 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
 
     return true;
 }
+bool IsBlockHashInChain(const uint256& hashBlock)
+{
+    if (hashBlock == 0 || !mapBlockIndex.count(hashBlock))
+        return false;
+
+    return chainActive.Contains(mapBlockIndex[hashBlock]);
+}
+
 bool IsTransactionInChain(const uint256& txId, int& nHeightTx, CTransactionRef& tx)
 {
     uint256 hashBlock;
