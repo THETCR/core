@@ -108,15 +108,6 @@ CCoinsMap::const_iterator CCoinsViewCache::FetchCoins(const uint256& txid) const
     }
     return ret;
 }
-bool CCoinsViewCache::GetCoins(const uint256& txid, CCoins& coins) const
-{
-    CCoinsMap::const_iterator it = FetchCoins(txid);
-    if (it != cacheCoins.end()) {
-        coins = it->second.coins;
-        return true;
-    }
-    return false;
-}
 CCoinsMap::iterator CCoinsViewCache::FetchCoin(const COutPoint &outpoint) const {
     CCoinsMap::iterator it = cacheCoins.find(outpoint);
     if (it != cacheCoins.end())
@@ -405,23 +396,7 @@ const Coin& AccessByTxid(const CCoinsViewCache& view, const uint256& txid)
     }
     return coinEmpty;
 }
-CCoinsMap::const_iterator CCoinsViewCache::FetchCoins(const uint256& txid) const
-{
-    CCoinsMap::iterator it = cacheCoins.find(txid);
-    if (it != cacheCoins.end())
-        return it;
-    CCoins tmp;
-    if (!base->GetCoins(txid, tmp))
-        return cacheCoins.end();
-    CCoinsMap::iterator ret = cacheCoins.insert(std::make_pair(txid, CCoinsCacheEntry())).first;
-    tmp.swap(ret->second.coins);
-    if (ret->second.coins.IsPruned()) {
-        // The parent only has an empty entry for this txid; we can consider our
-        // version as fresh.
-        ret->second.flags = CCoinsCacheEntry::FRESH;
-    }
-    return ret;
-}
+
 bool CCoinsViewCache::GetCoins(const uint256& txid, CCoins& coins) const
 {
     CCoinsMap::const_iterator it = FetchCoins(txid);

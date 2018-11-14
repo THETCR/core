@@ -9,6 +9,7 @@
 #include <primitives/transaction.h>
 #include <compressor.h>
 #include <core_memusage.h>
+#include <script/standard.h>
 #include <hash.h>
 #include <memusage.h>
 #include <serialize.h>
@@ -22,6 +23,7 @@
 #include <insight/spentindex.h>
 #include <rctindex.h>
 #include <undo.h>
+#include <boost/foreach.hpp>
 
 extern bool fParticlMode;
 
