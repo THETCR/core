@@ -149,6 +149,7 @@ test_test_wispr_fuzzy_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS
 
 test_test_wispr_fuzzy_LDADD = \
   $(LIBUNIVALUE) \
+  $(LIBWISPR_ZEROCOIN) \
   $(LIBWISPR_SERVER) \
   $(LIBWISPR_COMMON) \
   $(LIBWISPR_UTIL) \
