@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include <crypto/siphash.h>
 #include <bench/bench.h>
 #include <bloom.h>
 #include <hash.h>
