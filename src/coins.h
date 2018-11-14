@@ -17,7 +17,6 @@
 #include <assert.h>
 #include <stdint.h>
 
-#include <undo.h>
 #include <unordered_map>
 #include <insight/addressindex.h>
 #include <insight/spentindex.h>
@@ -26,7 +25,7 @@
 #include <boost/foreach.hpp>
 
 extern bool fParticlMode;
-
+class CTxInUndo;
 /**
  * A UTXO entry.
  *
