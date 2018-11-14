@@ -1454,9 +1454,11 @@ public:
     bool DatabaseMint(CDeterministicMint& dMint);
     bool SetMintUnspent(const CBigNum& bnSerial);
     bool UpdateMint(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom);
+    bool IsMyZerocoinSpend(const CBigNum& bnSerial) const;
+
     string GetUniqueWalletBackupName(bool fzwspAuto) const;
     int nStakeSetUpdateTime = 300; // 5 minutes
-
+    bool IsMyMint(const CBigNum& bnValue) const;
 
     /** Zerocin entry changed.
     * @note called with lock cs_wallet held.

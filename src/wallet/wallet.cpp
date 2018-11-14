@@ -1413,7 +1413,10 @@ isminetype CWallet::IsMine(const CTxIn &txin) const
     }
     return ISMINE_NO;
 }
-
+bool CWallet::IsMyZerocoinSpend(const CBigNum& bnSerial) const
+{
+    return zwspTracker->HasSerial(bnSerial);
+}
 // Note that this function doesn't distinguish between a 0-valued input,
 // and a not-"is mine" (according to the filter) input.
 CAmount CWallet::GetDebit(const CTxIn &txin, const isminefilter& filter) const
@@ -5808,7 +5811,7 @@ int CWallet::CountInputsWithAmount(CAmount nInputAmount)
                 int nDepth = pcoin->GetDepthInMainChain(false);
 
                 for (unsigned int i = 0; i < pcoin->tx->vout.size(); i++) {
-                    COutput out = COutput(pcoin, i, nDepth, true, true);
+                    COutput out = COutput(pcoin, i, nDepth, true, true, true);
                     COutPoint outpoint = COutPoint(out.tx->GetHash(), out.i);
 
                     if(out.tx->tx->vout[out.i].nValue != nInputAmount) continue;
