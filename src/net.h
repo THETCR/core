@@ -12,6 +12,7 @@
 #include <bloom.h>
 #include <compat.h>
 #include <crypto/siphash.h>
+#include <hash.h>
 #include <limitedmap.h>
 #include <netaddress.h>
 #include <policy/feerate.h>
