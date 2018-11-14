@@ -280,7 +280,7 @@ public:
         assert(fFirst || fSecond || nMaskCode);
         unsigned int nCode = 8 * (nMaskCode - (fFirst || fSecond ? 0 : 1)) + (fCoinBase ? 1 : 0) + (fCoinStake ? 2 : 0) + (fFirst ? 4 : 0) + (fSecond ? 8 : 0);
         // version
-        nSize += ::GetSerializeSize(VARINT(this->nVersion), nType, nVersion);
+        nSize += ::GetSerializeSize(VARINT(this->nVersion, VarIntMode::DEFAULT), nType, nVersion);
         // size of header code
         nSize += ::GetSerializeSize(VARINT(nCode), nType, nVersion);
         // spentness bitmask
