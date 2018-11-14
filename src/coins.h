@@ -445,6 +445,12 @@ private:
 class CCoinsView
 {
 public:
+    //! Retrieve the CCoins (unspent transaction outputs) for a given txid
+    virtual bool GetCoins(const uint256& txid, CCoins& coins) const;
+
+    //! Just check whether we have data for a given txid.
+    //! This may (but cannot always) return true for fully spent transactions
+    virtual bool HaveCoins(const uint256& txid) const;
     /** Retrieve the Coin (unspent transaction output) for a given outpoint.
      *  Returns true only when an unspent coin was found, which is returned in coin.
      *  When false is returned, coin's value is unspecified.
@@ -496,13 +502,13 @@ public:
     size_t EstimateSize() const override;
 };
 
-
 /** CCoinsView that adds a memory cache for transactions to another CCoinsView */
 class CCoinsViewCache : public CCoinsViewBacked
 {
 public:
 //protected:
-
+    /* Whether this cache has an active modifier. */
+    bool hasModifier;
     /**
      * Make mutable so that we can "fill the cache" even from Get-methods
      * declared as "const".
@@ -537,6 +543,7 @@ public:
 
 public:
     CCoinsViewCache(CCoinsView *baseIn);
+    ~CCoinsViewCache();
 
     /**
      * By deleting the copy constructor, we prevent accidentally using it when one intends to create a cache on top of a base cache.
@@ -544,6 +551,8 @@ public:
     CCoinsViewCache(const CCoinsViewCache &) = delete;
 
     // Standard CCoinsView methods
+    bool GetCoins(const uint256& txid, CCoins& coins) const;
+    bool HaveCoins(const uint256& txid) const;
     bool GetCoin(const COutPoint &outpoint, Coin &coin) const override;
     bool HaveCoin(const COutPoint &outpoint) const override;
     uint256 GetBestBlock() const override;
@@ -634,10 +643,32 @@ public:
     //! Check whether all prevouts of the transaction are present in the UTXO set represented by this view
     bool HaveInputs(const CTransaction& tx) const;
 
+    friend class CCoinsModifier;
+
 private:
+    CCoinsMap::iterator FetchCoins(const uint256& txid);
+    CCoinsMap::const_iterator FetchCoins(const uint256& txid) const;
     CCoinsMap::iterator FetchCoin(const COutPoint &outpoint) const;
 };
 
+/**
+ * A reference to a mutable cache entry. Encapsulating it allows us to run
+ *  cleanup code after the modification is finished, and keeping track of
+ *  concurrent modifications.
+ */
+class CCoinsModifier
+{
+private:
+    CCoinsViewCache& cache;
+    CCoinsMap::iterator it;
+    CCoinsModifier(CCoinsViewCache& cache_, CCoinsMap::iterator it_);
+
+public:
+    CCoins* operator->() { return &it->second.coins; }
+    CCoins& operator*() { return it->second.coins; }
+    ~CCoinsModifier();
+    friend class CCoinsViewCache;
+};
 //! Utility function to add all of a transaction's outputs to a cache.
 // When check is false, this assumes that overwrites are only possible for coinbase transactions.
 // When check is true, the underlying view may be queried to determine whether an addition is
