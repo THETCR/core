@@ -503,6 +503,29 @@ public:
     size_t EstimateSize() const override;
 };
 
+class CCoinsViewCache;
+
+/** Used as the flags parameter to sequence and nLocktime checks in non-consensus code. */
+static const unsigned int STANDARD_LOCKTIME_VERIFY_FLAGS = LOCKTIME_VERIFY_SEQUENCE |
+                                                           LOCKTIME_MEDIAN_TIME_PAST;
+/**
+ * A reference to a mutable cache entry. Encapsulating it allows us to run
+ *  cleanup code after the modification is finished, and keeping track of
+ *  concurrent modifications.
+ */
+class CCoinsModifier
+{
+private:
+    CCoinsViewCache& cache;
+    CCoinsMap::iterator it;
+    CCoinsModifier(CCoinsViewCache& cache_, CCoinsMap::iterator it_);
+
+public:
+    CCoins* operator->() { return &it->second.coins; }
+    CCoins& operator*() { return it->second.coins; }
+    ~CCoinsModifier();
+    friend class CCoinsViewCache;
+};
 /** CCoinsView that adds a memory cache for transactions to another CCoinsView */
 class CCoinsViewCache : public CCoinsViewBacked
 {
@@ -652,24 +675,6 @@ private:
     CCoinsMap::iterator FetchCoin(const COutPoint &outpoint) const;
 };
 
-/**
- * A reference to a mutable cache entry. Encapsulating it allows us to run
- *  cleanup code after the modification is finished, and keeping track of
- *  concurrent modifications.
- */
-class CCoinsModifier
-{
-private:
-    CCoinsViewCache& cache;
-    CCoinsMap::iterator it;
-    CCoinsModifier(CCoinsViewCache& cache_, CCoinsMap::iterator it_);
-
-public:
-    CCoins* operator->() { return &it->second.coins; }
-    CCoins& operator*() { return it->second.coins; }
-    ~CCoinsModifier();
-    friend class CCoinsViewCache;
-};
 //! Utility function to add all of a transaction's outputs to a cache.
 // When check is false, this assumes that overwrites are only possible for coinbase transactions.
 // When check is true, the underlying view may be queried to determine whether an addition is
