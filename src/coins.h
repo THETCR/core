@@ -21,11 +21,11 @@
 #include <insight/addressindex.h>
 #include <insight/spentindex.h>
 #include <rctindex.h>
+#include <undo.h>
 
 #include <boost/foreach.hpp>
 
 extern bool fParticlMode;
-class CTxInUndo;
 /**
  * A UTXO entry.
  *

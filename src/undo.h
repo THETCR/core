@@ -6,14 +6,13 @@
 #ifndef BITCOIN_UNDO_H
 #define BITCOIN_UNDO_H
 
-#include <coins.h>
 #include <compressor.h>
 #include <consensus/consensus.h>
 #include <primitives/transaction.h>
 #include <serialize.h>
 #include <version.h>
 
-
+class Coin;
 /** Undo information for a CTxIn
  *
  *  Contains the prevout's CTxOut being spent, and if this was the
