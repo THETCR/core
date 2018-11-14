@@ -21,7 +21,6 @@
 #include <insight/addressindex.h>
 #include <insight/spentindex.h>
 #include <rctindex.h>
-#include <undo.h>
 
 #include <boost/foreach.hpp>
 
@@ -686,5 +685,51 @@ void AddCoins(CCoinsViewCache& cache, const CTransaction& tx, int nHeight, bool 
 // which is not found in the cache, it can cause up to MAX_OUTPUTS_PER_BLOCK
 // lookups to database, so it should be used with care.
 const Coin& AccessByTxid(const CCoinsViewCache& cache, const uint256& txid);
+/** Undo information for a CTxIn
+ *
+ *  Contains the prevout's CTxOut being spent, and if this was the
+ *  last output of the affected transaction, its metadata as well
+ *  (coinbase or not, height, transaction version)
+ */
+class CTxInUndo
+{
+public:
+    CTxOut txout;   // the txout data before being spent
+    bool fCoinBase; // if the outpoint was the last unspent: whether it belonged to a coinbase
+    bool fCoinStake;
+    unsigned int nHeight; // if the outpoint was the last unspent: its height
+    int nVersion;         // if the outpoint was the last unspent: its version
 
+    CTxInUndo() : txout(), fCoinBase(false), fCoinStake(false), nHeight(0), nVersion(0) {}
+    CTxInUndo(const CTxOut& txoutIn, bool fCoinBaseIn = false, bool fCoinStakeIn = false, unsigned int nHeightIn = 0, int nVersionIn = 0) : txout(txoutIn), fCoinBase(fCoinBaseIn), fCoinStake(fCoinStakeIn), nHeight(nHeightIn), nVersion(nVersionIn) {}
+
+    unsigned int GetSerializeSize(int nType, int nVersion) const
+    {
+        return ::GetSerializeSize(VARINT(nHeight * 4 + (fCoinBase ? 2 : 0) + (fCoinStake ? 1 : 0)), nType, nVersion) +
+               (nHeight > 0 ? ::GetSerializeSize(VARINT(this->nVersion, VarIntMode::NONNEGATIVE_SIGNED), nType, nVersion) : 0) +
+               ::GetSerializeSize(CTxOutCompressor(REF(txout)), nType, nVersion);
+    }
+
+    template <typename Stream>
+    void Serialize(Stream& s, int nType, int nVersion) const
+    {
+        ::Serialize(s, VARINT(nHeight * 4 + (fCoinBase ? 2 : 0) + (fCoinStake ? 1 : 0)), nType, nVersion);
+        if (nHeight > 0)
+            ::Serialize(s, VARINT(this->nVersion, VarIntMode::NONNEGATIVE_SIGNED), nType, nVersion);
+        ::Serialize(s, CTxOutCompressor(REF(txout)), nType, nVersion);
+    }
+
+    template <typename Stream>
+    void Unserialize(Stream& s, int nType, int nVersion)
+    {
+        unsigned int nCode = 0;
+        ::Unserialize(s, VARINT(nCode), nType, nVersion);
+        nHeight = nCode >> 2;
+        fCoinBase = nCode & 2;
+        fCoinStake = nCode & 1;
+        if (nHeight > 0)
+            ::Unserialize(s, VARINT(this->nVersion, VarIntMode::NONNEGATIVE_SIGNED), nType, nVersion);
+        ::Unserialize(s, REF(CTxOutCompressor(REF(txout))), nType, nVersion);
+    }
+};
 #endif // BITCOIN_COINS_H
