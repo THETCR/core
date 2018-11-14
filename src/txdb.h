@@ -24,7 +24,7 @@
 #include <validation.h>
 #include <primitives/zerocoin.h>
 
-class CCoins;
+class Coin;
 class CBlockIndex;
 class CCoinsViewDBCursor;
 class uint256;

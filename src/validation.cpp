@@ -1933,12 +1933,12 @@ CAmount GetInvalidUTXOValue()
     for (auto out : invalid_out::setInvalidOutPoints) {
         bool fSpent = false;
         CCoinsViewCache cache(pcoinsTip.get());
-        const CCoins *coins = cache.AccessCoins(out.hash);
-        if(!coins || !coins->IsAvailable(out.n))
+        const Coin coins = cache.AccessCoin(out);
+        if(!coins || !coins.IsAvailable(out.n))
             fSpent = true;
 
         if (!fSpent)
-            nValue += coins->vout[out.n].nValue;
+            nValue += coins.out.nValue;
     }
 
     return nValue;
