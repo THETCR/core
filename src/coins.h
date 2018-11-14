@@ -576,8 +576,8 @@ public:
     CCoinsViewCache(const CCoinsViewCache &) = delete;
 
     // Standard CCoinsView methods
-    bool GetCoins(const uint256& txid, CCoins& coins) const;
-    bool HaveCoins(const uint256& txid) const;
+    bool GetCoins(const uint256& txid, CCoins& coins) const override;
+    bool HaveCoins(const uint256& txid) const override;
     bool GetCoin(const COutPoint &outpoint, Coin &coin) const override;
     bool HaveCoin(const COutPoint &outpoint) const override;
     uint256 GetBestBlock() const override;
