@@ -754,7 +754,7 @@ wispr_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 # wisprconsensus library #
 if BUILD_BITCOIN_LIBS
 include_HEADERS = script/wisprconsensus.h
-libwisprconsensus_la_SOURCES = $(crypto_libwispr_crypto_base_a_SOURCES) $(libwispr_consensus_a_SOURCES)
+libwisprconsensus_la_SOURCES = $(crypto_libwispr_crypto_base_a_SOURCES) $(libwispr_consensus_a_SOURCES) $(libzerocoin_libwispr_zerocoin_a_SOURCES)
 
 if GLIBC_BACK_COMPAT
   libwisprconsensus_la_SOURCES += compat/glibc_compat.cpp
