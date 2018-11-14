@@ -21,6 +21,7 @@
 #include <insight/addressindex.h>
 #include <insight/spentindex.h>
 #include <rctindex.h>
+#include <undo.h>
 
 extern bool fParticlMode;
 
