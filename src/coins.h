@@ -128,7 +128,7 @@ public:
     friend bool operator==(const Coin& a, const Coin& b)
     {
         // Empty CCoins objects are always equal.
-        if (a.out.IsNull() && b.out.IsNull())
+        if (a.IsSpent() && b.IsSpent())
             return true;
         return a.fCoinBase == b.fCoinBase &&
                a.fCoinStake == b.fCoinStake &&
