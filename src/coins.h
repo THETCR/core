@@ -46,6 +46,9 @@ public:
 
     uint8_t nType = OUTPUT_STANDARD;
     secp256k1_pedersen_commitment commitment;
+    //! version of the CTransaction; accesses to this value should probably check for nHeight as well,
+    //! as new tx version will probably only be introduced at certain heights
+    int nVersion;
 
     //! construct a Coin from a CTxOut and height/coinbase information.
     Coin(CTxOut&& outIn, int nHeightIn, bool fCoinBaseIn) : out(std::move(outIn)), fCoinBase(fCoinBaseIn), nHeight(nHeightIn) {}
@@ -71,7 +74,10 @@ public:
     void Clear() {
         out.SetNull();
         fCoinBase = false;
+        fCoinStake = false;
         nHeight = 0;
+        nHeight = 0;
+        nVersion = 0;
     }
 
     //! empty constructor
@@ -117,6 +123,22 @@ public:
     }
     size_t DynamicMemoryUsage() const {
         return memusage::DynamicUsage(out.scriptPubKey);
+    }
+    //! equality test
+    friend bool operator==(const Coin& a, const Coin& b)
+    {
+        // Empty CCoins objects are always equal.
+        if (a.out.IsNull() && b.out.IsNull())
+            return true;
+        return a.fCoinBase == b.fCoinBase &&
+               a.fCoinStake == b.fCoinStake &&
+               a.nHeight == b.nHeight &&
+               a.nVersion == b.nVersion &&
+               a.out == b.out;
+    }
+    friend bool operator!=(const Coin& a, const Coin& b)
+    {
+        return !(a == b);
     }
 };
 
