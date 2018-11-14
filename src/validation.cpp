@@ -291,6 +291,12 @@ std::unique_ptr<CSporkDB> pSporkDB;
 
 const std::string strMessageMagic = "Bitcoin Signed Message:\n";
 
+//!WISPR
+map<uint256, uint256> mapProofOfStake;
+set<pair<COutPoint, unsigned int> > setStakeSeen;
+map<unsigned int, unsigned int> mapHashedBlocks;
+unsigned int nStakeMinAge = 60 * 60;
+
 
 // Internal stuff
 namespace {
