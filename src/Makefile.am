@@ -342,9 +342,6 @@ libwispr_server_a_SOURCES = \
   obfuscation/privatesend.cpp \
   obfuscation/privatesend-server.cpp \
   pow.cpp \
-  zerocoin/accumulatorcheckpoints.cpp \
-  zerocoin/accumulatormap.cpp \
-  zerocoin/accumulators.cpp \
   pos/kernel.cpp \
   rest.cpp \
   rpc/anon.cpp \
