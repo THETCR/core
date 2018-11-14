@@ -6307,3 +6307,31 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block)
 
     return chainActive.Height() - pindex->nHeight + 1;
 }
+bool CWallet::GetMintFromStakeHash(const uint256& hashStake, CZerocoinMint& mint)
+{
+    CMintMeta meta;
+    if (!zwspTracker->GetMetaFromStakeHash(hashStake, meta))
+        return error("%s: failed to find meta associated with hashStake", __func__);
+    return GetMint(meta.hashSerial, mint);
+}
+bool CWallet::GetMint(const uint256& hashSerial, CZerocoinMint& mint)
+{
+    if (!zwspTracker->HasSerialHash(hashSerial))
+        return error("%s: serialhash %s is not in tracker", __func__, hashSerial.GetHex());
+
+    CHDWalletDB walletdb(this->GetDBHandle());
+    CMintMeta meta = zwspTracker->Get(hashSerial);
+    if (meta.isDeterministic) {
+        CDeterministicMint dMint;
+        if (!walletdb.ReadDeterministicMint(meta.hashPubcoin, dMint))
+            return error("%s: failed to read deterministic mint", __func__);
+        if (!zwalletMain->RegenerateMint(dMint, mint))
+            return error("%s: failed to generate mint", __func__);
+
+        return true;
+    } else if (!walletdb.ReadZerocoinMint(meta.hashPubcoin, mint)) {
+        return error("%s: failed to read zerocoinmint from database", __func__);
+    }
+
+    return true;
+}
