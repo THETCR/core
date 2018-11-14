@@ -249,7 +249,7 @@ std::set<CCmpPubKey> setConnectKi; // hacky workaround
 
 CBlockIndex *pindexBestHeader = nullptr;
 CWaitableCriticalSection g_best_block_mutex;
-//CConditionVariable g_best_block_cv;
+std::condition_variable g_best_block_cv;
 uint256 g_best_block;
 int nScriptCheckThreads = 0;
 std::atomic_bool fImporting(false);
