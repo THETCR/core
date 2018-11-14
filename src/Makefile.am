@@ -141,6 +141,7 @@ BITCOIN_CORE_H = \
   indirectmap.h \
   init.h \
   instantx.h \
+  invalid.cpp \
   anon.h \
   blind.h \
   interfaces/handler.h \
@@ -315,6 +316,7 @@ libwispr_server_a_SOURCES = \
   leveldbwrapper.cpp \
   init.cpp \
   instantx.cpp \
+  invalid.cpp \
   dbwrapper.cpp \
   governance/governance.cpp \
   governance/governance-classes.cpp \

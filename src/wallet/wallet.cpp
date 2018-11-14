@@ -79,6 +79,7 @@ CFeeRate CWallet::minTxFee = CFeeRate(DEFAULT_TRANSACTION_MINFEE);
  * Override with -fallbackfee
  */
 CFeeRate CWallet::fallbackFee = CFeeRate(DEFAULT_FALLBACK_FEE);
+CFeeRate payTxFee(DEFAULT_TRANSACTION_FEE);
 
 bool AddWallet(const std::shared_ptr<CWallet>& wallet)
 {
@@ -222,7 +223,15 @@ public:
     template<typename X>
     void operator()(const X &none) {}
 };
+int COutput::Priority() const
+{
+    for (const auto& d : CPrivateSend::GetStandardDenominations())
+        if(tx->tx->vout[i].nValue == d) return 10000;
+    if(tx->tx->vout[i].nValue < 1*COIN) return 20000;
 
+    //nondenom return largest first
+    return -(tx->tx->vout[i].nValue/COIN);
+}
 const CWalletTx* CWallet::GetWalletTx(const uint256& hash) const
 {
     LOCK(cs_wallet);
@@ -2911,7 +2920,14 @@ bool CWallet::SignTransaction(CMutableTransaction &tx)
     }
     return true;
 }
-
+struct CompareByPriority
+{
+    bool operator()(const COutput& t1,
+                    const COutput& t2) const
+    {
+        return t1.Priority() > t2.Priority();
+    }
+};
 bool CWallet::FundTransaction(CMutableTransaction& tx, CAmount& nFeeRet, int& nChangePosInOut, std::string& strFailReason, bool lockUnspents, const std::set<int>& setSubtractFeeFromOutputs, CCoinControl coinControl)
 {
     std::vector<CRecipient> vecSend;
@@ -5780,6 +5796,33 @@ CAmount CWallet::GetDenominatedBalance(bool unconfirmed) const
     return nTotal;
 }
 
+int CWallet::CountInputsWithAmount(CAmount nInputAmount)
+{
+    CAmount nTotal = 0;
+    {
+        LOCK2(cs_main, cs_wallet);
+        for (std::map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
+        {
+            const CWalletTx* pcoin = &(*it).second;
+            if (pcoin->IsTrusted()){
+                int nDepth = pcoin->GetDepthInMainChain(false);
+
+                for (unsigned int i = 0; i < pcoin->tx->vout.size(); i++) {
+                    COutput out = COutput(pcoin, i, nDepth, true, true);
+                    COutPoint outpoint = COutPoint(out.tx->GetHash(), out.i);
+
+                    if(out.tx->tx->vout[out.i].nValue != nInputAmount) continue;
+                    if(!CPrivateSend::IsDenominatedAmount(pcoin->tx->vout[i].nValue)) continue;
+                    if(IsSpent(out.tx->GetHash(), i) || IsMine(pcoin->tx->vout[i]) != ISMINE_SPENDABLE || !IsDenominated(outpoint)) continue;
+
+                    nTotal++;
+                }
+            }
+        }
+    }
+
+    return nTotal;
+}
 
 bool CWallet::HasCollateralInputs(bool fOnlyConfirmed) const
 {
@@ -6314,6 +6357,35 @@ bool CWallet::GetMintFromStakeHash(const uint256& hashStake, CZerocoinMint& mint
         return error("%s: failed to find meta associated with hashStake", __func__);
     return GetMint(meta.hashSerial, mint);
 }
+
+bool CWallet::IsMyMint(const CBigNum& bnValue) const
+{
+    if (zwspTracker->HasPubcoin(bnValue))
+        return true;
+
+    return zwalletMain->IsInMintPool(bnValue);
+}
+
+bool CWallet::UpdateMint(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom)
+{
+    uint256 hashValue = GetPubCoinHash(bnValue);
+    CZerocoinMint mint;
+    if (zwspTracker->HasPubcoinHash(hashValue)) {
+        CMintMeta meta = zwspTracker->GetMetaFromPubcoin(hashValue);
+        meta.nHeight = nHeight;
+        meta.txid = txid;
+        return zwspTracker->UpdateState(meta);
+    } else {
+        //Check if this mint is one that is in our mintpool (a potential future mint from our deterministic generation)
+        if (zwalletMain->IsInMintPool(bnValue)) {
+            if (zwalletMain->SetMintSeen(bnValue, nHeight, txid, denom))
+                return true;
+        }
+    }
+
+    return false;
+}
+
 bool CWallet::GetMint(const uint256& hashSerial, CZerocoinMint& mint)
 {
     if (!zwspTracker->HasSerialHash(hashSerial))
@@ -6334,4 +6406,58 @@ bool CWallet::GetMint(const uint256& hashSerial, CZerocoinMint& mint)
     }
 
     return true;
+}
+
+//! Primarily for the scenario that a mint was confirmed and added to the chain and then that block orphaned
+bool CWallet::SetMintUnspent(const CBigNum& bnSerial)
+{
+    uint256 hashSerial = GetSerialHash(bnSerial);
+    if (!zwspTracker->HasSerialHash(hashSerial))
+        return error("%s: did not find mint", __func__);
+
+    CMintMeta meta = zwspTracker->Get(hashSerial);
+    zwspTracker->SetPubcoinNotUsed(meta.hashPubcoin);
+    return true;
+}
+
+bool CWallet::DatabaseMint(CDeterministicMint& dMint)
+{
+    CHDWalletDB walletdb(this->GetDBHandle());
+    zwspTracker->Add(dMint, true);
+    return true;
+}
+bool CWallet::SelectCoinsDark(CAmount nValueMin, CAmount nValueMax, std::vector<CTxIn>& vecTxInRet, CAmount& nValueRet, int nPrivateSendRoundsMin, int nPrivateSendRoundsMax) const
+{
+    CCoinControl *coinControl=NULL;
+
+    vecTxInRet.clear();
+    nValueRet = 0;
+
+    std::vector<COutput> vCoins;
+    AvailableCoins(vCoins, true, coinControl, false, nPrivateSendRoundsMin < 0 ? ONLY_NONDENOMINATED : ONLY_DENOMINATED);
+
+    //order the array so largest nondenom are first, then denominations, then very small inputs.
+    std::sort(vCoins.rbegin(), vCoins.rend(), CompareByPriority());
+
+    for (const auto& out : vCoins)
+    {
+        //do not allow inputs less than 1/10th of minimum value
+        if(out.tx->tx->vout[out.i].nValue < nValueMin/10) continue;
+        //do not allow collaterals to be selected
+        if(CPrivateSend::IsCollateralAmount(out.tx->tx->vout[out.i].nValue)) continue;
+        if(fMasternodeMode && out.tx->tx->vout[out.i].nValue == 1000*COIN) continue; //masternode input
+
+        if(nValueRet + out.tx->tx->vout[out.i].nValue <= nValueMax){
+            CTxIn txin = CTxIn(out.tx->GetHash(),out.i);
+
+            int nRounds = GetOutpointPrivateSendRounds(txin.prevout);
+            if(nRounds >= nPrivateSendRoundsMax) continue;
+            if(nRounds < nPrivateSendRoundsMin) continue;
+
+            nValueRet += out.tx->tx->vout[out.i].nValue;
+            vecTxInRet.push_back(txin);
+        }
+    }
+
+    return nValueRet >= nValueMin;
 }

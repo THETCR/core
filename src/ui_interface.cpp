@@ -23,6 +23,7 @@ struct UISignals {
     boost::signals2::signal<CClientUIInterface::NotifyHeaderTipSig> NotifyHeaderTip;
     boost::signals2::signal<CClientUIInterface::BannedListChangedSig> BannedListChanged;
     boost::signals2::signal<CClientUIInterface::NotifyWaitingForDeviceSig> NotifyWaitingForDevice;
+    boost::signals2::signal<CClientUIInterface::NotifyWaitingForDeviceSig> NotifyAdditionalDataSyncProgressChanged;
 } g_ui_signals;
 
 #define ADD_SIGNALS_IMPL_WRAPPER(signal_name)                                                                 \
@@ -47,6 +48,7 @@ ADD_SIGNALS_IMPL_WRAPPER(NotifyBlockTip);
 ADD_SIGNALS_IMPL_WRAPPER(NotifyHeaderTip);
 ADD_SIGNALS_IMPL_WRAPPER(BannedListChanged);
 ADD_SIGNALS_IMPL_WRAPPER(NotifyWaitingForDevice);
+ADD_SIGNALS_IMPL_WRAPPER(NotifyAdditionalDataSyncProgressChanged);
 
 bool CClientUIInterface::ThreadSafeMessageBox(const std::string& message, const std::string& caption, unsigned int style) { return g_ui_signals.ThreadSafeMessageBox(message, caption, style); }
 bool CClientUIInterface::ThreadSafeQuestion(const std::string& message, const std::string& non_interactive_message, const std::string& caption, unsigned int style) { return g_ui_signals.ThreadSafeQuestion(message, non_interactive_message, caption, style); }
@@ -60,6 +62,7 @@ void CClientUIInterface::NotifyBlockTip(bool b, const CBlockIndex* i) { return g
 void CClientUIInterface::NotifyHeaderTip(bool b, const CBlockIndex* i) { return g_ui_signals.NotifyHeaderTip(b, i); }
 void CClientUIInterface::BannedListChanged() { return g_ui_signals.BannedListChanged(); }
 void CClientUIInterface::NotifyWaitingForDevice(bool b) { return g_ui_signals.NotifyWaitingForDevice(b); }
+void CClientUIInterface::NotifyAdditionalDataSyncProgressChanged(double b) { return g_ui_signals.NotifyAdditionalDataSyncProgressChanged(b); }
 
 
 bool InitError(const std::string& str)

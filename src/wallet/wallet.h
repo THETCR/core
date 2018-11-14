@@ -56,6 +56,8 @@ std::shared_ptr<CWallet> GetWallet(const std::string& name);
 //! Default for -keypool
 static const unsigned int DEFAULT_KEYPOOL_SIZE = 1000;
 //! -paytxfee default
+static const CAmount DEFAULT_TRANSACTION_FEE = 0;
+//! -paytxfee default
 constexpr CAmount DEFAULT_PAY_TX_FEE = 0;
 //! -fallbackfee default
 static const CAmount DEFAULT_FALLBACK_FEE = 1000;
@@ -681,6 +683,8 @@ public:
             nInputBytes = tx->GetSpendSize(i);
         }
     }
+    //Used with Darksend. Will return largest nondenom, then denominations, then very small inputs
+    int Priority() const;
 
     std::string ToString() const;
 
