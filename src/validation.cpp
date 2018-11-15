@@ -6790,3 +6790,93 @@ bool CoinStakeCache::InsertCoinStake(const uint256 &blockHash, const CTransactio
 bool VerifyingDB(){
     return fVerifyingDB;
 }
+/** Disconnect chainActive's tip. You probably want to call mempool.removeForReorg and manually re-limit mempool size after this, with cs_main held. */
+bool static DisconnectTip(CValidationState& state, const CChainParams& chainparams)
+{
+    CBlockIndex *pindexDelete = chainActive.Tip();
+    assert(pindexDelete);
+    // Read block from disk.
+    CBlock block;
+    if (!ReadBlockFromDisk(block, pindexDelete, chainparams.GetConsensus()))
+        return AbortNode(state, "Failed to read block");
+    // Apply the block atomically to the chain state.
+    int64_t nStart = GetTimeMicros();
+    {
+        CCoinsViewCache view(pcoinsTip.get());
+        if (DisconnectBlock(block, pindexDelete, view) != DISCONNECT_OK)
+            return error("DisconnectTip(): DisconnectBlock %s failed", pindexDelete->GetBlockHash().ToString());
+        bool flushed = view.Flush();
+        assert(flushed);
+    }
+//    LogPrint("bench", "- Disconnect block: %.2fms\n", (GetTimeMicros() - nStart) * 0.001);
+    // Write the chain state to disk, if necessary.
+    if (!FlushStateToDisk(chainparams, state, IF_NEEDED))
+        return false;
+    // Resurrect mempool transactions from the disconnected block.
+    std::vector<uint256> vHashUpdate;
+    for (const auto& it : block.vtx) {
+        const CTransaction& tx = *it;
+        // ignore validation errors in resurrected transactions
+        CValidationState stateDummy;
+        if (tx.IsCoinBase() || !AcceptToMemoryPool(mempool, stateDummy, it, false, NULL, NULL, true)) {
+            mempool.removeRecursive(tx, MemPoolRemovalReason::REORG);
+        } else if (mempool.exists(tx.GetHash())) {
+            vHashUpdate.push_back(tx.GetHash());
+        }
+    }
+    // AcceptToMemoryPool/addUnchecked all assume that new mempool entries have
+    // no in-mempool children, which is generally not true when adding
+    // previously-confirmed transactions back to the mempool.
+    // UpdateTransactionsFromBlock finds descendants of any transactions in this
+    // block that were added back and cleans up the mempool state.
+    mempool.UpdateTransactionsFromBlock(vHashUpdate);
+    // Update chainActive and related variables.
+    UpdateTip(pindexDelete->pprev, chainparams);
+    // Let wallets know transactions went from 1-confirmed to
+    // 0-confirmed or conflicted:
+    for (const CTransactionRef& tx : block.vtx) {
+        GetMainSignals().SyncTransaction(tx, pindexDelete->pprev, CMainSignals::SYNC_TRANSACTION_NOT_IN_BLOCK);
+    }
+    return true;
+}
+bool DisconnectBlocks(int blocks)
+{
+    LOCK(cs_main);
+
+    CValidationState state;
+    const CChainParams& chainparams = Params();
+
+    LogPrintf("DisconnectBlocks -- Got command to replay %d blocks\n", blocks);
+    for(int i = 0; i < blocks; i++) {
+        if(!DisconnectTip(state, chainparams) || !state.IsValid()) {
+            return false;
+        }
+    }
+
+    return true;
+}
+void ReprocessBlocks(int nBlocks)
+{
+    LOCK(cs_main);
+
+    std::map<uint256, int64_t>::iterator it = mapRejectedBlocks.begin();
+    while(it != mapRejectedBlocks.end()){
+        //use a window twice as large as is usual for the nBlocks we want to reset
+        if((*it).second  > GetTime() - (nBlocks*60*5)) {
+            BlockMap::iterator mi = mapBlockIndex.find((*it).first);
+            if (mi != mapBlockIndex.end() && (*mi).second) {
+
+                CBlockIndex* pindex = (*mi).second;
+                LogPrintf("ReprocessBlocks -- %s\n", (*it).first.ToString());
+
+                ResetBlockFailureFlags(pindex);
+            }
+        }
+        ++it;
+    }
+
+    DisconnectBlocks(nBlocks);
+
+    CValidationState state;
+    ActivateBestChain(state, Params());
+}

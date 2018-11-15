@@ -435,7 +435,7 @@ public:
     static CDarksendBroadcastTx GetDSTX(const uint256& hash);
 
     static void UpdatedBlockTip(const CBlockIndex *pindex);
-    static void SyncTransaction(const CTransaction& tx, const CBlockIndex *pindex, int posInBlock);
+    static void SyncTransaction(const CTransaction& tx, const CBlockIndex *pindex, int posInBlock, bool update_tx = true);
 };
 
 void ThreadCheckPrivateSend(CConnman& connman);

@@ -90,7 +90,7 @@ protected:
     virtual void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {}
     virtual void AcceptedBlockHeader(const CBlockIndex *pindexNew) {}
     virtual void NotifyHeaderTip(const CBlockIndex *pindexNew, bool fInitialDownload) {}
-    virtual void SyncTransaction(const CTransaction &tx, const CBlockIndex *pindex, int posInBlock) {}
+    virtual void SyncTransaction(const CTransactionRef &tx, const CBlockIndex *pindex, int posInBlock, bool update_tx = true) {}
     virtual void NotifyTransactionLock(const CTransaction &tx) {}
     /**
      * Notifies listeners of a transaction having been added to mempool.
@@ -186,7 +186,6 @@ public:
     void RegisterWithMempoolSignals(CTxMemPool& pool);
     /** Unregister with mempool */
     void UnregisterWithMempoolSignals(CTxMemPool& pool);
-    static const int SYNC_TRANSACTION_NOT_IN_BLOCK = -1;
 
     void UpdatedBlockTip(const CBlockIndex *, const CBlockIndex *, bool fInitialDownload);
     virtual void NotifyTransactionLock(const CTransaction &tx) {}
@@ -200,6 +199,18 @@ public:
 
     void TransactionAddedToWallet(const std::string &sWalletName, const CTransactionRef& tx);
     void NewSecureMessage(const smsg::SecureMessage *psmsg, const uint160 &hash);
+
+    /** A posInBlock value for SyncTransaction calls for tranactions not
+ * included in connected blocks such as transactions removed from mempool,
+ * accepted to mempool or appearing in disconnected blocks.*/
+    static const int SYNC_TRANSACTION_NOT_IN_BLOCK = -1;
+    /** Notifies listeners of updated transaction data (transaction, and
+     * optionally the block it is found in). Called with block data when
+     * transaction is included in a connected block, and without block data when
+     * transaction was accepted to mempool, removed from mempool (only when
+     * removal was due to conflict from connected block), or appeared in a
+     * disconnected block.*/
+    void SyncTransaction(const CTransactionRef &, const CBlockIndex *pindex, int posInBlock, bool update_tx = true);
 };
 
 CMainSignals& GetMainSignals();

@@ -46,7 +46,7 @@ struct MainSignalsInstance {
      * transaction was accepted to mempool, removed from mempool (only when
      * removal was due to conflict from connected block), or appeared in a
      * disconnected block.*/
-    boost::signals2::signal<void (const CTransaction &, const CBlockIndex *pindex, int posInBlock)> SyncTransaction;
+    boost::signals2::signal<void (const CTransactionRef &, const CBlockIndex *pindex, int posInBlock, bool update_tx)> SyncTransaction;
     /** Notifies listeners of an updated transaction lock without new data. */
     boost::signals2::signal<void (const CTransaction &)> NotifyTransactionLock;
     /** Notifies listeners of an updated transaction without new data (for now: a coinbase potentially becoming visible). */

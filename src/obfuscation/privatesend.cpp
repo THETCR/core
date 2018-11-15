@@ -497,7 +497,7 @@ void CPrivateSend::UpdatedBlockTip(const CBlockIndex *pindex)
     }
 }
 
-void CPrivateSend::SyncTransaction(const CTransaction& tx, const CBlockIndex *pindex, int posInBlock)
+void CPrivateSend::SyncTransaction(const CTransaction& tx, const CBlockIndex *pindex, int posInBlock, bool update_tx)
 {
     if (tx.IsCoinBase()) return;
 
