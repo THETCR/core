@@ -124,7 +124,7 @@ public:
     void Relay(const uint256& txHash, CConnman& connman);
 
     void UpdatedBlockTip(const CBlockIndex *pindex);
-    void SyncTransaction(const CTransactionRef& tx, const CBlockIndex *pindex, int posInBlock, bool update_tx);
+    void SyncTransaction(const CTransactionRef& tx, const CBlockIndex *pindex, int posInBlock, bool update_tx = true);
 
     std::string ToString();
 };
