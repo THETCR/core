@@ -210,7 +210,7 @@ public:
      * transaction was accepted to mempool, removed from mempool (only when
      * removal was due to conflict from connected block), or appeared in a
      * disconnected block.*/
-    void SyncTransaction(const CTransactionRef &, const CBlockIndex *pindex, int posInBlock, bool update_tx = true);
+    void SyncTransaction(const CTransactionRef &tx, const CBlockIndex *pindex, int posInBlock, bool update_tx = true);
 };
 
 CMainSignals& GetMainSignals();
