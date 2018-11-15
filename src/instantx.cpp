@@ -873,7 +873,7 @@ void CInstantSend::UpdatedBlockTip(const CBlockIndex *pindex)
     nCachedBlockHeight = pindex->nHeight;
 }
 
-void CInstantSend::SyncTransaction(const CTransactionRef& tx, const CBlockIndex *pindex, int posInBlock)
+void CInstantSend::SyncTransaction(const CTransactionRef& tx, const CBlockIndex *pindex, int posInBlock, bool update_tx)
 {
     // Update lock candidates and votes if corresponding tx confirmed
     // or went from confirmed to 0-confirmed or conflicted.

@@ -297,6 +297,7 @@ map<uint256, uint256> mapProofOfStake;
 set<pair<COutPoint, unsigned int> > setStakeSeen;
 map<unsigned int, unsigned int> mapHashedBlocks;
 unsigned int nStakeMinAge = 60 * 60;
+std::map<uint256, int64_t> mapRejectedBlocks GUARDED_BY(cs_main);
 
 
 // Internal stuff
