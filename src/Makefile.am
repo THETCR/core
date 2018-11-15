@@ -360,6 +360,7 @@ libwispr_server_a_SOURCES = \
   rpc/rpcutil.cpp \
   rpc/util.cpp \
   script/sigcache.cpp \
+  spork/spork.cpp \
   spork/sporkdb.cpp \
   shutdown.cpp \
   timedata.cpp \
@@ -600,8 +601,6 @@ libwispr_common_a_SOURCES = \
   script/ismine.cpp \
   script/sign.cpp \
   script/standard.cpp \
-  spork/spork.cpp \
-  spork/sporkdb.cpp \
   timedata.cpp \
   torcontrol.cpp \
   txdb.cpp \
