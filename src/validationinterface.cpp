@@ -106,6 +106,8 @@ void RegisterValidationInterface(CValidationInterface* pwalletIn) {
     g_signals.m_internals->NewPoWValidBlock.connect(boost::bind(&CValidationInterface::NewPoWValidBlock, pwalletIn, _1, _2));
     g_signals.m_internals->TransactionAddedToWallet.connect(boost::bind(&CValidationInterface::TransactionAddedToWallet, pwalletIn, _1, _2));
     g_signals.m_internals->NewSecureMessage.connect(boost::bind(&CValidationInterface::NewSecureMessage, pwalletIn, _1, _2));
+    g_signals.m_internals->SyncTransaction.connect(boost::bind(&CValidationInterface::SyncTransaction, pwalletIn, _1, _2, _3));
+
 }
 
 void UnregisterValidationInterface(CValidationInterface* pwalletIn) {
@@ -120,6 +122,8 @@ void UnregisterValidationInterface(CValidationInterface* pwalletIn) {
     g_signals.m_internals->NewPoWValidBlock.disconnect(boost::bind(&CValidationInterface::NewPoWValidBlock, pwalletIn, _1, _2));
     g_signals.m_internals->TransactionAddedToWallet.disconnect(boost::bind(&CValidationInterface::TransactionAddedToWallet, pwalletIn, _1, _2));
     g_signals.m_internals->NewSecureMessage.disconnect(boost::bind(&CValidationInterface::NewSecureMessage, pwalletIn, _1, _2));
+    g_signals.m_internals->SyncTransaction.disconnect(boost::bind(&CValidationInterface::SyncTransaction, pwalletIn, _1, _2, _3));
+
 }
 
 void UnregisterAllValidationInterfaces() {
@@ -136,6 +140,8 @@ void UnregisterAllValidationInterfaces() {
     g_signals.m_internals->UpdatedBlockTip.disconnect_all_slots();
     g_signals.m_internals->NewPoWValidBlock.disconnect_all_slots();
     g_signals.m_internals->NewSecureMessage.disconnect_all_slots();
+    g_signals.m_internals->SyncTransaction.disconnect_all_slots();
+
 }
 
 void CallFunctionInValidationInterfaceQueue(std::function<void ()> func) {
@@ -214,4 +220,7 @@ void CMainSignals::TransactionAddedToWallet(const std::string &sWalletName, cons
 void CMainSignals::NewSecureMessage(const smsg::SecureMessage *psmsg, const uint160 &hash)
 {
     m_internals->NewSecureMessage(psmsg, hash);
+};
+void CMainSignals::SyncTransaction(const CTransactionRef& tx, const CBlockIndex *pindex, int posInBlock, bool update_tx){
+    m_internals->SyncTransaction(tx, pindex, posInBlock, update_tx);
 };
