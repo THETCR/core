@@ -35,7 +35,7 @@ CAmount GetDustThreshold(const CTxOut& txout, const CFeeRate& dustRelayFeeIn)
     if (txout.scriptPubKey.IsUnspendable())
         return 0;
 
-    size_t nSize = GetSerializeSize(txout, SER_DISK, 0);
+    size_t nSize = GetSerializeSize(txout);
     int witnessversion = 0;
     std::vector<unsigned char> witnessprogram;
 
@@ -71,10 +71,11 @@ CAmount GetDustThreshold(const CTxOutStandard *txout, const CFeeRate& dustRelayF
     // so dust is a spendable txout less than
     // 98*dustRelayFee/1000 (in satoshis).
     // 294 satoshis at the default rate of 3000 sat/kB.
-    if (txout->scriptPubKey.IsUnspendable())
+    if (txout->scriptPubKey.IsUnspendable()) {
         return 0;
+    }
 
-    size_t nSize = GetSerializeSize(*txout, SER_DISK, 0);
+    size_t nSize = GetSerializeSize(*txout);
     int witnessversion = 0;
     std::vector<unsigned char> witnessprogram;
 
@@ -100,25 +101,23 @@ bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType)
 {
     const Consensus::Params& consensusParams = Params().GetConsensus();
 
-    if (chainActive.Time() >= consensusParams.OpIsCoinstakeTime)
-    {
+    if (chainActive.Time() >= consensusParams.OpIsCoinstakeTime) {
         // TODO: better method
-        if (HasIsCoinstakeOp(scriptPubKey))
-        {
+        if (HasIsCoinstakeOp(scriptPubKey)) {
             CScript scriptA, scriptB;
-            if (!SplitConditionalCoinstakeScript(scriptPubKey, scriptA, scriptB))
+            if (!SplitConditionalCoinstakeScript(scriptPubKey, scriptA, scriptB)) {
                 return false;
-
+            }
             return IsStandard(scriptA, whichType) && IsStandard(scriptB, whichType);
-        };
-    };
+        }
+    }
 
     std::vector<std::vector<unsigned char> > vSolutions;
-    if (!Solver(scriptPubKey, whichType, vSolutions))
-        return false;
+    whichType = Solver(scriptPubKey, vSolutions);
 
-    if (whichType == TX_MULTISIG)
-    {
+    if (whichType == TX_NONSTANDARD || whichType == TX_WITNESS_UNKNOWN) {
+        return false;
+    } else if (whichType == TX_MULTISIG) {
         unsigned char m = vSolutions.front()[0];
         unsigned char n = vSolutions.back()[0];
         // Support up to x-of-3 multisig txns as standard
@@ -127,10 +126,11 @@ bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType)
         if (m < 1 || m > n)
             return false;
     } else if (whichType == TX_NULL_DATA &&
-               (!fAcceptDatacarrier || scriptPubKey.size() > nMaxDatacarrierBytes))
+               (!fAcceptDatacarrier || scriptPubKey.size() > nMaxDatacarrierBytes)) {
           return false;
+    }
 
-    return whichType != TX_NONSTANDARD && whichType != TX_WITNESS_UNKNOWN;
+    return true;
 }
 
 bool IsStandardTx(const CTransaction& tx, std::string& reason)
@@ -287,15 +287,11 @@ bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs)
         const CTxOut& prev = mapInputs.AccessCoin(tx.vin[i].prevout).out;
 
         std::vector<std::vector<unsigned char> > vSolutions;
-        txnouttype whichType;
-        // get the scriptPubKey corresponding to this input:
-        const CScript& prevScript = prev.scriptPubKey;
-        if (!Solver(prevScript, whichType, vSolutions))
+        txnouttype whichType = Solver(prev.scriptPubKey, vSolutions);
+        if (whichType == TX_NONSTANDARD) {
             return false;
-
-        if (whichType == TX_SCRIPTHASH
-            || whichType == TX_SCRIPTHASH256)
-        {
+        } else if (whichType == TX_SCRIPTHASH
+            || whichType == TX_SCRIPTHASH256) {
             std::vector<std::vector<unsigned char> > stack;
             // convert the scriptSig into a stack, so we can inspect the redeemScript
             if (!EvalScript(stack, tx.vin[i].scriptSig, SCRIPT_VERIFY_NONE, BaseSignatureChecker(), SigVersion::BASE))
