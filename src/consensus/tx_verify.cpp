@@ -297,7 +297,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
         return state.DoS(10, false, REJECT_INVALID, "bad-txns-vin-empty");
 
     // Size limits (this doesn't take the witness into account, as that hasn't been checked for malleability)
-    if (::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT)
+    if (::GetSerializeSize(tx, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT)
         return state.DoS(100, false, REJECT_INVALID, "bad-txns-oversize");
 
     if (tx.IsParticlVersion())
@@ -396,7 +396,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
     state.fHasAnonOutput = false;
     state.fHasAnonInput = false;
 
-    // early out for wispr txns
+    // early out for particl txns
     if (tx.IsParticlVersion() && tx.vin.size() < 1) {
         return state.DoS(100, false, REJECT_INVALID, "bad-txn-no-inputs", false,
                          strprintf("%s: no inputs", __func__));
@@ -577,14 +577,14 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
         memset(blindPlain, 0, 32);
         if (nValueIn > 0)
         {
-            if (!secp256k1_pedersen_commit(secp256k1_ctx_blind, &plainInCommitment, blindPlain, (uint64_t) nValueIn, secp256k1_generator_h))
+            if (!secp256k1_pedersen_commit(secp256k1_ctx_blind, &plainInCommitment, blindPlain, (uint64_t) nValueIn, &secp256k1_generator_const_h, &secp256k1_generator_const_g))
                 return state.Invalid(false, REJECT_INVALID, "commit-failed");
             vpCommitsIn.push_back(&plainInCommitment);
         };
 
         if (nPlainValueOut > 0)
         {
-            if (!secp256k1_pedersen_commit(secp256k1_ctx_blind, &plainOutCommitment, blindPlain, (uint64_t) nPlainValueOut, secp256k1_generator_h))
+            if (!secp256k1_pedersen_commit(secp256k1_ctx_blind, &plainOutCommitment, blindPlain, (uint64_t) nPlainValueOut, &secp256k1_generator_const_h, &secp256k1_generator_const_g))
                 return state.Invalid(false, REJECT_INVALID, "commit-failed");
             vpCommitsOut.push_back(&plainOutCommitment);
         };
