@@ -418,6 +418,67 @@ void CTxMemPool::addUnchecked(const uint256& hash, const CTxMemPoolEntry &entry,
     vTxHashes.emplace_back(tx.GetWitnessHash(), newit);
     newit->vTxHashesIdx = vTxHashes.size() - 1;
 }
+void CTxMemPool::addUnchecked(const CTxMemPoolEntry &entry, setEntries &setAncestors, bool validFeeEstimate)
+{
+    NotifyEntryAdded(entry.GetSharedTx());
+    // Add to memory pool without checking anything.
+    // Used by AcceptToMemoryPool(), which DOES do
+    // all the appropriate checks.
+    indexed_transaction_set::iterator newit = mapTx.insert(entry).first;
+    mapLinks.insert(make_pair(newit, TxLinks()));
+
+    // Update transaction for any feeDelta created by PrioritiseTransaction
+    // TODO: refactor so that the fee delta is calculated before inserting
+    // into mapTx.
+    CAmount delta{0};
+    ApplyDelta(entry.GetTx().GetHash(), delta);
+    if (delta) {
+        mapTx.modify(newit, update_fee_delta(delta));
+    }
+
+    // Update cachedInnerUsage to include contained transaction's usage.
+    // (When we update the entry for in-mempool parents, memory usage will be
+    // further updated.)
+    cachedInnerUsage += entry.DynamicMemoryUsage();
+
+    const CTransaction& tx = newit->GetTx();
+    std::set<uint256> setParentTransactions;
+    for (unsigned int i = 0; i < tx.vin.size(); i++) {
+        if (tx.vin[i].IsAnonInput())
+            continue;
+        mapNextTx.insert(std::make_pair(&tx.vin[i].prevout, &tx));
+        setParentTransactions.insert(tx.vin[i].prevout.hash);
+    }
+    // Don't bother worrying about child transactions of this one.
+    // Normal case of a new transaction arriving is that there can't be any
+    // children, because such children would be orphans.
+    // An exception to that is if a transaction enters that used to be in a block.
+    // In that case, our disconnect block logic will call UpdateTransactionsFromBlock
+    // to clean up the mess we're leaving here.
+
+    // Update ancestors with information about this tx
+    for (const auto& pit : GetIterSet(setParentTransactions)) {
+        UpdateParent(newit, pit, true);
+    }
+    UpdateAncestorsOf(true, newit, setAncestors);
+    UpdateEntryForAncestors(newit, setAncestors);
+
+    nTransactionsUpdated++;
+    totalTxSize += entry.GetTxSize();
+    if (minerPolicyEstimator) {minerPolicyEstimator->processTransaction(entry, validFeeEstimate);}
+
+    vTxHashes.emplace_back(tx.GetWitnessHash(), newit);
+    newit->vTxHashesIdx = vTxHashes.size() - 1;
+}
+
+void CTxMemPool::addUnchecked(const CTxMemPoolEntry &entry, bool validFeeEstimate)
+{
+    setEntries setAncestors;
+    uint64_t nNoLimit = std::numeric_limits<uint64_t>::max();
+    std::string dummy;
+    CalculateMemPoolAncestors(entry, setAncestors, nNoLimit, nNoLimit, nNoLimit, nNoLimit, dummy);
+    return addUnchecked(entry, setAncestors, validFeeEstimate);
+}
 
 void CTxMemPool::addAddressIndex(const CTxMemPoolEntry &entry, const CCoinsViewCache &view)
 {
