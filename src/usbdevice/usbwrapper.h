@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PARTICL_USBDEVICE_USBWRAPPER_H
-#define PARTICL_USBDEVICE_USBWRAPPER_H
+#ifndef WISPR_USBDEVICE_USBWRAPPER_H
+#define WISPR_USBDEVICE_USBWRAPPER_H
 
 #include <libusb-1.0/libusb.h>
 
@@ -83,4 +83,4 @@ int webusb_read_timeout(webusb_device *dev, unsigned char *data, size_t length, 
 
 } // usb_device
 
-#endif // PARTICL_USBDEVICE_USBWRAPPER_H
+#endif // WISPR_USBDEVICE_USBWRAPPER_H

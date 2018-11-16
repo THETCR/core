@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PARTICL_WALLET_HDWALLETDB_H
-#define PARTICL_WALLET_HDWALLETDB_H
+#ifndef WISPR_WALLET_HDWALLETDB_H
+#define WISPR_WALLET_HDWALLETDB_H
 
 #include <amount.h>
 #include <primitives/transaction.h>
@@ -461,4 +461,4 @@ public:
 
 //void ThreadFlushHDWalletDB();
 
-#endif // PARTICL_WALLET_HDWALLETDB_H
+#endif // WISPR_WALLET_HDWALLETDB_H

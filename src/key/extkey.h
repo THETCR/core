@@ -3,8 +3,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PARTICL_KEY_EXTKEY_H
-#define PARTICL_KEY_EXTKEY_H
+#ifndef WISPR_KEY_EXTKEY_H
+#define WISPR_KEY_EXTKEY_H
 
 #include <util/system.h>
 #include <key.h>
@@ -901,5 +901,5 @@ std::string HDKeyIDToString(const CKeyID &id);
 
 std::string GetDefaultAccountPath();
 
-#endif // PARTICL_KEY_EXTKEY_H
+#endif // WISPR_KEY_EXTKEY_H
 

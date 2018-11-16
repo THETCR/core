@@ -1237,6 +1237,7 @@ protected:
     const int nVersion;
 public:
     explicit CSizeComputer(int nTypeIn, int nVersionIn) : nSize(0), nType(nTypeIn), nVersion(nVersionIn) {}
+    explicit CSizeComputer(int nVersionIn) : nSize(0), nType(0), nVersion(nVersionIn) {}
 
     void write(const char *psz, size_t _nSize)
     {

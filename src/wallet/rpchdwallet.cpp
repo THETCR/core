@@ -6532,7 +6532,7 @@ static UniValue createrawparttransaction(const JSONRPCRequest& request)
     UniValue outputs = request.params[1].get_array();
 
     CMutableTransaction rawTx;
-    rawTx.nVersion = PARTICL_TXN_VERSION;
+    rawTx.nVersion = WISPR_TXN_VERSION;
 
 
     if (!request.params[2].isNull()) {
@@ -6998,7 +6998,7 @@ static UniValue fundrawtransactionfrom(const JSONRPCRequest& request)
 
     // parse hex string from parameter
     CMutableTransaction tx;
-    tx.nVersion = PARTICL_TXN_VERSION;
+    tx.nVersion = WISPR_TXN_VERSION;
     if (!DecodeHexTx(tx, request.params[1].get_str(), true)) {
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
     }

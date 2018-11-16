@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PARTICL_WALLET_HDWALLET_H
-#define PARTICL_WALLET_HDWALLET_H
+#ifndef WISPR_WALLET_HDWALLET_H
+#define WISPR_WALLET_HDWALLET_H
 
 #include <wallet/wallet.h>
 #include <wallet/hdwalletdb.h>
@@ -856,5 +856,5 @@ CHDWallet *GetParticlWallet(CKeyStore *win);
 const CHDWallet *GetParticlWallet(const CKeyStore *win);
 
 
-#endif // PARTICL_WALLET_HDWALLET_H
+#endif // WISPR_WALLET_HDWALLET_H
 

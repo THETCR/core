@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PARTICL_QT_COLDSTAKINGDIALOG_H
-#define PARTICL_QT_COLDSTAKINGDIALOG_H
+#ifndef WISPR_QT_COLDSTAKINGDIALOG_H
+#define WISPR_QT_COLDSTAKINGDIALOG_H
 
 #include <QDialog>
 
@@ -34,4 +34,4 @@ private:
     Ui::ColdStakingDialog *ui;
 };
 
-#endif // PARTICL_QT_COLDSTAKINGDIALOG_H
+#endif // WISPR_QT_COLDSTAKINGDIALOG_H

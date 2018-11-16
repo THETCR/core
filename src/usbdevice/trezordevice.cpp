@@ -623,7 +623,7 @@ int CTrezorDevice::CompleteTransaction(CMutableTransaction *tx)
                 std::string s(txd->vData.begin(), txd->vData.end());
                 msg_output->set_op_return_data(s);
                 msg_output->set_amount(0);
-                msg_output->set_script_type(hw::trezor::messages::bitcoin::TxAck::TransactionType::TxOutputType::PAYTOPARTICLDATA);
+                msg_output->set_script_type(hw::trezor::messages::bitcoin::TxAck::TransactionType::TxOutputType::PAYTOWISPRDATA);
             } else {
                 return errorN(1, sError, __func__, "Unknown type of output %d.", i);
             }

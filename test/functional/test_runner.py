@@ -184,7 +184,7 @@ EXTENDED_SCRIPTS = [
     'feature_rbf.py',
 ]
 
-PARTICL_SCRIPTS = [
+WISPR_SCRIPTS = [
     'p2p_part_fork.py',
     'feature_part_pos.py',
     'feature_part_extkey.py',
@@ -216,7 +216,7 @@ INSIGHT_SCRIPTS = [
 ]
 
 # Place EXTENDED_SCRIPTS first since it has the 3 longest running tests
-ALL_SCRIPTS = EXTENDED_SCRIPTS + BASE_SCRIPTS + PARTICL_SCRIPTS + INSIGHT_SCRIPTS
+ALL_SCRIPTS = EXTENDED_SCRIPTS + BASE_SCRIPTS + WISPR_SCRIPTS + INSIGHT_SCRIPTS
 
 NON_SCRIPTS = [
     # These are python files that live in the functional tests directory, but are not test scripts.
@@ -308,7 +308,7 @@ def main():
         # Run all base tests, and optionally run extended tests.
         test_list = []
         if args.particl:
-            test_list += PARTICL_SCRIPTS
+            test_list += WISPR_SCRIPTS
         if args.insight:
             test_list += INSIGHT_SCRIPTS
         if args.bitcoin:
