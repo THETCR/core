@@ -401,6 +401,12 @@ public:
         return true;
     }
 
+    template <typename T>
+    unsigned int GetSerializeSize(const T& obj)
+    {
+        // Tells the size of the object if serialized to this stream
+        return ::GetSerializeSize(obj, nType, nVersion);
+    }
 
     //
     // Stream subset
