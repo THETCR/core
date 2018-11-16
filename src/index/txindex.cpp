@@ -283,12 +283,12 @@ bool TxIndex::WriteBlock(const CBlock& block, const CBlockIndex* pindex)
     vPos.reserve(block.vtx.size());
     for (const auto& tx : block.vtx) {
         vPos.emplace_back(tx->GetHash(), pos);
-        pos.nTxOffset += ::GetSerializeSize(*tx, SER_DISK, CLIENT_VERSION);
+        pos.nTxOffset += ::GetSerializeSize(*tx, CLIENT_VERSION);
     }
     return m_db->WriteTxs(vPos);
 }
 
-bool TxIndex::EraseBlock(const CBlock& block)
+bool TxIndex::DisconnectBlock(const CBlock& block)
 {
     if (!m_cs_index) {
         return true;
@@ -363,11 +363,7 @@ bool TxIndex::IndexCSOutputs(const CBlock& block, const CBlockIndex* pindex)
             ColdStakeIndexOutputValue ov;
             ColdStakeIndexLinkKey lk;
             lk.m_height = pindex->nHeight;
-
-            if (!Solver(scriptStake, lk.m_stake_type, vSolutions)) {
-                LogPrint(BCLog::COINDB, "%s: Failed to parse scriptStake.\n", __func__);
-                continue;
-            }
+            lk.m_stake_type = Solver(scriptStake, vSolutions);
 
             if (m_cs_index_whitelist.size() > 0
                 && !m_cs_index_whitelist.count(vSolutions[0])) {
@@ -382,15 +378,12 @@ bool TxIndex::IndexCSOutputs(const CBlock& block, const CBlockIndex* pindex)
             } else {
                 LogPrint(BCLog::COINDB, "%s: Ignoring unexpected stakescript type=%d.\n", __func__, lk.m_stake_type);
                 continue;
-            };
-
-            if (!Solver(scriptSpend, lk.m_spend_type, vSolutions)) {
-                LogPrint(BCLog::COINDB, "%s: Failed to parse spendscript.\n", __func__);
-                continue;
             }
 
-            if (lk.m_spend_type == TX_PUBKEYHASH || lk.m_spend_type == TX_SCRIPTHASH)
-            {
+
+            lk.m_spend_type = Solver(scriptSpend, vSolutions);
+
+            if (lk.m_spend_type == TX_PUBKEYHASH || lk.m_spend_type == TX_SCRIPTHASH) {
                 memcpy(lk.m_spend_id.begin(), vSolutions[0].data(), 20);
             } else
             if (lk.m_spend_type == TX_PUBKEYHASH256 || lk.m_spend_type == TX_SCRIPTHASH256) {

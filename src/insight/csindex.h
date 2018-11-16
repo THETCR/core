@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef WISPR_INSIGHT_CSINDEX_H
-#define WISPR_INSIGHT_CSINDEX_H
+#ifndef PARTICL_INSIGHT_CSINDEX_H
+#define PARTICL_INSIGHT_CSINDEX_H
 
 #include <script/standard.h>
 
@@ -98,4 +98,4 @@ public:
     }
 };
 
-#endif // WISPR_INSIGHT_CSINDEX_H
+#endif // PARTICL_INSIGHT_CSINDEX_H

@@ -65,7 +65,7 @@ bool BaseIndex::Init()
     return true;
 }
 
-static const CBlockIndex* NextSyncBlock(const CBlockIndex* pindex_prev)
+static const CBlockIndex* NextSyncBlock(const CBlockIndex* pindex_prev) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
     AssertLockHeld(cs_main);
 
@@ -192,7 +192,7 @@ void BaseIndex::BlockDisconnected(const std::shared_ptr<const CBlock> &pblock)
     if (!m_synced) {
         return;
     }
-    if (!EraseBlock(*pblock)) {
+    if (!DisconnectBlock(*pblock)) {
         FatalError("%s: Failed to erase block %s from index database",
                    __func__, pblock->GetHash().ToString());
         return;

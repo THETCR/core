@@ -2,11 +2,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef WISPR_INSIGHT_RPC_H
-#define WISPR_INSIGHT_RPC_H
+#ifndef PARTICL_INSIGHT_RPC_H
+#define PARTICL_INSIGHT_RPC_H
 
 class CRPCTable;
 
 void RegisterInsightRPCCommands(CRPCTable &t);
 
-#endif // WISPR_INSIGHT_RPC_H
+#endif // PARTICL_INSIGHT_RPC_H
