@@ -32,7 +32,7 @@
 #include "rpc/server.h"
 #include "scheduler.h"
 #include "ui_interface.h"
-#include "util.h"
+#include <util/system.h>
 
 #ifdef ENABLE_WALLET
 #include "wallet.h"

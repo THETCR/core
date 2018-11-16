@@ -12,7 +12,7 @@
 #include "masternode/masternode-sync.h"
 #include "masternode/masternodeman.h"
 #include "messagesigner.h"
-#include "util.h"
+#include <util/system.h>
 
 #include <univalue.h>
 
