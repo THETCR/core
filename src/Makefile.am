@@ -756,9 +756,8 @@ endif
 
 libwisprconsensus_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS)
 libwisprconsensus_la_LIBADD = $(LIBSECP256K1) $(BOOST_LIBS)
-libwisprconsensus_la_CPPFLAGS = -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL $(AM_CPPFLAGS)
+libwisprconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
 libwisprconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libwisprconsensus_la_LIBADD += secp256k1/libsecp256k1.la
 
 endif
 #
