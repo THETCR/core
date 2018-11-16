@@ -274,9 +274,4 @@ void ResetParams(std::string sNetworkId, bool fParticlModeIn);
  */
 CChainParams &RegtestParams();
 
-/**
- * Allows modifying the Version Bits regtest parameters.
- */
-void UpdateVersionBitsParameters(Consensus::DeploymentPos d, int64_t nStartTime, int64_t nTimeout);
-
 #endif // BITCOIN_CHAINPARAMS_H

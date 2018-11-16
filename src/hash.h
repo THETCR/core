@@ -116,7 +116,7 @@ inline uint256 Hash(const T1 pbegin, const T1 pend)
     static const unsigned char pblank[1] = {};
     uint256 result;
     CHash256().Write(pbegin == pend ? pblank : (const unsigned char*)&pbegin[0], (pend - pbegin) * sizeof(pbegin[0]))
-            .Finalize((unsigned char*)&result);
+              .Finalize((unsigned char*)&result);
     return result;
 }
 
@@ -127,7 +127,7 @@ inline uint256 HashSha256(const T1 pbegin, const T1 pend)
     static const unsigned char pblank[1] = {};
     uint256 result;
     CSHA256().Write(pbegin == pend ? pblank : (const unsigned char*)&pbegin[0], (pend - pbegin) * sizeof(pbegin[0]))
-            .Finalize((unsigned char*)&result);
+              .Finalize((unsigned char*)&result);
     return result;
 }
 
@@ -138,8 +138,8 @@ inline uint256 Hash(const T1 p1begin, const T1 p1end,
     static const unsigned char pblank[1] = {};
     uint256 result;
     CHash256().Write(p1begin == p1end ? pblank : (const unsigned char*)&p1begin[0], (p1end - p1begin) * sizeof(p1begin[0]))
-            .Write(p2begin == p2end ? pblank : (const unsigned char*)&p2begin[0], (p2end - p2begin) * sizeof(p2begin[0]))
-            .Finalize((unsigned char*)&result);
+              .Write(p2begin == p2end ? pblank : (const unsigned char*)&p2begin[0], (p2end - p2begin) * sizeof(p2begin[0]))
+              .Finalize((unsigned char*)&result);
     return result;
 }
 
@@ -150,7 +150,7 @@ inline uint160 Hash160(const T1 pbegin, const T1 pend)
     static unsigned char pblank[1] = {};
     uint160 result;
     CHash160().Write(pbegin == pend ? pblank : (const unsigned char*)&pbegin[0], (pend - pbegin) * sizeof(pbegin[0]))
-            .Finalize((unsigned char*)&result);
+              .Finalize((unsigned char*)&result);
     return result;
 }
 
@@ -185,7 +185,7 @@ public:
     void write(const char *pch, size_t size) {
         ctx.Write((const unsigned char*)pch, size);
     }
-
+    
     void read(const char *psz, size_t _nSize)
     {
         // do nothing, needed by CTxOutBaseCompressor

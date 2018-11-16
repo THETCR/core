@@ -129,7 +129,7 @@ struct CDiskBlockPos
 
     std::string ToString() const
     {
-        return strprintf("CBlockDiskPos(nFile=%i, nPos=%i)", nFile, nPos);
+        return strprintf("CDiskBlockPos(nFile=%i, nPos=%i)", nFile, nPos);
     }
 };
 
@@ -218,7 +218,7 @@ public:
     // proof-of-stake specific fields
     unsigned int nFlags;  // pos: block index flags
     uint64_t nStakeModifier; // hash modifier for proof-of-stake
-    uint256 bnStakeModifierV2;
+    uint256 bnStakeModifier;
     COutPoint prevoutStake;
     //uint256 hashProof;
     CAmount nMoneySupply;
@@ -268,7 +268,7 @@ public:
         nTimeMax = 0;
 
         nFlags = 0;
-        nStakeModifier = 0;
+        bnStakeModifier = uint256();
         prevoutStake.SetNull();
         nStakeModifierChecksum = 0;
         nStakeTime = 0;
@@ -510,7 +510,7 @@ public:
 
 
         READWRITE(nFlags);
-        READWRITE(nStakeModifier);
+        READWRITE(bnStakeModifier);
         READWRITE(prevoutStake);
         //READWRITE(hashProof);
         READWRITE(nMoneySupply);
