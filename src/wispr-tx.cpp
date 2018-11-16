@@ -32,6 +32,8 @@ static bool fCreateBlank;
 static std::map<std::string,UniValue> registers;
 static const int CONTINUE_EXECUTION=-1;
 
+const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
+
 static void SetupBitcoinTxArgs()
 {
     gArgs.AddArg("-?", "This help message", false, OptionsCategory::OPTIONS);
@@ -100,7 +102,7 @@ static int AppInitRawTx(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    fParticlMode = !gArgs.GetBoolArg("-legacymode", false); // qa tests
+    fParticlMode = !gArgs.GetBoolArg("-btcmode", false); // qa tests
     fCreateBlank = gArgs.GetBoolArg("-create", false);
 
     if (argc < 2 || HelpRequested(gArgs)) {
@@ -200,7 +202,7 @@ static CAmount ExtractAndValidateValue(const std::string& strValue)
 static void MutateTxVersion(CMutableTransaction& tx, const std::string& cmdVal)
 {
     int64_t newVersion;
-    if (!ParseInt64(cmdVal, &newVersion) || newVersion < 1 || newVersion > CTransaction::MAX_STANDARD_WISPR_VERSION)
+    if (!ParseInt64(cmdVal, &newVersion) || newVersion < 1 || newVersion > CTransaction::MAX_STANDARD_PARTICL_VERSION)
         throw std::runtime_error("Invalid TX version requested: '" + cmdVal + "'");
 
     if (!tx.IsParticlVersion() && IsParticlTxVersion(newVersion))
@@ -273,10 +275,10 @@ static void MutateTxAddInput(CMutableTransaction& tx, const std::string& strInpu
         throw std::runtime_error("TX input missing separator");
 
     // extract and validate TXID
-    std::string strTxid = vStrInputParts[0];
-    if ((strTxid.size() != 64) || !IsHex(strTxid))
+    uint256 txid;
+    if (!ParseHashStr(vStrInputParts[0], txid)) {
         throw std::runtime_error("invalid TX input txid");
-    uint256 txid(uint256S(strTxid));
+    }
 
     static const unsigned int minTxOutSz = 9;
     static const unsigned int maxVout = MAX_BLOCK_WEIGHT / (WITNESS_SCALE_FACTOR * minTxOutSz);
@@ -288,7 +290,7 @@ static void MutateTxAddInput(CMutableTransaction& tx, const std::string& strInpu
         throw std::runtime_error("invalid TX input vout '" + strVout + "'");
 
     // extract the optional sequence number
-    uint32_t nSequenceIn=std::numeric_limits<unsigned int>::max();
+    uint32_t nSequenceIn = CTxIn::SEQUENCE_FINAL;
     if (vStrInputParts.size() > 2)
         nSequenceIn = std::stoul(vStrInputParts[2]);
 
@@ -458,7 +460,7 @@ static void MutateTxAddOutMultiSig(CMutableTransaction& tx, const std::string& s
     if (vStrInputParts.size() < numkeys + 3)
         throw std::runtime_error("incorrect number of multisig pubkeys");
 
-    if (required < 1 || required > 20 || numkeys < 1 || numkeys > 20 || numkeys < required)
+    if (required < 1 || required > MAX_PUBKEYS_PER_MULTISIG || numkeys < 1 || numkeys > MAX_PUBKEYS_PER_MULTISIG || numkeys < required)
         throw std::runtime_error("multisig parameter mismatch. Required " \
                             + std::to_string(required) + " of " + std::to_string(numkeys) + "signatures.");
 
@@ -487,7 +489,7 @@ static void MutateTxAddOutMultiSig(CMutableTransaction& tx, const std::string& s
     CScript scriptPubKey = GetScriptForMultisig(required, pubkeys);
 
     if (bSegWit) {
-        for (CPubKey& pubkey : pubkeys) {
+        for (const CPubKey& pubkey : pubkeys) {
             if (!pubkey.IsCompressed()) {
                 throw std::runtime_error("Uncompressed pubkeys are not useable for SegWit outputs");
             }
@@ -714,7 +716,10 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
             if (!prevOut.checkObject(types))
                 throw std::runtime_error("prevtxs internal object typecheck fail");
 
-            uint256 txid = ParseHashStr(prevOut["txid"].get_str(), "txid");
+            uint256 txid;
+            if (!ParseHashStr(prevOut["txid"].get_str(), txid)) {
+                throw std::runtime_error("txid must be hexadecimal string (not '" + prevOut["txid"].get_str() + "')");
+            }
 
             const int nOut = prevOut["vout"].get_int();
             if (nOut < 0)
@@ -979,7 +984,7 @@ static int CommandLineRawTx(int argc, char* argv[])
         }
 
         CMutableTransaction tx;
-        tx.nVersion = CTransaction::CURRENT_WISPR_VERSION;
+        tx.nVersion = CTransaction::CURRENT_PARTICL_VERSION;
         int startArg;
 
         if (!fCreateBlank) {

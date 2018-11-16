@@ -11,6 +11,7 @@
 #include <clientversion.h>
 #include <compat.h>
 #include <fs.h>
+#include <interfaces/chain.h>
 #include <rpc/server.h>
 #include <init.h>
 #include <noui.h>
@@ -23,14 +24,16 @@
 
 #include <stdio.h>
 
+const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
+
 /* Introduction text for doxygen: */
 
 /*! \mainpage Developer documentation
  *
  * \section intro_sec Introduction
  *
- * This is the developer documentation of the reference client for an experimental new digital currency called Particl (https://www.wispr.io/),
- * which enables instant payments to anyone, anywhere in the world. Particl uses peer-to-peer technology to operate
+ * This is the developer documentation of the reference client for an experimental new digital currency called Wispr (https://www.wispr.io/),
+ * which enables instant payments to anyone, anywhere in the world. Wispr uses peer-to-peer technology to operate
  * with no central authority: managing transactions and issuing money are carried out collectively by the network.
  *
  * The software is a community-driven open source project, released under the MIT license.
@@ -60,6 +63,9 @@ extern int GetNewZMQKeypair(char *server_public_key, char *server_secret_key);
 //
 static bool AppInit(int argc, char* argv[])
 {
+    InitInterfaces interfaces;
+    interfaces.chain = interfaces::MakeChain();
+
     bool fRet = false;
 
     //
@@ -164,7 +170,7 @@ static bool AppInit(int argc, char* argv[])
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-            fprintf(stdout, "Particl server starting\n");
+            fprintf(stdout, "Wispr server starting\n");
 
             // Daemonize
             if (daemon(1, 0)) { // don't chdir (1), do close FDs (0)
@@ -187,11 +193,12 @@ static bool AppInit(int argc, char* argv[])
         }
 
 #ifdef WIN32
-        if (CreateMessageWindow() != 0)
+        if (CreateMessageWindow() != 0) {
             return false;
+        }
 #endif
 
-        fRet = AppInitMain();
+        fRet = AppInitMain(interfaces);
     }
     catch (const std::exception& e) {
         PrintExceptionContinue(&e, "AppInit()");
@@ -205,13 +212,17 @@ static bool AppInit(int argc, char* argv[])
     } else {
         WaitForShutdown();
     }
-    Shutdown();
+    Shutdown(interfaces);
 
     return fRet;
 }
 
 int main(int argc, char* argv[])
 {
+#ifdef WIN32
+    util::WinCmdLineArgs winArgs;
+    std::tie(argc, argv) = winArgs.get();
+#endif
     SetupEnvironment();
 
     // Connect bitcoind signal handlers

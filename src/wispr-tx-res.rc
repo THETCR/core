@@ -16,8 +16,8 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Particl"
-            VALUE "FileDescription",    "wispr-tx (CLI Particl transaction editor utility)"
+            VALUE "CompanyName",        "Wispr"
+            VALUE "FileDescription",    "wispr-tx (CLI Wispr transaction editor utility)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "wispr-tx"
             VALUE "LegalCopyright",     COPYRIGHT_STR
