@@ -198,7 +198,7 @@ void AdvertiseLocal(CNode *pnode)
         // tells us that it sees us as in case it has a better idea of our
         // address than we do.
         if (IsPeerAddrLocalGood(pnode) && (!addrLocal.IsRoutable() ||
-                                           GetRand((GetnScore(addrLocal) > LOCAL_MANUAL) ? 8:2) == 0))
+             GetRand((GetnScore(addrLocal) > LOCAL_MANUAL) ? 8:2) == 0))
         {
             addrLocal.SetIP(pnode->GetAddrLocal());
         }
@@ -309,7 +309,7 @@ CNode* CConnman::FindNode(const CNetAddr& ip)
 {
     LOCK(cs_vNodes);
     for (CNode* pnode : vNodes) {
-        if (static_cast<CNetAddr>(pnode->addr) == ip) {
+      if (static_cast<CNetAddr>(pnode->addr) == ip) {
             return pnode;
         }
     }
@@ -392,8 +392,8 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
 
     /// debug print
     LogPrint(BCLog::NET, "trying connection %s lastseen=%.1fhrs\n",
-             pszDest ? pszDest : addrConnect.ToString(),
-             pszDest ? 0.0 : (double)(GetAdjustedTime() - addrConnect.nTime)/3600.0);
+        pszDest ? pszDest : addrConnect.ToString(),
+        pszDest ? 0.0 : (double)(GetAdjustedTime() - addrConnect.nTime)/3600.0);
 
     // Resolve
     const int default_port = Params().GetDefaultPort();
@@ -488,7 +488,7 @@ void CConnman::DumpBanlist()
     }
 
     LogPrint(BCLog::NET, "Flushed %d banned node ips/subnets to banlist.dat  %dms\n",
-             banmap.size(), GetTimeMillis() - nStart);
+        banmap.size(), GetTimeMillis() - nStart);
 }
 
 void CNode::CloseSocketDisconnect()
@@ -1710,7 +1710,7 @@ void CConnman::DumpAddresses()
     adb.Write(addrman);
 
     LogPrint(BCLog::NET, "Flushed %d addresses to peers.dat  %dms\n",
-             addrman.size(), GetTimeMillis() - nStart);
+           addrman.size(), GetTimeMillis() - nStart);
 }
 
 void CConnman::DumpData()
@@ -2345,8 +2345,8 @@ bool CConnman::Start(CScheduler& scheduler, const Options& connOptions)
     if (fListen && !InitBinds(connOptions.vBinds, connOptions.vWhiteBinds)) {
         if (clientInterface) {
             clientInterface->ThreadSafeMessageBox(
-                    _("Failed to listen on any port. Use -listen=0 if you want this."),
-                    "", CClientUIInterface::MSG_ERROR);
+                _("Failed to listen on any port. Use -listen=0 if you want this."),
+                "", CClientUIInterface::MSG_ERROR);
         }
         return false;
     }
@@ -2382,7 +2382,7 @@ bool CConnman::Start(CScheduler& scheduler, const Options& connOptions)
         SweepBanned(); // sweep out unused entries
 
         LogPrint(BCLog::NET, "Loaded %d banned node ips/subnets from banlist.dat  %dms\n",
-                 banmap.size(), GetTimeMillis() - nStart);
+            banmap.size(), GetTimeMillis() - nStart);
     } else {
         LogPrintf("Invalid or missing banlist.dat; recreating\n");
         SetBannedSetDirty(true); // force write
@@ -2429,8 +2429,8 @@ bool CConnman::Start(CScheduler& scheduler, const Options& connOptions)
     if (connOptions.m_use_addrman_outgoing && !connOptions.m_specified_outgoing.empty()) {
         if (clientInterface) {
             clientInterface->ThreadSafeMessageBox(
-                    _("Cannot provide specific connections and have addrman find outgoing connections at the same."),
-                    "", CClientUIInterface::MSG_ERROR);
+                _("Cannot provide specific connections and have addrman find outgoing connections at the same."),
+                "", CClientUIInterface::MSG_ERROR);
         }
         return false;
     }
@@ -2459,7 +2459,7 @@ public:
 #endif
     }
 }
-        instance_of_cnetcleanup;
+instance_of_cnetcleanup;
 
 void CConnman::Interrupt()
 {
@@ -2837,18 +2837,18 @@ unsigned int CConnman::GetReceiveFloodSize() const { return nReceiveFloodSize; }
 unsigned int CConnman::GetSendBufferSize() const{ return nSendBufferMaxSize; }
 
 CNode::CNode(NodeId idIn, ServiceFlags nLocalServicesIn, int nMyStartingHeightIn, SOCKET hSocketIn, const CAddress& addrIn, uint64_t nKeyedNetGroupIn, uint64_t nLocalHostNonceIn, const CAddress &addrBindIn, const std::string& addrNameIn, bool fInboundIn) :
-        nTimeConnected(GetSystemTimeInSeconds()),
-        addr(addrIn),
-        addrBind(addrBindIn),
-        fInbound(fInboundIn),
-        nKeyedNetGroup(nKeyedNetGroupIn),
-        addrKnown(5000, 0.001),
-        filterInventoryKnown(50000, 0.000001),
-        id(idIn),
-        nLocalHostNonce(nLocalHostNonceIn),
-        nLocalServices(nLocalServicesIn),
-        nMyStartingHeight(nMyStartingHeightIn),
-        nSendVersion(0)
+    nTimeConnected(GetSystemTimeInSeconds()),
+    addr(addrIn),
+    addrBind(addrBindIn),
+    fInbound(fInboundIn),
+    nKeyedNetGroup(nKeyedNetGroupIn),
+    addrKnown(5000, 0.001),
+    filterInventoryKnown(50000, 0.000001),
+    id(idIn),
+    nLocalHostNonce(nLocalHostNonceIn),
+    nLocalServices(nLocalServicesIn),
+    nMyStartingHeight(nMyStartingHeightIn),
+    nSendVersion(0)
 {
     nServices = NODE_NONE;
     hSocket = hSocketIn;

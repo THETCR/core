@@ -207,7 +207,7 @@ class CSizeComputer;
 enum
 {
     // primary actions
-            SER_NETWORK         = (1 << 0),
+    SER_NETWORK         = (1 << 0),
     SER_DISK            = (1 << 1),
     SER_GETHASH         = (1 << 2),
 };
@@ -227,14 +227,14 @@ template<typename X> const X& ReadWriteAsHelper(const X& x) { return x; }
  * code. Adding "ADD_SERIALIZE_METHODS" in the body of the class causes these wrappers to be
  * added as members.
  */
-#define ADD_SERIALIZE_METHODS                                                         \
-    template<typename Stream>                                                         \
-    void Serialize(Stream& s) const {                                                 \
-        NCONST_PTR(this)->SerializationOp(s, CSerActionSerialize());                  \
-    }                                                                                 \
-    template<typename Stream>                                                         \
-    void Unserialize(Stream& s) {                                                     \
-        SerializationOp(s, CSerActionUnserialize());                                  \
+#define ADD_SERIALIZE_METHODS                                         \
+    template<typename Stream>                                         \
+    void Serialize(Stream& s) const {                                 \
+        NCONST_PTR(this)->SerializationOp(s, CSerActionSerialize());  \
+    }                                                                 \
+    template<typename Stream>                                         \
+    void Unserialize(Stream& s) {                                     \
+        SerializationOp(s, CSerActionUnserialize());                  \
     }
 
 #ifndef CHAR_EQUALS_INT8
@@ -382,8 +382,8 @@ uint64_t ReadCompactSize(Stream& is)
         if (nSizeRet < 0x100000000ULL)
             throw std::ios_base::failure("non-canonical ReadCompactSize()");
     }
-    if (nSizeRet > (uint64_t)MAX_SIZE)
-        throw std::ios_base::failure("ReadCompactSize(): size too large");
+    //if (nSizeRet > (uint64_t)MAX_SIZE)
+    //    throw std::ios_base::failure("ReadCompactSize(): size too large");
     return nSizeRet;
 }
 
@@ -475,7 +475,7 @@ I ReadVarInt(Stream& is)
     while(true) {
         unsigned char chData = ser_readdata8(is);
         if (n > (std::numeric_limits<I>::max() >> 7)) {
-            throw std::ios_base::failure("ReadVarInt(): size too large");
+           throw std::ios_base::failure("ReadVarInt(): size too large");
         }
         n = (n << 7) | (chData & 0x7F);
         if (chData & 0x80) {
@@ -488,6 +488,7 @@ I ReadVarInt(Stream& is)
         }
     }
 }
+
 inline int PutVarInt(std::vector<uint8_t> &v, uint64_t i)
 {
     uint8_t b = i & 0x7F;
@@ -514,6 +515,7 @@ inline int PutVarInt(uint8_t *p, uint64_t i)
     nBytes++;
     return nBytes;
 };
+
 inline int GetVarInt(const std::vector<uint8_t> &v, size_t ofs, uint64_t &i, size_t &nB)
 {
     size_t ml = v.size() - ofs;
@@ -1071,8 +1073,6 @@ void Unserialize(Stream& is, std::pair<K, T>& item)
     Unserialize(is, item.second);
 }
 
-
-
 /**
  * map
  */
@@ -1241,6 +1241,11 @@ public:
     void write(const char *psz, size_t _nSize)
     {
         this->nSize += _nSize;
+    }
+
+    void read(const char *psz, size_t _nSize)
+    {
+        // do nothing, needed by CTxOutBaseCompressor
     }
 
     /** Pretend _nSize bytes are written, without specifying them. */

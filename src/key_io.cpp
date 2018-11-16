@@ -4,6 +4,9 @@
 
 #include <key_io.h>
 
+#include <base58.h>
+#include <bech32.h>
+#include <script/script.h>
 #include <util/strencodings.h>
 #include <insight/addressindex.h>
 
@@ -24,7 +27,7 @@ private:
     bool m_stake_only;
 
 public:
-    DestinationEncoder(const CChainParams& params, bool fBech32=false, bool stake_only=false) : m_params(params), m_bech32(fBech32), m_stake_only(stake_only) {}
+    explicit DestinationEncoder(const CChainParams& params, bool fBech32=false, bool stake_only=false) : m_params(params), m_bech32(fBech32), m_stake_only(stake_only) {}
 
     std::string operator()(const CKeyID& id) const
     {

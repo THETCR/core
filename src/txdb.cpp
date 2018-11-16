@@ -24,15 +24,15 @@ using namespace std;
 using namespace libzerocoin;
 
 static const char DB_COIN = 'C';
-static const char DB_COINS = 'c';
+//static const char DB_COINS = 'c';
 static const char DB_BLOCK_FILES = 'f';
-static const char DB_TXINDEX = 't';
+//static const char DB_TXINDEX = 't';
 static const char DB_ADDRESSINDEX = 'a';
 static const char DB_ADDRESSUNSPENTINDEX = 'u';
 static const char DB_TIMESTAMPINDEX = 's';
 static const char DB_BLOCKHASHINDEX = 'z';
 static const char DB_SPENTINDEX = 'p';
-static const char DB_TXINDEX_BLOCK = 'T';
+//static const char DB_TXINDEX_BLOCK = 'T';
 static const char DB_BLOCK_INDEX = 'b';
 
 static const char DB_BEST_BLOCK = 'B';
@@ -446,8 +446,8 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 pindexNew->nStatus                  = diskindex.nStatus;
                 pindexNew->nTx                      = diskindex.nTx;
 
-                pindexNew->nFlags                   = diskindex.nFlags;
-                pindexNew->nStakeModifier          = diskindex.nStakeModifier;
+                pindexNew->nFlags                   = diskindex.nFlags & ~BLOCK_DELAYED;
+                pindexNew->bnStakeModifier          = diskindex.bnStakeModifier;
                 pindexNew->prevoutStake             = diskindex.prevoutStake;
                 //pindexNew->hashProof                = diskindex.hashProof;
 

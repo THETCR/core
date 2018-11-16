@@ -29,7 +29,6 @@
 #include <thread>
 #include <memory>
 #include <condition_variable>
-#include <mutex>
 
 #ifndef WIN32
 #include <arpa/inet.h>
@@ -200,8 +199,7 @@ public:
     bool GetNetworkActive() const { return fNetworkActive; };
     bool GetUseAddrmanOutgoing() const { return m_use_addrman_outgoing; };
     void SetNetworkActive(bool active);
-    bool OpenMasternodeConnection(const CAddress& addrConnect);
-    bool OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound = nullptr, const char *strDest = nullptr, bool fOneShot = false, bool fFeeler = false, bool manual_connection = false, bool fConnectToMasternode = false);
+    void OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound = nullptr, const char *strDest = nullptr, bool fOneShot = false, bool fFeeler = false, bool manual_connection = false);
     bool CheckIncomingNonce(uint64_t nonce);
     void RelayTransaction(const CTransaction& tx);
     void RelayInv(CInv &inv, const int minProtoVersion = MIN_PEER_PROTO_VERSION);
@@ -210,6 +208,7 @@ public:
     void ReleaseNodeVector(const std::vector<CNode*>& vecNodes);
 
     bool ForNode(NodeId id, std::function<bool(CNode* pnode)> func);
+
     void PushMessage(CNode* pnode, CSerializedNetMsg&& msg);
     bool ForNode(NodeId id, std::function<bool(const CNode* pnode)> cond, std::function<bool(CNode* pnode)> func);
 

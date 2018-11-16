@@ -38,17 +38,6 @@ CBloomFilter::CBloomFilter(const unsigned int nElements, const double nFPRate, c
 {
 }
 
-// Private constructor used by CRollingBloomFilter
-CBloomFilter::CBloomFilter(const unsigned int nElements, const double nFPRate, const unsigned int nTweakIn) :
-    vData((unsigned int)(-1  / LN2SQUARED * nElements * log(nFPRate)) / 8),
-    isFull(false),
-    isEmpty(true),
-    nHashFuncs((unsigned int)(vData.size() * 8 / nElements * LN2)),
-    nTweak(nTweakIn),
-    nFlags(BLOOM_UPDATE_NONE)
-{
-}
-
 inline unsigned int CBloomFilter::Hash(unsigned int nHashNum, const std::vector<unsigned char>& vDataToHash) const
 {
     // 0xFBA4C795 chosen as it guarantees a reasonable bit difference between nHashNum values.
@@ -164,19 +153,18 @@ bool CBloomFilter::IsRelevantAndUpdate(const CTransaction& tx)
                     insert(COutPoint(hash, i));
                 else if ((nFlags & BLOOM_UPDATE_MASK) == BLOOM_UPDATE_P2PUBKEY_ONLY)
                 {
-                    txnouttype type;
                     std::vector<std::vector<unsigned char> > vSolutions;
-                    if (Solver(txout.scriptPubKey, type, vSolutions) &&
-                            (type == TX_PUBKEY || type == TX_MULTISIG))
+                    txnouttype type = Solver(txout.scriptPubKey, vSolutions);
+                    if (type == TX_PUBKEY || type == TX_MULTISIG) {
                         insert(COutPoint(hash, i));
+                    }
                 }
                 break;
             }
         }
     }
 
-    for (unsigned int i = 0; i < tx.vpout.size(); i++)
-    {
+    for (unsigned int i = 0; i < tx.vpout.size(); i++) {
         const CScript *pscript = tx.vpout[i]->GetPScriptPubKey();
         if (!pscript)
             continue;
@@ -199,11 +187,11 @@ bool CBloomFilter::IsRelevantAndUpdate(const CTransaction& tx)
                     insert(COutPoint(hash, i));
                 else if ((nFlags & BLOOM_UPDATE_MASK) == BLOOM_UPDATE_P2PUBKEY_ONLY)
                 {
-                    txnouttype type;
                     std::vector<std::vector<unsigned char> > vSolutions;
-                    if (Solver(*pscript, type, vSolutions) &&
-                            (type == TX_PUBKEY || type == TX_MULTISIG))
+                    txnouttype type = Solver(*pscript, vSolutions);
+                    if (type == TX_PUBKEY || type == TX_MULTISIG) {
                         insert(COutPoint(hash, i));
+                    }
                 }
                 break;
             }

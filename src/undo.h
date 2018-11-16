@@ -13,8 +13,6 @@
 #include <serialize.h>
 #include <version.h>
 
-
-
 /** Undo information for a CTxIn
  *
  *  Contains the prevout's CTxOut being spent, and its metadata as well
@@ -118,4 +116,5 @@ public:
         READWRITE(vtxundo);
     }
 };
+
 #endif // BITCOIN_UNDO_H
