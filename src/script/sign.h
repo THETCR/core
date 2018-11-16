@@ -21,6 +21,12 @@ class CTransaction;
 
 struct CMutableTransaction;
 
+struct KeyOriginInfo
+{
+    unsigned char fingerprint[4];
+    std::vector<uint32_t> path;
+};
+
 /** An interface to be implemented by keystores that support signing. */
 class SigningProvider
 {
@@ -48,6 +54,7 @@ struct FlatSigningProvider final : public SigningProvider
 {
     std::map<CScriptID, CScript> scripts;
     std::map<CKeyID, CPubKey> pubkeys;
+    std::map<CKeyID, KeyOriginInfo> origins;
     std::map<CKeyID, CKey> keys;
 
     bool GetCScript(const CScriptID& scriptid, CScript& script) const override;
