@@ -176,8 +176,8 @@
         <translation>Confirmar encriptação da carteira</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
-        <translation>Aviso: se encriptar a sua carteira e perder a sua frase de segurnça, &lt;b&gt;PERDERÁ TODOS OS SEUS WISPR&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
+        <translation>Aviso: se encriptar a sua carteira e perder a sua frase de segurnça, &lt;b&gt;PERDERÁ TODOS OS SEUS PARTICL&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -188,8 +188,8 @@
         <translation>Carteira encriptada</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
-        <translation>%1 irá agora ser fechado para terminar o processo de encriptação. Recorde que a encriptação da sua carteira não protegerá totalmente os seus wispr de serem roubados por programas maliciosos que infectem o seu computador.</translation>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
+        <translation>%1 irá agora ser fechado para terminar o processo de encriptação. Recorde que a encriptação da sua carteira não protegerá totalmente os seus particl de serem roubados por programas maliciosos que infectem o seu computador.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
@@ -434,8 +434,8 @@
         <translation>Barra de ferramentas dos separadores</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and wispr: URIs)</source>
-        <translation>Solicitar pagamentos (gera códigos QR e wispr: URIs)</translation>
+        <source>Request payments (generates QR codes and particl: URIs)</source>
+        <translation>Solicitar pagamentos (gera códigos QR e particl: URIs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -446,8 +446,8 @@
         <translation>Mostrar a lista de rótulos e endereços de receção usados</translation>
     </message>
     <message>
-        <source>Open a wispr: URI or payment request</source>
-        <translation>Abrir URI wispr: ou pedido de pagamento</translation>
+        <source>Open a particl: URI or payment request</source>
+        <translation>Abrir URI particl: ou pedido de pagamento</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -765,7 +765,7 @@
     </message>
     <message>
         <source>The entered address "%1" is not a valid Particl address.</source>
-        <translation>O endereço introduzido "%1" não é um endereço wispr válido.</translation>
+        <translation>O endereço introduzido "%1" não é um endereço particl válido.</translation>
     </message>
     <message>
         <source>Could not unlock wallet.</source>
@@ -892,12 +892,12 @@
         <translation>Formulário</translation>
     </message>
     <message>
-        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the wispr network, as detailed below.</source>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the particl network, as detailed below.</source>
         <translation>Transações recentes podem não ser visíveis por agora, portanto o saldo da sua carteira pode estar incorreto. Esta informação será corrigida quando a sua carteira acabar de sincronizar com a rede, como está explicado em baixo.</translation>
     </message>
     <message>
-        <source>Attempting to spend wispr that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
-        <translation>Tentar enviar wispr que estão afetadas por transações ainda não exibidas não será aceite pela rede.</translation>
+        <source>Attempting to spend particl that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>Tentar enviar particl que estão afetadas por transações ainda não exibidas não será aceite pela rede.</translation>
     </message>
     <message>
         <source>Number of blocks left</source>
@@ -1072,7 +1072,7 @@
     </message>
     <message>
         <source>Automatically open the Particl client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Abrir a porta do cliente wispr automaticamente no seu router. Isto apenas funciona se o seu router suportar UPnP e este se encontrar ligado.</translation>
+        <translation>Abrir a porta do cliente particl automaticamente no seu router. Isto apenas funciona se o seu router suportar UPnP e este se encontrar ligado.</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -1305,16 +1305,16 @@
         <translation>Erro do pedido de pagamento</translation>
     </message>
     <message>
-        <source>Cannot start wispr: click-to-pay handler</source>
-        <translation>Impossível iniciar o controlador de wispr: click-to-pay</translation>
+        <source>Cannot start particl: click-to-pay handler</source>
+        <translation>Impossível iniciar o controlador de particl: click-to-pay</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>Manuseamento de URI</translation>
     </message>
     <message>
-        <source>'wispr://' is not a valid URI. Use 'wispr:' instead.</source>
-        <translation>'wispr://' não é um URI válido. Utilize 'wispr:'.</translation>
+        <source>'particl://' is not a valid URI. Use 'particl:' instead.</source>
+        <translation>'particl://' não é um URI válido. Utilize 'particl:'.</translation>
     </message>
     <message>
         <source>Payment request fetch URL is invalid: %1</source>
@@ -2112,7 +2112,7 @@
         <translation>Esconder</translation>
     </message>
     <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for wispr transactions than the network can process.</source>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for particl transactions than the network can process.</source>
         <translation>Pode pagar somente a taxa minima desde que haja um volume de transações inferior ao espaço nos blocos. No entanto tenha em atenção que esta opção poderá acabar em uma transação nunca confirmada assim que os pedidos de transações excedam a capacidade de processamento da rede.</translation>
     </message>
     <message>
@@ -2344,8 +2344,8 @@
         <translation>Remover esta entrada</translation>
     </message>
     <message>
-        <source>The fee will be deducted from the amount being sent. The recipient will receive less wispr than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
-        <translation>A taxa será deduzida ao valor que está a ser enviado. O destinatário irá receber menos wispr do que as que inseridas no campo do valor. Se estiverem selecionados múltiplos destinatários, a taxa será repartida equitativamente.</translation>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less particl than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>A taxa será deduzida ao valor que está a ser enviado. O destinatário irá receber menos particl do que as que inseridas no campo do valor. Se estiverem selecionados múltiplos destinatários, a taxa será repartida equitativamente.</translation>
     </message>
     <message>
         <source>S&amp;ubtract fee from amount</source>
@@ -2372,8 +2372,8 @@
         <translation>Introduza um rótulo para este endereço para o adicionar à sua lista de endereços usados</translation>
     </message>
     <message>
-        <source>A message that was attached to the wispr: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
-        <translation>Uma mensagem que estava anexada ao URI wispr: que será armazenada com a transação para sua referência. Nota: Esta mensagem não será enviada através da rede Particl.</translation>
+        <source>A message that was attached to the particl: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
+        <translation>Uma mensagem que estava anexada ao URI particl: que será armazenada com a transação para sua referência. Nota: Esta mensagem não será enviada através da rede Particl.</translation>
     </message>
     <message>
         <source>Pay To:</source>
@@ -2417,7 +2417,7 @@
         <translation>&amp;Assinar Mensagem</translation>
     </message>
     <message>
-        <source>You can sign messages/agreements with your addresses to prove you can receive wispr sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <source>You can sign messages/agreements with your addresses to prove you can receive particl sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
         <translation>Pode assinar mensagens com os seus endereços para provar que são seus. Tenha atenção ao assinar mensagens ambíguas, pois ataques de phishing podem tentar enganá-lo de modo a assinar a sua identidade para os atacantes. Apenas assine declarações detalhadas com as quais concorde.</translation>
     </message>
     <message>

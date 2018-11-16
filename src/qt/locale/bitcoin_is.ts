@@ -168,7 +168,7 @@
         <translation>Staðfesta dulkóðun veskis</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
         <translation>Viðvörun: Ef þú dulkóðar veskið og týnir lykilsetningunn þá munt þú &lt;b&gt;TAPA ALLRI ÞINNI BITCOIN MYNT&lt;/b&gt;!</translation>
     </message>
     <message>
@@ -180,7 +180,7 @@
         <translation>Veski dulkóðað</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
         <translation>%1 lokast núna til að dulkóðun klárist. Mundu að dulkóðun veskis kemur ekki að fullu í veg fyrir að mynt verði stolið úr tölvunni þinni með aðstoð smitforrita. </translation>
     </message>
     <message>
@@ -414,8 +414,8 @@
         <translation>Tólaborð flipa</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and wispr: URIs)</source>
-        <translation>Óska eftir greiðslum (býr til QR kóða og wispr: URI)</translation>
+        <source>Request payments (generates QR codes and particl: URIs)</source>
+        <translation>Óska eftir greiðslum (býr til QR kóða og particl: URI)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -426,8 +426,8 @@
         <translation>Sýna færslugildi sem notuð hafa verið til að taka við mynt og merkingar þeirra</translation>
     </message>
     <message>
-        <source>Open a wispr: URI or payment request</source>
-        <translation>Opna wispr: URI eða greiðslubeiðni</translation>
+        <source>Open a particl: URI or payment request</source>
+        <translation>Opna particl: URI eða greiðslubeiðni</translation>
     </message>
     <message>
         <source>Indexing blocks on disk...</source>
@@ -849,8 +849,8 @@
         <translation>Skiptimynt:</translation>
     </message>
     <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for wispr transactions than the network can process.</source>
-        <translation>Það er í lagi að greiða einungis lágmarksupphæðina svo framarlega sem færslurúmtakið er minna en plássið í blokkunum. En gætið þess að þegar það er meiri eftirspurn eftir wispr færslum en netið getur unnið úr þá gæti svo farið að færslurnar verða aldrei samþykktar.</translation>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for particl transactions than the network can process.</source>
+        <translation>Það er í lagi að greiða einungis lágmarksupphæðina svo framarlega sem færslurúmtakið er minna en plássið í blokkunum. En gætið þess að þegar það er meiri eftirspurn eftir particl færslum en netið getur unnið úr þá gæti svo farið að færslurnar verða aldrei samþykktar.</translation>
     </message>
     <message>
         <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>

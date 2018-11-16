@@ -2,10 +2,15 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#if defined(HAVE_CONFIG_H)
+#include <config/wispr-config.h>
+#endif
+
 #include <qt/coincontroldialog.h>
 #include <qt/forms/ui_coincontroldialog.h>
 
 #include <qt/addresstablemodel.h>
+#include <base58.h>
 #include <qt/bitcoinunits.h>
 #include <qt/guiutil.h>
 #include <qt/optionsmodel.h>
@@ -69,13 +74,13 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *_platformStyle, QWidge
     contextMenu->addAction(unlockAction);
 
     // context menu signals
-    connect(ui->treeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showMenu(QPoint)));
-    connect(copyAddressAction, SIGNAL(triggered()), this, SLOT(copyAddress()));
-    connect(copyLabelAction, SIGNAL(triggered()), this, SLOT(copyLabel()));
-    connect(copyAmountAction, SIGNAL(triggered()), this, SLOT(copyAmount()));
-    connect(copyTransactionHashAction, SIGNAL(triggered()), this, SLOT(copyTransactionHash()));
-    connect(lockAction, SIGNAL(triggered()), this, SLOT(lockCoin()));
-    connect(unlockAction, SIGNAL(triggered()), this, SLOT(unlockCoin()));
+    connect(ui->treeWidget, &QWidget::customContextMenuRequested, this, &CoinControlDialog::showMenu);
+    connect(copyAddressAction, &QAction::triggered, this, &CoinControlDialog::copyAddress);
+    connect(copyLabelAction, &QAction::triggered, this, &CoinControlDialog::copyLabel);
+    connect(copyAmountAction, &QAction::triggered, this, &CoinControlDialog::copyAmount);
+    connect(copyTransactionHashAction, &QAction::triggered, this, &CoinControlDialog::copyTransactionHash);
+    connect(lockAction, &QAction::triggered, this, &CoinControlDialog::lockCoin);
+    connect(unlockAction, &QAction::triggered, this, &CoinControlDialog::unlockCoin);
 
     // clipboard actions
     QAction *clipboardQuantityAction = new QAction(tr("Copy quantity"), this);
@@ -86,13 +91,13 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *_platformStyle, QWidge
     QAction *clipboardLowOutputAction = new QAction(tr("Copy dust"), this);
     QAction *clipboardChangeAction = new QAction(tr("Copy change"), this);
 
-    connect(clipboardQuantityAction, SIGNAL(triggered()), this, SLOT(clipboardQuantity()));
-    connect(clipboardAmountAction, SIGNAL(triggered()), this, SLOT(clipboardAmount()));
-    connect(clipboardFeeAction, SIGNAL(triggered()), this, SLOT(clipboardFee()));
-    connect(clipboardAfterFeeAction, SIGNAL(triggered()), this, SLOT(clipboardAfterFee()));
-    connect(clipboardBytesAction, SIGNAL(triggered()), this, SLOT(clipboardBytes()));
-    connect(clipboardLowOutputAction, SIGNAL(triggered()), this, SLOT(clipboardLowOutput()));
-    connect(clipboardChangeAction, SIGNAL(triggered()), this, SLOT(clipboardChange()));
+    connect(clipboardQuantityAction, &QAction::triggered, this, &CoinControlDialog::clipboardQuantity);
+    connect(clipboardAmountAction, &QAction::triggered, this, &CoinControlDialog::clipboardAmount);
+    connect(clipboardFeeAction, &QAction::triggered, this, &CoinControlDialog::clipboardFee);
+    connect(clipboardAfterFeeAction, &QAction::triggered, this, &CoinControlDialog::clipboardAfterFee);
+    connect(clipboardBytesAction, &QAction::triggered, this, &CoinControlDialog::clipboardBytes);
+    connect(clipboardLowOutputAction, &QAction::triggered, this, &CoinControlDialog::clipboardLowOutput);
+    connect(clipboardChangeAction, &QAction::triggered, this, &CoinControlDialog::clipboardChange);
 
     ui->labelCoinControlQuantity->addAction(clipboardQuantityAction);
     ui->labelCoinControlAmount->addAction(clipboardAmountAction);
@@ -103,23 +108,23 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *_platformStyle, QWidge
     ui->labelCoinControlChange->addAction(clipboardChangeAction);
 
     // toggle tree/list mode
-    connect(ui->radioTreeMode, SIGNAL(toggled(bool)), this, SLOT(radioTreeMode(bool)));
-    connect(ui->radioListMode, SIGNAL(toggled(bool)), this, SLOT(radioListMode(bool)));
+    connect(ui->radioTreeMode, &QRadioButton::toggled, this, &CoinControlDialog::radioTreeMode);
+    connect(ui->radioListMode, &QRadioButton::toggled, this, &CoinControlDialog::radioListMode);
 
-    connect(ui->cbxType, SIGNAL(currentIndexChanged(int)), this, SLOT(cbxTypeChanged(int)));
+    connect(ui->cbxType, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &CoinControlDialog::cbxTypeChanged);
 
     // click on checkbox
-    connect(ui->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(viewItemChanged(QTreeWidgetItem*, int)));
+    connect(ui->treeWidget, &QTreeWidget::itemChanged, this, &CoinControlDialog::viewItemChanged);
 
     // click on header
     ui->treeWidget->header()->setSectionsClickable(true);
-    connect(ui->treeWidget->header(), SIGNAL(sectionClicked(int)), this, SLOT(headerSectionClicked(int)));
+    connect(ui->treeWidget->header(), &QHeaderView::sectionClicked, this, &CoinControlDialog::headerSectionClicked);
 
     // ok button
-    connect(ui->buttonBox, SIGNAL(clicked( QAbstractButton*)), this, SLOT(buttonBoxClicked(QAbstractButton*)));
+    connect(ui->buttonBox, &QDialogButtonBox::clicked, this, &CoinControlDialog::buttonBoxClicked);
 
     // (un)select all
-    connect(ui->pushButtonSelectAll, SIGNAL(clicked()), this, SLOT(buttonSelectAllClicked()));
+    connect(ui->pushButtonSelectAll, &QPushButton::clicked, this, &CoinControlDialog::buttonSelectAllClicked);
 
     ui->treeWidget->setColumnWidth(COLUMN_CHECKBOX, 84);
     ui->treeWidget->setColumnWidth(COLUMN_AMOUNT, 110);
@@ -457,68 +462,46 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
     std::vector<COutPoint> vCoinControl;
     coinControl()->ListSelected(vCoinControl);
 
-    if (coinControl()->nCoinType != OUTPUT_STANDARD)
-    {
-        CHDWallet *phdw = model->wallet().getParticlWallet();
+    size_t i = 0;
+    for (const auto& out : model->wallet().getCoins(vCoinControl)) {
+        if (out.depth_in_main_chain < 0) continue;
 
-        for (const auto &op : vCoinControl)
+        // unselect already spent, very unlikely scenario, this could happen
+        // when selected are spent elsewhere, like rpc or another computer
+        const COutPoint& outpt = vCoinControl[i++];
+        if (out.is_spent)
         {
-            MapRecords_t::const_iterator mri = phdw->mapRecords.find(op.hash);
-            if (mri == phdw->mapRecords.end())
-                continue;
-
-            const COutputRecord *oR = mri->second.GetOutput(op.n);
-
-            if (!oR)
-                continue;
-
-            nQuantity++;
-
-            nAmount += oR->nValue;
-        };
-    } else
-    {
-        size_t i = 0;
-        for (const auto& out : model->wallet().getCoins(vCoinControl)) {
-            if (out.depth_in_main_chain < 0) continue;
-
-            // unselect already spent, very unlikely scenario, this could happen
-            // when selected are spent elsewhere, like rpc or another computer
-            const COutPoint& outpt = vCoinControl[i++];
-            if (out.is_spent)
-            {
-                coinControl()->UnSelect(outpt);
-                continue;
-            }
-
-            // Quantity
-            nQuantity++;
-
-            // Amount
-            nAmount += out.txout.nValue;
-
-            // Bytes
-            CTxDestination address;
-            int witnessversion = 0;
-            std::vector<unsigned char> witnessprogram;
-            if (out.txout.scriptPubKey.IsWitnessProgram(witnessversion, witnessprogram))
-            {
-                nBytesInputs += (32 + 4 + 1 + (107 / WITNESS_SCALE_FACTOR) + 4);
-                fWitness = true;
-            }
-            else if(ExtractDestination(out.txout.scriptPubKey, address))
-            {
-                CPubKey pubkey;
-                CKeyID *keyid = boost::get<CKeyID>(&address);
-                if (keyid && model->wallet().getPubKey(*keyid, pubkey))
-                {
-                    nBytesInputs += (pubkey.IsCompressed() ? 148 : 180);
-                }
-                else
-                    nBytesInputs += 148; // in all error cases, simply assume 148 here
-            }
-            else nBytesInputs += 148;
+            coinControl()->UnSelect(outpt);
+            continue;
         }
+
+        // Quantity
+        nQuantity++;
+
+        // Amount
+        nAmount += out.txout.nValue;
+
+        // Bytes
+        CTxDestination address;
+        int witnessversion = 0;
+        std::vector<unsigned char> witnessprogram;
+        if (out.txout.scriptPubKey.IsWitnessProgram(witnessversion, witnessprogram))
+        {
+            nBytesInputs += (32 + 4 + 1 + (107 / WITNESS_SCALE_FACTOR) + 4);
+            fWitness = true;
+        }
+        else if(ExtractDestination(out.txout.scriptPubKey, address))
+        {
+            CPubKey pubkey;
+            CKeyID *keyid = boost::get<CKeyID>(&address);
+            if (keyid && model->wallet().getPubKey(*keyid, pubkey))
+            {
+                nBytesInputs += (pubkey.IsCompressed() ? 148 : 180);
+            }
+            else
+                nBytesInputs += 148; // in all error cases, simply assume 148 here
+        }
+        else nBytesInputs += 148;
     }
 
     // calculation

@@ -16,11 +16,11 @@
 #include <core_io.h>
 #include <interfaces/handler.h>
 #include <interfaces/node.h>
-#include <validation.h>
 #include <sync.h>
 #include <uint256.h>
-#include <util.h>
+#include <util/system.h>
 #include <wallet/hdwallet.h>
+#include <validation.h>
 
 #include <QColor>
 #include <QDateTime>
@@ -28,7 +28,9 @@
 #include <QIcon>
 #include <QList>
 
-// Amount columns are right-aligned
+#include <boost/bind.hpp>
+
+// Amount column is right-aligned it contains numbers
 static int column_alignments[] = {
         Qt::AlignLeft|Qt::AlignVCenter, /* status */
         Qt::AlignLeft|Qt::AlignVCenter, /* watchonly */
@@ -61,7 +63,7 @@ struct TxLessThan
 class TransactionTablePriv
 {
 public:
-    TransactionTablePriv(TransactionTableModel *_parent) :
+    explicit TransactionTablePriv(TransactionTableModel *_parent) :
         parent(_parent)
     {
     }
@@ -211,9 +213,8 @@ public:
             // simply re-use the cached status.
             interfaces::WalletTxStatus wtx;
             int numBlocks;
-            int64_t adjustedTime;
-            if (wallet.tryGetTxStatus(rec->hash, wtx, numBlocks, adjustedTime) && rec->statusUpdateNeeded(numBlocks)) {
-                rec->updateStatus(wtx, numBlocks, adjustedTime);
+            if (wallet.tryGetTxStatus(rec->hash, wtx, numBlocks) && rec->statusUpdateNeeded(numBlocks)) {
+                rec->updateStatus(wtx, numBlocks);
             }
             return rec;
         }
@@ -246,7 +247,7 @@ TransactionTableModel::TransactionTableModel(const PlatformStyle *_platformStyle
     columns << QString() << QString() << tr("Date") << tr("Type") << tr("Label") << tr("In") << tr("Out") << BitcoinUnits::getAmountColumnTitle(walletModel->getOptionsModel()->getDisplayUnit());
     priv->refreshWallet(walletModel->wallet());
 
-    connect(walletModel->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
+    connect(walletModel->getOptionsModel(), &OptionsModel::displayUnitChanged, this, &TransactionTableModel::updateDisplayUnit);
 
     subscribeToCoreSignals();
 }

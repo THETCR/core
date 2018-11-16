@@ -168,8 +168,8 @@
         <translation>Cüzdan Şifrelemesini Onaylayın</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
-        <translation>Uyarı: Eğer cüzdanınızı şifreleyip parolanızı kaybederseniz (unutursanız) , &lt;b&gt;BÜTÜN WISPR'LERINIZI KAYBEDECEKSINIZ&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
+        <translation>Uyarı: Eğer cüzdanınızı şifreleyip parolanızı kaybederseniz (unutursanız) , &lt;b&gt;BÜTÜN PARTICL'LERINIZI KAYBEDECEKSINIZ&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -180,8 +180,8 @@
         <translation>Cüzdan Şifrelendi</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
-        <translation>%1 Şifreleme işlemini bitirmek için kapatılacak. Şunu unutmayın ki şampiyon galatasaray ve şifrelemek, wisprlerinizin bilgisayarınıza bulaşan malware yazılımları tarafından çalınmasını tamamen engelleyemez.</translation>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
+        <translation>%1 Şifreleme işlemini bitirmek için kapatılacak. Şunu unutmayın ki şampiyon galatasaray ve şifrelemek, particllerinizin bilgisayarınıza bulaşan malware yazılımları tarafından çalınmasını tamamen engelleyemez.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
@@ -303,7 +303,7 @@
     </message>
     <message>
         <source>Particl</source>
-        <translation>Particl
+        <translation>Bitcoin
 </translation>
     </message>
     <message>

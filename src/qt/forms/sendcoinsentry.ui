@@ -183,7 +183,7 @@
       <item>
        <widget class="QCheckBox" name="checkboxSubtractFeeFromAmount">
         <property name="toolTip">
-         <string>The fee will be deducted from the amount being sent. The recipient will receive less wispr than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</string>
+         <string>The fee will be deducted from the amount being sent. The recipient will receive less particl than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</string>
         </property>
         <property name="text">
          <string>S&amp;ubtract fee from amount</string>
@@ -222,7 +222,7 @@
     <item row="5" column="1">
      <widget class="QLabel" name="messageTextLabel">
       <property name="toolTip">
-       <string>A message that was attached to the wispr: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</string>
+       <string>A message that was attached to the particl: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</string>
       </property>
       <property name="textFormat">
        <enum>Qt::PlainText</enum>
@@ -245,7 +245,7 @@
    <property name="frameShape">
     <enum>QFrame::NoFrame</enum>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QGridLayout" name="gridLayout_cs">
     <property name="topMargin">
      <number>8</number>
     </property>
@@ -259,14 +259,14 @@
      <number>8</number>
     </property>
     <item row="3" column="1">
-     <layout class="QHBoxLayout" name="horizontalLayoutAmount" stretch="0,1,0">
+     <layout class="QHBoxLayout" name="horizontalLayoutAmount_cs" stretch="0,1,0">
       <item>
        <widget class="BitcoinAmountField" name="payAmount_cs"/>
       </item>
       <item>
        <widget class="QCheckBox" name="checkboxSubtractFeeFromAmount_cs">
         <property name="toolTip">
-         <string>The fee will be deducted from the amount being sent. The recipient will receive less wispr than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</string>
+         <string>The fee will be deducted from the amount being sent. The recipient will receive less particl than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</string>
         </property>
         <property name="text">
          <string>Subtract fee from amount</string>
@@ -366,7 +366,7 @@
      </layout>
     </item>
     <item row="5" column="0" colspan="2">
-     <widget class="Line" name="line">
+     <widget class="Line" name="line_cs">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>

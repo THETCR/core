@@ -15,7 +15,7 @@ OpenURIDialog::OpenURIDialog(QWidget *parent) :
     ui(new Ui::OpenURIDialog)
 {
     ui->setupUi(this);
-    ui->uriEdit->setPlaceholderText("wispr:");
+    ui->uriEdit->setPlaceholderText("particl:");
 }
 
 OpenURIDialog::~OpenURIDialog()

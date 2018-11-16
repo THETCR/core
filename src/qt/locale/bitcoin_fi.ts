@@ -176,7 +176,7 @@
         <translation>Vahvista lompakon salaaminen</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
         <translation>Varoitus: Jos salaat lompakkosi ja menetät tunnuslauseesi, &lt;b&gt;MENETÄT KAIKKI BITCOINISI&lt;/b&gt;!</translation>
     </message>
     <message>
@@ -188,7 +188,7 @@
         <translation>Lompakko salattiin</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
         <translation>%1 sulkeutuu lopettaakseen salausprosessin. Muista, että salattukaan lompakko ei täysin suojaa sitä haittaohjelmien aiheuttamilta varkauksilta.</translation>
     </message>
     <message>
@@ -326,14 +326,6 @@
         <translation>Avaa &amp;URI...</translation>
     </message>
     <message>
-        <source>Wallet:</source>
-        <translation>Lompakko:</translation>
-    </message>
-    <message>
-        <source>default wallet</source>
-        <translation>oletuslompakko</translation>
-    </message>
-    <message>
         <source>Click to disable network activity.</source>
         <translation>Paina poistaaksesi verkkoyhteysilmaisin käytöstä.</translation>
     </message>
@@ -352,10 +344,6 @@
     <message>
         <source>Reindexing blocks on disk...</source>
         <translation>Ladataan lohkoindeksiä...</translation>
-    </message>
-    <message>
-        <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
-        <translation>Välipalvelin on &lt;b&gt;käytössä&lt;/b&gt;: %1</translation>
     </message>
     <message>
         <source>Send coins to a Particl address</source>
@@ -434,8 +422,8 @@
         <translation>Välilehtipalkki</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and wispr: URIs)</source>
-        <translation>Pyydä maksuja (Luo QR koodit ja wispr: URIt)</translation>
+        <source>Request payments (generates QR codes and particl: URIs)</source>
+        <translation>Pyydä maksuja (Luo QR koodit ja particl: URIt)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -446,16 +434,12 @@
         <translation>Näytä vastaanottamiseen käytettyjen osoitteiden ja nimien lista</translation>
     </message>
     <message>
-        <source>Open a wispr: URI or payment request</source>
-        <translation>Avaa wispr: URI tai maksupyyntö</translation>
+        <source>Open a particl: URI or payment request</source>
+        <translation>Avaa particl: URI tai maksupyyntö</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
         <translation>&amp;Komentorivin valinnat</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n active connection(s) to Particl network</source>
-        <translation><numerusform>%n aktiivinen yhteys Particl-verkkoon</numerusform><numerusform>%n aktiivista yhteyttä Bitcoin-verkkoon</numerusform></translation>
     </message>
     <message>
         <source>Indexing blocks on disk...</source>
@@ -464,10 +448,6 @@
     <message>
         <source>Processing blocks on disk...</source>
         <translation>Käsitellään lohkoja levyllä...</translation>
-    </message>
-    <message numerus="yes">
-        <source>Processed %n block(s) of transaction history.</source>
-        <translation><numerusform>Käsitelty %n lohko rahansiirtohistoriasta.</numerusform><numerusform>Käsitelty %n lohkoa rahansiirtohistoriasta.</numerusform></translation>
     </message>
     <message>
         <source>%1 behind</source>
@@ -882,12 +862,12 @@
         <translation>Lomake</translation>
     </message>
     <message>
-        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the wispr network, as detailed below.</source>
-        <translation>Viimeiset tapahtumat eivät välttämättä vielä näy, joten lompakkosi saldo voi olla virheellinen. Tieto korjautuu, kunhan lompakkosi synkronointi wispr-verkon kanssa on päättynyt. Tiedot näkyvät alla.</translation>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the particl network, as detailed below.</source>
+        <translation>Viimeiset tapahtumat eivät välttämättä vielä näy, joten lompakkosi saldo voi olla virheellinen. Tieto korjautuu, kunhan lompakkosi synkronointi particl-verkon kanssa on päättynyt. Tiedot näkyvät alla.</translation>
     </message>
     <message>
-        <source>Attempting to spend wispr that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
-        <translation>Verkko ei tule hyväksymään sellaisten wisprien käyttämistä, jotka liittyvät vielä näkymättömissä oleviin siirtoihin.</translation>
+        <source>Attempting to spend particl that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>Verkko ei tule hyväksymään sellaisten particlien käyttämistä, jotka liittyvät vielä näkymättömissä oleviin siirtoihin.</translation>
     </message>
     <message>
         <source>Number of blocks left</source>
@@ -1137,11 +1117,11 @@
     </message>
     <message>
         <source>&amp;Unit to show amounts in:</source>
-        <translation>Yksikkö jona wispr-määrät näytetään</translation>
+        <translation>Yksikkö jona particl-määrät näytetään</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>Valitse mitä yksikköä käytetään ensisijaisesti wispr-määrien näyttämiseen.</translation>
+        <translation>Valitse mitä yksikköä käytetään ensisijaisesti particl-määrien näyttämiseen.</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1286,7 +1266,7 @@
         <translation>Maksupyyntövirhe</translation>
     </message>
     <message>
-        <source>Cannot start wispr: click-to-pay handler</source>
+        <source>Cannot start particl: click-to-pay handler</source>
         <translation>Particlia ei voi käynnistää: klikkaa-maksaaksesi -käsittelijän virhe</translation>
     </message>
     <message>
@@ -1727,10 +1707,6 @@
     <message>
         <source>&amp;Unban</source>
         <translation>&amp;Poista esto</translation>
-    </message>
-    <message>
-        <source>default wallet</source>
-        <translation>oletuslompakko</translation>
     </message>
     <message>
         <source>Welcome to the %1 RPC console.</source>
@@ -2248,8 +2224,8 @@
         <translation>Poista tämä alkio</translation>
     </message>
     <message>
-        <source>The fee will be deducted from the amount being sent. The recipient will receive less wispr than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
-        <translation>Kulu vähennetään lähetettävästä määrästä. Saaja vastaanottaa vähemmän wispreja kuin merkitset Määrä-kenttään. Jos saajia on monia, kulu jaetaan tasan.</translation>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less particl than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>Kulu vähennetään lähetettävästä määrästä. Saaja vastaanottaa vähemmän particleja kuin merkitset Määrä-kenttään. Jos saajia on monia, kulu jaetaan tasan.</translation>
     </message>
     <message>
         <source>S&amp;ubtract fee from amount</source>
@@ -2276,8 +2252,8 @@
         <translation>Aseta nimi tälle osoitteelle lisätäksesi sen käytettyjen osoitteiden listalle.</translation>
     </message>
     <message>
-        <source>A message that was attached to the wispr: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
-        <translation>Viesti joka liitettiin wispr: URI:iin tallennetaan rahansiirtoon viitteeksi. Tätä viestiä ei lähetetä Particl-verkkoon.</translation>
+        <source>A message that was attached to the particl: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
+        <translation>Viesti joka liitettiin particl: URI:iin tallennetaan rahansiirtoon viitteeksi. Tätä viestiä ei lähetetä Particl-verkkoon.</translation>
     </message>
     <message>
         <source>Pay To:</source>
@@ -2321,8 +2297,8 @@
         <translation>&amp;Allekirjoita viesti</translation>
     </message>
     <message>
-        <source>You can sign messages/agreements with your addresses to prove you can receive wispr sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
-        <translation>Voit allekirjoittaa viestit / sopimukset omalla osoitteellasi todistaaksesi että voit vastaanottaa siihen lähetetyt wisprit. Varo allekirjoittamasta mitään epämääräistä, sillä phishing-hyökkääjät voivat huijata sinua luovuttamaan henkilöllisyytesi allekirjoituksella. Allekirjoita ainoastaan täysin yksityiskohtainen selvitys siitä, mihin olet sitoutumassa.</translation>
+        <source>You can sign messages/agreements with your addresses to prove you can receive particl sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <translation>Voit allekirjoittaa viestit / sopimukset omalla osoitteellasi todistaaksesi että voit vastaanottaa siihen lähetetyt particlit. Varo allekirjoittamasta mitään epämääräistä, sillä phishing-hyökkääjät voivat huijata sinua luovuttamaan henkilöllisyytesi allekirjoituksella. Allekirjoita ainoastaan täysin yksityiskohtainen selvitys siitä, mihin olet sitoutumassa.</translation>
     </message>
     <message>
         <source>The Particl address to sign the message with</source>

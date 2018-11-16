@@ -172,7 +172,7 @@
         <translation>Tárca titkosításának jóváhagyása</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
         <translation>Figyelem: Ha titkosítja a pénztárcáját, és elveszíti a jelszóhalmazt, akkor &lt;b&gt;NEM TUD TÖBBET HOZZÁFÉRNI A BITCOINJAIHOZ&lt;/b&gt;!</translation>
     </message>
     <message>
@@ -184,8 +184,8 @@
         <translation>Tárca titkosítva</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
-        <translation>%1 Most az ablak bezáródik, amíg befejeződik a titkosítási folyamat. Kérem vegye figyelembe, hogy a pénztárca titkosítása nem jelenti a wisprjai teljes körű védelmét, a számítógépét esetlegesen megfertőző kártékony programoktól.</translation>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
+        <translation>%1 Most az ablak bezáródik, amíg befejeződik a titkosítási folyamat. Kérem vegye figyelembe, hogy a pénztárca titkosítása nem jelenti a particljai teljes körű védelmét, a számítógépét esetlegesen megfertőző kártékony programoktól.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
@@ -418,8 +418,8 @@
         <translation>Ablak fülek eszköztára</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and wispr: URIs)</source>
-        <translation>Kérjen fizetéseket (QR kódokat generál és wispr: URLeket)</translation>
+        <source>Request payments (generates QR codes and particl: URIs)</source>
+        <translation>Kérjen fizetéseket (QR kódokat generál és particl: URLeket)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -430,8 +430,8 @@
         <translation>Mutassa a használt fogadó címek és cimkék listáját</translation>
     </message>
     <message>
-        <source>Open a wispr: URI or payment request</source>
-        <translation>Nyisson meg egy wispr: URI-t vagy fizetési kérelmet</translation>
+        <source>Open a particl: URI or payment request</source>
+        <translation>Nyisson meg egy particl: URI-t vagy fizetési kérelmet</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -914,12 +914,12 @@
         <translation>Űrlap</translation>
     </message>
     <message>
-        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the wispr network, as detailed below.</source>
-        <translation>A legutóbbi tranzakciók még lehet, hogy nem látszanak, ezért előfordulhat, hogy a pénztárca egyenlege nem a valós állapotot mutatja. Ha a pénztárca befejezte a szinkronizációt a wispr hálózattal, utána már az aktuális egyenleget fogja mutatni, amint alant részletesen látszik.</translation>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the particl network, as detailed below.</source>
+        <translation>A legutóbbi tranzakciók még lehet, hogy nem látszanak, ezért előfordulhat, hogy a pénztárca egyenlege nem a valós állapotot mutatja. Ha a pénztárca befejezte a szinkronizációt a particl hálózattal, utána már az aktuális egyenleget fogja mutatni, amint alant részletesen látszik.</translation>
     </message>
     <message>
-        <source>Attempting to spend wispr that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
-        <translation>A hálózat nem fogadja el azoknak a wisproknak az elköltését, amelyek érintettek a még nem látszódó tranzakciókban.</translation>
+        <source>Attempting to spend particl that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>A hálózat nem fogadja el azoknak a particloknak az elköltését, amelyek érintettek a még nem látszódó tranzakciókban.</translation>
     </message>
     <message>
         <source>Number of blocks left</source>
@@ -1310,8 +1310,8 @@
         <translation>Hiba történt a fizetési kérelem során</translation>
     </message>
     <message>
-        <source>Cannot start wispr: click-to-pay handler</source>
-        <translation>A wispr nem tud elindulni: click-to-pay kezelő</translation>
+        <source>Cannot start particl: click-to-pay handler</source>
+        <translation>A particl nem tud elindulni: click-to-pay kezelő</translation>
     </message>
     <message>
         <source>URI handling</source>

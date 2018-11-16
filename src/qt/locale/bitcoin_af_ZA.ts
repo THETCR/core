@@ -172,8 +172,8 @@
         <translation>Bevestig beursie enkripsie.</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
-        <translation>Waarskuwing: As jy jou beursie enkripteer en jou wagwoord verloor, sal jy &lt;b&gt;AL JOU WISPR VERLOOR&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
+        <translation>Waarskuwing: As jy jou beursie enkripteer en jou wagwoord verloor, sal jy &lt;b&gt;AL JOU PARTICL VERLOOR&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -184,16 +184,16 @@
         <translation>Beursie enkriptasie voltooi</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
-        <translation>%1 gaan nou toe maak om die enkripsie proses klaar te maak. Onthou dat jou wispr nie ten volle beskerm kan word deur die beursie te enkrip teen "malware" wat jou rekenaar besmet.</translation>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
+        <translation>%1 gaan nou toe maak om die enkripsie proses klaar te maak. Onthou dat jou particl nie ten volle beskerm kan word deur die beursie te enkrip teen "malware" wat jou rekenaar besmet.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
         <translation>BELANGRIK: Enige vorige rugsteune wat u gemaak het van u beursie-lêer moet vervang word met die nuut-gegenereerde, versleutelde beursie-lêer. Vir sekuriteitsredes sal vorige rugsteune van die onversleutelde beursie-lêer onbruikbaar word sodra u die nuwe, versleutelde beursie begin gebruik.</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
-        <translation>%1 gaan nou toe maak om die enkripsie proses klaar te maak. Onthou dat jou wispr nie ten volle beskerm kan word deur die beursie te enkrip teen "malware" wat jou rekenaar besmet.</translation>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
+        <translation>%1 gaan nou toe maak om die enkripsie proses klaar te maak. Onthou dat jou particl nie ten volle beskerm kan word deur die beursie te enkrip teen "malware" wat jou rekenaar besmet.</translation>
     </message>
     <message>
         <source>Wallet encryption failed</source>
@@ -406,8 +406,8 @@
         <translation>Blad nutsbalk</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and wispr: URIs)</source>
-        <translation>Versoek betalings (genereer QR kodes en wispr: URIs)</translation>
+        <source>Request payments (generates QR codes and particl: URIs)</source>
+        <translation>Versoek betalings (genereer QR kodes en particl: URIs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>

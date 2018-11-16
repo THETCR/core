@@ -176,7 +176,7 @@
         <translation>確認錢包加密</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
         <translation>警告: 如果把錢包加密後又忘記密碼，你就會從此&lt;b&gt;失去其中所有的 Particl 了&lt;/b&gt;！</translation>
     </message>
     <message>
@@ -188,7 +188,7 @@
         <translation>錢包已加密</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
         <translation>%1 現在要關閉，好完成加密程序。請注意，加密錢包不能完全防止入侵你的電腦的惡意程式偷取錢幣。</translation>
     </message>
     <message>
@@ -434,8 +434,8 @@
         <translation>分頁工具列</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and wispr: URIs)</source>
-        <translation>要求付款(產生 QR Code 和 wispr 付款協議的資源識別碼: URI)</translation>
+        <source>Request payments (generates QR codes and particl: URIs)</source>
+        <translation>要求付款(產生 QR Code 和 particl 付款協議的資源識別碼: URI)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -446,8 +446,8 @@
         <translation>顯示已使用過的收款位址和標記的清單</translation>
     </message>
     <message>
-        <source>Open a wispr: URI or payment request</source>
-        <translation>開啓 wispr 協議的資源識別碼(URI)或付款要求</translation>
+        <source>Open a particl: URI or payment request</source>
+        <translation>開啓 particl 協議的資源識別碼(URI)或付款要求</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -904,12 +904,12 @@
         <translation>表單</translation>
     </message>
     <message>
-        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the wispr network, as detailed below.</source>
-        <translation>最近的交易可能還看不到，因此錢包餘額可能不正確。在錢包軟體完成跟 wispr 網路的同步後，這裡的資訊就會正確。詳情請見下面。</translation>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the particl network, as detailed below.</source>
+        <translation>最近的交易可能還看不到，因此錢包餘額可能不正確。在錢包軟體完成跟 particl 網路的同步後，這裡的資訊就會正確。詳情請見下面。</translation>
     </message>
     <message>
-        <source>Attempting to spend wispr that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
-        <translation>使用還沒顯示出來的交易所影響到的 wispr 可能會不被網路所接受。</translation>
+        <source>Attempting to spend particl that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>使用還沒顯示出來的交易所影響到的 particl 可能會不被網路所接受。</translation>
     </message>
     <message>
         <source>Number of blocks left</source>
@@ -1328,16 +1328,16 @@
         <translation>要求付款時發生錯誤</translation>
     </message>
     <message>
-        <source>Cannot start wispr: click-to-pay handler</source>
-        <translation>沒辦法啟動 wispr 協議的「按就付」處理器</translation>
+        <source>Cannot start particl: click-to-pay handler</source>
+        <translation>沒辦法啟動 particl 協議的「按就付」處理器</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>URI 處理</translation>
     </message>
     <message>
-        <source>'wispr://' is not a valid URI. Use 'wispr:' instead.</source>
-        <translation>字首為 wispr:// 不是有效的 URI，請改用 wispr: 開頭。</translation>
+        <source>'particl://' is not a valid URI. Use 'particl:' instead.</source>
+        <translation>字首為 particl:// 不是有效的 URI，請改用 particl: 開頭。</translation>
     </message>
     <message>
         <source>Payment request fetch URL is invalid: %1</source>
@@ -2151,7 +2151,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>隱藏</translation>
     </message>
     <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for wispr transactions than the network can process.</source>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for particl transactions than the network can process.</source>
         <translation>當交易量少於區塊可容納的空間時，只付最低手續費不會有什麽問題。但是當交易量的需求成長到超過整體網路可以處理的量時，可能會造成一筆一直不會被確認的交易。</translation>
     </message>
     <message>
@@ -2390,8 +2390,8 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>刪掉這個項目</translation>
     </message>
     <message>
-        <source>The fee will be deducted from the amount being sent. The recipient will receive less wispr than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
-        <translation>手續費會從要付款出去的金額中扣掉。因此收款人會收到比輸入的金額還要少的 wispr。如果有多個收款人的話，手續費會平均分配來扣除。</translation>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less particl than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>手續費會從要付款出去的金額中扣掉。因此收款人會收到比輸入的金額還要少的 particl。如果有多個收款人的話，手續費會平均分配來扣除。</translation>
     </message>
     <message>
         <source>S&amp;ubtract fee from amount</source>
@@ -2418,7 +2418,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>請輸入這個位址的標記，來把它加進去已使用過位址的清單。</translation>
     </message>
     <message>
-        <source>A message that was attached to the wispr: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
+        <source>A message that was attached to the particl: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
         <translation>附加在 Particl 付款協議的資源識別碼(URI)中的訊息，會和交易內容一起存起來，給你自己做參考。注意: 這個訊息不會送到 Particl 網路上。</translation>
     </message>
     <message>
@@ -2463,7 +2463,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>簽署訊息(&amp;S)</translation>
     </message>
     <message>
-        <source>You can sign messages/agreements with your addresses to prove you can receive wispr sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <source>You can sign messages/agreements with your addresses to prove you can receive particl sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
         <translation>你可以用自己的位址簽署訊息或合約，來證明你可以從該位址收款。但是請小心，不要簽署語意含糊不清，或隨機產生的內容，因為釣魚式詐騙可能會用騙你簽署的手法來冒充是你。只有在語句中的細節你都同意時才簽署。</translation>
     </message>
     <message>
@@ -3486,6 +3486,12 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     <message>
         <source>Specified -walletdir "%s" is not a directory</source>
         <translation>以 -walletdir 指定的路徑 "%s" 不是個目錄</translation>
+    </message>
+    <message>
+        <source>Specified blocks directory "%s" does not exist.
+</source>
+        <translation>指定的區塊目錄 "%s" 不存在。
+</translation>
     </message>
     <message>
         <source>The transaction amount is too small to pay the fee</source>

@@ -14,13 +14,15 @@
 #include <qt/clientmodel.h>
 #include <qt/guiconstants.h>
 #include <qt/intro.h>
+#ifdef ENABLE_BIP70
 #include <qt/paymentrequestplus.h>
+#endif
 #include <qt/guiutil.h>
 
 #include <clientversion.h>
 #include <init.h>
 #include <interfaces/node.h>
-#include <util.h>
+#include <util/system.h>
 
 #include <stdio.h>
 
@@ -70,7 +72,7 @@ HelpMessageDialog::HelpMessageDialog(interfaces::Node& node, QWidget *parent, bo
         ui->helpMessage->setVisible(false);
     } else {
         setWindowTitle(tr("Command-line options"));
-        QString header = "Usage:  wispr-qt [command-line options]                     \n";
+        QString header = "Usage:  particl-qt [command-line options]                     \n";
         QTextCursor cursor(ui->helpMessage->document());
         cursor.insertText(version);
         cursor.insertBlock();

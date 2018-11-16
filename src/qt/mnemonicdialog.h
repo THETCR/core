@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef WISPR_QT_MNEMONICDIALOG_H
-#define WISPR_QT_MNEMONICDIALOG_H
+#ifndef PARTICL_QT_MNEMONICDIALOG_H
+#define PARTICL_QT_MNEMONICDIALOG_H
 
 #include <QDialog>
 #include <QThread>
@@ -49,7 +49,7 @@ Q_SIGNALS:
     // Rescan blockchain for transactions
     void startRescan();
 
-private Q_SLOTS:
+public Q_SLOTS:
     void on_btnCancel_clicked();
     void on_btnImport_clicked();
     void on_btnGenerate_clicked();
@@ -59,4 +59,4 @@ private:
     Ui::MnemonicDialog *ui;
 };
 
-#endif // WISPR_QT_MNEMONICDIALOG_H
+#endif // PARTICL_QT_MNEMONICDIALOG_H

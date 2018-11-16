@@ -13,7 +13,7 @@
 #include <wallet/hdwallet.h>
 #include <wallet/rpchdwallet.h>
 #include <rpc/rpcutil.h>
-#include <util.h>
+#include <util/system.h>
 #include <univalue.h>
 
 #include <QFont>
@@ -78,7 +78,7 @@ public:
     QList<AddressTableEntry> cachedAddressTable;
     AddressTableModel *parent;
 
-    AddressTablePriv(AddressTableModel *_parent):
+    explicit AddressTablePriv(AddressTableModel *_parent):
         parent(_parent) {}
 
     void refreshAddressTable(interfaces::Wallet& wallet)

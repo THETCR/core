@@ -210,8 +210,8 @@
         <translation>Barra de ferramentas</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and wispr: URIs)</source>
-        <translation>Solicitar pagos (xenera códigos QR e wispr: URIs)</translation>
+        <source>Request payments (generates QR codes and particl: URIs)</source>
+        <translation>Solicitar pagos (xenera códigos QR e particl: URIs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -222,8 +222,8 @@
         <translation>Amosar a listaxe de etiquetas e direccións para recibir empregadas</translation>
     </message>
     <message>
-        <source>Open a wispr: URI or payment request</source>
-        <translation>Abrir un wispr: URI ou solicitude de pago</translation>
+        <source>Open a particl: URI or payment request</source>
+        <translation>Abrir un particl: URI ou solicitude de pago</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>

@@ -176,7 +176,7 @@
         <translation>საფულის დაშიფრვის დადასტურება</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
         <translation>გაფრთხილება: თუ თქვენ დაშიფრავთ თქვენს საფულეს და ამის შემდეგ დაკარგავთ გასაშიფრ ფრაზას, &lt;b&gt;თქვენ დაკარგავთ ყველა ბიტკოინს!&lt;/b&gt;</translation>
     </message>
     <message>
@@ -188,7 +188,7 @@
         <translation>საფულე დაშიფრულია</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
         <translation>%1 ახლა დაიხურება დაშიფრვის პროცესის დასასრულებლად. გახსოვდეთ, რომ თქვენი საფული დაშიფრვა სრულად არ იცავს თქვენს ბიტკოინებს მოპარვისგან მავნე პროგრამების მიერ თქვენი კომპიუტერის ინფიცირების საშუალებით.</translation>
     </message>
     <message>
@@ -398,8 +398,8 @@
         <translation>ბარათების პანელი</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and wispr: URIs)</source>
-        <translation>გადახდის მოთხოვნა (შეიქმნება QR-კოდები და wispr: ბმულები)</translation>
+        <source>Request payments (generates QR codes and particl: URIs)</source>
+        <translation>გადახდის მოთხოვნა (შეიქმნება QR-კოდები და particl: ბმულები)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -410,8 +410,8 @@
         <translation>გამოყენებული მიღების მისამართებისა და ნიშნულების სიის ჩვენება</translation>
     </message>
     <message>
-        <source>Open a wispr: URI or payment request</source>
-        <translation>wispr: URI-ის ან გადახდის მოთხოვნის გახსნა</translation>
+        <source>Open a particl: URI or payment request</source>
+        <translation>particl: URI-ის ან გადახდის მოთხოვნის გახსნა</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1350,7 +1350,7 @@
         <translation>შეიყვანეთ ამ მისამართის ნიშნული გამოყენებული მისამართების სიაში დასამატებლად</translation>
     </message>
     <message>
-        <source>A message that was attached to the wispr: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
+        <source>A message that was attached to the particl: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
         <translation>მესიჯი, რომელიც თან ერთვის მონეტებს:  URI, რომელიც შეინახება ტრანსაქციასთან ერთად თქვენთვის. შენიშვნა: მესიჯი არ გაყვება გადახდას ბითქოინის ქსელში.</translation>
     </message>
     <message>

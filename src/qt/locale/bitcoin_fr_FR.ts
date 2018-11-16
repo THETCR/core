@@ -47,11 +47,11 @@
     </message>
     <message>
         <source>Choose the address to send coins to</source>
-        <translation>Choisissez une adresse où envoyer les wispr</translation>
+        <translation>Choisissez une adresse où envoyer les particl</translation>
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
-        <translation>Choisissez une adresse où recevoir les wispr</translation>
+        <translation>Choisissez une adresse où recevoir les particl</translation>
     </message>
     <message>
         <source>C&amp;hoose</source>
@@ -176,8 +176,8 @@
         <translation>Confirmer le chiffrement du porte-monnaie</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
-        <translation>Attention : Si vous chiffrez votre portefeuille et que vous perdez votre mot de passe vous &lt;b&gt; PERDREZ TOUS VOS WISPR&lt;/b&gt; !</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
+        <translation>Attention : Si vous chiffrez votre portefeuille et que vous perdez votre mot de passe vous &lt;b&gt; PERDREZ TOUS VOS PARTICL&lt;/b&gt; !</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -188,7 +188,7 @@
         <translation>Portefeuille chiffré</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
         <translation>%1 va à présent se fermer pour terminer la procédure de cryptage. N'oubliez pas que le chiffrement de votre porte-monnaie ne peut pas fournir une protection totale contre le vol par des logiciels malveillants qui infecteraient votre ordinateur.</translation>
     </message>
     <message>
@@ -426,8 +426,8 @@
         <translation>Barre d'outils des onglets</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and wispr: URIs)</source>
-        <translation>Demander des paiements (générer QR codes et wispr: URIs)</translation>
+        <source>Request payments (generates QR codes and particl: URIs)</source>
+        <translation>Demander des paiements (générer QR codes et particl: URIs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -438,8 +438,8 @@
         <translation>Afficher la liste des labels et adresses de réception utilisées</translation>
     </message>
     <message>
-        <source>Open a wispr: URI or payment request</source>
-        <translation>Ouvrir un wispr: URI ou demande de paiement</translation>
+        <source>Open a particl: URI or payment request</source>
+        <translation>Ouvrir un particl: URI ou demande de paiement</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>

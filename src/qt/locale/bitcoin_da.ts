@@ -47,11 +47,11 @@
     </message>
     <message>
         <source>Choose the address to send coins to</source>
-        <translation>Vælg adresse at sende wispr til</translation>
+        <translation>Vælg adresse at sende particl til</translation>
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
-        <translation>Vælg adresse at modtage wispr med</translation>
+        <translation>Vælg adresse at modtage particl med</translation>
     </message>
     <message>
         <source>C&amp;hoose</source>
@@ -67,7 +67,7 @@
     </message>
     <message>
         <source>These are your Particl addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Disse er dine Particl-adresser til afsendelse af betalinger. Tjek altid beløb og modtagelsesadresse, inden du sender wispr.</translation>
+        <translation>Disse er dine Particl-adresser til afsendelse af betalinger. Tjek altid beløb og modtagelsesadresse, inden du sender particl.</translation>
     </message>
     <message>
         <source>These are your Particl addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
@@ -176,8 +176,8 @@
         <translation>Bekræft tegnebogskryptering</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
-        <translation>Advarsel: Hvis du krypterer din tegnebog og mister din adgangskode, vil du &lt;b&gt;MISTE ALLE DINE WISPR&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
+        <translation>Advarsel: Hvis du krypterer din tegnebog og mister din adgangskode, vil du &lt;b&gt;MISTE ALLE DINE PARTICL&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -188,8 +188,8 @@
         <translation>Tegnebog krypteret</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
-        <translation>%1 vil nu lukke for at færdiggøre krypteringsprocessen. Husk at kryptering af din tegnebog kan ikke beskytte dine wispr fuldt ud mod at blive stjålet af eventuel malware, der måtte have inficeret din computer.</translation>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
+        <translation>%1 vil nu lukke for at færdiggøre krypteringsprocessen. Husk at kryptering af din tegnebog kan ikke beskytte dine particl fuldt ud mod at blive stjålet af eventuel malware, der måtte have inficeret din computer.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
@@ -359,7 +359,7 @@
     </message>
     <message>
         <source>Send coins to a Particl address</source>
-        <translation>Send wispr til en Particl-adresse</translation>
+        <translation>Send particl til en Particl-adresse</translation>
     </message>
     <message>
         <source>Backup wallet to another location</source>
@@ -434,8 +434,8 @@
         <translation>Faneværktøjslinje</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and wispr: URIs)</source>
-        <translation>Anmod om betalinger (genererer QR-koder og “wispr:”-URI'er)</translation>
+        <source>Request payments (generates QR codes and particl: URIs)</source>
+        <translation>Anmod om betalinger (genererer QR-koder og “particl:”-URI'er)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -446,8 +446,8 @@
         <translation>Vis listen over brugte modtagelsesadresser og -mærkater</translation>
     </message>
     <message>
-        <source>Open a wispr: URI or payment request</source>
-        <translation>Åbn en “wispr:”-URI eller betalingsanmodning</translation>
+        <source>Open a particl: URI or payment request</source>
+        <translation>Åbn en “particl:”-URI eller betalingsanmodning</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -904,12 +904,12 @@
         <translation>Formular</translation>
     </message>
     <message>
-        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the wispr network, as detailed below.</source>
-        <translation>Nylige transaktioner er måske ikke synlige endnu, og derfor kan din tegnebogs saldo være ukorrekt. Denne information vil være korrekt, når din tegnebog er færdig med at synkronisere med wispr-netværket, som detaljerne herunder viser.</translation>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the particl network, as detailed below.</source>
+        <translation>Nylige transaktioner er måske ikke synlige endnu, og derfor kan din tegnebogs saldo være ukorrekt. Denne information vil være korrekt, når din tegnebog er færdig med at synkronisere med particl-netværket, som detaljerne herunder viser.</translation>
     </message>
     <message>
-        <source>Attempting to spend wispr that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
-        <translation>Forsøg på at bruge wispr, som er indeholdt i endnu-ikke-viste transaktioner, accepteres ikke af netværket.</translation>
+        <source>Attempting to spend particl that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>Forsøg på at bruge particl, som er indeholdt i endnu-ikke-viste transaktioner, accepteres ikke af netværket.</translation>
     </message>
     <message>
         <source>Number of blocks left</source>
@@ -1183,7 +1183,7 @@
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>Vælg standard for underopdeling af enhed, som skal vises i brugergrænsefladen og ved afsendelse af wispr.</translation>
+        <translation>Vælg standard for underopdeling af enhed, som skal vises i brugergrænsefladen og ved afsendelse af particl.</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1328,16 +1328,16 @@
         <translation>Fejl i betalingsanmodning</translation>
     </message>
     <message>
-        <source>Cannot start wispr: click-to-pay handler</source>
-        <translation>Kan ikke starte wispr: click-to-pay-håndtering</translation>
+        <source>Cannot start particl: click-to-pay handler</source>
+        <translation>Kan ikke starte particl: click-to-pay-håndtering</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>URI-håndtering</translation>
     </message>
     <message>
-        <source>'wispr://' is not a valid URI. Use 'wispr:' instead.</source>
-        <translation>'wispr://' er ikke et gyldigt URI. Brug 'wispr:' istedet. </translation>
+        <source>'particl://' is not a valid URI. Use 'particl:' instead.</source>
+        <translation>'particl://' er ikke et gyldigt URI. Brug 'particl:' istedet. </translation>
     </message>
     <message>
         <source>Payment request fetch URL is invalid: %1</source>
@@ -2064,7 +2064,7 @@
     <name>SendCoinsDialog</name>
     <message>
         <source>Send Coins</source>
-        <translation>Send wispr</translation>
+        <translation>Send particl</translation>
     </message>
     <message>
         <source>Coin Control Features</source>
@@ -2151,8 +2151,8 @@ Note: Siden gebyret er kalkuleret på en per-byte basis, et gebyr på "100 satos
         <translation>Skjul</translation>
     </message>
     <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for wispr transactions than the network can process.</source>
-        <translation>Det er helt fint kun at betale det minimale gebyr, så længe den totale transaktionsvolumen er mindre end den plads, der er tilgængelig i blokkene. Men vær opmærksom på, at dette kan ende ud i transaktioner, der aldrig bliver bekræftet, når der bliver større forespørgsel efter wispr-transaktioner, end hvad netværket kan bearbejde.</translation>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for particl transactions than the network can process.</source>
+        <translation>Det er helt fint kun at betale det minimale gebyr, så længe den totale transaktionsvolumen er mindre end den plads, der er tilgængelig i blokkene. Men vær opmærksom på, at dette kan ende ud i transaktioner, der aldrig bliver bekræftet, når der bliver større forespørgsel efter particl-transaktioner, end hvad netværket kan bearbejde.</translation>
     </message>
     <message>
         <source>(read the tooltip)</source>
@@ -2284,7 +2284,7 @@ Note: Siden gebyret er kalkuleret på en per-byte basis, et gebyr på "100 satos
     </message>
     <message>
         <source>Confirm send coins</source>
-        <translation>Bekræft afsendelse af wispr</translation>
+        <translation>Bekræft afsendelse af particl</translation>
     </message>
     <message>
         <source>The recipient address is not valid. Please recheck.</source>
@@ -2394,8 +2394,8 @@ Note: Siden gebyret er kalkuleret på en per-byte basis, et gebyr på "100 satos
         <translation>Fjern denne indgang</translation>
     </message>
     <message>
-        <source>The fee will be deducted from the amount being sent. The recipient will receive less wispr than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
-        <translation>Gebyret vil blive trukket fra det sendte beløb. Modtageren vil modtage færre wispr, end du indtaster i beløbfeltet. Hvis flere modtagere vælges, vil gebyret deles ligeligt.</translation>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less particl than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>Gebyret vil blive trukket fra det sendte beløb. Modtageren vil modtage færre particl, end du indtaster i beløbfeltet. Hvis flere modtagere vælges, vil gebyret deles ligeligt.</translation>
     </message>
     <message>
         <source>S&amp;ubtract fee from amount</source>
@@ -2422,7 +2422,7 @@ Note: Siden gebyret er kalkuleret på en per-byte basis, et gebyr på "100 satos
         <translation>Indtast et mærkat for denne adresse for at føje den til listen over brugte adresser</translation>
     </message>
     <message>
-        <source>A message that was attached to the wispr: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
+        <source>A message that was attached to the particl: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
         <translation>En besked, som blev føjet til “bitcon:”-URI'en, som vil gemmes med transaktionen til din reference. Bemærk: Denne besked vil ikke blive sendt over Particl-netværket.</translation>
     </message>
     <message>
@@ -2467,8 +2467,8 @@ Note: Siden gebyret er kalkuleret på en per-byte basis, et gebyr på "100 satos
         <translation>&amp;Singér besked</translation>
     </message>
     <message>
-        <source>You can sign messages/agreements with your addresses to prove you can receive wispr sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
-        <translation>Du kan signere beskeder/aftaler med dine adresser for at bevise, at du kan modtage wispr, der bliver sendt til adresserne. Vær forsigtig med ikke at signere noget vagt eller tilfældigt, da eventuelle phishing-angreb kan snyde dig til at overlade din identitet til dem. Signér kun fuldt ud detaljerede udsagn, som du er enig i.</translation>
+        <source>You can sign messages/agreements with your addresses to prove you can receive particl sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <translation>Du kan signere beskeder/aftaler med dine adresser for at bevise, at du kan modtage particl, der bliver sendt til adresserne. Vær forsigtig med ikke at signere noget vagt eller tilfældigt, da eventuelle phishing-angreb kan snyde dig til at overlade din identitet til dem. Signér kun fuldt ud detaljerede udsagn, som du er enig i.</translation>
     </message>
     <message>
         <source>The Particl address to sign the message with</source>
@@ -2749,7 +2749,7 @@ Note: Siden gebyret er kalkuleret på en per-byte basis, et gebyr på "100 satos
     </message>
     <message>
         <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
-        <translation>Minede wispr skal modne %1 blokke, før de kan bruges. Da du genererede denne blok, blev den transmitteret til netværket for at blive føjet til blokkæden. Hvis det ikke lykkes at få den i kæden, vil dens tilstand ændres til “ikke accepteret”, og den vil ikke kunne bruges. Dette kan ske nu og da, hvis en anden knude udvinder en blok inden for nogle få sekunder fra din.</translation>
+        <translation>Minede particl skal modne %1 blokke, før de kan bruges. Da du genererede denne blok, blev den transmitteret til netværket for at blive føjet til blokkæden. Hvis det ikke lykkes at få den i kæden, vil dens tilstand ændres til “ikke accepteret”, og den vil ikke kunne bruges. Dette kan ske nu og da, hvis en anden knude udvinder en blok inden for nogle få sekunder fra din.</translation>
     </message>
     <message>
         <source>Debug information</source>
@@ -3071,7 +3071,7 @@ Note: Siden gebyret er kalkuleret på en per-byte basis, et gebyr på "100 satos
     <name>WalletModel</name>
     <message>
         <source>Send Coins</source>
-        <translation>Send wispr</translation>
+        <translation>Send particl</translation>
     </message>
     <message>
         <source>Fee bump error</source>
@@ -3198,10 +3198,6 @@ Note: Siden gebyret er kalkuleret på en per-byte basis, et gebyr på "100 satos
     <message>
         <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
         <translation>Fejl under læsning af %s! Alle nøgler blev læst korrekt, men transaktionsdata eller indgange i adressebogen kan mangle eller være ukorrekte.</translation>
-    </message>
-    <message>
-        <source>Group outputs by address, selecting all or none, instead of selecting on a per-output basis. Privacy is improved as an address is only used once (unless someone sends to it after spending from it), but may result in slightly higher fees as suboptimal coin selection may result due to the added limitation (default: %u)</source>
-        <translation>Gruppér output efter adresse og vælg alle eller ingen, i stedet for at vælge på per-output-basis. Højere sikring af privatliv, da en adresse kun bruges én gang (med mindre nogen sender til en adresse efter den er brugt), men kan resultere i en anelse højere gebyrer, da ikke-optimal valg af output-adresser kan forekomme på grund af den tilføjede begrænsning (standard: %u)</translation>
     </message>
     <message>
         <source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source>
@@ -3348,10 +3344,6 @@ Note: Siden gebyret er kalkuleret på en per-byte basis, et gebyr på "100 satos
         <translation>Ugyldigt beløb for -fallbackfee=&lt;beløb&gt;: “%s”</translation>
     </message>
     <message>
-        <source>Specified blocks directory "%s" does not exist.</source>
-        <translation>Angivet blokmappe “%s” eksisterer ikke.</translation>
-    </message>
-    <message>
         <source>Upgrading txindex database</source>
         <translation>Opgraderer txindex database</translation>
     </message>
@@ -3490,6 +3482,12 @@ Note: Siden gebyret er kalkuleret på en per-byte basis, et gebyr på "100 satos
     <message>
         <source>Signing transaction failed</source>
         <translation>Signering af transaktion mislykkedes</translation>
+    </message>
+    <message>
+        <source>Specified blocks directory "%s" does not exist.
+</source>
+        <translation>Specificeret blokke mappe "%s" eksisterer ikke.
+</translation>
     </message>
     <message>
         <source>The transaction amount is too small to pay the fee</source>

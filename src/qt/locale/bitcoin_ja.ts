@@ -176,7 +176,7 @@
         <translation>ウォレットの暗号化を確認する</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WISPR&lt;/b&gt;!</source>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PARTICL&lt;/b&gt;!</source>
         <translation>警告: もしもあなたのウォレットを暗号化してパスフレーズを失ってしまったなら、&lt;b&gt;あなたの Particl はすべて失われます&lt;/b&gt;!</translation>
     </message>
     <message>
@@ -188,7 +188,7 @@
         <translation>ウォレットは暗号化されました</translation>
     </message>
     <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your wispr from being stolen by malware infecting your computer.</source>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your particl from being stolen by malware infecting your computer.</source>
         <translation>暗号化処理を完了させるため %1 をいますぐ終了します。ウォレットの暗号化では、コンピュータに感染したマルウェアなどによるビットコインの盗難から完全に守ることはできないことにご注意ください。</translation>
     </message>
     <message>
@@ -434,8 +434,8 @@
         <translation>タブツールバー</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and wispr: URIs)</source>
-        <translation>支払いを要求する (QRコードとwispr:ではじまるURIを生成する)</translation>
+        <source>Request payments (generates QR codes and particl: URIs)</source>
+        <translation>支払いを要求する (QRコードとparticl:ではじまるURIを生成する)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -446,8 +446,8 @@
         <translation>支払いを受け取るアドレスとラベルのリストを表示する</translation>
     </message>
     <message>
-        <source>Open a wispr: URI or payment request</source>
-        <translation>wispr: URIまたは支払いリクエストを開く</translation>
+        <source>Open a particl: URI or payment request</source>
+        <translation>particl: URIまたは支払いリクエストを開く</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -904,11 +904,11 @@
         <translation>フォーム</translation>
     </message>
     <message>
-        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the wispr network, as detailed below.</source>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the particl network, as detailed below.</source>
         <translation>確認できない最近のトランザクションがあるかもしれません。これによりウォレットの残高は不正確なものである可能性があります。この情報はウォレットが一度ビットコインネットワークへの同期が完了すると正確なものとなります。詳細は下記を参照してください。</translation>
     </message>
     <message>
-        <source>Attempting to spend wispr that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <source>Attempting to spend particl that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
         <translation>まだ表示されていないトランザクションが影響するビットコインを使用しようとすると、ネットワークから認証がなされないでしょう。</translation>
     </message>
     <message>
@@ -1328,7 +1328,7 @@
         <translation>支払いのリクエストのエラーです</translation>
     </message>
     <message>
-        <source>Cannot start wispr: click-to-pay handler</source>
+        <source>Cannot start particl: click-to-pay handler</source>
         <translation>Particl を起動できません: click-to-pay handler</translation>
     </message>
     <message>
@@ -1336,8 +1336,8 @@
         <translation>URI の操作</translation>
     </message>
     <message>
-        <source>'wispr://' is not a valid URI. Use 'wispr:' instead.</source>
-        <translation>'wispr://' は正しいURIではありません｡ 'wispr:'を利用してください｡</translation>
+        <source>'particl://' is not a valid URI. Use 'particl:' instead.</source>
+        <translation>'particl://' は正しいURIではありません｡ 'particl:'を利用してください｡</translation>
     </message>
     <message>
         <source>Payment request fetch URL is invalid: %1</source>
@@ -2151,8 +2151,8 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>隠す</translation>
     </message>
     <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for wispr transactions than the network can process.</source>
-        <translation>ブロックの容量に比べてトランザクション流量が少ないうちは最小手数料のみの支払で十分です。しかしながらネットワークが処理しきれないほどwisprトランザクションの需要がひとたび生まれてしまった場合には、永遠に検証がされないトランザクションになってしまう可能性があることに注意してください。</translation>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks. But be aware that this can end up in a never confirming transaction once there is more demand for particl transactions than the network can process.</source>
+        <translation>ブロックの容量に比べてトランザクション流量が少ないうちは最小手数料のみの支払で十分です。しかしながらネットワークが処理しきれないほどparticlトランザクションの需要がひとたび生まれてしまった場合には、永遠に検証がされないトランザクションになってしまう可能性があることに注意してください。</translation>
     </message>
     <message>
         <source>(read the tooltip)</source>
@@ -2402,7 +2402,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>この項目を削除する</translation>
     </message>
     <message>
-        <source>The fee will be deducted from the amount being sent. The recipient will receive less wispr than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less particl than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
         <translation>送金する金額から手数料が差し引かれます。受取人は数量フィールドで指定した量よりも少ないビットコインを受け取ります。受取人が複数いる場合には、手数料は均等割されます。</translation>
     </message>
     <message>
@@ -2430,8 +2430,8 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>このアドレスに対するラベルを入力することで、使用済みアドレスの一覧に追加することができます</translation>
     </message>
     <message>
-        <source>A message that was attached to the wispr: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
-        <translation>wispr: URIに添付されていたメッセージです。これは参照用としてトランザクションとともに保存されます。注意：このメッセージはParticlネットワークを通して送信されるわけではありません。</translation>
+        <source>A message that was attached to the particl: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Particl network.</source>
+        <translation>particl: URIに添付されていたメッセージです。これは参照用としてトランザクションとともに保存されます。注意：このメッセージはParticlネットワークを通して送信されるわけではありません。</translation>
     </message>
     <message>
         <source>Pay To:</source>
@@ -2475,7 +2475,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>メッセージの署名 (&amp;S)</translation>
     </message>
     <message>
-        <source>You can sign messages/agreements with your addresses to prove you can receive wispr sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <source>You can sign messages/agreements with your addresses to prove you can receive particl sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
         <translation>あなたの所有しているアドレスによりメッセージや合意書に署名をすることで、それらアドレスに対して送られたビットコインを受け取ることができることを証明できます。フィッシング攻撃により不正にあなたの識別情報を署名させられてしまうことを防ぐために、不明確なものやランダムなものに対して署名しないよう注意してください。あなたが同意した、よく詳細の記された文言にのみ署名するようにしてください。</translation>
     </message>
     <message>
@@ -3208,10 +3208,6 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>%s の読み込みエラー! すべてのキーは正しく読み取れますが、取引データやアドレス帳のエントリが失われたか、正しくない可能性があります。</translation>
     </message>
     <message>
-        <source>Group outputs by address, selecting all or none, instead of selecting on a per-output basis. Privacy is improved as an address is only used once (unless someone sends to it after spending from it), but may result in slightly higher fees as suboptimal coin selection may result due to the added limitation (default: %u)</source>
-        <translation>出力ごとではなく、アドレス単位に出力をまとめて選択します。(後からまたそのアドレスに支払われない限り)アドレスが一度しか使用されないためプライバシーが向上します。ただし追加の制限により最適ではないコイン選択が発生した場合に、わずかに高い手数料となる可能性があります。(初期値: %u)</translation>
-    </message>
-    <message>
         <source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source>
         <translation>あなたのPCの日付と時刻が正しいことを確認して下さい！ もしあなたの時計が正しくなければ %s が正確に動作しません。</translation>
     </message>
@@ -3357,10 +3353,6 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>不正な額 -fallbackfee=&lt;amount&gt;: '%s'</translation>
     </message>
     <message>
-        <source>Specified blocks directory "%s" does not exist.</source>
-        <translation>指定のブロックディレクトリ"%s"は存在しません｡</translation>
-    </message>
-    <message>
         <source>Upgrading txindex database</source>
         <translation>txindex データベースを更新しています</translation>
     </message>
@@ -3499,6 +3491,12 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     <message>
         <source>Signing transaction failed</source>
         <translation>取引の署名に失敗しました</translation>
+    </message>
+    <message>
+        <source>Specified blocks directory "%s" does not exist.
+</source>
+        <translation>指定のブロックディレクトリ"%s"が存在しません｡
+</translation>
     </message>
     <message>
         <source>The transaction amount is too small to pay the fee</source>
