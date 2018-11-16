@@ -3,6 +3,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <libzerocoin/Params.h>
 #include <chainparams.h>
 #include <consensus/merkle.h>
 
@@ -15,7 +16,10 @@
 
 #include <chainparamsseeds.h>
 #include <chainparamsimport.h>
-#include <libzerocoin/Params.h>
+#include <boost/assign/list_of.hpp>
+
+using namespace std;
+using namespace boost::assign;
 
 int64_t CChainParams::GetCoinYearReward(int64_t nTime) const
 {
