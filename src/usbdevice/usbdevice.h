@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef WISPR_USBDEVICE_USBDEVICE_H
-#define WISPR_USBDEVICE_USBDEVICE_H
+#ifndef PARTICL_USBDEVICE_USBDEVICE_H
+#define PARTICL_USBDEVICE_USBDEVICE_H
 
 #include <string.h>
 #include <assert.h>
@@ -17,8 +17,6 @@
 
 
 class UniValue;
-struct hid_device_;
-typedef struct hid_device_ hid_device;
 class CCoinsViewCache;
 
 namespace usb_device {
@@ -52,6 +50,7 @@ public:
         return true;
     }
 
+    using CBasicKeyStore::GetKey;
     bool GetKey(const CKeyID &address, CPathKey &keyOut) const
     {
         LOCK(cs_KeyStore);
@@ -98,13 +97,17 @@ class CUSBDevice
 {
 public:
     CUSBDevice() {};
+    virtual ~CUSBDevice() {};
     CUSBDevice(const DeviceType *pType_, const char *cPath_, const char *cSerialNo_, int nInterface_) : pType(pType_)
     {
         assert(strlen(cPath_) < sizeof(cPath));
-        assert(strlen(cSerialNo_) < sizeof(cSerialNo));
-
         strcpy(cPath, cPath_);
-        strcpy(cSerialNo, cSerialNo_);
+
+        cSerialNo[0] = '\n';
+        if (cSerialNo_) {
+            assert(strlen(cSerialNo_) < sizeof(cSerialNo));
+            strcpy(cSerialNo, cSerialNo_);
+        }
 
         nInterface = nInterface_;
     };
@@ -120,24 +123,27 @@ public:
 
     virtual int SignMessage(const std::vector<uint32_t> &vPath, const std::string &sMessage, std::vector<uint8_t> &vchSig, std::string &sError) { return 0; };
 
-    virtual int PrepareTransaction(const CMutableTransaction *tx, const CCoinsViewCache &view) { return 0; };
+    virtual int PrepareTransaction(CMutableTransaction &tx, const CCoinsViewCache &view, const CKeyStore &keystore, int nHashType) { return 0; };
 
     //int SignHash(const std::vector<uint32_t> &vPath, const uint256 &hash, std::vector<uint8_t> &vchSig, std::string &sError);
     virtual int SignTransaction(const std::vector<uint32_t> &vPath, const std::vector<uint8_t> &vSharedSecret, const CMutableTransaction *tx,
         int nIn, const CScript &scriptCode, int hashType, const std::vector<uint8_t> &amount, SigVersion sigversion,
         std::vector<uint8_t> &vchSig, std::string &sError) { return 0; };
 
+    virtual int LoadMnemonic(uint32_t wordcount, bool pinprotection, std::string &sError) { return 0; };
+    virtual int Backup(std::string &sError) { return 0; };
+
     const DeviceType *pType = nullptr;
     char cPath[512];
     char cSerialNo[128];
     int nInterface;
     std::string sError;
-
-protected:
-    hid_device *handle = nullptr;
 };
 
-void ListDevices(std::vector<std::unique_ptr<CUSBDevice> > &vDevices);
+
+void ListHIDDevices(std::vector<std::unique_ptr<CUSBDevice> > &vDevices);
+void ListWebUSBDevices(std::vector<std::unique_ptr<CUSBDevice> > &vDevices);
+void ListAllDevices(std::vector<std::unique_ptr<CUSBDevice> > &vDevices);
 CUSBDevice *SelectDevice(std::vector<std::unique_ptr<CUSBDevice> > &vDevices, std::string &sError);
 
 /** A signature creator for transactions. */
@@ -161,5 +167,5 @@ public:
 
 } // usb_device
 
-#endif // WISPR_USBDEVICE_USBDEVICE_H
+#endif // PARTICL_USBDEVICE_USBDEVICE_H
 

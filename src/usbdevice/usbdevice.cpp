@@ -7,8 +7,10 @@
 #include <usbdevice/debugdevice.h>
 #include <usbdevice/ledgerdevice.h>
 #include <usbdevice/trezordevice.h>
+#include <usbdevice/usbwrapper.h>
 
 #include <hidapi/hidapi.h>
+
 #include <stdio.h>
 #include <inttypes.h>
 #include <univalue.h>
@@ -25,7 +27,11 @@ namespace usb_device {
 const DeviceType usbDeviceTypes[] = {
     DeviceType(0xffff, 0x0001, "Debug", "Device", USBDEVICE_DEBUG),
     DeviceType(0x2c97, 0x0001, "Ledger", "Nano S", USBDEVICE_LEDGER_NANO_S),
-    DeviceType(0x534c, 0x0001, "Trezor", "One", USBDEVICE_TREZOR_ONE),
+    //DeviceType(0x534c, 0x0001, "Trezor", "One", USBDEVICE_TREZOR_ONE),
+};
+
+const DeviceType webusbDeviceTypes[] = {
+    DeviceType(0x1209, 0x53c1, "Trezor", "One", USBDEVICE_TREZOR_ONE),
 };
 
 void ShutdownHardwareIntegration()
@@ -68,7 +74,7 @@ static bool MatchTrezorInterface(struct hid_device_info *cur_dev)
     return cur_dev->interface_number == 0;
 }
 
-void ListDevices(std::vector<std::unique_ptr<CUSBDevice> > &vDevices)
+void ListHIDDevices(std::vector<std::unique_ptr<CUSBDevice> > &vDevices)
 {
     if (Params().NetworkIDString() == "regtest") {
         vDevices.push_back(std::unique_ptr<CUSBDevice>(new CDebugDevice()));
@@ -92,12 +98,16 @@ void ListDevices(std::vector<std::unique_ptr<CUSBDevice> > &vDevices)
 
             if (type.type == USBDEVICE_LEDGER_NANO_S
                 && MatchLedgerInterface(cur_dev)) {
-                std::unique_ptr<CUSBDevice> device(new CLedgerDevice(&type, cur_dev->path, (char*)cur_dev->serial_number, cur_dev->interface_number));
+                char mbs[128];
+                wcstombs(mbs, cur_dev->serial_number, sizeof(mbs));
+                std::unique_ptr<CUSBDevice> device(new CLedgerDevice(&type, cur_dev->path, mbs, cur_dev->interface_number));
                 vDevices.push_back(std::move(device));
             } else
             if (type.type == USBDEVICE_TREZOR_ONE
                 && MatchTrezorInterface(cur_dev)) {
-                std::unique_ptr<CUSBDevice> device(new CTrezorDevice(&type, cur_dev->path, (char*)cur_dev->serial_number, cur_dev->interface_number));
+                char mbs[128];
+                wcstombs(mbs, cur_dev->serial_number, sizeof(mbs));
+                std::unique_ptr<CUSBDevice> device(new CTrezorDevice(&type, cur_dev->path, mbs, cur_dev->interface_number));
                 vDevices.push_back(std::move(device));
             }
         }
@@ -106,6 +116,53 @@ void ListDevices(std::vector<std::unique_ptr<CUSBDevice> > &vDevices)
     hid_free_enumeration(devs);
 
     hid_exit();
+
+    return;
+};
+
+void ListWebUSBDevices(std::vector<std::unique_ptr<CUSBDevice> > &vDevices)
+{
+    struct webusb_device_info *devs, *cur_dev;
+    if (webusb_init()) {
+        return;
+    }
+
+    devs = webusb_enumerate(0x0, 0x0);
+    cur_dev = devs;
+    while (cur_dev) {
+        for (const auto &type : webusbDeviceTypes) {
+            if (cur_dev->vendor_id != type.nVendorId
+                || cur_dev->product_id != type.nProductId) {
+                continue;
+            }
+
+            if (type.type == USBDEVICE_TREZOR_ONE
+                && cur_dev->interface_number == 0) {
+                char mbs[128];
+                wcstombs(mbs, cur_dev->serial_number, sizeof(mbs));
+                std::unique_ptr<CUSBDevice> device(new CTrezorDevice(&type, cur_dev->path, mbs, cur_dev->interface_number));
+                vDevices.push_back(std::move(device));
+            }
+        }
+        cur_dev = cur_dev->next;
+    }
+    webusb_free_enumeration(devs);
+
+    webusb_exit();
+
+    return;
+};
+
+void ListAllDevices(std::vector<std::unique_ptr<CUSBDevice> > &vDevices)
+{
+    if (Params().NetworkIDString() == "regtest") {
+        vDevices.push_back(std::unique_ptr<CUSBDevice>(new CDebugDevice()));
+        return;
+    }
+
+    ListHIDDevices(vDevices);
+    ListWebUSBDevices(vDevices);
+
     return;
 };
 
@@ -116,7 +173,7 @@ CUSBDevice *SelectDevice(std::vector<std::unique_ptr<CUSBDevice> > &vDevices, st
         return vDevices[0].get();
     }
 
-    ListDevices(vDevices);
+    ListAllDevices(vDevices);
     if (vDevices.size() < 1) {
         sError = "No device found.";
         return nullptr;
@@ -142,7 +199,6 @@ bool DeviceSignatureCreator::CreateSig(const SigningProvider& provider, std::vec
     }
 
     //uint256 hash = SignatureHash(scriptCode, *txTo, nIn, nHashType, amount, sigversion);
-
     const CHDWallet *pw = dynamic_cast<const CHDWallet*>(&provider);
     if (pw) {
         const CEKAKey *pak = nullptr;
