@@ -443,6 +443,7 @@ libwispr_wallet_a_SOURCES = \
   blind.cpp \
   key/stealth.cpp \
   pos/miner.cpp \
+  pos/kernel.cpp \
   policy/rbf.cpp \
   primitives/deterministicmint.cpp \
   primitives/zerocoin.cpp \

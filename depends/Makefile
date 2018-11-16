@@ -16,7 +16,7 @@ HOST ?= $(BUILD)
 PATCHES_PATH = $(BASEDIR)/patches
 BASEDIR = $(CURDIR)
 HASH_LENGTH:=11
-DOWNLOAD_CONNECT_TIMEOUT:=10
+DOWNLOAD_CONNECT_TIMEOUT:=30
 DOWNLOAD_RETRIES:=3
 HOST_ID_SALT ?= salt
 BUILD_ID_SALT ?= salt
@@ -96,22 +96,21 @@ wallet_packages_$(NO_WALLET) = $(wallet_packages)
 upnp_packages_$(NO_UPNP) = $(upnp_packages)
 usb_packages_$(NO_USB) = $(usb_packages)
 
-rapidcheck_packages_$(RAPIDCHECK) = $(rapidcheck_packages)
-
 ifeq ($(NO_USB),)
-    linux_packages += $(linux_packages_usb)
     native_packages += $(usb_native_packages)
 endif
 
-ifeq ($(rapidcheck_packages_),)
-packages += $(rapidcheck_packages)
-endif
+rapidcheck_packages_$(RAPIDCHECK) = $(rapidcheck_packages)
 
 packages += $($(host_arch)_$(host_os)_packages) $($(host_os)_packages) $(qt_packages_) $(wallet_packages_) $(upnp_packages_) $(usb_packages_)
 native_packages += $($(host_arch)_$(host_os)_native_packages) $($(host_os)_native_packages)
 
 ifneq ($(qt_packages_),)
 native_packages += $(qt_native_packages)
+endif
+
+ifeq ($(rapidcheck_packages_),)
+packages += $(rapidcheck_packages)
 endif
 
 all_packages = $(packages) $(native_packages)
