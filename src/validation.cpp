@@ -4776,9 +4776,12 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
 
             // Blocks are connected at end of import / reindex
             // CheckProofOfStake is run again during connectblock
+            unique_ptr<CStakeInput> stake;
+            // Blocks are connected at end of import / reindex
+            // CheckProofOfStake is run again during connectblock
             if (!IsInitialBlockDownload() // checks (!fImporting && !fReindex)
                 && (!accept_block || chainActive.Height() > (int)Params().GetStakeMinConfirmations())
-                && !CheckProofOfStake(state, pindexPrev, *block.vtx[0], block.nTime, block.nBits, hashProof, targetProofOfStake)) {
+                && !CheckProofOfStake(block, hashProof, stake)) {
                 return error("ContextualCheckBlock(): check proof-of-stake failed for block %s\n", block.GetHash().ToString());
             }
         } else
