@@ -20,7 +20,7 @@
 #include <messagesigner.h>
 #include <rpc/server.h>
 #include <util.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #ifdef ENABLE_WALLET
 #include <wallet/wallet.h>
 #endif // ENABLE_WALLET

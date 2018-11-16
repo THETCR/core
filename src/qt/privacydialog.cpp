@@ -20,7 +20,7 @@
 
 #include <QClipboard>
 #include <QSettings>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #include <QtWidgets>
 #include <primitives/deterministicmint.h>
 #include <accumulators.h>

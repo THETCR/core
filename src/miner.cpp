@@ -22,7 +22,7 @@
 #include <script/standard.h>
 #include <timedata.h>
 #include <util.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #include <validationinterface.h>
 
 #include <algorithm>

@@ -23,7 +23,7 @@
 #include <txdb.h>
 #include <blind.h>
 #include <anon.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #include <wallet/hdwallet.h>
 #include <wallet/hdwalletdb.h>
 #include <wallet/coincontrol.h>

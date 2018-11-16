@@ -39,7 +39,7 @@
 #include <ui_interface.h>
 #include <undo.h>
 #include <util.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #include <util/strencodings.h>
 #include <validationinterface.h>
 #include <warnings.h>

@@ -24,7 +24,7 @@
 #include <shutdown.h>
 #include <timedata.h>
 #include <util.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #include <wallet/coincontrol.h>
 #include <wallet/feebumper.h>
 #include <wallet/rpcwallet.h>

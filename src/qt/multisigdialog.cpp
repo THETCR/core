@@ -18,7 +18,7 @@
 #include "wallet.h"
 #include "script/sign.h"
 #include "script/interpreter.h"
-#include "utilmoneystr.h"
+#include "util/moneystr.h"
 #include "guiutil.h"
 #include "qvalidatedlineedit.h"
 #include "bitcoinamountfield.h"

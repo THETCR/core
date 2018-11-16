@@ -25,7 +25,7 @@
 #include <shutdown.h>
 #include <timedata.h>
 #include <txmempool.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #include <wallet/fees.h>
 #include <wallet/walletutil.h>
 
@@ -36,7 +36,7 @@
 
 
 #include <txdb.h>
-#include <utiltime.h>
+#include <util/time.h>
 #include <wallet/walletdb.h>
 #include <zerocoin/accumulators.h>
 #include <primitives/transaction.h>

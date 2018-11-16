@@ -188,9 +188,9 @@
     <ClCompile Include="..\..\src\sync.cpp" />
     <ClCompile Include="..\..\src\threadinterrupt.cpp" />
     <ClCompile Include="..\..\src\util.cpp" />
-    <ClCompile Include="..\..\src\utilmoneystr.cpp" />
+    <ClCompile Include="..\..\src\util/moneystr.cpp" />
     <ClCompile Include="..\..\src\util/strencodings.cpp" />
-    <ClCompile Include="..\..\src\utiltime.cpp" />
+    <ClCompile Include="..\..\src\util/time.cpp" />
   </ItemGroup>
   <Import Label="configTarget" Project="..\common.vcxproj" />
 </Project>

@@ -10,7 +10,7 @@
 #include <script/standard.h>
 #include <sync.h>
 #include <util.h>
-#include <utiltime.h>
+#include <util/time.h>
 #include <wallet/wallet.h>
 #include <wallet/hdwallet.h>
 #include <merkleblock.h>

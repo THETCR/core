@@ -9,7 +9,7 @@
 #include <scheduler.h>
 #include <outputtype.h>
 #include <util.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #include <validation.h>
 #include <walletinitinterface.h>
 #include <wallet/rpcwallet.h>

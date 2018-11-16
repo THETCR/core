@@ -26,7 +26,7 @@
 #include <txmempool.h>
 #include <ui_interface.h>
 #include <util.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #include <util/strencodings.h>
 #include <smsg/smessage.h>
 

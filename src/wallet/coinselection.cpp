@@ -4,7 +4,7 @@
 
 #include <wallet/coinselection.h>
 #include <util.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 
 // Descending order comparator
 struct {

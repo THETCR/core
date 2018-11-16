@@ -10,7 +10,7 @@
 #include <tinyformat.h>
 #include <util.h>
 #include <util/strencodings.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 
 #include <assert.h>
 

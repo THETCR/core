@@ -12,7 +12,7 @@
 #include <policy/rbf.h>
 #include <validation.h> //for mempool access
 #include <txmempool.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #include <util.h>
 #include <net.h>
 

@@ -7,7 +7,7 @@
 
 #include <tinyformat.h>
 #include <util.h>
-#include <utilmemory.h>
+#include <util/memory.h>
 
 #include <assert.h>
 

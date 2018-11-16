@@ -43,7 +43,7 @@
 #include <torcontrol.h>
 #include <ui_interface.h>
 #include <util.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #include <validationinterface.h>
 #include <smsg/smessage.h>
 #include <smsg/rpcsmessage.h>

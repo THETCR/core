@@ -19,7 +19,7 @@
 #include <obfuscation/privatesend-server.h>
 #include <rpc/server.h>
 #include <util.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 
 #include <fstream>
 #include <iomanip>

@@ -15,8 +15,8 @@
 #include <streams.h>
 #include <timedata.h>
 #include <util.h>
-#include <utilmoneystr.h>
-#include <utiltime.h>
+#include <util/moneystr.h>
+#include <util/time.h>
 #include <insight/insight.h>
 
 #include <anon.h>

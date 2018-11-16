@@ -14,7 +14,7 @@
 #include <script/sign.h>
 #include <txmempool.h>
 #include <util.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 
 #include <memory>
 

@@ -9,7 +9,7 @@
 #include <tinyformat.h>
 #include <util.h>
 #include <util/strencodings.h>
-#include <utiltime.h>
+#include <util/time.h>
 #include <version.h>
 
 #include <fstream>

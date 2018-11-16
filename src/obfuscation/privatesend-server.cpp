@@ -13,7 +13,7 @@
 #include <script/interpreter.h>
 #include <txmempool.h>
 #include <util.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 
 CPrivateSendServer privateSendServer;
 
