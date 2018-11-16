@@ -532,7 +532,7 @@ public:
             READWRITE(mapZerocoinSupply);
             READWRITE(vMintDenominationsInBlock);
         }else{
-            READWRITE(bnStakeModifierV2);
+            READWRITE(bnStakeModifier);
         }
     }
 
