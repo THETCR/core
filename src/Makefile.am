@@ -98,17 +98,18 @@ if BUILD_BITCOIN_TX
   bin_PROGRAMS += wispr-tx
 endif
 
-
 .PHONY: FORCE check-symbols check-security
 # wispr core #
 BITCOIN_CORE_H = \
   addrdb.h \
   rctindex.h \
   addrman.h \
+  attributes.h \
   base58.h \
   bech32.h \
   bloom.h \
   blockencodings.h \
+  blockfilter.h \
   chain.h \
   chainparams.h \
   chainparamsbase.h \
@@ -148,6 +149,7 @@ BITCOIN_CORE_H = \
   invalid.cpp \
   anon.h \
   blind.h \
+  interfaces/chain.h \
   interfaces/handler.h \
   interfaces/node.h \
   interfaces/wallet.h \
@@ -203,9 +205,7 @@ BITCOIN_CORE_H = \
   pow.h \
   pos/kernel.h \
   pos/miner.h \
-  primitives/block.h \
   primitives/deterministicmint.h \
-  primitives/transaction.h \
   primitives/zerocoin.h \
   protocol.h \
   random.h \
@@ -257,6 +257,7 @@ BITCOIN_CORE_H = \
   validation.h \
   validationinterface.h \
   versionbits.h \
+  versionbitsinfo.h \
   walletinitinterface.h \
   wallet/coincontrol.h \
   wallet/crypter.h \
@@ -310,6 +311,7 @@ libwispr_server_a_SOURCES = \
   addrdb.cpp \
   bloom.cpp \
   blockencodings.cpp \
+  blockfilter.cpp \
   chain.cpp \
   checkpoints.cpp \
   dsnotificationinterface.cpp \
@@ -318,6 +320,9 @@ libwispr_server_a_SOURCES = \
   httpserver.cpp \
   index/base.cpp \
   index/txindex.cpp \
+  interfaces/chain.cpp \
+  interfaces/handler.cpp \
+  interfaces/node.cpp \
   leveldbwrapper.cpp \
   init.cpp \
   instantx.cpp \
@@ -381,6 +386,10 @@ libwispr_server_a_SOURCES = \
   zerocoin/zwspchain.cpp \
   $(BITCOIN_CORE_H)
 
+if !ENABLE_WALLET
+libwispr_server_a_SOURCES += dummywallet.cpp
+endif
+
 if ENABLE_ZMQ
 libwispr_zmq_a_CPPFLAGS = $(BITCOIN_INCLUDES) $(ZMQ_CFLAGS)
 libwispr_zmq_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
@@ -396,6 +405,8 @@ libwispr_usbdevice_a_CPPFLAGS = $(BITCOIN_INCLUDES) $(AM_CPPFLAGS) $(PROTOBUF_CF
 libwispr_usbdevice_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_usbdevice_a_CFLAGS = -DHAVE_HIDAPI $(AM_CFLAGS)
 libwispr_usbdevice_a_SOURCES = \
+  usbdevice/usbwrapper.cpp \
+  usbdevice/usbwrapper.h \
   usbdevice/ledger/btchipApdu.h \
   usbdevice/ledger/ledgerLayer.h \
   usbdevice/ledger/ledgerLayer.c \
@@ -409,6 +420,7 @@ libwispr_usbdevice_a_SOURCES = \
   usbdevice/trezor/messages.proto \
   usbdevice/trezor/messages-common.proto \
   usbdevice/trezor/messages-management.proto \
+  usbdevice/trezor/messages-bitcoin.proto \
   usbdevice/trezordevice.h \
   usbdevice/trezordevice.cpp \
   usbdevice/rpcusbdevice.cpp
@@ -418,7 +430,10 @@ nodist_libwispr_usbdevice_a_SOURCES = \
   usbdevice/trezor/messages-common.pb.h \
   usbdevice/trezor/messages-common.pb.cc \
   usbdevice/trezor/messages-management.pb.h \
-  usbdevice/trezor/messages-management.pb.cc
+  usbdevice/trezor/messages-management.pb.cc \
+  usbdevice/trezor/messages-bitcoin.pb.h \
+  usbdevice/trezor/messages-bitcoin.pb.cc
+BUILT_SOURCES = $(nodist_libwispr_usbdevice_a_SOURCES)
 endif
 
 # wallet: shared between wisprd and wispr-qt, but only linked
@@ -443,13 +458,13 @@ libwispr_wallet_a_SOURCES = \
   wallet/hdwalletdb.cpp \
   wallet/rpchdwallet.cpp \
   wallet/stakeinput.cpp \
-  wallet/walletutil.cpp \
-  wallet/coinselection.cpp \
   blind.cpp \
   key/stealth.cpp \
   pos/miner.cpp \
   pos/kernel.cpp \
   policy/rbf.cpp \
+  wallet/walletutil.cpp \
+  wallet/coinselection.cpp \
   primitives/deterministicmint.cpp \
   primitives/zerocoin.cpp \
   obfuscation/privatesend-client.cpp \
@@ -581,9 +596,7 @@ libwispr_common_a_SOURCES = \
   anon.cpp \
   blind.cpp \
   key.cpp \
-  primitives/block.cpp \
   primitives/deterministicmint.cpp \
-  primitives/transaction.cpp \
   primitives/zerocoin.cpp \
   key/keyutil.cpp \
   key/extkey.cpp \
@@ -603,14 +616,7 @@ libwispr_common_a_SOURCES = \
   script/ismine.cpp \
   script/sign.cpp \
   script/standard.cpp \
-  timedata.cpp \
-  torcontrol.cpp \
-  txdb.cpp \
-  txmempool.cpp \
-  ui_interface.cpp \
-  validation.cpp \
-  validationinterface.cpp \
-  versionbits.cpp \
+  versionbitsinfo.cpp \
   warnings.cpp \
   zerocoin/accumulators.cpp \
   zerocoin/accumulatorcheckpoints.cpp \
@@ -630,8 +636,6 @@ libwispr_util_a_SOURCES = \
   compat/glibcxx_sanity.cpp \
   compat/strnlen.cpp \
   fs.cpp \
-  interfaces/handler.cpp \
-  interfaces/node.cpp \
   logging.cpp \
   random.cpp \
   rpc/protocol.cpp \
@@ -705,9 +709,9 @@ wisprd_LDADD = \
   $(LIBWISPR_SMSG) \
   $(LIBWISPR_USBDEVICE)
 
-wisprd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
+wisprd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
 if ENABLE_USBDEVICE
-wisprd_LDADD += $(USB_LIBS) $(PROTOBUF_LIBS)
+wisprd_LDADD += $(USB_LIBS) $(HIDAPI_LIBS) $(PROTOBUF_LIBS)
 endif
 
 # wispr-cli binary #
@@ -727,7 +731,7 @@ wispr_cli_LDADD = \
   $(LIBWISPR_UTIL) \
   $(LIBWISPR_CRYPTO)
 
-wispr_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
+wispr_cli_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
 # wispr-tx binary #
@@ -745,8 +749,8 @@ wispr_tx_LDADD = \
   $(LIBWISPR_COMMON) \
   $(LIBWISPR_UTIL) \
   $(LIBWISPR_ZEROCOIN) \
-  $(LIBWISPR_CRYPTO) \
   $(LIBWISPR_CONSENSUS) \
+  $(LIBWISPR_CRYPTO) \
   $(LIBSECP256K1)
 
 wispr_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
@@ -755,7 +759,7 @@ wispr_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 # wisprconsensus library #
 if BUILD_BITCOIN_LIBS
 include_HEADERS = script/wisprconsensus.h
-libwisprconsensus_la_SOURCES = $(crypto_libwispr_crypto_base_a_SOURCES) $(libwispr_consensus_a_SOURCES) $(libzerocoin_libwispr_zerocoin_a_SOURCES)
+libwisprconsensus_la_SOURCES = $(crypto_libwispr_crypto_base_a_SOURCES) $(libwispr_consensus_a_SOURCES)
 
 if GLIBC_BACK_COMPAT
   libwisprconsensus_la_SOURCES += compat/glibc_compat.cpp
@@ -825,9 +829,11 @@ if HARDEN
 	$(AM_V_at) READELF=$(READELF) OBJDUMP=$(OBJDUMP) $(top_srcdir)/contrib/devtools/security-check.py < $(bin_PROGRAMS)
 endif
 
+if ENABLE_BIP70
 %.pb.cc %.pb.h: %.proto
 	@test -f $(PROTOC)
 	$(AM_V_GEN) $(PROTOC) --cpp_out=$(@D) --proto_path=$(<D) $<
+endif
 
 if EMBEDDED_LEVELDB
 include Makefile.leveldb.include
