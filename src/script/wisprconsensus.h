@@ -22,11 +22,11 @@
     #define EXPORT_SYMBOL __attribute__ ((visibility ("default")))
   #endif
 #elif defined(MSC_VER) && !defined(STATIC_LIBWISPRCONSENSUS)
-#define EXPORT_SYMBOL __declspec(dllimport)
+  #define EXPORT_SYMBOL __declspec(dllimport)
 #endif
 
 #ifndef EXPORT_SYMBOL
-#define EXPORT_SYMBOL
+  #define EXPORT_SYMBOL
 #endif
 
 #ifdef __cplusplus
@@ -69,8 +69,8 @@ EXPORT_SYMBOL int bitcoinconsensus_verify_script(const unsigned char *scriptPubK
                                                  unsigned int nIn, unsigned int flags, bitcoinconsensus_error* err);
 
 EXPORT_SYMBOL int bitcoinconsensus_verify_script_with_amount(const unsigned char *scriptPubKey, unsigned int scriptPubKeyLen, int64_t amount,
-                                                             const unsigned char *txTo        , unsigned int txToLen,
-                                                             unsigned int nIn, unsigned int flags, bitcoinconsensus_error* err);
+                                    const unsigned char *txTo        , unsigned int txToLen,
+                                    unsigned int nIn, unsigned int flags, bitcoinconsensus_error* err);
 
 EXPORT_SYMBOL unsigned int bitcoinconsensus_version();
 
