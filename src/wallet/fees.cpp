@@ -13,6 +13,7 @@
 #include <wallet/wallet.h>
 #include <anon.h>
 
+
 CAmount GetRequiredFee(const CWallet& wallet, unsigned int nTxBytes)
 {
     return GetRequiredFeeRate(wallet).GetFee(nTxBytes);

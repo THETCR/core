@@ -182,9 +182,9 @@ bool CCryptoKeyStore::IsLocked(bool fForMixing) const
         return false;
     bool result;
     {
-        LOCK(cs_KeyStore);
+    LOCK(cs_KeyStore);
         result = vMasterKey.empty();
-    }
+}
     // fForMixing   fOnlyMixingAllowed  return
     // ---------------------------------------
     // true         true                result
@@ -243,7 +243,7 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn)
         if (keyPass && keyFail)
         {
             LogPrintf("The wallet is probably corrupted: Some keys decrypt but not all.\n");
-            assert(false);
+            throw std::runtime_error("Error unlocking wallet: some keys decrypt but not all. Your wallet file may be corrupt.");
         }
         if (keyFail || (!keyPass && nTries > 0))
             return false;
@@ -364,7 +364,7 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
         return false;
 
     fUseCrypto = true;
-    for (KeyMap::value_type& mKey : mapKeys)
+    for (const KeyMap::value_type& mKey : mapKeys)
     {
         const CKey &key = mKey.second;
         CPubKey vchPubKey = key.GetPubKey();
