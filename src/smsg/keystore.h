@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef WISPR_SMSG_KEYSTORE_H
-#define WISPR_SMSG_KEYSTORE_H
+#ifndef PARTICL_SMSG_KEYSTORE_H
+#define PARTICL_SMSG_KEYSTORE_H
 
 #include <key.h>
 #include <pubkey.h>
@@ -60,4 +60,4 @@ public:
 
 } // namespace smsg
 
-#endif //WISPR_SMSG_KEYSTORE_H
+#endif //PARTICL_SMSG_KEYSTORE_H

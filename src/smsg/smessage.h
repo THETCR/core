@@ -3,8 +3,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef WISPR_SMSG_SMESSAGE_H
-#define WISPR_SMSG_SMESSAGE_H
+#ifndef PARTICL_SMSG_SMESSAGE_H
+#define PARTICL_SMSG_SMESSAGE_H
 
 #include <key_io.h>
 #include <net.h>
@@ -14,6 +14,7 @@
 #include <smsg/keystore.h>
 #include <interfaces/handler.h>
 
+#include <boost/signals2/signal.hpp>
 
 class CWallet;
 
@@ -104,8 +105,9 @@ uint32_t SMSGGetSecondsInDay();
 
 inline bool GetFundingTxid(const uint8_t *pPayload, size_t nPayload, uint256 &txid)
 {
-    if (!pPayload || nPayload < 32)
+    if (!pPayload || nPayload < 32) {
         return false;
+    }
     memcpy(txid.begin(), pPayload+(nPayload-32), 32);
     return true;
 };
@@ -117,18 +119,18 @@ public:
     SecureMessage() {};
     SecureMessage(bool fPaid, size_t nDaysRetention)
     {
-        if (fPaid)
-        {
+        if (fPaid) {
             version[0] = 3;
             version[1] = 0;
 
             nonce[0] = nDaysRetention;
-        };
+        }
     };
     ~SecureMessage()
     {
-        if (pPayload)
+        if (pPayload) {
             delete[] pPayload;
+        }
         pPayload = nullptr;
     };
 
@@ -146,8 +148,9 @@ public:
 
     bool GetFundingTxid(uint256 &txid) const
     {
-        if (version[0] != 3)
+        if (version[0] != 3) {
             return false;
+        }
         return smsg::GetFundingTxid(pPayload, nPayload, txid);
     };
 
@@ -192,18 +195,20 @@ public:
     {
         timestamp = ts;
 
-        if (np < 8)
+        if (np < 8) {
             memset(sample, 0, 8);
-        else
+        } else {
             memcpy(sample, p, 8);
+        }
         offset = o;
         ttl = ttl_;
     };
 
     bool operator <(const SecMsgToken &y) const
     {
-        if (timestamp == y.timestamp)
+        if (timestamp == y.timestamp) {
             return memcmp(sample, y.sample, 8) < 0;
+        }
         return timestamp < y.timestamp;
     };
 
@@ -228,8 +233,9 @@ public:
 
     bool operator <(const SecMsgPurged &y) const
     {
-        if (timestamp == y.timestamp)
+        if (timestamp == y.timestamp) {
             return memcmp(sample, y.sample, 8) < 0;
+        }
         return timestamp < y.timestamp;
     };
 
@@ -467,5 +473,5 @@ public:
 
 extern smsg::CSMSG smsgModule;
 
-#endif // WISPR_SMSG_SMESSAGE_H
+#endif // PARTICL_SMSG_SMESSAGE_H
 

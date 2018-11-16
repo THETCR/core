@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef WISPR_SMSG_CRYPTER_H
-#define WISPR_SMSG_CRYPTER_H
+#ifndef PARTICL_SMSG_CRYPTER_H
+#define PARTICL_SMSG_CRYPTER_H
 
 #include <support/allocators/secure.h>
 #include <vector>
@@ -46,4 +46,4 @@ public:
     bool Decrypt(const uint8_t *chCiphertext, uint32_t nCipher, std::vector<uint8_t> &vchPlaintext);
 };
 
-#endif // WISPR_SMSG_CRYPTER_H
+#endif // PARTICL_SMSG_CRYPTER_H
