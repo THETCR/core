@@ -6,13 +6,14 @@
 
 #include <rpc/server.h>
 #include <wallet/db.h>
+#include <wallet/rpcwallet.h>
 
 WalletTestingSetup::WalletTestingSetup(const std::string& chainName):
-    TestingSetup(chainName), m_wallet("mock", WalletDatabase::CreateMock())
+    TestingSetup(chainName), m_wallet(*m_chain, WalletLocation(), WalletDatabase::CreateMock())
 {
     bool fFirstRun;
 
-    gArgs.ForceSetArg("-legacymode", "1");
+    gArgs.ForceSetArg("-btcmode", "1");
     fParticlWallet = false;
 
     m_wallet.LoadWallet(fFirstRun);

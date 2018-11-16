@@ -7,6 +7,7 @@
 #include <rpc/server.h>
 #include <wallet/db.h>
 #include <wallet/hdwallet.h>
+#include <wallet/rpcwallet.h>
 #include <validation.h>
 #include <util/system.h>
 
@@ -14,9 +15,8 @@ HDWalletTestingSetup::HDWalletTestingSetup(const std::string &chainName):
     TestingSetup(chainName, true) // fParticlMode = true
 {
     bool fFirstRun;
-    pwalletMain = std::make_shared<CHDWallet>("mock_part", WalletDatabase::CreateMock());
+    pwalletMain = std::make_shared<CHDWallet>(*m_chain, WalletLocation(), WalletDatabase::CreateMock());
     AddWallet(pwalletMain);
-    fParticlWallet = true;
     pwalletMain->LoadWallet(fFirstRun);
     RegisterValidationInterface(pwalletMain.get());
 
