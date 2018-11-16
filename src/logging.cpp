@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <logging.h>
-#include <utiltime.h>
+#include <util/time.h>
 
 const char * const DEFAULT_DEBUGLOGFILE = "debug.log";
 
@@ -95,39 +95,39 @@ struct CLogCategoryDesc
 };
 
 const CLogCategoryDesc LogCategories[] =
-{
-    {BCLog::NONE, "0"},
-    {BCLog::NONE, "none"},
-    {BCLog::NET, "net"},
-    {BCLog::TOR, "tor"},
-    {BCLog::MEMPOOL, "mempool"},
-    {BCLog::HTTP, "http"},
-    {BCLog::BENCH, "bench"},
-    {BCLog::ZMQ, "zmq"},
-    {BCLog::DB, "db"},
-    {BCLog::RPC, "rpc"},
-    {BCLog::ESTIMATEFEE, "estimatefee"},
-    {BCLog::ADDRMAN, "addrman"},
-    {BCLog::SELECTCOINS, "selectcoins"},
-    {BCLog::REINDEX, "reindex"},
-    {BCLog::CMPCTBLOCK, "cmpctblock"},
-    {BCLog::RAND, "rand"},
-    {BCLog::PRUNE, "prune"},
-    {BCLog::PROXY, "proxy"},
-    {BCLog::MEMPOOLREJ, "mempoolrej"},
-    {BCLog::LIBEVENT, "libevent"},
-    {BCLog::COINDB, "coindb"},
-    {BCLog::QT, "qt"},
-    {BCLog::LEVELDB, "leveldb"},
+        {
+                {BCLog::NONE, "0"},
+                {BCLog::NONE, "none"},
+                {BCLog::NET, "net"},
+                {BCLog::TOR, "tor"},
+                {BCLog::MEMPOOL, "mempool"},
+                {BCLog::HTTP, "http"},
+                {BCLog::BENCH, "bench"},
+                {BCLog::ZMQ, "zmq"},
+                {BCLog::DB, "db"},
+                {BCLog::RPC, "rpc"},
+                {BCLog::ESTIMATEFEE, "estimatefee"},
+                {BCLog::ADDRMAN, "addrman"},
+                {BCLog::SELECTCOINS, "selectcoins"},
+                {BCLog::REINDEX, "reindex"},
+                {BCLog::CMPCTBLOCK, "cmpctblock"},
+                {BCLog::RAND, "rand"},
+                {BCLog::PRUNE, "prune"},
+                {BCLog::PROXY, "proxy"},
+                {BCLog::MEMPOOLREJ, "mempoolrej"},
+                {BCLog::LIBEVENT, "libevent"},
+                {BCLog::COINDB, "coindb"},
+                {BCLog::QT, "qt"},
+                {BCLog::LEVELDB, "leveldb"},
 
-    {BCLog::SMSG, "smsg"},
-    {BCLog::RINGCT, "ringct"},
-    {BCLog::POS, "pos"},
-    {BCLog::HDWALLET, "hdwallet"},
+                {BCLog::SMSG, "smsg"},
+                {BCLog::RINGCT, "ringct"},
+                {BCLog::POS, "pos"},
+                {BCLog::HDWALLET, "hdwallet"},
 
-    {BCLog::ALL, "1"},
-    {BCLog::ALL, "all"},
-};
+                {BCLog::ALL, "1"},
+                {BCLog::ALL, "all"},
+        };
 
 bool GetLogCategory(BCLog::LogFlags& flag, const std::string& str)
 {
@@ -225,13 +225,13 @@ void BCLog::Logger::LogPrintStr(const std::string &str)
             // reopen the log file, if requested
             if (m_reopen_file) {
                 m_reopen_file = false;
-                m_fileout = fsbridge::freopen(m_file_path, "a", m_fileout);
-                if (!m_fileout) {
-                    return;
+                FILE* new_fileout = fsbridge::fopen(m_file_path, "a");
+                if (new_fileout) {
+                    setbuf(new_fileout, nullptr); // unbuffered
+                    fclose(m_fileout);
+                    m_fileout = new_fileout;
                 }
-                setbuf(m_fileout, nullptr); // unbuffered
             }
-
             FileWriteStr(strTimestamped, m_fileout);
         }
     }
@@ -251,7 +251,7 @@ void BCLog::Logger::ShrinkDebugFile()
     size_t log_size = 0;
     try {
         log_size = fs::file_size(m_file_path);
-    } catch (boost::filesystem::filesystem_error &) {}
+    } catch (const fs::filesystem_error&) {}
 
     // If debug.log file is more than 10% bigger the RECENT_DEBUG_HISTORY_SIZE
     // trim it down by saving only the last RECENT_DEBUG_HISTORY_SIZE bytes
