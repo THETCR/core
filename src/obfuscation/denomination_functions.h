@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <reverse_iterate.h>
+#include <reverse_iterator.h>
 #include <util/system.h>
 #include <libzerocoin/Denominations.h>
 #include <primitives/zerocoin.h>
