@@ -202,7 +202,7 @@ static CAmount ExtractAndValidateValue(const std::string& strValue)
 static void MutateTxVersion(CMutableTransaction& tx, const std::string& cmdVal)
 {
     int64_t newVersion;
-    if (!ParseInt64(cmdVal, &newVersion) || newVersion < 1 || newVersion > CTransaction::MAX_STANDARD_PARTICL_VERSION)
+    if (!ParseInt64(cmdVal, &newVersion) || newVersion < 1 || newVersion > CTransaction::MAX_STANDARD_WISPR_VERSION)
         throw std::runtime_error("Invalid TX version requested: '" + cmdVal + "'");
 
     if (!tx.IsParticlVersion() && IsParticlTxVersion(newVersion))
@@ -984,7 +984,7 @@ static int CommandLineRawTx(int argc, char* argv[])
         }
 
         CMutableTransaction tx;
-        tx.nVersion = CTransaction::CURRENT_PARTICL_VERSION;
+        tx.nVersion = CTransaction::CURRENT_WISPR_VERSION;
         int startArg;
 
         if (!fCreateBlank) {
