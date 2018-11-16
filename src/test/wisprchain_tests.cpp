@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(signature_test)
     BOOST_CHECK(serror == SCRIPT_ERR_OK);
 }
 
-BOOST_AUTO_TEST_CASE(wisprchain_test)
+BOOST_AUTO_TEST_CASE(particlchain_test)
 {
     SeedInsecureRand();
     CBasicKeyStore keystore;
