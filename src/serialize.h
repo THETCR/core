@@ -1233,11 +1233,9 @@ class CSizeComputer
 protected:
     size_t nSize;
 
-    const int nType;
     const int nVersion;
 public:
-    explicit CSizeComputer(int nTypeIn, int nVersionIn) : nSize(0), nType(nTypeIn), nVersion(nVersionIn) {}
-    explicit CSizeComputer(int nVersionIn) : nSize(0), nType(0), nVersion(nVersionIn) {}
+    explicit CSizeComputer(int nVersionIn) : nSize(0), nVersion(nVersionIn) {}
 
     void write(const char *psz, size_t _nSize)
     {
@@ -1267,7 +1265,6 @@ public:
     }
 
     int GetVersion() const { return nVersion; }
-    int GetType() const { return nType; }
 };
 
 template<typename Stream>
@@ -1327,12 +1324,6 @@ inline void WriteVarInt(CSizeComputer &s, I n)
 inline void WriteCompactSize(CSizeComputer &s, uint64_t nSize)
 {
     s.seek(GetSizeOfCompactSize(nSize));
-}
-
-template <typename T>
-size_t GetSerializeSize(const T& t, int nType, int nVersion = 0)
-{
-    return (CSizeComputer(nType, nVersion) << t).size();
 }
 
 template <typename S, typename T>
