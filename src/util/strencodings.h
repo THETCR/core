@@ -247,5 +247,15 @@ constexpr unsigned char ToUpper(unsigned char c)
  * @return          string with the first letter capitalized.
  */
 std::string Capitalize(std::string str);
+/** Reverse the endianess of a string */
+inline std::string ReverseEndianString(std::string in)
+{
+    std::string out = "";
+    unsigned int s = in.size();
+    for (unsigned int i = 0; i < s; i += 2) {
+        out += in.substr(s - i - 2, 2);
+    }
 
+    return out;
+}
 #endif // BITCOIN_UTIL_STRENCODINGS_H

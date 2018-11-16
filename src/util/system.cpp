@@ -80,6 +80,20 @@
 #include <openssl/conf.h>
 #include <thread>
 
+
+
+//Dash only features
+bool fMasternodeMode = false;
+bool fLiteMode = false;
+/**
+    nWalletBackups:
+        1..10   - number of automatic backups to keep
+        0       - disabled by command-line
+        -1      - disabled because of some error during run-time
+        -2      - disabled because wallet was locked and we were not able to replenish keypool
+*/
+int nWalletBackups = 10;
+
 // Application startup time (used for uptime calculation)
 const int64_t nStartupTime = GetTime();
 
@@ -1533,3 +1547,61 @@ std::pair<int, char**> WinCmdLineArgs::get()
 }
 #endif
 } // namespace util
+
+
+uint32_t StringVersionToInt(const std::string& strVersion)
+{
+    std::vector<std::string> tokens;
+    boost::split(tokens, strVersion, boost::is_any_of("."));
+    if(tokens.size() != 3)
+        throw std::bad_cast();
+    uint32_t nVersion = 0;
+    for(unsigned idx = 0; idx < 3; idx++)
+    {
+        if(tokens[idx].length() == 0)
+            throw std::bad_cast();
+        uint32_t value = boost::lexical_cast<uint32_t>(tokens[idx]);
+        if(value > 255)
+            throw std::bad_cast();
+        nVersion <<= 8;
+        nVersion |= value;
+    }
+    return nVersion;
+}
+
+std::string IntVersionToString(uint32_t nVersion)
+{
+    if((nVersion >> 24) > 0) // MSB is always 0
+        throw std::bad_cast();
+    if(nVersion == 0)
+        throw std::bad_cast();
+    std::array<std::string, 3> tokens;
+    for(unsigned idx = 0; idx < 3; idx++)
+    {
+        unsigned shift = (2 - idx) * 8;
+        uint32_t byteValue = (nVersion >> shift) & 0xff;
+        tokens[idx] = boost::lexical_cast<std::string>(byteValue);
+    }
+    return boost::join(tokens, ".");
+}
+
+std::string SafeIntVersionToString(uint32_t nVersion)
+{
+    try
+    {
+        return IntVersionToString(nVersion);
+    }
+    catch(const std::bad_cast&)
+    {
+        return "invalid_version";
+    }
+}
+boost::filesystem::path GetBackupsDir()
+{
+    namespace fs = boost::filesystem;
+
+    if (!gArgs.IsArgSet("-walletbackupsdir"))
+        return GetDataDir() / "backups";
+
+    return fs::absolute(gArgs.GetArg("-walletbackupsdir", ""));
+}
