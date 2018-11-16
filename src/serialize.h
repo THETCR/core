@@ -1236,7 +1236,7 @@ protected:
     const int nType;
     const int nVersion;
 public:
-    CSizeComputer(int nTypeIn, int nVersionIn) : nSize(0), nType(nTypeIn), nVersion(nVersionIn) {}
+    explicit CSizeComputer(int nTypeIn, int nVersionIn) : nSize(0), nType(nTypeIn), nVersion(nVersionIn) {}
 
     void write(const char *psz, size_t _nSize)
     {
@@ -1344,6 +1344,13 @@ template <typename S, typename... T>
 size_t GetSerializeSizeMany(const S& s, const T&... t)
 {
     CSizeComputer sc(s.GetType(), s.GetVersion());
+    SerializeMany(sc, t...);
+    return sc.size();
+}
+template <typename... T>
+size_t GetSerializeSizeMany(int nVersion, const T&... t)
+{
+    CSizeComputer sc(nVersion);
     SerializeMany(sc, t...);
     return sc.size();
 }

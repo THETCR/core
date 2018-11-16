@@ -174,9 +174,9 @@ static bool SelectBlockFromCandidates(
 uint256 ComputeStakeModifier(const CBlockIndex *pindexPrev, const uint256 &kernel) {
     if (!pindexPrev)
         return 0;  // genesis block's modifier is 0
-//    LogPrintf("ComputeStakeModifier: kernel=%s, bnStakeModifierV2=%s\n", kernel.ToString().c_str(), pindexPrev->bnStakeModifierV2.ToString().c_str());
+//    LogPrintf("ComputeStakeModifier: kernel=%s, bnStakeModifier=%s\n", kernel.ToString().c_str(), pindexPrev->bnStakeModifier.ToString().c_str());
     CDataStream ss(SER_GETHASH, 0);
-    ss << kernel << pindexPrev->bnStakeModifierV2;
+    ss << kernel << pindexPrev->bnStakeModifier;
     uint256 hash = Hash(ss.begin(), ss.end());
 //    LogPrintf("ComputeStakeModifier: hash=%s\n", hash.ToString().c_str());
     return hash;
