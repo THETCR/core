@@ -924,11 +924,9 @@ public:
             m_min_fee = CFeeRate(DEFAULT_TRANSACTION_MINFEE_BTC);
         }
     }
-    CWallet(const std::string& strWalletFileIn)
-            : strWalletFile(strWalletFileIn)
+    CWallet(interfaces::Chain& chain, const std::string& strWalletFileIn)
+            : m_chain(chain), strWalletFile(strWalletFileIn)
     {
-//        SetNull();
-
         fFileBacked = true;
     }
     virtual ~CWallet()
