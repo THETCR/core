@@ -253,13 +253,13 @@ UniValue masternode(const JSONRPCRequest& request)
 
         UniValue obj(UniValue::VOBJ);
 
-        obj.push_back(Pair("height",        nHeight));
-        obj.push_back(Pair("IP:port",       mnInfo.addr.ToString()));
-        obj.push_back(Pair("protocol",      mnInfo.nProtocolVersion));
-        obj.push_back(Pair("outpoint",      mnInfo.outpoint.ToStringShort()));
-        obj.push_back(Pair("payee",         EncodeDestination(mnInfo.pubKeyCollateralAddress.GetID())));
-        obj.push_back(Pair("lastseen",      mnInfo.nTimeLastPing));
-        obj.push_back(Pair("activeseconds", mnInfo.nTimeLastPing - mnInfo.sigTime));
+        obj.pushKV("height",        nHeight);
+        obj.pushKV("IP:port",       mnInfo.addr.ToString());
+        obj.pushKV("protocol",      mnInfo.nProtocolVersion);
+        obj.pushKV("outpoint",      mnInfo.outpoint.ToStringShort());
+        obj.pushKV("payee",         EncodeDestination(mnInfo.pubKeyCollateralAddress.GetID()));
+        obj.pushKV("lastseen",      mnInfo.nTimeLastPing);
+        obj.pushKV("activeseconds", mnInfo.nTimeLastPing - mnInfo.sigTime);
         return obj;
     }
 
