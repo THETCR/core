@@ -11,7 +11,7 @@
 #include <key.h>
 #include <key_io.h>
 #include <script/standard.h>
-#include <util.h>
+#include <util/system.h>
 
 #include <boost/shared_ptr.hpp>
 

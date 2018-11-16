@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <reverse_iterate.h>
-#include <util.h>
+#include <util/system.h>
 #include <libzerocoin/Denominations.h>
 #include <primitives/zerocoin.h>
 #include <list>

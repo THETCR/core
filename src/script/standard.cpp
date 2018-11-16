@@ -8,7 +8,7 @@
 #include <crypto/sha256.h>
 #include <pubkey.h>
 #include <script/script.h>
-#include <util.h>
+#include <util/system.h>
 #include <util/strencodings.h>
 
 #include <key/extkey.h>

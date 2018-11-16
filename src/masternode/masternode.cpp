@@ -13,7 +13,7 @@
 #include <masternode/masternodeman.h>
 #include <messagesigner.h>
 #include <script/standard.h>
-#include <util.h>
+#include <util/system.h>
 #include <shutdown.h>
 #ifdef ENABLE_WALLET
 #include "wallet/wallet.h"

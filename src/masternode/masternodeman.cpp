@@ -17,7 +17,7 @@
 #endif // ENABLE_WALLET
 #include <script/standard.h>
 #include <ui_interface.h>
-#include <util.h>
+#include <util/system.h>
 #include <warnings.h>
 
 /** Masternode manager */

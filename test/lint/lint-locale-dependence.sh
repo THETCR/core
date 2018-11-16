@@ -44,7 +44,7 @@ KNOWN_VIOLATIONS=(
     "src/smsg/smessage.cpp:.*sscanf"
     "src/util.cpp:.*sscanf"
     "src/wallet/rpchdwallet.cpp:.*sscanf"
-    "src/util.cpp:.*strftime"
+    "src/util/system.cpp:.*strftime"
     "src/rpc/server.cpp:.*strftime"
     "src/key/stealth.cpp:.*strtol"
     "src/test/sighash_tests.cpp:.*strtoul"
@@ -53,7 +53,7 @@ KNOWN_VIOLATIONS=(
     "src/rpc/mnemonic.cpp:.*tolower"
     "src/smsg/rpcsmessage.cpp:.*tolower"
     "src/wallet/rpchdwallet.cpp:.*tolower"
-    "src/util.cpp:.*mktime"
+    "src/util/system.cpp:.*mktime"
     "src/wallet/rpchdwallet.cpp:.*mktime"
 )
 

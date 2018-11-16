@@ -4,7 +4,7 @@
 
 #include <primitives/deterministicmint.h>
 #include <zerocoin/zwsptracker.h>
-#include <util.h>
+#include <util/system.h>
 #include <sync.h>
 #include <validation.h>
 #include <txdb.h>

@@ -5,7 +5,7 @@
 
 #include <protocol.h>
 
-#include <util.h>
+#include <util/system.h>
 #include <util/strencodings.h>
 
 #ifndef WIN32

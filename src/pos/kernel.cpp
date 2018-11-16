@@ -24,7 +24,7 @@
 #include <spork/spork.h>
 #include <script/interpreter.h>
 #include <timedata.h>
-#include <util.h>
+#include <util/system.h>
 #include <wallet/stakeinput.h>
 #include <zerocoin/zwspchain.h>
 

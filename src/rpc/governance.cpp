@@ -19,7 +19,7 @@
 #include <masternode/masternodeman.h>
 #include <messagesigner.h>
 #include <rpc/server.h>
-#include <util.h>
+#include <util/system.h>
 #include <util/moneystr.h>
 #ifdef ENABLE_WALLET
 #include <wallet/wallet.h>

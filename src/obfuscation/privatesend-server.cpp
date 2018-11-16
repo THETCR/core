@@ -12,7 +12,7 @@
 #include <netmessagemaker.h>
 #include <script/interpreter.h>
 #include <txmempool.h>
-#include <util.h>
+#include <util/system.h>
 #include <util/moneystr.h>
 
 CPrivateSendServer privateSendServer;

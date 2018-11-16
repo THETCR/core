@@ -11,7 +11,7 @@
 #include <serialize.h>
 #include <streams.h>
 #include <univalue.h>
-#include <util.h>
+#include <util/system.h>
 #include <util/strencodings.h>
 #include <version.h>
 

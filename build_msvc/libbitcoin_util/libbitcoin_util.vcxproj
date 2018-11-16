@@ -187,7 +187,7 @@
     <ClCompile Include="..\..\src\support\lockedpool.cpp" />
     <ClCompile Include="..\..\src\sync.cpp" />
     <ClCompile Include="..\..\src\threadinterrupt.cpp" />
-    <ClCompile Include="..\..\src\util.cpp" />
+    <ClCompile Include="..\..\src\util/system.cpp" />
     <ClCompile Include="..\..\src\util/moneystr.cpp" />
     <ClCompile Include="..\..\src\util/strencodings.cpp" />
     <ClCompile Include="..\..\src\util/time.cpp" />

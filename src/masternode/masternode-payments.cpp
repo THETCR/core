@@ -12,7 +12,7 @@
 #include <netfulfilledman.h>
 #include <netmessagemaker.h>
 #include <spork/spork.h>
-#include <util.h>
+#include <util/system.h>
 
 #include <boost/lexical_cast.hpp>
 

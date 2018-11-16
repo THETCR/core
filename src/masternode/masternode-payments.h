@@ -5,7 +5,7 @@
 #ifndef MASTERNODE_PAYMENTS_H
 #define MASTERNODE_PAYMENTS_H
 
-#include <util.h>
+#include <util/system.h>
 #include <core_io.h>
 #include <key.h>
 #include <masternode/masternode.h>

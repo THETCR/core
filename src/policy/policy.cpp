@@ -11,7 +11,7 @@
 #include <validation.h>
 #include <coins.h>
 #include <tinyformat.h>
-#include <util.h>
+#include <util/system.h>
 #include <util/strencodings.h>
 #include <chainparams.h>
 

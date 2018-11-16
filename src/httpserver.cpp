@@ -6,7 +6,7 @@
 
 #include <chainparamsbase.h>
 #include <compat.h>
-#include <util.h>
+#include <util/system.h>
 #include <util/strencodings.h>
 #include <netbase.h>
 #include <rpc/protocol.h> // For HTTP status codes

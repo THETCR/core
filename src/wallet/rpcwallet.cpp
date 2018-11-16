@@ -23,7 +23,7 @@
 #include <script/sign.h>
 #include <shutdown.h>
 #include <timedata.h>
-#include <util.h>
+#include <util/system.h>
 #include <util/moneystr.h>
 #include <wallet/coincontrol.h>
 #include <wallet/feebumper.h>

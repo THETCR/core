@@ -7,7 +7,7 @@
 #include <hidapi/hidapi.h>
 #include <stdio.h>
 #include <inttypes.h>
-#include <util.h>
+#include <util/system.h>
 #include <pubkey.h>
 #include <crypto/common.h>
 #include <util/strencodings.h>

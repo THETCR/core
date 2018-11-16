@@ -18,7 +18,7 @@
 #endif // ENABLE_WALLET
 #include <obfuscation/privatesend-server.h>
 #include <rpc/server.h>
-#include <util.h>
+#include <util/system.h>
 #include <util/moneystr.h>
 
 #include <fstream>

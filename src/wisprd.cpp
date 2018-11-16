@@ -15,7 +15,7 @@
 #include <init.h>
 #include <noui.h>
 #include <shutdown.h>
-#include <util.h>
+#include <util/system.h>
 #include <httpserver.h>
 #include <httprpc.h>
 #include <util/strencodings.h>

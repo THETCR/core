@@ -19,7 +19,7 @@
 #include <rpc/util.h>
 #include <script/sign.h>
 #include <timedata.h>
-#include <util.h>
+#include <util/system.h>
 #include <txdb.h>
 #include <blind.h>
 #include <anon.h>

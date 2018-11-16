@@ -21,7 +21,7 @@
 #include <rpc/server.h>
 #include <shutdown.h>
 #include <txmempool.h>
-#include <util.h>
+#include <util/system.h>
 #include <util/strencodings.h>
 #include <validationinterface.h>
 #include <warnings.h>

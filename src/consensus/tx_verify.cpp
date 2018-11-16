@@ -14,7 +14,7 @@
 #include <blind.h>
 #include <anon.h>
 #include <timedata.h>
-#include <util.h>
+#include <util/system.h>
 
 
 // TODO remove the following dependencies

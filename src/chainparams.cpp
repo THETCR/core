@@ -8,7 +8,7 @@
 #include <consensus/merkle.h>
 
 #include <tinyformat.h>
-#include <util.h>
+#include <util/system.h>
 #include <util/strencodings.h>
 #include <util/moneystr.h>
 

@@ -38,7 +38,7 @@
 #include <txmempool.h>
 #include <ui_interface.h>
 #include <undo.h>
-#include <util.h>
+#include <util/system.h>
 #include <util/moneystr.h>
 #include <util/strencodings.h>
 #include <validationinterface.h>

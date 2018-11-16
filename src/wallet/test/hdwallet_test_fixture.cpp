@@ -8,7 +8,7 @@
 #include <wallet/db.h>
 #include <wallet/hdwallet.h>
 #include <validation.h>
-#include <util.h>
+#include <util/system.h>
 
 HDWalletTestingSetup::HDWalletTestingSetup(const std::string &chainName):
     TestingSetup(chainName, true) // fParticlMode = true
