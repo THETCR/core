@@ -32,6 +32,16 @@ file(GLOB SOURCE_FILES
         src/crypto/*.cpp
         src/governance/*.h
         src/governance/*.cpp
+        src/key/*.h
+        src/key/*.cpp
+        src/insight/*.h
+        src/insight/*.cpp
+        src/index/*.h
+        src/index/*.cpp
+        src/interfaces/*.h
+        src/interfaces/*.cpp
+        src/lz4/*.h
+        src/lz4/*.cpp
         src/masternode/*.h
         src/masternode/*.cpp
         src/leveldb/db/*.cc
@@ -58,11 +68,17 @@ file(GLOB SOURCE_FILES
         src/secp256k1/include/*.h
         src/smsg/*.h
         src/smsg/*.cpp
+        src/support/*.h
+        src/support/*.cpp
         src/test/*.cpp
         src/test/*.h
+        src/unilib/*.h
+        src/unilib/*.cpp
         src/univalue/include/*.h
         src/univalue/lib/*.cpp
         src/univalue/lib/*.h
+        src/usbdevice/*.h
+        src/usbdevice/*.cpp
         src/wallet/test/*.cpp
         src/wallet/*.cpp
         src/wallet/*.h
@@ -70,6 +86,8 @@ file(GLOB SOURCE_FILES
         src/zerocoin/*.h
         src/zmq/*.cpp
         src/zmq/*.h
+        src/uril/*.cpp
+        src/util/*.h
         src/*.cpp
         src/*.h
         src/evo/*.h
