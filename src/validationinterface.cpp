@@ -46,7 +46,7 @@ struct MainSignalsInstance {
      * transaction was accepted to mempool, removed from mempool (only when
      * removal was due to conflict from connected block), or appeared in a
      * disconnected block.*/
-    boost::signals2::signal<void (const CTransactionRef &, const CBlockIndex *pindex, int posInBlock, bool update_tx)> SyncTransaction;
+    boost::signals2::signal<void (const CTransactionRef &, const CBlockIndex *, int posInBlock, bool update_tx)> SyncTransaction;
     /** Notifies listeners of an updated transaction lock without new data. */
     boost::signals2::signal<void (const CTransaction &)> NotifyTransactionLock;
     /** Notifies listeners of an updated transaction without new data (for now: a coinbase potentially becoming visible). */
@@ -106,7 +106,7 @@ void RegisterValidationInterface(CValidationInterface* pwalletIn) {
     g_signals.m_internals->NewPoWValidBlock.connect(boost::bind(&CValidationInterface::NewPoWValidBlock, pwalletIn, _1, _2));
     g_signals.m_internals->TransactionAddedToWallet.connect(boost::bind(&CValidationInterface::TransactionAddedToWallet, pwalletIn, _1, _2));
     g_signals.m_internals->NewSecureMessage.connect(boost::bind(&CValidationInterface::NewSecureMessage, pwalletIn, _1, _2));
-    g_signals.m_internals->SyncTransaction.connect(boost::bind(&CValidationInterface::SyncTransaction, pwalletIn, _1, _2, _3));
+    g_signals.m_internals->SyncTransaction.connect(boost::bind(&CValidationInterface::SyncTransaction, pwalletIn, _1, _2, _3, _4));
 
 }
 
@@ -122,7 +122,7 @@ void UnregisterValidationInterface(CValidationInterface* pwalletIn) {
     g_signals.m_internals->NewPoWValidBlock.disconnect(boost::bind(&CValidationInterface::NewPoWValidBlock, pwalletIn, _1, _2));
     g_signals.m_internals->TransactionAddedToWallet.disconnect(boost::bind(&CValidationInterface::TransactionAddedToWallet, pwalletIn, _1, _2));
     g_signals.m_internals->NewSecureMessage.disconnect(boost::bind(&CValidationInterface::NewSecureMessage, pwalletIn, _1, _2));
-    g_signals.m_internals->SyncTransaction.disconnect(boost::bind(&CValidationInterface::SyncTransaction, pwalletIn, _1, _2, _3));
+    g_signals.m_internals->SyncTransaction.disconnect(boost::bind(&CValidationInterface::SyncTransaction, pwalletIn, _1, _2, _3, _4));
 
 }
 
@@ -221,6 +221,6 @@ void CMainSignals::NewSecureMessage(const smsg::SecureMessage *psmsg, const uint
 {
     m_internals->NewSecureMessage(psmsg, hash);
 };
-void CMainSignals::SyncTransaction(const CTransactionRef& tx, const CBlockIndex *pindex, int posInBlock, bool update_tx){
+void CMainSignals::SyncTransaction(const CTransactionRef &tx, const CBlockIndex *pindex, int posInBlock, bool update_tx){
     m_internals->SyncTransaction(tx, pindex, posInBlock, update_tx);
 };
