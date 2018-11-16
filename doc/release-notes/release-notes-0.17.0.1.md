@@ -624,7 +624,7 @@ Cold Staking Features in QT
 - #14000 `48c8459` fix qt determinism (theuni)
 - #14018 `3e4829a` Bugfix: NSIS: Exclude `Makefile*` from docs (luke-jr)
 - #12906 `048ac83` Avoid `interface` keyword to fix windows gitian build (ryanofsky)
-- #13314 `a9b6957` Fix FreeBSD build by including utilstrencodings.h (laanwj)
+- #13314 `a9b6957` Fix FreeBSD build by including util/strencodings.h (laanwj)
 
 ### Tests and QA
 - #12252 `8d57319` Require all tests to follow naming convention (ajtowns)

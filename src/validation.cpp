@@ -40,7 +40,7 @@
 #include <undo.h>
 #include <util.h>
 #include <utilmoneystr.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 #include <validationinterface.h>
 #include <warnings.h>
 #include <smsg/smessage.h>

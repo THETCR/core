@@ -26,7 +26,7 @@
 #include <txdb.h>
 #include <txmempool.h>
 #include <util.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 #include <hash.h>
 #include <validationinterface.h>
 #include <warnings.h>

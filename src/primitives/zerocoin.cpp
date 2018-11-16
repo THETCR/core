@@ -8,7 +8,7 @@
 #include <hash.h>
 #include <streams.h>
 #include <util.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 
 bool CMintMeta::operator <(const CMintMeta& a) const
 {

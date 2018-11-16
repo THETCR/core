@@ -20,7 +20,7 @@
 #include <univalue.h>
 #include <util.h>
 #include <utilmoneystr.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 #include <key/stealth.h>
 
 #include <memory>

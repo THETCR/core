@@ -4,7 +4,7 @@
 
 #include <key_io.h>
 
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 #include <insight/addressindex.h>
 
 #include <boost/variant/apply_visitor.hpp>

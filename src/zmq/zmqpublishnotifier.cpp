@@ -9,7 +9,7 @@
 #include <validation.h>
 #include <util.h>
 #include <rpc/server.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 #include <smsg/smessage.h>
 #include <compat/byteswap.h>
 

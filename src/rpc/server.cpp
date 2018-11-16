@@ -12,7 +12,7 @@
 #include <sync.h>
 #include <ui_interface.h>
 #include <util.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 
 #include <boost/bind.hpp>
 #include <boost/signals2/signal.hpp>

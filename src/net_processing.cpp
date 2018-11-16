@@ -27,7 +27,7 @@
 #include <ui_interface.h>
 #include <util.h>
 #include <utilmoneystr.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 #include <smsg/smessage.h>
 
 #include <memory>

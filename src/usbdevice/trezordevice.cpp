@@ -10,7 +10,7 @@
 #include <util.h>
 #include <pubkey.h>
 #include <crypto/common.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 #include <univalue.h>
 #include <chainparams.h>
 #include <validation.h>

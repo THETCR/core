@@ -9,7 +9,7 @@
 
 #include <tinyformat.h>
 #include <util.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 #include <utilmoneystr.h>
 
 #include <assert.h>

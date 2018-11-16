@@ -9,7 +9,7 @@
 #include <pubkey.h>
 #include <script/script.h>
 #include <util.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 
 #include <key/extkey.h>
 #include <key/stealth.h>
