@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef WISPR_RPC_RPCUTIL_H
-#define WISPR_RPC_RPCUTIL_H
+#ifndef PARTICL_RPC_RPCUTIL_H
+#define PARTICL_RPC_RPCUTIL_H
 
 #include <univalue.h>
 #include <string>
@@ -19,5 +19,5 @@ UniValue CallRPC(std::string args, std::string wallet="");
 void AddUri(JSONRPCRequest &request, std::string wallet);
 void CallRPC(UniValue &rv, const JSONRPCRequest &request);
 
-#endif // WISPR_RPC_RPCUTIL_H
+#endif // PARTICL_RPC_RPCUTIL_H
 
