@@ -421,9 +421,10 @@ UniValue masternode(const JSONRPCRequest& request)
 
         std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
         CWallet* const pwallet = wallet.get();
+        auto locked_chain = pwallet->chain().lock();
         // Find possible candidates
         std::vector<COutput> vPossibleCoins;
-        pwallet->AvailableCoins(vPossibleCoins, true, NULL, false, ONLY_1000);
+        pwallet->AvailableCoins(*locked_chain, vPossibleCoins, true, NULL, false, ONLY_1000);
 
         UniValue obj(UniValue::VOBJ);
         for (const auto& out : vPossibleCoins) {
