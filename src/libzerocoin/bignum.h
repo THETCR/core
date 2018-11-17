@@ -399,7 +399,7 @@ public:
     template<typename Stream>
     void Serialize(Stream& s, int nType=0, int nVersion=PROTOCOL_VERSION) const
     {
-        ::Serialize(s, getvch(), nType, nVersion);
+        ::Serialize(s, getvch(), nVersion);
     }
 
     template<typename Stream>
@@ -925,7 +925,7 @@ public:
     template<typename Stream>
     void Serialize(Stream& s, int nType=0, int nVersion=PROTOCOL_VERSION) const
     {
-        ::Serialize(s, getvch(), nType, nVersion);
+        ::Serialize(s, getvch(), nVersion);
     }
 
     template<typename Stream>
