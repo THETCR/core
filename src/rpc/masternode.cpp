@@ -635,13 +635,13 @@ UniValue masternodelist(const JSONRPCRequest& request)
                 objMN.pushKV("activeseconds", (int64_t)(mn.lastPing.sigTime - mn.sigTime));
                 objMN.pushKV("lastpaidtime", mn.GetLastPaidTime());
                 objMN.pushKV("lastpaidblock", mn.GetLastPaidBlock());
-                obj.pushKV(strOutpoint, objMN));
+                obj.pushKV(strOutpoint, objMN);
             } else if (strMode == "lastpaidblock") {
                 if (strFilter !="" && strOutpoint.find(strFilter) == std::string::npos) continue;
-                obj.pushKV(strOutpoint, mn.GetLastPaidBlock()));
+                obj.pushKV(strOutpoint, mn.GetLastPaidBlock());
             } else if (strMode == "lastpaidtime") {
                 if (strFilter !="" && strOutpoint.find(strFilter) == std::string::npos) continue;
-                obj.pushKV(strOutpoint, mn.GetLastPaidTime()));
+                obj.pushKV(strOutpoint, mn.GetLastPaidTime());
             } else if (strMode == "lastseen") {
                 if (strFilter !="" && strOutpoint.find(strFilter) == std::string::npos) continue;
                 obj.pushKV(strOutpoint, (int64_t)mn.lastPing.sigTime);

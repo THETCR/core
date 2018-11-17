@@ -680,7 +680,7 @@ UniValue gobject(const JSONRPCRequest& request)
             UniValue bObj(UniValue::VOBJ);
             bObj.pushKV("DataHex",  pGovObj->GetDataAsHexString());
             bObj.pushKV("DataString",  pGovObj->GetDataAsPlainString());
-            bObj.pushKV("Hash",  pGovObj->GetHash().ToString()));
+            bObj.pushKV("Hash",  pGovObj->GetHash().ToString());
             bObj.pushKV("CollateralHash",  pGovObj->GetCollateralHash().ToString());
             bObj.pushKV("ObjectType", pGovObj->GetObjectType());
             bObj.pushKV("CreationTime", pGovObj->GetCreationTime());
