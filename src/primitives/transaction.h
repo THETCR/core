@@ -967,7 +967,7 @@ struct CMutableTransaction
     uint32_t nLockTime;
 
     CMutableTransaction();
-    explicit CMutableTransaction(const CTransaction& tx);
+    CMutableTransaction(const CTransaction& tx);
 
     template <typename Stream>
     inline void Serialize(Stream& s) const {
