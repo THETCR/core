@@ -393,20 +393,20 @@ public:
 
     unsigned int GetSerializeSize(int nType=0, int nVersion=PROTOCOL_VERSION) const
     {
-        return ::GetSerializeSize(getvch(), nVersion);
+        return ::GetSerializeSize(getvch(), nType, nVersion);
     }
 
     template<typename Stream>
     void Serialize(Stream& s, int nType=0, int nVersion=PROTOCOL_VERSION) const
     {
-        ::Serialize(s, getvch(), nVersion);
+        ::Serialize(s, getvch(), nType, nVersion);
     }
 
     template<typename Stream>
     void Unserialize(Stream& s, int nType=0, int nVersion=PROTOCOL_VERSION)
     {
         std::vector<unsigned char> vch;
-        ::Unserialize(s, vch, nVersion);
+        ::Unserialize(s, vch, nType, nVersion);
         setvch(vch);
     }
 
@@ -919,20 +919,20 @@ public:
 
     unsigned int GetSerializeSize(int nType=0, int nVersion=PROTOCOL_VERSION) const
     {
-        return ::GetSerializeSize(getvch(), nVersion);
+        return ::GetSerializeSize(getvch(), nType, nVersion);
     }
 
     template<typename Stream>
     void Serialize(Stream& s, int nType=0, int nVersion=PROTOCOL_VERSION) const
     {
-        ::Serialize(s, getvch());
+        ::Serialize(s, getvch(), nType, nVersion);
     }
 
     template<typename Stream>
     void Unserialize(Stream& s, int nType=0, int nVersion=PROTOCOL_VERSION)
     {
         std::vector<unsigned char> vch;
-        ::Unserialize(s, vch, nVersion);
+        ::Unserialize(s, vch, nType, nVersion);
         setvch(vch);
     }
 
