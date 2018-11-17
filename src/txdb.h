@@ -144,7 +144,7 @@ public:
 };
 
 /** Zerocoin database (zerocoin/) */
-class CZerocoinDB : public CLevelDBWrapper
+class CZerocoinDB : public CDBWrapper
 {
 public:
     CZerocoinDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
