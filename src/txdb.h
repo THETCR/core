@@ -20,7 +20,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <leveldbwrapper.h>
+#include <dbwrapper.h>
 #include <validation.h>
 #include <primitives/zerocoin.h>
 

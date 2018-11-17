@@ -171,7 +171,6 @@ BITCOIN_CORE_H = \
   key/wordlists/korean.h \
   key_io.h \
   keystore.h \
-  leveldbwrapper.h \
   dbwrapper.h \
   limitedmap.h \
   logging.h \
@@ -323,7 +322,6 @@ libwispr_server_a_SOURCES = \
   interfaces/chain.cpp \
   interfaces/handler.cpp \
   interfaces/node.cpp \
-  leveldbwrapper.cpp \
   init.cpp \
   instantx.cpp \
   invalid.cpp \
