@@ -755,25 +755,27 @@ bool CZerocoinDB::WipeCoins(std::string strType)
     std::unique_ptr<CDBIterator> pcursor(NewIterator());
 
     char type = (strType == "spends" ? 's' : 'm');
-    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
-    ssKeySet << make_pair(type, uint256(0));
-    pcursor->Seek(ssKeySet.str());
+//    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+//    ssKeySet << make_pair(type, uint256(0));
+//    pcursor->Seek(ssKeySet.str());
+    pcursor->Seek(std::make_pair(type, uint256(0)));
     // Load mapBlockIndex
     std::set<uint256> setDelete;
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
+//        std::pair<char, uint256> key;
+        char chType;
         try {
-            leveldb::Slice slKey;
-            pcursor->GetKey(slKey);
-            CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
-            char chType;
-            ssKey >> chType;
+            pcursor->GetKey(chType);
+//            CDataStream ssKey(slKey.second, slKey.second + slKey.second.size(), SER_DISK, CLIENT_VERSION);
+//            char chType;
+//            ssKey >> chType;
             if (chType == type) {
-                leveldb::Slice slValue;
-                pcursor->GetValue(slValue);
-                CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
                 uint256 hash;
-                ssValue >> hash;
+                pcursor->GetValue(hash);
+//                CDataStream ssValue(slValue, slValue + slValue.size(), SER_DISK, CLIENT_VERSION);
+//                uint256 hash;
+//                ssValue >> hash;
                 setDelete.insert(hash);
                 pcursor->Next();
             } else {
