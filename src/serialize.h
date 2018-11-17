@@ -1237,6 +1237,7 @@ protected:
     const int nVersion;
 public:
     CSizeComputer(int nTypeIn, int nVersionIn) : nSize(0), nType(nTypeIn), nVersion(nVersionIn) {}
+    CSizeComputer(int nVersionIn) : nSize(0), nType(0), nVersion(nVersionIn) {}
 
     void write(const char *psz, size_t _nSize)
     {
@@ -1327,7 +1328,11 @@ inline void WriteCompactSize(CSizeComputer &s, uint64_t nSize)
 {
     s.seek(GetSizeOfCompactSize(nSize));
 }
-
+template <typename T>
+size_t GetSerializeSize(const T& t)
+{
+    return (CSizeComputer(0) << t).size();
+}
 template <typename T>
 size_t GetSerializeSize(const T& t, int nType, int nVersion = 0)
 {
