@@ -23,6 +23,7 @@
 #include <util/moneystr.h>
 #ifdef ENABLE_WALLET
 #include <wallet/wallet.h>
+#include <wallet/rpcwallet.h>
 #endif // ENABLE_WALLET
 
 bool EnsureWalletIsAvailable(bool avoidException);
