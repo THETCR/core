@@ -393,13 +393,13 @@ public:
 
     unsigned int GetSerializeSize(int nType=0, int nVersion=PROTOCOL_VERSION) const
     {
-        return ::GetSerializeSize(getvch(), nVersion);
+        return ::GetSerializeSize(getvch(), nType, nVersion);
     }
 
     template<typename Stream>
     void Serialize(Stream& s, int nType=0, int nVersion=PROTOCOL_VERSION) const
     {
-        ::Serialize(s, getvch(), nVersion);
+        ::Serialize(s, getvch(), nType, nVersion);
     }
 
     template<typename Stream>
@@ -919,13 +919,13 @@ public:
 
     unsigned int GetSerializeSize(int nType=0, int nVersion=PROTOCOL_VERSION) const
     {
-        return ::GetSerializeSize(getvch(), nVersion);
+        return ::GetSerializeSize(getvch(), nType, nVersion);
     }
 
     template<typename Stream>
     void Serialize(Stream& s, int nType=0, int nVersion=PROTOCOL_VERSION) const
     {
-        ::Serialize(s, getvch(), nVersion);
+        ::Serialize(s, getvch(), nType, nVersion);
     }
 
     template<typename Stream>
