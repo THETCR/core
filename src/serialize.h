@@ -1347,12 +1347,12 @@ size_t GetSerializeSizeMany(const S& s, const T&... t)
     SerializeMany(sc, t...);
     return sc.size();
 }
-template <typename... T>
-size_t GetSerializeSizeMany(int nVersion, const T&... t)
-{
-    CSizeComputer sc(nVersion);
-    SerializeMany(sc, t...);
-    return sc.size();
-}
+//template <typename... T>
+//size_t GetSerializeSizeMany(int nVersion, const T&... t)
+//{
+//    CSizeComputer sc(nVersion);
+//    SerializeMany(sc, t...);
+//    return sc.size();
+//}
 
 #endif // BITCOIN_SERIALIZE_H
