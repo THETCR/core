@@ -405,7 +405,7 @@ public:
     unsigned int GetSerializeSize(const T& obj)
     {
         // Tells the size of the object if serialized to this stream
-        return ::GetSerializeSize(obj, nType, nVersion);
+        return ::GetSerializeSize(obj, nVersion);
     }
 
     //
