@@ -86,6 +86,8 @@ enum txnouttype
     TX_TIMELOCKED_PUBKEYHASH,
     TX_TIMELOCKED_PUBKEYHASH256,
     TX_TIMELOCKED_MULTISIG,
+    TX_ZEROCOINMINT,
+
 };
 
 class CNoDestination {

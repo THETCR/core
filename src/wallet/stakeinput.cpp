@@ -193,9 +193,9 @@ CAmount CWspStake::GetValue()
 bool CWspStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout, CAmount nTotal)
 {
     vector<valtype> vSolutions;
-    txnouttype whichType;
     CScript scriptPubKeyKernel = txFrom.vout[nPosition].scriptPubKey;
-    if (!Solver(scriptPubKeyKernel, whichType, vSolutions)) {
+    txnouttype whichType = Solver(scriptPubKeyKernel, vSolutions);
+    if (whichType == TX_NONSTANDARD) {
         LogPrintf("CreateCoinStake : failed to parse kernel\n");
         return false;
     }

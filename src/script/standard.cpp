@@ -61,6 +61,9 @@ const char* GetTxnOutputType(txnouttype t)
     case TX_TIMELOCKED_PUBKEYHASH: return "timelocked_pubkeyhash";
     case TX_TIMELOCKED_PUBKEYHASH256: return "timelocked_pubkeyhash256";
     case TX_TIMELOCKED_MULTISIG: return "timelocked_multisig";
+
+    case TX_ZEROCOINMINT: return "zerocoinmint";
+
     }
     return nullptr;
 }
@@ -175,7 +178,12 @@ txnouttype Solver(const CScript& scriptPubKeyIn, std::vector<std::vector<unsigne
         vSolutionsRet.push_back(hashBytes);
         return fIsTimeLocked ? TX_TIMELOCKED_SCRIPTHASH256 : TX_SCRIPTHASH256;
     }
-
+    // Zerocoin
+    if (scriptPubKey.IsZerocoinMint() && scriptPubKey.size() <= 150){
+        std::vector<unsigned char> hashBytes(scriptPubKey.begin()+2, scriptPubKey.end());
+        vSolutionsRet.push_back(hashBytes);
+        return TX_ZEROCOINMINT;
+    }
     if (!fParticlMode) {
         int witnessversion;
         std::vector<unsigned char> witnessprogram;
