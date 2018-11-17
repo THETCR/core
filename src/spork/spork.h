@@ -5,11 +5,12 @@
 #ifndef SPORK_H
 #define SPORK_H
 
-#include "hash.h"
+#include <hash.h>
 #include <key_io.h>
-#include "net.h"
-#include "util/strencodings.h"
-#include "key.h"
+#include <net.h>
+#include <serialize.h>
+#include <util/strencodings.h>
+#include <key.h>
 
 class CSporkMessage;
 class CSporkManager;
@@ -67,7 +68,6 @@ public:
 
 
     ADD_SERIALIZE_METHODS;
-
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(nSporkID);
