@@ -12419,7 +12419,7 @@ bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listI
     auto locked_chain = chain().lock();
 
     vector<COutput> vCoins;
-    AvailableCoins(locked_chain, vCoins, true, NULL, false, STAKABLE_COINS);
+    AvailableCoins(*locked_chain, vCoins, true, NULL, false, STAKABLE_COINS);
     CAmount nAmountSelected = 0;
     if (gArgs.GetBoolArg("-wspstake", true)) {
         for (const COutput &out : vCoins) {
@@ -12431,7 +12431,7 @@ bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listI
             //if zerocoinspend, then use the block time
             int64_t nTxTime = out.tx->GetTxTime();
             if (ref.IsZerocoinSpend()) {
-                if (!out.tx->IsInMainChain())
+                if (!out.tx->IsInMainChain(*locked_chain))
                     continue;
                 nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
             }
