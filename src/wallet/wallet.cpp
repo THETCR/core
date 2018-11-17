@@ -2490,7 +2490,7 @@ const CTxOut& CWallet::FindNonChangeParentOutput(const CTransaction& tx, int out
 }
 
 bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, const CoinEligibilityFilter& eligibility_filter, std::vector<OutputGroup> groups,
-                                 std::set<CInputCoin>& setCoinsRet, CAmount& nValueRet, const CoinSelectionParams& coin_selection_params, bool& bnb_used) const
+                                 std::set<CInputCoin>& setCoinsRet, CAmount& nValueRet, const CoinSelectionParams& coin_selection_params, bool& bnb_used, bool fUseInstantSend) const
 {
     setCoinsRet.clear();
     nValueRet = 0;
@@ -2543,7 +2543,7 @@ bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, const CoinEligibil
     }
 }
 
-bool CWallet::SelectCoins(const std::vector<COutput>& vAvailableCoins, const CAmount& nTargetValue, std::set<CInputCoin>& setCoinsRet, CAmount& nValueRet, const CCoinControl& coin_control, CoinSelectionParams& coin_selection_params, bool& bnb_used) const
+bool CWallet::SelectCoins(const std::vector<COutput>& vAvailableCoins, const CAmount& nTargetValue, std::set<CInputCoin>& setCoinsRet, CAmount& nValueRet, const CCoinControl& coin_control, CoinSelectionParams& coin_selection_params, bool& bnb_used, AvailableCoinsType nCoinType, bool useIX) const
 {
     std::vector<COutput> vCoins(vAvailableCoins);
 
@@ -2740,7 +2740,7 @@ OutputType CWallet::TransactionChangeType(OutputType change_type, const std::vec
 }
 
 bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std::vector<CRecipient>& vecSend, CTransactionRef& tx, CReserveKey& reservekey, CAmount& nFeeRet,
-                         int& nChangePosInOut, std::string& strFailReason, const CCoinControl& coin_control, bool sign)
+                         int& nChangePosInOut, std::string& strFailReason, const CCoinControl& coin_control, bool sign, AvailableCoinsType nCoinType, bool fUseInstantSend)
 {
     CAmount nValue = 0;
     int nChangePosRequest = nChangePosInOut;
@@ -4443,7 +4443,7 @@ void CMerkleTx::SetMerkleBranch(const CBlockIndex* pindex, int posInBlock)
     nIndex = posInBlock;
 }
 
-int CMerkleTx::GetDepthInMainChain(interfaces::Chain::Lock& locked_chain) const
+int CMerkleTx::GetDepthInMainChain(interfaces::Chain::Lock& locked_chain, bool enableIX) const
 {
     if (hashUnset())
         return 0;
