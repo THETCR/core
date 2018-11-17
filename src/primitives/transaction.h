@@ -116,8 +116,8 @@ public:
     COutPoint prevout;
     CScript scriptSig;
     uint32_t nSequence;
-    CScriptWitness scriptData; // Non prunable
-    CScriptWitness scriptWitness; //! Only serialized through CTransaction
+    CScriptWitness scriptData; //!< Non prunable
+    CScriptWitness scriptWitness; //!< Only serialized through CTransaction
 
     /* Setting nSequence to this value for every input in a transaction
      * disables nLockTime. */
@@ -126,7 +126,7 @@ public:
     /* Below flags apply in the context of BIP 68*/
     /* If this flag set, CTxIn::nSequence is NOT interpreted as a
      * relative lock-time. */
-    static const uint32_t SEQUENCE_LOCKTIME_DISABLE_FLAG = (1 << 31);
+    static const uint32_t SEQUENCE_LOCKTIME_DISABLE_FLAG = (1U << 31);
 
     /* If CTxIn::nSequence encodes a relative lock-time and this flag
      * is set, the relative lock-time has units of 512 seconds,
@@ -211,6 +211,7 @@ class CTxOutBase
 {
 public:
     CTxOutBase(uint8_t v) : nVersion(v) {};
+    virtual ~CTxOutBase() {};
     uint8_t nVersion;
 
     template<typename Stream>
@@ -292,8 +293,8 @@ public:
     virtual secp256k1_pedersen_commitment *GetPCommitment() { return nullptr; };
     virtual std::vector<uint8_t> *GetPRangeproof() { return nullptr; };
 
-
     virtual bool GetCTFee(CAmount &nFee) const { return false; };
+    virtual bool SetCTFee(CAmount &nFee) { return false; };
     virtual bool GetDevFundCfwd(CAmount &nCfwd) const { return false; };
 
     std::string ToString() const;
@@ -502,6 +503,13 @@ public:
         size_t nb;
         return (0 == GetVarInt(vData, 1, (uint64_t&)nFee, nb));
     };
+
+    bool SetCTFee(CAmount &nFee) override
+    {
+        vData.clear();
+        vData.push_back(DO_FEE);
+        return (0 == PutVarInt(vData, nFee));
+    }
 
     bool GetDevFundCfwd(CAmount &nCfwd) const override
     {
@@ -959,7 +967,7 @@ struct CMutableTransaction
     uint32_t nLockTime;
 
     CMutableTransaction();
-    CMutableTransaction(const CTransaction& tx);
+    explicit CMutableTransaction(const CTransaction& tx);
 
     template <typename Stream>
     inline void Serialize(Stream& s) const {
