@@ -751,7 +751,8 @@ bool CZerocoinDB::WipeCoins(std::string strType)
     if (strType != "spends" && strType != "mints")
         return error("%s: did not recognize type %s", __func__, strType);
 
-    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+//    boost::scoped_ptr<CDBIterator> pcursor(NewIterator());
+    std::unique_ptr<CDBIterator> pcursor(NewIterator());
 
     char type = (strType == "spends" ? 's' : 'm');
     CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
@@ -762,12 +763,14 @@ bool CZerocoinDB::WipeCoins(std::string strType)
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
         try {
-            leveldb::Slice slKey = pcursor->key();
+            leveldb::Slice slKey;
+            pcursor->GetKey(slKey);
             CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
             char chType;
             ssKey >> chType;
             if (chType == type) {
-                leveldb::Slice slValue = pcursor->value();
+                leveldb::Slice slValue;
+                pcursor->GetValue(slValue);
                 CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
                 uint256 hash;
                 ssValue >> hash;
