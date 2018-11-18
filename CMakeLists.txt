@@ -86,7 +86,7 @@ file(GLOB SOURCE_FILES
         src/zerocoin/*.h
         src/zmq/*.cpp
         src/zmq/*.h
-        src/uril/*.cpp
+        src/util/*.cpp
         src/util/*.h
         src/*.cpp
         src/*.h
