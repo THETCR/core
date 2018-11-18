@@ -461,7 +461,7 @@ std::set<CMintMeta> CzWSPTracker::ListMints(CHDWallet *pwallet, bool fUnusedOnly
             continue;
 
         // Update the metadata of the mints if requested
-        if (fUpdateStatus && UpdateStatusInternal(setMempool, mint)) {
+        if (fUpdateStatus && UpdateStatusInternal(pwallet, setMempool, mint)) {
             if (mint.isArchived)
                 continue;
 
