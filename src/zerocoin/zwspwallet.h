@@ -20,7 +20,7 @@ class CzWSPWallet
 private:
     uint256 seedMaster;
     uint32_t nCountLastUsed;
-    WalletLocation m_location;
+    WalletLocation *m_location;
     CMintPool mintPool;
 
 public:

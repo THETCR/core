@@ -6,7 +6,6 @@
 #define WISPR_ZWSPTRACKER_H
 
 #include <primitives/zerocoin.h>
-#include <wallet/walletutil.h>
 #include <list>
 
 class CDeterministicMint;
