@@ -12463,7 +12463,7 @@ bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listI
             nTimeLastUpdate = GetAdjustedTime();
         }
 
-        set<CMintMeta> setMints = zwspTracker->ListMints(true, true, fUpdate);
+        set<CMintMeta> setMints = zwspTracker->ListMints(this, true, true, fUpdate);
         for (auto meta : setMints) {
             if (meta.hashStake == 0) {
                 CZerocoinMint mint;
@@ -12471,7 +12471,7 @@ bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listI
                     uint256 hashStake = mint.GetSerialNumber().getuint256();
                     hashStake = Hash(hashStake.begin(), hashStake.end());
                     meta.hashStake = hashStake;
-                    zwspTracker->UpdateState(meta);
+                    zwspTracker->UpdateState(this meta);
                 }
             }
             if (meta.nVersion < CZerocoinMint::STAKABLE_VERSION)
@@ -12636,7 +12636,7 @@ bool CHDWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, i
             CMintMeta meta = zwspTracker->GetMetaFromPubcoin(hashPubcoin);
             meta.txid = txNew.GetHash();
             meta.nHeight = chainActive.Height() + 1;
-            if (!zwspTracker->UpdateState(meta))
+            if (!zwspTracker->UpdateState(this, meta))
                 return error("%s: failed to update metadata in tracker", __func__);
         }
     }
