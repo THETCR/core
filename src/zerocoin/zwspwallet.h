@@ -24,7 +24,7 @@ private:
     CMintPool mintPool;
 
 public:
-    CzWSPWallet(CHDWallet *pwallet, WalletLocation m_location);
+    CzWSPWallet(CHDWallet *pwallet, WalletLocation *m_location);
 
     void AddToMintPool(const std::pair<uint256, uint32_t>& pMint, bool fVerbose);
     bool SetMasterSeed(CHDWallet *pwallet, const uint256& seedMaster, bool fResetCount = false);
