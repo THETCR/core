@@ -95,8 +95,8 @@
 //Dash only features
 bool fMasternodeMode = false;
 bool fLiteMode = false;
-string strMasterNodePrivKey = "";
-string strMasterNodeAddr = "";
+std::string strMasterNodePrivKey = "";
+std::string strMasterNodeAddr = "";
 // SwiftX
 bool fEnableSwiftTX = true;
 int nSwiftTXDepth = 5;
@@ -113,7 +113,7 @@ int64_t enforceMasternodePaymentsTime = 4085657524;
 bool fSucessfullyLoaded = false;
 /** All denominations used by obfuscation */
 std::vector<int64_t> obfuScationDenominations;
-string strBudgetMode = "";
+std::string strBudgetMode = "";
 
 /**
     nWalletBackups:

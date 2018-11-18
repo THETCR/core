@@ -16,11 +16,10 @@
 
 using namespace libzerocoin;
 
-CzWSPWallet::CzWSPWallet(std::string strWalletFile)
+CzWSPWallet::CzWSPWallet(CHDWallet *pwallet, WalletLocation location)
 {
-    this->strWalletFile = strWalletFile;
-    CHDWallet pwalletMain(strWalletFile);
-    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
+    this->m_location = location;
+    CHDWalletDB walletdb(pwallet->GetDBHandle());
 
     uint256 hashSeed;
     bool fFirstRun = !walletdb.ReadCurrentSeedHash(hashSeed);
@@ -32,7 +31,7 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
             //Update to new format, erase old
             seedMaster = seed;
             hashSeed = Hash(seed.begin(), seed.end());
-            if (pwalletMain.AddDeterministicSeed(&pwalletMain, seed)) {
+            if (pwallet->AddDeterministicSeed(&pwallet, seed)) {
                 if (walletdb.EraseZWSPSeed_deprecated()) {
                     LogPrintf("%s: Updated zWSP seed databasing\n", __func__);
                     fFirstRun = false;
@@ -44,7 +43,7 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
     }
 
     //Don't try to do anything if the wallet is locked.
-    if (pwalletMain.IsLocked()) {
+    if (pwallet->IsLocked()) {
         seedMaster = 0;
         nCountLastUsed = 0;
         this->mintPool = CMintPool();
@@ -60,7 +59,7 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
         seed = key.GetPrivKey_256();
         seedMaster = seed;
         LogPrintf("%s: first run of zwsp wallet detected, new seed generated. Seedhash=%s\n", __func__, Hash(seed.begin(), seed.end()).GetHex());
-    } else if (!pwalletMain.GetDeterministicSeed(&pwalletMain, hashSeed, seed)) {
+    } else if (!pwallet->GetDeterministicSeed(&pwallet, hashSeed, seed)) {
         LogPrintf("%s: failed to get deterministic seed for hashseed %s\n", __func__, hashSeed.GetHex());
         return;
     }
@@ -72,15 +71,14 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
     this->mintPool = CMintPool(nCountLastUsed);
 }
 
-bool CzWSPWallet::SetMasterSeed(const uint256& seedMaster, bool fResetCount)
+bool CzWSPWallet::SetMasterSeed(CHDWallet *pwallet, const uint256& seedMaster, bool fResetCount)
 {
 
-    CHDWallet pwalletMain(this->strWalletFile);
-    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
-    if (pwalletMain.IsLocked())
+    CHDWalletDB walletdb(pwallet->GetDBHandle());
+    if (pwallet->IsLocked())
         return false;
 
-    if (seedMaster != 0 && !pwalletMain.AddDeterministicSeed(&pwalletMain, seedMaster)) {
+    if (seedMaster != 0 && !pwallet->AddDeterministicSeed(&pwallet, seedMaster)) {
         return error("%s: failed to set master seed.", __func__);
     }
 
@@ -109,7 +107,7 @@ void CzWSPWallet::AddToMintPool(const std::pair<uint256, uint32_t>& pMint, bool 
 }
 
 //Add the next 20 mints to the mint pool
-void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
+void CzWSPWallet::GenerateMintPool(CHDWallet *pwallet, uint32_t nCountStart, uint32_t nCountEnd)
 {
 
     //Is locked
@@ -154,18 +152,16 @@ void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
         SeedToZWSP(seedZerocoin, bnValue, bnSerial, bnRandomness, key);
 
         mintPool.Add(bnValue, i);
-        CHDWallet pwalletMain(this->strWalletFile);
-        CHDWalletDB(pwalletMain.GetDBHandle()).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
+        CHDWalletDB(pwallet->GetDBHandle()).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
 //        CHDWalletDB(strWalletFile).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
         LogPrintf("%s : %s count=%d\n", __func__, bnValue.GetHex().substr(0, 6), i);
     }
 }
 
 // pubcoin hashes are stored to db so that a full accounting of mints belonging to the seed can be tracked without regenerating
-bool CzWSPWallet::LoadMintPoolFromDB()
+bool CzWSPWallet::LoadMintPoolFromDB(CHDWallet *pwallet)
 {
-    CHDWallet pwalletMain(this->strWalletFile);
-    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
+    CHDWalletDB walletdb(pwallet->GetDBHandle());
     map<uint256, vector<pair<uint256, uint32_t> > > mapMintPool = walletdb.MapMintPool();
 
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
@@ -188,12 +184,11 @@ void CzWSPWallet::GetState(int& nCount, int& nLastGenerated)
 }
 
 //Catch the counter up with the chain
-void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
+void CzWSPWallet::SyncWithChain(CHDWallet *pwallet, bool fGenerateMintPool)
 {
     uint32_t nLastCountUsed = 0;
     bool found = true;
-    CHDWallet pwalletMain(this->strWalletFile);
-    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
+    CHDWalletDB walletdb(pwallet->GetDBHandle());
 
     set<uint256> setAddedTx;
     while (found) {
@@ -213,7 +208,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
             if (ShutdownRequested())
                 return;
 
-            if (pwalletMain.zwspTracker->HasPubcoinHash(pMint.first)) {
+            if (pwallet->zwspTracker->HasPubcoinHash(pMint.first)) {
                 mintPool.Remove(pMint.first);
                 continue;
             }
@@ -271,13 +266,13 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
 
                 if (!setAddedTx.count(txHash)) {
                     CBlock block;
-                    CWalletTx wtx(&pwalletMain, tx);
+                    CWalletTx wtx(&pwallet, tx);
                     if (pindex && ReadBlockFromDisk(block, pindex, Params().GetConsensus()))
                         wtx.SetMerkleBranch(block);
 
                     //Fill out wtx so that a transaction record can be created
                     wtx.nTimeReceived = pindex->GetBlockTime();
-                    pwalletMain.AddToWallet(wtx);
+                    pwallet->AddToWallet(wtx);
                     setAddedTx.insert(txHash);
                 }
 
@@ -290,14 +285,13 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
     }
 }
 
-bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const CoinDenomination& denom)
+bool CzWSPWallet::SetMintSeen(CHDWallet *pwallet, const CBigNum& bnValue, const int& nHeight, const uint256& txid, const CoinDenomination& denom)
 {
     if (!mintPool.Has(bnValue))
         return error("%s: value not in pool", __func__);
     pair<uint256, uint32_t> pMint = mintPool.Get(bnValue);
 
-    CHDWallet pwalletMain(this->strWalletFile);
-    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
+    CHDWalletDB walletdb(pwallet->GetDBHandle());
     // Regenerate the mint
     uint512 seedZerocoin = GetZerocoinSeed(pMint.second);
     CBigNum bnValueGen;
@@ -328,18 +322,18 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
     if (IsSerialInBlockchain(hashSerial, nHeightTx, txidSpend, txSpend)) {
         //Find transaction details and make a wallettx and add to wallet
         dMint.SetUsed(true);
-        CWalletTx wtx(&pwalletMain, txSpend);
+        CWalletTx wtx(&pwallet, txSpend);
         CBlockIndex* pindex = chainActive[nHeightTx];
         CBlock block;
         if (ReadBlockFromDisk(block, pindex, Params().GetConsensus()))
             wtx.SetMerkleBranch(block);
 
         wtx.nTimeReceived = pindex->nTime;
-        pwalletMain.AddToWallet(wtx);
+        pwallet->AddToWallet(wtx);
     }
 
     // Add to zwspTracker which also adds to database
-    pwalletMain.zwspTracker->Add(dMint, true);
+    pwallet->zwspTracker->Add(dMint, true);
     
     //Update the count if it is less than the mint's count
     if (nCountLastUsed < pMint.second) {
@@ -419,11 +413,10 @@ uint512 CzWSPWallet::GetZerocoinSeed(uint32_t n)
     return zerocoinSeed;
 }
 
-void CzWSPWallet::UpdateCount()
+void CzWSPWallet::UpdateCount(CHDWallet *pwallet)
 {
     nCountLastUsed++;
-    CHDWallet pwalletMain(this->strWalletFile);
-    CHDWalletDB walletdb(pwalletMain.GetDBHandle());
+    CHDWalletDB walletdb(pwallet->GetDBHandle());
 //    CHDWalletDB walletdb(GetDBHandle());
     walletdb.WriteZWSPCount(nCountLastUsed);
 }
