@@ -16,7 +16,7 @@ class CzWSPTracker
 {
 private:
     bool fInitialized;
-    WalletLocation m_location;
+    WalletLocation *m_location;
     std::map<uint256, CMintMeta> mapSerialHashes;
     std::map<uint256, uint256> mapPendingSpends; //serialhash, txid of spend
     bool UpdateStatusInternal(CHDWallet *pwallet, const std::set<uint256>& setMempool, CMintMeta& mint);
