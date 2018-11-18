@@ -8,7 +8,7 @@
 #include <validation.h>
 #include <pos/kernel.h>
 #include <wallet/stakeinput.h>
-#include <wallet/wallet.h>
+#include <wallet/hdwallet.h>
 
 CZWspStake::CZWspStake(const libzerocoin::CoinSpend& spend)
 {
@@ -154,7 +154,7 @@ bool CZWspStake::GetTxFrom(CTransaction& tx)
     return false;
 }
 
-bool CZWspStake::MarkSpent(CWallet *pwallet, const uint256& txid)
+bool CZWspStake::MarkSpent(CHDWallet *pwallet, const uint256& txid)
 {
     CzWSPTracker* zwspTracker = pwallet->zwspTracker.get();
     CMintMeta meta;
