@@ -161,7 +161,7 @@ bool CZWspStake::MarkSpent(CWallet *pwallet, const uint256& txid)
     if (!zwspTracker->GetMetaFromStakeHash(hashSerial, meta))
         return error("%s: tracker does not have serialhash", __func__);
 
-    zwspTracker->SetPubcoinUsed(meta.hashPubcoin, txid);
+    zwspTracker->SetPubcoinUsed(pwallet, meta.hashPubcoin, txid);
     return true;
 }
 

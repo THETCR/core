@@ -12471,7 +12471,7 @@ bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listI
                     uint256 hashStake = mint.GetSerialNumber().getuint256();
                     hashStake = Hash(hashStake.begin(), hashStake.end());
                     meta.hashStake = hashStake;
-                    zwspTracker->UpdateState(this meta);
+                    zwspTracker->UpdateState(this, meta);
                 }
             }
             if (meta.nVersion < CZerocoinMint::STAKABLE_VERSION)
