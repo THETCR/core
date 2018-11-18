@@ -14,7 +14,7 @@
 
 using namespace libzerocoin;
 
-CzWSPWallet::CzWSPWallet(CHDWallet *pwallet, WalletLocation location)
+CzWSPWallet::CzWSPWallet(CHDWallet *pwallet, WalletLocation *location)
 {
     this->m_location = location;
     CHDWalletDB walletdb(pwallet->GetDBHandle());
