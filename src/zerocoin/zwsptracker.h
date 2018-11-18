@@ -9,6 +9,8 @@
 #include <list>
 
 class CDeterministicMint;
+class CHDWallet;
+class WalletLocation;
 
 class CzWSPTracker
 {

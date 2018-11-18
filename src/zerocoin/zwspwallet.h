@@ -12,6 +12,8 @@
 #include <primitives/zerocoin.h>
 
 class CDeterministicMint;
+class CHDWallet;
+class WalletLocation;
 
 class CzWSPWallet
 {

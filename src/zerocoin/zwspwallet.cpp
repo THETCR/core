@@ -10,7 +10,7 @@
 #include <primitives/deterministicmint.h>
 #include <hash.h>
 #include <consensus/validation.h>
-
+#include <wallet/hdwallet.h>
 
 using namespace libzerocoin;
 

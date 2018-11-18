@@ -10,6 +10,8 @@
 #include <txdb.h>
 #include <txmempool.h>
 #include <zerocoin/accumulators.h>
+#include <wallet/hdwallet.h>
+
 
 using namespace std;
 
