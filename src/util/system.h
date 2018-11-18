@@ -40,7 +40,20 @@
 extern bool fMasternodeMode;
 extern bool fLiteMode;
 extern int nWalletBackups;
-
+extern bool fEnableSwiftTX;
+extern int nSwiftTXDepth;
+extern int nZeromintPercentage;
+extern const int64_t AUTOMINT_DELAY;
+extern int nPreferredDenom;
+extern int nAnonymizeWisprAmount;
+extern int nLiquidityProvider;
+extern bool fEnableZeromint;
+extern int64_t enforceMasternodePaymentsTime;
+extern std::string strMasterNodeAddr;
+extern int keysLoaded;
+extern bool fSucessfullyLoaded;
+extern std::vector<int64_t> obfuScationDenominations;
+extern std::string strBudgetMode;
 // Application startup time (used for uptime calculation)
 int64_t GetStartupTime();
 

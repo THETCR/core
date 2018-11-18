@@ -749,6 +749,12 @@ public:
 
     size_t CountTxSpends() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet) { return mapTxSpends.size(); };
 
+    CzWSPWallet* zwalletMain;
+    bool fFileBacked;
+    bool fWalletUnlockAnonymizeOnly;
+    bool fBackupMints;
+    std::unique_ptr<CzWSPTracker> zwspTracker;
+
     int64_t nLastCoinStakeSearchTime = 0;
     uint32_t nStealth, nFoundStealth; // for reporting, zero before use
     int64_t nReserveBalance = 0;
@@ -806,7 +812,28 @@ public:
     std::map<uint256, std::set<uint256> > mapTxCollapsedSpends;
     std::set<uint256> m_collapsed_txns;
     std::set<COutPoint> m_collapsed_txn_inputs;
+    int getZeromintPercentage()
+    {
+        return nZeromintPercentage;
+    }
 
+    void setZWallet(CzWSPWallet* zwallet)
+    {
+        zwalletMain = zwallet;
+        zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(strWalletFile));
+    }
+
+    CzWSPWallet* getZWallet() { return zwalletMain; }
+
+    bool isZeromintEnabled()
+    {
+        return fEnableZeromint;
+    }
+
+    void setZWspAutoBackups(bool fEnabled)
+    {
+        fBackupMints = fEnabled;
+    }
 private:
     void ParseAddressForMetaData(const CTxDestination &addr, COutputRecord &rec);
 
