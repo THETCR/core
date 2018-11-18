@@ -9,7 +9,6 @@
 #include <validation.h>
 #include <txdb.h>
 #include <txmempool.h>
-#include <wallet/hdwalletdb.h>
 #include <zerocoin/accumulators.h>
 
 using namespace std;

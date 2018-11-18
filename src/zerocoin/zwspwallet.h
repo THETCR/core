@@ -10,7 +10,6 @@
 #include <zerocoin/mintpool.h>
 #include <uint256.h>
 #include <primitives/zerocoin.h>
-#include <wallet/hdwallet.h>
 
 class CDeterministicMint;
 
