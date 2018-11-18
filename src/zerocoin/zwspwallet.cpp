@@ -5,9 +5,7 @@
 #include <zerocoin/zwspwallet.h>
 #include <validation.h>
 #include <txdb.h>
-#include <wallet/hdwalletdb.h>
 #include <init.h>
-#include <wallet/hdwallet.h>
 #include <zerocoin/zwspchain.h>
 #include <primitives/deterministicmint.h>
 #include <hash.h>

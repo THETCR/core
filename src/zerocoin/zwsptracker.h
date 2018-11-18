@@ -7,7 +7,6 @@
 
 #include <primitives/zerocoin.h>
 #include <list>
-#include <wallet/hdwallet.h>
 
 class CDeterministicMint;
 
@@ -20,7 +19,7 @@ private:
     std::map<uint256, uint256> mapPendingSpends; //serialhash, txid of spend
     bool UpdateStatusInternal(CHDWallet *pwallet, const std::set<uint256>& setMempool, CMintMeta& mint);
 public:
-    CzWSPTracker(CHDWallet *pwallet, WalletLocation location);
+    CzWSPTracker(CHDWallet *pwallet, WalletLocation *location);
     ~CzWSPTracker();
     void Add(CHDWallet *pwallet, const CDeterministicMint& dMint, bool isNew = false, bool isArchived = false);
     void Add(CHDWallet *pwallet, const CZerocoinMint& mint, bool isNew = false, bool isArchived = false);

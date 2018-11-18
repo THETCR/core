@@ -14,7 +14,7 @@
 
 using namespace std;
 
-CzWSPTracker::CzWSPTracker(CHDWallet *pwallet, WalletLocation location)
+CzWSPTracker::CzWSPTracker(CHDWallet *pwallet, WalletLocation *location)
 {
     this->m_location = location;
     mapSerialHashes.clear();
