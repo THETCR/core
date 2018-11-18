@@ -100,7 +100,7 @@ CDataStream CZWspStake::GetUniqueness()
     return ss;
 }
 
-bool CZWspStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
+bool CZWspStake::CreateTxIn(CHDWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
 {
     CBlockIndex* pindexCheckpoint = GetIndexFrom();
     if (!pindexCheckpoint)
@@ -121,7 +121,7 @@ bool CZWspStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
     return true;
 }
 
-bool CZWspStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout, CAmount nTotal)
+bool CZWspStake::CreateTxOuts(CHDWallet* pwallet, vector<CTxOut>& vout, CAmount nTotal)
 {
     //Create an output returning the zWSP that was staked
     CTxOut outReward;
@@ -179,7 +179,7 @@ bool CWspStake::GetTxFrom(CTransaction& tx)
     return true;
 }
 
-bool CWspStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
+bool CWspStake::CreateTxIn(CHDWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
 {
     txIn = CTxIn(txFrom.GetHash(), nPosition);
     return true;
@@ -190,7 +190,7 @@ CAmount CWspStake::GetValue()
     return txFrom.vout[nPosition].nValue;
 }
 
-bool CWspStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout, CAmount nTotal)
+bool CWspStake::CreateTxOuts(CHDWallet* pwallet, vector<CTxOut>& vout, CAmount nTotal)
 {
     vector<valtype> vSolutions;
     CScript scriptPubKeyKernel = txFrom.vout[nPosition].scriptPubKey;
