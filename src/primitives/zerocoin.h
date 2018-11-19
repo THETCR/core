@@ -7,8 +7,8 @@
 
 #include <amount.h>
 #include <limits.h>
-#include "bignum.h"
-#include "Denominations.h"
+#include "libzerocoin/bignum.h"
+#include "libzerocoin/Denominations.h"
 #include <key.h>
 #include <serialize.h>
 
