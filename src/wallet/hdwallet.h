@@ -376,9 +376,6 @@ public:
         Finalise();
     }
 
-    //WISPR
-    bool SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount);
-
     int Finalise();
     int FreeExtKeyMaps();
 
@@ -740,12 +737,37 @@ public:
     uint64_t GetStakeWeight() const;
     void AvailableCoinsForStaking(std::vector<COutput> &vCoins, int64_t nTime, int nHeight) const;
     bool SelectCoinsForStaking(int64_t nTargetValue, int64_t nTime, int nHeight, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64_t& nValueRet) const;
-    bool CreateCoinStake(unsigned int nBits, int64_t nTime, int nBlockHeight, int64_t nFees, CMutableTransaction &txNew, CKey &key);
+//    bool CreateCoinStake(unsigned int nBits, int64_t nTime, int nBlockHeight, int64_t nFees, CMutableTransaction &txNew, CKey &key);
     bool CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime);
     bool SignBlock(CBlockTemplate *pblocktemplate, int nHeight, int64_t nSearchTime);
     bool SignBlockWithKey(CBlock& block, const CKey& key);
+    //WISPR
+    bool SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount);
+    // Zerocoin additions
+    CAmount GetZerocoinBalance(bool fMatureOnly) const;
+    std::map<libzerocoin::CoinDenomination, CAmount> GetMyZerocoinDistribution() const;
+    bool CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransaction& txNew, vector<CDeterministicMint>& vDMints, CReserveKey* reservekey, int64_t& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl = NULL, const bool isZCSpendChange = false);
+    bool CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLevel, CWalletTx& wtxNew, CReserveKey& reserveKey, CZerocoinSpendReceipt& receipt, vector<CZerocoinMint>& vSelectedMints, vector<CDeterministicMint>& vNewMints, bool fMintChange,  bool fMinimizeChange, CBitcoinAddress* address = NULL);
+    bool MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, const uint256& hashTxOut, CTxIn& newTxIn, CZerocoinSpendReceipt& receipt, libzerocoin::SpendType spendType, CBlockIndex* pindexCheckpoint = nullptr);
+    std::string MintZerocoinFromOutPoint(CAmount nValue, CWalletTx& wtxNew, std::vector<CDeterministicMint>& vDMints, const vector<COutPoint> vOutpts);
+    std::string MintZerocoin(CAmount nValue, CWalletTx& wtxNew, vector<CDeterministicMint>& vDMints, const CCoinControl* coinControl = NULL);
+    bool SpendZerocoin(CAmount nValue, int nSecurityLevel, CWalletTx& wtxNew, CZerocoinSpendReceipt& receipt, vector<CZerocoinMint>& vMintsSelected, bool fMintChange, bool fMinimizeChange, CBitcoinAddress* addressTo = NULL);
+    std::string ResetMintZerocoin();
+    std::string ResetSpentZerocoin();
+    void ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, std::list<CDeterministicMint>& listDMintsRestored);
+    void ZWspBackupWallet();
+    bool GetZerocoinKey(const CBigNum& bnSerial, CKey& key);
+    bool CreateZWSPOutPut(libzerocoin::CoinDenomination denomination, CTxOut& outMint, CDeterministicMint& dMint);
+    bool GetMint(const uint256& hashSerial, CZerocoinMint& mint);
+    bool GetMintFromStakeHash(const uint256& hashStake, CZerocoinMint& mint);
+    bool DatabaseMint(CDeterministicMint& dMint);
+    bool SetMintUnspent(const CBigNum& bnSerial);
+    bool UpdateMint(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom);
+    bool IsMyZerocoinSpend(const CBigNum& bnSerial) const;
 
-    boost::signals2::signal<void (CAmount nReservedBalance)> NotifyReservedBalanceChanged;
+    std::string GetUniqueWalletBackupName(bool fzwspAuto) const;
+    bool IsMyMint(const CBigNum& bnValue) const;
+    int nStakeSetUpdateTime = 300; // 5 minutes
 
     size_t CountTxSpends() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet) { return mapTxSpends.size(); };
 
