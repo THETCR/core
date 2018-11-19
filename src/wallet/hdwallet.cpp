@@ -13481,7 +13481,7 @@ bool CHDWallet::MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, c
     return true;
 }
 // Get a Map pairing the Denominations with the amount of Zerocoin for each Denomination
-std::map<libzerocoin::CoinDenomination, CAmount> CHDWallet::GetMyZerocoinDistribution() const
+std::map<libzerocoin::CoinDenomination, CAmount> CHDWallet::GetMyZerocoinDistribution()
 {
     std::map<libzerocoin::CoinDenomination, CAmount> spread;
     for (const auto& denom : libzerocoin::zerocoinDenomList)
