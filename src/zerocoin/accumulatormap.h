@@ -5,8 +5,8 @@
 #ifndef WISPR_ACCUMULATORMAP_H
 #define WISPR_ACCUMULATORMAP_H
 
-#include <libzerocoin/Accumulator.h>
-#include <libzerocoin/Coin.h>
+#include "libzerocoin/Accumulator.h"
+#include "libzerocoin/Coin.h"
 #include <zerocoin/accumulatorcheckpoints.h>
 
 //A map with an accumulator for each denomination

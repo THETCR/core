@@ -45,7 +45,7 @@
 #include <txmempool.h>
 #include <uint256.h>
 #include <undo.h>
-#include <libzerocoin/CoinSpend.h>
+#include "libzerocoin/CoinSpend.h"
 
 class CBlockIndex;
 class CBlockTreeDB;

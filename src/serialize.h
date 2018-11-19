@@ -25,8 +25,8 @@
 #include <prevector.h>
 #include <span.h>
 
-#include <libzerocoin/Denominations.h>
-#include <libzerocoin/SpendType.h>
+#include "libzerocoin/Denominations.h"
+#include "libzerocoin/SpendType.h"
 
 class CScript;
 

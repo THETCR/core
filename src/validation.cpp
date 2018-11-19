@@ -61,7 +61,7 @@
 
 #include <future>
 #include <sstream>
-#include <libzerocoin/Denominations.h>
+#include "libzerocoin/Denominations.h"
 #include <invalid.h>
 
 #include <boost/algorithm/string/replace.hpp>

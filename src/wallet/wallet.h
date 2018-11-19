@@ -41,7 +41,7 @@
 #include <zerocoin/zwspwallet.h>
 #include <obfuscation/privatesend.h>
 #include <spork/spork.h>
-#include <libzerocoin/Denominations.h>
+#include "libzerocoin/Denominations.h"
 #include <primitives/deterministicmint.h>
 #include <wallet/stakeinput.h>
 #include <masternode/masternode-payments.h>

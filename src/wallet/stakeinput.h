@@ -8,7 +8,7 @@
 #include <streams.h>
 #include <vector>
 #include <primitives/zerocoin.h>
-#include <libzerocoin/CoinSpend.h>
+#include "libzerocoin/CoinSpend.h"
 
 
 class CKeyStore;

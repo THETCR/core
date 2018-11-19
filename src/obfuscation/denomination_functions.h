@@ -4,7 +4,7 @@
 
 #include <reverse_iterator.h>
 #include <util/system.h>
-#include <libzerocoin/Denominations.h>
+#include "libzerocoin/Denominations.h"
 #include <primitives/zerocoin.h>
 #include <list>
 #include <map>

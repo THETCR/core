@@ -6,7 +6,7 @@
 #define WISPR_ZWSPWALLET_H
 
 #include <map>
-#include <libzerocoin/Coin.h>
+#include "libzerocoin/Coin.h"
 #include <zerocoin/mintpool.h>
 #include <uint256.h>
 #include <primitives/zerocoin.h>
