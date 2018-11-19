@@ -536,6 +536,10 @@ libwispr_consensus_a_SOURCES = \
   primitives/block.h \
   primitives/transaction.cpp \
   primitives/transaction.h \
+  primitives/zerocoin.cpp \
+  primitives/zerocoin.h \
+  primitives/deterministicmint.cpp \
+  primitives/deterministicmint.h \
   pubkey.cpp \
   pubkey.h \
   script/wisprconsensus.cpp \
@@ -691,10 +695,10 @@ wisprd_SOURCES += wisprd-res.rc
 endif
 
 wisprd_LDADD = \
-  $(LIBWISPR_ZEROCOIN) \
   $(LIBWISPR_SERVER) \
   $(LIBWISPR_WALLET) \
   $(LIBWISPR_COMMON) \
+  $(LIBWISPR_ZEROCOIN) \
   $(LIBUNIVALUE) \
   $(LIBWISPR_UTIL) \
   $(LIBWISPR_ZMQ) \
