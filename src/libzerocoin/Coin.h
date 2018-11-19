@@ -13,10 +13,10 @@
 
 #ifndef COIN_H_
 #define COIN_H_
-#include <libzerocoin/Denominations.h>
-#include <libzerocoin/Params.h>
+#include "Denominations.h"
+#include "Params.h"
 #include <amount.h>
-#include <libzerocoin/bignum.h>
+#include "bignum.h"
 #include <util/system.h>
 #include <key.h>
 

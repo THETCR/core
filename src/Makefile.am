@@ -691,11 +691,11 @@ wisprd_SOURCES += wisprd-res.rc
 endif
 
 wisprd_LDADD = \
+  $(LIBWISPR_ZEROCOIN) \
   $(LIBWISPR_SERVER) \
   $(LIBWISPR_WALLET) \
   $(LIBWISPR_COMMON) \
   $(LIBUNIVALUE) \
-  $(LIBWISPR_ZEROCOIN) \
   $(LIBWISPR_UTIL) \
   $(LIBWISPR_ZMQ) \
   $(LIBWISPR_CONSENSUS) \
@@ -743,10 +743,10 @@ wispr_tx_SOURCES += wispr-tx-res.rc
 endif
 
 wispr_tx_LDADD = \
+  $(LIBWISPR_ZEROCOIN) \
   $(LIBUNIVALUE) \
   $(LIBWISPR_COMMON) \
   $(LIBWISPR_UTIL) \
-  $(LIBWISPR_ZEROCOIN) \
   $(LIBWISPR_CONSENSUS) \
   $(LIBWISPR_CRYPTO) \
   $(LIBSECP256K1)
