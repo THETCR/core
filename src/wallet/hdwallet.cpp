@@ -13700,7 +13700,7 @@ void CHDWallet::ZWspBackupWallet()
             customPath /= GetUniqueWalletBackupName(true);
         }
 
-        BackupWallet(customPath);
+        BackupWallet(customPath.string());
     }
 
 }
@@ -13854,7 +13854,4 @@ bool CHDWallet::SpendZerocoin(CAmount nAmount, int nSecurityLevel, CWalletTx& wt
 
     return true;
 }
-bool CHDWallet::IsCollateralAmount(CAmount nInputAmount) const
-{
-    return nInputAmount != 0 && nInputAmount % OBFUSCATION_COLLATERAL == 0 && nInputAmount < OBFUSCATION_COLLATERAL * 5 && nInputAmount > OBFUSCATION_COLLATERAL;
-}
+
