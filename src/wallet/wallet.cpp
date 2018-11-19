@@ -5207,13 +5207,13 @@ CAmount CWalletTx::GetDenominatedCredit(bool unconfirmed, bool fUseCache) const
     auto locked_chain = pwallet->chain().lock();
 
     // Must wait until coinbase is safely deep enough in the chain before valuing it
-    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+    if (IsCoinBase() && GetBlocksToMaturity(*locked_chain) > 0)
         return 0;
 
-    int nDepth = GetDepthInMainChain(false);
+    int nDepth = GetDepthInMainChain(*locked_chain ,false);
     if(nDepth < 0) return 0;
 
-    bool isUnconfirmed = IsTrusted() && nDepth == 0;
+    bool isUnconfirmed = IsTrusted(*locked_chain) && nDepth == 0;
     if(unconfirmed != isUnconfirmed) return 0;
 
     if (fUseCache) {
@@ -5276,7 +5276,7 @@ CAmount CWalletTx::GetAnonymizedCredit(bool fUseCache) const
     auto locked_chain = pwallet->chain().lock();
 
     // Must wait until coinbase is safely deep enough in the chain before valuing it
-    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+    if (IsCoinBase() && GetBlocksToMaturity(*locked_chain) > 0)
         return 0;
 
     if (fUseCache && fAnonymizedCreditCached)
