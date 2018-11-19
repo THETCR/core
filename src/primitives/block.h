@@ -43,7 +43,7 @@ public:
         READWRITE(nVersion);
         READWRITE(hashPrevBlock);
         READWRITE(hashMerkleRoot);
-        if (IsParticlVersion())
+        if (IsWisprVersion())
             READWRITE(hashWitnessMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
@@ -71,7 +71,7 @@ public:
 
     uint256 GetHash() const;
 
-    bool IsParticlVersion() const
+    bool IsWisprVersion() const
     {
         return nVersion == WISPR_BLOCK_VERSION;
     }

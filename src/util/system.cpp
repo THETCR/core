@@ -127,11 +127,11 @@ int nWalletBackups = 10;
 // Application startup time (used for uptime calculation)
 const int64_t nStartupTime = GetTime();
 
-const char * const BITCOIN_CONF_FILENAME = "particl.conf";
-const char * const BITCOIN_PID_FILENAME = "particld.pid";
+const char * const BITCOIN_CONF_FILENAME = "wispr.conf";
+const char * const BITCOIN_PID_FILENAME = "wisprd.pid";
 
-bool fParticlMode = true;
-bool fParticlWallet = false;
+bool fWisprMode = true;
+bool fWisprWallet = false;
 ArgsManager gArgs;
 
 /** Init OpenSSL library multithreading support */
@@ -899,7 +899,7 @@ std::string ArgsManager::GetHelpMessage() const
                 usage += HelpMessageGroup("SMSG Commands:");
                 break;
             case OptionsCategory::PART_WALLET:
-                usage += HelpMessageGroup("Particl wallet Commands:");
+                usage += HelpMessageGroup("Wispr wallet Commands:");
                 break;
             case OptionsCategory::PART_STAKING:
                 usage += HelpMessageGroup("Staking Commands:");
@@ -952,7 +952,7 @@ static std::string FormatException(const std::exception* pex, const char* pszThr
     char pszModule[MAX_PATH] = "";
     GetModuleFileNameA(nullptr, pszModule, sizeof(pszModule));
 #else
-    const char* pszModule = "particl";
+    const char* pszModule = "wispr";
 #endif
     if (pex)
         return strprintf(
@@ -971,13 +971,13 @@ void PrintExceptionContinue(const std::exception* pex, const char* pszThread)
 
 fs::path GetDefaultDataDir()
 {
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Particl
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Particl
-    // Mac: ~/Library/Application Support/Particl
-    // Unix: ~/.particl
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Wispr
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Wispr
+    // Mac: ~/Library/Application Support/Wispr
+    // Unix: ~/.wispr
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Particl";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "Wispr";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -987,10 +987,10 @@ fs::path GetDefaultDataDir()
         pathRet = fs::path(pszHome);
 #ifdef MAC_OSX
     // Mac
-    return pathRet / "Library/Application Support/Particl";
+    return pathRet / "Library/Application Support/Wispr";
 #else
     // Unix
-    return pathRet / ".particl";
+    return pathRet / ".wispr";
 #endif
 #endif
 }

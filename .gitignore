@@ -87,7 +87,7 @@ src/qt/wispr-qt.includes
 *.qm
 Makefile
 wispr-qt
-Particl-Qt.app
+Wispr-Qt.app
 background.tiff*
 
 # Unit-tests

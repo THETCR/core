@@ -14,7 +14,7 @@ WalletTestingSetup::WalletTestingSetup(const std::string& chainName):
     bool fFirstRun;
 
     gArgs.ForceSetArg("-btcmode", "1");
-    fParticlWallet = false;
+    fWisprWallet = false;
 
     m_wallet.LoadWallet(fFirstRun);
     RegisterValidationInterface(&m_wallet);

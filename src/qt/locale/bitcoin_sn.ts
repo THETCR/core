@@ -98,8 +98,8 @@
         <translation>Vhura &amp;URI</translation>
     </message>
     <message>
-        <source>Particl</source>
-        <translation>Particl</translation>
+        <source>Wispr</source>
+        <translation>Wispr</translation>
     </message>
     <message>
         <source>Wallet</source>
@@ -165,8 +165,8 @@
 <context>
     <name>Intro</name>
     <message>
-        <source>Particl</source>
-        <translation>Particl</translation>
+        <source>Wispr</source>
+        <translation>Wispr</translation>
     </message>
     </context>
 <context>
@@ -194,8 +194,8 @@
         <translation>Marii </translation>
     </message>
     <message>
-        <source>Enter a Particl address (e.g. %1)</source>
-        <translation>Nyora kero ye Particl (sekuti %1)</translation>
+        <source>Enter a Wispr address (e.g. %1)</source>
+        <translation>Nyora kero ye Wispr (sekuti %1)</translation>
     </message>
     <message>
         <source>%1 d</source>

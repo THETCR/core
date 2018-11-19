@@ -1682,7 +1682,7 @@ void CWalletTx::GetAmounts(std::list<COutputEntry>& listReceived,
     }
 
     // Sent/received.
-    if (tx->IsParticlVersion()) {
+    if (tx->IsWisprVersion()) {
         for (unsigned int i = 0; i < tx->vpout.size(); ++i) {
             const CTxOutBase *txout = tx->vpout[i].get();
             if (!txout->IsStandardOutput()) {
@@ -2072,7 +2072,7 @@ CAmount CWalletTx::GetAvailableCredit(interfaces::Chain::Lock& locked_chain, boo
     {
         if (!pwallet->IsSpent(locked_chain, hashTx, i))
         {
-            nCredit += fParticlWallet ? pwallet->GetCredit(tx->vpout[i].get(), filter)
+            nCredit += fWisprWallet ? pwallet->GetCredit(tx->vpout[i].get(), filter)
                                       : pwallet->GetCredit(tx->vout[i], filter);
             if (!MoneyRange(nCredit))
                 throw std::runtime_error(std::string(__func__) + " : value out of range");
@@ -2143,7 +2143,7 @@ bool CWalletTx::IsTrusted(interfaces::Chain::Lock& locked_chain) const
         if (parent == nullptr)
             return false;
 
-        if (tx->IsParticlVersion()) {
+        if (tx->IsWisprVersion()) {
             const CTxOutBase *parentOut = parent->tx->vpout[txin.prevout.n].get();
             if (!(pwallet->IsMine(parentOut) & ISMINE_SPENDABLE)) {
                 return false;
@@ -4168,7 +4168,7 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
     bool fFirstRun = true;
     // TODO: Can't use std::make_shared because we need a custom deleter but
     // should be possible to use std::allocate_shared.
-    std::shared_ptr<CWallet> walletInstance(fParticlMode
+    std::shared_ptr<CWallet> walletInstance(fWisprMode
         ? std::shared_ptr<CWallet>(new CHDWallet(chain, location, WalletDatabase::Create(location.GetPath())), ReleaseWallet)
         : std::shared_ptr<CWallet>(new CWallet(chain, location, WalletDatabase::Create(location.GetPath())), ReleaseWallet));
 
@@ -4221,7 +4221,7 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
     }
 
     // Upgrade to HD if explicit upgrade
-    if (gArgs.GetBoolArg("-upgradewallet", false) && !fParticlMode) {
+    if (gArgs.GetBoolArg("-upgradewallet", false) && !fWisprMode) {
         LOCK(walletInstance->cs_wallet);
 
         // Do not upgrade versions to any version between HD_SPLIT and FEATURE_PRE_SPLIT_KEYPOOL unless already supporting HD_SPLIT
@@ -4261,7 +4261,7 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
         }
     }
 
-    if (fFirstRun && !fParticlMode)
+    if (fFirstRun && !fWisprMode)
     {
         // ensure this wallet.dat can only be opened by clients supporting HD with chain split and expects no default key
         walletInstance->SetMinVersion(FEATURE_LATEST);
@@ -4384,7 +4384,7 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
     walletInstance->m_last_block_processed = chainActive.Tip();
 
-    if (!fParticlMode) // Must rescan after hdwallet is loaded
+    if (!fWisprMode) // Must rescan after hdwallet is loaded
     if (chainActive.Tip() && chainActive.Tip() != pindexRescan)
     {
         //We can't rescan beyond non-pruned blocks, stop and throw an error
@@ -4536,7 +4536,7 @@ int CMerkleTx::GetBlocksToMaturity(interfaces::Chain::Lock& locked_chain, const 
     int chain_depth = pdepth ? *pdepth : GetDepthInMainChain(locked_chain);
     //assert(chain_depth >= 0); // coinbase tx should not be conflicted
 
-    if (fParticlMode && (chainActive.Height() < COINBASE_MATURITY * 2)) {
+    if (fWisprMode && (chainActive.Height() < COINBASE_MATURITY * 2)) {
         BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
         if (mi == mapBlockIndex.end()) {
             return COINBASE_MATURITY;
@@ -4572,7 +4572,7 @@ bool CWalletTx::AcceptToMemoryPool(interfaces::Chain::Lock& locked_chain, const 
 
 void CWallet::LearnRelatedScripts(const CPubKey& key, OutputType type)
 {
-    if (fParticlMode)
+    if (fWisprMode)
         return;
     if (key.IsCompressed() && (type == OutputType::P2SH_SEGWIT || type == OutputType::BECH32)) {
         CTxDestination witdest = WitnessV0KeyHash(key.GetID());

@@ -267,7 +267,7 @@ void SelectParams(const std::string& chain);
  * Toggle old parameters for unit tests
  */
 void SetOldParams(std::unique_ptr<CChainParams> &params);
-void ResetParams(std::string sNetworkId, bool fParticlModeIn);
+void ResetParams(std::string sNetworkId, bool fWisprModeIn);
 
 /**
  * mutable handle to regtest params

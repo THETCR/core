@@ -1,0 +1,25 @@
+[Unit]
+Description=Wispr daemon
+After=network.target
+
+[Service]
+User=wispr
+Group=wispr
+
+Type=forking
+PIDFile=/home/wispr/.wispr/wisprd.pid
+ExecStart=/home/wispr/Wispr/wisprd -daemon -pid=/home/wispr/.wispr/wisprd.pid \
+-conf=/home/wispr/.wispr/wispr.conf -datadir=/home/wispr/.wispr
+
+ExecStop=/home/wispr/Wispr/wispr-cli -conf=/home/wispr/.wispr/wispr.conf stop
+ExecStop=/usr/bin/sleep 25
+
+Restart=no
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

@@ -57,8 +57,8 @@ extern std::string strBudgetMode;
 // Application startup time (used for uptime calculation)
 int64_t GetStartupTime();
 
-extern bool fParticlMode;
-extern bool fParticlWallet;
+extern bool fWisprMode;
+extern bool fWisprWallet;
 
 extern const char * const BITCOIN_CONF_FILENAME;
 extern const char * const BITCOIN_PID_FILENAME;
@@ -382,7 +382,7 @@ void RenameThread(const char* name);
  */
 template <typename Callable> void TraceThread(const char* name,  Callable func)
 {
-    std::string s = strprintf("particl-%s", name);
+    std::string s = strprintf("wispr-%s", name);
     RenameThread(s.c_str());
     try
     {

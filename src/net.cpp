@@ -1550,7 +1550,7 @@ static void ThreadMapPort()
             }
         }
 
-        std::string strDesc = "Particl " + FormatFullVersion();
+        std::string strDesc = "Wispr " + FormatFullVersion();
 
         do {
 #ifndef UPNPDISCOVER_SUCCESS

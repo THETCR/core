@@ -278,27 +278,27 @@ EXTRA_DIST += \
     test/util/rpcauth-test.py
 
 EXTRA_DIST += \
-    test/util/data_particl/particl-util-test.json \
-    test/util/data_particl/blanktxv1.hex \
-    test/util/data_particl/blanktxv1.json \
-    test/util/data_particl/blanktxva0.hex \
-    test/util/data_particl/blanktxva0.json \
-    test/util/data_particl/tx14ae341f.hex \
-    test/util/data_particl/tt-delin1-out.hex \
-    test/util/data_particl/tt-delin1-out.json \
-    test/util/data_particl/tt-delout1-out.hex \
-    test/util/data_particl/tt-delout1-out.json \
-    test/util/data_particl/tt-locktime317000-out.hex \
-    test/util/data_particl/tt-locktime317000-out.json \
-    test/util/data_particl/txcreate1.hex \
-    test/util/data_particl/txcreate1.json \
-    test/util/data_particl/txcreate2.hex \
-    test/util/data_particl/txcreate2.json \
-    test/util/data_particl/txcreatesignva0.hex \
-    test/util/data_particl/txaddwitness0.hex \
-    test/util/data_particl/txdelwitness0.hex \
-    test/util/data_particl/txblindout0.hex \
-    test/util/data_particl/txoutdatatype0.hex
+    test/util/data_wispr/wispr-util-test.json \
+    test/util/data_wispr/blanktxv1.hex \
+    test/util/data_wispr/blanktxv1.json \
+    test/util/data_wispr/blanktxva0.hex \
+    test/util/data_wispr/blanktxva0.json \
+    test/util/data_wispr/tx14ae341f.hex \
+    test/util/data_wispr/tt-delin1-out.hex \
+    test/util/data_wispr/tt-delin1-out.json \
+    test/util/data_wispr/tt-delout1-out.hex \
+    test/util/data_wispr/tt-delout1-out.json \
+    test/util/data_wispr/tt-locktime317000-out.hex \
+    test/util/data_wispr/tt-locktime317000-out.json \
+    test/util/data_wispr/txcreate1.hex \
+    test/util/data_wispr/txcreate1.json \
+    test/util/data_wispr/txcreate2.hex \
+    test/util/data_wispr/txcreate2.json \
+    test/util/data_wispr/txcreatesignva0.hex \
+    test/util/data_wispr/txaddwitness0.hex \
+    test/util/data_wispr/txdelwitness0.hex \
+    test/util/data_wispr/txblindout0.hex \
+    test/util/data_wispr/txoutdatatype0.hex
 
 
 CLEANFILES = $(OSX_DMG) $(BITCOIN_WIN_INSTALLER)

@@ -218,7 +218,7 @@ static UniValue getrawtransaction(const JSONRPCRequest& request)
             "         \"reqSigs\" : n,            (numeric) The required sigs\n"
             "         \"type\" : \"pubkeyhash\",  (string) The type, eg 'pubkeyhash'\n"
             "         \"addresses\" : [           (json array of string)\n"
-            "           \"address\"               (string) particl address\n"
+            "           \"address\"               (string) wispr address\n"
             "           ,...\n"
             "         ]\n"
             "       }\n"
@@ -243,7 +243,7 @@ static UniValue getrawtransaction(const JSONRPCRequest& request)
     uint256 hash = ParseHashV(request.params[0], "parameter 1");
     CBlockIndex* blockindex = nullptr;
 
-    if (!fParticlMode && hash == Params().GenesisBlock().hashMerkleRoot) {
+    if (!fWisprMode && hash == Params().GenesisBlock().hashMerkleRoot) {
         // Special exception for the genesis block coinbase transaction
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "The genesis block coinbase is not considered an ordinary transaction and cannot be retrieved");
     }
@@ -317,7 +317,7 @@ static UniValue getrawtransaction(const JSONRPCRequest& request)
     if (blockindex) result.pushKV("in_active_chain", in_active_chain);
     result.pushKV("hex", strHex);
 
-    if (fParticlMode)
+    if (fWisprMode)
         TxToJSONExpanded(*tx, hashBlock, result, nHeight, nConfirmations, nBlockTime);
     else
         TxToJSON(*tx, hashBlock, result);
@@ -476,7 +476,7 @@ CMutableTransaction ConstructTransaction(const UniValue& inputs_in, const UniVal
     UniValue outputs = outputs_is_obj ? outputs_in.get_obj() : outputs_in.get_array();
 
     CMutableTransaction rawTx;
-    rawTx.nVersion = fParticlMode ? WISPR_TXN_VERSION : BTC_TXN_VERSION;
+    rawTx.nVersion = fWisprMode ? WISPR_TXN_VERSION : BTC_TXN_VERSION;
 
 
     if (!locktime.isNull()) {
@@ -546,7 +546,7 @@ CMutableTransaction ConstructTransaction(const UniValue& inputs_in, const UniVal
         if (name_ == "data") {
             std::vector<unsigned char> data = ParseHexV(outputs[name_].getValStr(), "Data");
 
-            if (fParticlMode)
+            if (fWisprMode)
             {
                 OUTPUT_PTR<CTxOutData> out = MAKE_OUTPUT<CTxOutData>();
                 out->vData = data;
@@ -559,7 +559,7 @@ CMutableTransaction ConstructTransaction(const UniValue& inputs_in, const UniVal
         } else {
             CTxDestination destination = DecodeDestination(name_);
             if (!IsValidDestination(destination)) {
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Particl address: ") + name_);
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Wispr address: ") + name_);
             }
 
             if (!destinations.insert(destination).second) {
@@ -569,7 +569,7 @@ CMutableTransaction ConstructTransaction(const UniValue& inputs_in, const UniVal
             CScript scriptPubKey = GetScriptForDestination(destination);
             CAmount nAmount = AmountFromValue(outputs[name_]);
 
-            if (fParticlMode)
+            if (fWisprMode)
             {
                 OUTPUT_PTR<CTxOutStandard> out = MAKE_OUTPUT<CTxOutStandard>();
                 out->nValue = nAmount;
@@ -710,7 +710,7 @@ static UniValue decoderawtransaction(const JSONRPCRequest& request)
             "         \"reqSigs\" : n,            (numeric) The required sigs\n"
             "         \"type\" : \"pubkeyhash\",  (string) The type, eg 'pubkeyhash'\n"
             "         \"addresses\" : [           (json array of string)\n"
-            "           \"PfqK97PXYfqRFtdYcZw82x3dzPrZbEAcYa\"   (string) particl address\n"
+            "           \"PfqK97PXYfqRFtdYcZw82x3dzPrZbEAcYa\"   (string) wispr address\n"
             "           ,...\n"
             "         ]\n"
             "       }\n"
@@ -756,7 +756,7 @@ static UniValue decodescript(const JSONRPCRequest& request)
             "  \"type\":\"type\", (string) The output type\n"
             "  \"reqSigs\": n,    (numeric) The required signatures\n"
             "  \"addresses\": [   (json array of string)\n"
-            "     \"address\"     (string) particl address\n"
+            "     \"address\"     (string) wispr address\n"
             "     ,...\n"
             "  ],\n"
             "  \"p2sh\",\"address\" (string) address of P2SH script wrapping this redeem script (not returned if the script is already a P2SH).\n"
@@ -812,7 +812,7 @@ static UniValue decodescript(const JSONRPCRequest& request)
             }
             ScriptPubKeyToUniv(segwitScr, sr, true);
             sr.pushKV("p2sh-segwit", EncodeDestination(CScriptID(segwitScr)));
-            if (!fParticlMode)
+            if (!fWisprMode)
             r.pushKV("segwit", sr);
         }
     }
@@ -1003,7 +1003,7 @@ UniValue SignTransaction(interfaces::Chain& chain, CMutableTransaction& mtx, con
 
             // if redeemScript and private keys were given, add redeemScript to the keystore so it can be signed
             if (is_temp_keystore && (scriptPubKey.IsPayToScriptHashAny(mtx.IsCoinStake())
-                || (!fParticlMode && scriptPubKey.IsPayToWitnessScriptHash()))) {
+                || (!fWisprMode && scriptPubKey.IsPayToWitnessScriptHash()))) {
                 RPCTypeCheckObj(prevOut,
                     {
                         {"redeemScript", UniValueType(UniValue::VSTR)},

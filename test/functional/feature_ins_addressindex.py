@@ -7,11 +7,11 @@
 # Test addressindex generation and fetching
 #
 
-from test_framework.test_particl import ParticlTestFramework
+from test_framework.test_wispr import WisprTestFramework
 from test_framework.util import *
 
 
-class AddressIndexTest(ParticlTestFramework):
+class AddressIndexTest(WisprTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 4

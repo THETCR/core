@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 The Particl Core developers
+// Copyright (c) 2017-2018 The Wispr Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -19,7 +19,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(wisprchain_tests, ParticlBasicTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(wisprchain_tests, WisprBasicTestingSetup)
 
 
 BOOST_AUTO_TEST_CASE(oldversion_test)
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(signature_test)
     BOOST_CHECK(serror == SCRIPT_ERR_OK);
 }
 
-BOOST_AUTO_TEST_CASE(particlchain_test)
+BOOST_AUTO_TEST_CASE(wisprchain_test)
 {
     SeedInsecureRand();
     CBasicKeyStore keystore;
@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_CASE(mixed_input_types)
 {
     CMutableTransaction txn;
     txn.nVersion = WISPR_TXN_VERSION;
-    BOOST_CHECK(txn.IsParticlVersion());
+    BOOST_CHECK(txn.IsWisprVersion());
 
     CAmount txfee;
     int nSpendHeight = 1;
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE(mixed_input_types)
 
     CMutableTransaction txnPrev;
     txnPrev.nVersion = WISPR_TXN_VERSION;
-    BOOST_CHECK(txnPrev.IsParticlVersion());
+    BOOST_CHECK(txnPrev.IsWisprVersion());
 
     CScript scriptPubKey;
     txnPrev.vpout.push_back(MAKE_OUTPUT<CTxOutStandard>(1 * COIN, scriptPubKey));

@@ -895,7 +895,7 @@ static void ApplyStats(CCoinsStats &stats, CHashWriter& ss, const uint256& hash,
         };
         stats.nBogoSize += 32 /* txid */ + 4 /* vout index */ + 4 /* height + coinbase */ + 8 /* amount */ +
                            2 /* scriptPubKey len */ + output.second.out.scriptPubKey.size() /* scriptPubKey */
-                           + (fParticlMode ? 1 /* nType */ + 33 /* commitment */ : 0);
+                           + (fWisprMode ? 1 /* nType */ + 33 /* commitment */ : 0);
     }
     ss << VARINT(0u);
 }
@@ -1020,7 +1020,7 @@ static UniValue gettxoutsetinfo(const JSONRPCRequest& request)
         ret.pushKV("bestblock", stats.hashBlock.GetHex());
         ret.pushKV("transactions", (int64_t)stats.nTransactions);
         ret.pushKV("txouts", (int64_t)stats.nTransactionOutputs);
-        if (fParticlMode)
+        if (fWisprMode)
             ret.pushKV("txouts_blinded", (int64_t)stats.nBlindedTransactionOutputs);
         ret.pushKV("bogosize", (int64_t)stats.nBogoSize);
         ret.pushKV("hash_serialized_2", stats.hashSerialized.GetHex());
@@ -1053,8 +1053,8 @@ UniValue gettxout(const JSONRPCRequest& request)
             "     \"hex\" : \"hex\",        (string) \n"
             "     \"reqSigs\" : n,          (numeric) Number of required signatures\n"
             "     \"type\" : \"pubkeyhash\", (string) The type, eg pubkeyhash\n"
-            "     \"addresses\" : [          (array of string) array of particl addresses\n"
-            "        \"address\"           (string) particl address\n"
+            "     \"addresses\" : [          (array of string) array of wispr addresses\n"
+            "        \"address\"           (string) wispr address\n"
             "        ,...\n"
             "     ]\n"
             "  },\n"
@@ -1273,7 +1273,7 @@ UniValue getblockchaininfo(const JSONRPCRequest& request)
     obj.pushKV("blocks",                (int)chainActive.Height());
     obj.pushKV("headers",               pindexBestHeader ? pindexBestHeader->nHeight : -1);
     obj.pushKV("bestblockhash",         chainActive.Tip()->GetBlockHash().GetHex());
-    if (fParticlMode) {
+    if (fWisprMode) {
         obj.pushKV("moneysupply",           ValueFromAmount(chainActive.Tip()->nMoneySupply));
         obj.pushKV("blockindexsize",        (int)mapBlockIndex.size());
         obj.pushKV("delayedblocks",         (int)CountDelayedBlocks());
@@ -1302,7 +1302,7 @@ UniValue getblockchaininfo(const JSONRPCRequest& request)
         }
     }
 
-    if (fParticlMode)
+    if (fWisprMode)
         return obj;
     const Consensus::Params& consensusParams = Params().GetConsensus();
     CBlockIndex* tip = chainActive.Tip();
@@ -1909,7 +1909,7 @@ static UniValue getblockstats(const JSONRPCRequest& request)
                     throw JSONRPCError(RPC_INTERNAL_ERROR, std::string("Unexpected internal error (tx index seems corrupt)"));
                 }
 
-                if (tx->IsParticlVersion()) {
+                if (tx->IsWisprVersion()) {
                     const auto& prevoutput = tx_in->vpout[in.prevout.n];
 
                     if (prevoutput->IsStandardOutput()) {

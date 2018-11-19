@@ -181,7 +181,7 @@ void OptionsDialog::setModel(OptionsModel *_model)
     connect(ui->lang, static_cast<void (QValueComboBox::*)()>(&QValueComboBox::valueChanged), [this]{ showRestartWarning(); });
     connect(ui->thirdPartyTxUrls, &QLineEdit::textChanged, [this]{ showRestartWarning(); });
 
-    if (fParticlMode) {
+    if (fWisprMode) {
         ui->prune->setEnabled(false);
     }
 }

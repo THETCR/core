@@ -102,7 +102,7 @@ static int AppInitRawTx(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    fParticlMode = !gArgs.GetBoolArg("-btcmode", false); // qa tests
+    fWisprMode = !gArgs.GetBoolArg("-btcmode", false); // qa tests
     fCreateBlank = gArgs.GetBoolArg("-create", false);
 
     if (argc < 2 || HelpRequested(gArgs)) {
@@ -205,7 +205,7 @@ static void MutateTxVersion(CMutableTransaction& tx, const std::string& cmdVal)
     if (!ParseInt64(cmdVal, &newVersion) || newVersion < 1 || newVersion > CTransaction::MAX_STANDARD_WISPR_VERSION)
         throw std::runtime_error("Invalid TX version requested: '" + cmdVal + "'");
 
-    if (!tx.IsParticlVersion() && IsParticlTxVersion(newVersion))
+    if (!tx.IsWisprVersion() && IsWisprTxVersion(newVersion))
     {
         for (const auto& txout : tx.vout)
         {
@@ -223,7 +223,7 @@ static void MutateTxVersion(CMutableTransaction& tx, const std::string& cmdVal)
             txin.scriptSig.clear();
         };
     } else
-    if (tx.IsParticlVersion() && !IsParticlTxVersion(newVersion))
+    if (tx.IsWisprVersion() && !IsWisprTxVersion(newVersion))
     {
         for (const auto &txout : tx.vpout)
         {
@@ -363,7 +363,7 @@ static void MutateTxAddOutAddr(CMutableTransaction& tx, const std::string& strIn
     CScript scriptPubKey = GetScriptForDestination(destination);
 
     // construct TxOut, append to transaction output list
-    if (tx.IsParticlVersion())
+    if (tx.IsWisprVersion())
     {
         if (destination.type() == typeid(CStealthAddress))
         {
@@ -427,7 +427,7 @@ static void MutateTxAddOutPubKey(CMutableTransaction& tx, const std::string& str
     }
 
     // construct TxOut, append to transaction output list
-    if (tx.IsParticlVersion())
+    if (tx.IsWisprVersion())
     {
         tx.vpout.push_back(MAKE_OUTPUT<CTxOutStandard>(value, scriptPubKey));
         return;
@@ -507,7 +507,7 @@ static void MutateTxAddOutMultiSig(CMutableTransaction& tx, const std::string& s
     }
 
     // construct TxOut, append to transaction output list
-    if (tx.IsParticlVersion())
+    if (tx.IsWisprVersion())
     {
         tx.vpout.push_back(MAKE_OUTPUT<CTxOutStandard>(value, scriptPubKey));
         return;
@@ -539,7 +539,7 @@ static void MutateTxAddOutData(CMutableTransaction& tx, const std::string& strIn
 
     std::vector<unsigned char> data = ParseHex(strData);
 
-    if (tx.IsParticlVersion())
+    if (tx.IsWisprVersion())
     {
         // TODO OUTPUT_DATA
         tx.vpout.push_back(MAKE_OUTPUT<CTxOutStandard>(value, CScript() << OP_RETURN << data));
@@ -590,7 +590,7 @@ static void MutateTxAddOutScript(CMutableTransaction& tx, const std::string& str
     }
 
     // construct TxOut, append to transaction output list
-    if (tx.IsParticlVersion())
+    if (tx.IsWisprVersion())
     {
         tx.vpout.push_back(MAKE_OUTPUT<CTxOutStandard>(value, scriptPubKey));
         return;
@@ -619,7 +619,7 @@ static void MutateTxDelOutput(CMutableTransaction& tx, const std::string& strOut
         throw std::runtime_error("Invalid TX output index '" + strOutIdx + "'");
     }
 
-    if (tx.IsParticlVersion()) {
+    if (tx.IsWisprVersion()) {
         // delete output from transaction
         tx.vpout.erase(tx.vpout.begin() + outIdx);
         return;
@@ -773,7 +773,7 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
         const CScript& prevPubKey = coin.out.scriptPubKey;
         const CAmount& amount = coin.out.nValue;
 
-        if (tx.IsParticlVersion() && amount == 0)
+        if (tx.IsWisprVersion() && amount == 0)
             throw std::runtime_error("expected amount for prevtx");
 
         std::vector<uint8_t> vchAmount(8);
@@ -790,7 +790,7 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
 
 static void MutateTxAddOutBlind(CMutableTransaction& tx, const std::string& strInput)
 {
-    if (!tx.IsParticlVersion())
+    if (!tx.IsWisprVersion())
         throw std::runtime_error("tx not wispr version.");
     // separate COMMITMENT:SCRIPT:RANGEPROOF[:DATA]
     std::vector<std::string> vStrInputParts;
@@ -836,7 +836,7 @@ static void MutateTxAddOutBlind(CMutableTransaction& tx, const std::string& strI
 
 static void MutateTxAddOutDataType(CMutableTransaction& tx, const std::string& strInput)
 {
-    if (!tx.IsParticlVersion())
+    if (!tx.IsWisprVersion())
         throw std::runtime_error("tx not wispr version.");
     if (!IsHex(strInput))
         throw std::runtime_error("invalid TX output data");

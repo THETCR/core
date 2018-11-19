@@ -75,7 +75,7 @@ public:
     virtual ~BaseSignatureCreator() {}
     virtual const BaseSignatureChecker& Checker() const =0;
 
-    virtual bool IsParticlVersion() const { return false; }
+    virtual bool IsWisprVersion() const { return false; }
     virtual bool IsCoinStake() const { return false; }
 
     /** Create a singular (non-script) signature. */
@@ -95,7 +95,7 @@ public:
     const BaseSignatureChecker& Checker() const override { return checker; }
     bool CreateSig(const SigningProvider& provider, std::vector<unsigned char>& vchSig, const CKeyID& keyid, const CScript& scriptCode, SigVersion sigversion) const override;
 
-    bool IsParticlVersion() const override { return txTo && txTo->IsParticlVersion(); }
+    bool IsWisprVersion() const override { return txTo && txTo->IsWisprVersion(); }
     bool IsCoinStake() const override { return txTo && txTo->IsCoinStake(); }
 };
 

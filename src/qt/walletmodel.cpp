@@ -491,7 +491,7 @@ void WalletModel::subscribeToCoreSignals()
     m_handler_show_progress = m_wallet->handleShowProgress(boost::bind(ShowProgress, this, _1, _2));
     m_handler_watch_only_changed = m_wallet->handleWatchOnlyChanged(boost::bind(NotifyWatchonlyChanged, this, _1));
 
-    if (m_wallet->IsParticlWallet()) {
+    if (m_wallet->IsWisprWallet()) {
         m_handler_reserved_balance_changed = m_wallet->handleReservedBalanceChanged(boost::bind(NotifyReservedBalanceChanged, this, _1));
     }
 }
@@ -506,7 +506,7 @@ void WalletModel::unsubscribeFromCoreSignals()
     m_handler_show_progress->disconnect();
     m_handler_watch_only_changed->disconnect();
 
-    if (m_wallet->IsParticlWallet()) {
+    if (m_wallet->IsWisprWallet()) {
         m_handler_reserved_balance_changed->disconnect();
     }
 }

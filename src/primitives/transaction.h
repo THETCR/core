@@ -53,7 +53,7 @@ enum DataOutputTypes
     DO_FUND_MSG             = 8,
 };
 
-inline bool IsParticlTxVersion(int nVersion)
+inline bool IsWisprTxVersion(int nVersion)
 {
     return (nVersion & 0xFF) >= WISPR_TXN_VERSION;
 }
@@ -716,7 +716,7 @@ template<typename Stream, typename TxType>
 inline void SerializeTransaction(const TxType& tx, Stream& s) {
     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
 
-    if (IsParticlTxVersion(tx.nVersion))
+    if (IsWisprTxVersion(tx.nVersion))
     {
         uint8_t bv = tx.nVersion & 0xFF;
         s << bv;
@@ -829,8 +829,8 @@ public:
         return vin.empty() && vout.empty() && vpout.empty();
     }
 
-    bool IsParticlVersion() const {
-        return IsParticlTxVersion(nVersion);
+    bool IsWisprVersion() const {
+        return IsWisprTxVersion(nVersion);
     }
 
     int GetType() const {
@@ -839,7 +839,7 @@ public:
 
     size_t GetNumVOuts() const
     {
-        return IsParticlTxVersion(nVersion) ? vpout.size() : vout.size();
+        return IsWisprTxVersion(nVersion) ? vpout.size() : vout.size();
     }
 
     const uint256& GetHash() const { return hash; }
@@ -890,7 +890,7 @@ public:
 
     bool IsCoinBase() const
     {
-        if (IsParticlVersion())
+        if (IsWisprVersion())
             return (GetType() == TXN_COINBASE
                 && vin.size() == 1 && vin[0].prevout.IsNull()); // TODO [rm]?
 
@@ -988,8 +988,8 @@ struct CMutableTransaction
         nVersion |= (type & 0xFF) << 8;
     }
 
-    bool IsParticlVersion() const {
-        return IsParticlTxVersion(nVersion);
+    bool IsWisprVersion() const {
+        return IsWisprTxVersion(nVersion);
     }
 
     int GetType() const {
@@ -1006,7 +1006,7 @@ struct CMutableTransaction
 
     size_t GetNumVOuts() const
     {
-        return IsParticlTxVersion(nVersion) ? vpout.size() : vout.size();
+        return IsWisprTxVersion(nVersion) ? vpout.size() : vout.size();
     }
 
     /** Compute the hash of this CMutableTransaction. This is computed on the

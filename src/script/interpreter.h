@@ -166,7 +166,7 @@ public:
         return false;
     }
 
-    virtual bool IsParticlVersion() const
+    virtual bool IsWisprVersion() const
     {
         return false;
     }
@@ -199,9 +199,9 @@ public:
         return txTo && txTo->IsCoinStake();
     }
 
-    bool IsParticlVersion() const override
+    bool IsWisprVersion() const override
     {
-        return txTo && txTo->IsParticlVersion();
+        return txTo && txTo->IsWisprVersion();
     }
 };
 
