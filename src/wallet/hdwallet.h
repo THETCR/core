@@ -764,6 +764,7 @@ public:
     bool SetMintUnspent(const CBigNum& bnSerial);
     bool UpdateMint(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom);
     bool IsMyZerocoinSpend(const CBigNum& bnSerial) const;
+    bool IsCollateralAmount(CAmount nInputAmount) const;
 
     std::string GetUniqueWalletBackupName(bool fzwspAuto) const;
     bool IsMyMint(const CBigNum& bnValue) const;

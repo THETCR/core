@@ -12960,7 +12960,7 @@ bool CHDWallet::UpdateMint(const CBigNum& bnValue, const int& nHeight, const uin
     } else {
         //Check if this mint is one that is in our mintpool (a potential future mint from our deterministic generation)
         if (zwalletMain->IsInMintPool(bnValue)) {
-            if (zwalletMain->SetMintSeen(bnValue, nHeight, txid, denom))
+            if (zwalletMain->SetMintSeen(this, bnValue, nHeight, txid, denom))
                 return true;
         }
     }
@@ -12998,7 +12998,7 @@ bool CHDWallet::SetMintUnspent(const CBigNum& bnSerial)
         return error("%s: did not find mint", __func__);
 
     CMintMeta meta = zwspTracker->Get(hashSerial);
-    zwspTracker->SetPubcoinNotUsed(meta.hashPubcoin);
+    zwspTracker->SetPubcoinNotUsed(this, meta.hashPubcoin);
     return true;
 }
 void CHDWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, std::list<CDeterministicMint>& listDMintsRestored)
@@ -13058,7 +13058,7 @@ string CHDWallet::ResetMintZerocoin()
 //    CHDWalletDB walletdb(this->strWalletFile);
     CHDWalletDB walletdb(this->GetDBHandle());
 
-    set<CMintMeta> setMints = zwspTracker->ListMints(false, false, true);
+    set<CMintMeta> setMints = zwspTracker->ListMints(this, false, false, true);
     vector<CMintMeta> vMintsToFind(setMints.begin(), setMints.end());
     vector<CMintMeta> vMintsMissing;
     vector<CMintMeta> vMintsToUpdate;
@@ -13069,7 +13069,7 @@ string CHDWallet::ResetMintZerocoin()
     // Update the meta data of mints that were marked for updating
     for (CMintMeta meta : vMintsToUpdate) {
         updates++;
-        zwspTracker->UpdateState(meta);
+        zwspTracker->UpdateState(this, meta);
     }
 
     // Delete any mints that were unable to be located on the blockchain
@@ -13153,7 +13153,7 @@ bool CHDWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLeve
     const int nMaxSpends = Params().Zerocoin_MaxSpendsPerTransaction(); // Maximum possible spends for one zWSP transaction
     vector<CMintMeta> vMintsToFetch;
     if (vSelectedMints.empty()) {
-        setMints = zwspTracker->ListMints(true, true, true); // need to find mints to spend
+        setMints = zwspTracker->ListMints(this, true, true, true); // need to find mints to spend
         if(setMints.empty()) {
             receipt.SetStatus(_("Failed to find Zerocoins in wallet.dat"), nStatus);
             return false;
@@ -13488,7 +13488,7 @@ std::map<libzerocoin::CoinDenomination, CAmount> CHDWallet::GetMyZerocoinDistrib
         spread.insert(std::pair<libzerocoin::CoinDenomination, CAmount>(denom, 0));
     {
         LOCK(cs_wallet);
-        set<CMintMeta> setMints = zwspTracker->ListMints(true, true, true);
+        set<CMintMeta> setMints = zwspTracker->ListMints(this, true, true, true);
         for (auto& mint : setMints)
             spread.at(mint.denom)++;
     }
@@ -13690,17 +13690,17 @@ void CHDWallet::ZWspBackupWallet()
         break;
     }
 
-    BackupWallet(*this, backupPath.string());
+    BackupWallet(backupPath.string());
 
     if(!gArgs.GetArg("-zwspbackuppath", "").empty()) {
-        fs::path customPath(GetArg("-zwspbackuppath", ""));
+        fs::path customPath(gArgs.GetArg("-zwspbackuppath", ""));
         fs::create_directories(customPath);
 
         if(!customPath.has_extension()) {
             customPath /= GetUniqueWalletBackupName(true);
         }
 
-        BackupWallet(*this, customPath, false);
+        BackupWallet(customPath);
     }
 
 }
@@ -13746,7 +13746,9 @@ string CHDWallet::MintZerocoin(CAmount nValue, CWalletTx& wtxNew, vector<CDeterm
         return strError;
     }
 
-    wtxNew = CWalletTx(this, txNew);
+    CWalletTx *wNew = new CWalletTx(this, MakeTransactionRef(std::move(txNew)));
+    wtxNew = *wNew;
+//    wtxNew = CWalletTx(this, txNew);
     wtxNew.fFromMe = true;
     wtxNew.fTimeReceivedIsTxTime = true;
 
@@ -13756,8 +13758,9 @@ string CHDWallet::MintZerocoin(CAmount nValue, CWalletTx& wtxNew, vector<CDeterm
         return _("Error: The transaction is larger than the maximum allowed transaction size!");
     }
 
+    CValidationState state;
     //commit the transaction to the network
-    if (!CommitTransaction(wtxNew, reservekey)) {
+    if (!CommitTransaction(wtxNew.tx, wtxNew.mapValue, wtxNew.vOrderForm, reservekey, g_connman.get(), state)) {
         return _("Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
     } else {
         //update mints with full transaction hash and then database them
@@ -13794,7 +13797,9 @@ bool CHDWallet::SpendZerocoin(CAmount nAmount, int nSecurityLevel, CWalletTx& wt
         ZWspBackupWallet();
 
     CHDWalletDB walletdb(this->GetDBHandle());
-    if (!CommitTransaction(wtxNew, reserveKey)) {
+    CValidationState state;
+
+    if (!CommitTransaction(wtxNew.tx, wtxNew.mapValue, wtxNew.vOrderForm, reserveKey, g_connman.get(), state)) {
         LogPrintf("%s: failed to commit\n", __func__);
         nStatus = ZWSP_COMMIT_FAILED;
 
