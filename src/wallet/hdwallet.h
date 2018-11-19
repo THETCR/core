@@ -768,6 +768,7 @@ public:
     std::string GetUniqueWalletBackupName(bool fzwspAuto) const;
     bool IsMyMint(const CBigNum& bnValue) const;
     int nStakeSetUpdateTime = 300; // 5 minutes
+    boost::signals2::signal<void (CAmount nReservedBalance)> NotifyReservedBalanceChanged;
 
     size_t CountTxSpends() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet) { return mapTxSpends.size(); };
 
