@@ -28,9 +28,9 @@ fi
 
 AC_CANONICAL_HOST
 
-AH_TOP([#ifndef BITCOIN_CONFIG_H])
-AH_TOP([#define BITCOIN_CONFIG_H])
-AH_BOTTOM([#endif //BITCOIN_CONFIG_H])
+AH_TOP([#ifndef WSP_CONFIG_H])
+AH_TOP([#define WSP_CONFIG_H])
+AH_BOTTOM([#endif //WSP_CONFIG_H])
 
 dnl faketime breaks configure and is only needed for make. Disable it here.
 unset FAKETIME
@@ -1377,6 +1377,7 @@ fi
 if test "x$use_ccache" = "xyes"; then
     AX_CHECK_PREPROC_FLAG([-Qunused-arguments],[CPPFLAGS="-Qunused-arguments $CPPFLAGS"])
 fi
+
 dnl bignum value
 set_bignum=$req_bignum
 case $req_bignum in
@@ -1402,6 +1403,7 @@ openssl)
   AC_MSG_ERROR([invalid bignum implementation selection])
   ;;
 esac
+
 dnl enable wallet
 AC_MSG_CHECKING([if wallet should be enabled])
 if test x$enable_wallet != xno; then
