@@ -231,7 +231,11 @@ AC_ARG_ENABLE([bip70],
   [enable_bip70=$enableval],
   [enable_bip70=yes])
 
-AC_ARG_WITH([protoc-bindir],[AS_HELP_STRING([--with-protoc-bindir=BIN_DIR],[specify protoc bin path])], [protoc_bin_path=$withval], [])
+AC_ARG_WITH([protoc-bindir],
+    [AS_HELP_STRING([--with-protoc-bindir=BIN_DIR],
+    [specify protoc bin path])],
+    [protoc_bin_path=$withval],
+    [])
 
 AC_ARG_ENABLE(man,
     [AS_HELP_STRING([--disable-man],
