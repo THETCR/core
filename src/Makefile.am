@@ -71,8 +71,8 @@ EXTRA_LIBRARIES += \
   $(LIBWISPR_CRYPTO) \
   $(LIBWISPR_UTIL) \
   $(LIBWISPR_COMMON) \
-  $(LIBWISPR_CONSENSUS) \
   $(LIBWISPR_ZEROCOIN) \
+  $(LIBWISPR_CONSENSUS) \
   $(LIBWISPR_SERVER) \
   $(LIBWISPR_CLI) \
   $(LIBWISPR_WALLET) \
@@ -456,6 +456,12 @@ libwispr_wallet_a_SOURCES = \
   wallet/hdwalletdb.cpp \
   wallet/rpchdwallet.cpp \
   wallet/stakeinput.cpp \
+  masternode/activemasternode.cpp \
+  masternode/masternode.cpp \
+  masternode/masternode-payments.cpp \
+  masternode/masternode-sync.cpp \
+  masternode/masternodeconfig.cpp \
+  masternode/masternodeman.cpp \
   blind.cpp \
   key/stealth.cpp \
   pos/miner.cpp \
@@ -697,8 +703,8 @@ wisprd_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBWISPR_UTIL) \
   $(LIBWISPR_ZMQ) \
-  $(LIBWISPR_CONSENSUS) \
   $(LIBWISPR_ZEROCOIN) \
+  $(LIBWISPR_CONSENSUS) \
   $(LIBWISPR_CRYPTO) \
   $(LIBLEVELDB) \
   $(LIBLEVELDB_SSE42) \
@@ -746,8 +752,8 @@ wispr_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBWISPR_COMMON) \
   $(LIBWISPR_UTIL) \
-  $(LIBWISPR_CONSENSUS) \
   $(LIBWISPR_ZEROCOIN) \
+  $(LIBWISPR_CONSENSUS) \
   $(LIBWISPR_CRYPTO) \
   $(LIBSECP256K1)
 
