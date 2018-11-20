@@ -388,7 +388,7 @@
     <None Include="..\..\src\qtes\src\verify.svg">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="GeneratedFiles\bitcoin.moc" />
+    <None Include="GeneratedFiles\wispr.moc" />
     <None Include="GeneratedFiles\bitcoinamountfield.moc" />
     <None Include="GeneratedFiles\intro.moc" />
     <None Include="GeneratedFiles\overviewpage.moc" />
