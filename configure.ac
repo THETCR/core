@@ -1650,7 +1650,7 @@ fi
 #ac_configure_args="${ac_configure_args} --disable-shared --with-pic --with-bignum=no --enable-module-recovery --disable-jni --enable-module-ecdh --enable-module-rangeproof --enable-module-generator --enable-module-mlsag --enable-experimental"
 #ac_configure_args="${ac_configure_args} --disable-shared --with-pic --with-bignum=auto --enable-module-recovery --disable-jni --enable-module-ecdh --enable-module-commitment --enable-module-rangeproof --enable-module-bulletproof --enable-module-generator --enable-module-mlsag --enable-experimental --enable-endomorphism"
 #ac_configure_args="${ac_configure_args} --disable-shared --with-pic --with-bignum=auto --enable-module-recovery --disable-jni"
-ac_configure_args="${ac_configure_args} --disable-shared --with-pic --enable-module-recovery"
+ac_configure_args="${ac_configure_args} --disable-shared --with-pic --enable-module-recovery --enable-module-ecdh --enable-module-commitment --enable-module-rangeproof --enable-module-bulletproof --enable-module-generator --enable-module-mlsag"
 
 
 AC_CONFIG_SUBDIRS([src/secp256k1])
