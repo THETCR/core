@@ -519,9 +519,9 @@ crypto_libwispr_crypto_shani_a_CPPFLAGS += -DENABLE_SHANI
 crypto_libwispr_crypto_shani_a_SOURCES = crypto/sha256_shani.cpp
 
 # libzerocoin library
-libzerocoin_libbitcoin_zerocoin_a_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS)
-libzerocoin_libbitcoin_zerocoin_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libzerocoin_libbitcoin_zerocoin_a_SOURCES = \
+libzerocoin_libwispr_zerocoin_a_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS)
+libzerocoin_libwispr_zerocoin_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libzerocoin_libwispr_zerocoin_a_SOURCES = \
   libzerocoin/Accumulator.h \
   libzerocoin/AccumulatorProofOfKnowledge.h \
   libzerocoin/bignum.h \
