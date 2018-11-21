@@ -100,6 +100,7 @@ endif
 # bitcoin core #
 BITCOIN_CORE_H = \
   addrdb.h \
+  masternode/activemasternode.h \
   rctindex.h \
   addrman.h \
   attributes.h \
@@ -108,6 +109,8 @@ BITCOIN_CORE_H = \
   bloom.h \
   blockencodings.h \
   blockfilter.h \
+  cachemap.h \
+  cachemultimap.h \
   chain.h \
   chainparams.h \
   chainparamsbase.h \
@@ -127,6 +130,19 @@ BITCOIN_CORE_H = \
   core_io.h \
   core_memusage.h \
   cuckoocache.h \
+  obfuscation/privatesend.h \
+  obfuscation/privatesend-client.h \
+  obfuscation/privatesend-server.h \
+  obfuscation/privatesend-util.h \
+  dsnotificationinterface.h \
+  governance/governance.h \
+  governance/governance-classes.h \
+  governance/governance-exceptions.h \
+  governance/governance-object.h \
+  governance/governance-validators.h \
+  governance/governance-vote.h \
+  governance/governance-votedb.h \
+  flat-database.h \
   fs.h \
   httprpc.h \
   httpserver.h \
@@ -134,6 +150,7 @@ BITCOIN_CORE_H = \
   index/txindex.h \
   indirectmap.h \
   init.h \
+  instantx.h \
   anon.h \
   blind.h \
   interfaces/chain.h \
@@ -161,13 +178,20 @@ BITCOIN_CORE_H = \
   dbwrapper.h \
   limitedmap.h \
   logging.h \
+  masternode/masternode.h \
+  masternode/masternode-payments.h \
+  masternode/masternode-sync.h \
+  masternode/masternodeman.h \
+  masternode/masternodeconfig.h \
   memusage.h \
   merkleblock.h \
+  messagesigner.h \
   miner.h \
   net.h \
   net_processing.h \
   netaddress.h \
   netbase.h \
+  netfulfilledman.h \
   netmessagemaker.h \
   noui.h \
   outputtype.h \
@@ -204,6 +228,8 @@ BITCOIN_CORE_H = \
   smsg/net.h \
   smsg/smessage.h \
   smsg/rpcsmessage.h \
+  spork/spork.h \
+  spork/sporkdb.h \
   support/allocators/secure.h \
   support/allocators/zeroafterfree.h \
   support/cleanse.h \
@@ -267,6 +293,7 @@ libwispr_util_a-clientversion.$(OBJEXT): obj/build.h
 libwispr_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
 libwispr_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_server_a_SOURCES = \
+  masternode/activemasternode.cpp \
   addrman.cpp \
   addrdb.cpp \
   bloom.cpp \
@@ -274,6 +301,7 @@ libwispr_server_a_SOURCES = \
   blockfilter.cpp \
   chain.cpp \
   checkpoints.cpp \
+  dsnotificationinterface.cpp \
   consensus/tx_verify.cpp \
   httprpc.cpp \
   httpserver.cpp \
@@ -283,10 +311,24 @@ libwispr_server_a_SOURCES = \
   interfaces/handler.cpp \
   interfaces/node.cpp \
   init.cpp \
+  instantx.cpp \
   dbwrapper.cpp \
+  governance/governance.cpp \
+  governance/governance-classes.cpp \
+  governance/governance-object.cpp \
+  governance/governance-validators.cpp \
+  governance/governance-vote.cpp \
+  governance/governance-votedb.cpp \
+  masternode/masternode.cpp \
+  masternode/masternode-payments.cpp \
+  masternode/masternode-sync.cpp \
+  masternode/masternodeconfig.cpp \
+  masternode/masternodeman.cpp \
   merkleblock.cpp \
+  messagesigner.cpp \
   miner.cpp \
   net.cpp \
+  netfulfilledman.cpp \
   net_processing.cpp \
   noui.cpp \
   outputtype.cpp \
@@ -294,11 +336,15 @@ libwispr_server_a_SOURCES = \
   policy/policy.cpp \
   policy/rbf.cpp \
   pow.cpp \
+  obfuscation/privatesend.cpp \
+  obfuscation/privatesend-server.cpp \
   pos/kernel.cpp \
   rest.cpp \
   rpc/anon.cpp \
   rpc/mnemonic.cpp \
   rpc/blockchain.cpp \
+  rpc/masternode.cpp \
+  rpc/governance.cpp \
   rpc/mining.cpp \
   rpc/misc.cpp \
   rpc/net.cpp \
@@ -308,7 +354,10 @@ libwispr_server_a_SOURCES = \
   rpc/rpcutil.cpp \
   rpc/util.cpp \
   script/sigcache.cpp \
+  script/ismine.cpp \
   shutdown.cpp \
+  spork/spork.cpp \
+  spork/sporkdb.cpp \
   timedata.cpp \
   torcontrol.cpp \
   txdb.cpp \
@@ -377,6 +426,9 @@ libwispr_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libwispr_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_wallet_a_SOURCES = \
   interfaces/wallet.cpp \
+  keepass.cpp \
+  obfuscation/privatesend-client.cpp \
+  obfuscation/privatesend-util.cpp \
   wallet/coincontrol.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \
@@ -464,7 +516,7 @@ libwispr_consensus_a_SOURCES = \
   primitives/transaction.h \
   pubkey.cpp \
   pubkey.h \
-  script/bitcoinconsensus.cpp \
+  script/wisprconsensus.cpp \
   script/interpreter.cpp \
   script/interpreter.h \
   script/script.cpp \
@@ -576,21 +628,21 @@ nodist_libwispr_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
 # bitcoind binary #
-wisprd_SOURCES = bitcoind.cpp
+wisprd_SOURCES = wisprd.cpp
 wisprd_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 wisprd_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 wisprd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-wisprd_SOURCES += bitcoind-res.rc
+wisprd_SOURCES += wisprd-res.rc
 endif
 
 wisprd_LDADD = \
   $(LIBWISPR_SERVER) \
-  $(LIBWISPR_WALLET) \
   $(LIBWISPR_COMMON) \
   $(LIBUNIVALUE) \
   $(LIBWISPR_UTIL) \
+  $(LIBWISPR_WALLET) \
   $(LIBWISPR_ZMQ) \
   $(LIBWISPR_CONSENSUS) \
   $(LIBWISPR_CRYPTO) \
@@ -601,7 +653,7 @@ wisprd_LDADD = \
   $(LIBWISPR_SMSG) \
   $(LIBWISPR_USBDEVICE)
 
-wisprd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
+wisprd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
 if ENABLE_USBDEVICE
 wisprd_LDADD += $(USB_LIBS) $(HIDAPI_LIBS) $(PROTOBUF_LIBS)
 endif
@@ -623,7 +675,7 @@ wispr_cli_LDADD = \
   $(LIBWISPR_UTIL) \
   $(LIBWISPR_CRYPTO)
 
-wispr_cli_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
+wispr_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
 # wispr-tx binary #
@@ -707,6 +759,10 @@ clean-local:
 	@test -f $(WINDRES)
 	## FIXME: How to get the appropriate modulename_CPPFLAGS in here?
 	$(AM_V_GEN) $(WINDRES) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) -DWINDRES_PREPROC -i $< -o $@
+
+.mm.o:
+	$(AM_V_CXX) $(OBJCXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	  $(CPPFLAGS) $(AM_CXXFLAGS) $(QT_INCLUDES) $(AM_CXXFLAGS) $(PIE_FLAGS) $(CXXFLAGS) -c -o $@ $<
 
 check-symbols: $(bin_PROGRAMS)
 if GLIBC_BACK_COMPAT
