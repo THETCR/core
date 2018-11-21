@@ -19,7 +19,7 @@ else
 LIBUNIVALUE = $(UNIVALUE_LIBS)
 endif
 
-BITCOIN_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS)
+BITCOIN_INCLUDES=-I$(builddir) $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS)
 
 BITCOIN_INCLUDES += -I$(srcdir)/secp256k1/include
 BITCOIN_INCLUDES += $(UNIVALUE_CFLAGS)
@@ -30,7 +30,6 @@ LIBWISPR_CONSENSUS=libwispr_consensus.a
 LIBWISPR_CLI=libwispr_cli.a
 LIBWISPR_UTIL=libwispr_util.a
 LIBWISPR_CRYPTO_BASE=crypto/libwispr_crypto_base.a
-LIBWISPR_ZEROCOIN=libzerocoin/libwispr_zerocoin.a
 LIBWISPRQT=qt/libwisprqt.a
 LIBSECP256K1=secp256k1/libsecp256k1.la
 LIBWISPR_SMSG=libwispr_smsg.a
@@ -62,7 +61,7 @@ LIBWISPR_CRYPTO_SHANI = crypto/libwispr_crypto_shani.a
 LIBWISPR_CRYPTO += $(LIBWISPR_CRYPTO_SHANI)
 endif
 
-$(LIBSECP256K1): $(wildcard secp256k1/src/*) $(wildcard secp256k1/include/*)
+$(LIBSECP256K1): $(wildcard secp256k1/src/*.h) $(wildcard secp256k1/src/*.c) $(wildcard secp256k1/include/*)
 	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -C $(@D) $(@F)
 
 # Make is not made aware of per-object dependencies to avoid limiting building parallelization
@@ -71,7 +70,6 @@ EXTRA_LIBRARIES += \
   $(LIBWISPR_CRYPTO) \
   $(LIBWISPR_UTIL) \
   $(LIBWISPR_COMMON) \
-  $(LIBWISPR_ZEROCOIN) \
   $(LIBWISPR_CONSENSUS) \
   $(LIBWISPR_SERVER) \
   $(LIBWISPR_CLI) \
@@ -99,7 +97,7 @@ if BUILD_BITCOIN_TX
 endif
 
 .PHONY: FORCE check-symbols check-security
-# wispr core #
+# bitcoin core #
 BITCOIN_CORE_H = \
   addrdb.h \
   rctindex.h \
@@ -129,24 +127,13 @@ BITCOIN_CORE_H = \
   core_io.h \
   core_memusage.h \
   cuckoocache.h \
-  dsnotificationinterface.h \
-  flat-database.h \
   fs.h \
-  governance/governance.h \
-  governance/governance-classes.h \
-  governance/governance-exceptions.h \
-  governance/governance-object.h \
-  governance/governance-validators.h \
-  governance/governance-vote.h \
-  governance/governance-votedb.h \
   httprpc.h \
   httpserver.h \
   index/base.h \
   index/txindex.h \
   indirectmap.h \
   init.h \
-  instantx.h \
-  invalid.cpp \
   anon.h \
   blind.h \
   interfaces/chain.h \
@@ -176,27 +163,14 @@ BITCOIN_CORE_H = \
   logging.h \
   memusage.h \
   merkleblock.h \
-  messagesigner.h \
   miner.h \
-  masternode/activemasternode.h \
-  masternode/masternode.h \
-  masternode/masternode-payments.h \
-  masternode/masternode-sync.h \
-  masternode/masternodeconfig.h \
-  masternode/masternodeman.h \
   net.h \
   net_processing.h \
   netaddress.h \
   netbase.h \
   netmessagemaker.h \
-  netfulfilledman.h \
   noui.h \
   outputtype.h \
-  obfuscation/denomination_functions.h \
-  obfuscation/privatesend.h \
-  obfuscation/privatesend-client.h \
-  obfuscation/privatesend-server.h \
-  obfuscation/privatesend-util.h \
   policy/feerate.h \
   policy/fees.h \
   policy/policy.h \
@@ -204,8 +178,6 @@ BITCOIN_CORE_H = \
   pow.h \
   pos/kernel.h \
   pos/miner.h \
-  primitives/deterministicmint.h \
-  primitives/zerocoin.h \
   protocol.h \
   random.h \
   reverse_iterator.h \
@@ -220,8 +192,6 @@ BITCOIN_CORE_H = \
   rpc/register.h \
   rpc/util.h \
   scheduler.h \
-  spork/spork.h \
-  spork/sporkdb.h \
   script/descriptor.h \
   script/ismine.h \
   script/sigcache.h \
@@ -271,16 +241,7 @@ BITCOIN_CORE_H = \
   wallet/hdwallet.h \
   wallet/walletutil.h \
   wallet/coinselection.h \
-  wallet/stakeinput.h \
   warnings.h \
-  zerocoin/accumulatorcheckpoints.h \
-  zerocoin/accumulatorcheckpoints.json.h \
-  zerocoin/accumulatormap.h \
-  zerocoin/accumulators.h \
-  zerocoin/mintpool.h \
-  zerocoin/zwspchain.h \
-  zerocoin/zwsptracker.h \
-  zerocoin/zwspwallet.h \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h\
   zmq/zmqnotificationinterface.h \
@@ -302,7 +263,7 @@ obj/build.h: FORCE
 	  $(abs_top_srcdir)
 libwispr_util_a-clientversion.$(OBJEXT): obj/build.h
 
-# server: shared between wisprd and wispr-qt
+# server: shared between bitcoind and wispr-qt
 libwispr_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
 libwispr_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_server_a_SOURCES = \
@@ -313,7 +274,6 @@ libwispr_server_a_SOURCES = \
   blockfilter.cpp \
   chain.cpp \
   checkpoints.cpp \
-  dsnotificationinterface.cpp \
   consensus/tx_verify.cpp \
   httprpc.cpp \
   httpserver.cpp \
@@ -323,42 +283,22 @@ libwispr_server_a_SOURCES = \
   interfaces/handler.cpp \
   interfaces/node.cpp \
   init.cpp \
-  instantx.cpp \
-  invalid.cpp \
   dbwrapper.cpp \
-  governance/governance.cpp \
-  governance/governance-classes.cpp \
-  governance/governance-object.cpp \
-  governance/governance-validators.cpp \
-  governance/governance-vote.cpp \
-  governance/governance-votedb.cpp \
-  masternode/activemasternode.cpp \
-  masternode/masternode.cpp \
-  masternode/masternode-payments.cpp \
-  masternode/masternode-sync.cpp \
-  masternode/masternodeconfig.cpp \
-  masternode/masternodeman.cpp \
   merkleblock.cpp \
-  messagesigner.cpp \
   miner.cpp \
   net.cpp \
   net_processing.cpp \
-  netfulfilledman.cpp \
   noui.cpp \
   outputtype.cpp \
   policy/fees.cpp \
   policy/policy.cpp \
   policy/rbf.cpp \
-  obfuscation/privatesend.cpp \
-  obfuscation/privatesend-server.cpp \
   pow.cpp \
   pos/kernel.cpp \
   rest.cpp \
   rpc/anon.cpp \
   rpc/mnemonic.cpp \
   rpc/blockchain.cpp \
-  rpc/masternode.cpp \
-  rpc/governance.cpp \
   rpc/mining.cpp \
   rpc/misc.cpp \
   rpc/net.cpp \
@@ -368,8 +308,6 @@ libwispr_server_a_SOURCES = \
   rpc/rpcutil.cpp \
   rpc/util.cpp \
   script/sigcache.cpp \
-  spork/spork.cpp \
-  spork/sporkdb.cpp \
   shutdown.cpp \
   timedata.cpp \
   torcontrol.cpp \
@@ -381,7 +319,6 @@ libwispr_server_a_SOURCES = \
   versionbits.cpp \
   insight/insight.cpp \
   insight/rpc.cpp \
-  zerocoin/zwspchain.cpp \
   $(BITCOIN_CORE_H)
 
 if !ENABLE_WALLET
@@ -434,13 +371,11 @@ nodist_libwispr_usbdevice_a_SOURCES = \
 BUILT_SOURCES = $(nodist_libwispr_usbdevice_a_SOURCES)
 endif
 
-# wallet: shared between wisprd and wispr-qt, but only linked
+# wallet: shared between bitcoind and wispr-qt, but only linked
 # when wallet enabled
 libwispr_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libwispr_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_wallet_a_SOURCES = \
-  instantx.cpp \
-  obfuscation/denomination_functions.cpp \
   interfaces/wallet.cpp \
   wallet/coincontrol.cpp \
   wallet/crypter.cpp \
@@ -455,27 +390,12 @@ libwispr_wallet_a_SOURCES = \
   wallet/hdwallet.cpp \
   wallet/hdwalletdb.cpp \
   wallet/rpchdwallet.cpp \
-  wallet/stakeinput.cpp \
-  masternode/activemasternode.cpp \
-  masternode/masternode.cpp \
-  masternode/masternode-payments.cpp \
-  masternode/masternode-sync.cpp \
-  masternode/masternodeconfig.cpp \
-  masternode/masternodeman.cpp \
   blind.cpp \
   key/stealth.cpp \
   pos/miner.cpp \
-  pos/kernel.cpp \
   policy/rbf.cpp \
   wallet/walletutil.cpp \
   wallet/coinselection.cpp \
-  primitives/deterministicmint.cpp \
-  primitives/zerocoin.cpp \
-  obfuscation/privatesend-client.cpp \
-  obfuscation/privatesend-util.cpp \
-  zerocoin/mintpool.cpp \
-  zerocoin/zwspwallet.cpp \
-  zerocoin/zwsptracker.cpp \
   $(BITCOIN_CORE_H)
 
 # crypto primitives library
@@ -544,7 +464,7 @@ libwispr_consensus_a_SOURCES = \
   primitives/transaction.h \
   pubkey.cpp \
   pubkey.h \
-  script/wisprconsensus.cpp \
+  script/bitcoinconsensus.cpp \
   script/interpreter.cpp \
   script/interpreter.h \
   script/script.cpp \
@@ -560,33 +480,7 @@ libwispr_consensus_a_SOURCES = \
   util/strencodings.h \
   version.h
 
-# libzerocoin library
-libzerocoin_libwispr_zerocoin_a_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS)
-libzerocoin_libwispr_zerocoin_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libzerocoin_libwispr_zerocoin_a_SOURCES = \
-  libzerocoin/Accumulator.h \
-  libzerocoin/AccumulatorProofOfKnowledge.h \
-  libzerocoin/bignum.h \
-  libzerocoin/Coin.h \
-  libzerocoin/CoinSpend.h \
-  libzerocoin/Commitment.h \
-  libzerocoin/Denominations.h \
-  libzerocoin/ParamGeneration.h \
-  libzerocoin/Params.h \
-  libzerocoin/SerialNumberSignatureOfKnowledge.h \
-  libzerocoin/SpendType.h \
-  libzerocoin/ZerocoinDefines.h \
-  libzerocoin/Accumulator.cpp \
-  libzerocoin/AccumulatorProofOfKnowledge.cpp \
-  libzerocoin/Coin.cpp \
-  libzerocoin/Denominations.cpp \
-  libzerocoin/CoinSpend.cpp \
-  libzerocoin/Commitment.cpp \
-  libzerocoin/ParamGeneration.cpp \
-  libzerocoin/Params.cpp \
-  libzerocoin/SerialNumberSignatureOfKnowledge.cpp
-
-# common: shared between wisprd, and wispr-qt and non-server tools
+# common: shared between bitcoind, and wispr-qt and non-server tools
 libwispr_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libwispr_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_common_a_SOURCES = \
@@ -600,8 +494,6 @@ libwispr_common_a_SOURCES = \
   anon.cpp \
   blind.cpp \
   key.cpp \
-  primitives/deterministicmint.cpp \
-  primitives/zerocoin.cpp \
   key/keyutil.cpp \
   key/extkey.cpp \
   key/stealth.cpp \
@@ -622,9 +514,6 @@ libwispr_common_a_SOURCES = \
   script/standard.cpp \
   versionbitsinfo.cpp \
   warnings.cpp \
-  zerocoin/accumulators.cpp \
-  zerocoin/accumulatorcheckpoints.cpp \
-  zerocoin/accumulatormap.cpp \
   $(BITCOIN_CORE_H)
 
 # util: shared between all executables.
@@ -686,14 +575,14 @@ libwispr_cli_a_SOURCES = \
 nodist_libwispr_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
-# wisprd binary #
-wisprd_SOURCES = wisprd.cpp
+# bitcoind binary #
+wisprd_SOURCES = bitcoind.cpp
 wisprd_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 wisprd_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 wisprd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-wisprd_SOURCES += wisprd-res.rc
+wisprd_SOURCES += bitcoind-res.rc
 endif
 
 wisprd_LDADD = \
@@ -703,7 +592,6 @@ wisprd_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBWISPR_UTIL) \
   $(LIBWISPR_ZMQ) \
-  $(LIBWISPR_ZEROCOIN) \
   $(LIBWISPR_CONSENSUS) \
   $(LIBWISPR_CRYPTO) \
   $(LIBLEVELDB) \
@@ -752,7 +640,6 @@ wispr_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBWISPR_COMMON) \
   $(LIBWISPR_UTIL) \
-  $(LIBWISPR_ZEROCOIN) \
   $(LIBWISPR_CONSENSUS) \
   $(LIBWISPR_CRYPTO) \
   $(LIBSECP256K1)
@@ -760,7 +647,7 @@ wispr_tx_LDADD = \
 wispr_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 #
 
-# wisprconsensus library #
+# bitcoinconsensus library #
 if BUILD_BITCOIN_LIBS
 include_HEADERS = script/wisprconsensus.h
 libwisprconsensus_la_SOURCES = $(crypto_libwispr_crypto_base_a_SOURCES) $(libwispr_consensus_a_SOURCES)
@@ -773,7 +660,6 @@ libwisprconsensus_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS)
 libwisprconsensus_la_LIBADD = $(LIBSECP256K1) $(BOOST_LIBS)
 libwisprconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
 libwisprconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libwisprconsensus_la_LIBADD += secp256k1/libsecp256k1.la
 
 endif
 #
