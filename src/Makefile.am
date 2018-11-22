@@ -169,6 +169,7 @@ BITCOIN_CORE_H = \
   interfaces/node.h \
   interfaces/wallet.h \
   key.h \
+  keepass.h \
   key/stealth.h \
   key/extkey.h \
   key/mnemonic.h \
@@ -459,7 +460,7 @@ libwispr_wallet_a_SOURCES = \
   wallet/hdwallet.cpp \
   wallet/hdwalletdb.cpp \
   wallet/rpchdwallet.cpp \
-  zerocoin/mintpool.h \
+  zerocoin/mintpool.cpp \
   zerocoin/zwspwallet.cpp \
   zerocoin/zwsptracker.cpp \
   wallet/stakeinput.cpp \
