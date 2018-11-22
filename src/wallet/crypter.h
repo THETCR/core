@@ -178,5 +178,6 @@ public:
     bool GetDeterministicSeed(CHDWallet *pwallet, const uint256& hashSeed, uint256& seed);
     bool AddDeterministicSeed(CHDWallet *pwallet, const uint256& seed);
 };
-
+bool EncryptAES256(const SecureString& sKey, const SecureString& sPlaintext, const std::string& sIV, std::string& sCiphertext);
+bool DecryptAES256(const SecureString& sKey, const std::string& sCiphertext, const std::string& sIV, SecureString& sPlaintext);
 #endif // BITCOIN_WALLET_CRYPTER_H

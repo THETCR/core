@@ -17,7 +17,6 @@
 
 #include <util/system.h>
 #include "util/strencodings.h"
-#include <crypto/aes.h>
 #include <event2/event.h>
 #include <event2/http.h>
 #include <event2/buffer.h>

@@ -455,3 +455,46 @@ bool CCryptoKeyStore::GetDeterministicSeed(CHDWallet *pwallet, const uint256& ha
 
 //    return error("Failed to decrypt deterministic seed %s", IsLocked() ? "Wallet is locked!" : "");
 }
+
+// General secure AES 256 CBC encryption routine
+bool EncryptAES256(const SecureString& sKey, const SecureString& sPlaintext, const std::string& sIV, std::string& sCiphertext)
+{
+    // Verify key sizes
+    if(sKey.size() != 32 || sIV.size() != AES_BLOCKSIZE) {
+        LogPrintf("crypter EncryptAES256 - Invalid key or block size: Key: %d sIV:%d\n", sKey.size(), sIV.size());
+        return false;
+    }
+
+    // max ciphertext len for a n bytes of plaintext is
+    // n + AES_BLOCKSIZE bytes
+    sCiphertext.resize(sPlaintext.size() + AES_BLOCKSIZE);
+
+    AES256CBCEncrypt enc((const unsigned char*) &sKey[0], (const unsigned char*) &sIV[0], true);
+    size_t nLen = enc.Encrypt((const unsigned char*) &sPlaintext[0], sPlaintext.size(), (unsigned char*) &sCiphertext[0]);
+    if(nLen < sPlaintext.size())
+        return false;
+    sCiphertext.resize(nLen);
+    return true;
+}
+
+// General secure AES 256 CBC decryption routine
+bool DecryptAES256(const SecureString& sKey, const std::string& sCiphertext, const std::string& sIV, SecureString& sPlaintext)
+{
+    // Verify key sizes
+    if(sKey.size() != 32 || sIV.size() != AES_BLOCKSIZE) {
+        LogPrintf("crypter DecryptAES256 - Invalid key or block size\n");
+        return false;
+    }
+
+    // plaintext will always be equal to or lesser than length of ciphertext
+    int nLen = sCiphertext.size();
+
+    sPlaintext.resize(nLen);
+
+    AES256CBCDecrypt dec((const unsigned char*) &sKey[0], (const unsigned char*) &sIV[0], true);
+    nLen = dec.Decrypt((const unsigned char*) &sCiphertext[0], sCiphertext.size(), (unsigned char*) &sPlaintext[0]);
+    if(nLen == 0)
+        return false;
+    sPlaintext.resize(nLen);
+    return true;
+}
