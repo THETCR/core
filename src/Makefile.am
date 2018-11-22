@@ -370,7 +370,6 @@ libwispr_server_a_SOURCES = \
   rpc/rpcutil.cpp \
   rpc/util.cpp \
   script/sigcache.cpp \
-  script/ismine.cpp \
   shutdown.cpp \
   spork/spork.cpp \
   spork/sporkdb.cpp \
@@ -460,6 +459,7 @@ libwispr_wallet_a_SOURCES = \
   wallet/hdwallet.cpp \
   wallet/hdwalletdb.cpp \
   wallet/rpchdwallet.cpp \
+  zerocoin/mintpool.h \
   zerocoin/zwspwallet.cpp \
   zerocoin/zwsptracker.cpp \
   wallet/stakeinput.cpp \
