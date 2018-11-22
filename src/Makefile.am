@@ -579,8 +579,6 @@ libwispr_consensus_a_SOURCES = \
   script/script_error.h \
   spork/spork.cpp \
   spork/spork.h \
-  spork/sporkdb.cpp \
-  spork/sporkdb.h \
   serialize.h \
   span.h \
   tinyformat.h \
@@ -622,6 +620,8 @@ libwispr_common_a_SOURCES = \
   script/ismine.cpp \
   script/sign.cpp \
   script/standard.cpp \
+  spork/spork.cpp \
+  spork/sporkdb.cpp \
   versionbitsinfo.cpp \
   warnings.cpp \
   zerocoin/accumulators.cpp \
