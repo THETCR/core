@@ -550,8 +550,11 @@ libwispr_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_consensus_a_SOURCES = \
   amount.h \
   zerocoin/accumulators.cpp \
+  zerocoin/accumulators.h \
   zerocoin/accumulatorcheckpoints.cpp \
+  zerocoin/accumulatorcheckpoints.h \
   zerocoin/accumulatormap.cpp \
+  zerocoin/accumulatormap.h \
   arith_uint256.cpp \
   arith_uint256.h \
   consensus/merkle.cpp \
