@@ -1626,7 +1626,7 @@ std::string SafeIntVersionToString(uint32_t nVersion)
         return "invalid_version";
     }
 }
-boost::filesystem::path GetBackupsDir()
+fs::path GetBackupsDir()
 {
     namespace fs = boost::filesystem;
 
@@ -1634,4 +1634,11 @@ boost::filesystem::path GetBackupsDir()
         return GetDataDir() / "backups";
 
     return fs::absolute(gArgs.GetArg("-walletbackupsdir", ""));
+}
+fs::path GetMasternodeConfigFile()
+{
+    boost::filesystem::path pathConfigFile(GetArg("-mnconf", "masternode.conf"));
+    if (!pathConfigFile.is_complete())
+        pathConfigFile = GetDataDir() / pathConfigFile;
+    return pathConfigFile;
 }

@@ -446,7 +446,7 @@ private:
 } // namespace util
 
 
-boost::filesystem::path GetBackupsDir();
+fs::path GetBackupsDir();
 
 fs::path GetMasternodeConfigFile();
 /**
