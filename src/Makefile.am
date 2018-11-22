@@ -136,7 +136,7 @@ BITCOIN_CORE_H = \
   core_io.h \
   core_memusage.h \
   cuckoocache.h \
-  denomination_functions.h \
+  obfuscation/denomination_functions.h \
   obfuscation/privatesend.h \
   obfuscation/privatesend-client.h \
   obfuscation/privatesend-server.h \
@@ -444,7 +444,7 @@ libwispr_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_wallet_a_SOURCES = \
   interfaces/wallet.cpp \
   keepass.cpp \
-  denomination_functions.cpp \
+  obfuscation/denomination_functions.cpp \
   obfuscation/privatesend-client.cpp \
   obfuscation/privatesend-util.cpp \
   wallet/coincontrol.cpp \
