@@ -143,7 +143,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../bitcoin.qrc"/>
+  <include location="../wispr.qrc"/>
  </resources>
  <connections/>
 </ui>
