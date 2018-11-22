@@ -549,12 +549,6 @@ libwispr_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libwispr_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_consensus_a_SOURCES = \
   amount.h \
-  zerocoin/accumulators.cpp \
-  zerocoin/accumulators.h \
-  zerocoin/accumulatorcheckpoints.cpp \
-  zerocoin/accumulatorcheckpoints.h \
-  zerocoin/accumulatormap.cpp \
-  zerocoin/accumulatormap.h \
   arith_uint256.cpp \
   arith_uint256.h \
   consensus/merkle.cpp \
@@ -630,6 +624,9 @@ libwispr_common_a_SOURCES = \
   script/standard.cpp \
   versionbitsinfo.cpp \
   warnings.cpp \
+  zerocoin/accumulators.cpp \
+  zerocoin/accumulatorcheckpoints.cpp \
+  zerocoin/accumulatormap.cpp \
   $(BITCOIN_CORE_H)
 
 # util: shared between all executables.
