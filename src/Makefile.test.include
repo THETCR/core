@@ -187,19 +187,19 @@ CLEAN_BITCOIN_TEST = test/*.gcda test/*.gcno $(GENERATED_TEST_FILES) $(BITCOIN_T
 CLEANFILES += $(CLEAN_BITCOIN_TEST)
 
 if TARGET_WINDOWS
-bitcoin_test: $(TEST_BINARY)
+wispr_test: $(TEST_BINARY)
 else
 if ENABLE_BENCH
-bitcoin_test: $(TEST_BINARY) $(BENCH_BINARY)
+wispr_test: $(TEST_BINARY) $(BENCH_BINARY)
 else
-bitcoin_test: $(TEST_BINARY)
+wispr_test: $(TEST_BINARY)
 endif
 endif
 
-bitcoin_test_check: $(TEST_BINARY) FORCE
+wispr_test_check: $(TEST_BINARY) FORCE
 	$(MAKE) check-TESTS TESTS=$^
 
-bitcoin_test_clean : FORCE
+wispr_test_clean : FORCE
 	rm -f $(CLEAN_BITCOIN_TEST) $(test_test_wispr_OBJECTS) $(TEST_BINARY)
 
 check-local: $(BITCOIN_TESTS:.cpp=.cpp.test)

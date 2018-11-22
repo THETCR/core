@@ -89,4 +89,4 @@ test_wispr_qt_check : qt/test/test_wispr-qt$(EXEEXT) FORCE
 	$(MAKE) check-TESTS TESTS=$^
 
 test_wispr_qt_clean: FORCE
-	rm -f $(CLEAN_BITCOIN_QT_TEST) $(qt_test_test_bitcoin_qt_OBJECTS)
+	rm -f $(CLEAN_BITCOIN_QT_TEST) $(qt_test_test_wispr_qt_OBJECTS)
