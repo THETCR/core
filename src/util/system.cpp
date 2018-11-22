@@ -1637,8 +1637,5 @@ fs::path GetBackupsDir()
 }
 fs::path GetMasternodeConfigFile()
 {
-    boost::filesystem::path pathConfigFile(GetArg("-mnconf", "masternode.conf"));
-    if (!pathConfigFile.is_complete())
-        pathConfigFile = GetDataDir() / pathConfigFile;
-    return pathConfigFile;
+    return AbsPathForConfigVal(fs::path(gArgs.GetArg("-mnconf", "masternode.conf")), false);
 }
