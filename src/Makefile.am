@@ -443,6 +443,7 @@ libwispr_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libwispr_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libwispr_wallet_a_SOURCES = \
   interfaces/wallet.cpp \
+  script/ismine.cpp \
   keepass.cpp \
   obfuscation/denomination_functions.cpp \
   obfuscation/privatesend-client.cpp \
