@@ -17,7 +17,7 @@
 
 #include <util/system.h>
 #include "util/strencodings.h"
-
+#include <crypto/aes.h>
 #include <event2/event.h>
 #include <event2/http.h>
 #include <event2/buffer.h>
@@ -101,11 +101,11 @@ CKeePassIntegrator::CKeePassIntegrator()
 // Initialze from application context
 void CKeePassIntegrator::init()
 {
-    bIsActive = GetBoolArg("-keepass", false);
-    nPort = GetArg("-keepassport", DEFAULT_KEEPASS_HTTP_PORT);
-    sKeyBase64 = SecureString(GetArg("-keepasskey", "").c_str());
-    strKeePassId = GetArg("-keepassid", "");
-    strKeePassEntryName = GetArg("-keepassname", "");
+    bIsActive = gArgs.GetBoolArg("-keepass", false);
+    nPort = gArgs.GetArg("-keepassport", DEFAULT_KEEPASS_HTTP_PORT);
+    sKeyBase64 = SecureString(gArgs.GetArg("-keepasskey", "").c_str());
+    strKeePassId = gArgs.GetArg("-keepassid", "");
+    strKeePassEntryName = gArgs.GetArg("-keepassname", "");
     // Convert key if available
     if(sKeyBase64.size() > 0)
     {
@@ -124,7 +124,7 @@ void CKeePassIntegrator::init()
 
 void CKeePassIntegrator::CKeePassRequest::addStrParameter(const std::string& strName, const std::string& strValue)
 {
-    requestObj.push_back(Pair(strName, strValue));
+    requestObj.pushKV(strName, strValue);
 }
 
 void CKeePassIntegrator::CKeePassRequest::addStrParameter(const std::string& strName, const SecureString& sValue)
@@ -342,7 +342,7 @@ void CKeePassIntegrator::doHTTPPost(const std::string& sRequest, int& nStatusRet
 
     // Logging of actual post data disabled as to not write passphrase in debug.log. Only enable temporarily when needed
     //LogPrint("keepass", "CKeePassIntegrator::doHTTPPost -- send POST data: %s\n", strPost);
-    LogPrint("keepass", "CKeePassIntegrator::doHTTPPost -- send POST data\n");
+//    LogPrint("keepass", "CKeePassIntegrator::doHTTPPost -- send POST data\n");
 
 //    boost::asio::streambuf request;
 //    std::ostream request_stream(&request);
@@ -431,7 +431,7 @@ void CKeePassIntegrator::rpcTestAssociation(bool bTriggerUnlock)
 
     doHTTPPost(request.getJson(), nStatus, strResponse);
 
-    LogPrint("keepass", "CKeePassIntegrator::rpcTestAssociation -- send result: status: %d response: %s\n", nStatus, strResponse);
+//    LogPrint("keepass", "CKeePassIntegrator::rpcTestAssociation -- send result: status: %d response: %s\n", nStatus, strResponse);
 }
 
 std::vector<CKeePassIntegrator::CKeePassEntry> CKeePassIntegrator::rpcGetLogins()
@@ -453,7 +453,7 @@ std::vector<CKeePassIntegrator::CKeePassEntry> CKeePassIntegrator::rpcGetLogins(
 
     // Logging of actual response data disabled as to not write passphrase in debug.log. Only enable temporarily when needed
     //LogPrint("keepass", "CKeePassIntegrator::rpcGetLogins -- send result: status: %d response: %s\n", nStatus, strResponse);
-    LogPrint("keepass", "CKeePassIntegrator::rpcGetLogins -- send result: status: %d\n", nStatus);
+//    LogPrint("keepass", "CKeePassIntegrator::rpcGetLogins -- send result: status: %d\n", nStatus);
 
     if(nStatus != 200)
     {
@@ -488,7 +488,7 @@ void CKeePassIntegrator::rpcSetLogin(const SecureString& sWalletPass, const Secu
     request.addStrParameter("Id", strKeePassId);
     request.addStrParameter("Url", sUrl);
 
-    LogPrint("keepass", "CKeePassIntegrator::rpcSetLogin -- send Url: %s\n", sUrl);
+//    LogPrint("keepass", "CKeePassIntegrator::rpcSetLogin -- send Url: %s\n", sUrl);
 
     //request.addStrParameter("SubmitUrl", sSubmitUrl); // Is used to construct the entry title
     request.addStrParameter("Login", SecureString("dash"));
@@ -504,7 +504,7 @@ void CKeePassIntegrator::rpcSetLogin(const SecureString& sWalletPass, const Secu
     doHTTPPost(request.getJson(), nStatus, strResponse);
 
 
-    LogPrint("keepass", "CKeePassIntegrator::rpcSetLogin -- send result: status: %d response: %s\n", nStatus, strResponse);
+//    LogPrint("keepass", "CKeePassIntegrator::rpcSetLogin -- send result: status: %d response: %s\n", nStatus, strResponse);
 
     if(nStatus != 200)
     {
@@ -547,7 +547,7 @@ void CKeePassIntegrator::rpcAssociate(std::string& strIdRet, SecureString& sKeyB
 
     doHTTPPost(request.getJson(), nStatus, strResponse);
 
-    LogPrint("keepass", "CKeePassIntegrator::rpcAssociate -- send result: status: %d response: %s\n", nStatus, strResponse);
+//    LogPrint("keepass", "CKeePassIntegrator::rpcAssociate -- send result: status: %d response: %s\n", nStatus, strResponse);
 
     if(nStatus != 200)
     {
