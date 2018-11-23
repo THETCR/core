@@ -4,7 +4,7 @@
 
 #include <key_io.h>
 #include <bech32.h>
-#include <test/test_bitcoin.h>
+#include <test/test_wispr.h>
 
 #include <boost/test/unit_test.hpp>
 

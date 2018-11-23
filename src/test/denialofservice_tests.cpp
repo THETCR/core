@@ -16,7 +16,7 @@
 #include <util/system.h>
 #include <validation.h>
 
-#include <test/test_bitcoin.h>
+#include <test/test_wispr.h>
 
 #include <stdint.h>
 

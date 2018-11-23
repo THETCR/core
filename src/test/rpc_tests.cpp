@@ -13,7 +13,7 @@
 #include <key_io.h>
 #include <netbase.h>
 
-#include <test/test_bitcoin.h>
+#include <test/test_wispr.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>

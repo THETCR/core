@@ -11,7 +11,7 @@
 #include <script/script_error.h>
 #include <script/standard.h>
 #include <util/strencodings.h>
-#include <test/test_bitcoin.h>
+#include <test/test_wispr.h>
 
 #include <boost/test/unit_test.hpp>
 

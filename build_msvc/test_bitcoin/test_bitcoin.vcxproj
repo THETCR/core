@@ -70,8 +70,8 @@
     <ClCompile Include="..\..\src\test\sigopcount_tests.cpp" />
     <ClCompile Include="..\..\src\test\skiplist_tests.cpp" />
     <ClCompile Include="..\..\src\test\streams_tests.cpp" />
-    <ClCompile Include="..\..\src\test\test_bitcoin.cpp" />
-    <ClCompile Include="..\..\src\test\test_bitcoin_main.cpp" />
+    <ClCompile Include="..\..\src\test\test_wispr.cpp" />
+    <ClCompile Include="..\..\src\test\test_wispr_main.cpp" />
     <ClCompile Include="..\..\src\test\timedata_tests.cpp" />
     <ClCompile Include="..\..\src\test\torcontrol_tests.cpp" />
     <ClCompile Include="..\..\src\test\transaction_tests.cpp" />
@@ -121,7 +121,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{A56B73DB-D46D-4882-8374-1FE3FFA08F07}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>test_bitcoin</RootNamespace>
+    <RootNamespace>test_wispr</RootNamespace>
     <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
     <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
   </PropertyGroup>

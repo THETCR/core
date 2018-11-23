@@ -7,7 +7,7 @@
 #include <uint256.h>
 #include <undo.h>
 #include <util/strencodings.h>
-#include <test/test_bitcoin.h>
+#include <test/test_wispr.h>
 #include <validation.h>
 #include <consensus/validation.h>
 

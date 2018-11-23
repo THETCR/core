@@ -14,7 +14,7 @@
 #include <script/sign.h>
 #include <util/system.h>
 #include <util/strencodings.h>
-#include <test/test_bitcoin.h>
+#include <test/test_wispr.h>
 #include <rpc/server.h>
 
 #if defined(HAVE_CONSENSUS_LIB)

@@ -5,7 +5,7 @@
 #ifndef WISPR_WALLET_TEST_HDWALLET_TEST_FIXTURE_H
 #define WISPR_WALLET_TEST_HDWALLET_TEST_FIXTURE_H
 
-#include <test/test_bitcoin.h>
+#include <test/test_wispr.h>
 #include <interfaces/chain.h>
 
 class CHDWallet;

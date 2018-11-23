@@ -25,11 +25,11 @@ RAW_TEST_FILES =
 GENERATED_TEST_FILES = $(JSON_TEST_FILES:.json=.json.h) $(RAW_TEST_FILES:.raw=.raw.h)
 
 BITCOIN_TEST_SUITE = \
-  test/test_bitcoin_main.cpp \
-  test/test_bitcoin.h \
-  test/test_bitcoin.cpp
+  test/test_wispr_main.cpp \
+  test/test_wispr.h \
+  test/test_wispr.cpp
 
-# test_bitcoin binary #
+# test_wispr binary #
 BITCOIN_TESTS =\
   test/arith_uint256_tests.cpp \
   test/scriptnum10.h \
@@ -158,7 +158,7 @@ endif
 #
 
 # test_wispr_fuzzy binary #
-test_test_wispr_fuzzy_SOURCES = test/test_bitcoin_fuzzy.cpp
+test_test_wispr_fuzzy_SOURCES = test/test_wispr_fuzzy.cpp
 test_test_wispr_fuzzy_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 test_test_wispr_fuzzy_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 test_test_wispr_fuzzy_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)

@@ -214,7 +214,7 @@ Low-level RPC changes
 - #11125 `812c870` Add bitcoin-cli -stdin and -stdinrpcpass functional tests (promag)
 - #11077 `1d80d1e` fix timeout issues from TestNode (jnewbery)
 - #11078 `f1ced0d` Make p2p-leaktests.py more robust (jnewbery)
-- #11210 `f3f7891` Stop test_bitcoin-qt touching ~/.bitcoin (MeshCollider)
+- #11210 `f3f7891` Stop test_wispr-qt touching ~/.bitcoin (MeshCollider)
 - #11234 `f0b6795` Remove redundant testutil.cpp|h files (MeshCollider)
 - #11215 `cef0319` fixups from set_test_params() (jnewbery)
 - #11345 `f9cf7b5` Check connectivity before sending in assumevalid.py (jnewbery)

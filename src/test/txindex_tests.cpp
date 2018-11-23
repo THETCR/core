@@ -4,7 +4,7 @@
 
 #include <index/txindex.h>
 #include <script/standard.h>
-#include <test/test_bitcoin.h>
+#include <test/test_wispr.h>
 #include <util/system.h>
 #include <util/time.h>
 #include <validation.h>

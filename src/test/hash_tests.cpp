@@ -5,7 +5,7 @@
 #include <crypto/siphash.h>
 #include <hash.h>
 #include <util/strencodings.h>
-#include <test/test_bitcoin.h>
+#include <test/test_wispr.h>
 
 #include <vector>
 
