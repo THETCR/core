@@ -19,4 +19,4 @@ FORMS += \
     ../src/qt/forms/mnemonicdialog.ui \
 
 RESOURCES += \
-    ../src/qt/bitcoin.qrc
+    ../src/qt/wispr.qrc
