@@ -366,7 +366,7 @@ Testing changes
 - #11541 `bb9ab0f` Build: Fix Automake warnings when running autogen.sh (fanquake)
 - #11611 `0e70791` [build] Don't fail when passed --disable-lcov and lcov isn't available (fanquake)
 - #11651 `3c098a8` refactor: Make all #includes relative to project root (laanwj, MeshCollider, ryanofsky)
-- #11621 `1f7695b` [build] Add temp_bitcoin_locale_qrc to CLEAN_QT to fix make distcheck (fanquake)
+- #11621 `1f7695b` [build] Add temp_wispr_locale_qrc to CLEAN_QT to fix make distcheck (fanquake)
 - #11755 `84fa645` [Docs] Bump minimum required version of GCC to 4.8 (fanquake)
 - #9254 `6d3dc52` [depends] ZeroMQ 4.2.2 (fanquake)
 - #11842 `3c8f0a3` [build] Add missing stuff to clean-local (kallewoof)

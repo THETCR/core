@@ -32,10 +32,10 @@
       <Outputs>.\GeneratedFiles\qrc_bitcoin.cpp</Outputs>
       <AdditionalInputs>(QTDIR)\bincc.exe</AdditionalInputs>
     </CustomBuild>
-    <CustomBuild Include="..\..\src\qt\bitcoin_locale.qrc">
-      <Command>"$(QTDIR)\bincc.exe" -name bitcoin_locale "%(Fullpath)" -o .\GeneratedFiles\qrc_bitcoin_locale.cpp</Command>
+    <CustomBuild Include="..\..\src\qt\wispr_locale.qrc">
+      <Command>"$(QTDIR)\bincc.exe" -name wispr_locale "%(Fullpath)" -o .\GeneratedFiles\qrc_wispr_locale.cpp</Command>
       <Message>Qt rcc generation for %(Identity)</Message>
-      <Outputs>.\GeneratedFiles\qrc_bitcoin_locale.cpp</Outputs>
+      <Outputs>.\GeneratedFiles\qrc_wispr_locale.cpp</Outputs>
       <AdditionalInputs>(QTDIR)\bincc.exe</AdditionalInputs>
     </CustomBuild>
     <None Include="..\..\src\qt\forms\addressbookpage.ui" />
@@ -674,7 +674,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\qrc_bitcoin.cpp" />
-    <ClCompile Include="GeneratedFiles\qrc_bitcoin_locale.cpp" />
+    <ClCompile Include="GeneratedFiles\qrc_wispr_locale.cpp" />
     <CustomBuild Include="..\..\src\qt\bitcoin.cpp">
       <Command>"$(QTDIR)\bin\moc.exe" "%(Fullpath)" -o .\GeneratedFiles\%(Filename).moc $(MOC_DEF)</Command>
       <Message>Qt moc generation for %(Identity)</Message>
