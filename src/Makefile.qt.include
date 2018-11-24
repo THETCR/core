@@ -348,7 +348,7 @@ RES_ICONS = \
   qt/res/icons/unit_uwispr.png \
   qt/res/icons/unit_twispr.png \
   qt/res/icons/unit_tmwispr.png \
-  qt/res/icons/unit_tuwispr.png
+  qt/res/icons/unit_tuwispr.png \
   qt/res/icons/warning.png \
   qt/res/icons/verify.png
 
