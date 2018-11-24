@@ -5,8 +5,8 @@
 #include "zwspcontroldialog.h"
 #include "ui_zwspcontroldialog.h"
 
-#include "accumulators.h"
-#include "main.h"
+#include "zerocoin/accumulators.h"
+#include "validation.h"
 #include "walletmodel.h"
 
 using namespace std;

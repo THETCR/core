@@ -13,9 +13,9 @@
 #include "optionsmodel.h"
 #include "sendcoinsentry.h"
 #include "walletmodel.h"
-#include "coincontrol.h"
+#include "wallet/coincontrol.h"
 #include "zwspcontroldialog.h"
-#include "spork.h"
+#include "spork/spork.h"
 #include "askpassphrasedialog.h"
 
 #include <QClipboard>
