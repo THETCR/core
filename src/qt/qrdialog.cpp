@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "qrdialog.h"
-#include "ui_qrdialog.h"
+#include "forms/ui_qrdialog.h"
 
 #include "bitcoinunits.h"
 #include "guiconstants.h"

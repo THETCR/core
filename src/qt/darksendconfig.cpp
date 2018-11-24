@@ -1,5 +1,5 @@
 #include "darksendconfig.h"
-#include "form/ui_darksendconfig.h"
+#include "forms/ui_darksendconfig.h"
 
 #include "bitcoinunits.h"
 #include "guiconstants.h"

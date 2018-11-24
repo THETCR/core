@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "zwspcontroldialog.h"
-#include "form/ui_zwspcontroldialog.h"
+#include "forms/ui_zwspcontroldialog.h"
 
 #include "zerocoin/accumulators.h"
 #include "validation.h"
