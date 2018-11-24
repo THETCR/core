@@ -1,5 +1,5 @@
 #include "masternodelist.h"
-#include "ui_masternodelist.h"
+#include "form/ui_masternodelist.h"
 
 #include "masternode/activemasternode.h"
 #include "clientmodel.h"
