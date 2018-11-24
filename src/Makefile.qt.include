@@ -144,7 +144,8 @@ QT_FORMS_UI = \
   qt/forms/signverifymessagedialog.ui \
   qt/forms/transactiondescdialog.ui \
   qt/forms/coldstakingdialog.ui \
-  qt/forms/mnemonicdialog.ui
+  qt/forms/mnemonicdialog.ui \
+  qt/forms/zwspcontroldialog.ui
 
 QT_MOC_CPP = \
   qt/moc_addressbookpage.cpp \
@@ -195,7 +196,8 @@ QT_MOC_CPP = \
   qt/moc_walletmodel.cpp \
   qt/moc_walletview.cpp \
   qt/moc_coldstakingdialog.cpp \
-  qt/moc_mnemonicdialog.cpp
+  qt/moc_mnemonicdialog.cpp \
+  qt/moc_zwspcontroldialog.cpp
 
 BITCOIN_MM = \
   qt/macdockiconhandler.mm \
@@ -281,7 +283,8 @@ BITCOIN_QT_H = \
   qt/walletview.h \
   qt/winshutdownmonitor.h \
   qt/coldstakingdialog.h \
-  qt/mnemonicdialog.h
+  qt/mnemonicdialog.h \
+  qt/zwspcontroldialog.h
 
 RES_ICONS = \
   qt/res/icons/add.png \
@@ -410,7 +413,8 @@ BITCOIN_QT_WALLET_CPP = \
   qt/darksendconfig.cpp \
   qt/masternodelist.cpp \
   qt/paymentrequestplus.cpp \
-  qt/qrdialog.cpp
+  qt/qrdialog.cpp \
+  qt/zwspcontroldialog.cpp
 
 BITCOIN_QT_WALLET_BIP70_CPP = \
   qt/paymentrequestplus.cpp
