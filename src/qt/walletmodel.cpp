@@ -512,19 +512,31 @@ void WalletModel::unsubscribeFromCoreSignals()
 }
 
 // WalletModel::UnlockContext implementation
-WalletModel::UnlockContext WalletModel::requestUnlock()
+WalletModel::UnlockContext WalletModel::requestUnlock(bool fForMixingOnly)
 {
     bool was_locked = getEncryptionStatus() == Locked || getEncryptionStatus() == UnlockedForStaking;
     bool was_unlocked_for_staking = getEncryptionStatus() == UnlockedForStaking;
-    if(was_locked)
+    // Wallet was unlocked for mixing
+    bool was_mixing = (getEncryptionStatus() == UnlockedForMixingOnly);
+    // Wallet was unlocked for mixing and now user requested to fully unlock it
+    bool fMixingToFullRequested = !fForMixingOnly && was_mixing;
+    if(was_locked || fMixingToFullRequested)
     {
         // Request UI to unlock wallet
-        Q_EMIT requireUnlock();
+        Q_EMIT requireUnlock(fForMixingOnly);
     }
     // If wallet is still locked, unlock was failed or cancelled, mark context as invalid
     //bool valid = getEncryptionStatus() != Locked;
     EncryptionStatus newStatus = getEncryptionStatus();
     bool valid = newStatus == Unlocked || newStatus == Unencrypted;
+    // Wallet was locked, user requested to unlock it for mixing and failed to do so
+    bool fMixingUnlockFailed = fForMixingOnly && !(newStatus == UnlockedForMixingOnly);
+    // Wallet was unlocked for mixing, user requested to fully unlock it and failed
+    bool fMixingToFullFailed = fMixingToFullRequested && !(newStatus == Unlocked);
+    // If wallet is still locked, unlock failed or was cancelled, mark context as invalid
+    bool fInvalid = (newStatus == Locked) || fMixingUnlockFailed || fMixingToFullFailed;
+    // Wallet was not locked in any way or user tried to unlock it for mixing only and succeeded, keep it unlocked
+    bool fKeepUnlocked = !was_locked || (fForMixingOnly && !fMixingUnlockFailed);
 
     return UnlockContext(this, valid, was_locked, was_unlocked_for_staking);
 }
