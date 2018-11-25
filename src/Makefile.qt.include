@@ -145,6 +145,7 @@ QT_FORMS_UI = \
   qt/forms/transactiondescdialog.ui \
   qt/forms/coldstakingdialog.ui \
   qt/forms/mnemonicdialog.ui \
+  qt/forms/qrdialog.ui \
   qt/forms/zwspcontroldialog.ui
 
 QT_MOC_CPP = \
