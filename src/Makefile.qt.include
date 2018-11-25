@@ -145,7 +145,6 @@ QT_FORMS_UI = \
   qt/forms/transactiondescdialog.ui \
   qt/forms/coldstakingdialog.ui \
   qt/forms/mnemonicdialog.ui \
-  qt/forms/qrdialog.ui \
   qt/forms/zwspcontroldialog.ui
 
 QT_MOC_CPP = \
@@ -178,7 +177,6 @@ QT_MOC_CPP = \
   qt/moc_paymentserver.cpp \
   qt/moc_qvalidatedlineedit.cpp \
   qt/moc_qvaluecombobox.cpp \
-  qt/moc_qrdialog.cpp \
   qt/moc_receivecoinsdialog.cpp \
   qt/moc_receiverequestdialog.cpp \
   qt/moc_recentrequeststablemodel.cpp \
@@ -263,7 +261,6 @@ BITCOIN_QT_H = \
   qt/platformstyle.h \
   qt/qvalidatedlineedit.h \
   qt/qvaluecombobox.h \
-  qt/qrdialog.h \
   qt/receivecoinsdialog.h \
   qt/receiverequestdialog.h \
   qt/recentrequeststablemodel.h \
@@ -416,7 +413,6 @@ BITCOIN_QT_WALLET_CPP = \
   qt/darksendconfig.cpp \
   qt/masternodelist.cpp \
   qt/paymentrequestplus.cpp \
-  qt/qrdialog.cpp \
   qt/zwspcontroldialog.cpp
 
 BITCOIN_QT_WALLET_BIP70_CPP = \
