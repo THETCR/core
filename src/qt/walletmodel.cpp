@@ -723,5 +723,6 @@ bool WalletModel::isMultiwallet()
 void WalletModel::listZerocoinMints(std::set<CMintMeta>& setMints, bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus)
 {
     setMints.clear();
-    setMints = m_wallet->getWisprWallet()->zwspTracker->ListMints(fUnusedOnly, fMaturedOnly, fUpdateStatus);
+    CHDWallet *pwallet = m_wallet->getWisprWallet();
+    setMints = pwallet->zwspTracker->ListMints(pwallet ,fUnusedOnly, fMaturedOnly, fUpdateStatus);
 }
