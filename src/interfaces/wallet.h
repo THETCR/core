@@ -24,6 +24,8 @@
 #include <key/stealth.h>               // For CTxDestination
 #include <key/extkey.h>                // For CTxDestination
 
+#include <primitives/zerocoin.h>
+
 class CCoinControl;
 class CFeeRate;
 class CKey;
