@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "privacydialog.h"
-#include "ui_privacydialog.h"
+#include "forms/ui_privacydialog.h"
 
 #include "addressbookpage.h"
 #include "addresstablemodel.h"

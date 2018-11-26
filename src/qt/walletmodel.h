@@ -242,6 +242,9 @@ public:
     bool tryCallRpc(const QString &sCommand, UniValue &rv, bool returnError=false) const;
     void warningBox(QString heading, QString msg) const;
 
+    //!WISPR
+    void listZerocoinMints(std::set<CMintMeta>& setMints, bool fUnusedOnly = false, bool fMaturedOnly = false, bool fUpdateStatus = false);
+
 private:
     std::unique_ptr<interfaces::Wallet> m_wallet;
     std::unique_ptr<interfaces::Handler> m_handler_unload;
