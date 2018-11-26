@@ -23,7 +23,7 @@
 #include <util/moneystr.h>
 #include <QtWidgets>
 #include <primitives/deterministicmint.h>
-#include <accumulators.h>
+#include <zerocoin/accumulators.h>
 
 PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowCloseButtonHint),
                                                           ui(new Ui::PrivacyDialog),
