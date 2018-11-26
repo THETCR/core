@@ -21,6 +21,7 @@
 
 #include <interfaces/wallet.h>
 #include <support/allocators/secure.h>
+#include <instantx.h>
 
 
 #include <map>
