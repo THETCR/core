@@ -133,6 +133,10 @@ BITCOIN_CORE_H = \
   compressor.h \
   consensus/consensus.h \
   consensus/tx_verify.h \
+  primitives/block.h \
+  primitives/deterministicmint.h \
+  primitives/transaction.h \
+  primitives/zerocoin.h \
   core_io.h \
   core_memusage.h \
   cuckoocache.h \
@@ -461,6 +465,8 @@ libwispr_wallet_a_SOURCES = \
   wallet/hdwallet.cpp \
   wallet/hdwalletdb.cpp \
   wallet/rpchdwallet.cpp \
+  primitives/deterministicmint.cpp \
+  primitives/zerocoin.cpp \
   zerocoin/mintpool.cpp \
   zerocoin/zwspwallet.cpp \
   zerocoin/zwsptracker.cpp \
@@ -601,6 +607,10 @@ libwispr_common_a_SOURCES = \
   compressor.cpp \
   core_read.cpp \
   core_write.cpp \
+  primitives/block.cpp \
+  primitives/deterministicmint.cpp \
+  primitives/transaction.cpp \
+  primitives/zerocoin.cpp \
   anon.cpp \
   blind.cpp \
   key.cpp \
