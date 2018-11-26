@@ -364,64 +364,25 @@ static CBlock CreateGenesisBlockTestNet(uint32_t nTime, uint32_t nNonce, uint32_
 
 static CBlock CreateGenesisBlockMainNet(uint32_t nTime, uint32_t nNonce, uint32_t nBits)
 {
-    const char *pszTimestamp = "BTC 000000000000000000c679bc2209676d05129834627c7b1c02d1018b224c6f37";
+    const char* pszTimestamp = "I would rather be without a state than without a voice";
 
     CMutableTransaction txNew;
-    txNew.nVersion = WISPR_TXN_VERSION;
-    txNew.SetType(TXN_COINBASE);
-
+    txNew.nVersion = 1;
+    txNew.nTime = 1513403825;
+    txNew.nLockTime = 0;
     txNew.vin.resize(1);
+    txNew.vout.resize(1);
+    txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+    txNew.vout[0].nValue = 125000 * COIN;
+    txNew.vout[0].scriptPubKey = CScript() << ParseHex("0433f2952f9002c9088a19607e3d4a54d3d9dfe1cf5c78168b8ba6524fb19fc5d7d3202948e6b8b09e98c425875af6af78fd4f64ff07d97a9ae31ebda5162fbac3") << OP_CHECKSIG;
+    txNew.SetType(TXN_COINBASE);
     uint32_t nHeight = 0;  // bip34
-    txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(4) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp)) << OP_RETURN << nHeight;
-
-    txNew.vpout.resize(nGenesisOutputs);
-    for (size_t k = 0; k < nGenesisOutputs; ++k)
-    {
-        OUTPUT_PTR<CTxOutStandard> out = MAKE_OUTPUT<CTxOutStandard>();
-        out->nValue = genesisOutputs[k].second;
-        out->scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ParseHex(genesisOutputs[k].first) << OP_EQUALVERIFY << OP_CHECKSIG;
-        txNew.vpout[k] = out;
-    };
-
-    // Foundation Fund Raiser Funds
-    // RHFKJkrB4H38APUDVckr7TDwrK11N7V7mx
-    OUTPUT_PTR<CTxOutStandard> out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 397364 * COIN;
-    out->scriptPubKey = CScript() << OP_HASH160 << ParseHex("5766354dcb13caff682ed9451b9fe5bbb786996c") << OP_EQUAL;
-    txNew.vpout.push_back(out);
-
-    out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 296138 * COIN;
-    out->scriptPubKey = CScript() << OP_HASH160 << ParseHex("5766354dcb13caff682ed9451b9fe5bbb786996c") << OP_EQUAL;
-    txNew.vpout.push_back(out);
-
-    // Community Initative
-    // RKKgSiQcMjbC8TABRoyyny1gTU4fAEiQz9
-    out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 156675 * COIN;
-    out->scriptPubKey = CScript() << OP_HASH160 << ParseHex("6e29c4a11fd54916d024af16ca913cdf8f89cb31") << OP_EQUAL;
-    txNew.vpout.push_back(out);
-
-    // Contributors Left Over Funds
-    // RKiaVeyLUp7EmwHtCP92j8Vc1AodhpWi2U
-    out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 216346 * COIN;
-    out->scriptPubKey = CScript() << OP_HASH160 << ParseHex("727e5e75929bbf26912dd7833971d77e7450a33e") << OP_EQUAL;
-    txNew.vpout.push_back(out);
-
-    // Reserved Wispr for primary round
-    // RNnoeeqBTkpPQH8d29Gf45dszVj9RtbmCu
-    out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 996000 * COIN;
-    out->scriptPubKey = CScript() << 1512000000 << OP_CHECKLOCKTIMEVERIFY << OP_DROP << OP_HASH160<< ParseHex("9433643b4fd5de3ebd7fdd68675f978f34585af1") << OP_EQUAL; // 2017-11-30
-    txNew.vpout.push_back(out);
-
 
     CBlock genesis;
     genesis.nTime    = nTime;
     genesis.nBits    = nBits;
     genesis.nNonce   = nNonce;
-    genesis.nVersion = WISPR_BLOCK_VERSION;
+    genesis.nVersion = 1;
     genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
 
     genesis.hashPrevBlock.SetNull();
@@ -474,7 +435,7 @@ public:
         consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000391526231dc4c21e4c");
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x5dacfb4e040ed98031f8586ce1516b6813990b53d677fb45a49099e8ceecb6fa"); //250000
+        consensus.defaultAssumeValid = uint256S("0xcf86529d0243cb653da92cbbaddc7f0a4f275bcf557cc112d03c33b756af25d3"); //250000
 
         consensus.nMinRCTOutputDepth = 12;
 
@@ -483,13 +444,14 @@ public:
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0xfb;
-        pchMessageStart[1] = 0xf2;
-        pchMessageStart[2] = 0xef;
-        pchMessageStart[3] = 0xb4;
+        pchMessageStart[0] = 0x20;
+        pchMessageStart[1] = 0x45;
+        pchMessageStart[2] = 0x12;
+        pchMessageStart[3] = 0x77;
         nDefaultPort = 51738;
         nBIP44ID = 0x8000002C;
-
+        bnProofOfWorkLimit = ~uint256(0) >> 16; // WISPR starting difficulty is 1 / 2^12
+        bnProofOfStakeLimit = ~uint256(0) >> 48;
         nModifierInterval = 10 * 60;    // 10 minutes
         nStakeMinConfirmations = 225;   // 225 * 2 minutes
         nTargetSpacing = 120;           // 2 minutes
@@ -500,7 +462,7 @@ public:
 
         nPruneAfterHeight = 100000;
 
-        genesis = CreateGenesisBlockMainNet(1500296400, 31429, 0x1f00ffff); // 2017-07-17 13:00:00
+        genesis = CreateGenesisBlockMainNet(1513403825, 36156, bnProofOfWorkLimit.GetCompact()); // 2017-07-17 13:00:00
         consensus.hashGenesisBlock = genesis.GetHash();
 
         assert(consensus.hashGenesisBlock == uint256S("0x0000ee0784c195317ac95623e22fddb8c7b8825dc3998e0bb924d66866eccf4c"));
@@ -523,13 +485,14 @@ public:
             DevFundSettings("RBiiQBnQsVPPQkUaJVQTjsZM9K2xMKozST", 10, 60));
 
 
-        base58Prefixes[PUBKEY_ADDRESS]     = {0x38}; // P
-        base58Prefixes[SCRIPT_ADDRESS]     = {0x3c};
+        base58Prefixes[PUBKEY_ADDRESS]     = {0x49}; // P
+        base58Prefixes[SCRIPT_ADDRESS]     = {0x87};
         base58Prefixes[PUBKEY_ADDRESS_256] = {0x39};
         base58Prefixes[SCRIPT_ADDRESS_256] = {0x3d};
-        base58Prefixes[SECRET_KEY]         = {0x6c};
-        base58Prefixes[EXT_PUBLIC_KEY]     = {0x69, 0x6e, 0x82, 0xd1}; // PPAR
-        base58Prefixes[EXT_SECRET_KEY]     = {0x8f, 0x1d, 0xae, 0xb8}; // XPAR
+        base58Prefixes[SECRET_KEY]         = {0x91};
+        base58Prefixes[EXT_PUBLIC_KEY]     = {0x04, 0x88, 0xB2, 0x1E}; // PPAR
+        base58Prefixes[EXT_SECRET_KEY]     = {0x04, 0x88, 0xAD, 0xE4}; // XPAR
+        base58Prefixes[EXT_COIN_TYPE]     =  {0x80, 0x00, 0x00, 0x77}; // XPAR
         base58Prefixes[STEALTH_ADDRESS]    = {0x14};
         base58Prefixes[EXT_KEY_HASH]       = {0x4b}; // X
         base58Prefixes[EXT_ACC_HASH]       = {0x17}; // A
@@ -574,7 +537,7 @@ public:
         nFulfilledRequestExpireTime = 60*60; // fulfilled requests expire in 1 hour
 
         strSporkAddress = "Xgtyuk76vhuFW2iT7UAiHgNdWXCf3J34wh";
-        //WISPR
+        //!WISPR
         /** Height or Time Based Activations **/
         nLastPOWBlock = 450;
         nNewProtocolStartHeight = 400000;
@@ -598,19 +561,18 @@ public:
 
         checkpointData = {
             {
-                { 5000,     uint256S("0xe786020ab94bc5461a07d744f3631a811b4ebf424fceda12274f2321883713f4")},
-                { 15000,    uint256S("0xafc73ac299f2e6dd309077d230fccef547b9fc24379c1bf324dd3683b13c61c3")},
-                { 30000,    uint256S("0x35d95c12799323d7b418fd64df9d88ef67ef27f057d54033b5b2f38a5ecaacbf")},
-                { 91000,    uint256S("0x4d1ffaa5b51431918a0c74345e2672035c743511359ac8b1be67467b02ff884c")},
-                { 112250,   uint256S("0x89e4b23471aea7a875df835d6f89613fd87ba649e7a1d8cb892917d0080ef337")},
-                { 128650,   uint256S("0x43597f7dd16719ab2ea63e9c34266120c85cf592a4ec61f82822003da6874408")},
-                { 159010,   uint256S("0xb724d359a10aaa51755a65da830f4aaf4e44aad0246ebf5f73171122bc4b3997")},
-                { 170880,   uint256S("0x03d23bd24386ebeb41c81f84145c46cc3f64e4d114b2b8d2bb14e5855f254f2a")},
-                { 194500,   uint256S("0x57ad502b9948d4c8291c8ce7b6394e4129985aab436b7242130a1ab0c74e1129")},
-                { 213800,   uint256S("0xfd6c0e5f7444a9e09a5fa1652db73d5b8628aeabe162529a5356be700509aa80")},
-                { 254275,   uint256S("0x7f454ac5629ef667f40f900357d30bd63b7983363255880fd155fadbc9add957")},
-                { 282130,   uint256S("0xf720421256795081c1d985e997bb81d040d557f24b9e2d16a1c13d21734fb2b1")},
-                { 303640,   uint256S("0x7cc035d7888ee6d824cec8ff01a6287a71873d874f72a5fd3706d227b88f8e99")},
+                {0, uint256S("0x0000ec93e0a3fe0aafa3be7dafe1290f5fca039a4037dd5174bc3dd7a35d67f0")},
+                {14317, uint256S("0x50929653a7146de37b82b9125e55ea03aa4ae062ce3a2e3098026eea07e5bc81")}, // 125.000 Coin Burn Confirmation
+                {50000, uint256S("0xb177127054381243141e809bbfb2d568aeae2dd9b3c486e54f0989d4546d0d80")}, // Block 50.000
+                {75000, uint256S("06f162fe22851c400c1532a6d49d7894640ea0aa292fad5f02f348480da6b20d")}, // Block 75.000
+                {100000, uint256S("ed8cccfb51c901af271892966160686177a05f101bd3fd517d5b82274a8f6611")}, // Block 100.000
+                {125000, uint256S("76d5412ec389433de6cd22345209c859b4c18b6d8f8893df479c9f7520d19901")}, // Block 125.000
+                {150000, uint256S("a7e0dfdc9c3197e9e763e858aafa9553c0235c0e328371a5f8c5ba0b6e44919d")}, // Block 150.000
+                {200000, uint256S("385e915b52f0ad669b91005ab7ddb22356b6a220e8b98cbcf2c8aca5c5dd3b03")}, // Block 200.000
+                {250000, uint256S("40ee22bd8b2cc23f83e16d19a53aa8591617772f9722c56b86d16163b2a10416")}, // Block 250.000
+                {300000, uint256S("700c33f9bf03c018f33167c2c455f05762b49e1f1f06e14833a5e8e269beebe7")}, // Block 300.000
+                    {350000, uint256S("ffb49991aa635992305029cb629037cf5d08e945d2027c79f4f737c11e7d680e")}, // Block 350.000
+                    {400000, uint256S("cf86529d0243cb653da92cbbaddc7f0a4f275bcf557cc112d03c33b756af25d3")}, // Block 400.000
             }
         };
 

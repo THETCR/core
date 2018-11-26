@@ -964,6 +964,7 @@ struct CMutableTransaction
     std::vector<CTxOut> vout;
     std::vector<CTxOutBaseRef> vpout;
     int32_t nVersion;
+    unsigned int nTime;
     uint32_t nLockTime;
 
     CMutableTransaction();

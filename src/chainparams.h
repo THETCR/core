@@ -86,6 +86,7 @@ public:
         PUBKEY_ADDRESS_256,
         SCRIPT_ADDRESS_256,
         STAKE_ONLY_PKADDR,
+        EXT_COIN_TYPE,  // BIP44
         MAX_BASE58_TYPES
     };
 
@@ -240,6 +241,7 @@ protected:
     uint256 bnProofOfStakeLimit;
     int nFulfilledRequestExpireTime;
     int nLastPOWBlock;
+    uint256 bnProofOfWorkLimit;
 
 };
 
