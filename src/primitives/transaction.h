@@ -13,7 +13,6 @@
 #include <uint256.h>
 #include <pubkey.h>
 #include <consensus/consensus.h>
-#include <timedata.h>
 
 #include <secp256k1_rangeproof.h>
 
