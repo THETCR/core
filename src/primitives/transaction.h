@@ -13,6 +13,7 @@
 #include <uint256.h>
 #include <pubkey.h>
 #include <consensus/consensus.h>
+#include <timedata.h>
 
 #include <secp256k1_rangeproof.h>
 
@@ -791,10 +792,11 @@ public:
     // actually immutable; deserialization and assignment are implemented,
     // and bypass the constness. This is safe, as they update the entire
     // structure, including the hash.
+    const int32_t nVersion;
+    unsigned int nTime;
     const std::vector<CTxIn> vin;
     const std::vector<CTxOut> vout;
     const std::vector<CTxOutBaseRef> vpout;
-    const int32_t nVersion;
     const uint32_t nLockTime;
 
 private:
@@ -960,11 +962,11 @@ public:
 /** A mutable version of CTransaction. */
 struct CMutableTransaction
 {
+    int32_t nVersion;
+    unsigned int nTime;
     std::vector<CTxIn> vin;
     std::vector<CTxOut> vout;
     std::vector<CTxOutBaseRef> vpout;
-    int32_t nVersion;
-    unsigned int nTime;
     uint32_t nLockTime;
 
     CMutableTransaction();
