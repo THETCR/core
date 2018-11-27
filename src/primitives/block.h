@@ -70,6 +70,7 @@ public:
     }
 
     uint256 GetHash() const;
+    uint256 GetPoWHash() const;
 
     bool IsWisprVersion() const
     {

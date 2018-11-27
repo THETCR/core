@@ -36,6 +36,7 @@
 #include <boost/thread/condition_variable.hpp> // for boost::thread_interrupted
 
 //Dash only features
+#define CVOIDBEGIN(a)        ((const void*)&(a))
 
 extern bool fMasternodeMode;
 extern bool fLiteMode;

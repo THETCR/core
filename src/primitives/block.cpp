@@ -8,15 +8,26 @@
 #include <hash.h>
 #include <tinyformat.h>
 #include <util/strencodings.h>
+#include <util/system.h>
 #include <crypto/common.h>
 
 int WITNESS_SCALE_FACTOR = WITNESS_SCALE_FACTOR_PART;
 
 uint256 CBlockHeader::GetHash() const
 {
-    return SerializeHash(*this);
+//    return SerializeHash(*this);
+    if(nVersion > 7){
+        return Hash(BEGIN(nVersion), END(nAccumulatorCheckpoint));
+    } else if ( nVersion == 7 ) {
+        return  Hash(BEGIN(nVersion), END(nNonce));
+    } else {
+        return GetPoWHash();
+    }
 }
-
+uint256 CBlockHeader::GetPoWHash() const
+{
+    return scrypt_blockhash(CVOIDBEGIN(nVersion));
+}
 std::string CBlock::ToString() const
 {
     std::stringstream s;
