@@ -28,7 +28,7 @@
  */
 
 #include "crypto/scrypt.h"
-#include "utilstrencodings.h"
+#include "util/strencodings.h"
 #include <openssl/sha.h>
 #include <string>
 
