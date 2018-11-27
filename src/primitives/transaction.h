@@ -682,6 +682,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     s >> bv;
     tx.nVersion |= bv<<24;
 
+    s >> tx.nTime;
 
     unsigned char flags = 0;
     tx.vin.clear();
@@ -744,7 +745,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     };
 
     s << tx.nVersion;
-
+    s << tx.nTime;
     unsigned char flags = 0;
     // Consistency check
     if (fAllowWitness) {
