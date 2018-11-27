@@ -10,6 +10,7 @@
 #include <util/strencodings.h>
 #include <util/system.h>
 #include <crypto/common.h>
+#include <crypto/scrypt.h>
 
 int WITNESS_SCALE_FACTOR = WITNESS_SCALE_FACTOR_PART;
 
