@@ -368,7 +368,7 @@ static CBlock CreateGenesisBlockMainNet(uint32_t nTime, uint32_t nNonce, uint32_
 
     CMutableTransaction txNew;
     txNew.nVersion = 1;
-    txNew.nTime = 1513403825;
+    txNew.nTime = nTime;
     txNew.nLockTime = 0;
     txNew.vin.resize(1);
     txNew.vout.resize(1);
@@ -376,7 +376,6 @@ static CBlock CreateGenesisBlockMainNet(uint32_t nTime, uint32_t nNonce, uint32_
     txNew.vout[0].nValue = 125000 * COIN;
     txNew.vout[0].scriptPubKey = CScript() << ParseHex("0433f2952f9002c9088a19607e3d4a54d3d9dfe1cf5c78168b8ba6524fb19fc5d7d3202948e6b8b09e98c425875af6af78fd4f64ff07d97a9ae31ebda5162fbac3") << OP_CHECKSIG;
     txNew.SetType(TXN_COINBASE);
-    uint32_t nHeight = 0;  // bip34
 
     CBlock genesis;
     genesis.nTime    = nTime;

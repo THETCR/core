@@ -200,6 +200,8 @@ public:
     };
 
     std::string ToString() const;
+    uint256 GetHash() const;
+
 };
 
 class CTxOutStandard;
@@ -596,6 +598,8 @@ public:
         return !scriptPubKey.empty() && scriptPubKey.IsZerocoinMint();
     }
     std::string ToString() const;
+    uint256 GetHash() const;
+
 };
 
 struct CMutableTransaction;

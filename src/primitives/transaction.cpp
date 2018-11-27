@@ -11,7 +11,7 @@
 
 std::string COutPoint::ToString() const
 {
-    return strprintf("COutPoint(%s, %u)", hash.ToString().substr(0,10), n);
+    return strprintf("COutPoint(%s, %u)", hash.ToString(), n);
 }
 std::string COutPoint::ToStringShort() const
 {
@@ -36,7 +36,11 @@ std::string CTxIn::ToString() const
     std::string str;
     str += "CTxIn(";
     str += prevout.ToString();
+    str += strprintf(", hash=%s", GetHash().ToString());
     if (prevout.IsNull())
+        if (scriptSig.IsZerocoinSpend())
+            str += strprintf(", zerocoinspend %s...", HexStr(scriptSig).substr(0, 25));
+        else
         str += strprintf(", coinbase %s", HexStr(scriptSig));
     else
         str += strprintf(", scriptSig=%s", HexStr(scriptSig).substr(0, 24));
@@ -54,7 +58,8 @@ CTxOut::CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn)
 
 std::string CTxOut::ToString() const
 {
-    return strprintf("CTxOut(nValue=%d.%08d, scriptPubKey=%s)", nValue / COIN, nValue % COIN, HexStr(scriptPubKey).substr(0, 30));
+    return strprintf("CTxOut(nValue=%d.%08d, scriptPubKey=%s, nRounds=%u, hash=%s)", nValue / COIN, nValue % COIN, HexStr(scriptPubKey) ,nRounds,
+            GetHash().ToString());
 }
 
 void CTxOutBase::SetValue(int64_t value)
@@ -267,9 +272,10 @@ unsigned int CTransaction::GetTotalSize() const
 std::string CTransaction::ToString() const
 {
     std::string str;
-    str += strprintf("CTransaction(hash=%s, ver=%d, vin.size=%u, vout.size=%u, nLockTime=%u)\n",
-        GetHash().ToString().substr(0,10),
+    str += strprintf("CTransaction(hash=%s, ver=%d, nTime=%u, vin.size=%u, vout.size=%u, nLockTime=%u)\n",
+        GetHash().ToString(),
         nVersion,
+        nTime,
         vin.size(),
         (nVersion & 0xFF) < WISPR_TXN_VERSION ? vout.size() : vpout.size(),
         nLockTime);
@@ -286,9 +292,10 @@ std::string CTransaction::ToString() const
 std::string CMutableTransaction::ToString() const
 {
     std::string str;
-    str += strprintf("CMutableTransaction(hash=%s, ver=%d, vin.size=%u, vout.size=%u, nLockTime=%u)\n",
-                     GetHash().ToString().substr(0,10),
+    str += strprintf("CMutableTransaction(hash=%s, ver=%d, nTime=%u, vin.size=%u, vout.size=%u, nLockTime=%u)\n",
+                     GetHash().ToString(),
                      nVersion,
+                     nTime,
                      vin.size(),
                      vout.size(),
                      nLockTime);
@@ -342,4 +349,11 @@ CTransaction& CTransaction::operator=(const CTransaction &tx) {
     *const_cast<unsigned int*>(&nLockTime) = tx.nLockTime;
     *const_cast<uint256*>(&hash) = tx.hash;
     return *this;
+}
+uint256 CTxOut::GetHash() const
+{
+    return SerializeHash(*this);
+}
+uint256 CTxIn::GetHash() const {
+    return SerializeHash(*this);
 }
