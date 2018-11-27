@@ -465,11 +465,11 @@ public:
         genesis = CreateGenesisBlockMainNet(1513403825, 36156, bnProofOfWorkLimit.GetCompact()); // 2017-07-17 13:00:00
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        printf("Main net block");
-        strprintf("Genesis hash = %s", consensus.hashGenesisBlock.ToString());
-        strprintf("Genesis merkle = %s", genesis.hashMerkleRoot.ToString());
-        strprintf("Genesis hash = %s", genesis.hashWitnessMerkleRoot.ToString());
-        strprintf("Genesis = %s", genesis.ToString());
+        printf("Main net block\n");
+        printf("Genesis hash = %s\n", consensus.hashGenesisBlock.ToString());
+        printf("Genesis merkle = %s\n", genesis.hashMerkleRoot.ToString());
+        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
+        printf("Genesis = %s\n", genesis.ToString());
 
 //        assert(consensus.hashGenesisBlock == uint256S("0x0000ee0784c195317ac95623e22fddb8c7b8825dc3998e0bb924d66866eccf4c"));
 //        assert(genesis.hashMerkleRoot == uint256S("0xc95fb023cf4bc02ddfed1a59e2b2f53edd1a726683209e2780332edf554f1e3e"));
@@ -680,11 +680,11 @@ public:
         genesis = CreateGenesisBlockTestNet(1502309248, 5924, 0x1f00ffff);
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        printf("Test net block");
-        strprintf("Genesis hash = %s", consensus.hashGenesisBlock.ToString());
-        strprintf("Genesis merkle = %s", genesis.hashMerkleRoot.ToString());
-        strprintf("Genesis hash = %s", genesis.hashWitnessMerkleRoot.ToString());
-        strprintf("Genesis = %s", genesis.ToString());
+        printf("Test net block\n");
+        printf("Genesis hash = %s\n", consensus.hashGenesisBlock.ToString());
+        printf("Genesis merkle = %s\n", genesis.hashMerkleRoot.ToString());
+        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
+        printf("Genesis = %s\n", genesis.ToString());
 
 //        assert(consensus.hashGenesisBlock == uint256S("0x0000594ada5310b367443ee0afd4fa3d0bbd5850ea4e33cdc7d6a904a7ec7c90"));
 //        assert(genesis.hashMerkleRoot == uint256S("0x2c7f4d88345994e3849502061f6303d9666172e4dff3641d3472a72908eec002"));
@@ -818,11 +818,11 @@ public:
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        printf("Regression net block");
-        strprintf("Genesis hash = %s", consensus.hashGenesisBlock.ToString());
-        strprintf("Genesis merkle = %s", genesis.hashMerkleRoot.ToString());
-        strprintf("Genesis hash = %s", genesis.hashWitnessMerkleRoot.ToString());
-        strprintf("Genesis = %s", genesis.ToString());
+        printf("Regression net block\n");
+        printf("Genesis hash = %s\n", consensus.hashGenesisBlock.ToString());
+        printf("Genesis merkle = %s\n", genesis.hashMerkleRoot.ToString());
+        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
+        printf("Genesis = %s\n", genesis.ToString());
 
 //        assert(consensus.hashGenesisBlock == uint256S("0x6cd174536c0ada5bfa3b8fde16b98ae508fff6586f2ee24cf866867098f25907"));
 //        assert(genesis.hashMerkleRoot == uint256S("0xf89653c7208af2c76a3070d436229fb782acbd065bd5810307995b9982423ce7"));
