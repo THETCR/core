@@ -56,11 +56,12 @@ CTxOut::CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn)
 {
     nValue = nValueIn;
     scriptPubKey = scriptPubKeyIn;
+    nRounds = -10;
 }
 
 std::string CTxOut::ToString() const
 {
-    return strprintf("CTxOut(nValue=%d.%08d, scriptPubKey=%s, nRounds=%u, hash=%s)", nValue / COIN, nValue % COIN, HexStr(scriptPubKey) ,nRounds,
+    return strprintf("CTxOut(nValue=%d.%08d, scriptPubKey=%s, nRounds=%u, hash=%s)", nValue / COIN, nValue % COIN, scriptPubKey.ToString(), nRounds,
             GetHash().ToString());
 }
 
