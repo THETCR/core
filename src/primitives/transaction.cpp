@@ -39,15 +39,22 @@ std::string CTxIn::ToString() const
     str += strprintf(", hash=%s", GetHash().ToString());
     str += strprintf(", prevPubKey=%s", prevPubKey.ToString());
     str += strprintf(", nSequence=%u", nSequence);
-    if (prevout.IsNull())
-        if (scriptSig.IsZerocoinSpend())
+    if (prevout.IsNull()) {
+        if (scriptSig.IsZerocoinSpend()){
             str += strprintf(", zerocoinspend %s...", HexStr(scriptSig).substr(0, 25));
-        else
+        }else{
             str += strprintf(", coinbase %s", HexStr(scriptSig));
-    else
+        }
+    }else {
         str += strprintf(", scriptSig=%s", scriptSig.ToString());
-    if (nSequence != SEQUENCE_FINAL)
+    }
+    if (nSequence != SEQUENCE_FINAL) {
         str += strprintf(", nSequence=%u", nSequence);
+    }
+    if (IsAnonInput())
+    {
+        str += strprintf(", isAnonInput=%s", "yes");
+    };
     str += ")";
     return str;
 }
