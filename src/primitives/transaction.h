@@ -18,9 +18,9 @@
 
 static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
 
-static const uint8_t WISPR_BLOCK_VERSION = 0xA0;
-static const uint8_t WISPR_TXN_VERSION = 0xA0;
-static const uint8_t MAX_WISPR_TXN_VERSION = 0xBF;
+static const uint8_t WISPR_BLOCK_VERSION = 0x08;
+static const uint8_t WISPR_TXN_VERSION = 0x02;
+static const uint8_t MAX_WISPR_TXN_VERSION = 0x02;
 static const uint8_t BTC_TXN_VERSION = 0x02;
 
 
@@ -782,14 +782,14 @@ class CTransaction
 public:
     // Default transaction version.
     static const int32_t CURRENT_VERSION=2;
-    static const int32_t CURRENT_WISPR_VERSION=0xA0;
+    static const int32_t CURRENT_WISPR_VERSION=0x02;
 
     // Changing the default transaction version requires a two step process: first
     // adapting relay policy by bumping MAX_STANDARD_VERSION, and then later date
     // bumping the default CURRENT_VERSION at which point both CURRENT_VERSION and
     // MAX_STANDARD_VERSION will be equal.
     static const int32_t MAX_STANDARD_VERSION=2;
-    static const int32_t MAX_STANDARD_WISPR_VERSION=0xA0;
+    static const int32_t MAX_STANDARD_WISPR_VERSION=0x02;
 
     // The local variables are made const to prevent unintended modification
     // without updating the cached hash value. However, CTransaction is not
