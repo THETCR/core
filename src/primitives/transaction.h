@@ -725,7 +725,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
 
     if (IsWisprTxVersion(tx.nVersion))
     {
-        printf("transaction is wispr version");
+        printf("transaction is wispr version\n");
         uint8_t bv = tx.nVersion & 0xFF;
         s << bv;
 
