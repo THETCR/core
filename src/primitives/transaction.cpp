@@ -37,6 +37,8 @@ std::string CTxIn::ToString() const
     str += "CTxIn(";
     str += prevout.ToString();
     str += strprintf(", hash=%s", GetHash().ToString());
+    str += strprintf(", prevPubKey=%s", prevPubKey.ToString());
+    str += strprintf(", nSequence=%u", nSequence);
     if (prevout.IsNull())
         if (scriptSig.IsZerocoinSpend())
             str += strprintf(", zerocoinspend %s...", HexStr(scriptSig).substr(0, 25));
