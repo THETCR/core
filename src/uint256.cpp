@@ -17,11 +17,11 @@ base_blob<BITS>::base_blob(const std::string& str)
     SetHex(str);
 }
 template <unsigned int BITS>
-base_blob<BITS>::base_blob(const uint8_t *p, size_t l)
+base_blob<BITS>::base_blob(const uint32_t *p, size_t l)
 {
-    assert(sizeof(data) >= l);
-    memset(data, 0, sizeof(data));
-    memcpy(data, p, l);
+    assert(sizeof(pn) >= l);
+    memset(pn, 0, sizeof(pn));
+    memcpy(pn, p, l);
 };
 template <unsigned int BITS>
 base_blob<BITS>::base_blob(const std::vector<unsigned char>& vch)
@@ -243,11 +243,11 @@ template std::string base_blob<160>::ToString() const;
 template void base_blob<160>::SetHex(const char*);
 template void base_blob<160>::SetHex(const std::string&);
 template unsigned int base_blob<160>::bits() const;
-template base_blob<160>::base_blob(const uint8_t *p, size_t l);
+template base_blob<160>::base_blob(const uint32_t *p, size_t l);
 
 // Explicit instantiations for base_blob<256>
 template base_blob<256>::base_blob(const std::string&);
-template base_blob<256>::base_blob(const uint8_t *p, size_t l);
+template base_blob<256>::base_blob(const uint32_t *p, size_t l);
 template base_blob<256>::base_blob(const std::vector<unsigned char>&);
 template base_blob<256>& base_blob<256>::operator<<=(unsigned int);
 template base_blob<256>& base_blob<256>::operator>>=(unsigned int);

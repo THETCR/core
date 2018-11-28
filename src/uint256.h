@@ -22,7 +22,7 @@ class base_blob
 {
 protected:
     enum { WIDTH = BITS / 32 };
-    uint8_t data[WIDTH];
+//    uint8_t data[WIDTH];
     uint32_t pn[WIDTH];
 
 public:
@@ -37,7 +37,7 @@ public:
         for (int i = 0; i < WIDTH; i++)
             pn[i] = b.pn[i];
     }
-    inline int Compare(const base_blob& other) const { return memcmp(data, other.data, sizeof(data)); }
+    inline int Compare(const base_blob& other) const { return memcmp(pn, other.pn, sizeof(pn)); }
 
 
     bool IsNull() const
@@ -71,7 +71,7 @@ public:
 
     explicit base_blob(const std::string& str);
     explicit base_blob(const std::vector<unsigned char>& vch);
-    explicit base_blob(const uint8_t *p, size_t l);
+    explicit base_blob(const uint32_t *p, size_t l);
 
     bool operator!() const
     {
@@ -270,17 +270,21 @@ public:
     {
         return sizeof(pn);
     }
+//    uint64_t GetUint64(int pos) const
+//    {
+//        const uint8_t* ptr = data + pos * 8;
+//        return ((uint64_t)ptr[0]) | \
+//               ((uint64_t)ptr[1]) << 8 | \
+//               ((uint64_t)ptr[2]) << 16 | \
+//               ((uint64_t)ptr[3]) << 24 | \
+//               ((uint64_t)ptr[4]) << 32 | \
+//               ((uint64_t)ptr[5]) << 40 | \
+//               ((uint64_t)ptr[6]) << 48 | \
+//               ((uint64_t)ptr[7]) << 56;
+//    }
     uint64_t GetUint64(int pos) const
     {
-        const uint8_t* ptr = data + pos * 8;
-        return ((uint64_t)ptr[0]) | \
-               ((uint64_t)ptr[1]) << 8 | \
-               ((uint64_t)ptr[2]) << 16 | \
-               ((uint64_t)ptr[3]) << 24 | \
-               ((uint64_t)ptr[4]) << 32 | \
-               ((uint64_t)ptr[5]) << 40 | \
-               ((uint64_t)ptr[6]) << 48 | \
-               ((uint64_t)ptr[7]) << 56;
+        return pn[2 * pos] | (uint64_t)pn[2 * pos + 1] << 32;
     }
     uint64_t Get64(int n = 0) const
     {
@@ -311,7 +315,7 @@ public:
     template <typename Stream>
     void Serialize(Stream& s) const
     {
-        s.write((char*)data, sizeof(data));
+        s.write((char*)pn, sizeof(pn));
     }
 
     template <typename Stream>
@@ -322,7 +326,7 @@ public:
     template<typename Stream>
     void Unserialize(Stream& s)
     {
-        s.read((char*)data, sizeof(data));
+        s.read((char*)pn, sizeof(pn));
     }
     template <typename Stream>
     void Unserialize(Stream& s, int nType, int nVersion)
@@ -344,7 +348,7 @@ public:
     uint160(uint64_t b) : base_blob<160>(b) {}
     explicit uint160(const std::string& str) : base_blob<160>(str) {}
     explicit uint160(const std::vector<unsigned char>& vch) : base_blob<160>(vch) {}
-    explicit uint160(const uint8_t *p, size_t l) : base_blob<160>(p, l) {}
+    explicit uint160(const uint32_t *p, size_t l) : base_blob<160>(p, l) {}
 
 };
 
@@ -357,7 +361,7 @@ public:
     uint256(uint64_t b) : base_blob<256>(b) {}
     explicit uint256(const std::string& str) : base_blob<256>(str) {}
     explicit uint256(const std::vector<unsigned char>& vch) : base_blob<256>(vch) {}
-    explicit uint256(const uint8_t *p, size_t l) : base_blob<256>(p, l) {}
+    explicit uint256(const uint32_t *p, size_t l) : base_blob<256>(p, l) {}
     /** A cheap hash function that just returns 64 bits from the result, it can be
      * used when the contents are considered uniformly random. It is not appropriate
      * when the value can easily be influenced from outside as e.g. a network adversary could
@@ -365,7 +369,7 @@ public:
      */
     uint64_t GetCheapHash() const
     {
-        return ReadLE64(data);
+        return ReadLE64(pn);
     }
     /**
      * The "compact" format is a representation of a whole
