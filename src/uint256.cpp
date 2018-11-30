@@ -28,7 +28,13 @@ base_blob<BITS>::base_blob(const std::vector<unsigned char>& vch)
 {
     memcpy(pn, &vch[0], sizeof(pn));
 }
-
+template <unsigned int BITS>
+base_blob<BITS>::base_blob(const uint8_t *p, size_t l)
+{
+    assert(sizeof(pn) >= l);
+    memset(pn, 0, sizeof(pn));
+    memcpy(pn, p, l);
+};
 template <unsigned int BITS>
 base_blob<BITS>& base_blob<BITS>::operator<<=(unsigned int shift)
 {
