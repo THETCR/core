@@ -350,6 +350,7 @@ public:
     explicit uint160(const std::string& str) : base_blob<160>(str) {}
     explicit uint160(const std::vector<unsigned char>& vch) : base_blob<160>(vch) {}
     explicit uint160(const uint32_t *p, size_t l) : base_blob<160>(p, l) {}
+    explicit uint160(const uint8_t *p, size_t l) : base_blob<160>(p, l) {}
 
 };
 
