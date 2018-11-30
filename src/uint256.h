@@ -369,7 +369,7 @@ public:
      */
     uint64_t GetCheapHash() const
     {
-        return ReadLE64(pn);
+        return ReadLE64((uint8_t) pn);
     }
     /**
      * The "compact" format is a representation of a whole
