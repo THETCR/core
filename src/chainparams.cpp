@@ -400,7 +400,7 @@ public:
     CMainParams() {
         strNetworkID = "main";
 
-        consensus.nSubsidyHalvingInterval = 210000;
+        consensus.nSubsidyHalvingInterval = 0;
         consensus.BIP34Height = 0;
         consensus.BIP65Height = 0;
         consensus.BIP66Height = 0;
@@ -613,7 +613,7 @@ class CTestNetParams : public CChainParams {
 public:
     CTestNetParams() {
         strNetworkID = "test";
-        consensus.nSubsidyHalvingInterval = 210000;
+        consensus.nSubsidyHalvingInterval = 0;
         consensus.BIP34Height = 0;
         consensus.BIP65Height = 0;
         consensus.BIP66Height = 0;
@@ -651,10 +651,10 @@ public:
 
         consensus.nMinRCTOutputDepth = 12;
 
-        pchMessageStart[0] = 0x08;
-        pchMessageStart[1] = 0x11;
-        pchMessageStart[2] = 0x05;
-        pchMessageStart[3] = 0x0b;
+        pchMessageStart[0] = 0x21;
+        pchMessageStart[1] = 0x46;
+        pchMessageStart[2] = 0x13;
+        pchMessageStart[3] = 0x78;
         nDefaultPort = 51938;
         nBIP44ID = 0x80000001;
 
@@ -673,11 +673,11 @@ public:
         genesis = CreateGenesisBlockTestNet(1502309248, 5924, 0x1f00ffff);
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        printf("Test net block\n");
-        printf("Genesis hash = %s\n", consensus.hashGenesisBlock.ToString());
-        printf("Genesis merkle = %s\n", genesis.hashMerkleRoot.ToString());
-        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
-        printf("Genesis = %s\n", genesis.ToString());
+//        printf("Test net block\n");
+//        printf("Genesis hash = %s\n", consensus.hashGenesisBlock.ToString());
+//        printf("Genesis merkle = %s\n", genesis.hashMerkleRoot.ToString());
+//        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
+//        printf("Genesis = %s\n", genesis.ToString());
 
 //        assert(consensus.hashGenesisBlock == uint256S("0x0000594ada5310b367443ee0afd4fa3d0bbd5850ea4e33cdc7d6a904a7ec7c90"));
 //        assert(genesis.hashMerkleRoot == uint256S("0x2c7f4d88345994e3849502061f6303d9666172e4dff3641d3472a72908eec002"));
@@ -751,7 +751,7 @@ class CRegTestParams : public CChainParams {
 public:
     explicit CRegTestParams(const ArgsManager& args) {
         strNetworkID = "regtest";
-        consensus.nSubsidyHalvingInterval = 150;
+        consensus.nSubsidyHalvingInterval = 0;
         consensus.BIP16Exception = uint256();
         consensus.BIP34Height = 100000000; // BIP34 has not activated on regtest (far in the future so block v1 are not rejected in tests)
         consensus.BIP34Hash = uint256();
@@ -787,10 +787,10 @@ public:
 
         consensus.nMinRCTOutputDepth = 1;
 
-        pchMessageStart[0] = 0x09;
-        pchMessageStart[1] = 0x12;
-        pchMessageStart[2] = 0x06;
-        pchMessageStart[3] = 0x0c;
+        pchMessageStart[0] = 0xFF;
+        pchMessageStart[1] = 0xAF;
+        pchMessageStart[2] = 0xB7;
+        pchMessageStart[3] = 0xDF;
         nDefaultPort = 11938;
         nBIP44ID = 0x80000001;
 
@@ -811,11 +811,11 @@ public:
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        printf("Regression net block\n");
-        printf("Genesis hash = %s\n", consensus.hashGenesisBlock.ToString());
-        printf("Genesis merkle = %s\n", genesis.hashMerkleRoot.ToString());
-        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
-        printf("Genesis = %s\n", genesis.ToString());
+//        printf("Regression net block\n");
+//        printf("Genesis hash = %s\n", consensus.hashGenesisBlock.ToString());
+//        printf("Genesis merkle = %s\n", genesis.hashMerkleRoot.ToString());
+//        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
+//        printf("Genesis = %s\n", genesis.ToString());
 
 //        assert(consensus.hashGenesisBlock == uint256S("0x6cd174536c0ada5bfa3b8fde16b98ae508fff6586f2ee24cf866867098f25907"));
 //        assert(genesis.hashMerkleRoot == uint256S("0xf89653c7208af2c76a3070d436229fb782acbd065bd5810307995b9982423ce7"));
