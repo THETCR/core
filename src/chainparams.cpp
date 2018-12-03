@@ -408,7 +408,8 @@ public:
         consensus.fAllowOpIsCoinstakeWithP2PKH = false;
         consensus.nPaidSmsgTime = 0x3AFE130E00; // 9999 TODO: lower
         consensus.csp2shHeight = 0x7FFFFFFF;
-        consensus.powLimit = uint256S("000000000000bfffffffffffffffffffffffffffffffffffffffffffffffffff");
+//        consensus.powLimit = uint256S("000000000000bfffffffffffffffffffffffffffffffffffffffffffffffffff");
+        consensus.powLimit = ~uint256(0) >> 16;
 
         consensus.nPowTargetTimespan = 14 * 24 * 60 * 60; // two weeks
         consensus.nPowTargetSpacing = 10 * 60;
