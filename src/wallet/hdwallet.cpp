@@ -12663,7 +12663,7 @@ bool CHDWallet::SignBlock(CBlockTemplate *pblocktemplate, int nHeight, int64_t n
 
     CKey key;
     pblock->nVersion = WISPR_BLOCK_VERSION;
-    pblock->nBits = GetNextTargetRequired(pindexPrev);
+    pblock->nBits = GetNextTargetRequired(pindexPrev, pblock->IsProofOfStake());
     if (LogAcceptCategory(BCLog::POS)) {
         WalletLogPrintf("%s, nBits %d\n", __func__, pblock->nBits);
     }
