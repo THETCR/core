@@ -464,8 +464,8 @@ public:
         genesis = CreateGenesisBlockMainNet(1513403825, 36156, bnProofOfWorkLimit.GetCompact()); // 2017-07-17 13:00:00
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        assert(consensus.hashGenesisBlock == uint256S("0x0000ee0784c195317ac95623e22fddb8c7b8825dc3998e0bb924d66866eccf4c"));
-        assert(genesis.hashMerkleRoot == uint256S("0xc95fb023cf4bc02ddfed1a59e2b2f53edd1a726683209e2780332edf554f1e3e"));
+        assert(consensus.hashGenesisBlock == uint256S("0x0000ec93e0a3fe0aafa3be7dafe1290f5fca039a4037dd5174bc3dd7a35d67f0"));
+        assert(genesis.hashMerkleRoot == uint256S("0xbcd0064f46daed0b3c1ccff16656a0da04b5509924118b7c13d21c81d62ec521"));
         assert(genesis.hashWitnessMerkleRoot == uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"));
 
         // Note that of those which support the service bits prefix, most only support a subset of
