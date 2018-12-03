@@ -694,7 +694,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 //    tx.nVersion |= bv<<16;
 //    s >> bv;
 //    tx.nVersion |= bv<<24;
-    s >> tx.nVersion;
+//    s >> tx.nVersion;
     s >> tx.nTime;
 
     unsigned char flags = 0;
