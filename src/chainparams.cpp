@@ -447,7 +447,7 @@ public:
         pchMessageStart[1] = 0x45;
         pchMessageStart[2] = 0x12;
         pchMessageStart[3] = 0x77;
-        nDefaultPort = 51738;
+        nDefaultPort = 17000;
         nBIP44ID = 0x8000002C;
         bnProofOfWorkLimit = ~uint256(0) >> 16; // WISPR starting difficulty is 1 / 2^12
         bnProofOfStakeLimit = ~uint256(0) >> 48;
@@ -655,7 +655,7 @@ public:
         pchMessageStart[1] = 0x46;
         pchMessageStart[2] = 0x13;
         pchMessageStart[3] = 0x78;
-        nDefaultPort = 51938;
+        nDefaultPort = 17002;
         nBIP44ID = 0x80000001;
 
         nModifierInterval = 10 * 60;    // 10 minutes
@@ -791,7 +791,7 @@ public:
         pchMessageStart[1] = 0xAF;
         pchMessageStart[2] = 0xB7;
         pchMessageStart[3] = 0xDF;
-        nDefaultPort = 11938;
+        nDefaultPort = 17004;
         nBIP44ID = 0x80000001;
 
 
