@@ -4636,17 +4636,20 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     }
     printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
 
-    if (fWisprMode && pindexPrev && block.nVersion > 7)
-    {
-        // Check proof-of-stake
-        if (block.nBits != GetNextTargetRequired(pindexPrev, true))
-            return state.DoS(100, false, REJECT_INVALID, "bad-proof-of-stake", true, strprintf("%s: Bad proof-of-stake target", __func__));
-    } else
-    {
-        // Check proof of work
-        if (block.nBits != GetNextWorkRequired(pindexPrev, &block))
-            return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
-    };
+//    if (fWisprMode && pindexPrev && block.nVersion > 7)
+//    {
+//        // Check proof-of-stake
+//        if (block.nBits != GetNextTargetRequired(pindexPrev, true))
+//            return state.DoS(100, false, REJECT_INVALID, "bad-proof-of-stake", true, strprintf("%s: Bad proof-of-stake target", __func__));
+//    } else
+//    {
+//        // Check proof of work
+//        if (block.nBits != GetNextWorkRequired(pindexPrev, &block))
+//            return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
+//    };
+    if (block.nBits != nBitsRequired){
+        return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
+    }
 
     // Check against checkpoints
     if (fCheckpointsEnabled) {
