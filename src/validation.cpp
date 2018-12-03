@@ -4628,6 +4628,14 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     const int nHeight = pindexPrev == nullptr ? 0 : pindexPrev->nHeight + 1;
     const Consensus::Params& consensusParams = params.GetConsensus();
 
+    unsigned int nBitsRequired;
+    if(block.nVersion > 7){
+        nBitsRequired  = GetNextWorkRequired(pindexPrev, &block);
+    }else{
+        nBitsRequired  = GetNextTargetRequired(pindexPrev, true);
+    }
+    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
+
     if (fWisprMode && pindexPrev && block.nVersion > 7)
     {
         // Check proof-of-stake
