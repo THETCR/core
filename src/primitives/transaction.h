@@ -627,6 +627,8 @@ template<typename Stream, typename TxType>
 inline void UnserializeTransaction(TxType& tx, Stream& s) {
     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
 
+    printf("Unserialize: transaction\n");
+
     uint8_t bv;
     tx.nVersion = 0;
     s >> bv;
@@ -997,7 +999,7 @@ struct CMutableTransaction
     }
 
     void SetType(int type) {
-        nVersion |= (type & 0xFF) << 8;
+//        nVersion |= (type & 0xFF) << 8;
     }
 
     bool IsWisprVersion() const {
