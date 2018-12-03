@@ -275,6 +275,6 @@ CInv::CInv(const std::string& strType, const uint256& hashIn)
         }
     }
     if (i == ARRAYLEN(allNetMessageTypes))
-        LogPrint("net", "CInv::CInv(string, uint256) : unknown type '%s'", strType);
+        LogPrintf("CInv::CInv(string, uint256) : unknown type '%s'", strType);
     hash = hashIn;
 }
