@@ -3623,7 +3623,7 @@ bool CChainState::ConnectTip(CValidationState& state, const CChainParams& chainp
     } else {
         pthisBlock = pblock;
     }
-    printf("ConnectTip = %s\n", pblock->ToString().c_str());
+//    printf("ConnectTip = %s\n", pblock->ToString().c_str());
 
     const CBlock& blockConnecting = *pthisBlock;
     // Apply the block atomically to the chain state.
