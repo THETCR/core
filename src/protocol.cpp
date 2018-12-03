@@ -257,3 +257,24 @@ const std::vector<std::string> &getAllNetMessageTypes()
 {
     return allNetMessageTypesVec;
 }
+bool CInv::IsKnownType() const
+{
+    return (type >= 1 && type < (int)ARRAYLEN(allNetMessageTypes));
+}
+
+bool CInv::IsMasterNodeType() const{
+    return (type >= 6);
+}
+CInv::CInv(const std::string& strType, const uint256& hashIn)
+{
+    unsigned int i;
+    for (i = 1; i < ARRAYLEN(allNetMessageTypes); i++) {
+        if (strType == allNetMessageTypes[i]) {
+            type = i;
+            break;
+        }
+    }
+    if (i == ARRAYLEN(allNetMessageTypes))
+        LogPrint("net", "CInv::CInv(string, uint256) : unknown type '%s'", strType);
+    hash = hashIn;
+}
