@@ -4634,7 +4634,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     }else{
         nBitsRequired  = GetNextTargetRequired(pindexPrev, true);
     }
-    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
+//    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
 
 //    if (fWisprMode && pindexPrev && block.nVersion > 7)
 //    {
@@ -4647,6 +4647,15 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
 //        if (block.nBits != GetNextWorkRequired(pindexPrev, &block))
 //            return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
 //    };
+//    if (block.IsProofOfWork()) {
+//        if (hashProof > hashTarget){
+//            return error("%s : incorrect proof of work - at %d", __func__, pindexPrev->nHeight + 1);
+//        }
+//        return true;
+//    }
+    if(nHeight < Params().LAST_POW_BLOCK()){
+        return true;
+    }
     if (block.nBits != nBitsRequired){
         return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
     }
