@@ -464,15 +464,9 @@ public:
         genesis = CreateGenesisBlockMainNet(1513403825, 36156, bnProofOfWorkLimit.GetCompact()); // 2017-07-17 13:00:00
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        printf("Main net block\n");
-        printf("Genesis hash = %s\n", consensus.hashGenesisBlock.ToString().c_str());
-        printf("Genesis merkle = %s\n", genesis.hashMerkleRoot.ToString().c_str());
-        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString().c_str());
-        printf("Genesis = %s\n", genesis.ToString().c_str());
-
-//        assert(consensus.hashGenesisBlock == uint256S("0x0000ee0784c195317ac95623e22fddb8c7b8825dc3998e0bb924d66866eccf4c"));
-//        assert(genesis.hashMerkleRoot == uint256S("0xc95fb023cf4bc02ddfed1a59e2b2f53edd1a726683209e2780332edf554f1e3e"));
-//        assert(genesis.hashWitnessMerkleRoot == uint256S("0x619e94a7f9f04c8a1d018eb8bcd9c42d3c23171ebed8f351872256e36959d66c"));
+        assert(consensus.hashGenesisBlock == uint256S("0x0000ee0784c195317ac95623e22fddb8c7b8825dc3998e0bb924d66866eccf4c"));
+        assert(genesis.hashMerkleRoot == uint256S("0xc95fb023cf4bc02ddfed1a59e2b2f53edd1a726683209e2780332edf554f1e3e"));
+        assert(genesis.hashWitnessMerkleRoot == uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"));
 
         // Note that of those which support the service bits prefix, most only support a subset of
         // possible options.
