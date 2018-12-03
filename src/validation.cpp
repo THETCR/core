@@ -4389,7 +4389,8 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
         bool mutated;
 
         uint256 hashMerkleRoot2 = BlockMerkleRoot(block, &mutated);
-
+        printf("Block merkle root = %s\n", block.hashMerkleRoot.ToString().c_str());
+        printf("hashMerkleRoot2 = %s\n", hashMerkleRoot2.ToString().c_str());
         if (block.hashMerkleRoot != hashMerkleRoot2)
             return state.DoS(100, false, REJECT_INVALID, "bad-txnmrklroot", true, "hashMerkleRoot mismatch");
 
