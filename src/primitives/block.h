@@ -24,11 +24,11 @@ public:
     int32_t nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
-    uint256 hashWitnessMerkleRoot;
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
     uint256 nAccumulatorCheckpoint;
+    uint256 hashWitnessMerkleRoot;
 
 
     CBlockHeader()
@@ -43,14 +43,15 @@ public:
         READWRITE(nVersion);
         READWRITE(hashPrevBlock);
         READWRITE(hashMerkleRoot);
-        if (IsWisprVersion())
-            READWRITE(hashWitnessMerkleRoot);
+//        if (IsWisprVersion())
+//            READWRITE(hashWitnessMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
         //zerocoin active, header changes to include accumulator checksum
         if(nVersion > 7)
             READWRITE(nAccumulatorCheckpoint);
+            READWRITE(hashWitnessMerkleRoot);
     }
 
     void SetNull()
@@ -62,6 +63,8 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+        nAccumulatorCheckpoint = 0;
+
     }
 
     bool IsNull() const
@@ -111,6 +114,7 @@ public:
 
     // memory only
     mutable bool fChecked;
+    mutable CScript payee;
     mutable std::vector<uint256> vMerkleTree;
 
     CBlock()
@@ -141,9 +145,10 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITEAS(CBlockHeader, *this);
         READWRITE(vtx);
+        READWRITE(vchBlockSig);
 
-        if (nVersion == WISPR_BLOCK_VERSION)
-            READWRITE(vchBlockSig);
+//        if (nVersion == WISPR_BLOCK_VERSION)
+//            READWRITE(vchBlockSig);
     }
 
     void SetNull()
@@ -159,10 +164,11 @@ public:
         block.nVersion              = nVersion;
         block.hashPrevBlock         = hashPrevBlock;
         block.hashMerkleRoot        = hashMerkleRoot;
-        block.hashWitnessMerkleRoot = hashWitnessMerkleRoot;
         block.nTime                 = nTime;
         block.nBits                 = nBits;
         block.nNonce                = nNonce;
+        block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
+        block.hashWitnessMerkleRoot = hashWitnessMerkleRoot;
         return block;
     }
 
