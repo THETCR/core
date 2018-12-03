@@ -4631,12 +4631,12 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     if (fWisprMode && pindexPrev && block.nVersion > 7)
     {
         // Check proof-of-stake
-        if (block.nBits != GetNextTargetRequired(pindexPrev))
+        if (block.nBits != GetNextTargetRequired(pindexPrev, true))
             return state.DoS(100, false, REJECT_INVALID, "bad-proof-of-stake", true, strprintf("%s: Bad proof-of-stake target", __func__));
     } else
     {
         // Check proof of work
-        if (block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
+        if (block.nBits != GetNextWorkRequired(pindexPrev, &block))
             return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
     };
 
@@ -6885,4 +6885,44 @@ void ReprocessBlocks(int nBlocks)
 
     CValidationState state;
     ActivateBestChain(state, Params());
+}
+unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake) {
+    uint256 bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit() : Params().ProofOfWorkLimit();
+
+    if (pindexLast == NULL)
+        return bnTargetLimit.GetCompact(); // genesis block
+
+    const CBlockIndex *pindexPrev = GetLastBlockIndex(pindexLast, fProofOfStake);
+    if (pindexPrev->pprev == NULL)
+        return bnTargetLimit.GetCompact(); // first block
+    const CBlockIndex *pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, fProofOfStake);
+    if (pindexPrevPrev->pprev == NULL)
+        return bnTargetLimit.GetCompact(); // second block
+    int64_t nTargetTimespan = Params().TargetTimespanV1();
+    int64_t nTargetSpacing = Params().TargetSpacingV1();
+    int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
+
+    if (nActualSpacing < 0)
+        nActualSpacing = nTargetSpacing;
+    if (nActualSpacing > nTargetSpacing * 10)
+        nActualSpacing = nTargetSpacing * 10;
+
+    // ppcoin: target change every block
+    // ppcoin: retarget with exponential moving toward target spacing
+    uint256 bnNew;
+    bnNew.SetCompact(pindexPrev->nBits);
+    int64_t nInterval = nTargetTimespan / nTargetSpacing;
+    bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
+    bnNew /= ((nInterval + 1) * nTargetSpacing);
+
+    if (bnNew <= 0 || bnNew > bnTargetLimit)
+        bnNew = bnTargetLimit;
+
+    return bnNew.GetCompact();
+}
+const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake)
+{
+    while (pindex && pindex->pprev && (pindex->IsProofOfStake() != fProofOfStake))
+        pindex = pindex->pprev;
+    return pindex;
 }

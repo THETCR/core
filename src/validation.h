@@ -673,4 +673,8 @@ inline bool IsBlockPruned(const CBlockIndex* pblockindex)
 bool RemoveUnreceivedHeader(const uint256 &hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 size_t CountDelayedBlocks() EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 
+//!WISPR
+unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake);
+const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake);
+
 #endif // BITCOIN_VALIDATION_H

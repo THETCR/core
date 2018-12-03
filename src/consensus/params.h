@@ -104,6 +104,7 @@ struct Params {
     int nMasternodeMinimumConfirmations;
     /** Block height at which DIP0001 becomes active */
     int DIP0001Height;
+    int lastPowBlock;
 };
 } // namespace Consensus
 

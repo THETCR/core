@@ -169,6 +169,28 @@ public:
     int Zerocoin_DefaultSpendSecurity() const { return nDefaultSecurityLevel; }
     int Zerocoin_HeaderVersion() const { return nZerocoinHeaderVersion; }
     int Zerocoin_RequiredStakeDepth() const { return nZerocoinRequiredStakeDepth; }
+    int64_t TargetTimespanV1() const {
+        return nTargetTimespanV1;
+    }
+    int64_t TargetSpacingV1() const {
+        return nTargetSpacingV1;
+    }
+    int64_t IntervalV1() const {
+        return nTargetTimespanV1 / nTargetSpacingV1;
+    }
+    int64_t TargetTimespanV2() const {
+        return nTargetTimespanV2;
+    }
+    int64_t TargetSpacingV2() const {
+        return nTargetSpacingV2;
+    }
+    int64_t IntervalV2() const {
+        return nTargetTimespanV2 / nTargetSpacingV2;
+    }
+    const uint256& ProofOfWorkLimit() const { return bnProofOfWorkLimit; }
+    const uint256& ProofOfStakeLimit() const { return bnProofOfStakeLimit; }
+    int LAST_POW_BLOCK() const { return nLastPOWBlock; }
+
 protected:
     CChainParams() {}
 
@@ -242,7 +264,10 @@ protected:
     int nFulfilledRequestExpireTime;
     int nLastPOWBlock;
     uint256 bnProofOfWorkLimit;
-
+    int64_t nTargetTimespanV1;
+    int64_t nTargetTimespanV2;
+    int64_t nTargetSpacingV1;
+    int64_t nTargetSpacingV2;
 };
 
 /**
