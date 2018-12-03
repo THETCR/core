@@ -250,10 +250,12 @@ template void base_blob<160>::SetHex(const char*);
 template void base_blob<160>::SetHex(const std::string&);
 template unsigned int base_blob<160>::bits() const;
 template base_blob<160>::base_blob(const uint32_t *p, size_t l);
+template base_blob<160>::base_blob(const uint8_t *p, size_t l);
 
 // Explicit instantiations for base_blob<256>
 template base_blob<256>::base_blob(const std::string&);
 template base_blob<256>::base_blob(const uint32_t *p, size_t l);
+template base_blob<256>::base_blob(const uint8_t *p, size_t l);
 template base_blob<256>::base_blob(const std::vector<unsigned char>&);
 template base_blob<256>& base_blob<256>::operator<<=(unsigned int);
 template base_blob<256>& base_blob<256>::operator>>=(unsigned int);
