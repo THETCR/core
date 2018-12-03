@@ -300,7 +300,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
     if (::GetSerializeSize(tx, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT)
         return state.DoS(100, false, REJECT_INVALID, "bad-txns-oversize");
 
-    if (tx.IsWisprVersion())
+    if (tx.IsWisprVersion() && chainActive.Height() >= 500000)
     {
         const Consensus::Params& consensusParams = Params().GetConsensus();
         if (tx.vpout.empty())
