@@ -539,14 +539,14 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.lastPowBlock = 450;
+        consensus.lastPowBlock = 201;
         nPoolMaxTransactions = 3;
         nFulfilledRequestExpireTime = 60*60; // fulfilled requests expire in 1 hour
 
         strSporkAddress = "Xgtyuk76vhuFW2iT7UAiHgNdWXCf3J34wh";
         //!WISPR
         /** Height or Time Based Activations **/
-        nLastPOWBlock = 450;
+        nLastPOWBlock = 201;
         nNewProtocolStartHeight = 400000;
         nNewProtocolStartTime = 1539963322; //Friday, October 19, 2018 3:35:22 PM
         nZerocoinStartHeight = nNewProtocolStartHeight;

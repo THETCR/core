@@ -19,9 +19,9 @@
 static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
 
 static const uint8_t WISPR_BLOCK_VERSION = 0x08;
-static const uint8_t WISPR_TXN_VERSION = 0x02;
-static const uint8_t MAX_WISPR_TXN_VERSION = 0x02;
-static const uint8_t BTC_TXN_VERSION = 0x02;
+static const uint8_t WISPR_TXN_VERSION = 0x08;
+static const uint8_t MAX_WISPR_TXN_VERSION = 0x08;
+static const uint8_t BTC_TXN_VERSION = 0x08;
 
 
 enum OutputTypes
@@ -730,6 +730,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 template<typename Stream, typename TxType>
 inline void SerializeTransaction(const TxType& tx, Stream& s) {
     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
+    printf("Serialize: transaction\n");
 
     if (IsWisprTxVersion(tx.nVersion))
     {
