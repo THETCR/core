@@ -3623,6 +3623,8 @@ bool CChainState::ConnectTip(CValidationState& state, const CChainParams& chainp
     } else {
         pthisBlock = pblock;
     }
+    printf("ConnectTip = %s\n", pblock->ToString().c_str());
+
     const CBlock& blockConnecting = *pthisBlock;
     // Apply the block atomically to the chain state.
     int64_t nTime2 = GetTimeMicros(); nTimeReadFromDisk += nTime2 - nTime1;
@@ -5340,6 +5342,8 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
         // Ensure that CheckBlock() passes before calling AcceptBlock, as
         // belt-and-suspenders.
         bool ret = CheckBlock(*pblock, state, chainparams.GetConsensus());
+
+        printf("CheckBlock = %s\n", pblock->ToString().c_str());
 
         LOCK(cs_main);
 
