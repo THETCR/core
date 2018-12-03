@@ -300,7 +300,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
     if (::GetSerializeSize(tx, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT)
         return state.DoS(100, false, REJECT_INVALID, "bad-txns-oversize");
 
-    if (tx.IsWisprVersion() && chainActive.Height() >= 500000)
+    if (tx.IsWisprVersion())
     {
         const Consensus::Params& consensusParams = Params().GetConsensus();
         if (tx.vpout.empty())
@@ -345,7 +345,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
             return state.DoS(100, false, REJECT_INVALID, "too-many-data-outputs");
     } else
     {
-        if (fWisprMode)
+        if (fWisprMode && chainActive.Height() >= 500000)
             return state.DoS(100, false, REJECT_INVALID, "bad-txn-version");
 
         if (tx.vout.empty())
