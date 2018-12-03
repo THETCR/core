@@ -633,6 +633,8 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 
     if (bv >= WISPR_TXN_VERSION)
     {
+        printf("Unserialize: transaction is wispr version\n");
+
         tx.nVersion = bv;
 
         s >> bv;
@@ -679,14 +681,14 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         return;
     };
 
-    tx.nVersion |= bv;
-    s >> bv;
-    tx.nVersion |= bv<<8;
-    s >> bv;
-    tx.nVersion |= bv<<16;
-    s >> bv;
-    tx.nVersion |= bv<<24;
-
+//    tx.nVersion |= bv;
+//    s >> bv;
+//    tx.nVersion |= bv<<8;
+//    s >> bv;
+//    tx.nVersion |= bv<<16;
+//    s >> bv;
+//    tx.nVersion |= bv<<24;
+    s >> tx.nVersion;
     s >> tx.nTime;
 
     unsigned char flags = 0;
@@ -725,7 +727,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
 
     if (IsWisprTxVersion(tx.nVersion))
     {
-        printf("transaction is wispr version\n");
+        printf("Serialize: transaction is wispr version\n");
         uint8_t bv = tx.nVersion & 0xFF;
         s << bv;
 
