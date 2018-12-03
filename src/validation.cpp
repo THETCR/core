@@ -5343,7 +5343,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
         // belt-and-suspenders.
         bool ret = CheckBlock(*pblock, state, chainparams.GetConsensus());
 
-        printf("CheckBlock = %s\n", pblock->ToString().c_str());
+//        printf("CheckBlock = %s\n", pblock->ToString().c_str());
 
         LOCK(cs_main);
 
