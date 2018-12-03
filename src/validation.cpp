@@ -4628,7 +4628,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     const int nHeight = pindexPrev == nullptr ? 0 : pindexPrev->nHeight + 1;
     const Consensus::Params& consensusParams = params.GetConsensus();
 
-    if (fWisprMode && pindexPrev)
+    if (fWisprMode && pindexPrev && block.nVersion > 7)
     {
         // Check proof-of-stake
         if (block.nBits != GetNextTargetRequired(pindexPrev))
