@@ -274,7 +274,7 @@ Other changed command-line options
 - #11415 `69ec021` Disallow using addresses in createmultisig (achow101)
 - #12278 `288deac` Add special error for genesis coinbase to getrawtransaction (MeshCollider)
 - #11362 `c6223b3` Remove nBlockMaxSize from miner opt struct as it is no longer used (gmaxwell)
-- #10825 `28485c7` Set regtest JSON-RPC port to 18443 to avoid conflict with testnet 18332 (fametrano)
+- #10825 `28485c7` Set regtest JSON-RPC port to 18443 to avoid conflict with testnet 17003 (fametrano)
 - #11303 `e542728` Fix estimatesmartfee rounding display issue (TheBlueMatt)
 - #7061 `8c2de82` Add RPC call "rescanblockchain <startheight> <stopheight>" (jonasschnelli)
 - #11055 `95e14dc` RPC getreceivedbyaddress should return error if called with address not owned by the wallet (jnewbery)
