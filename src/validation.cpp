@@ -4280,7 +4280,7 @@ static bool FindUndoPos(CValidationState &state, int nFile, CDiskBlockPos &pos, 
 
 static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW = true)
 {
-    if (fWisprMode
+    if (chainActive.Height() > 500000 && fWisprMode
         && !block.IsWisprVersion())
         return state.DoS(100, false, REJECT_INVALID, "block-version", false, "bad block version");
 
