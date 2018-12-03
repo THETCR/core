@@ -3284,7 +3284,28 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
     if (smsg::SMSG_UNKNOWN_MESSAGE != smsgModule.ReceiveData(pfrom, strCommand, vRecv)) {
         return true;
     }
-
+    bool found = false;
+    const std::vector<std::string> &allMessages = getAllNetMessageTypes();
+    BOOST_FOREACH(const std::string msg, allMessages) {
+        if(msg == strCommand) {
+            found = true;
+            break;
+        }
+    }
+    if (found)
+    {
+        //probably one the extensions
+#ifdef ENABLE_WALLET
+        privateSendClient.ProcessMessage(pfrom, strCommand, vRecv, *connman);
+#endif // ENABLE_WALLET
+        privateSendServer.ProcessMessage(pfrom, strCommand, vRecv, *connman);
+        mnodeman.ProcessMessage(pfrom, strCommand, vRecv, *connman);
+        mnpayments.ProcessMessage(pfrom, strCommand, vRecv, *connman);
+        instantsend.ProcessMessage(pfrom, strCommand, vRecv, *connman);
+        sporkManager.ProcessSpork(pfrom, strCommand, vRecv, *connman);
+        masternodeSync.ProcessMessage(pfrom, strCommand, vRecv);
+        governance.ProcessMessage(pfrom, strCommand, vRecv, *connman);
+    }
     // Ignore unknown commands for extensibility
     LogPrint(BCLog::NET, "Unknown command \"%s\" from peer=%d\n", SanitizeString(strCommand), pfrom->GetId());
 
