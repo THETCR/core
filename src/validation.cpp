@@ -2605,6 +2605,7 @@ static int64_t nBlocksTotal = 0;
 bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex,
                   CCoinsViewCache& view, const CChainParams& chainparams, bool fJustCheck)
 {
+    printf("ConnectBlock\n");
     AssertLockHeld(cs_main);
     assert(pindex);
     assert(*pindex->phashBlock == block.GetHash());
@@ -4390,10 +4391,10 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     if (fCheckMerkleRoot) {
         bool mutated;
 
-        printf("block = %s\n", block.ToString().c_str());
+//        printf("block = %s\n", block.ToString().c_str());
         uint256 hashMerkleRoot2 = BlockMerkleRoot(block, &mutated);
-        printf("Block merkle root = %s\n", block.hashMerkleRoot.ToString().c_str());
-        printf("hashMerkleRoot2 = %s\n", hashMerkleRoot2.ToString().c_str());
+//        printf("Block merkle root = %s\n", block.hashMerkleRoot.ToString().c_str());
+//        printf("hashMerkleRoot2 = %s\n", hashMerkleRoot2.ToString().c_str());
         if (block.hashMerkleRoot != hashMerkleRoot2)
             return state.DoS(100, false, REJECT_INVALID, "bad-txnmrklroot", true, "hashMerkleRoot mismatch");
 
@@ -5227,6 +5228,7 @@ bool ContextualCheckZerocoinStake(int nHeight, CStakeInput* stake)
 /** Store block on disk. If dbp is non-nullptr, the file is known to already reside on disk */
 bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CValidationState& state, const CChainParams& chainparams, CBlockIndex** ppindex, bool fRequested, const CDiskBlockPos* dbp, bool* fNewBlock)
 {
+            printf("AcceptBlock\n");
     const CBlock& block = *pblock;
 
     if (fNewBlock) *fNewBlock = false;
@@ -5345,6 +5347,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 
 bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<const CBlock> pblock, bool fForceProcessing, bool *fNewBlock)
 {
+    printf("ProcessNewBlock\n");
     AssertLockNotHeld(cs_main);
 
     CBlockIndex *pindex = nullptr;
@@ -5419,6 +5422,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
 
 bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams, const CBlock& block, CBlockIndex* pindexPrev, bool fCheckPOW, bool fCheckMerkleRoot)
 {
+    printf("TestBlockValidity\n");
     AssertLockHeld(cs_main);
     assert(pindexPrev && pindexPrev == chainActive.Tip());
     CCoinsViewCache viewNew(pcoinsTip.get());
@@ -5840,6 +5844,7 @@ CVerifyDB::~CVerifyDB()
 
 bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview, int nCheckLevel, int nCheckDepth)
 {
+    printf("VerifyDB\n");
     LOCK(cs_main);
     if (chainActive.Tip() == nullptr || chainActive.Tip()->pprev == nullptr)
         return true;
