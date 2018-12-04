@@ -4291,6 +4291,7 @@ static bool FindUndoPos(CValidationState &state, int nFile, CDiskBlockPos &pos, 
 
 static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW = true)
 {
+    printf("%s\n", __func__);
     if (chainActive.Height() > 500000 && fWisprMode
         && !block.IsWisprVersion())
         return state.DoS(100, false, REJECT_INVALID, "block-version", false, "bad block version");
@@ -4421,10 +4422,12 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     // checks that use witness data may be performed here.
 
     // Size limits
+    printf("%s\n", "Size limits");
     if (block.vtx.empty() || block.vtx.size() * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT || ::GetSerializeSize(block, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT)
         return state.DoS(100, false, REJECT_INVALID, "bad-blk-length", false, "size limits failed");
 
     if (fWisprMode) {
+        printf("%s\n", "fWisprMode");
         if (!IsInitialBlockDownload()
             && block.vtx[0]->IsCoinStake()
             && !CheckStakeUnique(block)) {
@@ -4461,10 +4464,12 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
             return state.DoS(100, false, REJECT_INVALID, "bad-block-signature", false, "bad block signature");
         }
     } else {
+        printf("%s\n", "Coinbase");
         // First transaction must be coinbase, the rest must not be
         if (block.vtx.empty() || !block.vtx[0]->IsCoinBase())
             return state.DoS(100, false, REJECT_INVALID, "bad-cb-missing", false, "first tx is not coinbase");
 
+        printf("%s\n", "Not coinbase");
         // Remaining txns must not be coinbase/stake
         for (size_t i = 1; i < block.vtx.size(); i++)
             if (block.vtx[i]->IsCoinBase() || block.vtx[i]->IsCoinStake())
@@ -4472,12 +4477,14 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     };
 
     // Check transactions
+    printf("%s\n", "Check transactions");
     for (const auto& tx : block.vtx)
         if (!CheckTransaction(*tx, state, true)) // Check for duplicate inputs, TODO: UpdateCoins should return a bool, db/coinsview txn should be undone
             return state.Invalid(false, state.GetRejectCode(), state.GetRejectReason(),
                                  strprintf("Transaction check failed (tx hash %s) %s", tx->GetHash().ToString(), state.GetDebugMessage()));
 
     unsigned int nSigOps = 0;
+    printf("%s\n", "Sigop count");
     for (const auto& tx : block.vtx)
     {
         nSigOps += GetLegacySigOpCount(*tx);
