@@ -1954,6 +1954,7 @@ CAmount GetInvalidUTXOValue()
  */
 bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck> *pvChecks, bool fAnonChecks) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
+    printf("%s\n", __func__);
     if (!tx.IsCoinBase())
     {
         if (pvChecks)
@@ -2532,6 +2533,7 @@ static bool IsScriptWitnessEnabled(const Consensus::Params& params)
 
 static unsigned int GetBlockScriptFlags(const CBlockIndex* pindex, const Consensus::Params& consensusparams) EXCLUSIVE_LOCKS_REQUIRED(cs_main) {
     AssertLockHeld(cs_main);
+    printf("%s\n", __func__);
 
     if (fWisprMode)
     {
@@ -2607,7 +2609,7 @@ static int64_t nBlocksTotal = 0;
 bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex,
                   CCoinsViewCache& view, const CChainParams& chainparams, bool fJustCheck)
 {
-    printf("ConnectBlock\n");
+    printf("%s\n", __func__);
     AssertLockHeld(cs_main);
     assert(pindex);
     assert(*pindex->phashBlock == block.GetHash());
@@ -4384,6 +4386,7 @@ bool CheckStakeUnique(const CBlock &block, bool fUpdate)
 bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW, bool fCheckMerkleRoot)
 {
     // These are checks that are independent of context.
+    printf("%s\n", __func__);
 
     if (block.fChecked)
         return true;
