@@ -1832,6 +1832,7 @@ static void CheckForkWarningConditionsOnNewFork(CBlockIndex* pindexNewForkTip) E
 
 void static InvalidChainFound(CBlockIndex* pindexNew) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
+    printf("%s\n", __func__);
     if (!pindexBestInvalid || pindexNew->nChainWork > pindexBestInvalid->nChainWork)
         pindexBestInvalid = pindexNew;
 
@@ -1847,6 +1848,7 @@ void static InvalidChainFound(CBlockIndex* pindexNew) EXCLUSIVE_LOCKS_REQUIRED(c
 }
 
 void CChainState::InvalidBlockFound(CBlockIndex *pindex, const CBlock &block, const CValidationState &state) {
+    printf("%s\n", __func__);
 
     if (!state.CorruptionPossible()) {
         pindex->nStatus |= BLOCK_FAILED_VALID;
@@ -3756,6 +3758,7 @@ void CChainState::PruneBlockIndexCandidates() {
  */
 bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainParams& chainparams, CBlockIndex* pindexMostWork, const std::shared_ptr<const CBlock>& pblock, bool& fInvalidFound, ConnectTrace& connectTrace)
 {
+    printf("ActivateBestChainStep\n");
     AssertLockHeld(cs_main);
 
     const CBlockIndex *pindexOldTip = chainActive.Tip();
@@ -4006,6 +4009,8 @@ bool PreciousBlock(CValidationState& state, const CChainParams& params, CBlockIn
 
 bool CChainState::InvalidateBlock(CValidationState& state, const CChainParams& chainparams, CBlockIndex *pindex)
 {
+    printf("%s\n", __func__);
+
     AssertLockHeld(cs_main);
 
     // We first disconnect backwards and then mark the blocks as invalid.
