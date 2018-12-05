@@ -628,15 +628,15 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
 
     printf("Unserialize: transaction\n");
+//    int32_t nVersion = tx.nVersion;
 
     uint8_t bv;
-//    tx.nVersion = 0;
-    s >> tx.nVersion;
-    tx.nVersion >> bv;
-//    if (IsWisprTxVersion(tx.nVersion))
+    tx.nVersion = 0;
+    s >> bv;
+
     if (bv >= WISPR_TXN_VERSION)
     {
-            printf("Unserialize: WISPR_TXN_VERSION\n");
+        printf("Unserialize: WISPR_TXN_VERSION\n");
         tx.nVersion = bv;
 
         s >> bv;
@@ -683,7 +683,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         return;
     };
 
-    if(tx.nVersion > 1){
+    if(bv > 1){
         printf("Unserialize: BTC_TXN_VERSION\n");
         tx.nVersion |= bv;
         s >> bv;
@@ -693,9 +693,10 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         s >> bv;
         tx.nVersion |= bv<<24;
     }else{
+        tx.nVersion = bv;
         s >> tx.nTime;
     }
-
+    printf("Unserialize nVersion = %d\n", tx.nVersion);
     unsigned char flags = 0;
     tx.vin.clear();
     tx.vout.clear();
@@ -730,7 +731,7 @@ template<typename Stream, typename TxType>
 inline void SerializeTransaction(const TxType& tx, Stream& s) {
     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
     printf("Serialize: transaction\n");
-
+    int32_t nVersion = tx.nVersion;
     if (IsWisprTxVersion(tx.nVersion))
     {
         printf("Serialize: transaction is wispr version\n");
@@ -759,7 +760,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     };
 
     s << tx.nVersion;
-    if(tx.nVersion < 2) {
+    if(nVersion == 1) {
         printf("Serialize: BTC_TXN_VERSION\n");
         s << tx.nTime;
     }
