@@ -630,7 +630,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     printf("Unserialize: transaction\n");
 
     uint8_t bv;
-    tx.nVersion = 0;
+//    tx.nVersion = 0;
     s >> tx.nVersion;
     tx.nVersion >> bv;
 //    if (IsWisprTxVersion(tx.nVersion))
@@ -759,7 +759,10 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     };
 
     s << tx.nVersion;
-    s << tx.nTime;
+    if(tx.nVersion < 2) {
+        printf("Serialize: BTC_TXN_VERSION\n");
+        s << tx.nTime;
+    }
     unsigned char flags = 0;
     // Consistency check
     if (fAllowWitness) {
