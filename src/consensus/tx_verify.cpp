@@ -354,6 +354,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
         if (fWisprMode && chainActive.Height() >= 500000)
             return state.DoS(100, false, REJECT_INVALID, "bad-txn-version");
 
+        printf("%s\n", "Vout empty");
         if (tx.vout.empty())
             return state.DoS(10, false, REJECT_INVALID, "bad-txns-vout-empty");
 
