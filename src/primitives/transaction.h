@@ -20,8 +20,8 @@ static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
 
 static const uint8_t WISPR_BLOCK_VERSION = 0x08;
 static const uint8_t WISPR_TXN_VERSION = 0x08;
-static const uint8_t MAX_WISPR_TXN_VERSION = 0x08;
-static const uint8_t BTC_TXN_VERSION = 0x08;
+static const uint8_t MAX_WISPR_TXN_VERSION = 0xBF;
+static const uint8_t BTC_TXN_VERSION = 0x02;
 
 
 enum OutputTypes
@@ -629,17 +629,17 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 
     printf("Unserialize: transaction\n");
 
-//    uint8_t bv;
+    uint8_t bv;
 //    tx.nVersion = 0;
 //    s >> bv;
     s >> tx.nVersion;
-
-//    if (bv >= WISPR_TXN_VERSION)
-    if (IsWisprTxVersion(tx.nVersion))
+    bv = tx.nVersion;
+//    if (IsWisprTxVersion(tx.nVersion))
+    if (bv >= WISPR_TXN_VERSION)
     {
-        uint8_t bv;
-        bv << tx.nVersion;
-        printf("Unserialize: transaction is wispr version\n");
+//        uint8_t bv;
+//        bv << tx.nVersion;
+//        printf("Unserialize: transaction is wispr version\n");
 
         tx.nVersion = bv;
 
@@ -687,14 +687,15 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         return;
     };
 
-//    tx.nVersion |= bv;
-//    s >> bv;
-//    tx.nVersion |= bv<<8;
-//    s >> bv;
-//    tx.nVersion |= bv<<16;
-//    s >> bv;
-//    tx.nVersion |= bv<<24;
-//    s >> tx.nVersion;
+    if(tx.nVersion > BTC_TXN_VERSION){
+        tx.nVersion |= bv;
+        s >> bv;
+        tx.nVersion |= bv<<8;
+        s >> bv;
+        tx.nVersion |= bv<<16;
+        s >> bv;
+        tx.nVersion |= bv<<24;
+    }
     s >> tx.nTime;
 
     unsigned char flags = 0;
