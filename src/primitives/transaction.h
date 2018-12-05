@@ -575,6 +575,12 @@ public:
 
     }
 
+    void SetEmpty()
+    {
+        nValue = 0;
+        scriptPubKey.clear();
+    }
+
     bool IsNull() const
     {
         return (nValue == -1);

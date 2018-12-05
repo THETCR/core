@@ -192,68 +192,68 @@ const std::pair<const char*, CAmount> regTestOutputs[] = {
 const size_t nGenesisOutputsRegtest = sizeof(regTestOutputs) / sizeof(regTestOutputs[0]);
 
 const std::pair<const char*, CAmount> genesisOutputs[] = {
-    std::make_pair("62a62c80e0b41f2857ba83eb438d5caa46e36bcb",7017084118),
-    std::make_pair("c515c636ae215ebba2a98af433a3fa6c74f84415",221897417980),
-    std::make_pair("711b5e1fd0b0f4cdf92cb53b00061ef742dda4fb",120499999),
-    std::make_pair("20c17c53337d80408e0b488b5af7781320a0a311",18074999),
-    std::make_pair("aba8c6f8dbcf4ecfb598e3c08e12321d884bfe0b",92637054909),
-    std::make_pair("1f3277a84a18f822171d720f0132f698bcc370ca",3100771006662),
-    std::make_pair("8fff14bea695ffa6c8754a3e7d518f8c53c3979a",465115650998),
-    std::make_pair("e54967b4067d91a777587c9f54ee36dd9f1947c4",669097504996),
-    std::make_pair("7744d2ac08f2e1d108b215935215a4e66d0262d2",802917005996),
-    std::make_pair("a55a17e86246ea21cb883c12c709476a09b4885c",267639001997),
-    std::make_pair("4e00dce8ab44fd4cafa34839edf8f68ba7839881",267639001997),
-    std::make_pair("702cae5d2537bfdd5673ac986f910d6adb23510a",254257051898),
-    std::make_pair("b19e494b0033c5608a7d153e57d7fdf3dfb51bb7",1204260290404),
-    std::make_pair("6909b0f1c94ea1979ed76e10a5a49ec795a8f498",1204270995964),
-    std::make_pair("05a06af3b29dade9f304244d934381ac495646c1",236896901156),
-    std::make_pair("557e2b3205719931e22853b27920d2ebd6147531",155127107700),
-    std::make_pair("ad16fb301bd21c60c5cb580b322aa2c61b6c5df2",115374999),
-    std::make_pair("182c5cfb9d17aa8d8ff78940135ca8d822022f32",17306249),
-    std::make_pair("b8a374a75f6d44a0bd1bf052da014efe564ae412",133819500998),
-    std::make_pair("fadee7e2878172dad55068c8696621b1788dccb3",133713917412),
-    std::make_pair("eacc4b108c28ed73b111ff149909aacffd2cdf78",173382671567),
-    std::make_pair("dd87cc0b8e0fc119061f33f161104ce691d23657",245040727620),
-    std::make_pair("1c8b0435eda1d489e9f0a16d3b9d65182f885377",200226012806),
-    std::make_pair("15a724f2bc643041cb35c9475cd67b897d62ca52",436119839355),
-    std::make_pair("626f86e9033026be7afbb2b9dbe4972ef4b3e085",156118097804),
-    std::make_pair("a4a73d99269639541cb7e845a4c6ef3e3911fcd6",108968353176),
-    std::make_pair("27929b31f11471aa4b77ca74bb66409ff76d24a2",126271503135),
-    std::make_pair("2d6248888c7f72cc88e4883e4afd1025c43a7f0e",35102718156),
-    std::make_pair("25d8debc253f5c3f70010f41c53348ed156e7baa",80306152234),
+//    std::make_pair("62a62c80e0b41f2857ba83eb438d5caa46e36bcb",7017084118),
+//    std::make_pair("c515c636ae215ebba2a98af433a3fa6c74f84415",221897417980),
+//    std::make_pair("711b5e1fd0b0f4cdf92cb53b00061ef742dda4fb",120499999),
+//    std::make_pair("20c17c53337d80408e0b488b5af7781320a0a311",18074999),
+//    std::make_pair("aba8c6f8dbcf4ecfb598e3c08e12321d884bfe0b",92637054909),
+//    std::make_pair("1f3277a84a18f822171d720f0132f698bcc370ca",3100771006662),
+//    std::make_pair("8fff14bea695ffa6c8754a3e7d518f8c53c3979a",465115650998),
+//    std::make_pair("e54967b4067d91a777587c9f54ee36dd9f1947c4",669097504996),
+//    std::make_pair("7744d2ac08f2e1d108b215935215a4e66d0262d2",802917005996),
+//    std::make_pair("a55a17e86246ea21cb883c12c709476a09b4885c",267639001997),
+//    std::make_pair("4e00dce8ab44fd4cafa34839edf8f68ba7839881",267639001997),
+//    std::make_pair("702cae5d2537bfdd5673ac986f910d6adb23510a",254257051898),
+//    std::make_pair("b19e494b0033c5608a7d153e57d7fdf3dfb51bb7",1204260290404),
+//    std::make_pair("6909b0f1c94ea1979ed76e10a5a49ec795a8f498",1204270995964),
+//    std::make_pair("05a06af3b29dade9f304244d934381ac495646c1",236896901156),
+//    std::make_pair("557e2b3205719931e22853b27920d2ebd6147531",155127107700),
+//    std::make_pair("ad16fb301bd21c60c5cb580b322aa2c61b6c5df2",115374999),
+//    std::make_pair("182c5cfb9d17aa8d8ff78940135ca8d822022f32",17306249),
+//    std::make_pair("b8a374a75f6d44a0bd1bf052da014efe564ae412",133819500998),
+//    std::make_pair("fadee7e2878172dad55068c8696621b1788dccb3",133713917412),
+//    std::make_pair("eacc4b108c28ed73b111ff149909aacffd2cdf78",173382671567),
+//    std::make_pair("dd87cc0b8e0fc119061f33f161104ce691d23657",245040727620),
+//    std::make_pair("1c8b0435eda1d489e9f0a16d3b9d65182f885377",200226012806),
+//    std::make_pair("15a724f2bc643041cb35c9475cd67b897d62ca52",436119839355),
+//    std::make_pair("626f86e9033026be7afbb2b9dbe4972ef4b3e085",156118097804),
+//    std::make_pair("a4a73d99269639541cb7e845a4c6ef3e3911fcd6",108968353176),
+//    std::make_pair("27929b31f11471aa4b77ca74bb66409ff76d24a2",126271503135),
+//    std::make_pair("2d6248888c7f72cc88e4883e4afd1025c43a7f0e",35102718156),
+//    std::make_pair("25d8debc253f5c3f70010f41c53348ed156e7baa",80306152234),
 };
 const size_t nGenesisOutputs = sizeof(genesisOutputs) / sizeof(genesisOutputs[0]);
 
 const std::pair<const char*, CAmount> genesisOutputsTestnet[] = {
-    std::make_pair("46a064688dc7beb5f70ef83569a0f15c7abf4f28",7017084118),
-    std::make_pair("9c97b561ac186bd3758bf690036296d36b1fd019",221897417980),
-    std::make_pair("118a92e28242a73244fb03c96b7e1429c06f979f",120499999),
-    std::make_pair("cae4bf990ce39624e2f77c140c543d4b15428ce7",18074999),
-    std::make_pair("9d6b7b5874afc100eb82a4883441a73b99d9c306",92637054909),
-    std::make_pair("f989e2deedb1f09ed10310fc0d7da7ebfb573326",3100771006662),
-    std::make_pair("4688d6701fb4ae2893d3ec806e6af966faf67545",465115650998),
-    std::make_pair("40e07b038941fb2616a54a498f763abae6d4f280",669097504996),
-    std::make_pair("c43f7c57448805a068a440cc51f67379ca946264",802917005996),
-    std::make_pair("98b7269dbf0c2e3344fb41cd60e75db16d6743a6",267639001997),
-    std::make_pair("85dceec8cdbb9e24fe07af783e4d273d1ae39f75",267639001997),
-    std::make_pair("ddc05d332b7d1a18a55509f34c786ccb65bbffbc",245040727620),
-    std::make_pair("8b04d0b2b582c986975414a01cb6295f1c33d0e9",1204260290404),
-    std::make_pair("1e9ff4c3ac6d0372963e92a13f1e47409eb62d37",1204270995964),
-    std::make_pair("687e7cf063cd106c6098f002fa1ea91d8aee302a",236896901156),
-    std::make_pair("dc0be0edcadd4cc97872db40bb8c2db2cebafd1c",155127107700),
-    std::make_pair("21efcbfe37045648180ac68b406794bde77f9983",115374999),
-    std::make_pair("deaf53dbfbc799eed1171269e84c733dec22f517",17306249),
-    std::make_pair("200a0f9dba25e00ea84a4a3a43a7ea6983719d71",133819500998),
-    std::make_pair("2d072fb1a9d1f7dd8df0443e37e9f942eab58680",133713917412),
-    std::make_pair("0850f3b7caf3b822bb41b9619f8edf9b277402d0",173382671567),
-    std::make_pair("ec62fbd782bf6f48e52eea75a3c68a4c3ab824c0",254257051898),
-    std::make_pair("c6dcb0065e98f5edda771c594265d61e38cf63a0",200226012806),
-    std::make_pair("e5f9a711ccd7cb0d2a70f9710229d0d0d7ef3bda",436119839355),
-    std::make_pair("cae1527d24a91470aeb796f9d024630f301752ef",156118097804),
-    std::make_pair("604f36860d79a9d72b827c99409118bfe16711bd",108968353176),
-    std::make_pair("f02e5891cef35c9c5d9a770756b240aba5ba3639",126271503135),
-    std::make_pair("8251b4983be1027a17dc3b977502086f08ba8910",35102718156),
-    std::make_pair("b991d98acde28455ecb0193fefab06841187c4e7",80306152234),
+//    std::make_pair("46a064688dc7beb5f70ef83569a0f15c7abf4f28",7017084118),
+//    std::make_pair("9c97b561ac186bd3758bf690036296d36b1fd019",221897417980),
+//    std::make_pair("118a92e28242a73244fb03c96b7e1429c06f979f",120499999),
+//    std::make_pair("cae4bf990ce39624e2f77c140c543d4b15428ce7",18074999),
+//    std::make_pair("9d6b7b5874afc100eb82a4883441a73b99d9c306",92637054909),
+//    std::make_pair("f989e2deedb1f09ed10310fc0d7da7ebfb573326",3100771006662),
+//    std::make_pair("4688d6701fb4ae2893d3ec806e6af966faf67545",465115650998),
+//    std::make_pair("40e07b038941fb2616a54a498f763abae6d4f280",669097504996),
+//    std::make_pair("c43f7c57448805a068a440cc51f67379ca946264",802917005996),
+//    std::make_pair("98b7269dbf0c2e3344fb41cd60e75db16d6743a6",267639001997),
+//    std::make_pair("85dceec8cdbb9e24fe07af783e4d273d1ae39f75",267639001997),
+//    std::make_pair("ddc05d332b7d1a18a55509f34c786ccb65bbffbc",245040727620),
+//    std::make_pair("8b04d0b2b582c986975414a01cb6295f1c33d0e9",1204260290404),
+//    std::make_pair("1e9ff4c3ac6d0372963e92a13f1e47409eb62d37",1204270995964),
+//    std::make_pair("687e7cf063cd106c6098f002fa1ea91d8aee302a",236896901156),
+//    std::make_pair("dc0be0edcadd4cc97872db40bb8c2db2cebafd1c",155127107700),
+//    std::make_pair("21efcbfe37045648180ac68b406794bde77f9983",115374999),
+//    std::make_pair("deaf53dbfbc799eed1171269e84c733dec22f517",17306249),
+//    std::make_pair("200a0f9dba25e00ea84a4a3a43a7ea6983719d71",133819500998),
+//    std::make_pair("2d072fb1a9d1f7dd8df0443e37e9f942eab58680",133713917412),
+//    std::make_pair("0850f3b7caf3b822bb41b9619f8edf9b277402d0",173382671567),
+//    std::make_pair("ec62fbd782bf6f48e52eea75a3c68a4c3ab824c0",254257051898),
+//    std::make_pair("c6dcb0065e98f5edda771c594265d61e38cf63a0",200226012806),
+//    std::make_pair("e5f9a711ccd7cb0d2a70f9710229d0d0d7ef3bda",436119839355),
+//    std::make_pair("cae1527d24a91470aeb796f9d024630f301752ef",156118097804),
+//    std::make_pair("604f36860d79a9d72b827c99409118bfe16711bd",108968353176),
+//    std::make_pair("f02e5891cef35c9c5d9a770756b240aba5ba3639",126271503135),
+//    std::make_pair("8251b4983be1027a17dc3b977502086f08ba8910",35102718156),
+//    std::make_pair("b991d98acde28455ecb0193fefab06841187c4e7",80306152234),
 };
 const size_t nGenesisOutputsTestnet = sizeof(genesisOutputsTestnet) / sizeof(genesisOutputsTestnet[0]);
 
@@ -294,59 +294,18 @@ static CBlock CreateGenesisBlockRegTest(uint32_t nTime, uint32_t nNonce, uint32_
 
 static CBlock CreateGenesisBlockTestNet(uint32_t nTime, uint32_t nNonce, uint32_t nBits)
 {
-    const char *pszTimestamp = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks";
+    const char* pszTimestamp = "I would rather be without a state than without a voice";
 
     CMutableTransaction txNew;
     txNew.nVersion = 1;
-    txNew.SetType(TXN_COINBASE);
+    txNew.nTime = nTime;
+    txNew.nLockTime = 0;
     txNew.vin.resize(1);
-    uint32_t nHeight = 0;  // bip34
-    txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(4) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp)) << OP_RETURN << nHeight;
-
-    txNew.vpout.resize(nGenesisOutputsTestnet);
-    for (size_t k = 0; k < nGenesisOutputsTestnet; ++k)
-    {
-        OUTPUT_PTR<CTxOutStandard> out = MAKE_OUTPUT<CTxOutStandard>();
-        out->nValue = genesisOutputsTestnet[k].second;
-        out->scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ParseHex(genesisOutputsTestnet[k].first) << OP_EQUALVERIFY << OP_CHECKSIG;
-        txNew.vpout[k] = out;
-    };
-
-
-    // Foundation Fund Raiser Funds
-    // rVDQRVBKnQEfNmykMSY9DHgqv8s7XZSf5R fc118af69f63d426f61c6a4bf38b56bcdaf8d069
-    OUTPUT_PTR<CTxOutStandard> out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 397364 * COIN;
-    out->scriptPubKey = CScript() << OP_HASH160 << ParseHex("fc118af69f63d426f61c6a4bf38b56bcdaf8d069") << OP_EQUAL;
-    txNew.vpout.push_back(out);
-
-    // rVDQRVBKnQEfNmykMSY9DHgqv8s7XZSf5R fc118af69f63d426f61c6a4bf38b56bcdaf8d069
-    out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 296138 * COIN;
-    out->scriptPubKey = CScript() << OP_HASH160 << ParseHex("89ca93e03119d53fd9ad1e65ce22b6f8791f8a49") << OP_EQUAL;
-    txNew.vpout.push_back(out);
-
-    // Community Initative
-    // rAybJ7dx4t6heHy99WqGcXkoT4Bh3V9qZ8 340288104577fcc3a6a84b98f7eac1a54e5287ee
-    out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 156675 * COIN;
-    out->scriptPubKey = CScript() << OP_HASH160 << ParseHex("89ca93e03119d53fd9ad1e65ce22b6f8791f8a49") << OP_EQUAL;
-    txNew.vpout.push_back(out);
-
-    // Contributors Left Over Funds
-    // rAvmLShYFZ78aAHhFfUFsrHMoBuPPyckm5 3379aa2a4379ae6c51c7777d72e8e0ffff71881b
-    out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 216346 * COIN;
-    out->scriptPubKey = CScript() << OP_HASH160 << ParseHex("89ca93e03119d53fd9ad1e65ce22b6f8791f8a49") << OP_EQUAL;
-    txNew.vpout.push_back(out);
-
-    // Reserved Wispr for primary round
-    // rLWLm1Hp7im3mq44Y1DgyirYgwvrmRASib 9c8c6c8c698f074180ecfdb38e8265c11f2a62cf
-    out = MAKE_OUTPUT<CTxOutStandard>();
-    out->nValue = 996000 * COIN;
-    out->scriptPubKey = CScript() << 1512000000 << OP_CHECKLOCKTIMEVERIFY << OP_DROP << OP_HASH160<< ParseHex("9c8c6c8c698f074180ecfdb38e8265c11f2a62cf") << OP_EQUAL; // 2017-11-30
-    txNew.vpout.push_back(out);
-
+    txNew.vout.resize(1);
+//    txNew.SetType(TXN_COINBASE);
+//    uint32_t nHeight = 0;  // bip34
+    txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+    txNew.vout[0].SetEmpty();
 
     CBlock genesis;
     genesis.nTime    = nTime;
@@ -541,6 +500,7 @@ public:
         consensus.lastPowBlock = 201;
         nPoolMaxTransactions = 3;
         nFulfilledRequestExpireTime = 60*60; // fulfilled requests expire in 1 hour
+        nMaxMoneyOut = 120000000 * COIN;
 
         strSporkAddress = "Xgtyuk76vhuFW2iT7UAiHgNdWXCf3J34wh";
         //!WISPR
@@ -584,9 +544,9 @@ public:
 
         chainTxData = ChainTxData {
             // Data from rpc: getchaintxstats 4096 7cc035d7888ee6d824cec8ff01a6287a71873d874f72a5fd3706d227b88f8e99
-            /* nTime    */ 1539414688,
-            /* nTxCount */ 342225,
-            /* dTxRate  */ 0.008
+            /* nTime    */ 1540087953,
+            /* nTxCount */ 815060,
+            /* dTxRate  */ 2000
         };
 
         /* disable fallback fee on mainnet */
@@ -666,9 +626,9 @@ public:
         nBIP44ID = 0x80000001;
 
         nModifierInterval = 10 * 60;    // 10 minutes
-        nStakeMinConfirmations = 225;   // 225 * 2 minutes
-        nTargetSpacing = 120;           // 2 minutes
-        nTargetTimespan = 24 * 60;      // 24 mins
+        nStakeMinConfirmations = 100;   // 225 * 2 minutes
+//        nTargetSpacing = 120;           // 2 minutes
+//        nTargetTimespan = 24 * 60;      // 24 mins
 
 
         AddImportHashesTest(vImportedCoinbaseTxns);
@@ -677,7 +637,7 @@ public:
         nPruneAfterHeight = 1000;
 
 
-        genesis = CreateGenesisBlockTestNet(1502309248, 5924, 0x1f00ffff);
+        genesis = CreateGenesisBlockTestNet(1512932225, 142000, bnProofOfWorkLimit.GetCompact());
         consensus.hashGenesisBlock = genesis.GetHash();
 
 //        printf("Test net block\n");
@@ -686,8 +646,9 @@ public:
 //        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
 //        printf("Genesis = %s\n", genesis.ToString());
 
-//        assert(consensus.hashGenesisBlock == uint256S("0x0000594ada5310b367443ee0afd4fa3d0bbd5850ea4e33cdc7d6a904a7ec7c90"));
-//        assert(genesis.hashMerkleRoot == uint256S("0x2c7f4d88345994e3849502061f6303d9666172e4dff3641d3472a72908eec002"));
+        assert(consensus.hashGenesisBlock == uint256S("0x03205c57ebefb02d86c2c0c2de368fa48e92f7df7240f1b528ebbeae70fdbdb1"));
+        assert(genesis.hashMerkleRoot == uint256S("0x26069b04c7c7b5b8773824b15cfbf0ddaf11ee261657a1aeb28aa5c8163909ee"));
+
 //        assert(genesis.hashWitnessMerkleRoot == uint256S("0xf9e2235c9531d5a19263ece36e82c4d5b71910d73cd0b677b81c5e50d17b6cda"));
 
         vFixedSeeds.clear();
@@ -733,17 +694,17 @@ public:
 
         checkpointData = {
             {
-                {127620, uint256S("0xe5ab909fc029b253bad300ccf859eb509e03897e7853e8bfdde2710dbf248dd1")},
-                {210920, uint256S("0x5534f546c3b5a264ca034703b9694fabf36d749d66e0659eef5f0734479b9802")},
-                {259290, uint256S("0x58267bdf935a2e0716cb910d055b8cdaa019089a5f71c3db90765dc7101dc5dc")},
+                {0, uint256S("0x03205c57ebefb02d86c2c0c2de368fa48e92f7df7240f1b528ebbeae70fdbdb1")},
+//                {210920, uint256S("0x5534f546c3b5a264ca034703b9694fabf36d749d66e0659eef5f0734479b9802")},
+//                {259290, uint256S("0x58267bdf935a2e0716cb910d055b8cdaa019089a5f71c3db90765dc7101dc5dc")},
             }
         };
 
         chainTxData = ChainTxData{
             // Data from rpc: getchaintxstats 4096 58267bdf935a2e0716cb910d055b8cdaa019089a5f71c3db90765dc7101dc5dc
-            /* nTime    */ 1539418544,
-            /* nTxCount */ 278613,
-            /* dTxRate  */ 0.005
+            /* nTime    */ 1512932225,
+            /* nTxCount */ 0,
+            /* dTxRate  */ 450
         };
 
         /* enable fallback fee on testnet */
