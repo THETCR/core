@@ -687,7 +687,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         return;
     };
 
-    if(tx.nVersion > BTC_TXN_VERSION){
+    if(tx.nVersion > 1){
         printf("Unserialize: BTC_TXN_VERSION\n");
         tx.nVersion |= bv;
         s >> bv;
@@ -764,7 +764,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     };
 
     s << tx.nVersion;
-    if(tx.nVersion < BTC_TXN_VERSION){
+    if(tx.nVersion < 2){
         s << tx.nTime;
     }
     unsigned char flags = 0;
