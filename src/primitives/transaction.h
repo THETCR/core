@@ -636,6 +636,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 //    if (IsWisprTxVersion(tx.nVersion))
     if (bv >= WISPR_TXN_VERSION)
     {
+            printf("Unserialize: WISPR_TXN_VERSION\n");
 //        uint8_t bv;
 //        bv << tx.nVersion;
 //        printf("Unserialize: transaction is wispr version\n");
@@ -687,6 +688,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     };
 
     if(tx.nVersion > BTC_TXN_VERSION){
+        printf("Unserialize: BTC_TXN_VERSION\n");
         tx.nVersion |= bv;
         s >> bv;
         tx.nVersion |= bv<<8;
@@ -696,8 +698,8 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         tx.nVersion |= bv<<24;
     }else{
         tx.nVersion = bv;
+        s >> tx.nTime;
     }
-    s >> tx.nTime;
 
     unsigned char flags = 0;
     tx.vin.clear();
@@ -762,7 +764,9 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     };
 
     s << tx.nVersion;
-    s << tx.nTime;
+    if(tx.nVersion < BTC_TXN_VERSION){
+        s << tx.nTime;
+    }
     unsigned char flags = 0;
     // Consistency check
     if (fAllowWitness) {
