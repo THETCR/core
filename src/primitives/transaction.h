@@ -1004,7 +1004,8 @@ struct CMutableTransaction
     }
 
     void SetType(int type) {
-//        nVersion |= (type & 0xFF) << 8;
+        nVersion |= (type & 0xFF) << 8;
+        printf("%d\n", nVersion);
     }
 
     bool IsWisprVersion() const {
