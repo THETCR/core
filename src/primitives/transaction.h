@@ -730,8 +730,11 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 template<typename Stream, typename TxType>
 inline void SerializeTransaction(const TxType& tx, Stream& s) {
     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
+
     printf("Serialize: transaction\n");
     int32_t nVersion = tx.nVersion;
+    printf("Serialize nVersion = %d\n", tx.nVersion);
+
     if (IsWisprTxVersion(tx.nVersion))
     {
         printf("Serialize: transaction is wispr version\n");
