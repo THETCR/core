@@ -26,6 +26,8 @@ set(QT5_LIB_DIR ${QT_PATH}/lib/cmake)
 set(QT5_CORE ${QT_LIB_DIR}/Qt5Core)
 set(QT5_WIDGETS ${QT_LIB_DIR}/Qt5Widgets)
 set(QT5_GUI ${QT_LIB_DIR}/Qt5Gui)
+set(QT5_NETWORK ${QT_LIB_DIR}/Qt5Network)
+set(QT5_TEST ${QT_LIB_DIR}/Qt5Test)
 #set(Qt5_INCLUDE_DIR D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32/include)
 #set(Qt5_LIBRARY_DIR D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32/lib)
 #find_package( Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test REQUIRED )
@@ -50,6 +52,7 @@ include_directories(
         src
         src/leveldb/include
         src/univalue/include
+        src/qt
         ${Boost_INCLUDE_DIR}
         ${QT5_LIB_DIR}
 )
