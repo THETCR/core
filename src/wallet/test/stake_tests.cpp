@@ -145,7 +145,6 @@ static void DisconnectTip(CBlock &block, CBlockIndex *pindexDelete, CCoinsViewCa
 
 BOOST_AUTO_TEST_CASE(stake_test)
 {
-    int i =0;
     SeedInsecureRand();
     CHDWallet *pwallet = pwalletMain.get();
     UniValue rv;
