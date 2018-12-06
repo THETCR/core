@@ -5,10 +5,18 @@
 # the run/debug configuration as otherwise CLion will try to build this project with cmake, failing horribly.
 # You'll also have to manually change the executable in the configuration to the correct path of the already built executable
 
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.13.1)
 project(core)
 
 set(CMAKE_CXX_STANDARD 11)
+# Find includes in corresponding build directories
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# Instruct CMake to run moc automatically when needed
+set(CMAKE_AUTOMOC ON)
+# Create code from a list of Qt designer ui files
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
 set(Boost_NO_SYSTEM_PATHS true)
 set(Boost_USE_STATIC_LIBS OFF CACHE BOOL "use static libraries from Boost")
 set(Boost_USE_MULTITHREADED ON)
@@ -16,8 +24,6 @@ set(Boost_INCLUDE_DIR D:/Development/Libraries/CPP/boost)
 set(Boost_LIBRARY_DIR D:/Development/Libraries/CPP/boost/lib)
 find_package(Boost COMPONENTS chrono filesystem program_options system thread test REQUIRED)
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
 set(QT_PATH D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32)
 #Qt5 paths
 #Qt5 library path
@@ -38,7 +44,7 @@ set(QT_LIBRARIES_REQUIRED Qt5Core Qt5Widgets Qt5Gui Qt5Test Qt5Network)
 
 #find packages
 foreach(QT_LIBRARIES_REQUIRED ${QT_LIBRARIES_REQUIRED})
-    find_package( ${QT_LIBRARIES_REQUIRED} REQUIRED )
+    find_package(${QT_LIBRARIES_REQUIRED} CONFIG REQUIRED)
 endforeach()
 if (WIN32)
     # disable autolinking in boost
@@ -56,37 +62,37 @@ include_directories(
         ${Boost_INCLUDE_DIR}
         ${QT5_LIB_DIR}
 )
-qt5_wrap_ui(src/qt/forms/ui_addressbookpage.h src/qt/forms/addressbookpage.ui)
-qt5_wrap_ui(src/qt/forms/ui_askpassphrasedialog.h askpassphrasedialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_bip38tooldialog.h bip38tooldialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_blockexplorer.h blockexplorer.ui)
-qt5_wrap_ui(src/qt/forms/ui_coincontroldialog.h coincontroldialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_coldstakingdialog.h coldstakingdialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_darksendconfig.h darksendconfig.ui)
-qt5_wrap_ui(src/qt/forms/ui_debugwindow.h debugwindow.ui)
-qt5_wrap_ui(src/qt/forms/ui_editaddressdialog.h editaddressdialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_helpmessagedialog.h helpmessagedialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_intro.h intro.ui)
-qt5_wrap_ui(src/qt/forms/ui_masternodelist.h masternodelist.ui)
-qt5_wrap_ui(src/qt/forms/ui_mnemonicdialog.h mnemonicdialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_modaloverlay.h modaloverlay.ui)
-qt5_wrap_ui(src/qt/forms/ui_multisenddialog.h multisenddialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_multisigdialog.ui multisigdialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_obfuscationconfig.h obfuscationconfig.ui)
-qt5_wrap_ui(src/qt/forms/ui_openuridialog.h openuridialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_optionsdialog.h optionsdialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_overviewpage.h overviewpage.ui)
-qt5_wrap_ui(src/qt/forms/ui_privacydialog.h privacydialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_qrdialog.h qrdialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_receivecoinsdialog.h receivecoinsdialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_receiverequestdialog.h receiverequestdialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_rpcconsole.h rpcconsole.ui)
-qt5_wrap_ui(src/qt/forms/ui_sendcoinsdialog.h sendcoinsdialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_sendcoinsentry.h sendcoinsentry.ui)
-qt5_wrap_ui(src/qt/forms/ui_signverifymessagedialog.h signverifymessagedialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_tradingdialog.h tradingdialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_transactiondescdialog.h transactiondescdialog.ui)
-qt5_wrap_ui(src/qt/forms/ui_zwspcontroldialog.h zwspcontroldialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_addressbookpage.h src/qt/forms/addressbookpage.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_askpassphrasedialog.h askpassphrasedialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_bip38tooldialog.h bip38tooldialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_blockexplorer.h blockexplorer.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_coincontroldialog.h coincontroldialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_coldstakingdialog.h coldstakingdialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_darksendconfig.h darksendconfig.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_debugwindow.h debugwindow.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_editaddressdialog.h editaddressdialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_helpmessagedialog.h helpmessagedialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_intro.h intro.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_masternodelist.h masternodelist.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_mnemonicdialog.h mnemonicdialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_modaloverlay.h modaloverlay.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_multisenddialog.h multisenddialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_multisigdialog.ui multisigdialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_obfuscationconfig.h obfuscationconfig.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_openuridialog.h openuridialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_optionsdialog.h optionsdialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_overviewpage.h overviewpage.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_privacydialog.h privacydialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_qrdialog.h qrdialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_receivecoinsdialog.h receivecoinsdialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_receiverequestdialog.h receiverequestdialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_rpcconsole.h rpcconsole.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_sendcoinsdialog.h sendcoinsdialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_sendcoinsentry.h sendcoinsentry.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_signverifymessagedialog.h signverifymessagedialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_tradingdialog.h tradingdialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_transactiondescdialog.h transactiondescdialog.ui)
+#QT5_WRAP_UI(src/qt/forms/ui_zwspcontroldialog.h zwspcontroldialog.ui)
 add_definitions(
         -DENABLE_WALLET=1
 )
@@ -132,6 +138,7 @@ file(GLOB SOURCE_FILES
         src/qt/forms/*.ui
         src/qt/*.cpp
         src/qt/*.h
+        src/qt/res/*.rc
         src/script/*.cpp
         src/script/*.h
         src/spork/*.cpp
@@ -161,11 +168,12 @@ file(GLOB SOURCE_FILES
         src/util/*.h
         src/*.cpp
         src/*.h
+        src/*.rc
         src/evo/*.h
         src/evo/*.cpp
         src/rpc/*.cpp
         src/rpc/*.h
         )
 
-add_executable(wispr ${SOURCE_FILES})
+add_executable(wispr WIN32 ${SOURCE_FILES})
 target_link_libraries(wispr ${QT_LIBRARIES} ${Boost_LIBRARIES})
