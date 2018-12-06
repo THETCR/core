@@ -632,7 +632,8 @@ public:
 
         nPruneAfterHeight = 1000;
 
-
+        bnProofOfWorkLimit = ~uint256(0) >> 16; // WISPR starting difficulty is 1 / 2^12
+        bnProofOfStakeLimit = ~uint256(0) >> 48;
         genesis = CreateGenesisBlockTestNet(1512932225, 142000, bnProofOfWorkLimit.GetCompact());
         consensus.hashGenesisBlock = genesis.GetHash();
 
