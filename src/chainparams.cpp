@@ -260,23 +260,18 @@ const size_t nGenesisOutputsTestnet = sizeof(genesisOutputsTestnet) / sizeof(gen
 
 static CBlock CreateGenesisBlockRegTest(uint32_t nTime, uint32_t nNonce, uint32_t nBits)
 {
-    const char *pszTimestamp = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks";
+    const char* pszTimestamp = "I would rather be without a state than without a voice";
 
     CMutableTransaction txNew;
     txNew.nVersion = 1;
-    txNew.SetType(TXN_COINBASE);
+    txNew.nTime = nTime;
+    txNew.nLockTime = 0;
     txNew.vin.resize(1);
-    uint32_t nHeight = 0;  // bip34
-    txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(4) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp)) << OP_RETURN << nHeight;
-
-    txNew.vpout.resize(nGenesisOutputsRegtest);
-    for (size_t k = 0; k < nGenesisOutputsRegtest; ++k)
-    {
-        OUTPUT_PTR<CTxOutStandard> out = MAKE_OUTPUT<CTxOutStandard>();
-        out->nValue = regTestOutputs[k].second;
-        out->scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ParseHex(regTestOutputs[k].first) << OP_EQUALVERIFY << OP_CHECKSIG;
-        txNew.vpout[k] = out;
-    };
+    txNew.vout.resize(1);
+//    txNew.SetType(TXN_COINBASE);
+//    uint32_t nHeight = 0;  // bip34
+    txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+    txNew.vout[0].SetEmpty();
 
     CBlock genesis;
     genesis.nTime    = nTime;
@@ -288,6 +283,7 @@ static CBlock CreateGenesisBlockRegTest(uint32_t nTime, uint32_t nNonce, uint32_
     genesis.hashPrevBlock.SetNull();
     genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
     genesis.hashWitnessMerkleRoot = BlockWitnessMerkleRoot(genesis);
+
 
     return genesis;
 }
@@ -765,8 +761,13 @@ public:
 
         nModifierInterval = 2 * 60;     // 2 minutes
         nStakeMinConfirmations = 12;
-        nTargetSpacing = 5;             // 5 seconds
-        nTargetTimespan = 16 * 60;      // 16 mins
+        nTargetTimespanV1 = 16 * 60; // WISPR Old: 1 day
+        nTargetTimespanV2 = 1 * 60; // WISPR New: 1 day
+        nTargetSpacingV1 = 64;        // WISPR Old: 1 minutes
+        nTargetSpacingV2 = 1 * 60;        // WISPR New: 1 minute
+        bnProofOfWorkLimit = ~uint256(0) >> 1;
+//        nTargetSpacing = 5;             // 5 seconds
+//        nTargetTimespan = 16 * 60;      // 16 mins
         nStakeTimestampMask = 0;
 
         SetLastImportHeight();
@@ -775,7 +776,7 @@ public:
 
         UpdateVersionBitsParametersFromArgs(args);
 
-        genesis = CreateGenesisBlockRegTest(1487714923, 0, 0x207fffff);
+        genesis = CreateGenesisBlockRegTest(1411111111, 2, bnProofOfWorkLimit.GetCompact());
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
@@ -785,7 +786,7 @@ public:
 //        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
 //        printf("Genesis = %s\n", genesis.ToString());
 
-//        assert(consensus.hashGenesisBlock == uint256S("0x6cd174536c0ada5bfa3b8fde16b98ae508fff6586f2ee24cf866867098f25907"));
+        assert(consensus.hashGenesisBlock == uint256S("0302157c185ae0018bb60f0c506087be772aa2015150f994cc1a6db55e8e23bd"));
 //        assert(genesis.hashMerkleRoot == uint256S("0xf89653c7208af2c76a3070d436229fb782acbd065bd5810307995b9982423ce7"));
 //        assert(genesis.hashWitnessMerkleRoot == uint256S("0x36b66a1aff91f34ab794da710d007777ef5e612a320e1979ac96e5f292399639"));
 
