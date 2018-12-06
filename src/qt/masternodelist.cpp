@@ -1,7 +1,7 @@
 #include "masternodelist.h"
-#include "forms/ui_masternodelist.h"
+#include <qt/forms/ui_masternodelist.h>
 
-#include "masternode/activemasternode.h"
+#include <masternode/activemasternode.h>
 #include "clientmodel.h"
 #include "clientversion.h"
 #include "init.h"
