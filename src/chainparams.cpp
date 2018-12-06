@@ -172,22 +172,22 @@ static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits
 }
 
 const std::pair<const char*, CAmount> regTestOutputs[] = {
-//    std::make_pair("585c2b3914d9ee51f8e710304e386531c3abcc82", 10000 * COIN),
-//    std::make_pair("c33f3603ce7c46b423536f0434155dad8ee2aa1f", 10000 * COIN),
-//    std::make_pair("72d83540ed1dcf28bfaca3fa2ed77100c2808825", 10000 * COIN),
-//    std::make_pair("69e4cc4c219d8971a253cd5db69a0c99c4a5659d", 10000 * COIN),
-//    std::make_pair("eab5ed88d97e50c87615a015771e220ab0a0991a", 10000 * COIN),
-//    std::make_pair("119668a93761a34a4ba1c065794b26733975904f", 10000 * COIN),
-//    std::make_pair("6da49762a4402d199d41d5778fcb69de19abbe9f", 10000 * COIN),
-//    std::make_pair("27974d10ff5ba65052be7461d89ef2185acbe411", 10000 * COIN),
-//    std::make_pair("89ea3129b8dbf1238b20a50211d50d462a988f61", 10000 * COIN),
-//    std::make_pair("3baab5b42a409b7c6848a95dfd06ff792511d561", 10000 * COIN),
-//
-//    std::make_pair("649b801848cc0c32993fb39927654969a5af27b0", 5000 * COIN),
-//    std::make_pair("d669de30fa30c3e64a0303cb13df12391a2f7256", 5000 * COIN),
-//    std::make_pair("f0c0e3ebe4a1334ed6a5e9c1e069ef425c529934", 5000 * COIN),
-//    std::make_pair("27189afe71ca423856de5f17538a069f22385422", 5000 * COIN),
-//    std::make_pair("0e7f6fe0c4a5a6a9bfd18f7effdd5898b1f40b80", 5000 * COIN),
+    std::make_pair("585c2b3914d9ee51f8e710304e386531c3abcc82", 10000 * COIN),
+    std::make_pair("c33f3603ce7c46b423536f0434155dad8ee2aa1f", 10000 * COIN),
+    std::make_pair("72d83540ed1dcf28bfaca3fa2ed77100c2808825", 10000 * COIN),
+    std::make_pair("69e4cc4c219d8971a253cd5db69a0c99c4a5659d", 10000 * COIN),
+    std::make_pair("eab5ed88d97e50c87615a015771e220ab0a0991a", 10000 * COIN),
+    std::make_pair("119668a93761a34a4ba1c065794b26733975904f", 10000 * COIN),
+    std::make_pair("6da49762a4402d199d41d5778fcb69de19abbe9f", 10000 * COIN),
+    std::make_pair("27974d10ff5ba65052be7461d89ef2185acbe411", 10000 * COIN),
+    std::make_pair("89ea3129b8dbf1238b20a50211d50d462a988f61", 10000 * COIN),
+    std::make_pair("3baab5b42a409b7c6848a95dfd06ff792511d561", 10000 * COIN),
+
+    std::make_pair("649b801848cc0c32993fb39927654969a5af27b0", 5000 * COIN),
+    std::make_pair("d669de30fa30c3e64a0303cb13df12391a2f7256", 5000 * COIN),
+    std::make_pair("f0c0e3ebe4a1334ed6a5e9c1e069ef425c529934", 5000 * COIN),
+    std::make_pair("27189afe71ca423856de5f17538a069f22385422", 5000 * COIN),
+    std::make_pair("0e7f6fe0c4a5a6a9bfd18f7effdd5898b1f40b80", 5000 * COIN),
 };
 const size_t nGenesisOutputsRegtest = sizeof(regTestOutputs) / sizeof(regTestOutputs[0]);
 
