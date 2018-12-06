@@ -262,23 +262,23 @@ static CBlock CreateGenesisBlockRegTest(uint32_t nTime, uint32_t nNonce, uint32_
 {
     const char* pszTimestamp = "I would rather be without a state than without a voice";
 
-    CMutableTransaction txNew;
-    txNew.nVersion = 1;
-    txNew.nTime = nTime;
-    txNew.nLockTime = 0;
-    txNew.vin.resize(1);
-    txNew.vout.resize(1);
+//    CMutableTransaction txNew;
+//    txNew.nVersion = 1;
+//    txNew.nTime = nTime;
+//    txNew.nLockTime = 0;
+//    txNew.vin.resize(1);
+//    txNew.vout.resize(1);
 //    txNew.SetType(TXN_COINBASE);
 //    uint32_t nHeight = 0;  // bip34
-    txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
-    txNew.vout[0].SetEmpty();
+//    txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+//    txNew.vout[0].SetEmpty();
 
     CBlock genesis;
     genesis.nTime    = nTime;
     genesis.nBits    = nBits;
     genesis.nNonce   = nNonce;
     genesis.nVersion = 1;
-    genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
+//    genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
 
     genesis.hashPrevBlock.SetNull();
     genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
