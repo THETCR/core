@@ -782,12 +782,12 @@ public:
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        printf("Regression net block\n");
-        printf("Genesis = %s\n", genesis.ToString().c_str());
+//        printf("Regression net block\n");
+//        printf("Genesis = %s\n", genesis.ToString().c_str());
 
-        assert(consensus.hashGenesisBlock == uint256S("0x0a8fa28466883c1a15f919244b95a58353064d50f791ca9bcb64360682b26455"));
-        assert(genesis.hashMerkleRoot == uint256S("0x15ef7fb9d8328ce94d34df8b801538c48d7b42ae23e6fb3f7970648c82c98517"));
-//        assert(genesis.hashWitnessMerkleRoot == uint256S("0x36b66a1aff91f34ab794da710d007777ef5e612a320e1979ac96e5f292399639"));
+        assert(consensus.hashGenesisBlock == uint256S("0xbef8ae0424482c2f4cccd4fa60dedfd036e9b852755d68950eba1033e808b549"));
+        assert(genesis.hashMerkleRoot == uint256S("0x9610143a84e1d907d78f15d8aba8d48f80e6fe24a325ce6419c544f9f981af98"));
+        assert(genesis.hashWitnessMerkleRoot == uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"));
 
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
