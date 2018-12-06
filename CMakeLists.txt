@@ -51,9 +51,9 @@ include_directories(
         src/leveldb/include
         src/univalue/include
         ${Boost_INCLUDE_DIR}
-        ${Qt5_INCLUDE_DIR}
+        ${QT5_LIB_DIR}
 )
-qt5_wrap_ui(src/qt/forms/ui_addressbookpage.h addressbookpage.ui)
+qt5_wrap_ui(src/qt/forms/ui_addressbookpage.h src/qt/forms/addressbookpage.ui)
 qt5_wrap_ui(src/qt/forms/ui_askpassphrasedialog.h askpassphrasedialog.ui)
 qt5_wrap_ui(src/qt/forms/ui_bip38tooldialog.h bip38tooldialog.ui)
 qt5_wrap_ui(src/qt/forms/ui_blockexplorer.h blockexplorer.ui)
@@ -126,6 +126,7 @@ file(GLOB SOURCE_FILES
         src/pos/*.h
         src/qt/test/*.cpp
         src/qt/test/*.h
+        src/qt/forms/*.ui
         src/qt/*.cpp
         src/qt/*.h
         src/script/*.cpp
