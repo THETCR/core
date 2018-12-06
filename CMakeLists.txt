@@ -9,17 +9,53 @@ cmake_minimum_required(VERSION 3.7)
 project(core)
 
 set(CMAKE_CXX_STANDARD 11)
+set(Boost_NO_SYSTEM_PATHS true)
+set(Boost_USE_STATIC_LIBS OFF CACHE BOOL "use static libraries from Boost")
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_INCLUDE_DIR D:/Development/Libraries/CPP/boost)
+set(Boost_LIBRARY_DIR D:/Development/Libraries/CPP/boost/lib)
+find_package(Boost COMPONENTS chrono filesystem program_options system thread test REQUIRED)
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(QT_PATH D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32)
+#Qt5 paths
+#Qt5 library path
+set(QT5_LIB_DIR ${QT_PATH}/lib/cmake)
+#Qt5 individual libraries
+set(QT5_CORE ${QT_LIB_DIR}/Qt5Core)
+set(QT5_WIDGETS ${QT_LIB_DIR}/Qt5Widgets)
+set(QT5_GUI ${QT_LIB_DIR}/Qt5Gui)
+#set(Qt5_INCLUDE_DIR D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32/include)
+#set(Qt5_LIBRARY_DIR D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32/lib)
+#find_package( Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test REQUIRED )
+#Libraries to link to. The :: is for convenience
+set(QT_LIBRARIES Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Test Qt5::Network)
+#Libraries required. Probably the same as above minus the '::'. find_package() will be called on these
+set(QT_LIBRARIES_REQUIRED Qt5Core Qt5Widgets Qt5Gui Qt5Test Qt5Network)
+
+#find packages
+foreach(QT_LIBRARIES_REQUIRED ${QT_LIBRARIES_REQUIRED})
+    find_package( ${QT_LIBRARIES_REQUIRED} REQUIRED )
+endforeach()
+if (WIN32)
+    # disable autolinking in boost
+    add_definitions( -DBOOST_ALL_NO_LIB )
+
+    # force all boost libraries to dynamic link (we already disabled
+    # autolinking, so I don't know why we need this, but we do!)
+    add_definitions( -DBOOST_ALL_DYN_LINK )
+endif()
 include_directories(
         src
         src/leveldb/include
         src/univalue/include
+        ${Boost_INCLUDE_DIR}
+        ${Qt5_INCLUDE_DIR}
 )
-
 add_definitions(
         -DENABLE_WALLET=1
 )
-
 file(GLOB SOURCE_FILES
         src/bench/*.cpp
         src/bench/*.h
@@ -96,4 +132,5 @@ file(GLOB SOURCE_FILES
         src/rpc/*.h
         )
 
-add_executable(bitcoin ${SOURCE_FILES})
+add_executable(wispr ${SOURCE_FILES})
+target_link_libraries(wispr ${QT_LIBRARIES} ${Boost_LIBRARIES})
