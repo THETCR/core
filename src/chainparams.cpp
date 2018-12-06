@@ -782,11 +782,8 @@ public:
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-//        printf("Regression net block\n");
-//        printf("Genesis hash = %s\n", consensus.hashGenesisBlock.ToString());
-//        printf("Genesis merkle = %s\n", genesis.hashMerkleRoot.ToString());
-//        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
-//        printf("Genesis = %s\n", genesis.ToString().c_str());
+        printf("Regression net block\n");
+        printf("Genesis = %s\n", genesis.ToString().c_str());
 
         assert(consensus.hashGenesisBlock == uint256S("0x0a8fa28466883c1a15f919244b95a58353064d50f791ca9bcb64360682b26455"));
         assert(genesis.hashMerkleRoot == uint256S("0x15ef7fb9d8328ce94d34df8b801538c48d7b42ae23e6fb3f7970648c82c98517"));
