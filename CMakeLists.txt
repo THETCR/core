@@ -9,6 +9,8 @@ cmake_minimum_required(VERSION 3.13.1)
 project(core)
 
 set(CMAKE_CXX_STANDARD 11)
+#set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER src/qt/forms)
+
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed
@@ -41,6 +43,7 @@ set(QT5_TEST ${QT_LIB_DIR}/Qt5Test)
 set(QT_LIBRARIES Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Test Qt5::Network)
 #Libraries required. Probably the same as above minus the '::'. find_package() will be called on these
 set(QT_LIBRARIES_REQUIRED Qt5Core Qt5Widgets Qt5Gui Qt5Test Qt5Network)
+set(HW_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/forms)
 
 #find packages
 foreach(QT_LIBRARIES_REQUIRED ${QT_LIBRARIES_REQUIRED})
@@ -62,37 +65,38 @@ include_directories(
         ${Boost_INCLUDE_DIR}
         ${QT5_LIB_DIR}
 )
-#QT5_WRAP_UI(src/qt/forms/ui_addressbookpage.h src/qt/forms/addressbookpage.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_askpassphrasedialog.h askpassphrasedialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_bip38tooldialog.h bip38tooldialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_blockexplorer.h blockexplorer.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_coincontroldialog.h coincontroldialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_coldstakingdialog.h coldstakingdialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_darksendconfig.h darksendconfig.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_debugwindow.h debugwindow.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_editaddressdialog.h editaddressdialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_helpmessagedialog.h helpmessagedialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_intro.h intro.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_masternodelist.h masternodelist.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_mnemonicdialog.h mnemonicdialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_modaloverlay.h modaloverlay.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_multisenddialog.h multisenddialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_multisigdialog.ui multisigdialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_obfuscationconfig.h obfuscationconfig.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_openuridialog.h openuridialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_optionsdialog.h optionsdialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_overviewpage.h overviewpage.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_privacydialog.h privacydialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_qrdialog.h qrdialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_receivecoinsdialog.h receivecoinsdialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_receiverequestdialog.h receiverequestdialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_rpcconsole.h rpcconsole.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_sendcoinsdialog.h sendcoinsdialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_sendcoinsentry.h sendcoinsentry.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_signverifymessagedialog.h signverifymessagedialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_tradingdialog.h tradingdialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_transactiondescdialog.h transactiondescdialog.ui)
-#QT5_WRAP_UI(src/qt/forms/ui_zwspcontroldialog.h zwspcontroldialog.ui)
+qt5_wrap_ui(UI_HEADERS
+        ${HW_GUI_DIR}/addressbookpage.ui
+        ${HW_GUI_DIR}/askpassphrasedialog.ui
+        ${HW_GUI_DIR}/bip38tooldialog.ui
+        ${HW_GUI_DIR}/blockexplorer.ui
+        ${HW_GUI_DIR}/coincontroldialog.ui
+        ${HW_GUI_DIR}/coldstakingdialog.ui
+        ${HW_GUI_DIR}/darksendconfig.ui
+        ${HW_GUI_DIR}/debugwindow.ui
+        ${HW_GUI_DIR}/editaddressdialog.ui
+        ${HW_GUI_DIR}/helpmessagedialog.ui
+        ${HW_GUI_DIR}/intro.ui
+        ${HW_GUI_DIR}/qt/forms/masternodelist.ui
+        ${HW_GUI_DIR}/mnemonicdialog.ui
+        ${HW_GUI_DIR}/modaloverlay.ui
+        ${HW_GUI_DIR}/multisenddialog.ui
+        ${HW_GUI_DIR}/multisigdialog.ui
+        ${HW_GUI_DIR}/obfuscationconfig.ui
+        ${HW_GUI_DIR}/openuridialog.ui
+        ${HW_GUI_DIR}/optionsdialog.ui
+        ${HW_GUI_DIR}/overviewpage.ui
+        ${HW_GUI_DIR}/privacydialog.ui
+        ${HW_GUI_DIR}/qrdialog.ui
+        ${HW_GUI_DIR}/receivecoinsdialog.ui
+        ${HW_GUI_DIR}/receiverequestdialog.ui
+        ${HW_GUI_DIR}/rpcconsole.ui
+        ${HW_GUI_DIR}/sendcoinsdialog.ui
+        ${HW_GUI_DIR}/sendcoinsentry.ui
+        ${HW_GUI_DIR}/signverifymessagedialog.ui
+        ${HW_GUI_DIR}/tradingdialog.ui
+        ${HW_GUI_DIR}/transactiondescdialog.ui
+        ${HW_GUI_DIR}/zwspcontroldialog.ui)
 add_definitions(
         -DENABLE_WALLET=1
 )
@@ -136,6 +140,7 @@ file(GLOB SOURCE_FILES
         src/qt/test/*.cpp
         src/qt/test/*.h
         src/qt/forms/*.ui
+        src/qt/*.qrc
         src/qt/*.cpp
         src/qt/*.h
         src/qt/res/*.rc
@@ -175,5 +180,5 @@ file(GLOB SOURCE_FILES
         src/rpc/*.h
         )
 
-add_executable(wispr WIN32 ${SOURCE_FILES})
+add_executable(wispr WIN32 ${SOURCE_FILES} ${UI_HEADERS})
 target_link_libraries(wispr ${QT_LIBRARIES} ${Boost_LIBRARIES})
