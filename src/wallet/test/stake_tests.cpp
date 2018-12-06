@@ -150,7 +150,8 @@ BOOST_AUTO_TEST_CASE(stake_test)
     CHDWallet *pwallet = pwalletMain.get();
     UniValue rv;
     BOOST_TEST_CHECKPOINT("Stake test\n");
-
+    printf("Stake test print\n");
+    BOOST_TEST_MESSAGE("Stake test message\n");
     std::unique_ptr<CChainParams> regtestChainParams = CreateChainParams(CBaseChainParams::REGTEST);
     const CChainParams &chainparams = *regtestChainParams;
     BOOST_TEST_CHECKPOINT("Stake test\n");
