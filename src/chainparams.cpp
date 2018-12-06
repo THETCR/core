@@ -268,9 +268,9 @@ static CBlock CreateGenesisBlockRegTest(uint32_t nTime, uint32_t nNonce, uint32_
     txNew.nLockTime = 0;
     txNew.vin.resize(1);
     txNew.vout.resize(1);
-//    txNew.SetType(TXN_COINBASE);
+    txNew.SetType(TXN_COINBASE);
     uint32_t nHeight = 0;  // bip34
-    txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+    txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp)) << nHeight;
     txNew.vout[0].SetEmpty();
 
     CBlock genesis;
@@ -782,11 +782,11 @@ public:
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-//        printf("Regression net block\n");
+        printf("Regression net block\n");
 //        printf("Genesis hash = %s\n", consensus.hashGenesisBlock.ToString());
 //        printf("Genesis merkle = %s\n", genesis.hashMerkleRoot.ToString());
 //        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
-//        printf("Genesis = %s\n", genesis.ToString().c_str());
+        printf("Genesis = %s\n", genesis.ToString().c_str());
 
         assert(consensus.hashGenesisBlock == uint256S("0x258a2e1546142ab49afbc636dfacdd34c8e81fca6201ae79a4bea1c7a226987f"));
         assert(genesis.hashMerkleRoot == uint256S("0xcd09537dade288f071614bd176a4822790c094be00bea0d77bedb299b515274b"));
