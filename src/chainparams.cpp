@@ -390,7 +390,7 @@ public:
         consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000008758e1eda6f3fbf3fe");
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0xcf86529d0243cb653da92cbbaddc7f0a4f275bcf557cc112d03c33b756af25d3"); //400000
+//        consensus.defaultAssumeValid = uint256S("0xcf86529d0243cb653da92cbbaddc7f0a4f275bcf557cc112d03c33b756af25d3"); //400000
 
         consensus.nMinRCTOutputDepth = 12;
 
