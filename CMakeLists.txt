@@ -14,13 +14,13 @@ set(CMAKE_CXX_STANDARD 11)
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed
-set(CMAKE_AUTOMOC ON)
+#set(CMAKE_AUTOMOC ON)
 # Create code from a list of Qt designer ui files
-set(CMAKE_AUTOUIC ON)
+#set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(Boost_NO_SYSTEM_PATHS true)
-set(Boost_USE_STATIC_LIBS OFF CACHE BOOL "use static libraries from Boost")
+#set(Boost_USE_STATIC_LIBS OFF CACHE BOOL "use static libraries from Boost")
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_INCLUDE_DIR D:/Development/Libraries/CPP/boost)
 set(Boost_LIBRARY_DIR D:/Development/Libraries/CPP/boost/lib)
@@ -44,6 +44,7 @@ set(QT_LIBRARIES Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Test Qt5::Network)
 #Libraries required. Probably the same as above minus the '::'. find_package() will be called on these
 set(QT_LIBRARIES_REQUIRED Qt5Core Qt5Widgets Qt5Gui Qt5Test Qt5Network)
 set(HW_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/forms)
+set(HW_MOC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/qt)
 
 #find packages
 foreach(QT_LIBRARIES_REQUIRED ${QT_LIBRARIES_REQUIRED})
@@ -77,7 +78,7 @@ qt5_wrap_ui(UI_HEADERS
         ${HW_GUI_DIR}/editaddressdialog.ui
         ${HW_GUI_DIR}/helpmessagedialog.ui
         ${HW_GUI_DIR}/intro.ui
-        ${HW_GUI_DIR}/qt/forms/masternodelist.ui
+        ${HW_GUI_DIR}/masternodelist.ui
         ${HW_GUI_DIR}/mnemonicdialog.ui
         ${HW_GUI_DIR}/modaloverlay.ui
         ${HW_GUI_DIR}/multisenddialog.ui
@@ -97,6 +98,58 @@ qt5_wrap_ui(UI_HEADERS
         ${HW_GUI_DIR}/tradingdialog.ui
         ${HW_GUI_DIR}/transactiondescdialog.ui
         ${HW_GUI_DIR}/zwspcontroldialog.ui)
+qt5_wrap_cpp(UI_MOC
+        ${HW_MOC_DIR}/addressbookpage.cpp
+        ${HW_MOC_DIR}/addresstablemodel.cpp
+        ${HW_MOC_DIR}/askpassphrasedialog.cpp
+        ${HW_MOC_DIR}/bantablemodel.cpp
+        ${HW_MOC_DIR}/bitcoinaddressvalidator.cpp
+        ${HW_MOC_DIR}/bitcoinamountfield.cpp
+        ${HW_MOC_DIR}/bitcoingui.cpp
+        ${HW_MOC_DIR}/bitcoinunits.cpp
+        ${HW_MOC_DIR}/clientmodel.cpp
+        ${HW_MOC_DIR}/coincontroldialog.cpp
+        ${HW_MOC_DIR}/coincontroltreewidget.cpp
+        ${HW_MOC_DIR}/csvmodelwriter.cpp
+        ${HW_MOC_DIR}/darksendconfig.cpp
+        ${HW_MOC_DIR}/editaddressdialog.cpp
+        ${HW_MOC_DIR}/guiutil.cpp
+        ${HW_MOC_DIR}/intro.cpp
+        ${HW_MOC_DIR}/macdockiconhandler.cpp
+        ${HW_MOC_DIR}/macnotificationhandler.cpp
+        ${HW_MOC_DIR}/modaloverlay.cpp
+        ${HW_MOC_DIR}/masternodelist.cpp
+        ${HW_MOC_DIR}/notificator.cpp
+        ${HW_MOC_DIR}/openuridialog.cpp
+        ${HW_MOC_DIR}/optionsdialog.cpp
+        ${HW_MOC_DIR}/optionsmodel.cpp
+        ${HW_MOC_DIR}/overviewpage.cpp
+        ${HW_MOC_DIR}/peertablemodel.cpp
+        ${HW_MOC_DIR}/paymentserver.cpp
+        ${HW_MOC_DIR}/qvalidatedlineedit.cpp
+        ${HW_MOC_DIR}/qvaluecombobox.cpp
+        ${HW_MOC_DIR}/receivecoinsdialog.cpp
+        ${HW_MOC_DIR}/receiverequestdialog.cpp
+        ${HW_MOC_DIR}/recentrequeststablemodel.cpp
+        ${HW_MOC_DIR}/rpcconsole.cpp
+        ${HW_MOC_DIR}/sendcoinsdialog.cpp
+        ${HW_MOC_DIR}/sendcoinsentry.cpp
+        ${HW_MOC_DIR}/signverifymessagedialog.cpp
+        ${HW_MOC_DIR}/splashscreen.cpp
+        ${HW_MOC_DIR}/trafficgraphwidget.cpp
+        ${HW_MOC_DIR}/transactiondesc.cpp
+        ${HW_MOC_DIR}/transactiondescdialog.cpp
+        ${HW_MOC_DIR}/transactionfilterproxy.cpp
+        ${HW_MOC_DIR}/transactiontablemodel.cpp
+        ${HW_MOC_DIR}/transactionview.cpp
+        ${HW_MOC_DIR}/utilitydialog.cpp
+        ${HW_MOC_DIR}/walletframe.cpp
+        ${HW_MOC_DIR}/walletmodel.cpp
+        ${HW_MOC_DIR}/walletview.cpp
+        ${HW_MOC_DIR}/coldstakingdialog.cpp
+        ${HW_MOC_DIR}/mnemonicdialog.cpp
+        ${HW_MOC_DIR}/zwspcontroldialog.cpp
+        )
 add_definitions(
         -DENABLE_WALLET=1
 )
@@ -180,5 +233,5 @@ file(GLOB SOURCE_FILES
         src/rpc/*.h
         )
 
-add_executable(wispr WIN32 ${SOURCE_FILES} ${UI_HEADERS})
+add_executable(wispr WIN32 ${SOURCE_FILES} ${UI_HEADERS} ${UI_MOC})
 target_link_libraries(wispr ${QT_LIBRARIES} ${Boost_LIBRARIES})
