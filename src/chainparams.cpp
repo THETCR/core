@@ -777,19 +777,19 @@ public:
 
         UpdateVersionBitsParametersFromArgs(args);
 
-        printf("Create reg net block\n");
+//        printf("Create reg net block\n");
         genesis = CreateGenesisBlockRegTest(1411111111, 2, bnProofOfWorkLimit.GetCompact());
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        printf("Regression net block\n");
+//        printf("Regression net block\n");
 //        printf("Genesis hash = %s\n", consensus.hashGenesisBlock.ToString());
 //        printf("Genesis merkle = %s\n", genesis.hashMerkleRoot.ToString());
 //        printf("Genesis hash = %s\n", genesis.hashWitnessMerkleRoot.ToString());
-        printf("Genesis = %s\n", genesis.ToString().c_str());
+//        printf("Genesis = %s\n", genesis.ToString().c_str());
 
-        assert(consensus.hashGenesisBlock == uint256S("0302157c185ae0018bb60f0c506087be772aa2015150f994cc1a6db55e8e23bd"));
-//        assert(genesis.hashMerkleRoot == uint256S("0xf89653c7208af2c76a3070d436229fb782acbd065bd5810307995b9982423ce7"));
+        assert(consensus.hashGenesisBlock == uint256S("0x258a2e1546142ab49afbc636dfacdd34c8e81fca6201ae79a4bea1c7a226987f"));
+        assert(genesis.hashMerkleRoot == uint256S("0xcd09537dade288f071614bd176a4822790c094be00bea0d77bedb299b515274b"));
 //        assert(genesis.hashWitnessMerkleRoot == uint256S("0x36b66a1aff91f34ab794da710d007777ef5e612a320e1979ac96e5f292399639"));
 
 
