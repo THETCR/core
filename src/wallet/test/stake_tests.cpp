@@ -216,6 +216,7 @@ BOOST_AUTO_TEST_CASE(stake_test)
     BOOST_CHECK(chainActive.Tip()->GetBlockHash() == pindexDelete->pprev->GetBlockHash());
     BOOST_REQUIRE(chainActive.Tip()->nMoneySupply == 12500000039637);
 
+    printf("Stake tests: Reconnect block\n");
 
     // Reconnect block
     {
@@ -228,6 +229,7 @@ BOOST_AUTO_TEST_CASE(stake_test)
         BOOST_REQUIRE(coin.IsSpent());
         BOOST_REQUIRE(chainActive.Tip()->nMoneySupply == 12500000079274);
     }
+    printf("Stake tests: InsecureNewKey\n");
 
     CKey kRecv;
     InsecureNewKey(kRecv, true);
