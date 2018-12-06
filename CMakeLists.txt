@@ -36,7 +36,7 @@ set(QT5_NETWORK ${QT_LIB_DIR}/Qt5Network)
 set(QT5_TEST ${QT_LIB_DIR}/Qt5Test)
 #set(Qt5_INCLUDE_DIR D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32/include)
 #set(Qt5_LIBRARY_DIR D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32/lib)
-#find_package( Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test REQUIRED )
+#find_package(Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test REQUIRED )
 #Libraries to link to. The :: is for convenience
 set(QT_LIBRARIES Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Test Qt5::Network)
 #Libraries required. Probably the same as above minus the '::'. find_package() will be called on these
