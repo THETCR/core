@@ -149,22 +149,17 @@ BOOST_AUTO_TEST_CASE(stake_test)
     SeedInsecureRand();
     CHDWallet *pwallet = pwalletMain.get();
     UniValue rv;
-    BOOST_TEST_CHECKPOINT("Stake test\n");
-    printf("Stake test print\n");
     BOOST_TEST_MESSAGE("Stake test message\n");
     std::unique_ptr<CChainParams> regtestChainParams = CreateChainParams(CBaseChainParams::REGTEST);
     const CChainParams &chainparams = *regtestChainParams;
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     BOOST_REQUIRE(chainparams.GenesisBlock().GetHash() == chainActive.Tip()->GetBlockHash());
 
     BOOST_CHECK_NO_THROW(rv = CallRPC("extkeyimportmaster tprv8ZgxMBicQKsPeK5mCpvMsd1cwyT1JZsrBN82XkoYuZY1EVK7EwDaiL9sDfqUU5SntTfbRfnRedFWjg5xkDG5i3iwd3yP7neX5F2dtdCojk4"));
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     // Import the key to the last 5 outputs in the regtest genesis coinbase
     BOOST_CHECK_NO_THROW(rv = CallRPC("extkeyimportmaster tprv8ZgxMBicQKsPe3x7bUzkHAJZzCuGqN6y28zFFyg5i7Yqxqm897VCnmMJz6QScsftHDqsyWW5djx6FzrbkF9HSD3ET163z1SzRhfcWxvwL4G"));
     BOOST_CHECK_NO_THROW(rv = CallRPC("getnewextaddress lblHDKey"));
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     {
         LOCK(pwallet->cs_wallet);
@@ -172,7 +167,6 @@ BOOST_AUTO_TEST_CASE(stake_test)
         CKeyID idk;
         BOOST_CHECK(addr.GetKeyID(idk));
         BOOST_CHECK(pwallet->IsMine(idk) == ISMINE_SPENDABLE);
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
         const CEKAKey *pak = nullptr;
         const CEKASCKey *pasc = nullptr;
@@ -183,7 +177,6 @@ BOOST_AUTO_TEST_CASE(stake_test)
         BOOST_CHECK(pak->nParent == 1);
         BOOST_CHECK(pak->nKey == 1);
         BOOST_CHECK(!pasc);
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
         CEKAKey ak;
         CKey key;
@@ -191,57 +184,45 @@ BOOST_AUTO_TEST_CASE(stake_test)
         BOOST_CHECK(pwallet->GetKey(idk, key, pa, ak, idStealth));
         BOOST_CHECK(idk == key.GetPubKey().GetID());
     }
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     {
         LOCK2(cs_main, pwallet->cs_wallet);
         BOOST_REQUIRE(pwallet->GetBalance() == 12500000000000);
     }
     BOOST_REQUIRE(chainActive.Tip()->nMoneySupply == 12500000000000);
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     StakeNBlocks(pwallet, 2);
     BOOST_REQUIRE(chainActive.Tip()->nMoneySupply == 12500000079274);
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     CBlockIndex *pindexDelete = chainActive.Tip();
     BOOST_REQUIRE(pindexDelete);
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     CBlock block;
     BOOST_REQUIRE(ReadBlockFromDisk(block, pindexDelete, chainparams.GetConsensus()));
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     const CTxIn &txin = block.vtx[0]->vin[0];
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     CCoinsViewCache view(pcoinsTip.get());
     const Coin &coin = view.AccessCoin(txin.prevout);
     BOOST_REQUIRE(coin.IsSpent());
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     DisconnectTip(block, pindexDelete, view, chainparams);
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     BOOST_REQUIRE(pindexDelete->pprev->GetBlockHash() == chainActive.Tip()->GetBlockHash());
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     const Coin &coin2 = view.AccessCoin(txin.prevout);
     BOOST_REQUIRE(!coin2.IsSpent());
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     BOOST_CHECK(chainActive.Height() == pindexDelete->nHeight - 1);
     BOOST_CHECK(chainActive.Tip()->GetBlockHash() == pindexDelete->pprev->GetBlockHash());
     BOOST_REQUIRE(chainActive.Tip()->nMoneySupply == 12500000039637);
 
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     // Reconnect block
     {
         CValidationState state;
         std::shared_ptr<const CBlock> pblock = std::make_shared<const CBlock>(block);
         BOOST_REQUIRE(ActivateBestChain(state, chainparams, pblock));
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
         CCoinsViewCache view(pcoinsTip.get());
         const Coin &coin = view.AccessCoin(txin.prevout);
@@ -253,16 +234,13 @@ BOOST_AUTO_TEST_CASE(stake_test)
     CKey kRecv;
     InsecureNewKey(kRecv, true);
     CKeyID idRecv = kRecv.GetPubKey().GetID();
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     bool fSubtractFeeFromAmount = false;
     CAmount nAmount = 10000;
     CTransactionRef tx_new;
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     // Parse Bitcoin address
     CScript scriptPubKey = GetScriptForDestination(idRecv);
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     // Create and send the transaction
     CReserveKey reservekey(pwalletMain.get());
@@ -272,7 +250,6 @@ BOOST_AUTO_TEST_CASE(stake_test)
     int nChangePosRet = -1;
     CRecipient recipient = {scriptPubKey, nAmount, fSubtractFeeFromAmount};
     vecSend.push_back(recipient);
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     CCoinControl coinControl;
     {
@@ -286,41 +263,32 @@ BOOST_AUTO_TEST_CASE(stake_test)
         mapValue_t mapValue;
         BOOST_CHECK(pwallet->CommitTransaction(tx_new, std::move(mapValue), {} /* orderForm */, reservekey, g_connman.get(), state));
     }
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     StakeNBlocks(pwallet, 1);
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     CBlock blockLast;
     BOOST_REQUIRE(ReadBlockFromDisk(blockLast, chainActive.Tip(), chainparams.GetConsensus()));
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     BOOST_REQUIRE(blockLast.vtx.size() == 2);
     BOOST_REQUIRE(blockLast.vtx[1]->GetHash() == tx_new->GetHash());
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     {
         uint256 tipHash = chainActive.Tip()->GetBlockHash();
         uint256 prevTipHash = chainActive.Tip()->pprev->GetBlockHash();
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
         // Disconnect last block
         CBlockIndex *pindexDelete = chainActive.Tip();
         BOOST_REQUIRE(pindexDelete);
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
         CBlock block;
         BOOST_REQUIRE(ReadBlockFromDisk(block, pindexDelete, chainparams.GetConsensus()));
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
         CCoinsViewCache view(pcoinsTip.get());
         DisconnectTip(block, pindexDelete, view, chainparams);
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
 
         BOOST_CHECK(prevTipHash == chainActive.Tip()->GetBlockHash());
 
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
         // Reduce the reward
         RegtestParams().SetCoinYearReward(1 * CENT);
@@ -328,35 +296,29 @@ BOOST_AUTO_TEST_CASE(stake_test)
 
         {
             LOCK(cs_main);
-            BOOST_TEST_CHECKPOINT("Stake test\n");
 
             CValidationState state;
             CCoinsViewCache view(pcoinsTip.get());
             BOOST_REQUIRE(false == ConnectBlock(block, state, pindexDelete, view, chainparams, false));
-            BOOST_TEST_CHECKPOINT("Stake test\n");
 
             BOOST_CHECK(state.IsInvalid());
             BOOST_CHECK(state.GetRejectReason() == "bad-cs-amount");
             BOOST_CHECK(prevTipHash == chainActive.Tip()->GetBlockHash());
-            BOOST_TEST_CHECKPOINT("Stake test\n");
 
             // restore the reward
             RegtestParams().SetCoinYearReward(2 * CENT);
             BOOST_CHECK(Params().GetCoinYearReward(0) == 2 * CENT);
-            BOOST_TEST_CHECKPOINT("Stake test\n");
 
             // block should connect now
             CValidationState clearstate;
             CCoinsViewCache clearview(pcoinsTip.get());
             BOOST_REQUIRE(ConnectBlock(block, clearstate, pindexDelete, clearview, chainparams, false));
-            BOOST_TEST_CHECKPOINT("Stake test\n");
 
             BOOST_CHECK(!clearstate.IsInvalid());
             BOOST_REQUIRE(FlushView(&clearview, state, false));
             BOOST_REQUIRE(FlushStateToDisk(chainparams, clearstate, FlushStateMode::IF_NEEDED));
             chainActive.SetTip(pindexDelete);
             UpdateTip(pindexDelete, chainparams);
-            BOOST_TEST_CHECKPOINT("Stake test\n");
 
             BOOST_CHECK(tipHash == chainActive.Tip()->GetBlockHash());
             BOOST_CHECK(chainActive.Tip()->nMoneySupply == 12500000153511);
@@ -365,30 +327,24 @@ BOOST_AUTO_TEST_CASE(stake_test)
 
     BOOST_CHECK_NO_THROW(rv = CallRPC("getnewextaddress lblTestKey"));
     std::string extaddr = StripQuotes(rv.write());
-    BOOST_TEST_CHECKPOINT("Stake test\n");
 
     BOOST_CHECK(pwallet->GetBalance() + pwallet->GetStaked() == 12500000108911);
 
     {
         BOOST_CHECK_NO_THROW(rv = CallRPC("getnewstealthaddress"));
         std::string sSxAddr = StripQuotes(rv.write());
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
         CBitcoinAddress address(sSxAddr);
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
 
         AddAnonTxn(pwallet, address, 10 * COIN);
         AddAnonTxn(pwallet, address, 20 * COIN);
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
         StakeNBlocks(pwallet, 2);
         CCoinControl coinControl;
         BOOST_CHECK(30 * COIN == pwallet->GetAvailableAnonBalance(&coinControl));
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
         BOOST_CHECK(chainActive.Tip()->nAnonOutputs == 4);
-        BOOST_TEST_CHECKPOINT("Stake test\n");
 
         for (size_t i = 0; i < 2; ++i) {
             // Disconnect last block
