@@ -394,15 +394,12 @@ BOOST_AUTO_TEST_CASE(stake_test)
             uint256 prevTipHash = chainActive.Tip()->pprev->GetBlockHash();
             CBlockIndex *pindexDelete = chainActive.Tip();
             BOOST_REQUIRE(pindexDelete);
-            printf("Stake tests: %d\n", i++);
 
             CBlock block;
             BOOST_REQUIRE(ReadBlockFromDisk(block, pindexDelete, chainparams.GetConsensus()));
-            printf("Stake tests: %d\n", i++);
 
             CCoinsViewCache view(pcoinsTip.get());
             DisconnectTip(block, pindexDelete, view, chainparams);
-            printf("Stake tests: %d\n", i++);
 
             BOOST_CHECK(prevTipHash == chainActive.Tip()->GetBlockHash());
         }
