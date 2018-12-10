@@ -10,7 +10,7 @@ project(core)
 
 set(CMAKE_CXX_STANDARD 11)
 #set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER src/qt/forms)
-set(CMAKE_AUTOUIC_SEARCH_PATHS src/qt/forms)
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/forms)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
