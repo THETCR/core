@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.13.1)
 project(core)
 
 set(CMAKE_CXX_STANDARD 11)
-#set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER src/qt/forms)
+set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/forms)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/forms)
 
 # Find includes in corresponding build directories
@@ -108,11 +108,19 @@ file(GLOB SOURCE_FILES
         src/pos/*.h
         src/qt/test/*.cpp
         src/qt/test/*.h
-        src/qt/forms/*.ui
         src/qt/*.qrc
         src/qt/*.cpp
         src/qt/*.h
+        src/qt/locale/*.ts
+        src/qt/res/css/*.css
+        src/qt/res/icons/*.png
+        src/qt/res/icons/*.ico
+        src/qt/res/icons/*.icns
+        src/qt/res/images/*.png
+        src/qt/res/movies/*.png
+        src/qt/res/src/*.svg
         src/qt/res/*.rc
+        src/qt/forms/*.ui
         src/script/*.cpp
         src/script/*.h
         src/spork/*.cpp
@@ -151,6 +159,6 @@ file(GLOB SOURCE_FILES
 
 #add_library(configwin ${UI_HEADERS} ${UI_MOC})
 #qt5_use_modules(configwin Widgets)
-add_executable(wispr WIN32 ${SOURCE_FILES})
-target_link_libraries(wispr ${QT_LIBRARIES} ${Boost_LIBRARIES})
+add_executable(core WIN32 ${SOURCE_FILES})
+target_link_libraries(core ${QT_LIBRARIES} ${Boost_LIBRARIES})
 #qt5_use_modules(wispr Core Gui Widgets Network Test)
