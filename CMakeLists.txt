@@ -9,14 +9,12 @@ cmake_minimum_required(VERSION 3.13.1)
 project(core)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/forms)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/src/qt ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/forms)
 
-# Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# Instruct CMake to run moc automatically when needed
 set(CMAKE_AUTOMOC ON)
-# Create code from a list of Qt designer ui files
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
@@ -25,33 +23,10 @@ set(Boost_NO_SYSTEM_PATHS true)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_INCLUDE_DIR D:/Development/Libraries/CPP/boost)
 set(Boost_LIBRARY_DIR D:/Development/Libraries/CPP/boost/lib)
-find_package(Boost COMPONENTS chrono filesystem program_options system thread test REQUIRED)
-
-#set(QT_PATH D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32)
-#Qt5 paths
-#Qt5 library path
-#set(QT5_LIB_DIR ${QT_PATH}/lib/cmake)
-##Qt5 individual libraries
-#set(QT5_CORE ${QT_LIB_DIR}/Qt5Core)
-#set(QT5_WIDGETS ${QT_LIB_DIR}/Qt5Widgets)
-#set(QT5_GUI ${QT_LIB_DIR}/Qt5Gui)
-#set(QT5_NETWORK ${QT_LIB_DIR}/Qt5Network)
-#set(QT5_TEST ${QT_LIB_DIR}/Qt5Test)
-#set(Qt5_INCLUDE_DIR D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32/include)
-#set(Qt5_LIBRARY_DIR D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32/lib)
-find_package(Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test CONFIG REQUIRED )
 #Libraries to link to. The :: is for convenience
 set(QT_LIBRARIES Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Test Qt5::Network)
-#Libraries required. Probably the same as above minus the '::'. find_package() will be called on these
-#set(QT_LIBRARIES_REQUIRED Qt5Core Qt5Widgets Qt5Gui Qt5Test Qt5Network)
-#set(HW_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR} src/qt/forms)
-#set(HW_MOC_DIR ${CMAKE_CURRENT_SOURCE_DIR} src/qt)
 
-#find packages
-#foreach(QT_LIBRARIES_REQUIRED ${QT_LIBRARIES_REQUIRED})
-#    find_package(${QT_LIBRARIES_REQUIRED} CONFIG REQUIRED)
-#endforeach()
-if (WIN32)
+if(WIN32)
     # disable autolinking in boost
     add_definitions( -DBOOST_ALL_NO_LIB )
 
@@ -59,6 +34,7 @@ if (WIN32)
     # autolinking, so I don't know why we need this, but we do!)
     add_definitions( -DBOOST_ALL_DYN_LINK )
 endif()
+
 include_directories(
         src
         src/leveldb/include
@@ -69,6 +45,7 @@ include_directories(
 add_definitions(
         -DENABLE_WALLET=1
 )
+
 file(GLOB SOURCE_FILES
         src/bench/*.cpp
         src/bench/*.h
@@ -157,8 +134,7 @@ file(GLOB SOURCE_FILES
         src/rpc/*.h
         )
 
-#add_library(configwin ${UI_HEADERS} ${UI_MOC})
-#qt5_use_modules(configwin Widgets)
-add_executable(core WIN32 ${SOURCE_FILES})
+find_package(Boost COMPONENTS chrono filesystem program_options system thread test REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test CONFIG REQUIRED )
+add_executable(core ${SOURCE_FILES})
 target_link_libraries(core ${QT_LIBRARIES} ${Boost_LIBRARIES})
-#qt5_use_modules(wispr Core Gui Widgets Network Test)
