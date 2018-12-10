@@ -10,13 +10,14 @@ project(core)
 
 set(CMAKE_CXX_STANDARD 11)
 #set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER src/qt/forms)
+set(CMAKE_AUTOUIC_SEARCH_PATHS src/qt/forms)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed
-#set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOMOC ON)
 # Create code from a list of Qt designer ui files
-#set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(Boost_NO_SYSTEM_PATHS true)
@@ -26,30 +27,30 @@ set(Boost_INCLUDE_DIR D:/Development/Libraries/CPP/boost)
 set(Boost_LIBRARY_DIR D:/Development/Libraries/CPP/boost/lib)
 find_package(Boost COMPONENTS chrono filesystem program_options system thread test REQUIRED)
 
-set(QT_PATH D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32)
+#set(QT_PATH D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32)
 #Qt5 paths
 #Qt5 library path
-set(QT5_LIB_DIR ${QT_PATH}/lib/cmake)
-#Qt5 individual libraries
-set(QT5_CORE ${QT_LIB_DIR}/Qt5Core)
-set(QT5_WIDGETS ${QT_LIB_DIR}/Qt5Widgets)
-set(QT5_GUI ${QT_LIB_DIR}/Qt5Gui)
-set(QT5_NETWORK ${QT_LIB_DIR}/Qt5Network)
-set(QT5_TEST ${QT_LIB_DIR}/Qt5Test)
+#set(QT5_LIB_DIR ${QT_PATH}/lib/cmake)
+##Qt5 individual libraries
+#set(QT5_CORE ${QT_LIB_DIR}/Qt5Core)
+#set(QT5_WIDGETS ${QT_LIB_DIR}/Qt5Widgets)
+#set(QT5_GUI ${QT_LIB_DIR}/Qt5Gui)
+#set(QT5_NETWORK ${QT_LIB_DIR}/Qt5Network)
+#set(QT5_TEST ${QT_LIB_DIR}/Qt5Test)
 #set(Qt5_INCLUDE_DIR D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32/include)
 #set(Qt5_LIBRARY_DIR D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32/lib)
-#find_package(Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test REQUIRED )
+find_package(Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test CONFIG REQUIRED )
 #Libraries to link to. The :: is for convenience
 set(QT_LIBRARIES Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Test Qt5::Network)
 #Libraries required. Probably the same as above minus the '::'. find_package() will be called on these
-set(QT_LIBRARIES_REQUIRED Qt5Core Qt5Widgets Qt5Gui Qt5Test Qt5Network)
-set(HW_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/qt/forms)
-set(HW_MOC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/qt)
+#set(QT_LIBRARIES_REQUIRED Qt5Core Qt5Widgets Qt5Gui Qt5Test Qt5Network)
+#set(HW_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR} src/qt/forms)
+#set(HW_MOC_DIR ${CMAKE_CURRENT_SOURCE_DIR} src/qt)
 
 #find packages
-foreach(QT_LIBRARIES_REQUIRED ${QT_LIBRARIES_REQUIRED})
-    find_package(${QT_LIBRARIES_REQUIRED} CONFIG REQUIRED)
-endforeach()
+#foreach(QT_LIBRARIES_REQUIRED ${QT_LIBRARIES_REQUIRED})
+#    find_package(${QT_LIBRARIES_REQUIRED} CONFIG REQUIRED)
+#endforeach()
 if (WIN32)
     # disable autolinking in boost
     add_definitions( -DBOOST_ALL_NO_LIB )
@@ -62,94 +63,9 @@ include_directories(
         src
         src/leveldb/include
         src/univalue/include
-        src/qt
         ${Boost_INCLUDE_DIR}
-        ${QT5_LIB_DIR}
 )
-qt5_wrap_ui(UI_HEADERS
-        ${HW_GUI_DIR}/addressbookpage.ui
-        ${HW_GUI_DIR}/askpassphrasedialog.ui
-        ${HW_GUI_DIR}/bip38tooldialog.ui
-        ${HW_GUI_DIR}/blockexplorer.ui
-        ${HW_GUI_DIR}/coincontroldialog.ui
-        ${HW_GUI_DIR}/coldstakingdialog.ui
-        ${HW_GUI_DIR}/darksendconfig.ui
-        ${HW_GUI_DIR}/debugwindow.ui
-        ${HW_GUI_DIR}/editaddressdialog.ui
-        ${HW_GUI_DIR}/helpmessagedialog.ui
-        ${HW_GUI_DIR}/intro.ui
-        ${HW_GUI_DIR}/masternodelist.ui
-        ${HW_GUI_DIR}/mnemonicdialog.ui
-        ${HW_GUI_DIR}/modaloverlay.ui
-        ${HW_GUI_DIR}/multisenddialog.ui
-        ${HW_GUI_DIR}/multisigdialog.ui
-        ${HW_GUI_DIR}/obfuscationconfig.ui
-        ${HW_GUI_DIR}/openuridialog.ui
-        ${HW_GUI_DIR}/optionsdialog.ui
-        ${HW_GUI_DIR}/overviewpage.ui
-        ${HW_GUI_DIR}/privacydialog.ui
-        ${HW_GUI_DIR}/qrdialog.ui
-        ${HW_GUI_DIR}/receivecoinsdialog.ui
-        ${HW_GUI_DIR}/receiverequestdialog.ui
-        ${HW_GUI_DIR}/rpcconsole.ui
-        ${HW_GUI_DIR}/sendcoinsdialog.ui
-        ${HW_GUI_DIR}/sendcoinsentry.ui
-        ${HW_GUI_DIR}/signverifymessagedialog.ui
-        ${HW_GUI_DIR}/tradingdialog.ui
-        ${HW_GUI_DIR}/transactiondescdialog.ui
-        ${HW_GUI_DIR}/zwspcontroldialog.ui)
-qt5_wrap_cpp(UI_MOC
-        ${HW_MOC_DIR}/addressbookpage.cpp
-        ${HW_MOC_DIR}/addresstablemodel.cpp
-        ${HW_MOC_DIR}/askpassphrasedialog.cpp
-        ${HW_MOC_DIR}/bantablemodel.cpp
-        ${HW_MOC_DIR}/bitcoinaddressvalidator.cpp
-        ${HW_MOC_DIR}/bitcoinamountfield.cpp
-        ${HW_MOC_DIR}/bitcoingui.cpp
-        ${HW_MOC_DIR}/bitcoinunits.cpp
-        ${HW_MOC_DIR}/clientmodel.cpp
-        ${HW_MOC_DIR}/coincontroldialog.cpp
-        ${HW_MOC_DIR}/coincontroltreewidget.cpp
-        ${HW_MOC_DIR}/csvmodelwriter.cpp
-        ${HW_MOC_DIR}/darksendconfig.cpp
-        ${HW_MOC_DIR}/editaddressdialog.cpp
-        ${HW_MOC_DIR}/guiutil.cpp
-        ${HW_MOC_DIR}/intro.cpp
-        ${HW_MOC_DIR}/macdockiconhandler.cpp
-        ${HW_MOC_DIR}/macnotificationhandler.cpp
-        ${HW_MOC_DIR}/modaloverlay.cpp
-        ${HW_MOC_DIR}/masternodelist.cpp
-        ${HW_MOC_DIR}/notificator.cpp
-        ${HW_MOC_DIR}/openuridialog.cpp
-        ${HW_MOC_DIR}/optionsdialog.cpp
-        ${HW_MOC_DIR}/optionsmodel.cpp
-        ${HW_MOC_DIR}/overviewpage.cpp
-        ${HW_MOC_DIR}/peertablemodel.cpp
-        ${HW_MOC_DIR}/paymentserver.cpp
-        ${HW_MOC_DIR}/qvalidatedlineedit.cpp
-        ${HW_MOC_DIR}/qvaluecombobox.cpp
-        ${HW_MOC_DIR}/receivecoinsdialog.cpp
-        ${HW_MOC_DIR}/receiverequestdialog.cpp
-        ${HW_MOC_DIR}/recentrequeststablemodel.cpp
-        ${HW_MOC_DIR}/rpcconsole.cpp
-        ${HW_MOC_DIR}/sendcoinsdialog.cpp
-        ${HW_MOC_DIR}/sendcoinsentry.cpp
-        ${HW_MOC_DIR}/signverifymessagedialog.cpp
-        ${HW_MOC_DIR}/splashscreen.cpp
-        ${HW_MOC_DIR}/trafficgraphwidget.cpp
-        ${HW_MOC_DIR}/transactiondesc.cpp
-        ${HW_MOC_DIR}/transactiondescdialog.cpp
-        ${HW_MOC_DIR}/transactionfilterproxy.cpp
-        ${HW_MOC_DIR}/transactiontablemodel.cpp
-        ${HW_MOC_DIR}/transactionview.cpp
-        ${HW_MOC_DIR}/utilitydialog.cpp
-        ${HW_MOC_DIR}/walletframe.cpp
-        ${HW_MOC_DIR}/walletmodel.cpp
-        ${HW_MOC_DIR}/walletview.cpp
-        ${HW_MOC_DIR}/coldstakingdialog.cpp
-        ${HW_MOC_DIR}/mnemonicdialog.cpp
-        ${HW_MOC_DIR}/zwspcontroldialog.cpp
-        )
+
 add_definitions(
         -DENABLE_WALLET=1
 )
@@ -233,5 +149,8 @@ file(GLOB SOURCE_FILES
         src/rpc/*.h
         )
 
-add_executable(wispr WIN32 ${SOURCE_FILES} ${UI_HEADERS} ${UI_MOC})
+#add_library(configwin ${UI_HEADERS} ${UI_MOC})
+#qt5_use_modules(configwin Widgets)
+add_executable(wispr WIN32 ${SOURCE_FILES})
 target_link_libraries(wispr ${QT_LIBRARIES} ${Boost_LIBRARIES})
+#qt5_use_modules(wispr Core Gui Widgets Network Test)
