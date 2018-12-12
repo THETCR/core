@@ -1,4 +1,6 @@
 project(util)
+list(TRANSFORM WISPR_CORE_H PREPEND ../)
+
 
 # Various completely unrelated features shared by all executables.
 add_library(util
@@ -20,6 +22,7 @@ add_library(util
         moneystr.cpp
         strencodings.cpp
         time.cpp
+        ${WISPR_CORE_H}
         )
 
 target_compile_definitions(util PUBLIC HAVE_CONFIG_H)
