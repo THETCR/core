@@ -6,6 +6,18 @@ project(libzerocoin)
 find_package(GMP REQUIRED)
 
 add_library(libzerocoin
+        Accumulator.h
+        AccumulatorProofOfKnowledge.h
+        bignum.h
+        Coin.h
+        CoinSpend.h
+        Commitment.h
+        Denominations.h
+        ParamGeneration.h
+        Params.h
+        SerialNumberSignatureOfKnowledge.h
+        SpendType.h
+        ZerocoinDefines.h
         Accumulator.cpp
         AccumulatorProofOfKnowledge.cpp
         Coin.cpp

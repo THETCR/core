@@ -10,7 +10,7 @@ set(CMAKE_MODULE_PATH
         )
 set(OPENSSL_ROOT_DIR D:/Development/Libraries/CPP/openssl)
 set(OPENSSL_INCLUDE_DIR D:/Development/Libraries/CPP/openssl/include)
-set(EVENT_LIBRARY D:/Development/Libraries/CPP/libevent)
+set(EVENT_LIBRARY D:/Development/Libraries/CPP/libevent/libevent.lib)
 set(EVENT_INCLUDE_DIR D:/Development/Libraries/CPP/libevent/include)
 set(BDB_LIBRARY D:/Development/Libraries/CPP/bdb/lib/libdb48.lib)
 set(BDB_INCLUDE_DIR D:/Development/Libraries/CPP/bdb/include)

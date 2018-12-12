@@ -4,10 +4,13 @@ project(smsg)
 
 
 add_library(smsg
+        ../lz4/lz4.h
         ../lz4/lz4.c
+        ../xxhash/xxhash.h
         ../xxhash/xxhash.c
         ../interfaces/handler.cpp
         crypter.cpp
+        keystore.h
         keystore.cpp
         db.cpp
         smessage.cpp

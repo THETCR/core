@@ -8,15 +8,22 @@ protobuf_generate_cpp(PROTOBUF_SOURCES PROTOBUF_HEADERS trezor/messages.proto tr
 
 add_library(usbdevice
         usbwrapper.cpp
+        usbwrapper.h
+        ledger/btchipApdu.h
+        ledger/ledgerLayer.h
         ledger/ledgerLayer.c
+        ledger/dongleCommHidHidapi.h
         ledger/dongleCommHidHidapi.c
         usbdevice.cpp
+        debugdevice.h
         debugdevice.cpp
+        ledgerdevice.h
         ledgerdevice.cpp
         trezor/messages.proto
         trezor/messages-common.proto
         trezor/messages-management.proto
         trezor/messages-bitcoin.proto
+        trezordevice.h
         trezordevice.cpp
         rpcusbdevice.cpp
         # Protobuf codegen

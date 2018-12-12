@@ -5,14 +5,24 @@ project(crypto)
 # The library
 add_library(crypto
 		aes.cpp
+		aes.h
+		chacha20.h
 		chacha20.cpp
+		common.h
 		hmac_sha256.cpp
+		hmac_sha256.h
 		hmac_sha512.cpp
+		hmac_sha512.h
 		ripemd160.cpp
+		ripemd160.h
 		scrypt.cpp
+		scrypt.h
 		sha1.cpp
+		sha1.h
 		sha256.cpp
+		sha256.h
 		sha512.cpp
+		sha512.h
 		siphash.cpp
 		siphash.h
 )

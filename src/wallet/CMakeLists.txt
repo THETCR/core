@@ -42,7 +42,8 @@ add_library(wallet
 		../policy/rbf.cpp
 		walletutil.cpp
 		coinselection.cpp
-)
+		${WISPR_CORE_H}
+		)
 
 target_link_libraries(wallet util univalue Event ${BDBXX_LIBRARY})
 

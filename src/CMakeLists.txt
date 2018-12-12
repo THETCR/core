@@ -45,6 +45,211 @@ else()
 	add_compiler_flag(-Wno-unused-parameter)
 endif()
 
+#set the bitcoin headers
+set(WISPR_CORE_H
+		addrdb.h
+		masternode/activemasternode.h
+		zerocoin/accumulators.h
+		zerocoin/accumulatorcheckpoints.h
+		zerocoin/accumulatorcheckpoints.json.h
+		zerocoin/accumulatormap.h
+		rctindex.h
+		addrman.h
+		attributes.h
+		base58.h
+		bech32.h
+		bloom.h
+		blockencodings.h
+		blockfilter.h
+		cachemap.h
+		cachemultimap.h
+		chain.h
+		chainparams.h
+		chainparamsbase.h
+		chainparamsseeds.h
+		chainparamsimport.h
+		checkpoints.h
+		checkqueue.h
+		clientversion.h
+		coins.h
+		compat.h
+		compat/byteswap.h
+		compat/endian.h
+		compat/sanity.h
+		compressor.h
+		consensus/consensus.h
+		consensus/tx_verify.h
+		primitives/block.h
+		primitives/deterministicmint.h
+		primitives/transaction.h
+		primitives/zerocoin.h
+		core_io.h
+		core_memusage.h
+		cuckoocache.h
+		obfuscation/denomination_functions.h
+		obfuscation/privatesend.h
+		obfuscation/privatesend-client.h
+		obfuscation/privatesend-server.h
+		obfuscation/privatesend-util.h
+		dsnotificationinterface.h
+		governance/governance.h
+		governance/governance-classes.h
+		governance/governance-exceptions.h
+		governance/governance-object.h
+		governance/governance-validators.h
+		governance/governance-vote.h
+		governance/governance-votedb.h
+		flat-database.h
+		fs.h
+		httprpc.h
+		httpserver.h
+		index/base.h
+		index/txindex.h
+		indirectmap.h
+		init.h
+		invalid.h
+		invalid_outpoints.json.h
+		invalid_serials.json.h
+		pos/kernel.h
+		instantx.h
+		anon.h
+		blind.h
+		interfaces/chain.h
+		interfaces/handler.h
+		interfaces/node.h
+		interfaces/wallet.h
+		key.h
+		keepass.h
+		key/stealth.h
+		key/extkey.h
+		key/mnemonic.h
+		unilib/uninorms.h
+		unilib/utf8.h
+		key/types.h
+		key/keyutil.h
+		key/wordlists/chinese_simplified.h
+		key/wordlists/chinese_traditional.h
+		key/wordlists/english.h
+		key/wordlists/french.h
+		key/wordlists/japanese.h
+		key/wordlists/spanish.h
+		key/wordlists/italian.h
+		key/wordlists/korean.h
+		key_io.h
+		keystore.h
+		dbwrapper.h
+		limitedmap.h
+		logging.h
+		masternode/masternode.h
+		masternode/masternode-payments.h
+		masternode/masternode-sync.h
+		masternode/masternodeman.h
+		masternode/masternodeconfig.h
+		memusage.h
+		merkleblock.h
+		messagesigner.h
+		miner.h
+		zerocoin/mintpool.h
+		net.h
+		net_processing.h
+		netaddress.h
+		netbase.h
+		netfulfilledman.h
+		netmessagemaker.h
+		noui.h
+		outputtype.h
+		policy/feerate.h
+		policy/fees.h
+		policy/policy.h
+		policy/rbf.h
+		pow.h
+		pos/kernel.h
+		pos/miner.h
+		protocol.h
+		random.h
+		reverse_iterator.h
+		reverselock.h
+		rpc/blockchain.h
+		rpc/client.h
+		rpc/mining.h
+		rpc/protocol.h
+		rpc/server.h
+		rpc/rpcutil.h
+		rpc/rawtransaction.h
+		rpc/register.h
+		rpc/util.h
+		scheduler.h
+		script/descriptor.h
+		script/ismine.h
+		script/sigcache.h
+		script/sign.h
+		script/standard.h
+		shutdown.h
+		streams.h
+		smsg/db.h
+		smsg/crypter.h
+		smsg/net.h
+		smsg/smessage.h
+		smsg/rpcsmessage.h
+		spork/spork.h
+		spork/sporkdb.h
+		wallet/stakeinput.h
+		support/allocators/secure.h
+		support/allocators/zeroafterfree.h
+		support/cleanse.h
+		support/events.h
+		support/lockedpool.h
+		sync.h
+		threadsafety.h
+		threadinterrupt.h
+		timedata.h
+		torcontrol.h
+		txdb.h
+		txmempool.h
+		ui_interface.h
+		undo.h
+		util/bytevectorhash.h
+		util/system.h
+		util/memory.h
+		util/moneystr.h
+		util/time.h
+		validation.h
+		validationinterface.h
+		versionbits.h
+		versionbitsinfo.h
+		walletinitinterface.h
+		wallet/coincontrol.h
+		wallet/crypter.h
+		wallet/db.h
+		wallet/feebumper.h
+		wallet/fees.h
+		wallet/rpcwallet.h
+		wallet/wallet.h
+		wallet/walletdb.h
+		wallet/rpchdwallet.h
+		wallet/hdwalletdb.h
+		wallet/hdwallet.h
+		wallet/walletutil.h
+		wallet/coinselection.h
+		zerocoin/zwspchain.h
+		zerocoin/zwsptracker.h
+		zerocoin/zwspwallet.h
+		warnings.h
+		zmq/zmqabstractnotifier.h
+		zmq/zmqconfig.h
+		zmq/zmqnotificationinterface.h
+		zmq/zmqpublishnotifier.h
+		zmq/zmqrpc.h
+		usbdevice/usbdevice.h
+		usbdevice/rpcusbdevice.h
+		insight/addressindex.h
+		insight/spentindex.h
+		insight/timestampindex.h
+		insight/csindex.h
+		insight/insight.h
+		insight/rpc.h)
+
+
 # Create a target for OpenSSL
 include(BrewHelper)
 find_brew_prefix(OPENSSL_ROOT_DIR openssl)
@@ -124,28 +329,52 @@ add_library(common
 		zerocoin/accumulators.cpp
 		zerocoin/accumulatorcheckpoints.cpp
 		zerocoin/accumulatormap.cpp
-)
+		${WISPR_CORE_H}
+		)
 
 target_link_libraries(common util secp256k1)
 
 # libbitcoinconsensus
 add_library(bitcoinconsensus
+		amount.h
 		arith_uint256.cpp
+		arith_uint256.h
 		consensus/merkle.cpp
+		consensus/merkle.h
+		consensus/params.h
+		consensus/validation.h
 		hash.cpp
+		hash.h
 		invalid.cpp
+		invalid.h
+		prevector.h
 		primitives/block.cpp
+		primitives/block.h
 		primitives/transaction.cpp
+		primitives/transaction.h
 		primitives/deterministicmint.cpp
+		primitives/deterministicmint.h
 		primitives/zerocoin.cpp
+		primitives/zerocoin.h
 		pubkey.cpp
+		pubkey.h
 		script/wisprconsensus.cpp
 		script/interpreter.cpp
+		script/interpreter.h
 		script/script.cpp
+		script/script.h
 		script/script_error.cpp
+		script/script_error.h
 		spork/spork.cpp
+		spork/spork.h
+		serialize.h
+		span.h
+		tinyformat.h
 		uint256.cpp
+		uint256.h
 		util/strencodings.cpp
+		util/strencodings.h
+		version.h
 )
 
 target_link_libraries(bitcoinconsensus common)
@@ -227,7 +456,8 @@ add_library(server
 		versionbits.cpp
 		insight/insight.cpp
 		insight/rpc.cpp
-)
+		${WISPR_CORE_H}
+		)
 
 # This require libevent
 find_package(Event REQUIRED)
