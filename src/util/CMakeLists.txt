@@ -20,7 +20,6 @@ add_library(util
         moneystr.cpp
         strencodings.cpp
         time.cpp
-        ${WISPR_CORE_H}
         )
 
 target_compile_definitions(util PUBLIC HAVE_CONFIG_H)
