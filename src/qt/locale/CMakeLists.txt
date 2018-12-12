@@ -1,0 +1,99 @@
+# Copyright (c) 2018 The Bitcoin developers
+
+project(wispr-qt-locale)
+
+include(BrewHelper)
+find_brew_prefix(QT5_PREFIX qt5)
+
+find_package(Qt5LinguistTools HINTS "${QT5_PREFIX}")
+
+qt5_add_translation(BITCOIN_QM_FILES
+	wispr_af.ts
+	wispr_af_ZA.ts
+	wispr_ar.ts
+	wispr_be_BY.ts
+	wispr_bg_BG.ts
+	wispr_bg.ts
+	wispr_ca_ES.ts
+	wispr_ca.ts
+	wispr_ca@valencia.ts
+	wispr_cs.ts
+	wispr_cy.ts
+	wispr_da.ts
+	wispr_de.ts
+	wispr_el_GR.ts
+	wispr_el.ts
+	wispr_en_GB.ts
+	wispr_en.ts
+	wispr_eo.ts
+	wispr_es_AR.ts
+	wispr_es_CL.ts
+	wispr_es_CO.ts
+	wispr_es_DO.ts
+	wispr_es_ES.ts
+	wispr_es_MX.ts
+	wispr_es.ts
+	wispr_es_UY.ts
+	wispr_es_VE.ts
+	wispr_et_EE.ts
+	wispr_et.ts
+	wispr_eu_ES.ts
+	wispr_fa_IR.ts
+	wispr_fa.ts
+	wispr_fi.ts
+	wispr_fr_CA.ts
+	wispr_fr_FR.ts
+	wispr_fr.ts
+	wispr_gl.ts
+	wispr_he.ts
+	wispr_hi_IN.ts
+	wispr_hr.ts
+	wispr_hu.ts
+	wispr_id_ID.ts
+	wispr_it_IT.ts
+	wispr_it.ts
+	wispr_ja.ts
+	wispr_ka.ts
+	wispr_kk_KZ.ts
+	wispr_ko_KR.ts
+	wispr_ku_IQ.ts
+	wispr_ky.ts
+	wispr_la.ts
+	wispr_lt.ts
+	wispr_lv_LV.ts
+	wispr_mk_MK.ts
+	wispr_mn.ts
+	wispr_ms_MY.ts
+	wispr_nb.ts
+	wispr_ne.ts
+	wispr_nl.ts
+	wispr_pam.ts
+	wispr_pl.ts
+	wispr_pt_BR.ts
+	wispr_pt_PT.ts
+	wispr_ro_RO.ts
+	wispr_ro.ts
+	wispr_ru_RU.ts
+	wispr_ru.ts
+	wispr_sk.ts
+	wispr_sl_SI.ts
+	wispr_sq.ts
+	wispr_sr@latin.ts
+	wispr_sr.ts
+	wispr_sv.ts
+	wispr_ta.ts
+	wispr_th_TH.ts
+	wispr_tr_TR.ts
+	wispr_tr.ts
+	wispr_uk.ts
+	wispr_ur_PK.ts
+	wispr_uz@Cyrl.ts
+	wispr_vi.ts
+	wispr_vi_VN.ts
+	wispr_zh_CN.ts
+	wispr_zh_HK.ts
+	wispr_zh.ts
+	wispr_zh_TW.ts
+)
+
+add_custom_target(locales DEPENDS ${BITCOIN_QM_FILES})
