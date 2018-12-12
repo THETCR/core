@@ -2,6 +2,8 @@
 
 project(wispr-qt)
 
+set(CMAKE_AUTOUIC_SEARCH_PATHS forms/)
+
 # This ensure that AUTOMOC doesn't run on generated files.
 cmake_policy(SET CMP0071 OLD)
 

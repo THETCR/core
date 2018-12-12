@@ -8,6 +8,11 @@ set(CMAKE_MODULE_PATH
         ${CMAKE_MODULE_PATH}
         ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules
         )
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 set(OPENSSL_ROOT_DIR D:/Development/Libraries/CPP/openssl)
 set(OPENSSL_INCLUDE_DIR D:/Development/Libraries/CPP/openssl/include)
 set(EVENT_LIBRARY D:/Development/Libraries/CPP/libevent/libevent.lib)
