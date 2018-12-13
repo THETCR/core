@@ -8,8 +8,8 @@
       </BuildDependsOn>
   </PropertyGroup>
   <Target Name="CopyConfig"
-          Inputs="$(MSBuildThisFileDirectory)bitcoin_config.h"
+          Inputs="$(MSBuildThisFileDirectory)wispr_config.h"
           Outputs="$(MSBuildThisFileDirectory)..\src\config\wispr-config.h">
-      <Copy SourceFiles="$(MSBuildThisFileDirectory)bitcoin_config.h" DestinationFiles="$(MSBuildThisFileDirectory)..\src\config\wispr-config.h" />
+      <Copy SourceFiles="$(MSBuildThisFileDirectory)wispr_config.h" DestinationFiles="$(MSBuildThisFileDirectory)..\src\config\wispr-config.h" />
   </Target>
 </Project>
