@@ -69,6 +69,30 @@ include_directories(
 add_definitions(
         -DENABLE_WALLET=1
 )
+qt5_wrap_ui(UI_GENERATED_HEADERS
+        qt/forms/addressbookpage.ui
+        qt/forms/askpassphrasedialog.ui
+        qt/forms/coincontroldialog.ui
+        qt/forms/darksendconfig.ui
+        qt/forms/editaddressdialog.ui
+        qt/forms/helpmessagedialog.ui
+        qt/forms/intro.ui
+        qt/forms/modaloverlay.ui
+        qt/forms/masternodelist.ui
+        qt/forms/openuridialog.ui
+        qt/forms/optionsdialog.ui
+        qt/forms/overviewpage.ui
+        qt/forms/receivecoinsdialog.ui
+        qt/forms/receiverequestdialog.ui
+        qt/forms/debugwindow.ui
+        qt/forms/sendcoinsdialog.ui
+        qt/forms/sendcoinsentry.ui
+        qt/forms/signverifymessagedialog.ui
+        qt/forms/transactiondescdialog.ui
+        qt/forms/coldstakingdialog.ui
+        qt/forms/mnemonicdialog.ui
+        qt/forms/zwspcontroldialog.ui
+        )
 file(GLOB SOURCE_FILES
         src/bench/*.cpp
         src/bench/*.h
@@ -155,7 +179,9 @@ file(GLOB SOURCE_FILES
         src/evo/*.cpp
         src/rpc/*.cpp
         src/rpc/*.h
+        # Handle ui files
+        ${UI_GENERATED_HEADERS}
         )
 find_package(Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test CONFIG REQUIRED )
 add_executable(core ${SOURCE_FILES})
-target_link_libraries(core ${QT_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(core ${QT_LIBRARIES} ${Boost_LIBRARIES} ${Protobuf_LIBRARIES} Event zmq GMP)
