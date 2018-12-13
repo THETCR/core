@@ -691,7 +691,11 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         return;
     };
 
-    if(bv > 1){
+    if(tx.nVersion == 1){
+        printf("Unserialize: BTC_TXN_VERSION\n");
+//        tx.nVersion = bv;
+        s >> tx.nTime;
+    }else{
         tx.nVersion |= bv;
         s >> bv;
         tx.nVersion |= bv<<8;
@@ -699,10 +703,6 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         tx.nVersion |= bv<<16;
         s >> bv;
         tx.nVersion |= bv<<24;
-    }else{
-        printf("Unserialize: BTC_TXN_VERSION\n");
-        tx.nVersion = bv;
-        s >> tx.nTime;
     }
     printf("Unserialize nVersion = %d\n", tx.nVersion);
     unsigned char flags = 0;
