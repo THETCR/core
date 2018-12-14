@@ -4831,14 +4831,16 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
             if (fCheckPOW && !CheckProofOfWork(block.GetHash(), block.nBits, consensusParams, nHeight, Params().GetLastImportHeight()))
                 return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
 
-            // Enforce rule that the coinbase/ ends with serialized block height
-            // genesis block scriptSig size will be different
-            CScript expect = CScript() << OP_RETURN << nHeight;
-            const CScript &scriptSig = block.vtx[0]->vin[0].scriptSig;
-            if (scriptSig.size() < expect.size() ||
-                !std::equal(expect.begin()
-                    , expect.end(), scriptSig.begin() + scriptSig.size()-expect.size())) {
-                return state.DoS(100, false, REJECT_INVALID, "bad-cb-height", false, "block height mismatch in coinbase");
+            if (nHeight >= consensusParams.BIP34Height) {
+                // Enforce rule that the coinbase/ ends with serialized block height
+                // genesis block scriptSig size will be different
+                CScript expect = CScript() << OP_RETURN << nHeight;
+                const CScript &scriptSig = block.vtx[0]->vin[0].scriptSig;
+                if (scriptSig.size() < expect.size() ||
+                    !std::equal(expect.begin(), expect.end(), scriptSig.begin() + scriptSig.size() - expect.size())) {
+                    return state.DoS(100, false, REJECT_INVALID, "bad-cb-height", false,
+                                     "block height mismatch in coinbase");
+                }
             }
         };
 
