@@ -4155,6 +4155,10 @@ CBlockIndex* CChainState::AddToBlockIndex(const CBlockHeader& block)
     if (pindexBestHeader == nullptr || pindexBestHeader->nChainWork < pindexNew->nChainWork)
         pindexBestHeader = pindexNew;
 
+    //update previous block pointer
+    if (pindexNew->nHeight)
+        pindexNew->pprev->pnext = pindexNew;
+
     setDirtyBlockIndex.insert(pindexNew);
 
     return pindexNew;
