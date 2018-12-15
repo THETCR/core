@@ -4660,7 +4660,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     }else{
         nBitsRequired  = GetNextTargetRequired(pindexPrev, true);
     }
-//    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
+    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
 
 //    if (fWisprMode && pindexPrev && block.nVersion > 7)
 //    {
