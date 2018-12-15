@@ -4853,7 +4853,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
             }
         };
 
-        if (nHeight > 0 && !block.vtx[0]->IsCoinStake()) // only genesis block can start with coinbase
+        if (chainActive.NewProtocolsStarted() && nHeight > 0 && !block.vtx[0]->IsCoinStake()) // only genesis block can start with coinbase
             return state.DoS(100, false, REJECT_INVALID, "bad-cs-missing", false, "first tx is not coinstake");
 
         if (nHeight > 0 // skip genesis
