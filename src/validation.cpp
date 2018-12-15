@@ -4679,7 +4679,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
 //        }
 //        return true;
 //    }
-    if(nHeight < Params().LAST_POW_BLOCK()){
+    if(nHeight >= Params().LAST_POW_BLOCK()){
         return true;
     }
     if (block.nBits != nBitsRequired){
