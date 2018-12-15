@@ -4313,7 +4313,7 @@ static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state,
 
     // Check proof of work matches claimed amount
     if (!fWisprMode
-        && fCheckPOW && !CheckProofOfWork(block.GetHash(), block.nBits, consensusParams))
+        && fCheckPOW && !CheckProofOfWork(block.GetPoWHash(), block.nBits, consensusParams))
         return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
 
     return true;
@@ -4837,7 +4837,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
         } else
         {
             bool fCheckPOW = true; // TODO: pass properly
-            if (fCheckPOW && !CheckProofOfWork(block.GetHash(), block.nBits, consensusParams, nHeight, Params().GetLastImportHeight()))
+            if (fCheckPOW && !CheckProofOfWork(block.GetPoWHash(), block.nBits, consensusParams, nHeight, Params().GetLastImportHeight()))
                 return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
 
             if (nHeight >= consensusParams.BIP34Height) {
