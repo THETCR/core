@@ -43,15 +43,16 @@ public:
         READWRITE(nVersion);
         READWRITE(hashPrevBlock);
         READWRITE(hashMerkleRoot);
-//        if (IsWisprVersion())
-//            READWRITE(hashWitnessMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
         //zerocoin active, header changes to include accumulator checksum
-        if(nVersion > 7)
+        if(nVersion > 7){
             READWRITE(nAccumulatorCheckpoint);
+        }
+        if (IsWisprVersion()) {
             READWRITE(hashWitnessMerkleRoot);
+        }
     }
 
     void SetNull()

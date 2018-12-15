@@ -16,7 +16,7 @@
 
 #include <secp256k1_rangeproof.h>
 
-static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
+static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x01;
 
 static const uint8_t WISPR_BLOCK_VERSION = 0x08;
 static const uint8_t WISPR_TXN_VERSION = 0x08;
