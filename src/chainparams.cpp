@@ -504,7 +504,7 @@ public:
         strSporkAddress = "Xgtyuk76vhuFW2iT7UAiHgNdWXCf3J34wh";
         //!WISPR
         /** Height or Time Based Activations **/
-        nLastPOWBlock = 201;
+        nLastPOWBlock = 202;
         nNewProtocolStartHeight = 400000;
         nNewProtocolStartTime = 1539963322; //Friday, October 19, 2018 3:35:22 PM
         nZerocoinStartHeight = nNewProtocolStartHeight;
