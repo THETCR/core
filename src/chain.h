@@ -186,10 +186,12 @@ public:
 
     //! pointer to the index of the predecessor of this block
     CBlockIndex* pprev;
-
+    //! pointer to the index of the next block
+    CBlockIndex* pnext;
     //! pointer to the index of some further predecessor of this block
     CBlockIndex* pskip;
-
+    //ppcoin: trust score of block chain
+    uint256 bnChainTrust;
     //! height of the entry in the chain. The genesis block has height 0
     int nHeight;
 
@@ -213,33 +215,37 @@ public:
     //! This value will be non-zero only if and only if transactions for this block and all its parents are available.
     //! Change to 64-bit type when necessary; won't happen before 2030
     unsigned int nChainTx;
+    //! Verification status of this block. See enum BlockStatus
+    unsigned int nStatus;
 
 
     // proof-of-stake specific fields
     unsigned int nFlags;  // pos: block index flags
+    // proof-of-stake specific fields
+    uint256 GetBlockTrust() const;
     uint64_t nStakeModifier; // hash modifier for proof-of-stake
     uint256 bnStakeModifier;
-    COutPoint prevoutStake;
-    //uint256 hashProof;
-    CAmount nMoneySupply;
-    int64_t nAnonOutputs; // last index
     unsigned int nStakeModifierChecksum; // checksum of index; in-memeory only
+
+    COutPoint prevoutStake;
     unsigned int nStakeTime;
     uint256 hashProofOfStake;
+    int64_t nMint;
+    CAmount nMoneySupply;
+    int64_t nAnonOutputs; // last index
 
     //! Verification status of this block. See enum BlockStatus
-    uint32_t nStatus;
+//    uint32_t nStatus;
 
-    int64_t nMint;
 
     //! block header
     int32_t nVersion;
     uint256 hashMerkleRoot;
-    uint256 hashWitnessMerkleRoot;
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
     uint256 nAccumulatorCheckpoint;
+    uint256 hashWitnessMerkleRoot;
 
     //! (memory only) Sequential id assigned to distinguish order in which blocks are received.
     int32_t nSequenceId;
@@ -303,12 +309,14 @@ public:
 
         nVersion                = block.nVersion;
         hashMerkleRoot          = block.hashMerkleRoot;
-        hashWitnessMerkleRoot   = block.hashWitnessMerkleRoot;
         nTime                   = block.nTime;
         nBits                   = block.nBits;
         nNonce                  = block.nNonce;
-        if(block.nVersion > 7)
+        if(block.nVersion > 7) {
             nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
+            hashWitnessMerkleRoot = block.hashWitnessMerkleRoot;
+        }
+
     }
 
     CDiskBlockPos GetBlockPos() const {
@@ -336,10 +344,11 @@ public:
         if (pprev)
             block.hashPrevBlock     = pprev->GetBlockHash();
         block.hashMerkleRoot        = hashMerkleRoot;
-        block.hashWitnessMerkleRoot = hashWitnessMerkleRoot;
         block.nTime                 = nTime;
         block.nBits                 = nBits;
         block.nNonce                = nNonce;
+        block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
+        block.hashWitnessMerkleRoot = hashWitnessMerkleRoot;
         return block;
     }
     bool MintedDenomination(libzerocoin::CoinDenomination denom) const
@@ -481,9 +490,11 @@ class CDiskBlockIndex : public CBlockIndex
 {
 public:
     uint256 hashPrev;
+    uint256 hashNext;
 
     CDiskBlockIndex() {
         hashPrev = uint256();
+        hashNext = uint256();
     }
 
     explicit CDiskBlockIndex(const CBlockIndex* pindex) : CBlockIndex(*pindex) {
@@ -508,22 +519,26 @@ public:
         if (nStatus & BLOCK_HAVE_UNDO)
             READWRITE(VARINT(nUndoPos));
 
-
+        READWRITE(nMint);
+        READWRITE(nMoneySupply);
         READWRITE(nFlags);
         READWRITE(bnStakeModifier);
-        READWRITE(prevoutStake);
-        //READWRITE(hashProof);
-        READWRITE(nMoneySupply);
+        if (IsProofOfStake()) {
+            READWRITE(prevoutStake);
+            READWRITE(nStakeTime);
+        } else {
+            const_cast<CDiskBlockIndex*>(this)->prevoutStake.SetNull();
+            const_cast<CDiskBlockIndex*>(this)->nStakeTime = 0;
+            const_cast<CDiskBlockIndex*>(this)->hashProofOfStake = GetProofOfWorkHash();
+        }
         READWRITE(nAnonOutputs);
 
 
         // block header
         READWRITE(this->nVersion);
         READWRITE(hashPrev);
+        READWRITE(hashNext);
         READWRITE(hashMerkleRoot);
-        // NOTE: Careful matching the version, qa tests use different versions
-        if (this->nVersion == WISPR_BLOCK_VERSION)
-            READWRITE(hashWitnessMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
@@ -534,6 +549,9 @@ public:
         }else{
             READWRITE(bnStakeModifier);
         }
+        // NOTE: Careful matching the version, qa tests use different versions
+        if (this->nVersion == WISPR_BLOCK_VERSION)
+            READWRITE(hashWitnessMerkleRoot);
     }
 
     uint256 GetBlockHash() const
@@ -550,6 +568,18 @@ public:
         return block.GetHash();
     }
 
+    uint256 GetProofOfWorkHash() const
+    {
+        CBlockHeader block;
+        block.nVersion = nVersion;
+        block.hashPrevBlock = hashPrev;
+        block.hashMerkleRoot = hashMerkleRoot;
+        block.nTime = nTime;
+        block.nBits = nBits;
+        block.nNonce = nNonce;
+        block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
+        return block.GetPoWHash();
+    }
 
     std::string ToString() const
     {
