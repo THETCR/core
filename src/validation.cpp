@@ -4323,21 +4323,43 @@ static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state,
 
 bool CheckBlockSignature(const CBlock &block)
 {
-    if (!block.IsProofOfStake())
+    if (block.IsProofOfWork())
         return block.vchBlockSig.empty();
     if (block.vchBlockSig.empty())
         return false;
     if (block.vtx[0]->vin.size() < 1)
         return false;
 
-    const auto &txin = block.vtx[0]->vin[0];
-    if (txin.scriptWitness.stack.size() != 2)
-        return false;
+    /** Each block is signed by the private key of the input that is staked. This can be either zWSP or normal UTXO
+    *  zWSP: Each zWSP has a keypair associated with it. The serial number is a hash of the public key.
+    *  UTXO: The public key that signs must match the public key associated with the first utxo of the coinstake tx.
+    */
+    bool fzWSPStake = block.vtx[1]->IsZerocoinSpend();
+    CPubKey pubKey;
+    if (fzWSPStake) {
+        libzerocoin::CoinSpend spend = TxInToZerocoinSpend(block.vtx[1]->vin[0]);
+        pubKey = spend.getPubKey();
+    } else if(!chainActive.NewProtocolsStarted()) {
+        txnouttype whichType;
+        std::vector<valtype> vSolutions;
+        const CTxOut& txout = block.vtx[1]->vout[1];
+        whichType = Solver(txout.scriptPubKey, vSolutions);
+        if (whichType == TX_PUBKEY || whichType == TX_PUBKEYHASH) {
+            valtype& vchPubKey = vSolutions[0];
+            pubKey = CPubKey(vchPubKey);
+        }else {
+            return false;
+        }
+    }else{
+        const auto &txin = block.vtx[0]->vin[0];
+        if (txin.scriptWitness.stack.size() != 2)
+            return false;
 
-    if (txin.scriptWitness.stack[1].size() != 33)
-        return false;
+        if (txin.scriptWitness.stack[1].size() != 33)
+            return false;
 
-    CPubKey pubKey(txin.scriptWitness.stack[1]);
+        CPubKey pubKey(txin.scriptWitness.stack[1]);
+    }
     return pubKey.Verify(block.GetHash(), block.vchBlockSig);
 };
 
