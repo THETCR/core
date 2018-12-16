@@ -5336,10 +5336,10 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     if (!CheckBlock(block, state, chainparams.GetConsensus())) {
         return error("%s: %s", __func__, FormatStateMessage(state));
     }
-
+    printf("%s\n", "Check block succeeded");
     if (block.IsProofOfStake()) {
         pindex->SetProofOfStake();
-        pindex->prevoutStake = pblock->vtx[0]->vin[0].prevout;
+        pindex->prevoutStake = pblock->vtx[1]->vin[0].prevout;
         if (!pindex->pprev
             || (pindex->pprev->bnStakeModifier.IsNull()
                 && pindex->pprev->GetBlockHash() != chainparams.GetConsensus().hashGenesisBlock)) {
@@ -5354,6 +5354,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
                 return DelayBlock(pblock, state);
             }
         } else {
+            printf("%s\n", "Compute Stake Modifier");
             pindex->bnStakeModifier = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
         }
         pindex->nFlags &= ~BLOCK_DELAYED;
