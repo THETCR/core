@@ -271,7 +271,7 @@ public:
     {
         return sizeof(pn);
     }
-//    uint64_t GetUint64(int pos) const
+/**    uint64_t GetUint64(int pos) const
 //    {
 //        const uint8_t* ptr = data + pos * 8;
 //        return ((uint64_t)ptr[0]) | \
@@ -283,6 +283,7 @@ public:
 //               ((uint64_t)ptr[6]) << 48 | \
 //               ((uint64_t)ptr[7]) << 56;
 //    }
+*/
     uint64_t GetUint64(int pos) const
     {
         return pn[2 * pos] | (uint64_t)pn[2 * pos + 1] << 32;
