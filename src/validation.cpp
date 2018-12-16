@@ -2609,7 +2609,7 @@ static int64_t nBlocksTotal = 0;
 bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex,
                   CCoinsViewCache& view, const CChainParams& chainparams, bool fJustCheck)
 {
-//    printf("%s\n", __func__);
+    printf("%s\n", __func__);
     AssertLockHeld(cs_main);
     assert(pindex);
     assert(*pindex->phashBlock == block.GetHash());
@@ -2637,7 +2637,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         }
         return error("%s: Consensus::CheckBlock: %s", __func__, FormatStateMessage(state));
     }
-
+    printf("%s\n", "Check block succeeded");
     if (block.IsProofOfStake()) {
         printf("%s\n", "Compute stake modifier");
         pindex->bnStakeModifier = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
@@ -4533,10 +4533,9 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     {
         nSigOps += GetLegacySigOpCount(*tx);
     }
-    printf("%s\n", "WITNESS_SCALE_FACTOR");
-    if (nSigOps * WITNESS_SCALE_FACTOR > MAX_BLOCK_SIGOPS_COST)
+    if (chainActive.NewProtocolsStarted() && nSigOps * WITNESS_SCALE_FACTOR > MAX_BLOCK_SIGOPS_COST) {
         return state.DoS(100, false, REJECT_INVALID, "bad-blk-sigops", false, "out-of-bounds SigOpCount");
-
+    }
     if (fCheckPOW && fCheckMerkleRoot)
         block.fChecked = true;
 
