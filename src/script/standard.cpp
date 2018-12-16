@@ -154,7 +154,7 @@ txnouttype Solver(const CScript& scriptPubKeyIn, std::vector<std::vector<unsigne
         } else
         if (k == 2)
         {
-             if (opcode != OP_DROP)
+            if (opcode != OP_DROP)
                 break;
         };
     };
@@ -185,6 +185,7 @@ txnouttype Solver(const CScript& scriptPubKeyIn, std::vector<std::vector<unsigne
         vSolutionsRet.push_back(hashBytes);
         return TX_ZEROCOINMINT;
     }
+
     if (!fWisprMode) {
         int witnessversion;
         std::vector<unsigned char> witnessprogram;
