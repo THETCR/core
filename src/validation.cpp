@@ -3124,11 +3124,12 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
                 coinStakeCache.InsertCoinStake(blockHash, txCoinstake);
             };
-        } else {
-            if (block.GetHash() != Params().GenesisBlock().GetHash()) {
-                return state.DoS(100, error("ConnectBlock() : Found block that isn't coinstake or genesis."), REJECT_INVALID, "bad-cs");
-            }
         }
+//        else {
+//            if (block.GetHash() != Params().GenesisBlock().GetHash()) {
+//                return state.DoS(100, error("ConnectBlock() : Found block that isn't coinstake or genesis."), REJECT_INVALID, "bad-cs");
+//            }
+//        }
     } else
     {
         CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus());
