@@ -633,7 +633,7 @@ template<typename Stream, typename TxType>
 inline void UnserializeTransaction(TxType& tx, Stream& s) {
     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
 
-    printf("Unserialize: transaction\n");
+//    printf("Unserialize: transaction\n");
 //    int32_t nVersion = tx.nVersion;
 
     uint8_t bv;
@@ -644,7 +644,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     if (bv >= WISPR_TXN_VERSION)
     {
         tx.nVersion = 0;
-        printf("Unserialize: WISPR_TXN_VERSION\n");
+//        printf("Unserialize: WISPR_TXN_VERSION\n");
         tx.nVersion = bv;
 
         s >> bv;
@@ -692,7 +692,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     };
 
     if(tx.nVersion == 1){
-        printf("Unserialize: BTC_TXN_VERSION\n");
+//        printf("Unserialize: BTC_TXN_VERSION\n");
 //        tx.nVersion = bv;
         s >> tx.nTime;
     }else{
@@ -704,7 +704,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         s >> bv;
         tx.nVersion |= bv<<24;
     }
-    printf("Unserialize nVersion = %d\n", tx.nVersion);
+//    printf("Unserialize nVersion = %d\n", tx.nVersion);
     unsigned char flags = 0;
     tx.vin.clear();
     tx.vout.clear();
@@ -741,11 +741,11 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
 
 //    printf("Serialize: transaction\n");
     int32_t nVersion = tx.nVersion;
-    printf("Serialize nVersion = %d\n", tx.nVersion);
+//    printf("Serialize nVersion = %d\n", tx.nVersion);
 
     if (IsWisprTxVersion(tx.nVersion))
     {
-        printf("Serialize: transaction is wispr version\n");
+//        printf("Serialize: transaction is wispr version\n");
         uint8_t bv = tx.nVersion & 0xFF;
         s << bv;
 
@@ -1019,7 +1019,7 @@ struct CMutableTransaction
 
     void SetType(int type) {
         nVersion |= (type & 0xFF) << 8;
-        printf("%d\n", nVersion);
+//        printf("%d\n", nVersion);
     }
 
     bool IsWisprVersion() const {
