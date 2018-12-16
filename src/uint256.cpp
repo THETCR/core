@@ -26,6 +26,8 @@ base_blob<BITS>::base_blob(const uint32_t *p, size_t l)
 template <unsigned int BITS>
 base_blob<BITS>::base_blob(const std::vector<unsigned char>& vch)
 {
+    if (vch.size() != sizeof(pn))
+        throw uint_error("Converting vector of wrong size to base_uint");
     memcpy(pn, &vch[0], sizeof(pn));
 }
 template <unsigned int BITS>

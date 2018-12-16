@@ -4345,6 +4345,9 @@ bool CheckBlockSignature(const CBlock &block)
         std::vector<valtype> vSolutions;
         const CTxOut& txout = block.vtx[1]->vout[1];
         whichType = Solver(txout.scriptPubKey, vSolutions);
+        if(whichType == TX_NONSTANDARD){
+            return false;
+        }
         if (whichType == TX_PUBKEY || whichType == TX_PUBKEYHASH) {
 //            printf("CheckBlockSignature TX_PUBKEY || TX_PUBKEYHASH\n");
             pubKey = CPubKey(vSolutions[0]);
