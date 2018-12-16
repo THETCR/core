@@ -4326,8 +4326,8 @@ bool CheckBlockSignature(const CBlock &block)
         return block.vchBlockSig.empty();
     if (block.vchBlockSig.empty())
         return false;
-    if (block.vtx[0]->vin.size() < 1)
-        return false;
+//    if (block.vtx[0]->vin.size() < 1)
+//        return false;
 
     /** Each block is signed by the private key of the input that is staked. This can be either zWSP or normal UTXO
     *  zWSP: Each zWSP has a keypair associated with it. The serial number is a hash of the public key.
