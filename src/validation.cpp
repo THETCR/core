@@ -4323,7 +4323,6 @@ static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state,
 bool CheckBlockSignature(const CBlock &block)
 {
     if (block.IsProofOfWork())
-        printf("CheckBlockSignature proof-of-work vchBlockSig not empty\n");
         return block.vchBlockSig.empty();
     if (block.vchBlockSig.empty()){
         printf("CheckBlockSignature vchBlockSig empty\n");
