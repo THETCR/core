@@ -4350,7 +4350,7 @@ bool CheckBlockSignature(const CBlock &block)
             return false;
         }
         if (whichType == TX_PUBKEY || whichType == TX_PUBKEYHASH) {
-            printf("CheckBlockSignature TX_PUBKEY || TX_PUBKEYHASH\n");
+//            printf("CheckBlockSignature TX_PUBKEY || TX_PUBKEYHASH\n");
             valtype& vchPubKey = vSolutions[0];
             pubKey = CPubKey(vchPubKey);
         }

@@ -214,14 +214,17 @@ txnouttype Solver(const CScript& scriptPubKeyIn, std::vector<std::vector<unsigne
         return TX_NULL_DATA;
     }
 
+    // TODO Fix
     std::vector<unsigned char> data;
     if (MatchPayToPubkey(scriptPubKey, data)) {
-        vSolutionsRet.push_back(std::move(data));
+//        vSolutionsRet.push_back(std::move(data));
+        vSolutionsRet.push_back(vch1);
         return TX_PUBKEY;
     }
 
     if (MatchPayToPubkeyHash(scriptPubKey, data)) {
-        vSolutionsRet.push_back(std::move(data));
+//        vSolutionsRet.push_back(std::move(data));
+        vSolutionsRet.push_back(vch1);
         return fIsTimeLocked ? TX_TIMELOCKED_PUBKEYHASH : TX_PUBKEYHASH;
     }
 
