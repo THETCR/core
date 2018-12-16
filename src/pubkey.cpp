@@ -176,10 +176,12 @@ bool CPubKey::Verify(const uint256 &hash, const std::vector<unsigned char>& vchS
         return false;
     secp256k1_pubkey pubkey;
     secp256k1_ecdsa_signature sig;
-    if (!secp256k1_ec_pubkey_parse(secp256k1_context_verify, &pubkey, vch, size())) {
+    if (!secp256k1_ec_pubkey_parse(secp256k1_context_verify, &pubkey, &(*this)[0], size())) {
+        printf("CPubKey::Verify : secp256k1_ec_pubkey_parse failed.\n");
         return false;
     }
     if (!ecdsa_signature_parse_der_lax(secp256k1_context_verify, &sig, vchSig.data(), vchSig.size())) {
+        printf("CPubKey::Verify : ecdsa_signature_parse_der_lax failed.\n");
         return false;
     }
     /* libsecp256k1's ECDSA verification requires lower-S signatures, which have
