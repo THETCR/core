@@ -185,7 +185,7 @@ txnouttype Solver(const CScript& scriptPubKeyIn, std::vector<std::vector<unsigne
         vSolutionsRet.push_back(hashBytes);
         return TX_ZEROCOINMINT;
     }
-    if (!fWisprMode && chainActive.NewProtocolsStarted()) {
+    if (!fWisprMode) {
         int witnessversion;
         std::vector<unsigned char> witnessprogram;
         if (scriptPubKey.IsWitnessProgram(witnessversion, witnessprogram)) {
