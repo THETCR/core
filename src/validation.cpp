@@ -1832,7 +1832,7 @@ static void CheckForkWarningConditionsOnNewFork(CBlockIndex* pindexNewForkTip) E
 
 void static InvalidChainFound(CBlockIndex* pindexNew) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
     if (!pindexBestInvalid || pindexNew->nChainWork > pindexBestInvalid->nChainWork)
         pindexBestInvalid = pindexNew;
 
@@ -1848,7 +1848,7 @@ void static InvalidChainFound(CBlockIndex* pindexNew) EXCLUSIVE_LOCKS_REQUIRED(c
 }
 
 void CChainState::InvalidBlockFound(CBlockIndex *pindex, const CBlock &block, const CValidationState &state) {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
 
     if (!state.CorruptionPossible()) {
         pindex->nStatus |= BLOCK_FAILED_VALID;
@@ -1954,7 +1954,7 @@ CAmount GetInvalidUTXOValue()
  */
 bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck> *pvChecks, bool fAnonChecks) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
     if (!tx.IsCoinBase())
     {
         if (pvChecks)
@@ -2533,7 +2533,7 @@ static bool IsScriptWitnessEnabled(const Consensus::Params& params)
 
 static unsigned int GetBlockScriptFlags(const CBlockIndex* pindex, const Consensus::Params& consensusparams) EXCLUSIVE_LOCKS_REQUIRED(cs_main) {
     AssertLockHeld(cs_main);
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
 
     if (fWisprMode)
     {
@@ -2609,7 +2609,7 @@ static int64_t nBlocksTotal = 0;
 bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex,
                   CCoinsViewCache& view, const CChainParams& chainparams, bool fJustCheck)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
     AssertLockHeld(cs_main);
     assert(pindex);
     assert(*pindex->phashBlock == block.GetHash());
@@ -3617,7 +3617,7 @@ public:
  */
 bool CChainState::ConnectTip(CValidationState& state, const CChainParams& chainparams, CBlockIndex* pindexNew, const std::shared_ptr<const CBlock>& pblock, ConnectTrace& connectTrace, DisconnectedBlockTransactions &disconnectpool)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
     assert(pindexNew->pprev == chainActive.Tip());
     // Read block from disk.
     int64_t nTime1 = GetTimeMicros();
@@ -3762,7 +3762,6 @@ void CChainState::PruneBlockIndexCandidates() {
  */
 bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainParams& chainparams, CBlockIndex* pindexMostWork, const std::shared_ptr<const CBlock>& pblock, bool& fInvalidFound, ConnectTrace& connectTrace)
 {
-    printf("ActivateBestChainStep\n");
     AssertLockHeld(cs_main);
 
     const CBlockIndex *pindexOldTip = chainActive.Tip();
@@ -4013,7 +4012,7 @@ bool PreciousBlock(CValidationState& state, const CChainParams& params, CBlockIn
 
 bool CChainState::InvalidateBlock(CValidationState& state, const CChainParams& chainparams, CBlockIndex *pindex)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
 
     AssertLockHeld(cs_main);
 
@@ -4301,7 +4300,7 @@ static bool FindUndoPos(CValidationState &state, int nFile, CDiskBlockPos &pos, 
 
 static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW = true)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
     if (chainActive.Height() > 500000 && fWisprMode
         && !block.IsWisprVersion())
         return state.DoS(100, false, REJECT_INVALID, "block-version", false, "bad block version");
@@ -4420,7 +4419,7 @@ bool CheckStakeUnique(const CBlock &block, bool fUpdate)
 bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW, bool fCheckMerkleRoot)
 {
     // These are checks that are independent of context.
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
 
     if (block.fChecked)
         return true;
@@ -4455,12 +4454,12 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     // checks that use witness data may be performed here.
 
     // Size limits
-    printf("%s\n", "Size limits");
+//    printf("%s\n", "Size limits");
     if (block.vtx.empty() || block.vtx.size() * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT || ::GetSerializeSize(block, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT)
         return state.DoS(100, false, REJECT_INVALID, "bad-blk-length", false, "size limits failed");
 
     if (fWisprMode) {
-        printf("%s\n", "fWisprMode");
+//        printf("%s\n", "fWisprMode");
         if (!IsInitialBlockDownload()
             && block.vtx[0]->IsCoinStake()
             && !CheckStakeUnique(block)) {
@@ -4497,12 +4496,12 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
             return state.DoS(100, false, REJECT_INVALID, "bad-block-signature", false, "bad block signature");
         }
     } else {
-        printf("%s\n", "Coinbase");
+//        printf("%s\n", "Coinbase");
         // First transaction must be coinbase, the rest must not be
         if (block.vtx.empty() || !block.vtx[0]->IsCoinBase())
             return state.DoS(100, false, REJECT_INVALID, "bad-cb-missing", false, "first tx is not coinbase");
 
-        printf("%s\n", "Not coinbase");
+//        printf("%s\n", "Not coinbase");
         // Remaining txns must not be coinbase/stake
         for (size_t i = 1; i < block.vtx.size(); i++)
             if (block.vtx[i]->IsCoinBase() || block.vtx[i]->IsCoinStake())
@@ -4510,14 +4509,14 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     };
 
     // Check transactions
-    printf("%s\n", "Check transactions");
+//    printf("%s\n", "Check transactions");
     for (const auto& tx : block.vtx)
         if (!CheckTransaction(*tx, state, true)) // Check for duplicate inputs, TODO: UpdateCoins should return a bool, db/coinsview txn should be undone
             return state.Invalid(false, state.GetRejectCode(), state.GetRejectReason(),
                                  strprintf("Transaction check failed (tx hash %s) %s", tx->GetHash().ToString(), state.GetDebugMessage()));
 
     unsigned int nSigOps = 0;
-    printf("%s\n", "Sigop count");
+//    printf("%s\n", "Sigop count");
     for (const auto& tx : block.vtx)
     {
         nSigOps += GetLegacySigOpCount(*tx);
@@ -5398,7 +5397,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 
 bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<const CBlock> pblock, bool fForceProcessing, bool *fNewBlock)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
     AssertLockNotHeld(cs_main);
 
     CBlockIndex *pindex = nullptr;

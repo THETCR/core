@@ -294,17 +294,14 @@ bool CheckDataOutput(CValidationState &state, const CTxOutData *p)
 
 bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fCheckDuplicateInputs)
 {
-    printf("%s\n", __func__);
     // Basic checks that don't depend on any context
     if (tx.vin.empty())
         return state.DoS(10, false, REJECT_INVALID, "bad-txns-vin-empty");
 
-    printf("%s\n", "Size limit");
     // Size limits (this doesn't take the witness into account, as that hasn't been checked for malleability)
     if (::GetSerializeSize(tx, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT)
         return state.DoS(100, false, REJECT_INVALID, "bad-txns-oversize");
 
-    printf("%s\n", "Is wispr version?");
     if (tx.IsWisprVersion())
     {
         const Consensus::Params& consensusParams = Params().GetConsensus();
@@ -350,16 +347,13 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
             return state.DoS(100, false, REJECT_INVALID, "too-many-data-outputs");
     } else
     {
-        printf("%s\n", "fWisprMode on but not a wispr version transaction");
         if (fWisprMode && chainActive.Height() >= 500000)
             return state.DoS(100, false, REJECT_INVALID, "bad-txn-version");
 
-        printf("%s\n", "Vout empty");
         if (tx.vout.empty())
             return state.DoS(10, false, REJECT_INVALID, "bad-txns-vout-empty");
 
         // Check for negative or overflow output values
-        printf("%s\n", "Output values check");
         CAmount nValueOut = 0;
         for (const auto& txout : tx.vout)
         {
@@ -373,7 +367,6 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
         }
     };
 
-    printf("%s\n", "Check duplicate inputs");
     // Check for duplicate inputs - note that this check is slow so we skip it in CheckBlock
     if (fCheckDuplicateInputs) {
         std::set<COutPoint> vInOutPoints;
@@ -384,7 +377,6 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
                 return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputs-duplicate");
         };
     }
-    printf("%s\n", "Is coinbase?");
     if (tx.IsCoinBase())
     {
         if (tx.vin[0].scriptSig.size() < 2 || tx.vin[0].scriptSig.size() > 100)
