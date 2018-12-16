@@ -4528,7 +4528,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
                                  strprintf("Transaction check failed (tx hash %s) %s", tx->GetHash().ToString(), state.GetDebugMessage()));
 
     unsigned int nSigOps = 0;
-    printf("%s\n", "Sigop count");
+//    printf("%s\n", "Sigop count");
     for (const auto& tx : block.vtx)
     {
         nSigOps += GetLegacySigOpCount(*tx);
