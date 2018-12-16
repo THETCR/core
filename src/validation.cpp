@@ -4359,6 +4359,7 @@ bool CheckBlockSignature(const CBlock &block)
             return false;
 
         CPubKey pubKey(txin.scriptWitness.stack[1]);
+        return pubKey.Verify(block.GetHash(), block.vchBlockSig);
     }
     return pubKey.Verify(block.GetHash(), block.vchBlockSig);
 };
