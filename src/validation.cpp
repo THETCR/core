@@ -4323,9 +4323,12 @@ static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state,
 bool CheckBlockSignature(const CBlock &block)
 {
     if (block.IsProofOfWork())
+        printf("CheckBlockSignature proof-of-work vchBlockSig not empty\n");
         return block.vchBlockSig.empty();
-    if (block.vchBlockSig.empty())
+    if (block.vchBlockSig.empty()){
+        printf("CheckBlockSignature vchBlockSig empty\n");
         return false;
+    }
 //    if (block.vtx[0]->vin.size() < 1)
 //        return false;
 
@@ -4344,6 +4347,7 @@ bool CheckBlockSignature(const CBlock &block)
         const CTxOut& txout = block.vtx[1]->vout[1];
         whichType = Solver(txout.scriptPubKey, vSolutions);
         if(whichType == TX_NONSTANDARD){
+            printf("CheckBlockSignature TX_NONSTANDARD\n");
             return false;
         }
         if (whichType == TX_PUBKEY || whichType == TX_PUBKEYHASH) {
@@ -4358,8 +4362,7 @@ bool CheckBlockSignature(const CBlock &block)
         if (txin.scriptWitness.stack[1].size() != 33)
             return false;
 
-        CPubKey pubKey(txin.scriptWitness.stack[1]);
-        return pubKey.Verify(block.GetHash(), block.vchBlockSig);
+        pubKey = CPubKey(txin.scriptWitness.stack[1]);
     }
     return pubKey.Verify(block.GetHash(), block.vchBlockSig);
 };
