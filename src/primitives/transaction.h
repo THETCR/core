@@ -926,7 +926,7 @@ public:
             return (GetType() == TXN_COINBASE
                 && vin.size() == 1 && vin[0].prevout.IsNull()); // TODO [rm]?
 
-        return (vin.size() == 1 && vin[0].prevout.IsNull());
+        return (vin.size() == 1 && vin[0].prevout.IsNull() && !ContainsZerocoins());
     }
 
     bool IsCoinStake() const

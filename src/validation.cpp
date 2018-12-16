@@ -4814,7 +4814,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
 
             // coinstake output 0 must be data output of blockheight
             int i;
-            if (!block.vtx[0]->GetCoinStakeHeight(i)) {
+            if (!block.vtx[1]->GetCoinStakeHeight(i)) {
                 return state.DoS(100, false, REJECT_INVALID, "bad-cs-malformed", false, "coinstake txn is malformed");
             }
 
