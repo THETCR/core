@@ -16,12 +16,6 @@
 #include <vector>
 #include <crypto/common.h>
 
-class uint_error : public std::runtime_error
-{
-public:
-    explicit uint_error(const std::string& str) : std::runtime_error(str) {}
-};
-
 /** Template base class for unsigned big integers. */
 template <unsigned int BITS>
 class base_blob
