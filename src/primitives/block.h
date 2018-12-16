@@ -111,7 +111,7 @@ public:
     std::vector<CTransactionRef> vtx;
 
     // pos block signature - signed by one of the coin stake txout[N]'s owner
-    std::vector<uint8_t> vchBlockSig;
+    std::vector<unsigned char> vchBlockSig;
 
     // memory only
     mutable bool fChecked;
