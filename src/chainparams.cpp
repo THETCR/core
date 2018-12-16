@@ -412,8 +412,8 @@ public:
         bnProofOfStakeLimit = ~uint256(0) >> 48;
         nModifierInterval = 10 * 60;    // 10 minutes
         nStakeMinConfirmations = 100;   // 225 * 2 minutes
-//        nTargetSpacing = 64;           // 2 minutes
-//        nTargetTimespan = 16 * 60;      // 24 mins
+        nTargetSpacing = 64;           // 2 minutes
+        nTargetTimespan = 16 * 60;      // 24 mins
 
         nTargetTimespanV1 =  16 * 60; // WISPR Old: 1 day
         nTargetTimespanV2 =  1 * 60; // WISPR New: 1 day
@@ -496,7 +496,7 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.lastPowBlock = 201;
+        consensus.lastPowBlock = 450;
         nPoolMaxTransactions = 3;
         nFulfilledRequestExpireTime = 60*60; // fulfilled requests expire in 1 hour
         nMaxMoneyOut = 120000000 * COIN;
@@ -504,7 +504,7 @@ public:
         strSporkAddress = "Xgtyuk76vhuFW2iT7UAiHgNdWXCf3J34wh";
         //!WISPR
         /** Height or Time Based Activations **/
-        nLastPOWBlock = 202;
+        nLastPOWBlock = 450;
         nNewProtocolStartHeight = 400000;
         nNewProtocolStartTime = 1539963322; //Friday, October 19, 2018 3:35:22 PM
         nZerocoinStartHeight = nNewProtocolStartHeight;

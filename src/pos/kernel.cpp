@@ -393,7 +393,7 @@ bool Stake(CStakeInput* stakeInput, unsigned int nBits, unsigned int nTimeBlockF
 // Check kernel hash target and coinstake signature
 bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::unique_ptr<CStakeInput>& stake)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
 
 //    const CTransaction tx = block.vtx[1];
     const CTransaction &tx = *(block.vtx[1]);

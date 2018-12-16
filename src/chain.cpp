@@ -109,7 +109,7 @@ const CBlockIndex* CBlockIndex::GetAncestor(int height) const
 
 CBlockIndex* CBlockIndex::GetAncestor(int height)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
     return const_cast<CBlockIndex*>(static_cast<const CBlockIndex*>(this)->GetAncestor(height));
 }
 
@@ -136,7 +136,7 @@ arith_uint256 GetBlockProof(const CBlockIndex& block)
 
 int64_t GetBlockProofEquivalentTime(const CBlockIndex& to, const CBlockIndex& from, const CBlockIndex& tip, const Consensus::Params& params)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
 
     arith_uint256 r;
     int sign = 1;

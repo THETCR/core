@@ -4640,8 +4640,8 @@ unsigned int GetNextTargetRequired(const CBlockIndex *pindexLast)
     if (pindexPrevPrev->pprev == nullptr)
         return nProofOfWorkLimit; // second block
 
-    int64_t nTargetSpacing = Params().GetTargetSpacing();
-    int64_t nTargetTimespan = Params().GetTargetTimespan();
+    int64_t nTargetTimespan = Params().TargetTimespanV1();
+    int64_t nTargetSpacing = Params().TargetSpacingV1();
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
 
     if (nActualSpacing > nTargetSpacing * 10)
@@ -5278,7 +5278,6 @@ bool ContextualCheckZerocoinStake(int nHeight, CStakeInput* stake)
 /** Store block on disk. If dbp is non-nullptr, the file is known to already reside on disk */
 bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CValidationState& state, const CChainParams& chainparams, CBlockIndex** ppindex, bool fRequested, const CDiskBlockPos* dbp, bool* fNewBlock)
 {
-            printf("AcceptBlock\n");
     const CBlock& block = *pblock;
 
     if (fNewBlock) *fNewBlock = false;

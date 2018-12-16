@@ -156,7 +156,7 @@ const Coin& CCoinsViewCache::AccessCoin(const COutPoint &outpoint) const {
 }
 
 bool CCoinsViewCache::HaveCoin(const COutPoint &outpoint) const {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
     CCoinsMap::const_iterator it = FetchCoin(outpoint);
     return (it != cacheCoins.end() && !it->second.coin.IsSpent());
 }
@@ -173,7 +173,7 @@ uint256 CCoinsViewCache::GetBestBlock() const {
 }
 
 void CCoinsViewCache::SetBestBlock(const uint256 &hashBlockIn, int height) {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
     hashBlock = hashBlockIn;
     nBlockHeight = height;
 }
