@@ -4350,6 +4350,7 @@ bool CheckBlockSignature(const CBlock &block)
             return false;
         }
         if (whichType == TX_PUBKEY || whichType == TX_PUBKEYHASH) {
+            printf("CheckBlockSignature TX_PUBKEY || TX_PUBKEYHASH\n");
             valtype& vchPubKey = vSolutions[0];
             pubKey = CPubKey(vchPubKey);
         }
@@ -4363,7 +4364,14 @@ bool CheckBlockSignature(const CBlock &block)
 
         pubKey = CPubKey(txin.scriptWitness.stack[1]);
     }
-    return pubKey.Verify(block.GetHash(), block.vchBlockSig);
+    if(pubKey.Verify(block.GetHash(), block.vchBlockSig)){
+        printf("CPubKey::Verify : secp256k1_ecdsa_verify failed.\n");
+        return true;
+    }else{
+        printf("CPubKey::Verify : secp256k1_ecdsa_verify failed.\n");
+        return false;
+    }
+//    return pubKey.Verify(block.GetHash(), block.vchBlockSig);
 };
 
 bool AddToMapStakeSeen(const COutPoint &kernel, const uint256 &blockHash)
