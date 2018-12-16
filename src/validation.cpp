@@ -4349,8 +4349,8 @@ bool CheckBlockSignature(const CBlock &block)
             return false;
         }
         if (whichType == TX_PUBKEY || whichType == TX_PUBKEYHASH) {
-//            printf("CheckBlockSignature TX_PUBKEY || TX_PUBKEYHASH\n");
             pubKey = CPubKey(vSolutions[0]);
+            printf("CPubKey::Verify : secp256k1_ecdsa_verify failed, hash = %s\n", pubKey.GetHash().ToString().c_str());
         }
     }else{
         const auto &txin = block.vtx[0]->vin[0];
