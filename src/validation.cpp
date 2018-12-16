@@ -4322,8 +4322,9 @@ static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state,
 
 bool CheckBlockSignature(const CBlock &block)
 {
-    if (block.IsProofOfWork())
+    if (block.IsProofOfWork()) {
         return block.vchBlockSig.empty();
+    }
     if (block.vchBlockSig.empty()){
         printf("CheckBlockSignature vchBlockSig empty\n");
         return false;
@@ -4350,7 +4351,7 @@ bool CheckBlockSignature(const CBlock &block)
         }
         if (whichType == TX_PUBKEY || whichType == TX_PUBKEYHASH) {
             pubKey = CPubKey(vSolutions[0]);
-            printf("CPubKey::Verify : secp256k1_ecdsa_verify failed, hash = %s\n", pubKey.GetHash().ToString().c_str());
+            printf("CPubKey::Verify :pub key hash = %s\n", pubKey.GetHash().ToString().c_str());
         }
     }else{
         const auto &txin = block.vtx[0]->vin[0];
@@ -4362,13 +4363,13 @@ bool CheckBlockSignature(const CBlock &block)
 
         pubKey = CPubKey(txin.scriptWitness.stack[1]);
     }
-    if(pubKey.Verify(block.GetHash(), block.vchBlockSig)){
-        return true;
-    }else{
-        printf("CPubKey::Verify : secp256k1_ecdsa_verify failed, hash = %s\n", block.GetHash().ToString().c_str());
-        return false;
-    }
-//    return pubKey.Verify(block.GetHash(), block.vchBlockSig);
+//    if(pubKey.Verify(block.GetHash(), block.vchBlockSig)){
+//        return true;
+//    }else{
+//        printf("CPubKey::Verify : secp256k1_ecdsa_verify failed, hash = %s\n", block.GetHash().ToString().c_str());
+//        return false;
+//    }
+    return pubKey.Verify(block.GetHash(), block.vchBlockSig);
 };
 
 bool AddToMapStakeSeen(const COutPoint &kernel, const uint256 &blockHash)
