@@ -248,6 +248,14 @@ namespace GUIUtil
     private:
         bool eventFilter(QObject *object, QEvent *event);
     };
+
+    //!WISPR
+    /** Load global CSS theme */
+    QString loadStyleSheet();
+
+    /** Check whether a theme is not build-in */
+    bool isExternal(QString theme);
+
 } // namespace GUIUtil
 
 #endif // BITCOIN_QT_GUIUTIL_H

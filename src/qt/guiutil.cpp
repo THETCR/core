@@ -935,5 +935,43 @@ bool ItemDelegate::eventFilter(QObject *object, QEvent *event)
     }
     return QItemDelegate::eventFilter(object, event);
 }
+bool isExternal(QString theme)
+{
+    if (theme.isEmpty())
+        return false;
 
+    return (theme.operator!=("default"));
+}
+
+
+QString loadStyleSheet()
+{
+    QString styleSheet;
+    QSettings settings;
+    QString cssName;
+    QString theme = settings.value("theme", "").toString();
+
+    if (isExternal(theme)) {
+        // External CSS
+        settings.setValue("fCSSexternal", true);
+        boost::filesystem::path pathAddr = GetDataDir() / "themes/";
+        cssName = pathAddr.string().c_str() + theme + "/css/theme.css";
+    } else {
+        // Build-in CSS
+        settings.setValue("fCSSexternal", false);
+        if (!theme.isEmpty()) {
+            cssName = QString(":/css/") + theme;
+        } else {
+            cssName = QString(":/css/default");
+            settings.setValue("theme", "default");
+        }
+    }
+
+    QFile qFile(cssName);
+    if (qFile.open(QFile::ReadOnly)) {
+        styleSheet = QLatin1String(qFile.readAll());
+    }
+
+    return styleSheet;
+}
 } // namespace GUIUtil
