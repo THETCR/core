@@ -4365,7 +4365,7 @@ bool CheckBlockSignature(const CBlock &block)
         pubKey = CPubKey(txin.scriptWitness.stack[1]);
     }
     if(pubKey.Verify(block.GetHash(), block.vchBlockSig)){
-        printf("CPubKey::Verify : secp256k1_ecdsa_verify failed.\n");
+        printf("CPubKey::Verify : secp256k1_ecdsa_verify failed. hash = %s\n", block.GetHash().ToString().c_str());
         return true;
     }else{
         printf("CPubKey::Verify : secp256k1_ecdsa_verify failed.\n");
