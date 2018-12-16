@@ -2639,6 +2639,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
 
     if (block.IsProofOfStake()) {
+        printf("%s\n", "Compute stake modifier");
         pindex->bnStakeModifier = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
         setDirtyBlockIndex.insert(pindex);
 
@@ -2649,6 +2650,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         }
     }
 
+    printf("%s\n", "Assert view get best block");
     // verify that the view's current state corresponds to the previous block
     uint256 hashPrevBlock = pindex->pprev == nullptr ? uint256() : pindex->pprev->GetBlockHash();
     assert(hashPrevBlock == view.GetBestBlock());
@@ -2795,6 +2797,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
 
     // Get the script flags for this block
+    printf("%s\n", "Get script flags");
     unsigned int flags = GetBlockScriptFlags(pindex, chainparams.GetConsensus());
 
     int64_t nTime2 = GetTimeMicros(); nTimeForks += nTime2 - nTime1;
@@ -4518,7 +4521,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     };
 
     // Check transactions
-    printf("%s\n", "Check transactions");
+//    printf("%s\n", "Check transactions");
     for (const auto& tx : block.vtx)
         if (!CheckTransaction(*tx, state, true)) // Check for duplicate inputs, TODO: UpdateCoins should return a bool, db/coinsview txn should be undone
             return state.Invalid(false, state.GetRejectCode(), state.GetRejectReason(),
@@ -4530,6 +4533,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     {
         nSigOps += GetLegacySigOpCount(*tx);
     }
+    printf("%s\n", "WITNESS_SCALE_FACTOR");
     if (nSigOps * WITNESS_SCALE_FACTOR > MAX_BLOCK_SIGOPS_COST)
         return state.DoS(100, false, REJECT_INVALID, "bad-blk-sigops", false, "out-of-bounds SigOpCount");
 
