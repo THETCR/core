@@ -638,10 +638,10 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 
 //    tx.nVersion = 0;
     s >> tx.nVersion;
+    uint8_t bv = tx.nVersion & 0xFF;
 
     if (IsWisprTxVersion(tx.nVersion))
     {
-        uint8_t bv = tx.nVersion & 0xFF;
         tx.nVersion = 0;
 //        printf("Unserialize: WISPR_TXN_VERSION\n");
         tx.nVersion = bv;
