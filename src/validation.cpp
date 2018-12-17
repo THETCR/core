@@ -2637,7 +2637,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         }
         return error("%s: Consensus::CheckBlock: %s", __func__, FormatStateMessage(state));
     }
-    printf("%s\n", "Check block succeeded");
+    printf("%s\n", "Connect block Check block succeeded");
     if (block.IsProofOfStake()) {
         printf("%s\n", "Compute stake modifier");
         pindex->bnStakeModifier = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
@@ -4785,7 +4785,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
 {
     const int nHeight = pindexPrev == nullptr ? 0 : pindexPrev->nHeight + 1;
     const int64_t nPrevTime = pindexPrev ? pindexPrev->nTime : 0;
-
+    printf("%s\n", "ContextualCheckBlock BIP113");
     // Start enforcing BIP113 (Median Time Past) using versionbits logic.
     int nLockTimeFlags = 0;
     if (fWisprMode)
@@ -4803,6 +4803,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
                               : block.GetBlockTime();
 
     // Check that all transactions are finalized
+    printf("%s\n", "transactions are finalized?");
     for (const auto& tx : block.vtx) {
         if (!IsFinalTx(*tx, nHeight, nLockTimeCutoff)) {
             return state.DoS(10, false, REJECT_INVALID, "bad-txns-nonfinal", false, "non-final transaction");
@@ -4810,6 +4811,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
     }
 
     if (fWisprMode) {
+        printf("%s\n", "fWisprMode");
         // Enforce rule that the coinbase/coinstake ends with serialized block height
         // genesis block scriptSig size will be different
 
@@ -4929,6 +4931,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
         //   multiple, the last one is used.
         bool fHaveWitness = false;
         if (VersionBitsState(pindexPrev, consensusParams, Consensus::DEPLOYMENT_SEGWIT, versionbitscache) == ThresholdState::ACTIVE) {
+            printf("%s\n", "GetWitnessCommitmentIndex");
             int commitpos = GetWitnessCommitmentIndex(block);
             if (commitpos != -1) {
                 bool malleated = false;
@@ -5336,7 +5339,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     if (!CheckBlock(block, state, chainparams.GetConsensus())) {
         return error("%s: %s", __func__, FormatStateMessage(state));
     }
-    printf("%s\n", "Check block succeeded");
+    printf("%s\n", "Accept block Check block succeeded");
     if (block.IsProofOfStake()) {
         pindex->SetProofOfStake();
         pindex->prevoutStake = pblock->vtx[1]->vin[0].prevout;
@@ -5374,7 +5377,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             Misbehaving(state.nodeId, 20, "Spent kernel");
         }
     }
-
+    printf("%s\n", "Remove node heaader");
     RemoveNodeHeader(pindex->GetBlockHash());
     pindex->nFlags |= BLOCK_ACCEPTED;
     setDirtyBlockIndex.insert(pindex);
@@ -5395,13 +5398,14 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             state.Error(strprintf("%s: Failed to find position to write new block to disk", __func__));
             return false;
         }
+        printf("%s\n", "Receive block transactions");
         ReceivedBlockTransactions(block, pindex, blockPos, chainparams.GetConsensus());
     } catch (const std::runtime_error& e) {
         return AbortNode(state, std::string("System error: ") + e.what());
     }
 
     FlushStateToDisk(chainparams, state, FlushStateMode::NONE);
-
+    printf("%s\n", "Check Block index");
     CheckBlockIndex(chainparams.GetConsensus());
 
     return true;
@@ -6382,6 +6386,7 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                     }
 
                     // process in case the block isn't known yet
+                    printf("%s\n", "LookupBlockIndex");
                     CBlockIndex* pindex = LookupBlockIndex(hash);
                     if (!pindex || (pindex->nStatus & BLOCK_HAVE_DATA) == 0) {
                       CValidationState state;
