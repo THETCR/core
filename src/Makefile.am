@@ -578,6 +578,8 @@ libwispr_consensus_a_SOURCES = \
   primitives/zerocoin.h \
   pubkey.cpp \
   pubkey.h \
+  key.h \
+  key.cpp \
   script/wisprconsensus.cpp \
   script/interpreter.cpp \
   script/interpreter.h \
