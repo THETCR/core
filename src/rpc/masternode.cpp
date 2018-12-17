@@ -575,7 +575,7 @@ UniValue masternodelist(const JSONRPCRequest& request)
                     strOutpoint.find(strFilter) == std::string::npos) continue;
                 obj.pushKV(strOutpoint, strDaemon);
             } else if (strMode == "sentinel") {
-                std::string strSentinel = mn.lastPing.nSentinelVersion > DEFAULT_SENTINEL_VERSION ? SafeIntVersionToString(mn.lastPing.nSentinelVersion) : "Unknown";
+                std::string strSentinel = mn.lastPing.nSentinelVersion > DEFAULT_SENTINEL_VERSION ? FormatVersion(mn.lastPing.nSentinelVersion) : "Unknown";
                 if (strFilter !="" && strSentinel.find(strFilter) == std::string::npos &&
                     strOutpoint.find(strFilter) == std::string::npos) continue;
                 obj.pushKV(strOutpoint, strSentinel);
@@ -602,7 +602,7 @@ UniValue masternodelist(const JSONRPCRequest& request)
                                EncodeDestination(mn.pubKeyCollateralAddress.GetID()) << " " <<
                                (int64_t)mn.lastPing.sigTime << " " << std::setw(8) <<
                                (int64_t)(mn.lastPing.sigTime - mn.sigTime) << " " <<
-                               SafeIntVersionToString(mn.lastPing.nSentinelVersion) << " "  <<
+                               FormatVersion(mn.lastPing.nSentinelVersion) << " "  <<
                                (mn.lastPing.fSentinelIsCurrent ? "current" : "expired") << " " <<
                                mn.addr.ToString();
                 std::string strInfo = streamInfo.str();
@@ -616,7 +616,7 @@ UniValue masternodelist(const JSONRPCRequest& request)
                                mn.GetStatus() << " " <<
                                mn.nProtocolVersion << " " <<
                                mn.lastPing.nDaemonVersion << " " <<
-                               SafeIntVersionToString(mn.lastPing.nSentinelVersion) << " " <<
+                               FormatVersion(mn.lastPing.nSentinelVersion) << " " <<
                                (mn.lastPing.fSentinelIsCurrent ? "current" : "expired") << " " <<
                                (int64_t)mn.lastPing.sigTime << " " <<
                                (int64_t)(mn.lastPing.sigTime - mn.sigTime) << " " <<
@@ -631,7 +631,7 @@ UniValue masternodelist(const JSONRPCRequest& request)
                 objMN.pushKV("status", mn.GetStatus());
                 objMN.pushKV("protocol", mn.nProtocolVersion);
                 objMN.pushKV("daemonversion", mn.lastPing.nDaemonVersion > DEFAULT_DAEMON_VERSION ? FormatVersion(mn.lastPing.nDaemonVersion) : "Unknown");
-                objMN.pushKV("sentinelversion", mn.lastPing.nSentinelVersion > DEFAULT_SENTINEL_VERSION ? SafeIntVersionToString(mn.lastPing.nSentinelVersion) : "Unknown");
+                objMN.pushKV("sentinelversion", mn.lastPing.nSentinelVersion > DEFAULT_SENTINEL_VERSION ? FormatVersion(mn.lastPing.nSentinelVersion) : "Unknown");
                 objMN.pushKV("sentinelstate", (mn.lastPing.fSentinelIsCurrent ? "current" : "expired"));
                 objMN.pushKV("lastseen", (int64_t)mn.lastPing.sigTime);
                 objMN.pushKV("activeseconds", (int64_t)(mn.lastPing.sigTime - mn.sigTime));

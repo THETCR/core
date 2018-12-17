@@ -269,7 +269,7 @@ add_subdirectory(univalue)
 add_subdirectory(util)
 
 # Boost packages
-set(BOOST_PACKAGES_REQUIRED chrono filesystem program_options system thread test)
+set(BOOST_PACKAGES_REQUIRED chrono filesystem system thread test)
 
 function(prepend var prefix)
 	set(listVar "")
