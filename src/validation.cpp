@@ -4810,7 +4810,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
         }
     }
 
-    if (fWisprMode) {
+    if (chainActive.NewProtocolsStarted() && fWisprMode) {
         printf("%s\n", "fWisprMode");
         // Enforce rule that the coinbase/coinstake ends with serialized block height
         // genesis block scriptSig size will be different
