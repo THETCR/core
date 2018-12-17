@@ -148,15 +148,15 @@ typedef CCheckQueue<FrozenCleanupCheck> FrozenCleanup_Queue;
  */
 static void Correct_Queue_range(std::vector<size_t> range)
 {
-    BOOST_TEST_MESSAGE("Correct_Queue_range");
+    cout << "Correct_Queue_range";
     auto small_queue = MakeUnique<Correct_Queue>(QUEUE_BATCH_SIZE);
     boost::thread_group tg;
-    BOOST_TEST_MESSAGE("create_thread");
+    cout << "create_thread";
     for (auto x = 0; x < nScriptCheckThreads; ++x) {
        tg.create_thread([&]{small_queue->Thread();});
     }
     // Make vChecks here to save on malloc (this test can be slow...)
-    BOOST_TEST_MESSAGE("vChecks");
+    cout << "vChecks";
     std::vector<FakeCheckCheckCompletion> vChecks;
     for (const size_t i : range) {
         size_t total = i;
@@ -173,7 +173,7 @@ static void Correct_Queue_range(std::vector<size_t> range)
             BOOST_TEST_MESSAGE("Failure on trial " << i << " expected, got " << FakeCheckCheckCompletion::n_calls);
         }
     }
-    BOOST_TEST_MESSAGE("interrupt_all");
+    cout << "interrupt_all";
     tg.interrupt_all();
     tg.join_all();
 }
