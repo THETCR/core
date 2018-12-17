@@ -607,6 +607,7 @@ libwispr_common_a_SOURCES = \
   compressor.cpp \
   core_read.cpp \
   core_write.cpp \
+  invalid.cpp \
   primitives/block.cpp \
   primitives/deterministicmint.cpp \
   primitives/transaction.cpp \
