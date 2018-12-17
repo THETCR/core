@@ -4,9 +4,7 @@
 #include <util/system.h>
 #include <chainparams.h>
 #include <util/strencodings.h>
-
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
+#include <fs.h>
 
 CMasternodeConfig masternodeConfig;
 
@@ -17,8 +15,8 @@ void CMasternodeConfig::add(const std::string& alias, const std::string& ip, con
 
 bool CMasternodeConfig::read(std::string& strErrRet) {
     int linenumber = 1;
-    boost::filesystem::path pathMasternodeConfigFile = GetMasternodeConfigFile();
-    boost::filesystem::ifstream streamConfig(pathMasternodeConfigFile);
+    fs::path pathMasternodeConfigFile = GetMasternodeConfigFile();
+    fs::ifstream streamConfig(pathMasternodeConfigFile);
 
     if (!streamConfig.good()) {
         FILE* configFile = fopen(pathMasternodeConfigFile.string().c_str(), "a");

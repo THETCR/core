@@ -11,7 +11,7 @@
 #include <streams.h>
 #include <util/system.h>
 
-#include <boost/filesystem.hpp>
+#include <fs.h>
 
 /** 
 *   Generic Dumping and Loading
@@ -33,7 +33,7 @@ private:
         IncorrectFormat
     };
 
-    boost::filesystem::path pathDB;
+    fs::path pathDB;
     std::string strFilename;
     std::string strMagicMessage;
 
@@ -87,7 +87,7 @@ private:
         }
 
         // use file size to size memory buffer
-        int fileSize = boost::filesystem::file_size(pathDB);
+        int fileSize = fs::file_size(pathDB);
         int dataSize = fileSize - sizeof(uint256);
         // Don't try to resize to a negative number if file is small
         if (dataSize < 0)
