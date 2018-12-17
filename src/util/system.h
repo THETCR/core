@@ -456,7 +456,7 @@ fs::path GetMasternodeConfigFile();
  * @return 4-byte unsigned integer, most significant byte is always 0
  * Throws std::bad_cast if format doesn\t match.
  */
-uint32_t StringVersionToInt(const std::string& strVersion);
+//uint32_t StringVersionToInt(const std::string& strVersion);
 
 
 /**

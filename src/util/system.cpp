@@ -80,7 +80,7 @@
 #include <thread>
 
 //DASH
-#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string.hpp>
 
 
 //Dash only features
@@ -1570,28 +1570,28 @@ std::pair<int, char**> WinCmdLineArgs::get()
 } // namespace util
 
 
-uint32_t StringVersionToInt(const std::string& strVersion)
-{
-    std::vector<std::string> tokens;
-    boost::split(tokens, strVersion, boost::is_any_of("."));
-    if(tokens.size() != 3)
-        throw std::bad_cast();
-    uint32_t nVersion = 0;
-    for(unsigned idx = 0; idx < 3; idx++)
-    {
-        if(tokens[idx].length() == 0)
-            throw std::bad_cast();
-        uint32_t value;
-        if (!ParseUInt32(tokens[idx], &value)) {
-            throw std::bad_cast();
-        }
-        if(value > 255)
-            throw std::bad_cast();
-        nVersion <<= 8;
-        nVersion |= value;
-    }
-    return nVersion;
-}
+//uint32_t StringVersionToInt(const std::string& strVersion)
+//{
+//    std::vector<std::string> tokens;
+//    boost::split(tokens, strVersion, boost::is_any_of("."));
+//    if(tokens.size() != 3)
+//        throw std::bad_cast();
+//    uint32_t nVersion = 0;
+//    for(unsigned idx = 0; idx < 3; idx++)
+//    {
+//        if(tokens[idx].length() == 0)
+//            throw std::bad_cast();
+//        uint32_t value;
+//        if (!ParseUInt32(tokens[idx], &value)) {
+//            throw std::bad_cast();
+//        }
+//        if(value > 255)
+//            throw std::bad_cast();
+//        nVersion <<= 8;
+//        nVersion |= value;
+//    }
+//    return nVersion;
+//}
 
 //std::string IntVersionToString(uint32_t nVersion)
 //{

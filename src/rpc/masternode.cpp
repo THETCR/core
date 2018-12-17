@@ -939,7 +939,11 @@ UniValue sentinelping(const JSONRPCRequest& request)
         );
     }
 
-    activeMasternode.UpdateSentinelPing(StringVersionToInt(request.params[0].get_str()));
+    uint32_t value;
+    if(ParseUInt32(request.params[0].get_str(), &value)){
+        activeMasternode.UpdateSentinelPing(value);
+    }
+//    activeMasternode.UpdateSentinelPing(StringVersionToInt(request.params[0].get_str()));
     return true;
 }
 

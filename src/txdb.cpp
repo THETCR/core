@@ -751,7 +751,6 @@ bool CZerocoinDB::WipeCoins(std::string strType)
     if (strType != "spends" && strType != "mints")
         return error("%s: did not recognize type %s", __func__, strType);
 
-//    boost::scoped_ptr<CDBIterator> pcursor(NewIterator());
     std::unique_ptr<CDBIterator> pcursor(NewIterator());
 
     char type = (strType == "spends" ? 's' : 'm');
