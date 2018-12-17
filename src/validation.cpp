@@ -2472,9 +2472,20 @@ static bool WriteUndoDataForBlock(const CBlockUndo& blockundo, CValidationState&
 
 static CCheckQueue<CScriptCheck> scriptcheckqueue(128);
 
-void ThreadScriptCheck() {
-    RenameThread("wispr-scriptch");
-    scriptcheckqueue.Thread();
+void StartScriptCheck()
+{
+    LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
+    scriptcheckqueue.Start(nScriptCheckThreads - 1, "bitcoin-scriptch");
+}
+
+void InterruptScriptCheck()
+{
+    scriptcheckqueue.Interrupt();
+}
+
+void StopScriptCheck()
+{
+    scriptcheckqueue.Stop();
 }
 
 // Protected by cs_main

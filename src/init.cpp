@@ -277,6 +277,7 @@ static CScheduler scheduler;
 
 void Interrupt()
 {
+    InterruptScriptCheck();
     InterruptHTTPServer();
     InterruptHTTPRPC();
     InterruptRPC();
@@ -305,7 +306,7 @@ void Shutdown(InitInterfaces& interfaces)
     RenameThread("wispr-shutoff");
     mempool.AddTransactionsUpdated(1);
 
-
+    StopScriptCheck();
     StopHTTPRPC();
     StopREST();
     StopRPC();
@@ -1422,11 +1423,8 @@ bool AppInitMain(InitInterfaces& interfaces)
     InitSignatureCache();
     InitScriptExecutionCache();
 
-    LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
-    if (nScriptCheckThreads) {
-        for (int i=0; i<nScriptCheckThreads-1; i++)
-            threadGroup.create_thread(&ThreadScriptCheck);
-    }
+//    LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
+    StartScriptCheck();
 
     // Start the lightweight task scheduler thread
     CScheduler::Function serviceLoop = boost::bind(&CScheduler::serviceQueue, &scheduler);
