@@ -4691,7 +4691,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     const Consensus::Params& consensusParams = params.GetConsensus();
 
     unsigned int nBitsRequired;
-    if(block.IsWisprVersion()){
+    if(block.nVersion > 0x07){
         nBitsRequired  = GetNextWorkRequired(pindexPrev, &block);
     }else{
         nBitsRequired  = GetNextTargetRequired(pindexPrev, true);
