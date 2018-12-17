@@ -574,12 +574,8 @@ libwispr_consensus_a_SOURCES = \
   primitives/transaction.h \
   primitives/deterministicmint.cpp \
   primitives/deterministicmint.h \
-  primitives/zerocoin.cpp \
-  primitives/zerocoin.h \
   pubkey.cpp \
   pubkey.h \
-  key.h \
-  key.cpp \
   script/wisprconsensus.cpp \
   script/interpreter.cpp \
   script/interpreter.h \
