@@ -858,7 +858,7 @@ bool CSMSG::Start(std::shared_ptr<CWallet> pwalletIn, bool fDontStart, bool fSca
     }
     pwallet = pwalletIn;
 #ifdef ENABLE_WALLET
-    m_handler_unload = interfaces::MakeHandler(pwallet->NotifyUnload.connect(boost::bind(&NotifyUnload, this)));
+    m_handler_unload = interfaces::MakeHandler(pwallet->NotifyUnload.connect(std::bind(&NotifyUnload, this)));
 #endif
 
     fSecMsgEnabled = true;
@@ -913,8 +913,8 @@ bool CSMSG::Start(std::shared_ptr<CWallet> pwalletIn, bool fDontStart, bool fSca
         return error("%s: Could not load purged sets, secure messaging disabled.", __func__);
     }
 
-    threadGroupSmsg.create_thread(boost::bind(&TraceThread<void (*)()>, "smsg", &ThreadSecureMsg));
-    threadGroupSmsg.create_thread(boost::bind(&TraceThread<void (*)()>, "smsg-pow", &ThreadSecureMsgPow));
+    threadGroupSmsg.create_thread(std::bind(&TraceThread<void (*)()>, "smsg", &ThreadSecureMsg));
+    threadGroupSmsg.create_thread(std::bind(&TraceThread<void (*)()>, "smsg-pow", &ThreadSecureMsgPow));
 
     return true;
 };
