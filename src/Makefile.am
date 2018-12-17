@@ -567,8 +567,6 @@ libwispr_consensus_a_SOURCES = \
   consensus/validation.h \
   hash.cpp \
   hash.h \
-  invalid.cpp \
-  invalid.h \
   prevector.h \
   primitives/block.cpp \
   primitives/block.h \
