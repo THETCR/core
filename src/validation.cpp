@@ -3048,7 +3048,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     if (!control.Wait())
         return state.DoS(100, error("%s: CheckQueue failed", __func__), REJECT_INVALID, "block-validation-failed");
 
-    if (fWisprMode)
+    if (fWisprMode && chainActive.NewProtocolsStarted())
     {
         if (block.IsProofOfStake()) // only the genesis block isn't proof of stake
         {
