@@ -3044,15 +3044,16 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * (nTime3 - nTime2), MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * MICRO, nTimeConnect * MILLI / nBlocksTotal);
-
+    printf("%s\n", "!control.Wait()");
     if (!control.Wait())
         return state.DoS(100, error("%s: CheckQueue failed", __func__), REJECT_INVALID, "block-validation-failed");
 
-    if (fWisprMode && chainActive.NewProtocolsStarted())
+    if (fWisprMode)
     {
+            printf("%s\n", "fWisprMode");
         if (block.IsProofOfStake()) // only the genesis block isn't proof of stake
         {
-            CTransactionRef txCoinstake = block.vtx[0];
+            CTransactionRef txCoinstake = block.vtx[1];
             const DevFundSettings *pDevFundSettings = Params().GetDevFundSettings(block.nTime);
 
             CAmount nCalculatedStakeReward = Params().GetProofOfStakeReward(pindex->pprev, nFees);
@@ -3136,7 +3137,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     } else
     {
         CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus());
-        if (block.vtx[0]->GetValueOut() > blockReward) // wispr coins are imported as coinbase txns
+        if (block.vtx[1]->GetValueOut() > blockReward) // wispr coins are imported as coinbase txns
             return state.DoS(100,
                              error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
                                    block.vtx[0]->GetValueOut(), blockReward),
@@ -3145,7 +3146,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     int64_t nTime4 = GetTimeMicros(); nTimeVerify += nTime4 - nTime2;
     LogPrint(BCLog::BENCH, "    - Verify %u txins: %.2fms (%.3fms/txin) [%.2fs (%.2fms/blk)]\n", nInputs - 1, MILLI * (nTime4 - nTime2), nInputs <= 1 ? 0 : MILLI * (nTime4 - nTime2) / (nInputs-1), nTimeVerify * MICRO, nTimeVerify * MILLI / nBlocksTotal);
-
+    printf("%s\n", "fJustCheck");
     if (fJustCheck)
         return true;
 
@@ -3162,7 +3163,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         setDirtyBlockIndex.insert(pindex);
     }
 
-
+    printf("%s\n", "fTimestampIndex");
     if (fTimestampIndex)
     {
         unsigned int logicalTS = pindex->nTime;
