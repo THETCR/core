@@ -14,6 +14,7 @@
 //CScript in serialize.h (included from crypter.h)
 #include "script/script.h"
 #include "script/standard.h"
+#include <support/cleanse.h> // for OPENSSL_cleanse()
 
 #include <util/system.h>
 #include "util/strencodings.h"
@@ -25,7 +26,6 @@
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 #include <openssl/buffer.h>
-#include "support/cleanse.h" // for OPENSSL_cleanse()
 
 const char* CKeePassIntegrator::KEEPASS_HTTP_HOST = "localhost";
 
