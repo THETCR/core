@@ -603,7 +603,7 @@ UniValue importwallet(const JSONRPCRequest& request)
             };
 
             std::vector<std::string> vstr;
-            boost::split(vstr, line, boost::is_any_of(" "));
+            Split(vstr, line, " ");
             if (vstr.size() < 2)
                 continue;
             CKey key = DecodeSecret(vstr[0]);

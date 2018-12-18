@@ -17,7 +17,7 @@
 
 #include <boost/signals2/signal.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
+#include <util/splitstring.h>
 
 #include <memory> // for unique_ptr
 #include <unordered_map>
@@ -438,7 +438,7 @@ static inline JSONRPCRequest transformNamedArguments(const JSONRPCRequest& in, c
     int hole = 0;
     for (const std::string &argNamePattern: argNames) {
         std::vector<std::string> vargNames;
-        boost::algorithm::split(vargNames, argNamePattern, boost::algorithm::is_any_of("|"));
+        Split(vargNames, argNamePattern, "|");
         auto fr = argsIn.end();
         for (const std::string & argName : vargNames) {
             fr = argsIn.find(argName);

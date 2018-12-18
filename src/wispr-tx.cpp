@@ -268,7 +268,7 @@ static void MutateTxRBFOptIn(CMutableTransaction& tx, const std::string& strInId
 static void MutateTxAddInput(CMutableTransaction& tx, const std::string& strInput)
 {
     std::vector<std::string> vStrInputParts;
-    boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
+    Split(vStrInputParts, strInput, ":");
 
     // separate TXID:VOUT in string
     if (vStrInputParts.size()<2)
@@ -314,7 +314,7 @@ static void MutateTxDelWitness(CMutableTransaction& tx, const std::string& strIn
 static void MutateTxAddWitness(CMutableTransaction& tx, const std::string& strInput)
 {
     std::vector<std::string> vStrInputParts;
-    boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
+    Split(vStrInputParts, strInput, ":");
 
     if (vStrInputParts.size() < 2) {
         std::string strErr = "Bad input '" + strInput + "'";
@@ -346,7 +346,7 @@ static void MutateTxAddOutAddr(CMutableTransaction& tx, const std::string& strIn
 {
     // Separate into VALUE:ADDRESS
     std::vector<std::string> vStrInputParts;
-    boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
+    Split(vStrInputParts, strInput, ":");
 
     if (vStrInputParts.size() != 2)
         throw std::runtime_error("TX output missing or too many separators");
@@ -391,7 +391,7 @@ static void MutateTxAddOutPubKey(CMutableTransaction& tx, const std::string& str
 {
     // Separate into VALUE:PUBKEY[:FLAGS]
     std::vector<std::string> vStrInputParts;
-    boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
+    Split(vStrInputParts, strInput, ":");
 
     if (vStrInputParts.size() < 2 || vStrInputParts.size() > 3)
         throw std::runtime_error("TX output missing or too many separators");
@@ -441,7 +441,7 @@ static void MutateTxAddOutMultiSig(CMutableTransaction& tx, const std::string& s
 {
     // Separate into VALUE:REQUIRED:NUMKEYS:PUBKEY1:PUBKEY2:....[:FLAGS]
     std::vector<std::string> vStrInputParts;
-    boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
+    Split(vStrInputParts, strInput, ":");
 
     // Check that there are enough parameters
     if (vStrInputParts.size()<3)
@@ -553,7 +553,7 @@ static void MutateTxAddOutScript(CMutableTransaction& tx, const std::string& str
 {
     // separate VALUE:SCRIPT[:FLAGS]
     std::vector<std::string> vStrInputParts;
-    boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
+    Split(vStrInputParts, strInput, ":");
     if (vStrInputParts.size() < 2)
         throw std::runtime_error("TX output missing separator");
 
@@ -794,7 +794,7 @@ static void MutateTxAddOutBlind(CMutableTransaction& tx, const std::string& strI
         throw std::runtime_error("tx not wispr version.");
     // separate COMMITMENT:SCRIPT:RANGEPROOF[:DATA]
     std::vector<std::string> vStrInputParts;
-    boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
+    Split(vStrInputParts, strInput, ":");
     if (vStrInputParts.size() < 3)
         throw std::runtime_error("TX output missing separator");
 

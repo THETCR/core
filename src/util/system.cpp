@@ -1573,7 +1573,7 @@ std::pair<int, char**> WinCmdLineArgs::get()
 //uint32_t StringVersionToInt(const std::string& strVersion)
 //{
 //    std::vector<std::string> tokens;
-//    boost::split(tokens, strVersion, boost::is_any_of("."));
+//    Split(tokens, strVersion, ".");
 //    if(tokens.size() != 3)
 //        throw std::bad_cast();
 //    uint32_t nVersion = 0;

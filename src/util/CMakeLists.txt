@@ -23,7 +23,7 @@ add_library(util
         strencodings.cpp
         time.cpp
         ${WISPR_CORE_H}
-        )
+        splitstring.h)
 
 target_compile_definitions(util PUBLIC HAVE_CONFIG_H)
 target_include_directories(util

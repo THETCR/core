@@ -588,6 +588,7 @@ libwispr_consensus_a_SOURCES = \
   tinyformat.h \
   uint256.cpp \
   uint256.h \
+  util/splitstring.h \
   util/strencodings.cpp \
   util/strencodings.h \
   version.h

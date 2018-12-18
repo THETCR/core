@@ -22,7 +22,7 @@ CGovernanceTriggerManager triggerman;
 std::vector<std::string> SplitBy(const std::string& strCommand, const std::string& strDelimit)
 {
     std::vector<std::string> vParts;
-    boost::split(vParts, strCommand, boost::is_any_of(strDelimit));
+    Split(vParts, strCommand, strDelimit);
 
     for(int q=0; q<(int)vParts.size(); q++) {
         if(strDelimit.find(vParts[q]) != std::string::npos) {

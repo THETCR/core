@@ -20,7 +20,7 @@
 #include <assert.h>
 
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
+#include <util/splitstring.h>
 
 int64_t CChainParams::GetCoinYearReward(int64_t nTime) const
 {
@@ -878,7 +878,7 @@ void CRegTestParams::UpdateVersionBitsParametersFromArgs(const ArgsManager& args
 
     for (const std::string& strDeployment : args.GetArgs("-vbparams")) {
         std::vector<std::string> vDeploymentParams;
-        boost::split(vDeploymentParams, strDeployment, boost::is_any_of(":"));
+        Split(vDeploymentParams, strDeployment, ":");
         if (vDeploymentParams.size() != 3) {
             throw std::runtime_error("Version bits parameters malformed, expecting deployment:start:end");
         }

@@ -109,7 +109,7 @@
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/algorithm/string/split.hpp>
+#include <util/splitstring.h>
 #include <boost/thread.hpp>
 #include <openssl/crypto.h>
 
@@ -1317,7 +1317,7 @@ bool AppInitParameterInteraction()
         // Minimal effort at forwards compatibility
         std::string strReplacementModeList = gArgs.GetArg("-mempoolreplacement", "");  // default is impossible
         std::vector<std::string> vstrReplacementModes;
-        boost::split(vstrReplacementModes, strReplacementModeList, boost::is_any_of(","));
+        Split(vstrReplacementModes, strReplacementModeList, ",");
         fEnableReplacement = (std::find(vstrReplacementModes.begin(), vstrReplacementModes.end(), "fee") != vstrReplacementModes.end());
     }
 
