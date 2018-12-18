@@ -2649,7 +2649,7 @@ void CConnman::RelayTransaction(const CTransaction& tx)
                (instantsend.HasTxLockRequest(hash) ? MSG_TXLOCK_REQUEST : MSG_TX);
     CInv inv(nInv, hash);
     LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
+    for (CNode* pnode: vNodes)
     {
         pnode->PushInventory(inv);
     }
