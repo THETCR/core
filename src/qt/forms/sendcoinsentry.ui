@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>729</width>
-    <height>254</height>
+    <height>156</height>
    </rect>
   </property>
   <property name="focusPolicy">
@@ -21,34 +21,15 @@
     <string>This is a normal payment.</string>
    </property>
    <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Sunken</enum>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <property name="topMargin">
-     <number>8</number>
-    </property>
-    <property name="bottomMargin">
-     <number>4</number>
-    </property>
-    <property name="horizontalSpacing">
+    <property name="spacing">
      <number>12</number>
     </property>
-    <property name="verticalSpacing">
-     <number>8</number>
-    </property>
-    <item row="4" column="0">
-     <widget class="QLabel" name="lblNarration">
-      <property name="text">
-       <string>Narration:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="buddy">
-       <cstring>edtNarration</cstring>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0">
      <widget class="QLabel" name="payToLabel">
       <property name="text">
@@ -62,19 +43,6 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="amountLabel">
-      <property name="text">
-       <string>A&amp;mount:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="buddy">
-       <cstring>payAmount</cstring>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1">
      <layout class="QHBoxLayout" name="payToLayout">
       <property name="spacing">
@@ -83,7 +51,7 @@
       <item>
        <widget class="QValidatedLineEdit" name="payTo">
         <property name="toolTip">
-         <string>The Wispr address to send the payment to</string>
+         <string>The WISPR address to send the payment to</string>
         </property>
        </widget>
       </item>
@@ -98,12 +66,6 @@
         <property name="icon">
          <iconset resource="../wispr.qrc">
           <normaloff>:/icons/address-book</normaloff>:/icons/address-book</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
         </property>
         <property name="shortcut">
          <string>Alt+A</string>
@@ -122,12 +84,6 @@
          <iconset resource="../wispr.qrc">
           <normaloff>:/icons/editpaste</normaloff>:/icons/editpaste</iconset>
         </property>
-        <property name="iconSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
-        </property>
         <property name="shortcut">
          <string>Alt+P</string>
         </property>
@@ -145,25 +101,12 @@
          <iconset resource="../wispr.qrc">
           <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
         </property>
-        <property name="iconSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
-        </property>
        </widget>
       </item>
      </layout>
     </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="addAsLabel">
-      <property name="toolTip">
-       <string>Enter a label for this address to add it to the list of used addresses</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="0">
-     <widget class="QLabel" name="labellLabel">
+     <widget class="QLabel" name="labelLabel">
       <property name="text">
        <string>&amp;Label:</string>
       </property>
@@ -306,194 +249,51 @@
      </widget>
     </item>
     <item row="1" column="1">
-     <layout class="QHBoxLayout" name="payToLayout2_cs">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QValidatedLineEdit" name="spendAddr">
-        <property name="toolTip">
-         <string>The Wispr address that will be able to spend the output (must be 256bit)</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="addressBookButton2_cs">
-        <property name="toolTip">
-         <string>Choose previously used address</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../wispr.qrc">
-          <normaloff>:/icons/address-book</normaloff>:/icons/address-book</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="shortcut">
-         <string>Alt+A</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="pasteButton2_cs">
-        <property name="toolTip">
-         <string>Paste address from clipboard</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../wispr.qrc">
-          <normaloff>:/icons/editpaste</normaloff>:/icons/editpaste</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="shortcut">
-         <string>Alt+P</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item row="5" column="0" colspan="2">
-     <widget class="Line" name="line_cs">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+     <widget class="QLineEdit" name="addAsLabel">
+      <property name="toolTip">
+       <string>Enter a label for this address to add it to the list of used addresses</string>
       </property>
      </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="amountLabel">
+      <property name="text">
+       <string>A&amp;mount:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="buddy">
+       <cstring>payAmount</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="BitcoinAmountField" name="payAmount"/>
     </item>
     <item row="3" column="0">
-     <widget class="QLabel" name="amountLabel_cs">
+     <widget class="QLabel" name="messageLabel">
       <property name="text">
-       <string>Amount:</string>
+       <string>Message:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
-      <property name="buddy">
-       <cstring>payAmount_cs</cstring>
-      </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="stakeAddrLabel">
-      <property name="text">
-       <string>Stake Address:</string>
+    <item row="3" column="1">
+     <widget class="QLabel" name="messageTextLabel">
+      <property name="toolTip">
+       <string>A message that was attached to the WISPR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the WISPR network.</string>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="buddy">
-       <cstring>stakeAddr</cstring>
+      <property name="textFormat">
+       <enum>Qt::PlainText</enum>
       </property>
      </widget>
-    </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="lblNarration_cs">
-      <property name="text">
-       <string>Narration:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="buddy">
-       <cstring>edtNarration_cs</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <layout class="QHBoxLayout" name="payToLayout_cs">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QValidatedLineEdit" name="stakeAddr">
-        <property name="toolTip">
-         <string>The Wispr address that will be able to stake the output</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="addressBookButton_cs">
-        <property name="toolTip">
-         <string>Choose previously used address</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../wispr.qrc">
-          <normaloff>:/icons/address-book</normaloff>:/icons/address-book</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="shortcut">
-         <string>Alt+A</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="pasteButton_cs">
-        <property name="toolTip">
-         <string>Paste address from clipboard</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../wispr.qrc">
-          <normaloff>:/icons/editpaste</normaloff>:/icons/editpaste</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="shortcut">
-         <string>Alt+P</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="deleteButton_cs">
-        <property name="toolTip">
-         <string>Remove this entry</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../wispr.qrc">
-          <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </item>
    </layout>
   </widget>
-  <widget class="QFrame" name="SendCoins_UnauthenticatedPaymentRequest">
+  <widget class="QFrame" name="SendCoins_InsecurePaymentRequest">
    <property name="palette">
     <palette>
      <active>
@@ -910,13 +710,16 @@
     </palette>
    </property>
    <property name="toolTip">
-    <string>This is an unauthenticated payment request.</string>
+    <string>This is an unverified payment request.</string>
    </property>
    <property name="autoFillBackground">
     <bool>true</bool>
    </property>
    <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Sunken</enum>
    </property>
    <layout class="QGridLayout" name="gridLayout_is">
     <property name="spacing">
@@ -995,7 +798,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QFrame" name="SendCoins_AuthenticatedPaymentRequest">
+  <widget class="QFrame" name="SendCoins_SecurePaymentRequest">
    <property name="palette">
     <palette>
      <active>
@@ -1439,13 +1242,16 @@
     </palette>
    </property>
    <property name="toolTip">
-    <string>This is an authenticated payment request.</string>
+    <string>This is a verified payment request.</string>
    </property>
    <property name="autoFillBackground">
     <bool>true</bool>
    </property>
    <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Sunken</enum>
    </property>
    <layout class="QGridLayout" name="gridLayout_s">
     <property name="spacing">
@@ -1533,12 +1339,12 @@
   <customwidget>
    <class>QValidatedLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>qt/qvalidatedlineedit.h</header>
+   <header>qvalidatedlineedit.h</header>
   </customwidget>
   <customwidget>
    <class>BitcoinAmountField</class>
    <extends>QLineEdit</extends>
-   <header>qt/bitcoinamountfield.h</header>
+   <header>bitcoinamountfield.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
