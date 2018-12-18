@@ -12,6 +12,8 @@
 #include <consensus/validation.h>
 #include <core_io.h>
 #include <key.h>
+#include <key/extkey.h>
+#include <key/stealth.h>
 #include <keystore.h>
 #include <validation.h>
 #include <policy/policy.h>
@@ -20,12 +22,11 @@
 #include <script/script_error.h>
 #include <script/standard.h>
 #include <util/strencodings.h>
-
-#include <map>
-#include <string>
-
-#include <boost/algorithm/string/classification.hpp>
 #include <util/splitstring.h>
+#include <map>
+
+#include <string>
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <univalue.h>
@@ -167,10 +168,12 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
                     if (mapprevOutValues.count(tx.vin[i].prevout)) {
                         amount = mapprevOutValues[tx.vin[i].prevout];
                     }
+                    std::vector<uint8_t> vchAmount(8);
+                    memcpy(&vchAmount[0], &amount, 8);
                     unsigned int verify_flags = ParseScriptFlags(test[2].get_str());
                     const CScriptWitness *witness = &tx.vin[i].scriptWitness;
                     BOOST_CHECK_MESSAGE(VerifyScript(tx.vin[i].scriptSig, mapprevOutScriptPubKeys[tx.vin[i].prevout],
-                                                     witness, verify_flags, TransactionSignatureChecker(&tx, i, amount, txdata), &err),
+                                                     witness, verify_flags, TransactionSignatureChecker(&tx, i, vchAmount, txdata), &err),
                                         strTest);
                     BOOST_CHECK_MESSAGE(err == SCRIPT_ERR_OK, ScriptErrorString(err));
                 }
@@ -251,12 +254,14 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
 
                     unsigned int verify_flags = ParseScriptFlags(test[2].get_str());
                     CAmount amount = 0;
+                    std::vector<uint8_t> vchAmount(8);
+                    memcpy(&vchAmount[0], &amount, 8);
                     if (mapprevOutValues.count(tx.vin[i].prevout)) {
                         amount = mapprevOutValues[tx.vin[i].prevout];
                     }
                     const CScriptWitness *witness = &tx.vin[i].scriptWitness;
                     fValid = VerifyScript(tx.vin[i].scriptSig, mapprevOutScriptPubKeys[tx.vin[i].prevout],
-                                          witness, verify_flags, TransactionSignatureChecker(&tx, i, amount, txdata), &err);
+                                          witness, verify_flags, TransactionSignatureChecker(&tx, i, vchAmount, txdata), &err);
                 }
                 BOOST_CHECK_MESSAGE(!fValid, strTest);
                 BOOST_CHECK_MESSAGE(err != SCRIPT_ERR_OK, ScriptErrorString(err));
@@ -273,11 +278,11 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
         CMutableTransaction tx;
         stream >> tx;
         CValidationState state;
-        BOOST_CHECK_MESSAGE(CheckTransaction(CTransaction(tx), state) && state.IsValid(), "Simple deserialized transaction should be valid.");
+        BOOST_CHECK_MESSAGE(CheckTransaction(tx, state) && state.IsValid(), "Simple deserialized transaction should be valid.");
 
         // Check that duplicate txins fail
         tx.vin.push_back(tx.vin[0]);
-        BOOST_CHECK_MESSAGE(!CheckTransaction(CTransaction(tx), state) || !state.IsValid(), "Transaction with duplicate txins should be invalid.");
+        BOOST_CHECK_MESSAGE(!CheckTransaction(tx, state) || !state.IsValid(), "Transaction with duplicate txins should be invalid.");
     }
 
 //
@@ -306,14 +311,14 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
         dummyTransactions[0].vout[0].scriptPubKey << ToByteVector(key[0].GetPubKey()) << OP_CHECKSIG;
         dummyTransactions[0].vout[1].nValue = 50*CENT;
         dummyTransactions[0].vout[1].scriptPubKey << ToByteVector(key[1].GetPubKey()) << OP_CHECKSIG;
-        AddCoins(coinsRet, CTransaction(dummyTransactions[0]), 0);
+        AddCoins(coinsRet, dummyTransactions[0], 0);
 
         dummyTransactions[1].vout.resize(2);
         dummyTransactions[1].vout[0].nValue = 21*CENT;
         dummyTransactions[1].vout[0].scriptPubKey = GetScriptForDestination(key[2].GetPubKey().GetID());
         dummyTransactions[1].vout[1].nValue = 22*CENT;
         dummyTransactions[1].vout[1].scriptPubKey = GetScriptForDestination(key[3].GetPubKey().GetID());
-        AddCoins(coinsRet, CTransaction(dummyTransactions[1]), 0);
+        AddCoins(coinsRet, dummyTransactions[1], 0);
 
         return dummyTransactions;
     }
@@ -340,8 +345,8 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
         t1.vout[0].nValue = 90*CENT;
         t1.vout[0].scriptPubKey << OP_1;
 
-        BOOST_CHECK(AreInputsStandard(CTransaction(t1), coins));
-        BOOST_CHECK_EQUAL(coins.GetValueIn(CTransaction(t1)), (50+21+22)*CENT);
+        BOOST_CHECK(AreInputsStandard(t1, coins));
+        BOOST_CHECK_EQUAL(coins.GetValueIn(t1), (50+21+22)*CENT);
     }
 
     static void CreateCreditAndSpend(const CKeyStore& keystore, const CScript& outscript, CTransactionRef& output, CMutableTransaction& input, bool success = true)
@@ -386,7 +391,9 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
     {
         ScriptError error;
         CTransaction inputi(input);
-        bool ret = VerifyScript(inputi.vin[0].scriptSig, output->vout[0].scriptPubKey, &inputi.vin[0].scriptWitness, flags, TransactionSignatureChecker(&inputi, 0, output->vout[0].nValue), &error);
+        std::vector<uint8_t> vchAmount(8);
+        memcpy(&vchAmount[0], &output->vout[0].nValue, 8);
+        bool ret = VerifyScript(inputi.vin[0].scriptSig, output->vout[0].scriptPubKey, &inputi.vin[0].scriptWitness, flags, TransactionSignatureChecker(&inputi, 0, vchAmount), &error);
         assert(ret == success);
     }
 
@@ -421,7 +428,7 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
         CKey key;
         key.MakeNewKey(true); // Need to use compressed keys in segwit or the signing will fail
         CBasicKeyStore keystore;
-        BOOST_CHECK(keystore.AddKeyPubKey(key, key.GetPubKey()));
+        keystore.AddKeyPubKey(key, key.GetPubKey());
         CKeyID hash = key.GetPubKey().GetID();
         CScript scriptPubKey = CScript() << OP_0 << std::vector<unsigned char>(hash.begin(), hash.end());
 
@@ -449,9 +456,12 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
             mtx.vout[i].scriptPubKey = CScript() << OP_1;
         }
 
+        CAmount amount = 1000;
+        std::vector<uint8_t> vchAmount(8);
+        memcpy(&vchAmount[0], &amount, 8);
         // sign all inputs
         for(uint32_t i = 0; i < mtx.vin.size(); i++) {
-            bool hashSigned = SignSignature(keystore, scriptPubKey, mtx, i, 1000, sigHashes.at(i % sigHashes.size()));
+            bool hashSigned = SignSignature(keystore, scriptPubKey, mtx, i, vchAmount, sigHashes.at(i % sigHashes.size()));
             assert(hashSigned);
         }
 
@@ -477,7 +487,6 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
                 coin.out.scriptPubKey = scriptPubKey;
                 coins.emplace_back(std::move(coin));
             }
-
             for (uint32_t i = 0; i < mtx.vin.size(); i++) {
                 std::vector<CScriptCheck> vChecks;
                 CScriptCheck check(coins[tx.vin[i].prevout.n].out, tx, i, SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_WITNESS, false, &txdata);
@@ -499,12 +508,16 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
         SignatureData sigdata;
         sigdata = DataFromTransaction(input1, 0, tx->vout[0]);
         sigdata.MergeSignatureData(DataFromTransaction(input2, 0, tx->vout[0]));
-        ProduceSignature(DUMMY_SIGNING_PROVIDER, MutableTransactionSignatureCreator(&input1, 0, tx->vout[0].nValue), tx->vout[0].scriptPubKey, sigdata);
+        std::vector<uint8_t> vamount(8);
+        memcpy(vamount.data(), &tx->vout[0].nValue, 8);
+        ProduceSignature(DUMMY_SIGNING_PROVIDER, MutableTransactionSignatureCreator(&input1, 0, vamount), tx->vout[0].scriptPubKey, sigdata);
         return sigdata;
     }
 
     BOOST_AUTO_TEST_CASE(test_witness)
     {
+        std::vector<uint8_t> vchAmount(8);
+
         CBasicKeyStore keystore, keystore2;
         CKey key1, key2, key3, key1L, key2L;
         CPubKey pubkey1, pubkey2, pubkey3, pubkey1L, pubkey2L;
@@ -518,10 +531,10 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
         pubkey3 = key3.GetPubKey();
         pubkey1L = key1L.GetPubKey();
         pubkey2L = key2L.GetPubKey();
-        BOOST_CHECK(keystore.AddKeyPubKey(key1, pubkey1));
-        BOOST_CHECK(keystore.AddKeyPubKey(key2, pubkey2));
-        BOOST_CHECK(keystore.AddKeyPubKey(key1L, pubkey1L));
-        BOOST_CHECK(keystore.AddKeyPubKey(key2L, pubkey2L));
+        keystore.AddKeyPubKey(key1, pubkey1);
+        keystore.AddKeyPubKey(key2, pubkey2);
+        keystore.AddKeyPubKey(key1L, pubkey1L);
+        keystore.AddKeyPubKey(key2L, pubkey2L);
         CScript scriptPubkey1, scriptPubkey2, scriptPubkey1L, scriptPubkey2L, scriptMulti;
         scriptPubkey1 << ToByteVector(pubkey1) << OP_CHECKSIG;
         scriptPubkey2 << ToByteVector(pubkey2) << OP_CHECKSIG;
@@ -531,19 +544,19 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
         oneandthree.push_back(pubkey1);
         oneandthree.push_back(pubkey3);
         scriptMulti = GetScriptForMultisig(2, oneandthree);
-        BOOST_CHECK(keystore.AddCScript(scriptPubkey1));
-        BOOST_CHECK(keystore.AddCScript(scriptPubkey2));
-        BOOST_CHECK(keystore.AddCScript(scriptPubkey1L));
-        BOOST_CHECK(keystore.AddCScript(scriptPubkey2L));
-        BOOST_CHECK(keystore.AddCScript(scriptMulti));
-        BOOST_CHECK(keystore.AddCScript(GetScriptForWitness(scriptPubkey1)));
-        BOOST_CHECK(keystore.AddCScript(GetScriptForWitness(scriptPubkey2)));
-        BOOST_CHECK(keystore.AddCScript(GetScriptForWitness(scriptPubkey1L)));
-        BOOST_CHECK(keystore.AddCScript(GetScriptForWitness(scriptPubkey2L)));
-        BOOST_CHECK(keystore.AddCScript(GetScriptForWitness(scriptMulti)));
-        BOOST_CHECK(keystore2.AddCScript(scriptMulti));
-        BOOST_CHECK(keystore2.AddCScript(GetScriptForWitness(scriptMulti)));
-        BOOST_CHECK(keystore2.AddKeyPubKey(key3, pubkey3));
+        keystore.AddCScript(scriptPubkey1);
+        keystore.AddCScript(scriptPubkey2);
+        keystore.AddCScript(scriptPubkey1L);
+        keystore.AddCScript(scriptPubkey2L);
+        keystore.AddCScript(scriptMulti);
+        keystore.AddCScript(GetScriptForWitness(scriptPubkey1));
+        keystore.AddCScript(GetScriptForWitness(scriptPubkey2));
+        keystore.AddCScript(GetScriptForWitness(scriptPubkey1L));
+        keystore.AddCScript(GetScriptForWitness(scriptPubkey2L));
+        keystore.AddCScript(GetScriptForWitness(scriptMulti));
+        keystore2.AddCScript(scriptMulti);
+        keystore2.AddCScript(GetScriptForWitness(scriptMulti));
+        keystore2.AddKeyPubKey(key3, pubkey3);
 
         CTransactionRef output1, output2;
         CMutableTransaction input1, input2;
@@ -697,75 +710,75 @@ BOOST_FIXTURE_TEST_SUITE(transaction_tests, BasicTestingSetup)
         t.vout[0].scriptPubKey = GetScriptForDestination(key.GetPubKey().GetID());
 
         std::string reason;
-        BOOST_CHECK(IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(IsStandardTx(t, reason));
 
         // Check dust with default relay fee:
         CAmount nDustThreshold = 182 * dustRelayFee.GetFeePerK()/1000;
         BOOST_CHECK_EQUAL(nDustThreshold, 546);
         // dust:
         t.vout[0].nValue = nDustThreshold - 1;
-        BOOST_CHECK(!IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(!IsStandardTx(t, reason));
         // not dust:
         t.vout[0].nValue = nDustThreshold;
-        BOOST_CHECK(IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(IsStandardTx(t, reason));
 
         // Check dust with odd relay fee to verify rounding:
         // nDustThreshold = 182 * 3702 / 1000
         dustRelayFee = CFeeRate(3702);
         // dust:
         t.vout[0].nValue = 673 - 1;
-        BOOST_CHECK(!IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(!IsStandardTx(t, reason));
         // not dust:
         t.vout[0].nValue = 673;
-        BOOST_CHECK(IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(IsStandardTx(t, reason));
         dustRelayFee = CFeeRate(DUST_RELAY_TX_FEE);
 
         t.vout[0].scriptPubKey = CScript() << OP_1;
-        BOOST_CHECK(!IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(!IsStandardTx(t, reason));
 
         // MAX_OP_RETURN_RELAY-byte TX_NULL_DATA (standard)
         t.vout[0].scriptPubKey = CScript() << OP_RETURN << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef3804678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38");
         BOOST_CHECK_EQUAL(MAX_OP_RETURN_RELAY, t.vout[0].scriptPubKey.size());
-        BOOST_CHECK(IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(IsStandardTx(t, reason));
 
         // MAX_OP_RETURN_RELAY+1-byte TX_NULL_DATA (non-standard)
         t.vout[0].scriptPubKey = CScript() << OP_RETURN << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef3804678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef3800");
         BOOST_CHECK_EQUAL(MAX_OP_RETURN_RELAY + 1, t.vout[0].scriptPubKey.size());
-        BOOST_CHECK(!IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(!IsStandardTx(t, reason));
 
         // Data payload can be encoded in any way...
         t.vout[0].scriptPubKey = CScript() << OP_RETURN << ParseHex("");
-        BOOST_CHECK(IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(IsStandardTx(t, reason));
         t.vout[0].scriptPubKey = CScript() << OP_RETURN << ParseHex("00") << ParseHex("01");
-        BOOST_CHECK(IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(IsStandardTx(t, reason));
         // OP_RESERVED *is* considered to be a PUSHDATA type opcode by IsPushOnly()!
         t.vout[0].scriptPubKey = CScript() << OP_RETURN << OP_RESERVED << -1 << 0 << ParseHex("01") << 2 << 3 << 4 << 5 << 6 << 7 << 8 << 9 << 10 << 11 << 12 << 13 << 14 << 15 << 16;
-        BOOST_CHECK(IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(IsStandardTx(t, reason));
         t.vout[0].scriptPubKey = CScript() << OP_RETURN << 0 << ParseHex("01") << 2 << ParseHex("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        BOOST_CHECK(IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(IsStandardTx(t, reason));
 
         // ...so long as it only contains PUSHDATA's
         t.vout[0].scriptPubKey = CScript() << OP_RETURN << OP_RETURN;
-        BOOST_CHECK(!IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(!IsStandardTx(t, reason));
 
         // TX_NULL_DATA w/o PUSHDATA
         t.vout.resize(1);
         t.vout[0].scriptPubKey = CScript() << OP_RETURN;
-        BOOST_CHECK(IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(IsStandardTx(t, reason));
 
         // Only one TX_NULL_DATA permitted in all cases
         t.vout.resize(2);
         t.vout[0].scriptPubKey = CScript() << OP_RETURN << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38");
         t.vout[1].scriptPubKey = CScript() << OP_RETURN << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38");
-        BOOST_CHECK(!IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(!IsStandardTx(t, reason));
 
         t.vout[0].scriptPubKey = CScript() << OP_RETURN << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38");
         t.vout[1].scriptPubKey = CScript() << OP_RETURN;
-        BOOST_CHECK(!IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(!IsStandardTx(t, reason));
 
         t.vout[0].scriptPubKey = CScript() << OP_RETURN;
         t.vout[1].scriptPubKey = CScript() << OP_RETURN;
-        BOOST_CHECK(!IsStandardTx(CTransaction(t), reason));
+        BOOST_CHECK(!IsStandardTx(t, reason));
     }
 
 BOOST_AUTO_TEST_SUITE_END()
