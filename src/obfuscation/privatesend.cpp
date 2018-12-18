@@ -18,6 +18,7 @@
 #include <txmempool.h>
 #include <util/system.h>
 #include <util/moneystr.h>
+#include <reverse_iterator.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -417,7 +418,7 @@ int CPrivateSend::GetDenominationsByAmounts(const std::vector<CAmount>& vecAmoun
     CScript scriptTmp = CScript();
     std::vector<CTxOut> vecTxOut;
 
-    BOOST_REVERSE_FOREACH(CAmount nAmount, vecAmount) {
+    for(CAmount nAmount: reverse_iterate(vecAmount)) {
         CTxOut txout(nAmount, scriptTmp);
         vecTxOut.push_back(txout);
     }

@@ -15,6 +15,7 @@
 #include <txmempool.h>
 #include <util/system.h>
 #include <util/moneystr.h>
+#include <reverse_iterator.h>
 
 #include <memory>
 
@@ -1383,7 +1384,7 @@ bool CPrivateSendClient::CreateDenominated(const CompactTallyItem& tallyItem, bo
     do {
         std::vector<CAmount> vecStandardDenoms = CPrivateSend::GetStandardDenominations();
 
-        BOOST_REVERSE_FOREACH(CAmount nDenomValue, vecStandardDenoms) {
+        for(CAmount nDenomValue: reverse_iterate(vecStandardDenoms)) {
 
             if(fSkip) {
                 // Note: denoms are skipped if there are already DENOMS_COUNT_MAX of them
