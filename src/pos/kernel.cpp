@@ -18,7 +18,6 @@
 #include <coins.h>
 
 //old includes
-#include <boost/assign/list_of.hpp>
 
 #include <pos/kernel.h>
 #include <spork/spork.h>
@@ -63,7 +62,7 @@ unsigned int GetStakeMinAge(){
 }
 // Hard checkpoints of stake modifiers to ensure they are deterministic
 static std::map<int, unsigned int> mapStakeModifierCheckpoints =
-        boost::assign::map_list_of(0, 0xfd11f4e7u);
+        {0, 0xfd11f4e7u};
 
 // Get time weight
 int64_t GetWeight(int64_t nIntervalBeginning, int64_t nIntervalEnd)
