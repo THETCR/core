@@ -16,7 +16,6 @@
 #include <init.h>
 #include <uint256.h>
 
-#include <boost/foreach.hpp>
 #include <openssl/evp.h>
 #include <wallet/hdwallet.h>
 #include <wallet/hdwalletdb.h>
