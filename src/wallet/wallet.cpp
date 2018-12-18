@@ -4911,7 +4911,6 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
 // either supply "wallet" (if already loaded) or "strWalletFile" (if wallet wasn't loaded yet)
 bool AutoBackupWallet(CWallet* wallet, const std::string& strWalletFile_, std::string& strBackupWarningRet, std::string& strBackupErrorRet)
 {
-    namespace fs = boost::filesystem;
 
     strBackupWarningRet = strBackupErrorRet = "";
     std::string strWalletFile = "";
