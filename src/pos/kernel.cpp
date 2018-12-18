@@ -62,7 +62,9 @@ unsigned int GetStakeMinAge(){
 }
 // Hard checkpoints of stake modifiers to ensure they are deterministic
 static std::map<int, unsigned int> mapStakeModifierCheckpoints =
-        {0, 0xfd11f4e7u};
+        {
+        {0, 0xfd11f4e7u},
+        };
 
 // Get time weight
 int64_t GetWeight(int64_t nIntervalBeginning, int64_t nIntervalEnd)
