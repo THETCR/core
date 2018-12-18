@@ -1,9 +1,9 @@
 #ifndef MASTERNODELIST_H
 #define MASTERNODELIST_H
 
-#include "primitives/transaction.h"
-#include "platformstyle.h"
-#include "sync.h"
+#include <primitives/transaction.h>
+#include <qt/platformstyle.h>
+#include <sync.h>
 #include <util/system.h>
 
 #include <QMenu>

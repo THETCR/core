@@ -7,8 +7,8 @@
 
 #include <QMainWindow>
 
-#include "base58.h"
-#include "uint256.h"
+#include <base58.h>
+#include <uint256.h>
 #undef loop
 
 namespace Ui

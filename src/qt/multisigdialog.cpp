@@ -2,26 +2,26 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "multisigdialog.h"
-#include "forms/ui_multisigdialog.h"
+#include <qt/multisigdialog.h>
+#include <forms/ui_multisigdialog.h>
 
-#include "askpassphrasedialog.h"
-#include "primitives/transaction.h"
-#include "addressbookpage.h"
-#include "util/strencodings.h"
-#include "core_io.h"
-#include "script/script.h"
-#include "base58.h"
-#include "coins.h"
-#include "keystore.h"
-#include "init.h"
-#include "wallet.h"
-#include "script/sign.h"
-#include "script/interpreter.h"
-#include "util/moneystr.h"
-#include "guiutil.h"
-#include "qvalidatedlineedit.h"
-#include "bitcoinamountfield.h"
+#include <qt/askpassphrasedialog.h>
+#include <primitives/transaction.h>
+#include <qt/addressbookpage.h>
+#include <util/strencodings.h>
+#include <core_io.h>
+#include <script/script.h>
+#include <base58.h>
+#include <coins.h>
+#include <keystore.h>
+#include <init.h>
+#include <wallet/wallet.h>
+#include <script/sign.h>
+#include <script/interpreter.h>
+#include <util/moneystr.h>
+#include <qt/guiutil.h>
+#include <qt/qvalidatedlineedit.h>
+#include <qt/bitcoinamountfield.h>
 
 #include <QVariant>
 #include <QHBoxLayout>

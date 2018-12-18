@@ -1,11 +1,11 @@
-#include "darksendconfig.h"
-#include "forms/ui_darksendconfig.h"
+#include <qt/darksendconfig.h>
+#include <forms/ui_darksendconfig.h>
 
-#include "bitcoinunits.h"
-#include "guiconstants.h"
-#include "optionsmodel.h"
-#include "obfuscation/privatesend-client.h"
-#include "walletmodel.h"
+#include <qt/bitcoinunits.h>
+#include <qt/guiconstants.h>
+#include <qt/optionsmodel.h>
+#include <obfuscation/privatesend-client.h>
+#include <qt/walletmodel.h>
 
 #include <QMessageBox>
 #include <QPushButton>
