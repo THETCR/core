@@ -16,11 +16,11 @@
 
 #include <secp256k1_rangeproof.h>
 
-static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x01;
+static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x02;
 
 static const uint8_t WISPR_BLOCK_VERSION = 0x09;
-static const uint8_t WISPR_TXN_VERSION = 0x09;
-static const uint8_t MAX_WISPR_TXN_VERSION = 0xBF;
+static const uint8_t WISPR_TXN_VERSION = 0x03;
+static const uint8_t MAX_WISPR_TXN_VERSION = 0x03;
 static const uint8_t BTC_TXN_VERSION = 0x02;
 
 
@@ -55,7 +55,8 @@ enum DataOutputTypes
 
 inline bool IsWisprTxVersion(int nVersion)
 {
-    return (nVersion & 0xFF) >= WISPR_TXN_VERSION;
+    return nVersion >= WISPR_TXN_VERSION;
+//    return (nVersion & 0xFF) >= WISPR_TXN_VERSION;
 }
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
@@ -74,8 +75,9 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(hash);
-        READWRITE(n);
+        READWRITE(*this);
+//        READWRITE(hash);
+//        READWRITE(n);
     }
 
     void SetNull() { hash.SetNull(); n = (uint32_t) -1; }
@@ -694,7 +696,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 //        printf("Unserialize: BTC_TXN_VERSION\n");
 //        tx.nVersion = bv;
         s >> tx.nTime;
-    }else{
+    }else if (tx.nVersion >= 0x03){
         tx.nVersion |= bv;
         s >> bv;
         tx.nVersion |= bv<<8;
