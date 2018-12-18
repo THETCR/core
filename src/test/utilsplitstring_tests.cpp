@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include <test/test_bitcoin.h>
+#include <test/test_wispr.h>
 #include <boost/test/unit_test.hpp>
 
 // Comment out `#include <util/splitstring.h>` above and uncomment the lines below to validate
