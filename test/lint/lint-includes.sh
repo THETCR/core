@@ -46,7 +46,6 @@ if [[ ${INCLUDED_CPP_FILES} != "" ]]; then
 fi
 
 EXPECTED_BOOST_INCLUDES=(
-    boost/algorithm/string.hpp
     boost/algorithm/string/case_conv.hpp
     boost/algorithm/string/classification.hpp
     boost/algorithm/string/replace.hpp

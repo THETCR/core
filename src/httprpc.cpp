@@ -20,7 +20,7 @@
 
 #include <memory>
 
-#include <boost/algorithm/string.hpp> // boost::trim
+#include <util/splitstring.h> // boost::trim
 
 /** WWW-Authenticate to present with 401 Unauthorized response */
 static const char* WWW_AUTH_HEADER_DATA = "Basic realm=\"jsonrpc\"";

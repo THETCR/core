@@ -20,7 +20,7 @@
 #include <validation.h>
 #include <version.h>
 
-#include <boost/algorithm/string.hpp>
+#include <util/splitstring.h>
 
 #include <univalue.h>
 

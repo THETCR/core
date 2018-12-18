@@ -80,7 +80,7 @@
 #include <thread>
 
 //DASH
-//#include <boost/algorithm/string.hpp>
+//#include <util/splitstring.h>
 
 
 //Dash only features

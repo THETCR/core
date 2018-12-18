@@ -39,7 +39,7 @@
 
 #include <univalue.h>
 
-#include <boost/algorithm/string.hpp>
+#include <util/splitstring.h>
 #include <boost/thread/thread.hpp> // boost::thread::interrupt
 
 #include <memory>

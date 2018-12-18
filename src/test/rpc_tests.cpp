@@ -15,7 +15,7 @@
 
 #include <test/test_wispr.h>
 
-#include <boost/algorithm/string.hpp>
+#include <util/splitstring.h>
 #include <boost/test/unit_test.hpp>
 
 #include <univalue.h>

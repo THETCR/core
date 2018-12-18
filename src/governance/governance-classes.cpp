@@ -10,7 +10,7 @@
 #include "validation.h"
 #include "util/strencodings.h"
 
-#include <boost/algorithm/string.hpp>
+#include <util/splitstring.h>
 
 #include <univalue.h>
 
