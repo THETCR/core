@@ -1,5 +1,5 @@
 #include <qt/darksendconfig.h>
-#include <forms/ui_darksendconfig.h>
+#include <qt/forms/ui_darksendconfig.h>
 
 #include <qt/bitcoinunits.h>
 #include <qt/guiconstants.h>
