@@ -116,18 +116,9 @@
       </widget>
      </item>
      <item row="5" column="0">
-      <widget class="QCheckBox" name="unlockForStakingOnlyLabel">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="toolTip">
-        <string>Serves to disable the trivial sendmoney when OS account compromised. Provides no real security.</string>
-       </property>
+      <widget class="QLabel" name="unlockForStakingOnlyLabel">
        <property name="text">
-        <string>For anonymization, automint, and staking only</string>
-       </property>
-       <property name="visible">
-        <bool>false</bool>
+        <string>Unlock For Staking Only</string>
        </property>
       </widget>
      </item>
