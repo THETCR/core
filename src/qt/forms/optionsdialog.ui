@@ -471,6 +471,112 @@
         </layout>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2_Network">
+         <item>
+          <widget class="QLabel" name="proxyActiveNets">
+           <property name="text">
+            <string>Used for reaching peers via:</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="proxyReachIPv4">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="proxyReachIPv4Label">
+           <property name="text">
+            <string>IPv4</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="proxyReachIPv6">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="proxyReachIPv6Label">
+           <property name="text">
+            <string>IPv6</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="proxyReachTor">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="proxyReachTorLabel">
+           <property name="text">
+            <string>Tor</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2_Network">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="connectSocksTor">
+         <property name="toolTip">
+          <string>Connect to the Wispr network through a separate SOCKS5 proxy for Tor hidden services.</string>
+         </property>
+         <property name="text">
+          <string>Use separate SOCKS&amp;5 proxy to reach peers via Tor hidden services:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_Network">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -728,6 +834,34 @@ https://www.transifex.com/WisprProject/WisprProject-translations</string>
           </size>
          </property>
         </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Staking</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="reserveBalanceLabel">
+           <property name="text">
+            <string>Reserve Balance</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="BitcoinAmountField" name="reserveBalanceAmount">
+           <property name="maximumSize">
+            <size>
+             <width>250</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
