@@ -1596,14 +1596,8 @@ bool ReadRawBlockFromDisk(std::vector<uint8_t>& block, const CBlockIndex* pindex
 
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
 {
-    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
-    // Force block reward to zero when right shift is undefined.
-    if (halvings >= 64)
-        return 0;
-
-    CAmount nSubsidy = 50 * COIN;
-    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
-    nSubsidy >>= halvings;
+    printf("%s\n", __func__);
+    CAmount nSubsidy = 125000 * COIN;
     return nSubsidy;
 }
 /*
@@ -3148,7 +3142,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     } else
     {
         CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus());
-        if (block.vtx[1]->GetValueOut() > blockReward) // wispr coins are imported as coinbase txns
+        if (block.vtx[0]->GetValueOut() > blockReward) // wispr coins are imported as coinbase txns
             return state.DoS(100,
                              error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
                                    block.vtx[0]->GetValueOut(), blockReward),

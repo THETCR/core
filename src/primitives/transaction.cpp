@@ -200,6 +200,7 @@ CTransaction::CTransaction(CMutableTransaction &&tx) : nVersion(tx.nVersion), nT
 
 CAmount CTransaction::GetValueOut() const
 {
+    printf("%s\n", __func__);
     CAmount nValueOut = 0;
     for (const auto& tx_out : vout) {
         nValueOut += tx_out.nValue;
