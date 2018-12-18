@@ -75,9 +75,9 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(*this);
-//        READWRITE(hash);
-//        READWRITE(n);
+//        READWRITE(*this);
+        READWRITE(hash);
+        READWRITE(n);
     }
 
     void SetNull() { hash.SetNull(); n = (uint32_t) -1; }
