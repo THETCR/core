@@ -26,7 +26,7 @@
 #include <memory>
 #include <stdio.h>
 
-#include <util/splitstring.h>
+#include <boost/algorithm/string.hpp>
 
 static bool fCreateBlank;
 static std::map<std::string,UniValue> registers;
