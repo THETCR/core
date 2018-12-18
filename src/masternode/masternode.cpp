@@ -19,8 +19,6 @@
 #include "wallet/wallet.h"
 #endif // ENABLE_WALLET
 
-#include <boost/lexical_cast.hpp>
-
 
 CMasternode::CMasternode() :
     masternode_info_t{ MASTERNODE_ENABLED, PROTOCOL_VERSION, GetAdjustedTime()},
@@ -650,9 +648,9 @@ bool CMasternodeBroadcast::Sign(const CKey& keyCollateralAddress)
             return false;
         }
     } else {
-        std::string strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) +
+        std::string strMessage = addr.ToString() + strprintf("%d", sigTime) +
                         pubKeyCollateralAddress.GetID().ToString() + pubKeyMasternode.GetID().ToString() +
-                        boost::lexical_cast<std::string>(nProtocolVersion);
+                        strprintf("%d", nProtocolVersion);
 
         if (!CMessageSigner::SignMessage(strMessage, vchSig, keyCollateralAddress)) {
             LogPrintf("CMasternodeBroadcast::Sign -- SignMessage() failed\n");
@@ -678,9 +676,9 @@ bool CMasternodeBroadcast::CheckSignature(int& nDos) const
 
         if (!CHashSigner::VerifyHash(hash, pubKeyCollateralAddress, vchSig, strError)) {
             // maybe it's in old format
-            std::string strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) +
+            std::string strMessage = addr.ToString() + strprintf("%d", sigTime) +
                             pubKeyCollateralAddress.GetID().ToString() + pubKeyMasternode.GetID().ToString() +
-                            boost::lexical_cast<std::string>(nProtocolVersion);
+                            strprintf("%d", nProtocolVersion);
 
             if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, strMessage, strError)){
                 // nope, not in old format either
@@ -690,9 +688,9 @@ bool CMasternodeBroadcast::CheckSignature(int& nDos) const
             }
         }
     } else {
-        std::string strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) +
+        std::string strMessage = addr.ToString() + strprintf("%d", sigTime) +
                         pubKeyCollateralAddress.GetID().ToString() + pubKeyMasternode.GetID().ToString() +
-                        boost::lexical_cast<std::string>(nProtocolVersion);
+                        strprintf("%d", nProtocolVersion);
 
         if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, strMessage, strError)){
             LogPrintf("CMasternodeBroadcast::CheckSignature -- Got bad Masternode announce signature, error: %s\n", strError);
@@ -772,7 +770,7 @@ bool CMasternodePing::Sign(const CKey& keyMasternode, const CPubKey& pubKeyMaste
         }
     } else {
         std::string strMessage = CTxIn(masternodeOutpoint).ToString() + blockHash.ToString() +
-                    boost::lexical_cast<std::string>(sigTime);
+                    strprintf("%d", sigTime);
 
         if (!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
             LogPrintf("CMasternodePing::Sign -- SignMessage() failed\n");
@@ -798,7 +796,7 @@ bool CMasternodePing::CheckSignature(const CPubKey& pubKeyMasternode, int &nDos)
 
         if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
             std::string strMessage = CTxIn(masternodeOutpoint).ToString() + blockHash.ToString() +
-                        boost::lexical_cast<std::string>(sigTime);
+                        strprintf("%d", sigTime);
 
             if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
                 LogPrintf("CMasternodePing::CheckSignature -- Got bad Masternode ping signature, masternode=%s, error: %s\n", masternodeOutpoint.ToStringShort(), strError);
@@ -808,7 +806,7 @@ bool CMasternodePing::CheckSignature(const CPubKey& pubKeyMasternode, int &nDos)
         }
     } else {
         std::string strMessage = CTxIn(masternodeOutpoint).ToString() + blockHash.ToString() +
-                    boost::lexical_cast<std::string>(sigTime);
+                    strprintf("%d", sigTime);
 
         if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
             LogPrintf("CMasternodePing::CheckSignature -- Got bad Masternode ping signature, masternode=%s, error: %s\n", masternodeOutpoint.ToStringShort(), strError);

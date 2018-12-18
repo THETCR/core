@@ -11,8 +11,6 @@
 #include <net_processing.h>
 #include <netmessagemaker.h>
 
-#include <boost/lexical_cast.hpp>
-
 CSporkManager sporkManager;
 
 std::map<uint256, CSporkMessage> mapSporks;
@@ -265,7 +263,7 @@ bool CSporkMessage::Sign(const CKey& key)
             return false;
         }
     } else {
-        std::string strMessage = boost::lexical_cast<std::string>(nSporkID) + boost::lexical_cast<std::string>(nValue) + boost::lexical_cast<std::string>(nTimeSigned);
+        std::string strMessage = strprintf("%d", nSporkID) + strprintf("%d", nValue) + strprintf("%d", nTimeSigned);
 
         if(!CMessageSigner::SignMessage(strMessage, vchSig, key)) {
             LogPrintf("CSporkMessage::Sign -- SignMessage() failed\n");
@@ -295,7 +293,7 @@ bool CSporkMessage::CheckSignature(const CKeyID& pubKeyId) const
             return false;
         }
     } else {
-        std::string strMessage = boost::lexical_cast<std::string>(nSporkID) + boost::lexical_cast<std::string>(nValue) + boost::lexical_cast<std::string>(nTimeSigned);
+        std::string strMessage = strprintf("%d", nSporkID) + strprintf("%d", nValue) + strprintf("%d", nTimeSigned);
 
         if (!CMessageSigner::VerifyMessage(pubKeyId, vchSig, strMessage, strError)){
             // Note: unlike for other messages we have to check for new format even with SPORK_6_NEW_SIGS

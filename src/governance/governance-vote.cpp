@@ -9,7 +9,6 @@
 #include "messagesigner.h"
 #include <util/system.h>
 
-#include <boost/lexical_cast.hpp>
 
 std::string CGovernanceVoting::ConvertOutcomeToString(vote_outcome_enum_t nOutcome)
 {
@@ -173,7 +172,7 @@ bool CGovernanceVote::Sign(const CKey& keyMasternode, const CPubKey& pubKeyMaste
     } else {
 
         std::string strMessage = masternodeOutpoint.ToStringShort() + "|" + nParentHash.ToString() + "|" +
-            boost::lexical_cast<std::string>(nVoteSignal) + "|" + boost::lexical_cast<std::string>(nVoteOutcome) + "|" + boost::lexical_cast<std::string>(nTime);
+                    strprintf("%d", nVoteSignal) + "|" + strprintf("%d", nVoteOutcome) + "|" + strprintf("%d", nTime);
 
         if(!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
             LogPrintf("CGovernanceVote::Sign -- SignMessage() failed\n");
@@ -199,9 +198,9 @@ bool CGovernanceVote::CheckSignature(const CPubKey& pubKeyMasternode) const
         if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
             // could be a signature in old format
             std::string strMessage = masternodeOutpoint.ToStringShort() + "|" + nParentHash.ToString() + "|" +
-                boost::lexical_cast<std::string>(nVoteSignal) + "|" +
-                boost::lexical_cast<std::string>(nVoteOutcome) + "|" +
-                boost::lexical_cast<std::string>(nTime);
+                    strprintf("%d", nVoteSignal) + "|" +
+                    strprintf("%d", nVoteOutcome) + "|" +
+                    strprintf("%d", nTime);
 
             if(!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
                 // nope, not in old format either
@@ -211,9 +210,9 @@ bool CGovernanceVote::CheckSignature(const CPubKey& pubKeyMasternode) const
         }
     } else {
         std::string strMessage = masternodeOutpoint.ToStringShort() + "|" + nParentHash.ToString() + "|" +
-            boost::lexical_cast<std::string>(nVoteSignal) + "|" +
-            boost::lexical_cast<std::string>(nVoteOutcome) + "|" +
-            boost::lexical_cast<std::string>(nTime);
+                strprintf("%d", nVoteSignal) + "|" +
+                strprintf("%d", nVoteOutcome) + "|" +
+                strprintf("%d", nTime);
 
         if(!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
 //            LogPrint("gobject", "CGovernanceVote::IsValid -- VerifyMessage() failed, error: %s\n", strError);
