@@ -12,6 +12,7 @@
 #include <script/script.h>
 #include <script/standard.h>
 #include <sync.h>
+#include <util/splitstring.h>
 #include <util/system.h>
 #include <util/time.h>
 #include <validation.h>
