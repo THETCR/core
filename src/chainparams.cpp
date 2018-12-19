@@ -793,9 +793,9 @@ public:
 //        printf("Regression net block\n");
 //        printf("Genesis = %s\n", genesis.ToString().c_str());
 
-        assert(consensus.hashGenesisBlock == uint256S("0x33a525cad9e251b88c6b9882a431bd7c3cecec59bb61d745c76ea919d8335039"));
-        assert(genesis.hashMerkleRoot == uint256S("0x529915432b67f7a86f0fd19d15ea1ba0c0bccb4a159e6d6f56c08530a70bfb4b"));
-        assert(genesis.hashWitnessMerkleRoot == uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"));
+//        assert(consensus.hashGenesisBlock == uint256S("0x33a525cad9e251b88c6b9882a431bd7c3cecec59bb61d745c76ea919d8335039"));
+//        assert(genesis.hashMerkleRoot == uint256S("0x529915432b67f7a86f0fd19d15ea1ba0c0bccb4a159e6d6f56c08530a70bfb4b"));
+//        assert(genesis.hashWitnessMerkleRoot == uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"));
 
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.

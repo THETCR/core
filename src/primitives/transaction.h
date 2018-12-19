@@ -35,9 +35,9 @@ enum OutputTypes
 
 enum TransactionTypes
 {
-    TXN_STANDARD            = 2,
-    TXN_COINBASE            = 2,
-    TXN_COINSTAKE           = 2,
+    TXN_STANDARD            = 1,
+    TXN_COINBASE            = 1,
+    TXN_COINSTAKE           = 1,
 //    TXN_STANDARD            = 0,
 //    TXN_COINBASE            = 1,
 //    TXN_COINSTAKE           = 2,
@@ -58,7 +58,7 @@ enum DataOutputTypes
 
 inline bool IsWisprTxVersion(int nVersion)
 {
-    return nVersion >= WISPR_TXN_VERSION;
+    return (nVersion & 0x0) >= WISPR_TXN_VERSION;
 //    return (nVersion & 0xFF) >= WISPR_TXN_VERSION;
 }
 
@@ -930,7 +930,7 @@ public:
         }
 
         return (GetType() == TXN_COINBASE
-                && vin.size() == 1 && vin[0].prevout.IsNull()); // TODO [rm]?
+                && vin.size() == 1 && vin[0].prevout.IsNull() && !ContainsZerocoins()); // TODO [rm]?
     }
 
     bool IsCoinStake() const
@@ -948,7 +948,8 @@ public:
         }
 
         return GetType() == TXN_COINSTAKE
-            && vin.size() > 0 && vpout.size() > 1
+            && vin.size() > 0 && vpout.size() >= 2
+            && vout[0].IsEmpty()
             && vpout[0]->nVersion == OUTPUT_DATA
             && vpout[1]->nVersion == OUTPUT_STANDARD;
     }
