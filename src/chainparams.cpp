@@ -446,16 +446,21 @@ public:
 //            DevFundSettings("RJAPhgckEgRGVPZa9WoGSWW24spskSfLTQ", 10, 60));
 //        vDevFundSettings.emplace_back(consensus.OpIsCoinstakeTime,
 //            DevFundSettings("RBiiQBnQsVPPQkUaJVQTjsZM9K2xMKozST", 10, 60));
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 73);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 135);
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1, 145);
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x04,0x88,0xB2,0x1E};
+        base58Prefixes[EXT_SECRET_KEY] = {0x04,0x88,0xAD,0xE4};
+        base58Prefixes[EXT_COIN_TYPE] = {0x80,0x00,0x00,0x77};
 
-
-        base58Prefixes[PUBKEY_ADDRESS]     = {0x49}; // P
-        base58Prefixes[SCRIPT_ADDRESS]     = {0x87};
+//        base58Prefixes[PUBKEY_ADDRESS]     = {0x49}; // P
+//        base58Prefixes[SCRIPT_ADDRESS]     = {0x87};
         base58Prefixes[PUBKEY_ADDRESS_256] = {0x39};
         base58Prefixes[SCRIPT_ADDRESS_256] = {0x3d};
-        base58Prefixes[SECRET_KEY]         = {0x91};
-        base58Prefixes[EXT_PUBLIC_KEY]     = {0x04, 0x88, 0xB2, 0x1E}; // PPAR
-        base58Prefixes[EXT_SECRET_KEY]     = {0x04, 0x88, 0xAD, 0xE4}; // XPAR
-        base58Prefixes[EXT_COIN_TYPE]     =  {0x80, 0x00, 0x00, 0x77}; // XPAR
+//        base58Prefixes[SECRET_KEY]         = {0x91};
+//        base58Prefixes[EXT_PUBLIC_KEY]     = {0x04, 0x88, 0xB2, 0x1E}; // PPAR
+//        base58Prefixes[EXT_SECRET_KEY]     = {0x04, 0x88, 0xAD, 0xE4}; // XPAR
+//        base58Prefixes[EXT_COIN_TYPE]     =  {0x80, 0x00, 0x00, 0x77}; // XPAR
         base58Prefixes[STEALTH_ADDRESS]    = {0x14};
         base58Prefixes[EXT_KEY_HASH]       = {0x4b}; // X
         base58Prefixes[EXT_ACC_HASH]       = {0x17}; // A
@@ -657,7 +662,7 @@ public:
         vSeeds.emplace_back("testnet-seed.wispr.io");
         vSeeds.emplace_back("dnsseed-testnet.wispr.io");
 
-        vDevFundSettings.push_back(std::make_pair(0, DevFundSettings("rTvv9vsbu269mjYYEecPYinDG8Bt7D86qD", 10, 60)));
+//        vDevFundSettings.push_back(std::make_pair(0, DevFundSettings("rTvv9vsbu269mjYYEecPYinDG8Bt7D86qD", 10, 60)));
 
         base58Prefixes[PUBKEY_ADDRESS]     = {0x76}; // p
         base58Prefixes[SCRIPT_ADDRESS]     = {0x7a};
