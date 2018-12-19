@@ -2944,6 +2944,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             bool fCacheResults = fJustCheck; /* Don't cache results if we're actually connecting blocks (still consult the cache, though) */
             if (!CheckInputs(tx, state, view, fScriptChecks, flags, fCacheResults, fCacheResults, txdata[i], nScriptCheckThreads ? &vChecks : nullptr)) {
                 control.Wait();
+                printf("%s\n", "CheckInputs failed");
                 return error("ConnectBlock(): CheckInputs on %s failed with %s",
                     txhash.ToString(), FormatStateMessage(state));
             };
@@ -2951,6 +2952,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             control.Add(vChecks);
 
             blockundo.vtxundo.push_back(CTxUndo());
+            printf("%s\n", "Update coins");
             UpdateCoins(tx, view, blockundo.vtxundo.back(), pindex->nHeight);
         } else
         {
