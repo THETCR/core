@@ -705,7 +705,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         s >> bv;
         tx.nVersion |= bv<<24;
     }
-//    printf("Unserialize nVersion = %d\n", tx.nVersion);
+    printf("Unserialize nVersion = %d\n", tx.nVersion);
     unsigned char flags = 0;
     tx.vin.clear();
     tx.vout.clear();
@@ -742,8 +742,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
 
 //    printf("Serialize: transaction\n");
     int32_t nVersion = tx.nVersion;
-//    printf("Serialize nVersion = %d\n", tx.nVersion);
-
+    printf("Serialize nVersion = %d\n", tx.nVersion);
     if (IsWisprTxVersion(tx.nVersion))
     {
 //        printf("Serialize: transaction is wispr version\n");
@@ -923,11 +922,12 @@ public:
 
     bool IsCoinBase() const
     {
-        if (IsWisprVersion()) {
-            return (GetType() == TXN_COINBASE
-                    && vin.size() == 1 && vin[0].prevout.IsNull()); // TODO [rm]?
+        if(vin.size() == 1 && vin[0].prevout.IsNull() && !ContainsZerocoins()){
+            return true;
         }
-        return (vin.size() == 1 && vin[0].prevout.IsNull() && !ContainsZerocoins());
+
+        return (GetType() == TXN_COINBASE
+                && vin.size() == 1 && vin[0].prevout.IsNull()); // TODO [rm]?
     }
 
     bool IsCoinStake() const
