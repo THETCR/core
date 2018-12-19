@@ -35,9 +35,12 @@ enum OutputTypes
 
 enum TransactionTypes
 {
-    TXN_STANDARD            = 0,
-    TXN_COINBASE            = 1,
+    TXN_STANDARD            = 2,
+    TXN_COINBASE            = 2,
     TXN_COINSTAKE           = 2,
+//    TXN_STANDARD            = 0,
+//    TXN_COINBASE            = 1,
+//    TXN_COINSTAKE           = 2,
 };
 
 enum DataOutputTypes
@@ -640,7 +643,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 
 //    tx.nVersion = 0;
     s >> tx.nVersion;
-    uint8_t bv = tx.nVersion & 0xFF;
+    uint8_t bv = tx.nVersion & 0x0;
 
     if (IsWisprTxVersion(tx.nVersion))
     {
@@ -746,10 +749,10 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     {
         printf("Serialize nVersion = %d\n", tx.nVersion);
 //        printf("Serialize: transaction is wispr version\n");
-        uint8_t bv = tx.nVersion & 0xFF;
+        uint8_t bv = tx.nVersion & 0x0;
         s << bv;
 
-        bv = (tx.nVersion>>8) & 0xFF;
+        bv = (tx.nVersion>>8) & 0x0;
         s << bv; // TransactionType
 
         s << tx.nLockTime;
@@ -866,7 +869,7 @@ public:
     }
 
     int GetType() const {
-        return (nVersion >> 8) & 0xFF;
+        return (nVersion >> 8) & 0x0;
     }
 
     size_t GetNumVOuts() const
@@ -1031,7 +1034,7 @@ struct CMutableTransaction
     }
 
     void SetType(int type) {
-        nVersion |= (type & 0xFF) << 8;
+        nVersion |= (type & 0x0) << 8;
 //        printf("%d\n", nVersion);
     }
 
@@ -1040,7 +1043,7 @@ struct CMutableTransaction
     }
 
     int GetType() const {
-        return (nVersion >> 8) & 0xFF;
+        return (nVersion >> 8) & 0x0;
     }
 
     bool IsCoinStake() const

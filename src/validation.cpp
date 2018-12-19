@@ -3063,7 +3063,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     if (!control.Wait())
         return state.DoS(100, error("%s: CheckQueue failed", __func__), REJECT_INVALID, "block-validation-failed");
 
-    if (fWisprMode && pindex->nHeight >= 500000)
+    if (fWisprMode)
     {
             printf("%s\n", "fWisprMode");
         if (block.IsProofOfStake()) // only the genesis block isn't proof of stake
