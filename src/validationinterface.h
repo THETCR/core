@@ -93,7 +93,7 @@ protected:
     virtual void AcceptedBlockHeader(const CBlockIndex *pindexNew) {}
     virtual void NotifyHeaderTip(const CBlockIndex *pindexNew, bool fInitialDownload) {}
     virtual void SyncTransaction(const CTransactionRef &tx, const CBlockIndex *pindex, int posInBlock, bool update_tx = true) {}
-    virtual void UpdatedTransaction(const uint256 &hash) {}
+    virtual bool UpdatedTransaction(const uint256 &hash) {}
 
     virtual void NotifyTransactionLock(const CTransaction &tx) {}
     /**
