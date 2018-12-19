@@ -1948,7 +1948,7 @@ CAmount GetInvalidUTXOValue()
  */
 bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck> *pvChecks, bool fAnonChecks) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
-//    printf("%s\n", __func__);
+    printf("%s\n", __func__);
     if (!tx.IsCoinBase())
     {
         if (pvChecks)
@@ -2861,21 +2861,22 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             // BIP68 lock checks (as opposed to nLockTime checks) must
             // be in ConnectBlock because they require the UTXO set
             printf("%s\n", "BIP68 lock checks");
-            prevheights.resize(tx.vin.size());
-            for (size_t j = 0; j < tx.vin.size(); j++) {
-                if (tx.vin[j].IsAnonInput())
-                    prevheights[j] = 0;
-                else
-                    prevheights[j] = view.AccessCoin(tx.vin[j].prevout).nHeight;
-            }
+            if(chainActive.NewProtocolsStarted()) {
+                prevheights.resize(tx.vin.size());
+                for (size_t j = 0; j < tx.vin.size(); j++) {
+                    if (tx.vin[j].IsAnonInput())
+                        prevheights[j] = 0;
+                    else
+                        prevheights[j] = view.AccessCoin(tx.vin[j].prevout).nHeight;
+                }
 
-            if (!SequenceLocks(tx, nLockTimeFlags, &prevheights, *pindex)) {
-                control.Wait();
-                printf("%s\n", "contains a non-BIP68-final transaction");
-                return state.DoS(100, error("%s: contains a non-BIP68-final transaction", __func__),
-                                 REJECT_INVALID, "bad-txns-nonfinal");
+                if (!SequenceLocks(tx, nLockTimeFlags, &prevheights, *pindex)) {
+                    control.Wait();
+                    printf("%s\n", "contains a non-BIP68-final transaction");
+                    return state.DoS(100, error("%s: contains a non-BIP68-final transaction", __func__),
+                                     REJECT_INVALID, "bad-txns-nonfinal");
+                }
             }
-
             if (tx.IsWisprVersion()
                 && (fAddressIndex || fSpentIndex))
             {
