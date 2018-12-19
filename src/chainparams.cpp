@@ -138,7 +138,7 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
     txNew.nVersion = 1;
     txNew.vin.resize(1);
     txNew.vout.resize(1);
-    txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(4) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+    txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
     txNew.vout[0].nValue = genesisReward;
     txNew.vout[0].scriptPubKey = genesisOutputScript;
 
@@ -166,28 +166,28 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
  */
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
-    const char* pszTimestamp = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks";
-    const CScript genesisOutputScript = CScript() << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f") << OP_CHECKSIG;
+    const char* pszTimestamp = "I would rather be without a state than without a voice";
+    const CScript genesisOutputScript = CScript() << ParseHex("0433f2952f9002c9088a19607e3d4a54d3d9dfe1cf5c78168b8ba6524fb19fc5d7d3202948e6b8b09e98c425875af6af78fd4f64ff07d97a9ae31ebda5162fbac3") << OP_CHECKSIG;
     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
 }
 
 const std::pair<const char*, CAmount> regTestOutputs[] = {
-    std::make_pair("585c2b3914d9ee51f8e710304e386531c3abcc82", 10000 * COIN),
-    std::make_pair("c33f3603ce7c46b423536f0434155dad8ee2aa1f", 10000 * COIN),
-    std::make_pair("72d83540ed1dcf28bfaca3fa2ed77100c2808825", 10000 * COIN),
-    std::make_pair("69e4cc4c219d8971a253cd5db69a0c99c4a5659d", 10000 * COIN),
-    std::make_pair("eab5ed88d97e50c87615a015771e220ab0a0991a", 10000 * COIN),
-    std::make_pair("119668a93761a34a4ba1c065794b26733975904f", 10000 * COIN),
-    std::make_pair("6da49762a4402d199d41d5778fcb69de19abbe9f", 10000 * COIN),
-    std::make_pair("27974d10ff5ba65052be7461d89ef2185acbe411", 10000 * COIN),
-    std::make_pair("89ea3129b8dbf1238b20a50211d50d462a988f61", 10000 * COIN),
-    std::make_pair("3baab5b42a409b7c6848a95dfd06ff792511d561", 10000 * COIN),
-
-    std::make_pair("649b801848cc0c32993fb39927654969a5af27b0", 5000 * COIN),
-    std::make_pair("d669de30fa30c3e64a0303cb13df12391a2f7256", 5000 * COIN),
-    std::make_pair("f0c0e3ebe4a1334ed6a5e9c1e069ef425c529934", 5000 * COIN),
-    std::make_pair("27189afe71ca423856de5f17538a069f22385422", 5000 * COIN),
-    std::make_pair("0e7f6fe0c4a5a6a9bfd18f7effdd5898b1f40b80", 5000 * COIN),
+//    std::make_pair("585c2b3914d9ee51f8e710304e386531c3abcc82", 10000 * COIN),
+//    std::make_pair("c33f3603ce7c46b423536f0434155dad8ee2aa1f", 10000 * COIN),
+//    std::make_pair("72d83540ed1dcf28bfaca3fa2ed77100c2808825", 10000 * COIN),
+//    std::make_pair("69e4cc4c219d8971a253cd5db69a0c99c4a5659d", 10000 * COIN),
+//    std::make_pair("eab5ed88d97e50c87615a015771e220ab0a0991a", 10000 * COIN),
+//    std::make_pair("119668a93761a34a4ba1c065794b26733975904f", 10000 * COIN),
+//    std::make_pair("6da49762a4402d199d41d5778fcb69de19abbe9f", 10000 * COIN),
+//    std::make_pair("27974d10ff5ba65052be7461d89ef2185acbe411", 10000 * COIN),
+//    std::make_pair("89ea3129b8dbf1238b20a50211d50d462a988f61", 10000 * COIN),
+//    std::make_pair("3baab5b42a409b7c6848a95dfd06ff792511d561", 10000 * COIN),
+//
+//    std::make_pair("649b801848cc0c32993fb39927654969a5af27b0", 5000 * COIN),
+//    std::make_pair("d669de30fa30c3e64a0303cb13df12391a2f7256", 5000 * COIN),
+//    std::make_pair("f0c0e3ebe4a1334ed6a5e9c1e069ef425c529934", 5000 * COIN),
+//    std::make_pair("27189afe71ca423856de5f17538a069f22385422", 5000 * COIN),
+//    std::make_pair("0e7f6fe0c4a5a6a9bfd18f7effdd5898b1f40b80", 5000 * COIN),
 };
 const size_t nGenesisOutputsRegtest = sizeof(regTestOutputs) / sizeof(regTestOutputs[0]);
 
@@ -555,20 +555,20 @@ public:
     void SetOld()
     {
         consensus.BIP16Exception = uint256S("0x00000000000002dc756eebf4f49723ed8d30cc28a5f108eb94b1ba88ac4f9c22");
-        consensus.BIP34Height = 227931;
+        consensus.BIP34Height = 500000;
         consensus.BIP34Hash = uint256S("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8");
-        consensus.BIP65Height = 388381; // 000000000000000004c2b624ed5d7756c508d90fd0da2c7c679febfa6c4735f0
-        consensus.BIP66Height = 363725; // 00000000000000000379eaa19dce8c9b722d46ae6a57c2f1a988119488b50931
+        consensus.BIP65Height = 500000; // 000000000000000004c2b624ed5d7756c508d90fd0da2c7c679febfa6c4735f0
+        consensus.BIP66Height = 500000; // 00000000000000000379eaa19dce8c9b722d46ae6a57c2f1a988119488b50931
         consensus.powLimit = uint256S("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        genesis = CreateGenesisBlock(1513403825, 36156, bnProofOfWorkLimit.GetCompact(), 1, 125000); // 2017-07-17 13:00:00
 
-        genesis = CreateGenesisBlock(1231006505, 2083236893, 0x1d00ffff, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,0);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,5);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,128);
-        base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x88, 0xB2, 0x1E};
-        base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 73);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 135);
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1, 145);
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x04,0x88,0xB2,0x1E};
+        base58Prefixes[EXT_SECRET_KEY] = {0x04,0x88,0xAD,0xE4};
+        base58Prefixes[EXT_COIN_TYPE] = {0x80,0x00,0x00,0x77};
     }
 };
 
@@ -845,20 +845,20 @@ public:
 
     void SetOld()
     {
-        genesis = CreateGenesisBlock(1296688602, 2, 0x207fffff, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1411111111, 2, bnProofOfWorkLimit.GetCompact(), 1, 125000 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        /*
-        pchMessageStart[0] = 0xfa;
-        pchMessageStart[1] = 0xbf;
-        pchMessageStart[2] = 0xb5;
-        pchMessageStart[3] = 0xda;
-        */
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,196);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,239);
-        base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
-        base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
+        pchMessageStart[0] = 0xFF;
+        pchMessageStart[1] = 0xAF;
+        pchMessageStart[2] = 0xB7;
+        pchMessageStart[3] = 0xDF;
+
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 110);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 8);
+        base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1, 239);
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x04,0x35,0x87,0xCF};
+        base58Prefixes[EXT_SECRET_KEY] = {0x04,0x35,0x83,0x94};
+        base58Prefixes[EXT_COIN_TYPE] = {0x80,0x00,0x00,0x01};
     }
 
     /**
