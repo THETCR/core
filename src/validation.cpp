@@ -2962,6 +2962,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             nMoneyCreated += tx.GetValueOut();
         };
 
+        printf("%s\n", "nLastRCTOutput");
         if (view.nLastRCTOutput == 0)
             view.nLastRCTOutput = pindex->pprev ? pindex->pprev->nAnonOutputs : 0;
         // Index rct outputs and keyimages
