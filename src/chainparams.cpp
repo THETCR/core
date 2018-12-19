@@ -770,8 +770,8 @@ public:
         nTargetSpacingV1 = 64;        // WISPR Old: 1 minutes
         nTargetSpacingV2 = 1 * 60;        // WISPR New: 1 minute
         bnProofOfWorkLimit = ~uint256(0) >> 1;
-//        nTargetSpacing = 5;             // 5 seconds
-//        nTargetTimespan = 16 * 60;      // 16 mins
+        nTargetSpacing = 5;             // 5 seconds
+        nTargetTimespan = 16 * 60;      // 16 mins
         nStakeTimestampMask = 0;
 
         SetLastImportHeight();
@@ -785,7 +785,7 @@ public:
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-//        printf("Regression net block\n");
+        printf("Regression net block\n");
 //        printf("Genesis = %s\n", genesis.ToString().c_str());
 
         assert(consensus.hashGenesisBlock == uint256S("0xed67040c19dd2e132e5196db4df80df4e28fa5bb6423249aedfe14c65435ac42"));
