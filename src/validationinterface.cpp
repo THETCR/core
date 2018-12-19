@@ -129,6 +129,10 @@ void RegisterValidationInterface(CValidationInterface* pwalletIn) {
     conns.TransactionAddedToWallet = g_signals.m_internals->TransactionAddedToWallet.connect(std::bind(&CValidationInterface::TransactionAddedToWallet, pwalletIn, std::placeholders::_1, std::placeholders::_2));
     conns.NewSecureMessage = g_signals.m_internals->NewSecureMessage.connect(std::bind(&CValidationInterface::NewSecureMessage, pwalletIn, std::placeholders::_1, std::placeholders::_2));
     conns.SyncTransaction = g_signals.m_internals->SyncTransaction.connect(std::bind(&CValidationInterface::SyncTransaction, pwalletIn, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+    conns.NotifyHeaderTip = g_signals.m_internals->NotifyHeaderTip.connect(std::bind(&CValidationInterface::NotifyHeaderTip, pwalletIn, std::placeholders::_1, std::placeholders::_2));
+    conns.NotifyTransactionLock = g_signals.m_internals->NotifyTransactionLock.connect(std::bind(&CValidationInterface::NotifyTransactionLock, pwalletIn, std::placeholders::_1));
+    conns.UpdatedTransaction = g_signals.m_internals->UpdatedTransaction.connect(std::bind(&CValidationInterface::UpdatedTransaction, pwalletIn, std::placeholders::_1));
+    conns.AcceptedBlockHeader = g_signals.m_internals->AcceptedBlockHeader.connect(std::bind(&CValidationInterface::AcceptedBlockHeader, pwalletIn, std::placeholders::_1));
 
 }
 
@@ -222,4 +226,16 @@ void CMainSignals::NewSecureMessage(const smsg::SecureMessage *psmsg, const uint
 };
 void CMainSignals::SyncTransaction(const CTransactionRef &tx, const CBlockIndex *pindex, int posInBlock, bool update_tx){
     m_internals->SyncTransaction(tx, pindex, posInBlock, update_tx);
+};
+void CMainSignals::NotifyHeaderTip(const CBlockIndex *pindexNew, bool fInitialDownload){
+    m_internals->NotifyHeaderTip(pindexNew, fInitialDownload);
+};
+void CMainSignals::NotifyTransactionLock(const CTransaction &tx){
+    m_internals->NotifyTransactionLock(tx);
+};
+void CMainSignals::UpdatedTransaction(const uint256 &hash){
+    m_internals->UpdatedTransaction(hash);
+};
+void CMainSignals::AcceptedBlockHeader(const CBlockIndex *pindexNew){
+    m_internals->AcceptedBlockHeader(pindexNew);
 };

@@ -93,6 +93,8 @@ protected:
     virtual void AcceptedBlockHeader(const CBlockIndex *pindexNew) {}
     virtual void NotifyHeaderTip(const CBlockIndex *pindexNew, bool fInitialDownload) {}
     virtual void SyncTransaction(const CTransactionRef &tx, const CBlockIndex *pindex, int posInBlock, bool update_tx = true) {}
+    virtual void UpdatedTransaction(const uint256 &hash) {}
+
     virtual void NotifyTransactionLock(const CTransaction &tx) {}
     /**
      * Notifies listeners of a transaction having been added to mempool.
@@ -190,7 +192,7 @@ public:
     void UnregisterWithMempoolSignals(CTxMemPool& pool);
 
     void UpdatedBlockTip(const CBlockIndex *, const CBlockIndex *, bool fInitialDownload);
-    virtual void NotifyTransactionLock(const CTransaction &tx) {}
+    void NotifyTransactionLock(const CTransaction &tx);
     void TransactionAddedToMempool(const CTransactionRef &);
     void BlockConnected(const std::shared_ptr<const CBlock> &, const CBlockIndex *pindex, const std::shared_ptr<const std::vector<CTransactionRef>> &);
     void BlockDisconnected(const std::shared_ptr<const CBlock> &);
@@ -213,6 +215,10 @@ public:
      * removal was due to conflict from connected block), or appeared in a
      * disconnected block.*/
     void SyncTransaction(const CTransactionRef &tx, const CBlockIndex *pindex, int posInBlock, bool update_tx = true);
+    void UpdatedTransaction(const uint256 &hash);
+    void NotifyHeaderTip(const CBlockIndex *pindexNew, bool fInitialDownload);
+    void AcceptedBlockHeader(const CBlockIndex *pindexNew);
+
 };
 
 CMainSignals& GetMainSignals();

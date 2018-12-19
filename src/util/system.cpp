@@ -121,7 +121,7 @@ const int64_t nStartupTime = GetTime();
 const char * const BITCOIN_CONF_FILENAME = "wispr.conf";
 const char * const BITCOIN_PID_FILENAME = "wisprd.pid";
 
-bool fWisprMode = false;
+bool fWisprMode = true;
 bool fWisprWallet = false;
 ArgsManager gArgs;
 
