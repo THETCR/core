@@ -423,7 +423,7 @@ public:
         AddImportHashesMain(vImportedCoinbaseTxns);
         SetLastImportHeight();
 
-        nPruneAfterHeight = 100000;
+        nPruneAfterHeight = 500000;
 
         genesis = CreateGenesisBlockMainNet(1513403825, 36156, bnProofOfWorkLimit.GetCompact()); // 2017-07-17 13:00:00
         consensus.hashGenesisBlock = genesis.GetHash();
@@ -437,15 +437,15 @@ public:
         // This is fine at runtime as we'll fall back to using them as a oneshot if they don't support the
         // service bits we want, but we should get them updated to support all service bits wanted by any
         // release ASAP to avoid it where possible.
-        vSeeds.emplace_back("mainnet-seed.wispr.io");
-        vSeeds.emplace_back("dnsseed-mainnet.wispr.io");
-        vSeeds.emplace_back("mainnet.wispr.io");
+//        vSeeds.emplace_back("mainnet-seed.wispr.io");
+//        vSeeds.emplace_back("dnsseed-mainnet.wispr.io");
+//        vSeeds.emplace_back("mainnet.wispr.io");
 
 
-        vDevFundSettings.emplace_back(0,
-            DevFundSettings("RJAPhgckEgRGVPZa9WoGSWW24spskSfLTQ", 10, 60));
-        vDevFundSettings.emplace_back(consensus.OpIsCoinstakeTime,
-            DevFundSettings("RBiiQBnQsVPPQkUaJVQTjsZM9K2xMKozST", 10, 60));
+//        vDevFundSettings.emplace_back(0,
+//            DevFundSettings("RJAPhgckEgRGVPZa9WoGSWW24spskSfLTQ", 10, 60));
+//        vDevFundSettings.emplace_back(consensus.OpIsCoinstakeTime,
+//            DevFundSettings("RBiiQBnQsVPPQkUaJVQTjsZM9K2xMKozST", 10, 60));
 
 
         base58Prefixes[PUBKEY_ADDRESS]     = {0x49}; // P
