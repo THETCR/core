@@ -134,7 +134,7 @@ public:
                 return;
             };
 
-            uint8_t bv = txout->nVersion & 0xFF;
+            uint8_t bv = txout->nVersion & 0x0;
             READWRITE(bv);
 
             switch (bv)

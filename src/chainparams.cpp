@@ -268,7 +268,7 @@ static CBlock CreateGenesisBlockRegTest(uint32_t nTime, uint32_t nNonce, uint32_
     txNew.nLockTime = 0;
     txNew.vin.resize(1);
     txNew.vout.resize(1);
-    txNew.SetType(TXN_COINBASE);
+//    txNew.SetType(TXN_COINBASE);
     uint32_t nHeight = 0;  // bip34
     txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp)) << nHeight;
     txNew.vout[0].SetEmpty();
