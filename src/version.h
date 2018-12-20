@@ -35,7 +35,7 @@ static const int BIP0031_VERSION = 60000;
 static const int NO_BLOOM_VERSION = 70011;
 
 //! "sendheaders" command and announcing blocks with headers starts with this version
-static const int SENDHEADERS_VERSION = 70915;
+static const int SENDHEADERS_VERSION = 70916;
 
 //! "feefilter" tells peers to filter invs to you by fee starts with this version
 static const int FEEFILTER_VERSION = 70915;
