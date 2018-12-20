@@ -452,11 +452,13 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04,0x88,0xB2,0x1E};
         base58Prefixes[EXT_SECRET_KEY] = {0x04,0x88,0xAD,0xE4};
         base58Prefixes[EXT_COIN_TYPE] = {0x80,0x00,0x00,0x77};
+        base58Prefixes[PUBKEY_ADDRESS_256] = std::vector<unsigned char>(1, 73);
+        base58Prefixes[SCRIPT_ADDRESS_256] = std::vector<unsigned char>(1, 135);
 
 //        base58Prefixes[PUBKEY_ADDRESS]     = {0x49}; // P
 //        base58Prefixes[SCRIPT_ADDRESS]     = {0x87};
-        base58Prefixes[PUBKEY_ADDRESS_256] = {0x39};
-        base58Prefixes[SCRIPT_ADDRESS_256] = {0x3d};
+//        base58Prefixes[PUBKEY_ADDRESS_256] = {0x39};
+//        base58Prefixes[SCRIPT_ADDRESS_256] = {0x3d};
 //        base58Prefixes[SECRET_KEY]         = {0x91};
 //        base58Prefixes[EXT_PUBLIC_KEY]     = {0x04, 0x88, 0xB2, 0x1E}; // PPAR
 //        base58Prefixes[EXT_SECRET_KEY]     = {0x04, 0x88, 0xAD, 0xE4}; // XPAR
@@ -467,13 +469,13 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY_BTC] = {0x04, 0x88, 0xB2, 0x1E}; // xpub
         base58Prefixes[EXT_SECRET_KEY_BTC] = {0x04, 0x88, 0xAD, 0xE4}; // xprv
 
-        bech32Prefixes[PUBKEY_ADDRESS].assign       ("ph","ph"+2);
-        bech32Prefixes[SCRIPT_ADDRESS].assign       ("pr","pr"+2);
-        bech32Prefixes[PUBKEY_ADDRESS_256].assign   ("pl","pl"+2);
-        bech32Prefixes[SCRIPT_ADDRESS_256].assign   ("pj","pj"+2);
-        bech32Prefixes[SECRET_KEY].assign           ("px","px"+2);
-        bech32Prefixes[EXT_PUBLIC_KEY].assign       ("pep","pep"+3);
-        bech32Prefixes[EXT_SECRET_KEY].assign       ("pex","pex"+3);
+//        bech32Prefixes[PUBKEY_ADDRESS].assign       ("ph","ph"+2);
+//        bech32Prefixes[SCRIPT_ADDRESS].assign       ("pr","pr"+2);
+//        bech32Prefixes[PUBKEY_ADDRESS_256].assign   ("pl","pl"+2);
+//        bech32Prefixes[SCRIPT_ADDRESS_256].assign   ("pj","pj"+2);
+//        bech32Prefixes[SECRET_KEY].assign           ("px","px"+2);
+//        bech32Prefixes[EXT_PUBLIC_KEY].assign       ("pep","pep"+3);
+//        bech32Prefixes[EXT_SECRET_KEY].assign       ("pex","pex"+3);
         bech32Prefixes[STEALTH_ADDRESS].assign      ("ps","ps"+2);
         bech32Prefixes[EXT_KEY_HASH].assign         ("pek","pek"+3);
         bech32Prefixes[EXT_ACC_HASH].assign         ("pea","pea"+3);
