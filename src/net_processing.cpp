@@ -3416,6 +3416,7 @@ bool PeerLogicValidation::ProcessMessages(CNode* pfrom, std::atomic<bool>& inter
     }
 
     // Process message
+    printf("Process message = %s\n", strCommand.c_str());
     bool fRet = false;
     try
     {
