@@ -3128,15 +3128,15 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             uint64_t nonce = 0;
             vRecv >> nonce;
 
-
-            int nChainHeight;
-            vRecv >> nChainHeight;
-            pfrom->nChainHeight = nChainHeight;
-            {
-                LOCK(cs_main);
-                connman->cPeerBlockCounts.input(nChainHeight);
+            if(pfrom->nVersion > CHAINHEIGHT_VERSION) {
+                int nChainHeight;
+                vRecv >> nChainHeight;
+                pfrom->nChainHeight = nChainHeight;
+                {
+                    LOCK(cs_main);
+                    connman->cPeerBlockCounts.input(nChainHeight);
+                }
             }
-
             // Echo the message back with the nonce. This allows for two useful features:
             //
             // 1) A remote node can quickly check if the connection is operational

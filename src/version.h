@@ -11,6 +11,7 @@
 
 static const int PROTOCOL_VERSION = 70915;
 static const int MIN_WISPR_VERSION = 70914;
+static const int CHAINHEIGHT_VERSION = 70915;
 
 //! initial proto version, to be increased after version/verack negotiation
 static const int INIT_PROTO_VERSION = 209;
