@@ -1214,17 +1214,7 @@ template <typename Stream>
 void Serialize(Stream& os, const CScript& v, int nType, int nVersion);
 template <typename Stream>
 void Unserialize(Stream& is, CScript& v, int nType, int nVersion);
-inline unsigned int GetSerializeSize(unsigned int a, int nVersion = 0) { return sizeof(a); }
-template <typename Stream>
-inline void Serialize(Stream& s, unsigned int a, int = 0)
-{
-    WRITEDATA(s, a);
-}
-template <typename Stream>
-inline void Unserialize(Stream& s, unsigned int& a, int = 0)
-{
-    READDATA(s, a);
-}
+inline unsigned int GetSerializeSize(unsigned int a) { return sizeof(a); }
 
 /**
  * vector
