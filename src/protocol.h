@@ -18,7 +18,6 @@
 #include <atomic>
 #include <stdint.h>
 #include <string>
-#define MESSAGE_START_SIZE 4
 
 /** Message header.
  * (4) message start.
@@ -29,7 +28,7 @@
 class CMessageHeader
 {
 public:
-//    static constexpr size_t MESSAGE_START_SIZE = 4;
+    static constexpr size_t MESSAGE_START_SIZE = 4;
     static constexpr size_t COMMAND_SIZE = 12;
     static constexpr size_t MESSAGE_SIZE_SIZE = sizeof(int);
 //    static constexpr size_t MESSAGE_SIZE_SIZE = 4;
