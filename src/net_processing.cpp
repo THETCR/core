@@ -2298,10 +2298,10 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 if (!fAlreadyHave && !fImporting && !fReindex && !mapBlocksInFlight.count(inv.hash)) {
                     if(pfrom->nVersion == MIN_WISPR_VERSION){
                         // Old version node
-                        std::vector<CInv> vInv(1);
-                        vInv[0] = CInv(MSG_BLOCK | GetFetchFlags(pfrom), inv.hash);
-                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, vInv));
-                        LogPrint(BCLog::NET, "getblocks (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
+                        std::vector<CInv> ask(1);
+                        ask[0] = CInv(MSG_BLOCK | GetFetchFlags(pfrom), inv.hash);
+                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, ask));
+                        LogPrint(BCLog::NET, "getdata (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
 
                     }
                     // We used to request the full block here, but since headers-announcements are now the
