@@ -34,7 +34,7 @@ static const int SPORK_16_ZEROCOIN_MAINTENANCE_MODE                     = 10015;
 static const int SPORK_17_REQUIRE_SENTINEL_FLAG                         = 10016;
 
 static const int SPORK_START                                            = SPORK_2_INSTANTSEND_ENABLED;
-static const int SPORK_END                                              = SPORK_14_REQUIRE_SENTINEL_FLAG;
+static const int SPORK_END                                              = SPORK_17_REQUIRE_SENTINEL_FLAG;
 
 extern std::map<int, int64_t> mapSporkDefaults;
 extern std::map<uint256, CSporkMessage> mapSporks;
