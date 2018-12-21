@@ -404,32 +404,32 @@ enum GetDataMsg
 {
     UNDEFINED = 0,
     MSG_TX = 1,
-    MSG_BLOCK = 2,
+    MSG_BLOCK,
     // The following can only occur in getdata. Invs always use TX or BLOCK.
-    MSG_FILTERED_BLOCK = 3,  //!< Defined in BIP37
-    MSG_CMPCT_BLOCK = 4,     //!< Defined in BIP152
+    MSG_FILTERED_BLOCK,  //!< Defined in BIP37
+    MSG_CMPCT_BLOCK,     //!< Defined in BIP152
     MSG_WITNESS_BLOCK = MSG_BLOCK | MSG_WITNESS_FLAG, //!< Defined in BIP144
     MSG_WITNESS_TX = MSG_TX | MSG_WITNESS_FLAG,       //!< Defined in BIP144
     MSG_FILTERED_WITNESS_BLOCK = MSG_FILTERED_BLOCK | MSG_WITNESS_FLAG,
 
     // Dash message types
     // NOTE: declare non-implmented here, we must keep this enum consistent and backwards compatible
-    MSG_TXLOCK_REQUEST = 5,
-    MSG_TXLOCK_VOTE = 6,
-    MSG_SPORK = 7,
-    MSG_MASTERNODE_PAYMENT_VOTE = 8,
-    MSG_MASTERNODE_PAYMENT_BLOCK = 9, // reusing, was MSG_MASTERNODE_SCANNING_ERROR previousely, was NOT used in 12.0
-    MSG_BUDGET_VOTE = 10, // deprecated since 12.1
-    MSG_BUDGET_PROPOSAL = 11, // deprecated since 12.1
-    MSG_BUDGET_FINALIZED = 12, // deprecated since 12.1
-    MSG_BUDGET_FINALIZED_VOTE = 13, // deprecated since 12.1
-    MSG_MASTERNODE_QUORUM = 14, // not implemented
-    MSG_MASTERNODE_ANNOUNCE = 15,
-    MSG_MASTERNODE_PING = 16,
-    MSG_DSTX = 17,
-    MSG_GOVERNANCE_OBJECT = 18,
-    MSG_GOVERNANCE_OBJECT_VOTE = 19,
-    MSG_MASTERNODE_VERIFY = 20,
+    MSG_TXLOCK_REQUEST,
+    MSG_TXLOCK_VOTE,
+    MSG_SPORK,
+    MSG_MASTERNODE_PAYMENT_VOTE,
+    MSG_MASTERNODE_PAYMENT_BLOCK, // reusing, was MSG_MASTERNODE_SCANNING_ERROR previousely, was NOT used in 12.0
+    MSG_BUDGET_VOTE, // deprecated since 12.1
+    MSG_BUDGET_PROPOSAL, // deprecated since 12.1
+    MSG_BUDGET_FINALIZED, // deprecated since 12.1
+    MSG_BUDGET_FINALIZED_VOTE, // deprecated since 12.1
+    MSG_MASTERNODE_QUORUM, // not implemented
+    MSG_MASTERNODE_ANNOUNCE,
+    MSG_MASTERNODE_PING,
+    MSG_DSTX,
+    MSG_GOVERNANCE_OBJECT,
+    MSG_GOVERNANCE_OBJECT_VOTE,
+    MSG_MASTERNODE_VERIFY,
     // Nodes may always request a MSG_CMPCT_BLOCK in a getdata, however,
     // MSG_CMPCT_BLOCK should not appear in any invs except as a part of getdata.
 //    MSG_CMPCT_BLOCK = 20, //!< Defined in BIP152
