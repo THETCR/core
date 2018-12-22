@@ -412,13 +412,13 @@ public:
         bnProofOfStakeLimit = ~uint256(0) >> 48;
         nModifierInterval = 10 * 60;    // 10 minutes
         nStakeMinConfirmations = 100;   // 225 * 2 minutes
-        nTargetSpacing = 64;           // 2 minutes
-        nTargetTimespan = 16 * 60;      // 24 mins
 
         nTargetTimespanV1 =  16 * 60; // WISPR Old: 1 day
         nTargetTimespanV2 =  1 * 60; // WISPR New: 1 day
+        nTargetTimespan = 16 * 60;      // 24 mins
         nTargetSpacingV1 = 64;  // WISPR Old: 1 minute
         nTargetSpacingV2 = 1 * 60;  // WISPR New: 1 minute
+        nTargetSpacing = 64;           // 2 minutes
 
         AddImportHashesMain(vImportedCoinbaseTxns);
         SetLastImportHeight();
