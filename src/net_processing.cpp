@@ -2506,6 +2506,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
         // we must use CBlockGetHeader, as CBlockHeaders won't include the 0x00 nTx count at the end
         std::vector<CBlockGetHeader> vHeaders;
+        std::vector<CBlockHeader> vHeadersOld;
         int nLimit = MAX_HEADERS_RESULTS;
         LogPrint(BCLog::NET, "getheaders %d to %s from peer=%d\n", (pindex ? pindex->nHeight : -1), hashStop.IsNull() ? "end" : hashStop.ToString(), pfrom->GetId());
         for (; pindex; pindex = chainActive.Next(pindex))
@@ -2515,7 +2516,13 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             {
                 break;
             };
-            vHeaders.push_back(pindex->GetBlockHeader());
+            if(pfrom->nVersion >= CHAINHEIGHT_VERSION) {
+                // we must use CBlockGetHeader, as CBlockHeaders won't include the 0x00 nTx count at the end
+                vHeaders.push_back(pindex->GetBlockHeader());
+            }else{
+                vHeadersOld.push_back(pindex->GetBlockHeader());
+            }
+//            vHeaders.push_back(pindex->GetBlockHeader());
             if (--nLimit <= 0 || pindex->GetBlockHash() == hashStop)
                 break;
         }
