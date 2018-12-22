@@ -4730,7 +4730,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     if(nHeight < Params().LAST_POW_BLOCK()){
         return true;
     }
-//    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
+    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
     if (block.nBits != nBitsRequired){
         return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
     }
