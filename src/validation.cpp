@@ -6995,14 +6995,14 @@ void ReprocessBlocks(int nBlocks)
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake) {
     uint256 bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit() : Params().ProofOfWorkLimit();
 
-    if (pindexLast == NULL)
+    if (pindexLast == nullptr)
         return bnTargetLimit.GetCompact(); // genesis block
 
     const CBlockIndex *pindexPrev = GetLastBlockIndex(pindexLast, fProofOfStake);
-    if (pindexPrev->pprev == NULL)
+    if (pindexPrev->pprev == nullptr)
         return bnTargetLimit.GetCompact(); // first block
     const CBlockIndex *pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, fProofOfStake);
-    if (pindexPrevPrev->pprev == NULL)
+    if (pindexPrevPrev->pprev == nullptr)
         return bnTargetLimit.GetCompact(); // second block
     int64_t nTargetTimespan = Params().TargetTimespanV1();
     int64_t nTargetSpacing = Params().TargetSpacingV1();
