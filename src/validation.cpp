@@ -6999,11 +6999,15 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
         return bnTargetLimit.GetCompact(); // genesis block
 
     const CBlockIndex *pindexPrev = GetLastBlockIndex(pindexLast, fProofOfStake);
-    if (pindexPrev->pprev == nullptr)
+    if (pindexPrev->pprev == nullptr){
+        LogPrint(BCLog::NET, "GetNextTargetRequired first block");
         return bnTargetLimit.GetCompact(); // first block
+    }
     const CBlockIndex *pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, fProofOfStake);
-    if (pindexPrevPrev->pprev == nullptr)
+    if (pindexPrevPrev->pprev == nullptr){
+        LogPrint(BCLog::NET, "GetNextTargetRequired second block");
         return bnTargetLimit.GetCompact(); // second block
+    }
     int64_t nTargetTimespan = Params().TargetTimespanV1();
     int64_t nTargetSpacing = Params().TargetSpacingV1();
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
