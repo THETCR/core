@@ -4322,10 +4322,10 @@ static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state,
         return state.DoS(100, false, REJECT_INVALID, "block-version", false, "bad block version");
 
     // Check timestamp
-    if (fWisprMode
-        && !block.hashPrevBlock.IsNull() // allow genesis block to be created in the future
-        && block.GetBlockTime() > FutureDrift(GetAdjustedTime()))
-        return state.DoS(50, false, REJECT_INVALID, "block-timestamp", false, "block timestamp too far in the future");
+//    if (fWisprMode
+//        && !block.hashPrevBlock.IsNull() // allow genesis block to be created in the future
+//        && block.GetBlockTime() > FutureDrift(GetAdjustedTime()))
+//        return state.DoS(50, false, REJECT_INVALID, "block-timestamp", false, "block timestamp too far in the future");
 
     // Check proof of work matches claimed amount
     if (!fWisprMode
@@ -4453,6 +4453,11 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     // redundant with the call in AcceptBlockHeader.
     if (!CheckBlockHeader(block, state, consensusParams, fCheckPOW))
         return false;
+
+    if (fWisprMode
+        && !block.hashPrevBlock.IsNull() // allow genesis block to be created in the future
+        && block.GetBlockTime() > GetAdjustedTime() + (block.IsProofOfStake() ? 180 : 7200))
+        return state.DoS(50, false, REJECT_INVALID, "block-timestamp", false, "block timestamp too far in the future");
 
     // Check the merkle root.
     if (fCheckMerkleRoot) {
