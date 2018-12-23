@@ -4703,13 +4703,12 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     const int nHeight = pindexPrev == nullptr ? 0 : pindexPrev->nHeight + 1;
     const Consensus::Params& consensusParams = params.GetConsensus();
 
-    unsigned int nBitsRequired;
-    if(block.nVersion > 0x07){
-        nBitsRequired  = GetNextWorkRequired(pindexPrev, &block);
-    }else{
-        nBitsRequired  = GetNextTargetRequired(pindexPrev, true);
-    }
-
+//    unsigned int nBitsRequired;
+//    if(block.nVersion > 0x07){
+//        nBitsRequired  = GetNextWorkRequired(pindexPrev, &block);
+//    }else{
+//        nBitsRequired  = GetNextTargetRequired(pindexPrev, true);
+//    }
 //    if (fWisprMode && pindexPrev && block.nVersion > 7)
 //    {
 //        // Check proof-of-stake
@@ -4727,13 +4726,13 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
 //        }
 //        return true;
 //    }
-    if(nHeight < Params().LAST_POW_BLOCK()){
-        return true;
-    }
-    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
-    if (block.nBits != nBitsRequired){
-        return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
-    }
+//    if(nHeight < Params().LAST_POW_BLOCK()){
+//        return true;
+//    }
+//    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
+//    if (block.nBits != nBitsRequired){
+//        return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
+//    }
 
     // Check against checkpoints
     if (fCheckpointsEnabled) {
@@ -4818,6 +4817,19 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
 
     // Check that all transactions are finalized
 //    printf("%s\n", "transactions are finalized?");
+    unsigned int nBitsRequired;
+    if(block.nVersion > 0x07){
+        nBitsRequired  = GetNextWorkRequired(pindexPrev, &block);
+    }else{
+        nBitsRequired  = GetNextTargetRequired(pindexPrev, block.IsProofOfStake());
+    }
+    if(nHeight < Params().LAST_POW_BLOCK()){
+        return true;
+    }
+    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
+    if (block.nBits != nBitsRequired){
+        return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
+    }
     for (const auto& tx : block.vtx) {
         if (!IsFinalTx(*tx, nHeight, nLockTimeCutoff)) {
             return state.DoS(10, false, REJECT_INVALID, "bad-txns-nonfinal", false, "non-final transaction");
@@ -7035,4 +7047,35 @@ const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfSta
     while (pindex && pindex->pprev && (pindex->IsProofOfStake() != fProofOfStake))
         pindex = pindex->pprev;
     return pindex;
+}
+bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
+{
+    uint256 hashProof = block.GetPoWHash();
+    uint256 hashTarget;
+    hashTarget.SetCompact(block.nBits);
+
+    if (pindexPrev == NULL)
+        return error("%s : null pindexPrev for block %s", __func__, block.GetHash().ToString().c_str());
+
+    unsigned int nBitsRequired;
+    if(block.nVersion > 7){
+        nBitsRequired  = GetNextWorkRequired(pindexPrev, &block);
+    }else{
+        nBitsRequired  = GetNextTargetRequired(pindexPrev, block.IsProofOfStake());
+    }
+    LogPrintf("Block hashProof=%s, hashTarget=%s\n", hashProof.ToString(), hashTarget.ToString());
+    LogPrintf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
+    if (block.IsProofOfWork()) {
+        if (hashProof > hashTarget){
+            return error("%s : incorrect proof of work - at %d", __func__, pindexPrev->nHeight + 1);
+        }
+        return true;
+    }
+
+    if (block.nBits != nBitsRequired){
+        LogPrintf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
+        return error("%s : incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
+    }
+
+    return true;
 }

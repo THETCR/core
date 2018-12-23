@@ -680,5 +680,6 @@ size_t CountDelayedBlocks() EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 //!WISPR
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake);
 const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake);
+bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev);
 
 #endif // BITCOIN_VALIDATION_H
