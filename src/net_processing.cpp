@@ -3078,29 +3078,44 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
     {
         std::shared_ptr<CBlock> pblock = std::make_shared<CBlock>();
         vRecv >> *pblock;
-
+        uint256 hashBlock = pblock->GetHash();
+        CInv inv(MSG_BLOCK, hashBlock);
         LogPrint(BCLog::NET, "received block %s peer=%d\n", pblock->GetHash().ToString(), pfrom->GetId());
-
-        bool forceProcessing = false;
-        const uint256 hash(pblock->GetHash());
-        {
-            LOCK(cs_main);
-            // Also always process if we requested the block explicitly, as we may
-            // need it even though it is not a candidate for a new best tip.
-            forceProcessing |= MarkBlockAsReceived(hash);
-            // mapBlockSource is only used for sending reject messages and DoS scores,
-            // so the race between here and cs_main in ProcessNewBlock is fine.
-            mapBlockSource.emplace(hash, std::make_pair(pfrom->GetId(), true));
-        }
-        bool fNewBlock = false;
-        ProcessNewBlock(chainparams, pblock, forceProcessing, &fNewBlock);
-        if (fNewBlock) {
-            pfrom->nLastBlockTime = GetTime();
+        //sometimes we will be sent their most recent block and its not the one we want, in that case tell where we are
+        if (!mapBlockIndex.count(pblock->hashPrevBlock)) {
+            if (find(pfrom->vInventoryBlockToSend.begin(), pfrom->vInventoryBlockToSend.end(), hashBlock) != pfrom->vInventoryBlockToSend.end()) {
+                //we already asked for this block, so lets work backwards and ask for the previous block
+                connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(), pblock->hashPrevBlock));
+                pfrom->vInventoryBlockToSend.push_back(pblock->hashPrevBlock);
+            } else {
+                //ask to sync to this block
+                connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(), hashBlock));
+                pfrom->vInventoryBlockToSend.push_back(hashBlock);
+            }
+            return true;
         } else {
-            LOCK(cs_main);
-            mapBlockSource.erase(pblock->GetHash());
+            pfrom->PushInventory(CInv(MSG_BLOCK, inv.hash));
+            bool forceProcessing = false;
+            const uint256 hash(pblock->GetHash());
+            {
+                LOCK(cs_main);
+                // Also always process if we requested the block explicitly, as we may
+                // need it even though it is not a candidate for a new best tip.
+                forceProcessing |= MarkBlockAsReceived(hash);
+                // mapBlockSource is only used for sending reject messages and DoS scores,
+                // so the race between here and cs_main in ProcessNewBlock is fine.
+                mapBlockSource.emplace(hash, std::make_pair(pfrom->GetId(), true));
+            }
+            bool fNewBlock = false;
+            ProcessNewBlock(chainparams, pblock, forceProcessing, &fNewBlock);
+            if (fNewBlock) {
+                pfrom->nLastBlockTime = GetTime();
+            } else {
+                LOCK(cs_main);
+                mapBlockSource.erase(pblock->GetHash());
+            }
+            return true;
         }
-        return true;
     }
 
     if (strCommand == NetMsgType::GETADDR) {
