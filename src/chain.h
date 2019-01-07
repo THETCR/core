@@ -224,7 +224,7 @@ public:
     // proof-of-stake specific fields
     uint256 GetBlockTrust() const;
     uint64_t nStakeModifier; // hash modifier for proof-of-stake
-    uint256 bnStakeModifier;
+    uint256 bnStakeModifierV2;
     unsigned int nStakeModifierChecksum; // checksum of index; in-memeory only
 
     COutPoint prevoutStake;
@@ -274,7 +274,7 @@ public:
         nTimeMax = 0;
 
         nFlags = 0;
-        bnStakeModifier = uint256();
+        bnStakeModifierV2 = uint256();
         prevoutStake.SetNull();
         nStakeModifierChecksum = 0;
         nStakeTime = 0;
@@ -551,7 +551,7 @@ public:
         READWRITE(nMint);
         READWRITE(nMoneySupply);
         READWRITE(nFlags);
-        READWRITE(bnStakeModifier);
+        READWRITE(bnStakeModifierV2);
         if (IsProofOfStake()) {
             READWRITE(prevoutStake);
             READWRITE(nStakeTime);
@@ -576,7 +576,7 @@ public:
             READWRITE(mapZerocoinSupply);
             READWRITE(vMintDenominationsInBlock);
         }else{
-            READWRITE(bnStakeModifier);
+            READWRITE(bnStakeModifierV2);
         }
         // NOTE: Careful matching the version, qa tests use different versions
         if (this->nVersion == WISPR_BLOCK_VERSION)

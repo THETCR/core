@@ -422,8 +422,8 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
     std::unique_ptr<CDBIterator> pcursor(NewIterator());
 
     pcursor->Seek(std::make_pair(DB_BLOCK_INDEX, uint256()));
-
     // Load mapBlockIndex
+    uint256 nPreviousCheckpoint;
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
         std::pair<char, uint256> key;
@@ -433,6 +433,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 // Construct block index object
                 CBlockIndex* pindexNew  = insertBlockIndex(diskindex.GetBlockHash());
                 pindexNew->pprev                    = insertBlockIndex(diskindex.hashPrev);
+                pindexNew->pnext                    = insertBlockIndex(diskindex.hashNext);
                 pindexNew->nHeight                  = diskindex.nHeight;
                 pindexNew->nFile                    = diskindex.nFile;
                 pindexNew->nDataPos                 = diskindex.nDataPos;
@@ -446,10 +447,21 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 pindexNew->nStatus                  = diskindex.nStatus;
                 pindexNew->nTx                      = diskindex.nTx;
 
+                //zerocoin
+                pindexNew->nAccumulatorCheckpoint   = diskindex.nAccumulatorCheckpoint;
+                pindexNew->mapZerocoinSupply        = diskindex.mapZerocoinSupply;
+                pindexNew->vMintDenominationsInBlock = diskindex.vMintDenominationsInBlock;
+
+                //Proof Of Stake
+                pindexNew->nMint = diskindex.nMint;
+                pindexNew->nMoneySupply = diskindex.nMoneySupply;
+
                 pindexNew->nFlags                   = diskindex.nFlags & ~BLOCK_DELAYED;
-                pindexNew->bnStakeModifier          = diskindex.bnStakeModifier;
+                pindexNew->nStakeModifier = diskindex.nStakeModifier;
+                pindexNew->bnStakeModifierV2          = diskindex.bnStakeModifierV2;
                 pindexNew->prevoutStake             = diskindex.prevoutStake;
-                //pindexNew->hashProof                = diskindex.hashProof;
+                pindexNew->nStakeTime = diskindex.nStakeTime;
+                pindexNew->hashProofOfStake = diskindex.hashProofOfStake;
 
                 pindexNew->nMoneySupply             = diskindex.nMoneySupply;
                 pindexNew->nAnonOutputs             = diskindex.nAnonOutputs;
@@ -466,10 +478,24 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                         pindexNew->nBits, Params().GetConsensus(), 0, Params().GetLastImportHeight()))
                         return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());
                 } else
-                if (!CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits, Params().GetConsensus()))
-                {
-                    return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());
-                };
+                if (pindexNew->IsProofOfWork()) {
+                    if (!CheckProofOfWork(pindexNew->GetBlockHeader().GetPoWHash(), pindexNew->nBits,
+                                          Params().GetConsensus())) {
+                        return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());
+                    };
+                }
+                // ppcoin: build setStakeSeen
+                if (pindexNew->IsProofOfStake()) {
+                    setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
+                }
+                //populate accumulator checksum map in memory
+                if(pindexNew->nAccumulatorCheckpoint != 0 && pindexNew->nAccumulatorCheckpoint != nPreviousCheckpoint) {
+                    //Don't load any checkpoints that exist before v2 zwsp. The accumulator is invalid for v1 and not used.
+                    if (pindexNew->nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT())
+                        LoadAccumulatorValuesFromDB(pindexNew->nAccumulatorCheckpoint);
+
+                    nPreviousCheckpoint = pindexNew->nAccumulatorCheckpoint;
+                }
 
                 pcursor->Next();
             } else {
