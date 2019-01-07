@@ -943,7 +943,7 @@ bool EvalScript(std::vector<std::vector<unsigned char> >& stack, const CScript& 
 
                     if (!CheckSignatureEncoding(vchSig, flags, serror) || !CheckPubKeyEncoding(vchPubKey, flags, sigversion, serror)) {
                         //serror is set
-                        printf("EvalScript() : ScriptError %s", ScriptErrorString(*serror));
+                        printf("EvalScript() : ScriptError %s\n", ScriptErrorString(*serror));
                         return false;
                     }
 
@@ -955,7 +955,7 @@ bool EvalScript(std::vector<std::vector<unsigned char> >& stack, const CScript& 
                     popstack(stack);
                     popstack(stack);
                     stack.push_back(fSuccess ? vchTrue : vchFalse);
-                    printf("EvalScript() : fSuccess %s", fSuccess ? "true" : "false");
+                    printf("EvalScript() : fSuccess %s\n", fSuccess ? "true" : "false");
                     if (opcode == OP_CHECKSIGVERIFY)
                     {
                         if (fSuccess)
@@ -1185,6 +1185,10 @@ public:
     void Serialize(S &s) const {
         // Serialize nVersion
         ::Serialize(s, txTo.nVersion);
+        if(txTo.nVersion < 2){
+            // Serialize nTime
+            ::Serialize(s, txTo.nTime);
+        }
         // Serialize vin
         unsigned int nInputs = fAnyoneCanPay ? 1 : txTo.vin.size();
         ::WriteCompactSize(s, nInputs);
