@@ -425,7 +425,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
         if (!VerifyScript(txin.scriptSig, txPrev->vout[txin.prevout.n].scriptPubKey,
                 chainActive.NewProtocolsStarted() ? &txin.scriptWitness : nullptr,
                 SCRIPT_VERIFY_NONE, TransactionSignatureChecker(&tx, 0), &serror))
-            return error("CheckProofOfStake() : VerifySignature failed on coinstake %s, ScriptError %s", tx.GetHash().ToString().c_str(), serror);
+            return error("CheckProofOfStake() : VerifySignature failed on coinstake %s, ScriptError %d", tx.GetHash().ToString().c_str(), serror);
 
         CWspStake* wspInput = new CWspStake();
         wspInput->SetInput(*txPrev, txin.prevout.n);
