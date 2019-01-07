@@ -2828,235 +2828,234 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     CAmount nMoneyCreated = 0;
 
     state.fEnforceSmsgFees = block.nTime >= chainparams.GetConsensus().nPaidSmsgTime;
-    for (unsigned int i = 0; i < block.vtx.size(); i++)
-    {
-        const CTransaction &tx = *(block.vtx[i]);
-        const uint256 txhash = tx.GetHash();
-        nInputs += tx.vin.size();
+    if(block.IsProofOfStake()) {
+        for (unsigned int i = 0; i < block.vtx.size(); i++) {
+            const CTransaction &tx = *(block.vtx[i]);
+            const uint256 txhash = tx.GetHash();
+            nInputs += tx.vin.size();
 
-        if (!tx.IsCoinBase())
-        {
-            CAmount txfee = 0;
-            if (!Consensus::CheckTxInputs(tx, state, view, pindex->nHeight, txfee)) {
-                control.Wait();
-                return error("%s: Consensus::CheckTxInputs: %s, %s", __func__, tx.GetHash().ToString(), FormatStateMessage(state));
-            }
-            if (tx.IsCoinStake())
-            {
-                // Stake reward is passed back in txfee (nPlainValueOut - nPlainValueIn)
-                nStakeReward += txfee;
-                nMoneyCreated += nStakeReward;
-            } else
-            {
-                nFees += txfee;
-            };
-            if (!MoneyRange(nFees)) {
-                control.Wait();
-                printf("%s\n", "accumulated fee in the block out of range");
-                return state.DoS(100, error("%s: accumulated fee in the block out of range.", __func__),
-                                 REJECT_INVALID, "bad-txns-accumulated-fee-outofrange");
-            }
-
-            // Check that transaction is BIP68 final
-            // BIP68 lock checks (as opposed to nLockTime checks) must
-            // be in ConnectBlock because they require the UTXO set
-            printf("%s\n", "BIP68 lock checks");
-            if(chainActive.NewProtocolsStarted()) {
-                prevheights.resize(tx.vin.size());
-                for (size_t j = 0; j < tx.vin.size(); j++) {
-                    if (tx.vin[j].IsAnonInput())
-                        prevheights[j] = 0;
-                    else
-                        prevheights[j] = view.AccessCoin(tx.vin[j].prevout).nHeight;
-                }
-
-                if (!SequenceLocks(tx, nLockTimeFlags, &prevheights, *pindex)) {
+            if (!tx.IsCoinBase()) {
+                CAmount txfee = 0;
+                if (!Consensus::CheckTxInputs(tx, state, view, pindex->nHeight, txfee)) {
                     control.Wait();
-                    printf("%s\n", "contains a non-BIP68-final transaction");
-                    return state.DoS(100, error("%s: contains a non-BIP68-final transaction", __func__),
-                                     REJECT_INVALID, "bad-txns-nonfinal");
+                    return error("%s: Consensus::CheckTxInputs: %s, %s", __func__, tx.GetHash().ToString(),
+                                 FormatStateMessage(state));
                 }
+                if (tx.IsCoinStake()) {
+                    // Stake reward is passed back in txfee (nPlainValueOut - nPlainValueIn)
+                    nStakeReward += txfee;
+                    nMoneyCreated += nStakeReward;
+                } else {
+                    nFees += txfee;
+                };
+                if (!MoneyRange(nFees)) {
+                    control.Wait();
+                    printf("%s\n", "accumulated fee in the block out of range");
+                    return state.DoS(100, error("%s: accumulated fee in the block out of range.", __func__),
+                                     REJECT_INVALID, "bad-txns-accumulated-fee-outofrange");
+                }
+
+                // Check that transaction is BIP68 final
+                // BIP68 lock checks (as opposed to nLockTime checks) must
+                // be in ConnectBlock because they require the UTXO set
+                printf("%s\n", "BIP68 lock checks");
+                if (chainActive.NewProtocolsStarted()) {
+                    prevheights.resize(tx.vin.size());
+                    for (size_t j = 0; j < tx.vin.size(); j++) {
+                        if (tx.vin[j].IsAnonInput())
+                            prevheights[j] = 0;
+                        else
+                            prevheights[j] = view.AccessCoin(tx.vin[j].prevout).nHeight;
+                    }
+
+                    if (!SequenceLocks(tx, nLockTimeFlags, &prevheights, *pindex)) {
+                        control.Wait();
+                        printf("%s\n", "contains a non-BIP68-final transaction");
+                        return state.DoS(100, error("%s: contains a non-BIP68-final transaction", __func__),
+                                         REJECT_INVALID, "bad-txns-nonfinal");
+                    }
+                }
+                if (tx.IsWisprVersion()
+                    && (fAddressIndex || fSpentIndex)) {
+                    printf("%s\n", "Update spent inputs for insight");
+                    // Update spent inputs for insight
+                    for (size_t j = 0; j < tx.vin.size(); j++) {
+                        const CTxIn input = tx.vin[j];
+                        if (input.IsAnonInput()) {
+                            nAnonIn++;
+                            continue;
+                        };
+
+                        const Coin &coin = view.AccessCoin(input.prevout);
+                        const CScript *pScript = &coin.out.scriptPubKey;
+
+                        CAmount nValue = coin.nType == OUTPUT_CT ? 0 : coin.out.nValue;
+                        std::vector<uint8_t> hashBytes;
+                        int scriptType = 0;
+
+                        if (!ExtractIndexInfo(pScript, scriptType, hashBytes)
+                            || scriptType == 0)
+                            continue;
+
+                        uint256 hashAddress;
+                        if (scriptType > 0)
+                            hashAddress = uint256(hashBytes.data(), hashBytes.size());
+
+                        if (fAddressIndex && scriptType > 0) {
+                            // record spending activity
+                            view.addressIndex.push_back(std::make_pair(
+                                    CAddressIndexKey(scriptType, hashAddress, pindex->nHeight, i, txhash, j, true),
+                                    nValue * -1));
+                            // remove address from unspent index
+                            view.addressUnspentIndex.push_back(std::make_pair(
+                                    CAddressUnspentKey(scriptType, hashAddress, input.prevout.hash, input.prevout.n),
+                                    CAddressUnspentValue()));
+                        };
+
+                        if (fSpentIndex) {
+                            CAmount nValue = coin.nType == OUTPUT_CT ? -1 : coin.out.nValue;
+                            // add the spent index to determine the txid and input that spent an output
+                            // and to find the amount and address from an input
+                            view.spentIndex.push_back(
+                                    std::make_pair(CSpentIndexKey(input.prevout.hash, input.prevout.n),
+                                                   CSpentIndexValue(txhash, j, pindex->nHeight, nValue, scriptType,
+                                                                    hashAddress)));
+                        };
+                    };
+                };
+            };
+
+            // GetTransactionSigOpCost counts 3 types of sigops:
+            // * legacy (always)
+            // * p2sh (when P2SH enabled in flags and excludes coinbase)
+            // * witness (when witness enabled in flags and excludes coinbase)
+            nSigOpsCost += GetTransactionSigOpCost(tx, view, flags);
+            if (nSigOpsCost > MAX_BLOCK_SIGOPS_COST) {
+                control.Wait();
+                printf("%s\n", "too many sigops");
+                return state.DoS(100, error("ConnectBlock(): too many sigops"),
+                                 REJECT_INVALID, "bad-blk-sigops");
             }
-            if (tx.IsWisprVersion()
-                && (fAddressIndex || fSpentIndex))
-            {
-                printf("%s\n", "Update spent inputs for insight");
-                // Update spent inputs for insight
-                for (size_t j = 0; j < tx.vin.size(); j++)
-                {
-                    const CTxIn input = tx.vin[j];
-                    if (input.IsAnonInput())
-                    {
-                        nAnonIn++;
+            txdata.emplace_back(tx);
+
+            if (!tx.IsCoinBase()) {
+                std::vector<CScriptCheck> vChecks;
+                bool fCacheResults = fJustCheck; /* Don't cache results if we're actually connecting blocks (still consult the cache, though) */
+                if (!CheckInputs(tx, state, view, fScriptChecks, flags, fCacheResults, fCacheResults, txdata[i],
+                                 nScriptCheckThreads ? &vChecks : nullptr)) {
+                    control.Wait();
+                    printf("%s\n", "CheckInputs failed");
+                    return error("ConnectBlock(): CheckInputs on %s failed with %s",
+                                 txhash.ToString(), FormatStateMessage(state));
+                };
+
+                control.Add(vChecks);
+
+                blockundo.vtxundo.push_back(CTxUndo());
+                printf("%s\n", "Update coins");
+                UpdateCoins(tx, view, blockundo.vtxundo.back(), pindex->nHeight);
+            } else {
+                // tx is coinbase
+                CTxUndo undoDummy;
+                UpdateCoins(tx, view, undoDummy, pindex->nHeight);
+                nMoneyCreated += tx.GetValueOut();
+            };
+
+            printf("%s\n", "nLastRCTOutput");
+            if (view.nLastRCTOutput == 0)
+                view.nLastRCTOutput = pindex->pprev ? pindex->pprev->nAnonOutputs : 0;
+            // Index rct outputs and keyimages
+            if (state.fHasAnonOutput || state.fHasAnonInput) {
+                printf("%s\n", "fHasAnonOutput || fHasAnonInput");
+                COutPoint op(txhash, 0);
+                for (const auto &txin : tx.vin) {
+                    if (txin.IsAnonInput()) {
+                        uint32_t nAnonInputs, nRingSize;
+                        txin.GetAnonInfo(nAnonInputs, nRingSize);
+                        if (txin.scriptData.stack.size() != 1
+                            || txin.scriptData.stack[0].size() != 33 * nAnonInputs) {
+                            control.Wait();
+                            return error("%s: Bad scriptData stack, %s.", __func__, txhash.ToString());
+                        };
+
+                        const std::vector<uint8_t> &vKeyImages = txin.scriptData.stack[0];
+                        for (size_t k = 0; k < nAnonInputs; ++k) {
+                            const CCmpPubKey &ki = *((CCmpPubKey *) &vKeyImages[k * 33]);
+
+                            view.keyImages.push_back(std::make_pair(ki, txhash));
+                        };
+                    };
+                };
+
+                for (unsigned int k = 0; k < tx.vpout.size(); k++) {
+                    if (!tx.vpout[k]->IsType(OUTPUT_RINGCT))
                         continue;
+
+                    CTxOutRingCT *txout = (CTxOutRingCT *) tx.vpout[k].get();
+
+                    int64_t nTestExists;
+                    if (!fVerifyingDB && pblocktree->ReadRCTOutputLink(txout->pk, nTestExists)) {
+                        control.Wait();
+
+                        if (nTestExists > pindex->pprev->nAnonOutputs) {
+                            // The anon index can diverge from the chain index if shutdown does not complete
+                            LogPrintf("%s: Duplicate anon-output %s, index %d, above last index %d.\n", __func__,
+                                      HexStr(txout->pk.begin(), txout->pk.end()), nTestExists,
+                                      pindex->pprev->nAnonOutputs);
+                            LogPrintf("Attempting to repair anon index.\n");
+                            std::set<CCmpPubKey> setKi; // unused
+                            RollBackRCTIndex(pindex->pprev->nAnonOutputs, nTestExists, setKi);
+                            return false;
+                        }
+
+                        return error("%s: Duplicate anon-output (db) %s, index %d.", __func__,
+                                     HexStr(txout->pk.begin(), txout->pk.end()), nTestExists);
+                    };
+                    if (!fVerifyingDB && view.ReadRCTOutputLink(txout->pk, nTestExists)) {
+                        control.Wait();
+                        return error("%s: Duplicate anon-output (view) %s, index %d.", __func__,
+                                     HexStr(txout->pk.begin(), txout->pk.end()), nTestExists);
                     };
 
-                    const Coin &coin = view.AccessCoin(input.prevout);
-                    const CScript *pScript = &coin.out.scriptPubKey;
+                    op.n = k;
+                    view.nLastRCTOutput++;
+                    CAnonOutput ao(txout->pk, txout->commitment, op, pindex->nHeight, 0);
 
-                    CAmount nValue = coin.nType == OUTPUT_CT ? 0 : coin.out.nValue;
-                    std::vector<uint8_t> hashBytes;
+                    view.anonOutputLinks[txout->pk] = view.nLastRCTOutput;
+                    view.anonOutputs.push_back(std::make_pair(view.nLastRCTOutput, ao));
+                };
+            };
+
+            if (fAddressIndex) {
+                printf("%s\n", "fAddressIndex");
+                // Update outputs for insight
+                for (unsigned int k = 0; k < tx.vpout.size(); k++) {
+                    const CTxOutBase *out = tx.vpout[k].get();
+
+                    if (!out->IsType(OUTPUT_STANDARD)
+                        && !out->IsType(OUTPUT_CT))
+                        continue;
+
+                    const CScript *pScript;
+                    std::vector<unsigned char> hashBytes;
                     int scriptType = 0;
-
-                    if (!ExtractIndexInfo(pScript, scriptType, hashBytes)
+                    CAmount nValue;
+                    if (!ExtractIndexInfo(out, scriptType, hashBytes, nValue, pScript)
                         || scriptType == 0)
                         continue;
 
-                    uint256 hashAddress;
-                    if (scriptType > 0)
-                        hashAddress = uint256(hashBytes.data(), hashBytes.size());
-
-                    if (fAddressIndex && scriptType > 0)
-                    {
-                        // record spending activity
-                        view.addressIndex.push_back(std::make_pair(CAddressIndexKey(scriptType, hashAddress, pindex->nHeight, i, txhash, j, true), nValue * -1));
-                        // remove address from unspent index
-                        view.addressUnspentIndex.push_back(std::make_pair(CAddressUnspentKey(scriptType, hashAddress, input.prevout.hash, input.prevout.n), CAddressUnspentValue()));
-                    };
-
-                    if (fSpentIndex)
-                    {
-                        CAmount nValue = coin.nType == OUTPUT_CT ? -1 : coin.out.nValue;
-                        // add the spent index to determine the txid and input that spent an output
-                        // and to find the amount and address from an input
-                        view.spentIndex.push_back(std::make_pair(CSpentIndexKey(input.prevout.hash, input.prevout.n), CSpentIndexValue(txhash, j, pindex->nHeight, nValue, scriptType, hashAddress)));
-                    };
+                    // record receiving activity
+                    view.addressIndex.push_back(std::make_pair(
+                            CAddressIndexKey(scriptType, uint256(hashBytes.data(), hashBytes.size()), pindex->nHeight,
+                                             i, txhash, k, false), nValue));
+                    // record unspent output
+                    view.addressUnspentIndex.push_back(std::make_pair(
+                            CAddressUnspentKey(scriptType, uint256(hashBytes.data(), hashBytes.size()), txhash, k),
+                            CAddressUnspentValue(nValue, *pScript, pindex->nHeight)));
                 };
-            };
+            }; // if (fAddressIndex)
         };
-
-        // GetTransactionSigOpCost counts 3 types of sigops:
-        // * legacy (always)
-        // * p2sh (when P2SH enabled in flags and excludes coinbase)
-        // * witness (when witness enabled in flags and excludes coinbase)
-        nSigOpsCost += GetTransactionSigOpCost(tx, view, flags);
-        if (nSigOpsCost > MAX_BLOCK_SIGOPS_COST) {
-            control.Wait();
-            printf("%s\n", "too many sigops");
-            return state.DoS(100, error("ConnectBlock(): too many sigops"),
-                             REJECT_INVALID, "bad-blk-sigops");
-        }
-        txdata.emplace_back(tx);
-
-        if (!tx.IsCoinBase())
-        {
-            std::vector<CScriptCheck> vChecks;
-            bool fCacheResults = fJustCheck; /* Don't cache results if we're actually connecting blocks (still consult the cache, though) */
-            if (!CheckInputs(tx, state, view, fScriptChecks, flags, fCacheResults, fCacheResults, txdata[i], nScriptCheckThreads ? &vChecks : nullptr)) {
-                control.Wait();
-                printf("%s\n", "CheckInputs failed");
-                return error("ConnectBlock(): CheckInputs on %s failed with %s",
-                    txhash.ToString(), FormatStateMessage(state));
-            };
-
-            control.Add(vChecks);
-
-            blockundo.vtxundo.push_back(CTxUndo());
-            printf("%s\n", "Update coins");
-            UpdateCoins(tx, view, blockundo.vtxundo.back(), pindex->nHeight);
-        } else
-        {
-            // tx is coinbase
-            CTxUndo undoDummy;
-            UpdateCoins(tx, view, undoDummy, pindex->nHeight);
-            nMoneyCreated += tx.GetValueOut();
-        };
-
-        printf("%s\n", "nLastRCTOutput");
-        if (view.nLastRCTOutput == 0)
-            view.nLastRCTOutput = pindex->pprev ? pindex->pprev->nAnonOutputs : 0;
-        // Index rct outputs and keyimages
-        if (state.fHasAnonOutput || state.fHasAnonInput)
-        {
-            printf("%s\n", "fHasAnonOutput || fHasAnonInput");
-            COutPoint op(txhash, 0);
-            for (const auto &txin : tx.vin)
-            {
-                if (txin.IsAnonInput())
-                {
-                    uint32_t nAnonInputs, nRingSize;
-                    txin.GetAnonInfo(nAnonInputs, nRingSize);
-                    if (txin.scriptData.stack.size() != 1
-                        || txin.scriptData.stack[0].size() != 33 * nAnonInputs) {
-                        control.Wait();
-                        return error("%s: Bad scriptData stack, %s.", __func__, txhash.ToString());
-                    };
-
-                    const std::vector<uint8_t> &vKeyImages = txin.scriptData.stack[0];
-                    for (size_t k = 0; k < nAnonInputs; ++k)
-                    {
-                        const CCmpPubKey &ki = *((CCmpPubKey*)&vKeyImages[k*33]);
-
-                        view.keyImages.push_back(std::make_pair(ki, txhash));
-                    };
-                };
-            };
-
-            for (unsigned int k = 0; k < tx.vpout.size(); k++)
-            {
-                if (!tx.vpout[k]->IsType(OUTPUT_RINGCT))
-                    continue;
-
-                CTxOutRingCT *txout = (CTxOutRingCT*)tx.vpout[k].get();
-
-                int64_t nTestExists;
-                if (!fVerifyingDB && pblocktree->ReadRCTOutputLink(txout->pk, nTestExists)) {
-                    control.Wait();
-
-                    if (nTestExists > pindex->pprev->nAnonOutputs)
-                    {
-                        // The anon index can diverge from the chain index if shutdown does not complete
-                        LogPrintf("%s: Duplicate anon-output %s, index %d, above last index %d.\n", __func__, HexStr(txout->pk.begin(), txout->pk.end()), nTestExists, pindex->pprev->nAnonOutputs);
-                        LogPrintf("Attempting to repair anon index.\n");
-                        std::set<CCmpPubKey> setKi; // unused
-                        RollBackRCTIndex(pindex->pprev->nAnonOutputs, nTestExists, setKi);
-                        return false;
-                    }
-
-                    return error("%s: Duplicate anon-output (db) %s, index %d.", __func__, HexStr(txout->pk.begin(), txout->pk.end()), nTestExists);
-                };
-                if (!fVerifyingDB && view.ReadRCTOutputLink(txout->pk, nTestExists)) {
-                    control.Wait();
-                    return error("%s: Duplicate anon-output (view) %s, index %d.", __func__, HexStr(txout->pk.begin(), txout->pk.end()), nTestExists);
-                };
-
-                op.n = k;
-                view.nLastRCTOutput++;
-                CAnonOutput ao(txout->pk, txout->commitment, op, pindex->nHeight, 0);
-
-                view.anonOutputLinks[txout->pk] = view.nLastRCTOutput;
-                view.anonOutputs.push_back(std::make_pair(view.nLastRCTOutput, ao));
-            };
-        };
-
-        if (fAddressIndex)
-        {
-            printf("%s\n", "fAddressIndex");
-            // Update outputs for insight
-            for (unsigned int k = 0; k < tx.vpout.size(); k++)
-            {
-                const CTxOutBase *out = tx.vpout[k].get();
-
-                if (!out->IsType(OUTPUT_STANDARD)
-                    && !out->IsType(OUTPUT_CT))
-                    continue;
-
-                const CScript *pScript;
-                std::vector<unsigned char> hashBytes;
-                int scriptType = 0;
-                CAmount nValue;
-                if (!ExtractIndexInfo(out, scriptType, hashBytes, nValue, pScript)
-                    || scriptType == 0)
-                    continue;
-
-                // record receiving activity
-                view.addressIndex.push_back(std::make_pair(CAddressIndexKey(scriptType, uint256(hashBytes.data(), hashBytes.size()), pindex->nHeight, i, txhash, k, false), nValue));
-                // record unspent output
-                view.addressUnspentIndex.push_back(std::make_pair(CAddressUnspentKey(scriptType, uint256(hashBytes.data(), hashBytes.size()), txhash, k), CAddressUnspentValue(nValue, *pScript, pindex->nHeight)));
-            };
-        }; // if (fAddressIndex)
-    };
-
+    }
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * (nTime3 - nTime2), MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * MICRO, nTimeConnect * MILLI / nBlocksTotal);
     printf("%s\n", "!control.Wait()");
