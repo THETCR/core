@@ -943,6 +943,7 @@ bool EvalScript(std::vector<std::vector<unsigned char> >& stack, const CScript& 
 
                     if (!CheckSignatureEncoding(vchSig, flags, serror) || !CheckPubKeyEncoding(vchPubKey, flags, sigversion, serror)) {
                         //serror is set
+                        printf("EvalScript() : ScriptError %s", ScriptErrorString(&serror));
                         return false;
                     }
 
@@ -954,6 +955,7 @@ bool EvalScript(std::vector<std::vector<unsigned char> >& stack, const CScript& 
                     popstack(stack);
                     popstack(stack);
                     stack.push_back(fSuccess ? vchTrue : vchFalse);
+                    printf("EvalScript() : fSuccess %s", fSuccess ? "true" : "false");
                     if (opcode == OP_CHECKSIGVERIFY)
                     {
                         if (fSuccess)
