@@ -2645,7 +2645,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 //    printf("%s\n", "Connect block Check block succeeded");
     if (block.IsProofOfStake()) {
 //        printf("%s\n", "Compute stake modifier");
-        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
+//        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
         setDirtyBlockIndex.insert(pindex);
 
         uint256 hashProof, targetProofOfStake;
