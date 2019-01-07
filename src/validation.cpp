@@ -2653,18 +2653,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         if (!CheckProofOfStake(block, hashProof, stake)) {
             return error("%s: Check proof of stake failed.", __func__);
         }
-        if (stake->IsZWSP() && !ContextualCheckZerocoinStake(pindex->pprev->nHeight, stake.get()))
-            return state.DoS(100, error("%s: staked zWSP fails context checks", __func__));
-
-        uint256 hash = block.GetHash();
-        if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
-            mapProofOfStake.insert(make_pair(hash, hashProof));
-    }
-    if(block.IsProofOfWork()){
-        uint256 hashProofOfStake = block.GetPoWHash();
-        uint256 hash = block.GetHash();
-        if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
-            mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
     }
 //    printf("%s\n", "Assert view get best block");
     // verify that the view's current state corresponds to the previous block
@@ -5421,6 +5409,17 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             if(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()) {
                 pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
             }
+            uint256 hashProof, targetProofOfStake;
+            unique_ptr<CStakeInput> stake;
+            if (!CheckProofOfStake(block, hashProof, stake)) {
+                return error("%s: Check proof of stake failed.", __func__);
+            }
+            if (stake->IsZWSP() && !ContextualCheckZerocoinStake(pindex->pprev->nHeight, stake.get()))
+                    return state.DoS(100, error("%s: staked zWSP fails context checks", __func__));
+
+            uint256 hash = block.GetHash();
+            if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
+                mapProofOfStake.insert(make_pair(hash, hashProof));
 //            pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
         }
         pindex->nFlags &= ~BLOCK_DELAYED;
