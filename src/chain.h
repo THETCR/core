@@ -686,7 +686,7 @@ public:
 
     //!WISPR
     bool NewProtocolsStarted () {
-        return Height() >= 500000;
+        return Height() >= 600000;
     }
 };
 
