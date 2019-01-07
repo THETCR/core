@@ -2653,8 +2653,19 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         if (!CheckProofOfStake(block, hashProof, stake)) {
             return error("%s: Check proof of stake failed.", __func__);
         }
-    }
+        if (stake->IsZWSP() && !ContextualCheckZerocoinStake(pindex->pprev->nHeight, stake.get()))
+            return state.DoS(100, error("%s: staked zWSP fails context checks", __func__));
 
+        uint256 hash = block.GetHash();
+        if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
+            mapProofOfStake.insert(make_pair(hash, hashProof));
+    }
+    if(block.IsProofOfWork()){
+        uint256 hashProofOfStake = block.GetPoWHash();
+        uint256 hash = block.GetHash();
+        if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
+            mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
+    }
 //    printf("%s\n", "Assert view get best block");
     // verify that the view's current state corresponds to the previous block
     uint256 hashPrevBlock = pindex->pprev == nullptr ? uint256() : pindex->pprev->GetBlockHash();
@@ -5415,6 +5426,12 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         pindex->nFlags &= ~BLOCK_DELAYED;
         setDirtyBlockIndex.insert(pindex);
     }
+    if(block.IsProofOfWork()){
+        uint256 hashProofOfStake = block.GetPoWHash();
+        uint256 hash = block.GetHash();
+        if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
+            mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
+    }
 
     if (!ContextualCheckBlock(block, state, chainparams.GetConsensus(), pindex->pprev, true)) {
         if (state.IsInvalid() && !state.CorruptionPossible()) {
@@ -7101,6 +7118,30 @@ bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
     if (block.nBits != nBitsRequired){
         LogPrintf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
         return error("%s : incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
+    }
+
+    return true;
+}
+bool ContextualCheckZerocoinStake(int nHeight, CStakeInput* stake)
+{
+    if (nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT())
+        return error("%s: zWSP stake block is less than allowed start height", __func__);
+
+    if (CZWspStake* zWSP = dynamic_cast<CZWspStake*>(stake)) {
+        CBlockIndex* pindexFrom = zWSP->GetIndexFrom();
+        if (!pindexFrom)
+            return error("%s: failed to get index associated with zWSP stake checksum", __func__);
+
+        if (chainActive.Height() - pindexFrom->nHeight < Params().Zerocoin_RequiredStakeDepth())
+            return error("%s: zWSP stake does not have required confirmation depth", __func__);
+
+        //The checksum needs to be the exact checksum from 200 blocks ago
+        uint256 nCheckpoint200 = chainActive[nHeight - Params().Zerocoin_RequiredStakeDepth()]->nAccumulatorCheckpoint;
+        uint32_t nChecksum200 = ParseChecksum(nCheckpoint200, libzerocoin::AmountToZerocoinDenomination(zWSP->GetValue()));
+        if (nChecksum200 != zWSP->GetChecksum())
+            return error("%s: accumulator checksum is different than the block 200 blocks previous. stake=%d block200=%d", __func__, zWSP->GetChecksum(), nChecksum200);
+    } else {
+        return error("%s: dynamic_cast of stake ptr failed", __func__);
     }
 
     return true;
