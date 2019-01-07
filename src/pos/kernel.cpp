@@ -334,10 +334,8 @@ bool stakeTargetHit(uint256 hashProofOfStake, int64_t nValueIn, uint256 bnTarget
     return hashProofOfStake < (bnCoinDayWeight * bnTargetPerCoinDay);
 }
 bool stakeTargetHitOld(uint256 hashProofOfStake, uint256 bnTargetPerCoinDay) {
-    if (hashProofOfStake > bnTargetPerCoinDay)
-        return false;
+    return !(hashProofOfStake > bnTargetPerCoinDay);
 
-    return true;
 }
 bool CheckStake(const CDataStream& ssUniqueID, CAmount nValueIn, const uint64_t nStakeModifier, const uint256& bnTarget,
                   unsigned int nTimeBlockFrom, unsigned int& nTimeTx, uint256& hashProofOfStake)
