@@ -7122,27 +7122,3 @@ bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
 
     return true;
 }
-bool ContextualCheckZerocoinStake(int nHeight, CStakeInput* stake)
-{
-    if (nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT())
-        return error("%s: zWSP stake block is less than allowed start height", __func__);
-
-    if (CZWspStake* zWSP = dynamic_cast<CZWspStake*>(stake)) {
-        CBlockIndex* pindexFrom = zWSP->GetIndexFrom();
-        if (!pindexFrom)
-            return error("%s: failed to get index associated with zWSP stake checksum", __func__);
-
-        if (chainActive.Height() - pindexFrom->nHeight < Params().Zerocoin_RequiredStakeDepth())
-            return error("%s: zWSP stake does not have required confirmation depth", __func__);
-
-        //The checksum needs to be the exact checksum from 200 blocks ago
-        uint256 nCheckpoint200 = chainActive[nHeight - Params().Zerocoin_RequiredStakeDepth()]->nAccumulatorCheckpoint;
-        uint32_t nChecksum200 = ParseChecksum(nCheckpoint200, libzerocoin::AmountToZerocoinDenomination(zWSP->GetValue()));
-        if (nChecksum200 != zWSP->GetChecksum())
-            return error("%s: accumulator checksum is different than the block 200 blocks previous. stake=%d block200=%d", __func__, zWSP->GetChecksum(), nChecksum200);
-    } else {
-        return error("%s: dynamic_cast of stake ptr failed", __func__);
-    }
-
-    return true;
-}
