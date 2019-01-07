@@ -288,7 +288,7 @@ std::string CTransaction::ToString() const
         nVersion,
         nTime,
         vin.size(),
-        (nVersion & 0xFF) < WISPR_TXN_VERSION ? vout.size() : vpout.size(),
+        (nVersion & 0x0) < WISPR_TXN_VERSION ? vout.size() : vpout.size(),
         nLockTime);
     for (const auto& tx_in : vin)
         str += "    " + tx_in.ToString() + "\n";
