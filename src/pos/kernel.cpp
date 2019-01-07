@@ -421,8 +421,9 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
             return error("CheckProofOfStake() : INFO: read txPrev failed");
 
         //verify signature and script
-        if (!VerifyScript(txin.scriptSig, txPrev->vout[txin.prevout.n].scriptPubKey, &txin.scriptWitness, SCRIPT_VERIFY_NONE, TransactionSignatureChecker(&tx, 0)))
-            return error("CheckProofOfStake() : VerifySignature failed on coinstake %s", tx.GetHash().ToString().c_str());
+        ScriptError* serror = nullptr;
+        if (!VerifyScript(txin.scriptSig, txPrev->vout[txin.prevout.n].scriptPubKey, &txin.scriptWitness, SCRIPT_VERIFY_NONE, TransactionSignatureChecker(&tx, 0), serror))
+            return error("CheckProofOfStake() : VerifySignature failed on coinstake %s, ScriptError %s", tx.GetHash().ToString().c_str(), serror);
 
         CWspStake* wspInput = new CWspStake();
         wspInput->SetInput(*txPrev, txin.prevout.n);
