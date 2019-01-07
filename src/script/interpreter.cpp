@@ -943,7 +943,7 @@ bool EvalScript(std::vector<std::vector<unsigned char> >& stack, const CScript& 
 
                     if (!CheckSignatureEncoding(vchSig, flags, serror) || !CheckPubKeyEncoding(vchPubKey, flags, sigversion, serror)) {
                         //serror is set
-                        printf("EvalScript() : ScriptError %s", ScriptErrorString(&serror));
+                        printf("EvalScript() : ScriptError %s", ScriptErrorString(*serror));
                         return false;
                     }
 
