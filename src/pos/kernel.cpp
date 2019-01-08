@@ -385,7 +385,7 @@ bool CheckStakeV1(unsigned int nTxPrevTime, const COutPoint &prevout,
         printf("%s : Checking block at height=%ds\n",
                   __func__, (nStakeModifierHeight + 1));
         printf(
-                "%s : height=%ds, using modifier %016x, bnStakeModifierV2 %s\n nTimeTxPrev=%u nPrevout=%u "
+                "%s : height=%d, using modifier %016x, bnStakeModifierV2 %s\n nTimeTxPrev=%u nPrevout=%u "
                 "nTimeTx=%u, nBits = %08x, modifier checksum %016x, prevoutHash=%s \n hashProofOfStake=%s\n", __func__,
                 nStakeModifierHeight, nStakeModifier,
                 bnStakeModifierV2.ToString().c_str(), nTxPrevTime,
