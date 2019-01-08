@@ -5399,7 +5399,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             if (stake->IsZWSP() && !ContextualCheckZerocoinStake(pindex->pprev->nHeight, stake.get()))
                     return state.DoS(100, error("%s: staked zWSP fails context checks", __func__));
 
-            uint256 hash = block.GetHash();
+//            uint256 hash = block.GetHash();
             if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
                 mapProofOfStake.insert(make_pair(hash, hashProof));
 //            pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);

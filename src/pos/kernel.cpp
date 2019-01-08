@@ -351,6 +351,10 @@ bool CheckStakeV1(unsigned int nTxPrevTime, const COutPoint &prevout,
                   unsigned int nTimeTx, uint256 &hashProofOfStake, int64_t nValueIn, CBlockIndex *pindexPrev,
                   unsigned int nBits, bool fDebug = false) {
 
+    string function = __func__;
+//    LogPrintf(
+//            "%s :nTimeTxPrev=%u nTimeTx=%u\n", function, nTxPrevTime, nTimeTx);
+
     if (nTimeTx < nTxPrevTime)  // Transaction timestamp violation
         return error("CheckStakeV1() : nTime violation");
 
@@ -365,12 +369,34 @@ bool CheckStakeV1(unsigned int nTxPrevTime, const COutPoint &prevout,
     uint256 bnWeight = uint256(nValueIn);
     bnTarget *= bnWeight;
 
+//    uint256 targetProofOfStake = bnTarget;
+
+    uint64_t nStakeModifier = pindexPrev->nStakeModifier;
     uint256 bnStakeModifierV2 = pindexPrev->bnStakeModifierV2;
+    int nStakeModifierHeight = pindexPrev->nHeight;
+
     // Calculate hash
     CDataStream ss(SER_GETHASH, 0);
     ss << bnStakeModifierV2;
     ss << nTxPrevTime << prevout.hash << prevout.n << nTimeTx;
     hashProofOfStake = Hash(ss.begin(), ss.end());
+
+    if(fDebug) {
+        printf("%s : Checking block at height=%ds\n",
+                  __func__, (nStakeModifierHeight + 1));
+        printf(
+                "%s : height=%ds, using modifier %016x, bnStakeModifierV2 %s\n nTimeTxPrev=%u nPrevout=%u "
+                "nTimeTx=%u, nBits = %08x, modifier checksum %016x, prevoutHash=%s \n hashProofOfStake=%s\n", __func__,
+                nStakeModifierHeight, nStakeModifier,
+                bnStakeModifierV2.ToString().c_str(), nTxPrevTime,
+                prevout.n, nTimeTx, nBits, pindexPrev->nStakeModifierChecksum, prevout.hash.ToString().c_str(),
+                hashProofOfStake.ToString().c_str());
+        printf(
+                "%s :  bnTarget=%s \n bnCoinDayWeight=%s \n bnTarget * bnCoinDayWeight=%s \n",
+                __func__,
+                bnTargetOld.ToString().c_str(), bnWeight.ToString().c_str(),
+                bnTarget.ToString().c_str());
+    }
 
     return stakeTargetHitOld(hashProofOfStake, bnTarget);
 }
@@ -489,7 +515,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
                          tx.GetHash().ToString(), hashProofOfStake.ToString());
         }
     } else {
-        if (!CheckStakeV1(txPrev->nTime, txin.prevout, tx.nTime, hashProofOfStake, nValueIn, pindexOld, block.nBits)) {
+        if (!CheckStakeV1(txPrev->nTime, txin.prevout, tx.nTime, hashProofOfStake, nValueIn, pindexOld, block.nBits, true)) {
             return error("CheckProofOfStake() : INFO: old bnStakeModifierV2 check kernel failed on coinstake %s, hashProof=%s \n",
                          tx.GetHash().ToString(), hashProofOfStake.ToString());
         }
