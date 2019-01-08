@@ -4166,10 +4166,10 @@ CBlockIndex* CChainState::AddToBlockIndex(const CBlockHeader& block)
             LogPrintf("AddToBlockIndex() : SetStakeEntropyBit() failed \n");
 
         // ppcoin: record proof-of-stake hash value
-        if (!mapProofOfStake.count(hash))
-            LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
+//        if (!mapProofOfStake.count(hash))
+//            LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
 
-        pindexNew->hashProofOfStake = mapProofOfStake[hash];
+//        pindexNew->hashProofOfStake = mapProofOfStake[hash];
         uint64_t nStakeModifier = 0;
         bool fGeneratedStakeModifier = false;
         if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
