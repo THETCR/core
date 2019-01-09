@@ -475,6 +475,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
                 return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputvalues-outofrange");
         };
     }
+    printf("%s: nValueIn =%lli\n", __func__, nValueIn);
 
     if ((nStandard > 0) + (nCt > 0) + (nRingCT > 0) > 1)
         return state.DoS(100, false, REJECT_INVALID, "mixed-input-types");
@@ -483,6 +484,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
     // GetPlainValueOut adds to nStandard, nCt, nRingCT
     CAmount nPlainValueOut = tx.GetPlainValueOut(nStandard, nCt, nRingCT);
     state.fHasAnonOutput = nRingCT > nRingCTInputs;
+    printf("%s: nPlainValueOut =%lli\n", __func__, nPlainValueOut);
 
     nTxFee = 0;
     if (fWisprMode)
@@ -564,6 +566,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
         if (!MoneyRange(nFees))
             return state.DoS(100, false, REJECT_INVALID, "bad-txns-fee-outofrange");
     };
+    printf("%s: nTxFee =%lli\n", __func__, nTxFee);
 
     if (nCt > 0 && nRingCT == 0)
     {
