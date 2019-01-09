@@ -2873,7 +2873,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             const uint256 txhash = tx.GetHash();
             nInputs += tx.vin.size();
 
-            if (!tx.IsCoinBase()) {
+            if (!tx.IsCoinBase() && !tx.IsZerocoinSpend()) {
                 CAmount txfee = 0;
                 if (!Consensus::CheckTxInputs(tx, state, view, pindex->nHeight, txfee)) {
                     control.Wait();
