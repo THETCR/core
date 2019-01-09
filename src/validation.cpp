@@ -4166,10 +4166,10 @@ CBlockIndex* CChainState::AddToBlockIndex(const CBlockHeader& block)
             LogPrintf("AddToBlockIndex() : SetStakeEntropyBit() failed \n");
 
         // ppcoin: record proof-of-stake hash value
-//        if (!mapProofOfStake.count(hash))
-//            LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
+        if (!mapProofOfStake.count(hash))
+            LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
 
-//        pindexNew->hashProofOfStake = mapProofOfStake[hash];
+        pindexNew->hashProofOfStake = mapProofOfStake[hash];
         uint64_t nStakeModifier = 0;
         bool fGeneratedStakeModifier = false;
         if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
@@ -5412,27 +5412,16 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             if(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()) {
                 pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
             }
-            uint256 hashProof, targetProofOfStake;
-            unique_ptr<CStakeInput> stake;
-            if (!CheckProofOfStake(block, hashProof, stake)) {
-                return error("%s: Check proof of stake failed.", __func__);
-            }
-            if (stake->IsZWSP() && !ContextualCheckZerocoinStake(pindex->pprev->nHeight, stake.get()))
-                    return state.DoS(100, error("%s: staked zWSP fails context checks", __func__));
-
-//            uint256 hash = block.GetHash();
-            if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
-                mapProofOfStake.insert(make_pair(hash, hashProof));
 //            pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
             // ppcoin: compute stake entropy bit for stake modifier
             if (!pindex->SetStakeEntropyBit(pindex->GetStakeEntropyBit()))
                 LogPrintf("AcceptBlock() : SetStakeEntropyBit() failed \n");
 
-            // ppcoin: record proof-of-stake hash value
-            if (!mapProofOfStake.count(hash))
-                LogPrintf("AcceptBlock() : hashProofOfStake not found in map \n");
+//            // ppcoin: record proof-of-stake hash value
+//            if (!mapProofOfStake.count(hash))
+//                LogPrintf("AcceptBlock() : hashProofOfStake not found in map \n");
 
-            pindex->hashProofOfStake = mapProofOfStake[hash];
+//            pindex->hashProofOfStake = mapProofOfStake[hash];
             uint64_t nStakeModifier = 0;
             bool fGeneratedStakeModifier = false;
             if (!ComputeNextStakeModifier(pindex->pprev, nStakeModifier, fGeneratedStakeModifier))
@@ -5441,6 +5430,18 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
             if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
                 LogPrintf("%s : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", __func__, pindex->nHeight, std::to_string(nStakeModifier));
+
+            uint256 hashProof, targetProofOfStake;
+            unique_ptr<CStakeInput> stake;
+            if (!CheckProofOfStake(block, hashProof, stake)) {
+                return error("%s: Check proof of stake failed.", __func__);
+            }
+            if (stake->IsZWSP() && !ContextualCheckZerocoinStake(pindex->pprev->nHeight, stake.get()))
+                return state.DoS(100, error("%s: staked zWSP fails context checks", __func__));
+
+//            uint256 hash = block.GetHash();
+            if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
+                mapProofOfStake.insert(make_pair(hash, hashProof));
         }
         pindex->nFlags &= ~BLOCK_DELAYED;
         setDirtyBlockIndex.insert(pindex);
