@@ -1599,7 +1599,7 @@ bool ReadRawBlockFromDisk(std::vector<uint8_t>& block, const CBlockIndex* pindex
 
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
     CAmount nSubsidy = 125000 * COIN;
     return nSubsidy;
 }
@@ -1951,7 +1951,7 @@ CAmount GetInvalidUTXOValue()
  */
 bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck> *pvChecks, bool fAnonChecks) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
-    printf("%s\n", __func__);
+//    printf("%s\n", __func__);
     if (!tx.IsCoinBase())
     {
         if (pvChecks)
