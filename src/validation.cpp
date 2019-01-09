@@ -2890,7 +2890,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 };
                 if (!MoneyRange(nFees)) {
                     control.Wait();
-                    printf("%s\n", "accumulated fee in the block out of range");
+//                    printf("%s\n", "accumulated fee in the block out of range");
                     return state.DoS(100, error("%s: accumulated fee in the block out of range.", __func__),
                                      REJECT_INVALID, "bad-txns-accumulated-fee-outofrange");
                 }
@@ -2898,7 +2898,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 // Check that transaction is BIP68 final
                 // BIP68 lock checks (as opposed to nLockTime checks) must
                 // be in ConnectBlock because they require the UTXO set
-                printf("%s\n", "BIP68 lock checks");
+//                printf("%s\n", "BIP68 lock checks");
                 if (chainActive.NewProtocolsStarted()) {
                     prevheights.resize(tx.vin.size());
                     for (size_t j = 0; j < tx.vin.size(); j++) {
@@ -2910,14 +2910,14 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
                     if (!SequenceLocks(tx, nLockTimeFlags, &prevheights, *pindex)) {
                         control.Wait();
-                        printf("%s\n", "contains a non-BIP68-final transaction");
+//                        printf("%s\n", "contains a non-BIP68-final transaction");
                         return state.DoS(100, error("%s: contains a non-BIP68-final transaction", __func__),
                                          REJECT_INVALID, "bad-txns-nonfinal");
                     }
                 }
                 if (tx.IsWisprVersion()
                     && (fAddressIndex || fSpentIndex)) {
-                    printf("%s\n", "Update spent inputs for insight");
+//                    printf("%s\n", "Update spent inputs for insight");
                     // Update spent inputs for insight
                     for (size_t j = 0; j < tx.vin.size(); j++) {
                         const CTxIn input = tx.vin[j];
@@ -2972,7 +2972,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             nSigOpsCost += GetTransactionSigOpCost(tx, view, flags);
             if (nSigOpsCost > MAX_BLOCK_SIGOPS_COST) {
                 control.Wait();
-                printf("%s\n", "too many sigops");
+//                printf("%s\n", "too many sigops");
                 return state.DoS(100, error("ConnectBlock(): too many sigops"),
                                  REJECT_INVALID, "bad-blk-sigops");
             }
@@ -2984,7 +2984,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 if (!CheckInputs(tx, state, view, fScriptChecks, flags, fCacheResults, fCacheResults, txdata[i],
                                  nScriptCheckThreads ? &vChecks : nullptr)) {
                     control.Wait();
-                    printf("%s\n", "CheckInputs failed");
+//                    printf("%s\n", "CheckInputs failed");
                     return error("ConnectBlock(): CheckInputs on %s failed with %s",
                                  txhash.ToString(), FormatStateMessage(state));
                 };
@@ -2992,7 +2992,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 control.Add(vChecks);
 
                 blockundo.vtxundo.push_back(CTxUndo());
-                printf("%s\n", "Update coins");
+//                printf("%s\n", "Update coins");
                 UpdateCoins(tx, view, blockundo.vtxundo.back(), pindex->nHeight);
             } else {
                 // tx is coinbase
@@ -3001,12 +3001,12 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 nMoneyCreated += tx.GetValueOut();
             };
 
-            printf("%s\n", "nLastRCTOutput");
+//            printf("%s\n", "nLastRCTOutput");
             if (view.nLastRCTOutput == 0)
                 view.nLastRCTOutput = pindex->pprev ? pindex->pprev->nAnonOutputs : 0;
             // Index rct outputs and keyimages
             if (state.fHasAnonOutput || state.fHasAnonInput) {
-                printf("%s\n", "fHasAnonOutput || fHasAnonInput");
+//                printf("%s\n", "fHasAnonOutput || fHasAnonInput");
                 COutPoint op(txhash, 0);
                 for (const auto &txin : tx.vin) {
                     if (txin.IsAnonInput()) {
@@ -3067,7 +3067,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             };
 
             if (fAddressIndex) {
-                printf("%s\n", "fAddressIndex");
+//                printf("%s\n", "fAddressIndex");
                 // Update outputs for insight
                 for (unsigned int k = 0; k < tx.vpout.size(); k++) {
                     const CTxOutBase *out = tx.vpout[k].get();
@@ -4953,7 +4953,6 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
             unique_ptr<CStakeInput> stake;
             // Blocks are connected at end of import / reindex
             // CheckProofOfStake is run again during connectblock
-            printf("ContextualCheckBlock() : CheckProofOfStake() \n");
             if (!IsInitialBlockDownload() // checks (!fImporting && !fReindex)
                 && (!accept_block || chainActive.Height() > (int)Params().GetStakeMinConfirmations())
                 && !CheckProofOfStake(block, hashProof, stake)) {
