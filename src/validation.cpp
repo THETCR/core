@@ -2650,7 +2650,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 //        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
         // ppcoin: compute stake entropy bit for stake modifier
         if (!pindex->SetStakeEntropyBit(pindex->GetStakeEntropyBit()))
-            LogPrintf("AddToBlockIndex() : SetStakeEntropyBit() failed \n");
+            LogPrintf("ConnectBlock() : SetStakeEntropyBit() failed \n");
 
         // ppcoin: record proof-of-stake hash value
 //        if (!mapProofOfStake.count(hash))
@@ -2672,6 +2672,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
         uint256 hashProof, targetProofOfStake;
         unique_ptr<CStakeInput> stake;
+        printf("ConnectBlock() : CheckProofOfStake() \n");
         if (!CheckProofOfStake(block, hashProof, stake)) {
             return error("%s: Check proof of stake failed.", __func__);
         }
@@ -4939,12 +4940,10 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
             }
 
             uint256 hashProof, targetProofOfStake;
-
-            // Blocks are connected at end of import / reindex
-            // CheckProofOfStake is run again during connectblock
             unique_ptr<CStakeInput> stake;
             // Blocks are connected at end of import / reindex
             // CheckProofOfStake is run again during connectblock
+            printf("ContextualCheckBlock() : CheckProofOfStake() \n");
             if (!IsInitialBlockDownload() // checks (!fImporting && !fReindex)
                 && (!accept_block || chainActive.Height() > (int)Params().GetStakeMinConfirmations())
                 && !CheckProofOfStake(block, hashProof, stake)) {
@@ -5466,6 +5465,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 
             uint256 hashProof, targetProofOfStake;
             unique_ptr<CStakeInput> stake;
+            printf("AcceptBlock() : CheckProofOfStake() \n");
             if (!CheckProofOfStake(block, hashProof, stake)) {
                 return error("%s: Check proof of stake failed.", __func__);
             }
