@@ -306,13 +306,18 @@ CAmount CCoinsViewCache::GetValueIn(const CTransaction& tx) const
 
 bool CCoinsViewCache::HaveInputs(const CTransaction& tx) const
 {
-    if (!tx.IsCoinBase()) {
+    if (!tx.IsCoinBase() && !tx.IsZerocoinSpend()) {
         for (unsigned int i = 0; i < tx.vin.size(); i++) {
+            const COutPoint& prevout = tx.vin[i].prevout;
+            const Coin coins = AccessCoin(COutPoint(prevout.hash, 0));
             if (tx.vin[i].IsAnonInput())
                 continue;
-            if (!HaveCoin(tx.vin[i].prevout)) {
+            if (coins == coinEmpty || !coins.IsAvailable(prevout.n)) {
                 return false;
             }
+//            if (!coins || !HaveCoin(tx.vin[i].prevout)) {
+//                return false;
+//            }
         }
     }
     return true;
