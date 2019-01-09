@@ -296,7 +296,10 @@ const std::string strMessageMagic = "Bitcoin Signed Message:\n";
 map<uint256, uint256> mapProofOfStake;
 set<pair<COutPoint, unsigned int> > setStakeSeen;
 map<unsigned int, unsigned int> mapHashedBlocks;
-unsigned int nStakeMinAge = 60 * 60;
+unsigned int nStakeMinAge = 8 * 60 * 60;
+unsigned int nStakeMinAgeV2 = 60 * 60;
+int64_t nReserveBalance = 0;
+
 std::map<uint256, int64_t> mapRejectedBlocks GUARDED_BY(cs_main);
 
 
@@ -2678,12 +2681,18 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         }
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
             mapProofOfStake.insert(make_pair(hash, hashProof));
+
+        pindex->hashProofOfStake = mapProofOfStake[hash];
     }
     if(block.IsProofOfWork()){
         uint256 hashProofOfStake = block.GetPoWHash();
 //        uint256 hash = block.GetHash();
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
             mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
+    }
+    pindex->hashProofOfStake = mapProofOfStake[hash];
+    if(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()){
+        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
 //    printf("%s\n", "Assert view get best block");
     // verify that the view's current state corresponds to the previous block

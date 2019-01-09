@@ -166,7 +166,10 @@ inline int64_t FutureDrift(int64_t nTime) { return nTime + 15; } // FutureDriftV
 static const int DEFAULT_STOPATHEIGHT = 0;
 
 extern unsigned int nStakeMinAge;
-
+extern unsigned int nStakeMinAgeV2;
+extern int64_t nLastCoinStakeSearchInterval;
+extern int64_t nLastCoinStakeSearchTime;
+extern int64_t nReserveBalance;
 
 struct BlockHasher
 {

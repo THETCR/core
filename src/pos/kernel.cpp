@@ -58,6 +58,11 @@ unsigned int GetTargetSpacing() {
     return 64;
 }
 unsigned int GetStakeMinAge(){
+    bool newVersion = chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT();
+    if(newVersion){
+        return nStakeMinAgeV2;
+
+    }
     return nStakeMinAge;
 }
 // Hard checkpoints of stake modifiers to ensure they are deterministic
@@ -179,7 +184,7 @@ uint256 ComputeStakeModifier(const CBlockIndex *pindexPrev, const uint256 &kerne
     CDataStream ss(SER_GETHASH, 0);
     ss << kernel << pindexPrev->bnStakeModifierV2;
     uint256 hash = Hash(ss.begin(), ss.end());
-//    LogPrintf("ComputeStakeModifier: hash=%s\n", hash.ToString().c_str());
+    LogPrintf("ComputeStakeModifier: hash=%s\n", hash.ToString().c_str());
     return hash;
 }
 
@@ -234,7 +239,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
     const CBlockIndex* pindex = pindexPrev;
 
     while (pindex && pindex->GetBlockTime() >= nSelectionIntervalStart) {
-        vSortedByTimestamp.push_back(make_pair(pindex->GetBlockTime(), pindex->GetBlockHash()));
+        vSortedByTimestamp.emplace_back(pindex->GetBlockTime(), pindex->GetBlockHash());
         pindex = pindex->pprev;
     }
 
