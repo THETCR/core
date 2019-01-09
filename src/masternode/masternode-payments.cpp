@@ -78,7 +78,9 @@ bool IsBlockValueValid(const CBlock& block, int nBlockHeight, CAmount blockRewar
     bool isSuperblockMaxValueMet = (block.vtx[0]->GetValueOut() <= nSuperblockMaxValue);
 
 //    LogPrint("gobject", "block.vtx[0]->GetValueOut() %lld <= nSuperblockMaxValue %lld\n", block.vtx[0]->GetValueOut(), nSuperblockMaxValue);
-
+    if(nBlockHeight == Params().NEW_PROTOCOLS_STARTHEIGHT()){
+        return true;
+    }
     if(!masternodeSync.IsSynced() || fLiteMode) {
         // not enough data but at least it must NOT exceed superblock max value
         if(CSuperblock::IsValidBlockHeight(nBlockHeight)) {
@@ -1110,4 +1112,45 @@ void CMasternodePayments::UpdatedBlockTip(const CBlockIndex *pindex, CConnman& c
 
     CheckBlockVotes(nFutureBlock - 1);
     ProcessBlock(nFutureBlock, connman);
+}
+bool IsBlockValueValid(const CBlock& block, CAmount nExpectedValue, CAmount nMinted)
+{
+    CBlockIndex* pindexPrev = chainActive.Tip();
+    if (pindexPrev == nullptr) return true;
+
+    int nHeight = 0;
+    if (pindexPrev->GetBlockHash() == block.hashPrevBlock) {
+        nHeight = pindexPrev->nHeight + 1;
+    } else { //out of order
+        BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
+        if (mi != mapBlockIndex.end() && (*mi).second)
+            nHeight = (*mi).second->nHeight + 1;
+    }
+
+    if (nHeight == 0) {
+//        LogPrint("masternode","IsBlockValueValid() : WARNING: Couldn't find previous block\n");
+    }
+
+    //LogPrintf("XX69----------> IsBlockValueValid(): nMinted: %d, nExpectedValue: %d\n", FormatMoney(nMinted), FormatMoney(nExpectedValue));
+    if(nHeight == Params().NEW_PROTOCOLS_STARTHEIGHT()){
+        return true;
+    }
+    if (!masternodeSync.IsSynced()) { //there is no budget data to use to check anything
+        //super blocks will always be on these blocks, max 100 per budgeting
+            if (nMinted > nExpectedValue) {
+                return false;
+            }
+    } else { // we're synced and have data so check the budget schedule
+
+        //are these blocks even enabled
+        if (!sporkManager.IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS)) {
+            return nMinted <= nExpectedValue;
+        }
+
+         if (nMinted > nExpectedValue) {
+             return false;
+         }
+    }
+
+    return true;
 }

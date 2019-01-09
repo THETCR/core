@@ -2675,7 +2675,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
         uint256 hashProof, targetProofOfStake;
         unique_ptr<CStakeInput> stake;
-        printf("ConnectBlock() : CheckProofOfStake() \n");
+//        printf("ConnectBlock() : CheckProofOfStake() \n");
         if (!CheckProofOfStake(block, hashProof, stake)) {
             return error("%s: Check proof of stake failed.", __func__);
         }
@@ -3197,6 +3197,17 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                                    block.vtx[0]->GetValueOut(), blockReward),
                                    REJECT_INVALID, "bad-cb-amount");
     };
+    //PoW phase redistributed fees to miner. PoS stage destroys fees.
+    CAmount nExpectedMint = Params().GetProofOfStakeReward(pindex->pprev, nFees);
+    if (block.IsProofOfWork() || chainActive.Height() < Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+        nExpectedMint += nFees;
+    }
+    //Check that the block does not overmint
+    if (!IsBlockValueValid(block, nExpectedMint, pindex->nMint)) {
+        return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)",
+                                    FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)),
+                         REJECT_INVALID, "bad-cb-amount");
+    }
 
     int64_t nTime4 = GetTimeMicros(); nTimeVerify += nTime4 - nTime2;
     LogPrint(BCLog::BENCH, "    - Verify %u txins: %.2fms (%.3fms/txin) [%.2fs (%.2fms/blk)]\n", nInputs - 1, MILLI * (nTime4 - nTime2), nInputs <= 1 ? 0 : MILLI * (nTime4 - nTime2) / (nInputs-1), nTimeVerify * MICRO, nTimeVerify * MILLI / nBlocksTotal);

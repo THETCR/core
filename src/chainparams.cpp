@@ -43,7 +43,7 @@ int64_t CChainParams::GetProofOfStakeReward(const CBlockIndex *pindexPrev, int64
 //    int64_t nSubsidy;
 
 //    nSubsidy = (pindexPrev->nMoneySupply / COIN) * GetCoinYearReward(pindexPrev->nTime) / (365 * 24 * (60 * 60 / nTargetSpacing));
-    if (pindexPrev->nHeight < 450 && pindexPrev->nHeight > 0) {
+    if (pindexPrev->IsProofOfWork()) {
         return 125000 * COIN;
     }
     int64_t nSubsidy = 0;
