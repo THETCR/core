@@ -567,8 +567,6 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
             nFees += nTxFee;
             if (!MoneyRange(nFees))
                 return state.DoS(100, false, REJECT_INVALID, "bad-txns-fee-outofrange");
-        }else{
-            nTxFee = tx.GetValueOut();
         }
     };
 //    printf("%s: nTxFee =%lli\n", __func__, nTxFee);
