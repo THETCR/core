@@ -40,9 +40,20 @@ int64_t CChainParams::GetCoinYearReward(int64_t nTime) const
 
 int64_t CChainParams::GetProofOfStakeReward(const CBlockIndex *pindexPrev, int64_t nFees) const
 {
-    int64_t nSubsidy;
+//    int64_t nSubsidy;
 
-    nSubsidy = (pindexPrev->nMoneySupply / COIN) * GetCoinYearReward(pindexPrev->nTime) / (365 * 24 * (60 * 60 / nTargetSpacing));
+//    nSubsidy = (pindexPrev->nMoneySupply / COIN) * GetCoinYearReward(pindexPrev->nTime) / (365 * 24 * (60 * 60 / nTargetSpacing));
+    if (pindexPrev->nHeight < 450 && pindexPrev->nHeight > 0) {
+        return 125000 * COIN;
+    }
+    int64_t nSubsidy = 0;
+    if (pindexPrev->nHeight == 0) {
+        nSubsidy = 125000 * COIN;
+    } else if (pindexPrev->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT() && pindexPrev->nHeight > 450) {
+        nSubsidy = 5 * COIN;
+    } else {
+        nSubsidy = 10 * COIN;
+    }
 
     return nSubsidy + nFees;
 };
