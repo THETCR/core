@@ -2884,6 +2884,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                     // Stake reward is passed back in txfee (nPlainValueOut - nPlainValueIn)
                     nStakeReward += txfee;
                     nMoneyCreated += nStakeReward;
+                    printf("%s: nStakeReward =%lli\n", __func__, nStakeReward);
                 } else {
                     nFees += txfee;
                 };
