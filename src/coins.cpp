@@ -312,7 +312,7 @@ bool CCoinsViewCache::HaveInputs(const CTransaction& tx) const
             const Coin coins = AccessCoin(COutPoint(prevout.hash, 0));
             if (tx.vin[i].IsAnonInput())
                 continue;
-            if (coins == coinEmpty || !coins.IsAvailable(prevout.n)) {
+            if (!coins.IsAvailable(prevout.n)) {
                 return false;
             }
 //            if (!coins || !HaveCoin(tx.vin[i].prevout)) {
