@@ -3003,7 +3003,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             nMoneyCreated += tx.GetValueOut();
             CTxUndo undoDummy;
             if (i > 0) {
-                blockundo.vtxundo.push_back(CTxUndo());
+                blockundo.vtxundo.emplace_back(CTxUndo());
             }
             UpdateCoins(tx, view, i == 0 ? undoDummy : blockundo.vtxundo.back(), pindex->nHeight);
 
