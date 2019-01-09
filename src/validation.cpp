@@ -2619,6 +2619,8 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     assert(pindex);
     assert(*pindex->phashBlock == block.GetHash());
     int64_t nTimeStart = GetTimeMicros();
+    uint256 hash = block.GetHash();
+    uint256 bn2Hash = block.IsProofOfWork() ? hash : block.vtx[1]->vin[0].prevout.hash;
 
     // Check it again in case a previous version let a bad block in
     // NOTE: We don't currently (re-)invoke ContextualCheckBlock() or
@@ -2646,6 +2648,26 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     if (block.IsProofOfStake()) {
 //        printf("%s\n", "Compute stake modifier");
 //        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
+        // ppcoin: compute stake entropy bit for stake modifier
+        if (!pindex->SetStakeEntropyBit(pindex->GetStakeEntropyBit()))
+            LogPrintf("AddToBlockIndex() : SetStakeEntropyBit() failed \n");
+
+        // ppcoin: record proof-of-stake hash value
+//        if (!mapProofOfStake.count(hash))
+//            LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
+
+//        pindexNew->hashProofOfStake = mapProofOfStake[hash];
+        uint64_t nStakeModifier = 0;
+        bool fGeneratedStakeModifier = false;
+        if (!ComputeNextStakeModifier(pindex->pprev, nStakeModifier, fGeneratedStakeModifier))
+            LogPrintf("ConnectBlock() : ComputeNextStakeModifier() failed \n");
+        pindex->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
+        if(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()){
+            pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
+        }
+        pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
+        if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
+            LogPrintf("ConnectBlock() : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", pindex->nHeight, std::to_string(nStakeModifier));
         setDirtyBlockIndex.insert(pindex);
 
         uint256 hashProof, targetProofOfStake;
@@ -2653,6 +2675,14 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         if (!CheckProofOfStake(block, hashProof, stake)) {
             return error("%s: Check proof of stake failed.", __func__);
         }
+        if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
+            mapProofOfStake.insert(make_pair(hash, hashProof));
+    }
+    if(block.IsProofOfWork()){
+        uint256 hashProofOfStake = block.GetPoWHash();
+//        uint256 hash = block.GetHash();
+        if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
+            mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
     }
 //    printf("%s\n", "Assert view get best block");
     // verify that the view's current state corresponds to the previous block
@@ -4920,6 +4950,9 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
                 && !CheckProofOfStake(block, hashProof, stake)) {
                 return error("ContextualCheckBlock(): check proof-of-stake failed for block %s\n", block.GetHash().ToString());
             }
+            uint256 hash = block.GetHash();
+            if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
+                mapProofOfStake.insert(make_pair(hash, hashProof));
         } else
         {
             bool fCheckPOW = true; // TODO: pass properly
