@@ -2867,7 +2867,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     CAmount nMoneyCreated = 0;
 
     state.fEnforceSmsgFees = block.nTime >= chainparams.GetConsensus().nPaidSmsgTime;
-    if(block.IsProofOfStake()) {
+//    if(block.IsProofOfStake()) {
         for (unsigned int i = 0; i < block.vtx.size(); i++) {
             const CTransaction &tx = *(block.vtx[i]);
             const uint256 txhash = tx.GetHash();
@@ -3094,7 +3094,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 };
             }; // if (fAddressIndex)
         };
-    }
+//    }
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * (nTime3 - nTime2), MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * MICRO, nTimeConnect * MILLI / nBlocksTotal);
 //    printf("%s\n", "!control.Wait()");
