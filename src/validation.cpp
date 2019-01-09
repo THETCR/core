@@ -1859,7 +1859,7 @@ void CChainState::InvalidBlockFound(CBlockIndex *pindex, const CBlock &block, co
 void UpdateCoins(const CTransaction& tx, CCoinsViewCache& inputs, CTxUndo &txundo, int nHeight)
 {
     // mark inputs spent
-    if (!tx.IsCoinBase()) {
+    if (!tx.IsCoinBase() && !tx.IsZerocoinSpend()) {
         txundo.vprevout.reserve(tx.vin.size());
         for (const CTxIn &txin : tx.vin)
         {
@@ -2991,16 +2991,20 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
                 control.Add(vChecks);
 
-                blockundo.vtxundo.push_back(CTxUndo());
+                blockundo.vtxundo.emplace_back(CTxUndo());
 //                printf("%s\n", "Update coins");
-                UpdateCoins(tx, view, blockundo.vtxundo.back(), pindex->nHeight);
+//                UpdateCoins(tx, view, blockundo.vtxundo.back(), pindex->nHeight);
             } else {
                 // tx is coinbase
-                CTxUndo undoDummy;
-                UpdateCoins(tx, view, undoDummy, pindex->nHeight);
+//                CTxUndo undoDummy;
+//                UpdateCoins(tx, view, undoDummy, pindex->nHeight);
                 nMoneyCreated += tx.GetValueOut();
             };
-
+            CTxUndo undoDummy;
+            UpdateCoins(tx, view, i == 0 ? undoDummy : blockundo.vtxundo.back(), pindex->nHeight);
+//            if(tx.IsCoinBase()){
+//                nMoneyCreated += tx.GetValueOut();
+//            }
 //            printf("%s\n", "nLastRCTOutput");
             if (view.nLastRCTOutput == 0)
                 view.nLastRCTOutput = pindex->pprev ? pindex->pprev->nAnonOutputs : 0;
