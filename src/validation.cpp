@@ -2998,9 +2998,8 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 // tx is coinbase
 //                CTxUndo undoDummy;
 //                UpdateCoins(tx, view, undoDummy, pindex->nHeight);
-//                nMoneyCreated += tx.GetValueOut();
+                nMoneyCreated += tx.GetValueOut();
             };
-            nMoneyCreated += tx.GetValueOut();
             CTxUndo undoDummy;
             if (i > 0) {
                 blockundo.vtxundo.emplace_back(CTxUndo());
