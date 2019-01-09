@@ -2858,7 +2858,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     int64_t nAnonIn = 0;
     int64_t nStakeReward = 0;
 
-    blockundo.vtxundo.reserve(block.vtx.size() - (fWisprMode ? 0 : 1));
+    blockundo.vtxundo.reserve(block.vtx.size() - (fWisprMode && chainActive.NewProtocolsStarted() ? 0 : 1));
 
     std::vector<PrecomputedTransactionData> txdata;
     txdata.reserve(block.vtx.size()); // Required so that pointers to individual PrecomputedTransactionData don't get invalidated
@@ -2991,7 +2991,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
                 control.Add(vChecks);
 
-                blockundo.vtxundo.emplace_back(CTxUndo());
+//                blockundo.vtxundo.emplace_back(CTxUndo());
 //                printf("%s\n", "Update coins");
 //                UpdateCoins(tx, view, blockundo.vtxundo.back(), pindex->nHeight);
             } else {
@@ -3001,11 +3001,11 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 nMoneyCreated += tx.GetValueOut();
             };
             CTxUndo undoDummy;
+            if (i > 0) {
+                blockundo.vtxundo.push_back(CTxUndo());
+            }
             UpdateCoins(tx, view, i == 0 ? undoDummy : blockundo.vtxundo.back(), pindex->nHeight);
-//            if(tx.IsCoinBase()){
-//                nMoneyCreated += tx.GetValueOut();
-//            }
-//            printf("%s\n", "nLastRCTOutput");
+
             if (view.nLastRCTOutput == 0)
                 view.nLastRCTOutput = pindex->pprev ? pindex->pprev->nAnonOutputs : 0;
             // Index rct outputs and keyimages
