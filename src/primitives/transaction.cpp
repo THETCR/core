@@ -266,11 +266,13 @@ CAmount CTransaction::GetPlainValueOut(size_t &nStandard, size_t &nCT, size_t &n
             continue;
 
         nStandard++;
+        printf("%s: nValue =%lli\n", __func__, txout->GetValue());
         CAmount nValue = txout->GetValue();
         nValueOut += nValue;
         if (!MoneyRange(nValue) || !MoneyRange(nValueOut))
             throw std::runtime_error(std::string(__func__) + ": value out of range");
     };
+    printf("%s: nValueOut =%lli\n", __func__, nValueOut);
 
     return nValueOut;
 };
