@@ -2867,7 +2867,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     CAmount nMoneyCreated = 0;
 
     state.fEnforceSmsgFees = block.nTime >= chainparams.GetConsensus().nPaidSmsgTime;
-//    if(block.IsProofOfStake()) {
         for (unsigned int i = 0; i < block.vtx.size(); i++) {
             const CTransaction &tx = *(block.vtx[i]);
             const uint256 txhash = tx.GetHash();
@@ -2875,7 +2874,8 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
             if (!tx.IsCoinBase() && !tx.IsZerocoinSpend()) {
                 CAmount txfee = 0;
-                if (!Consensus::CheckTxInputs(tx, state, view, pindex->nHeight, txfee)) {
+                if (chainActive.NewProtocolsStarted() &&
+                    !Consensus::CheckTxInputs(tx, state, view, pindex->nHeight, txfee)) {
                     control.Wait();
                     return error("%s: Consensus::CheckTxInputs: %s, %s", __func__, tx.GetHash().ToString(),
                                  FormatStateMessage(state));
@@ -3099,7 +3099,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 };
             }; // if (fAddressIndex)
         };
-//    }
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * (nTime3 - nTime2), MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * MICRO, nTimeConnect * MILLI / nBlocksTotal);
 //    printf("%s\n", "!control.Wait()");
@@ -3202,17 +3201,13 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                                    REJECT_INVALID, "bad-cb-amount");
     };
     //PoW phase redistributed fees to miner. PoS stage destroys fees.
-//    CAmount nExpectedMint = Params().GetProofOfStakeReward(pindex->pprev, nFees);
-//    if (block.IsProofOfWork() || chainActive.Height() < Params().NEW_PROTOCOLS_STARTHEIGHT()) {
-//        nExpectedMint += nFees;
-//    }
-//    //Check that the block does not overmint
-//    if (!IsBlockValueValid(block, nExpectedMint, pindex->nMint)) {
-//        return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)",
-//                                    FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)),
-//                         REJECT_INVALID, "bad-cb-amount");
-//    }
-
+    CAmount nExpectedMint = Params().GetProofOfStakeReward(pindex->pprev, nFees);
+    //Check that the block does not overmint
+    if (pindex->nMint < 0 || nExpectedMint < pindex->nMint) {
+        return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)",
+                                    FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)),
+                         REJECT_INVALID, "bad-cb-amount");
+    }
     int64_t nTime4 = GetTimeMicros(); nTimeVerify += nTime4 - nTime2;
     LogPrint(BCLog::BENCH, "    - Verify %u txins: %.2fms (%.3fms/txin) [%.2fs (%.2fms/blk)]\n", nInputs - 1, MILLI * (nTime4 - nTime2), nInputs <= 1 ? 0 : MILLI * (nTime4 - nTime2) / (nInputs-1), nTimeVerify * MICRO, nTimeVerify * MILLI / nBlocksTotal);
 //    printf("%s\n", "fJustCheck");
