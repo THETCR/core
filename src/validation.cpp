@@ -1600,7 +1600,17 @@ bool ReadRawBlockFromDisk(std::vector<uint8_t>& block, const CBlockIndex* pindex
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
 {
 //    printf("%s\n", __func__);
-    CAmount nSubsidy = 125000 * COIN;
+    if(nHeight <= Params().LAST_POW_BLOCK()){
+        return 125000 * COIN;
+    }
+    CAmount nSubsidy = 0;
+    if (nHeight == 0) {
+        nSubsidy = 125000 * COIN;
+    } else if (nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT() && nHeight > 450) {
+        nSubsidy = 5 * COIN;
+    } else {
+        nSubsidy = 10 * COIN;
+    }
     return nSubsidy;
 }
 /*
@@ -3172,7 +3182,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                                    REJECT_INVALID, "bad-cb-amount");
     };
     //PoW phase redistributed fees to miner. PoS stage destroys fees.
-    CAmount nExpectedMint = Params().GetProofOfStakeReward(pindex->pprev, nFees);
+    CAmount nExpectedMint = GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus());
     //Check that the block does not overmint
     if (pindex->nMint < 0 || nExpectedMint < pindex->nMint) {
         return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)",
