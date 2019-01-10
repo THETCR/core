@@ -2647,54 +2647,26 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         }
         return error("%s: Consensus::CheckBlock: %s", __func__, FormatStateMessage(state));
     }
-//    printf("%s\n", "Connect block Check block succeeded");
-    // ppcoin: compute stake entropy bit for stake modifier
-    if (!pindex->SetStakeEntropyBit(pindex->GetStakeEntropyBit()))
-        LogPrintf("ConnectBlock() : SetStakeEntropyBit() failed \n");
-
-    // ppcoin: record proof-of-stake hash value
-//        if (!mapProofOfStake.count(hash))
-//            LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
-
-//        pindexNew->hashProofOfStake = mapProofOfStake[hash];
-    uint64_t nStakeModifier = 0;
-    bool fGeneratedStakeModifier = false;
-    if (!ComputeNextStakeModifier(pindex->pprev, nStakeModifier, fGeneratedStakeModifier))
-        LogPrintf("ConnectBlock() : ComputeNextStakeModifier() failed \n");
-    pindex->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
-    if(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()){
-        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
-    }
-    pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
-    if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
-        LogPrintf("ConnectBlock() : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", pindex->nHeight, std::to_string(nStakeModifier));
     if (block.IsProofOfStake()) {
-//        printf("%s\n", "Compute stake modifier");
 //        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
         setDirtyBlockIndex.insert(pindex);
 
         uint256 hashProof, targetProofOfStake;
         unique_ptr<CStakeInput> stake;
-//        printf("ConnectBlock() : CheckProofOfStake() \n");
         if (!CheckProofOfStake(block, hashProof, stake)) {
             return error("%s: Check proof of stake failed.", __func__);
         }
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
             mapProofOfStake.insert(make_pair(hash, hashProof));
 
-        pindex->hashProofOfStake = mapProofOfStake[hash];
     }
     if(block.IsProofOfWork()){
         uint256 hashProofOfStake = block.GetPoWHash();
-//        uint256 hash = block.GetHash();
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
             mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
     }
     pindex->hashProofOfStake = mapProofOfStake[hash];
-//    if(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()){
-//        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
-//    }
-//    printf("%s\n", "Assert view get best block");
+
     // verify that the view's current state corresponds to the previous block
     uint256 hashPrevBlock = pindex->pprev == nullptr ? uint256() : pindex->pprev->GetBlockHash();
     assert(hashPrevBlock == view.GetBestBlock());
@@ -2703,12 +2675,12 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     bool fIsGenesisBlock = blockHash == chainparams.GetConsensus().hashGenesisBlock;
     // Special case for the genesis block, skipping connection of its transactions
     // (its coinbase is unspendable)
-    if (!fWisprMode  // genesis coinbase is spendable when in Wispr mode
-        && fIsGenesisBlock) {
-        if (!fJustCheck)
-            view.SetBestBlock(pindex->GetBlockHash(), pindex->nHeight);
-        return true;
-    }
+//    if (!fWisprMode  // genesis coinbase is spendable when in Wispr mode
+//        && fIsGenesisBlock) {
+//        if (!fJustCheck)
+//            view.SetBestBlock(pindex->GetBlockHash(), pindex->nHeight);
+//        return true;
+//    }
 
     nBlocksTotal++;
 
@@ -2841,7 +2813,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
 
     // Get the script flags for this block
-//    printf("%s\n", "Get script flags");
     unsigned int flags = GetBlockScriptFlags(pindex, chainparams.GetConsensus());
 
     int64_t nTime2 = GetTimeMicros(); nTimeForks += nTime2 - nTime1;
