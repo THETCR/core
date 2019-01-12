@@ -4194,25 +4194,25 @@ CBlockIndex* CChainState::AddToBlockIndex(const CBlockHeader& block)
         pindexNew->bnChainTrust = (pindexNew->pprev ? pindexNew->pprev->bnChainTrust : 0) + pindexNew->GetBlockTrust();
 
         // ppcoin: compute stake entropy bit for stake modifier
-        if (!pindexNew->SetStakeEntropyBit(pindexNew->GetStakeEntropyBit()))
-            LogPrintf("AddToBlockIndex() : SetStakeEntropyBit() failed \n");
+//        if (!pindexNew->SetStakeEntropyBit(pindexNew->GetStakeEntropyBit()))
+//            LogPrintf("AddToBlockIndex() : SetStakeEntropyBit() failed \n");
 
         // ppcoin: record proof-of-stake hash value
 //        if (!mapProofOfStake.count(hash))
 //            LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
 
 //        pindexNew->hashProofOfStake = mapProofOfStake[hash];
-        uint64_t nStakeModifier = 0;
-        bool fGeneratedStakeModifier = false;
-        if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
-            LogPrintf("AddToBlockIndex() : ComputeNextStakeModifier() failed \n");
-        pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
+//        uint64_t nStakeModifier = 0;
+//        bool fGeneratedStakeModifier = false;
+//        if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
+//            LogPrintf("AddToBlockIndex() : ComputeNextStakeModifier() failed \n");
+//        pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
 //        if(pindexNew->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()){
 //            pindexNew->bnStakeModifierV2 = ComputeStakeModifier(pindexNew->pprev, bn2Hash);
 //        }
-        pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
-        if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
-            LogPrintf("AddToBlockIndex() : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", pindexNew->nHeight, std::to_string(nStakeModifier));
+//        pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
+//        if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
+//            LogPrintf("AddToBlockIndex() : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", pindexNew->nHeight, std::to_string(nStakeModifier));
     }
     pindexNew->nTimeMax = (pindexNew->pprev ? std::max(pindexNew->pprev->nTimeMax, pindexNew->nTime) : pindexNew->nTime);
     pindexNew->nChainWork = (pindexNew->pprev ? pindexNew->pprev->nChainWork : 0) + GetBlockProof(*pindexNew);
@@ -5446,22 +5446,22 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             }
 //            pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
             // ppcoin: compute stake entropy bit for stake modifier
-//            if (!pindex->SetStakeEntropyBit(pindex->GetStakeEntropyBit()))
-//                LogPrintf("AcceptBlock() : SetStakeEntropyBit() failed \n");
+            if (!pindex->SetStakeEntropyBit(pindex->GetStakeEntropyBit()))
+                LogPrintf("AcceptBlock() : SetStakeEntropyBit() failed \n");
 
-//            // ppcoin: record proof-of-stake hash value
+            // ppcoin: record proof-of-stake hash value
 //            if (!mapProofOfStake.count(hash))
 //                LogPrintf("AcceptBlock() : hashProofOfStake not found in map \n");
 
-//            pindex->hashProofOfStake = mapProofOfStake[hash];
-//            uint64_t nStakeModifier = 0;
-//            bool fGeneratedStakeModifier = false;
-//            if (!ComputeNextStakeModifier(pindex->pprev, nStakeModifier, fGeneratedStakeModifier))
-//                LogPrintf("%s : ComputeNextStakeModifier() failed \n", __func__);
-//            pindex->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
-//            pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
-//            if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
-//                LogPrintf("%s : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", __func__, pindex->nHeight, std::to_string(nStakeModifier));
+            pindex->hashProofOfStake = mapProofOfStake[hash];
+            uint64_t nStakeModifier = 0;
+            bool fGeneratedStakeModifier = false;
+            if (!ComputeNextStakeModifier(pindex->pprev, nStakeModifier, fGeneratedStakeModifier))
+                LogPrintf("%s : ComputeNextStakeModifier() failed \n", __func__);
+            pindex->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
+            pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
+            if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
+                LogPrintf("%s : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", __func__, pindex->nHeight, std::to_string(nStakeModifier));
 
             uint256 hashProof, targetProofOfStake;
             unique_ptr<CStakeInput> stake;
