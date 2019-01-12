@@ -2659,6 +2659,9 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
     if (block.IsProofOfStake()) {
 //        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
+        if(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+            pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
+        }
         setDirtyBlockIndex.insert(pindex);
 
         uint256 hashProof, targetProofOfStake;
