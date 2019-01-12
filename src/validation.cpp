@@ -5446,22 +5446,22 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             }
 //            pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
             // ppcoin: compute stake entropy bit for stake modifier
-            if (!pindex->SetStakeEntropyBit(pindex->GetStakeEntropyBit()))
-                LogPrintf("AcceptBlock() : SetStakeEntropyBit() failed \n");
+//            if (!pindex->SetStakeEntropyBit(pindex->GetStakeEntropyBit()))
+//                LogPrintf("AcceptBlock() : SetStakeEntropyBit() failed \n");
 
 //            // ppcoin: record proof-of-stake hash value
 //            if (!mapProofOfStake.count(hash))
 //                LogPrintf("AcceptBlock() : hashProofOfStake not found in map \n");
 
 //            pindex->hashProofOfStake = mapProofOfStake[hash];
-            uint64_t nStakeModifier = 0;
-            bool fGeneratedStakeModifier = false;
-            if (!ComputeNextStakeModifier(pindex->pprev, nStakeModifier, fGeneratedStakeModifier))
-                LogPrintf("%s : ComputeNextStakeModifier() failed \n", __func__);
-            pindex->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
-            pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
-            if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
-                LogPrintf("%s : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", __func__, pindex->nHeight, std::to_string(nStakeModifier));
+//            uint64_t nStakeModifier = 0;
+//            bool fGeneratedStakeModifier = false;
+//            if (!ComputeNextStakeModifier(pindex->pprev, nStakeModifier, fGeneratedStakeModifier))
+//                LogPrintf("%s : ComputeNextStakeModifier() failed \n", __func__);
+//            pindex->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
+//            pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
+//            if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
+//                LogPrintf("%s : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", __func__, pindex->nHeight, std::to_string(nStakeModifier));
 
             uint256 hashProof, targetProofOfStake;
             unique_ptr<CStakeInput> stake;
