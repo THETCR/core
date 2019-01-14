@@ -2659,7 +2659,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
 
     if(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()) {
-        LogPrintf("ConnectBlock() : ComputeStakeModifier()\n");
+//        LogPrintf("ConnectBlock() : ComputeStakeModifier()\n");
         pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
     // ppcoin: compute stake entropy bit for stake modifier
@@ -2884,7 +2884,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                     // Stake reward is passed back in txfee (nPlainValueOut - nPlainValueIn)
                     nStakeReward += txfee;
                     nMoneyCreated += nStakeReward;
-                    printf("%s: nStakeReward =%lli\n", __func__, nStakeReward);
+//                    printf("%s: nStakeReward =%lli\n", __func__, nStakeReward);
                 } else {
                     nFees += txfee;
                 };

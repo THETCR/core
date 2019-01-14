@@ -184,7 +184,7 @@ uint256 ComputeStakeModifier(const CBlockIndex *pindexPrev, const uint256 &kerne
     CDataStream ss(SER_GETHASH, 0);
     ss << kernel << pindexPrev->bnStakeModifierV2;
     uint256 hash = Hash(ss.begin(), ss.end());
-    LogPrintf("ComputeStakeModifier: hash=%s\n", hash.ToString().c_str());
+//    LogPrintf("ComputeStakeModifier: hash=%s\n", hash.ToString().c_str());
     return hash;
 }
 
