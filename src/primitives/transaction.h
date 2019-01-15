@@ -18,7 +18,7 @@
 
 static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x04;
 
-static const uint8_t WISPR_BLOCK_VERSION = 0x09;
+static const uint8_t WISPR_BLOCK_VERSION = 0x10;
 static const uint8_t WISPR_TXN_VERSION = 0x03;
 static const uint8_t MAX_WISPR_TXN_VERSION = 0x03;
 static const uint8_t BTC_TXN_VERSION = 0x02;
