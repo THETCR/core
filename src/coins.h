@@ -287,7 +287,7 @@ public:
 
     bool ReadRCTOutputLink(CCmpPubKey &pk, int64_t &index)
     {
-        std::map<CCmpPubKey, int64_t>::iterator it = anonOutputLinks.find(pk);
+        auto it = anonOutputLinks.find(pk);
         if (it != anonOutputLinks.end())
         {
             index = it->second;

@@ -408,7 +408,7 @@ bool ToolTipToRichTextFilter::eventFilter(QObject *obj, QEvent *evt)
 {
     if(evt->type() == QEvent::ToolTipChange)
     {
-        QWidget *widget = static_cast<QWidget*>(obj);
+        auto *widget = static_cast<QWidget*>(obj);
         QString tooltip = widget->toolTip();
         if(tooltip.size() > size_threshold && !tooltip.startsWith("<qt") && !Qt::mightBeRichText(tooltip))
         {

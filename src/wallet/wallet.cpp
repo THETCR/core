@@ -4542,7 +4542,7 @@ int CMerkleTx::GetBlocksToMaturity(interfaces::Chain::Lock& locked_chain, const 
             return COINBASE_MATURITY;
         }
         CBlockIndex *pindex = mi->second;
-        int nRequiredDepth = (int)(pindex->nHeight / 2);
+        auto nRequiredDepth = (int)(pindex->nHeight / 2);
         return std::max(0, (nRequiredDepth+1) - chain_depth);
     }
 

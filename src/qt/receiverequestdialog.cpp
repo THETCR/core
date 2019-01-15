@@ -49,7 +49,7 @@ void QRImageWidget::mousePressEvent(QMouseEvent *event)
     if(event->button() == Qt::LeftButton && pixmap())
     {
         event->accept();
-        QMimeData *mimeData = new QMimeData;
+        auto *mimeData = new QMimeData;
         mimeData->setImageData(exportImage());
 
         QDrag *drag = new QDrag(this);

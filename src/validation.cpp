@@ -2257,7 +2257,7 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
 
             if (out->IsType(OUTPUT_RINGCT))
             {
-                CTxOutRingCT *txout = (CTxOutRingCT*)out;
+                auto *txout = (CTxOutRingCT*)out;
 
                 if (view.nLastRCTOutput == 0)
                 {
@@ -4194,7 +4194,7 @@ CBlockIndex* CChainState::AddToBlockIndex(const CBlockHeader& block)
         return it->second;
 
     // Construct new block index object
-    CBlockIndex* pindexNew = new CBlockIndex(block);
+    auto * pindexNew = new CBlockIndex(block);
     // We assign the sequence id to blocks only when the full data is available,
     // to avoid miners withholding blocks but broadcasting headers, to get a
     // competitive advantage.
@@ -4715,7 +4715,7 @@ unsigned int GetNextTargetRequired(const CBlockIndex *pindexLast)
     {
         if (nHeight == 0)
             return arith_uint256("00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff").GetCompact();
-        int nLastImportHeight = (int) Params().GetLastImportHeight();
+        auto nLastImportHeight = (int) Params().GetLastImportHeight();
         arith_uint256 nMaxProofOfWorkLimit = arith_uint256("000000000008ffffffffffffffffffffffffffffffffffffffffffffffffffff");
         arith_uint256 nMinProofOfWorkLimit = UintToArith256(consensus.powLimit);
         arith_uint256 nStep = (nMaxProofOfWorkLimit - nMinProofOfWorkLimit) / nLastImportHeight;
@@ -5370,7 +5370,7 @@ bool ContextualCheckZerocoinStake(int nHeight, CStakeInput* stake)
     if (nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT())
         return error("%s: zWSP stake block is less than allowed start height", __func__);
 
-    if (CZWspStake* zWSP = dynamic_cast<CZWspStake*>(stake)) {
+    if (auto * zWSP = dynamic_cast<CZWspStake*>(stake)) {
         CBlockIndex* pindexFrom = zWSP->GetIndexFrom();
         if (!pindexFrom)
             return error("%s: failed to get index associated with zWSP stake checksum", __func__);
@@ -5878,7 +5878,7 @@ CBlockIndex * CChainState::InsertBlockIndex(const uint256& hash)
         return (*mi).second;
 
     // Create new
-    CBlockIndex* pindexNew = new CBlockIndex();
+    auto * pindexNew = new CBlockIndex();
     mi = mapBlockIndex.insert(std::make_pair(hash, pindexNew)).first;
     pindexNew->phashBlock = &((*mi).first);
 
@@ -6445,7 +6445,7 @@ bool CChainState::LoadGenesisBlock(const CChainParams& chainparams)
         return true;
 
     try {
-        CBlock &block = const_cast<CBlock&>(chainparams.GenesisBlock());
+        auto &block = const_cast<CBlock&>(chainparams.GenesisBlock());
         CDiskBlockPos blockPos = SaveBlockToDisk(block, 0, chainparams, nullptr);
         if (blockPos.IsNull())
             return error("%s: writing genesis block to disk failed", __func__);

@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(dbwrapper_compression)
 {
     // Perform tests both with compression and without
     for (int i = 0; i < 2; i++) {
-        bool compression = (bool)i;
+        auto compression = (bool)i;
         fs::path ph = fs::temp_directory_path() / fs::unique_path();
         CDBWrapper dbw(ph, (1 << 20), true, false, false, compression);
         char key = 'k';

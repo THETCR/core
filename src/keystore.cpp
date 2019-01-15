@@ -39,7 +39,7 @@ bool CBasicKeyStore::GetPubKey(const CKeyID &address, CPubKey &vchPubKeyOut) con
     CKey key;
     if (!GetKey(address, key)) {
         LOCK(cs_KeyStore);
-        WatchKeyMap::const_iterator it = mapWatchKeys.find(address);
+        auto it = mapWatchKeys.find(address);
         if (it != mapWatchKeys.end()) {
             vchPubKeyOut = it->second;
             return true;
@@ -87,7 +87,7 @@ std::set<CKeyID> CBasicKeyStore::GetKeys() const
 bool CBasicKeyStore::GetKey(const CKeyID &address, CKey &keyOut) const
 {
     LOCK(cs_KeyStore);
-    KeyMap::const_iterator mi = mapKeys.find(address);
+    auto mi = mapKeys.find(address);
     if (mi != mapKeys.end()) {
         keyOut = mi->second;
         return true;
@@ -124,7 +124,7 @@ std::set<CScriptID> CBasicKeyStore::GetCScripts() const
 bool CBasicKeyStore::GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const
 {
     LOCK(cs_KeyStore);
-    ScriptMap::const_iterator mi = mapScripts.find(hash);
+    auto mi = mapScripts.find(hash);
     if (mi != mapScripts.end())
     {
         redeemScriptOut = (*mi).second;

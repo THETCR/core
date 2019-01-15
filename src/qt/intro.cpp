@@ -301,7 +301,7 @@ void Intro::on_dataDirCustom_clicked()
 void Intro::startThread()
 {
     thread = new QThread(this);
-    FreespaceChecker *executor = new FreespaceChecker(this);
+    auto *executor = new FreespaceChecker(this);
     executor->moveToThread(thread);
 
     connect(executor, &FreespaceChecker::reply, this, &Intro::setStatus);

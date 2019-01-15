@@ -303,7 +303,7 @@ void ThreadSecureMsgPow()
 
             uint8_t *pHeader = &smsgStored.vchMessage[0];
             uint8_t *pPayload = &smsgStored.vchMessage[SMSG_HDR_LEN];
-            SecureMessage *psmsg = (SecureMessage*) pHeader;
+            auto *psmsg = (SecureMessage*) pHeader;
 
             const int64_t FUND_TXN_TIMEOUT = 3600 * 48;
             int64_t now = GetTime();
@@ -2299,7 +2299,7 @@ int CSMSG::ScanMessage(const uint8_t *pHeader, const uint8_t *pPayload, uint32_t
 
     if (fOwnMessage) {
         // Save to inbox
-        SecureMessage *psmsg = (SecureMessage*) pHeader;
+        auto *psmsg = (SecureMessage*) pHeader;
 
         uint160 hash;
         HashMsg(*psmsg, pPayload, nPayload-(psmsg->IsPaidVersion() ? 32 : 0), hash);
@@ -2859,7 +2859,7 @@ int CSMSG::StoreUnscanned(const uint8_t *pHeader, const uint8_t *pPayload, uint3
         return errorN(SMSG_GENERAL_ERROR, "%s - Null pointer to header or payload.", __func__);
     }
 
-    SecureMessage *psmsg = (SecureMessage*) pHeader;
+    auto *psmsg = (SecureMessage*) pHeader;
 
     if (SMSG_NO_ERROR != CheckPurged(psmsg, pPayload)) {
         return errorN(SMSG_PURGED_MSG, "%s: Purged message.", __func__);
@@ -2912,7 +2912,7 @@ int CSMSG::Store(const uint8_t *pHeader, const uint8_t *pPayload, uint32_t nPayl
         return errorN(SMSG_GENERAL_ERROR, "Null pointer to header or payload.");
     }
 
-    SecureMessage *psmsg = (SecureMessage*) pHeader;
+    auto *psmsg = (SecureMessage*) pHeader;
 
     if (SMSG_NO_ERROR != CheckPurged(psmsg, pPayload)) {
         return errorN(SMSG_PURGED_MSG, "%s: Purged message.", __func__);
@@ -3070,7 +3070,7 @@ int CSMSG::Purge(std::vector<uint8_t> &vMsgId, std::string &sError)
 int CSMSG::Validate(const uint8_t *pHeader, const uint8_t *pPayload, uint32_t nPayload)
 {
     // return SecureMessageCodes
-    SecureMessage *psmsg = (SecureMessage*) pHeader;
+    auto *psmsg = (SecureMessage*) pHeader;
 
     if (psmsg->IsPaidVersion()) {
         if (nPayload > SMSG_MAX_MSG_BYTES_PAID)
@@ -3221,7 +3221,7 @@ int CSMSG::SetHash(uint8_t *pHeader, uint8_t *pPayload, uint32_t nPayload)
         returns SecureMessageCodes
     */
 
-    SecureMessage *psmsg = (SecureMessage*) pHeader;
+    auto *psmsg = (SecureMessage*) pHeader;
 
     int64_t nStart = GetTimeMillis();
     uint8_t civ[32];
@@ -3817,7 +3817,7 @@ int CSMSG::Decrypt(bool fTestOnly, const CKey &keyDest, const CKeyID &address, c
         return errorN(SMSG_GENERAL_ERROR, "%s: null pointer to header or payload.", __func__);
     }
 
-    SecureMessage *psmsg = (SecureMessage*) pHeader;
+    auto *psmsg = (SecureMessage*) pHeader;
     if (psmsg->version[0] == 3) {
         nPayload -= 32; // Exclude funding txid
     } else

@@ -298,7 +298,7 @@ static UniValue disconnectnode(const JSONRPCRequest& request)
         success = g_connman->DisconnectNode(address_arg.get_str());
     } else if (!id_arg.isNull() && (address_arg.isNull() || (address_arg.isStr() && address_arg.get_str().empty()))) {
         /* handle disconnect-by-id */
-        NodeId nodeid = (NodeId) id_arg.get_int64();
+        auto nodeid = (NodeId) id_arg.get_int64();
         success = g_connman->DisconnectNode(nodeid);
     } else {
         throw JSONRPCError(RPC_INVALID_PARAMS, "Only one of address and nodeid should be provided.");
@@ -428,7 +428,7 @@ static UniValue GetNetworksInfo()
     UniValue networks(UniValue::VARR);
     for(int n=0; n<NET_MAX; ++n)
     {
-        enum Network network = static_cast<enum Network>(n);
+        auto network = static_cast<enum Network>(n);
         if(network == NET_UNROUTABLE || network == NET_INTERNAL)
             continue;
         proxyType proxy;

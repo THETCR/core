@@ -261,7 +261,7 @@ struct HTTPReply
 
 static void http_request_done(struct evhttp_request *req, void *ctx)
 {
-    HTTPReply *reply = static_cast<HTTPReply*>(ctx);
+    auto *reply = static_cast<HTTPReply*>(ctx);
 
     if (req == nullptr) {
         /* If req is NULL, it means an error occurred while connecting, but

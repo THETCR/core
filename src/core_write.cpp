@@ -226,7 +226,7 @@ void OutputToJSON(uint256 &txid, int i,
             {
             fCanSpend = true;
             entry.pushKV("type", "standard");
-            CTxOutStandard *s = (CTxOutStandard*) baseOut;
+                auto *s = (CTxOutStandard*) baseOut;
             entry.pushKV("value", ValueFromAmount(s->nValue));
             entry.pushKV("valueSat", s->nValue);
             UniValue o(UniValue::VOBJ);
@@ -236,7 +236,7 @@ void OutputToJSON(uint256 &txid, int i,
             break;
         case OUTPUT_DATA:
             {
-            CTxOutData *s = (CTxOutData*) baseOut;
+                auto *s = (CTxOutData*) baseOut;
             entry.pushKV("type", "data");
             entry.pushKV("data_hex", HexStr(s->vData.begin(), s->vData.end()));
             CAmount nValue;
@@ -249,7 +249,7 @@ void OutputToJSON(uint256 &txid, int i,
         case OUTPUT_CT:
             {
             fCanSpend = true;
-            CTxOutCT *s = (CTxOutCT*) baseOut;
+                auto *s = (CTxOutCT*) baseOut;
             entry.pushKV("type", "blind");
             entry.pushKV("valueCommitment", HexStr(&s->commitment.data[0], &s->commitment.data[0]+33));
             UniValue o(UniValue::VOBJ);
@@ -262,7 +262,7 @@ void OutputToJSON(uint256 &txid, int i,
             break;
         case OUTPUT_RINGCT:
             {
-            CTxOutRingCT *s = (CTxOutRingCT*) baseOut;
+                auto *s = (CTxOutRingCT*) baseOut;
             entry.pushKV("type", "anon");
             entry.pushKV("pubkey", HexStr(s->pk.begin(), s->pk.end()));
             entry.pushKV("valueCommitment", HexStr(&s->commitment.data[0], &s->commitment.data[0]+33));

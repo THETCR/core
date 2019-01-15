@@ -307,7 +307,7 @@ void PrivacyDialog::on_pushButtonZWspControl_clicked()
     if (!walletModel || !walletModel->getOptionsModel())
         return;
 
-    ZWspControlDialog* zWspControl = new ZWspControlDialog(this);
+    auto * zWspControl = new ZWspControlDialog(this);
     zWspControl->setModel(walletModel);
     zWspControl->exec();
 }

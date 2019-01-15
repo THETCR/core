@@ -1151,7 +1151,7 @@ static UniValue extkey(const JSONRPCRequest &request)
         CKeyID idOldDefault = pwallet->idDefaultAccount;
         CBitcoinAddress addr;
 
-        CExtKeyAccount *sea = new CExtKeyAccount();
+        auto *sea = new CExtKeyAccount();
 
         if (addr.SetString(sInKey)
             && addr.IsValid(CChainParams::EXT_ACC_HASH)
@@ -1204,7 +1204,7 @@ static UniValue extkey(const JSONRPCRequest &request)
             throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Unknown parameter '%s'", strParam.c_str()));
         }
 
-        CExtKeyAccount *sea = new CExtKeyAccount();
+        auto *sea = new CExtKeyAccount();
 
         {
             LOCK(pwallet->cs_wallet);
@@ -1506,7 +1506,7 @@ static UniValue extkeyimportinternal(const JSONRPCRequest &request, bool fGenesi
 
         if (fGenesisChain) {
             std::string genesisChainLabel = "Genesis Import";
-            CStoredExtKey *sekGenesisChain = new CStoredExtKey();
+            auto *sekGenesisChain = new CStoredExtKey();
 
             if (0 != (rv = pwallet->NewExtKeyFromAccount(&wdb, idNewDefaultAccount,
                 genesisChainLabel, sekGenesisChain, nullptr, &CHAIN_NO_GENESIS))) {
@@ -1713,7 +1713,7 @@ static UniValue getnewextaddress(const JSONRPCRequest &request)
     bool fBech32 = !request.params[2].isNull() ? request.params[2].get_bool() : false;
     bool fHardened = !request.params[3].isNull() ? request.params[3].get_bool() : false;
 
-    CStoredExtKey *sek = new CStoredExtKey();
+    auto *sek = new CStoredExtKey();
     if (0 != pwallet->NewExtKeyFromAccount(strLabel, sek, pLabel, pChild, fHardened, fBech32))
     {
         delete sek;
@@ -2356,7 +2356,7 @@ static UniValue deriverangekeys(const JSONRPCRequest &request)
                 throw JSONRPCError(RPC_WALLET_ERROR, _("ExtKeyGetIndex failed."));
         };
 
-        uint32_t nChildIn = (uint32_t)nStart;
+        auto nChildIn = (uint32_t)nStart;
         CPubKey newKey;
         for (int i = nStart; i <= nEnd; ++i)
         {
@@ -6320,7 +6320,7 @@ static UniValue tallyvotes(const JSONRPCRequest &request)
     result.pushKV("height_end", nEndHeight);
     result.pushKV("blocks_counted", nBlocks);
 
-    float fnBlocks = (float) nBlocks;
+    auto fnBlocks = (float) nBlocks;
     for (auto &i : mapVotes)
     {
         std::string sKey = i.first == 0 ? "Abstain" : strprintf("Option %d", i.first);

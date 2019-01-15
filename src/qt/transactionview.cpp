@@ -44,7 +44,7 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
     // Build filter row
     setContentsMargins(0,0,0,0);
 
-    QHBoxLayout *hlayout = new QHBoxLayout();
+    auto *hlayout = new QHBoxLayout();
     hlayout->setContentsMargins(0,0,0,0);
 
     if (platformStyle->getUseExtraSpacing()) {
@@ -107,7 +107,7 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
     } else {
         amountWidget->setFixedWidth(100);
     }
-    QDoubleValidator *amountValidator = new QDoubleValidator(0, 1e20, 8, this);
+    auto *amountValidator = new QDoubleValidator(0, 1e20, 8, this);
     QLocale amountLocale(QLocale::C);
     amountLocale.setNumberOptions(QLocale::RejectGroupSeparator);
     amountValidator->setLocale(amountLocale);
@@ -117,19 +117,19 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
     // Delay before filtering transactions in ms
     static const int input_filter_delay = 200;
 
-    QTimer* amount_typing_delay = new QTimer(this);
+    auto * amount_typing_delay = new QTimer(this);
     amount_typing_delay->setSingleShot(true);
     amount_typing_delay->setInterval(input_filter_delay);
 
-    QTimer* prefix_typing_delay = new QTimer(this);
+    auto * prefix_typing_delay = new QTimer(this);
     prefix_typing_delay->setSingleShot(true);
     prefix_typing_delay->setInterval(input_filter_delay);
 
-    QVBoxLayout *vlayout = new QVBoxLayout(this);
+    auto *vlayout = new QVBoxLayout(this);
     vlayout->setContentsMargins(0,0,0,0);
     vlayout->setSpacing(0);
 
-    QTableView *view = new QTableView(this);
+    auto *view = new QTableView(this);
     vlayout->addLayout(hlayout);
     vlayout->addWidget(createDateRangeWidget());
     vlayout->addWidget(view);
@@ -253,7 +253,7 @@ void TransactionView::setModel(WalletModel *_model)
                 QString host = QUrl(listUrls[i].trimmed(), QUrl::StrictMode).host();
                 if (!host.isEmpty())
                 {
-                    QAction *thirdPartyTxUrlAction = new QAction(host, this); // use host as menu item label
+                    auto *thirdPartyTxUrlAction = new QAction(host, this); // use host as menu item label
                     if (i == 0)
                         contextMenu->addSeparator();
                     contextMenu->addAction(thirdPartyTxUrlAction);
@@ -536,7 +536,7 @@ void TransactionView::showDetails()
     QModelIndexList selection = transactionView->selectionModel()->selectedRows();
     if(!selection.isEmpty())
     {
-        TransactionDescDialog *dlg = new TransactionDescDialog(selection.at(0));
+        auto *dlg = new TransactionDescDialog(selection.at(0));
         dlg->setAttribute(Qt::WA_DeleteOnClose);
         dlg->show();
     }
@@ -556,7 +556,7 @@ QWidget *TransactionView::createDateRangeWidget()
     dateRangeWidget = new QFrame();
     dateRangeWidget->setFrameStyle(QFrame::Panel | QFrame::Raised);
     dateRangeWidget->setContentsMargins(1,1,1,1);
-    QHBoxLayout *layout = new QHBoxLayout(dateRangeWidget);
+    auto *layout = new QHBoxLayout(dateRangeWidget);
     layout->setContentsMargins(0,0,0,0);
     layout->addSpacing(23);
     layout->addWidget(new QLabel(tr("Range:")));
@@ -646,7 +646,7 @@ bool TransactionView::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress)
     {
-        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+        auto *ke = static_cast<QKeyEvent *>(event);
         if (ke->key() == Qt::Key_C && ke->modifiers().testFlag(Qt::ControlModifier))
         {
              GUIUtil::copyEntryData(transactionView, 0, TransactionTableModel::TxPlainTextRole);

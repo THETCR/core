@@ -112,7 +112,7 @@ void benchmark::BenchRunner::RunAll(Printer& printer, uint64_t num_evals, double
             continue;
         }
 
-        uint64_t num_iters = static_cast<uint64_t>(p.second.num_iters_for_one_second * scaling);
+        auto num_iters = static_cast<uint64_t>(p.second.num_iters_for_one_second * scaling);
         if (0 == num_iters) {
             num_iters = 1;
         }

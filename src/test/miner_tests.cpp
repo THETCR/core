@@ -376,7 +376,7 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
     // Create an actual 209999-long block chain (without valid blocks).
     while (chainActive.Tip()->nHeight < 209999) {
         CBlockIndex* prev = chainActive.Tip();
-        CBlockIndex* next = new CBlockIndex();
+        auto * next = new CBlockIndex();
         next->phashBlock = new uint256(InsecureRand256());
         pcoinsTip->SetBestBlock(next->GetBlockHash(), prev->nHeight + 1);
         next->pprev = prev;
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
     // Extend to a 210000-long block chain.
     while (chainActive.Tip()->nHeight < 210000) {
         CBlockIndex* prev = chainActive.Tip();
-        CBlockIndex* next = new CBlockIndex();
+        auto * next = new CBlockIndex();
         next->phashBlock = new uint256(InsecureRand256());
         pcoinsTip->SetBestBlock(next->GetBlockHash(), prev->nHeight + 1);
         next->pprev = prev;

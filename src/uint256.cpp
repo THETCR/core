@@ -188,7 +188,7 @@ void base_blob<BITS>::SetHex(const char* psz)
     while (::HexDigit(*psz) != -1)
         psz++;
     psz--;
-    unsigned char* p1 = (unsigned char*)pn;
+    auto * p1 = (unsigned char*)pn;
     unsigned char* pend = p1 + WIDTH * 4;
     while (psz >= pbegin && p1 < pend) {
         *p1 = ::HexDigit(*psz--);

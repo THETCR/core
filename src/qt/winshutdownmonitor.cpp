@@ -20,7 +20,7 @@ bool WinShutdownMonitor::nativeEventFilter(const QByteArray &eventType, void *pM
 {
        Q_UNUSED(eventType);
 
-       MSG *pMsg = static_cast<MSG *>(pMessage);
+    auto *pMsg = static_cast<MSG *>(pMessage);
 
        // Seed OpenSSL PRNG with Windows event data (e.g.  mouse movements and other user interactions)
        if (RAND_event(pMsg->message, pMsg->wParam, pMsg->lParam) == 0) {
@@ -56,7 +56,7 @@ bool WinShutdownMonitor::nativeEventFilter(const QByteArray &eventType, void *pM
 void WinShutdownMonitor::registerShutdownBlockReason(const QString& strReason, const HWND& mainWinId)
 {
     typedef BOOL (WINAPI *PSHUTDOWNBRCREATE)(HWND, LPCWSTR);
-    PSHUTDOWNBRCREATE shutdownBRCreate = (PSHUTDOWNBRCREATE)GetProcAddress(GetModuleHandleA("User32.dll"), "ShutdownBlockReasonCreate");
+    auto shutdownBRCreate = (PSHUTDOWNBRCREATE)GetProcAddress(GetModuleHandleA("User32.dll"), "ShutdownBlockReasonCreate");
     if (shutdownBRCreate == nullptr) {
         qWarning() << "registerShutdownBlockReason: GetProcAddress for ShutdownBlockReasonCreate failed";
         return;

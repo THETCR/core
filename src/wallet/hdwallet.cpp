@@ -1845,7 +1845,7 @@ isminetype CHDWallet::IsMine(const CScript &scriptPubKey, CKeyID &keyID,
 
         isminetype typeA = IsMine(scriptA, keyID, pak, pasc, pa, isInvalid, sigversion);
         if (typeA & ISMINE_SPENDABLE) {
-            int ia = (int)typeA;
+            auto ia = (int)typeA;
             ia &= ~ISMINE_SPENDABLE;
             ia |= ISMINE_WATCH_COLDSTAKE;
             typeA = (isminetype)ia;
@@ -5550,7 +5550,7 @@ int CHDWallet::GetDefaultConfidentialChain(CHDWalletDB *pwdb, CExtKeyAccount *&s
         return werrorN(1, "%s: %s.", __func__, _("DeriveNextKey failed"));
     }
 
-    CStoredExtKey *sekConfidential = new CStoredExtKey();
+    auto *sekConfidential = new CStoredExtKey();
     sekConfidential->kp = evConfidential;
     vSubKeyPath = vAccountPath;
     SetHardenedBit(nChild);
@@ -5819,7 +5819,7 @@ int CHDWallet::ExtKeyImportAccount(CHDWalletDB *pwdb, CStoredExtKey &sekIn, int6
         }
     }
 
-    CExtKeyAccount *sea = new CExtKeyAccount();
+    auto *sea = new CExtKeyAccount();
     if (pwdb->ReadExtAccount(idAccount, *sea)) {
         if (0 != ExtKeyUnlock(sea)) {
             delete sek;
@@ -6155,7 +6155,7 @@ int CHDWallet::ExtKeyDeriveNewAccount(CHDWalletDB *pwdb, CExtKeyAccount *sea, co
 
     CKeyID idMaster = pEKMaster->GetID();
 
-    CStoredExtKey *sekAccount = new CStoredExtKey();
+    auto *sekAccount = new CStoredExtKey();
     CExtKey evAccountKey;
     uint32_t nOldHGen = pEKMaster->GetCounter(true);
     uint32_t nAccount;
@@ -6240,7 +6240,7 @@ int CHDWallet::ExtKeySetDefaultAccount(CHDWalletDB *pwdb, CKeyID &idNewDefault)
     AssertLockHeld(cs_wallet);
     assert(pwdb);
 
-    CExtKeyAccount *sea = new CExtKeyAccount();
+    auto *sea = new CExtKeyAccount();
 
     // Read account from db, inactive accounts are not loaded into maps
     if (!pwdb->ReadExtAccount(idNewDefault, *sea)) {
@@ -6514,7 +6514,7 @@ int CHDWallet::ExtKeyCreateInitial(CHDWalletDB *pwdb)
         return werrorN(1, "%s Make or SetNewMasterKey failed.", __func__);
     }
 
-    CExtKeyAccount *seaDefault = new CExtKeyAccount();
+    auto *seaDefault = new CExtKeyAccount();
 
     if (ExtKeyDeriveNewAccount(pwdb, seaDefault, "default") != 0) {
         delete seaDefault;
@@ -6633,7 +6633,7 @@ int CHDWallet::ExtKeyLoadAccountKeys(CHDWalletDB *pwdb, CExtKeyAccount *sea)
 
 int CHDWallet::ExtKeyLoadAccount(CHDWalletDB *pwdb, const CKeyID &idAccount)
 {
-    CExtKeyAccount *sea = new CExtKeyAccount();
+    auto *sea = new CExtKeyAccount();
     if (!pwdb->ReadExtAccount(idAccount, *sea)) {
         return werrorN(1, "%s: ReadExtAccount failed.", __func__);
     }
@@ -7628,7 +7628,7 @@ int CHDWallet::InitAccountStealthV2Chains(CHDWalletDB *pwdb, CExtKeyAccount *sea
     CExtKey evStealthScan;
     evStealthScan.SetSeed(vchSig.data(), vchSig.size());
 
-    CStoredExtKey *sekStealthScan = new CStoredExtKey();
+    auto *sekStealthScan = new CStoredExtKey();
     sekStealthScan->kp = evStealthScan;
     std::vector<uint32_t> vPath;
     //sekStealthSpend->SetPath(vPath);
@@ -7647,7 +7647,7 @@ int CHDWallet::InitAccountStealthV2Chains(CHDWalletDB *pwdb, CExtKeyAccount *sea
     vPath.clear();
     AppendPath(sekAccount, vPath);
 
-    CStoredExtKey *sekStealthSpend = new CStoredExtKey();
+    auto *sekStealthSpend = new CStoredExtKey();
     sekStealthSpend->kp = evStealthSpend;
     vPath.push_back(nStealthSpend);
     sekStealthSpend->SetPath(vPath);
@@ -13706,7 +13706,7 @@ void CHDWallet::ZWspBackupWallet()
 }
 string CHDWallet::MintZerocoinFromOutPoint(CAmount nValue, CWalletTx& wtxNew, vector<CDeterministicMint>& vDMints, const vector<COutPoint> vOutpts)
 {
-    CCoinControl* coinControl = new CCoinControl();
+    auto * coinControl = new CCoinControl();
     for (const COutPoint& outpt : vOutpts) {
         coinControl->Select(outpt);
     }

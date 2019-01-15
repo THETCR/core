@@ -72,7 +72,7 @@ namespace {
             isminetype typeA = IsMineInner(keystore, scriptA, isInvalid, sigversion);
             if (typeA & ISMINE_SPENDABLE)
             {
-                int ia = (int)typeA;
+                auto ia = (int)typeA;
                 ia &= ~ISMINE_SPENDABLE;
                 ia |= ISMINE_WATCH_COLDSTAKE;
                 typeA = (isminetype)ia;

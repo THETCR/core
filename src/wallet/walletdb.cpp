@@ -710,7 +710,7 @@ bool WalletBatch::Recover(const fs::path& wallet_path, std::string& out_backup_f
 
 bool WalletBatch::RecoverKeysOnlyFilter(void *callbackData, CDataStream &ssKey, CDataStream &ssValue)
 {
-    CWallet *dummyWallet = reinterpret_cast<CWallet*>(callbackData);
+    auto *dummyWallet = reinterpret_cast<CWallet*>(callbackData);
     CWalletScanState dummyWss;
     std::string strType, strErr;
 

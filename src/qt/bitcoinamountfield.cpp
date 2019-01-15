@@ -178,7 +178,7 @@ protected:
     {
         if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
         {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            auto *keyEvent = static_cast<QKeyEvent *>(event);
             if (keyEvent->key() == Qt::Key_Comma)
             {
                 // Translate a comma into a period
@@ -223,7 +223,7 @@ BitcoinAmountField::BitcoinAmountField(QWidget *parent) :
     amount->installEventFilter(this);
     amount->setMaximumWidth(240);
 
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    auto *layout = new QHBoxLayout(this);
     layout->addWidget(amount);
     unit = new QValueComboBox(this);
     unit->setModel(new BitcoinUnits(this));

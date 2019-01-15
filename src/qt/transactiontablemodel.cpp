@@ -518,7 +518,7 @@ QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid())
         return QVariant();
-    TransactionRecord *rec = static_cast<TransactionRecord*>(index.internalPointer());
+    auto *rec = static_cast<TransactionRecord*>(index.internalPointer());
 
     switch(role)
     {

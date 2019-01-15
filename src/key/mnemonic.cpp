@@ -91,7 +91,7 @@ static void NormaliseInput(std::string &str)
 int GetWord(int o, const char *pwl, int max, std::string &sWord)
 {
     sWord = "";
-    char *pt = (char*)pwl;
+    auto *pt = (char*)pwl;
     while (o > 0) {
         if (*pt == '\n') {
             o--;
@@ -117,7 +117,7 @@ int GetWord(int o, const char *pwl, int max, std::string &sWord)
 int GetWordOffset(const char *p, const char *pwl, int max, int &o)
 {
     // List must end with \n
-    char *pt = (char*)pwl;
+    auto *pt = (char*)pwl;
     int l = strlen(p);
     int i = 0;
     int c = 0;
@@ -157,7 +157,7 @@ int MnemonicDetectLanguage(const std::string &sWordList)
     for (int l = 1; l < WLL_MAX; ++l) {
         strcpy(tmp, sWordList.c_str());
 
-        char *pwl = (char*) mnLanguages[l];
+        auto *pwl = (char*) mnLanguages[l];
         int m = mnLanguageLens[l];
 
         // The chinese dialects have many words in common, match full phrase
@@ -259,7 +259,7 @@ int MnemonicEncode(int nLanguage, const std::vector<uint8_t> &vEntropy, std::str
         i += 11;
     }
 
-    char *pwl = (char*) mnLanguages[nLanguage];
+    auto *pwl = (char*) mnLanguages[nLanguage];
     int m = mnLanguageLens[nLanguage];
 
     for (size_t k = 0; k < vWord.size(); ++k) {
@@ -315,7 +315,7 @@ int MnemonicDecode(int &nLanguage, const std::string &sWordListIn, std::vector<u
 
     strcpy(tmp, sWordList.c_str());
 
-    char *pwl = (char*) mnLanguages[nLanguage];
+    auto *pwl = (char*) mnLanguages[nLanguage];
     int m = mnLanguageLens[nLanguage];
 
     std::vector<int> vWordInts;
@@ -516,7 +516,7 @@ int MnemonicGetWord(int nLanguage, int nWord, std::string &sWord, std::string &s
         return errorN(1, "%s: %s", __func__, sError.c_str());
     }
 
-    char *pwl = (char*) mnLanguages[nLanguage];
+    auto *pwl = (char*) mnLanguages[nLanguage];
     int m = mnLanguageLens[nLanguage];
 
     if (0 != GetWord(nWord, pwl, m, sWord)) {

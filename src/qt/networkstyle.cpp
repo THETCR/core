@@ -39,7 +39,7 @@ NetworkStyle::NetworkStyle(const QString &_appName, const int iconColorHueShift,
         // traverse though lines
         for(int y=0;y<img.height();y++)
         {
-            QRgb *scL = reinterpret_cast< QRgb *>( img.scanLine( y ) );
+            auto *scL = reinterpret_cast< QRgb *>( img.scanLine( y ) );
 
             // loop through pixels
             for(int x=0;x<img.width();x++)

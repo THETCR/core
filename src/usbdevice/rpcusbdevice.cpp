@@ -720,13 +720,13 @@ static UniValue initaccountfromdevice(const JSONRPCRequest &request)
         }
 
 
-        CStoredExtKey *sekAccount = new CStoredExtKey();
+        auto *sekAccount = new CStoredExtKey();
         sekAccount->nFlags |= EAF_ACTIVE | EAF_IN_ACCOUNT | EAF_HARDWARE_DEVICE;
         sekAccount->kp = ekp;
         sekAccount->SetPath(vPath); // EKVT_PATH
 
         std::vector<uint8_t> vData;
-        CExtKeyAccount *sea = new CExtKeyAccount();
+        auto *sea = new CExtKeyAccount();
         sea->sLabel = sLabel;
         sea->nFlags |= EAF_ACTIVE | EAF_HARDWARE_DEVICE;
         sea->mapValue[EKVT_CREATED_AT] = SetCompressedInt64(vData, GetTime());
@@ -746,7 +746,7 @@ static UniValue initaccountfromdevice(const JSONRPCRequest &request)
 
         std::vector<uint32_t> vChainPath;
         vChainPath.push_back(vPath.back()); // make relative to key before account
-        CStoredExtKey *sekExternal = new CStoredExtKey();
+        auto *sekExternal = new CStoredExtKey();
         sekExternal->kp = epExternal;
         vChainPath.push_back(nExternal);
         sekExternal->SetPath(vChainPath);
@@ -755,7 +755,7 @@ static UniValue initaccountfromdevice(const JSONRPCRequest &request)
         sea->InsertChain(sekExternal);
         sea->nActiveExternal = sea->NumChains();
 
-        CStoredExtKey *sekInternal = new CStoredExtKey();
+        auto *sekInternal = new CStoredExtKey();
         sekInternal->kp = epInternal;
         vChainPath.pop_back();
         vChainPath.push_back(nInternal);
@@ -791,7 +791,7 @@ static UniValue initaccountfromdevice(const JSONRPCRequest &request)
             CExtKey evStealthScan;
             evStealthScan.SetSeed(vchSig.data(), vchSig.size());
 
-            CStoredExtKey *sekStealthScan = new CStoredExtKey();
+            auto *sekStealthScan = new CStoredExtKey();
             sekStealthScan->kp = evStealthScan;
             vSigPath.clear();
             // sekStealthScan isn't on the account chain
@@ -813,7 +813,7 @@ static UniValue initaccountfromdevice(const JSONRPCRequest &request)
             }
             vPath.pop_back();
 
-            CStoredExtKey *sekStealthSpend = new CStoredExtKey();
+            auto *sekStealthSpend = new CStoredExtKey();
             sekStealthSpend->kp = epStealthSpend;
             vChainPath.pop_back();
             vChainPath.push_back(nStealthSpend);

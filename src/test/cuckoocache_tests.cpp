@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE(cuckoocache_tests);
  */
 static void insecure_GetRandHash(uint256& t)
 {
-    uint32_t* ptr = (uint32_t*)t.begin();
+    auto * ptr = (uint32_t*)t.begin();
     for (uint8_t j = 0; j < 8; ++j)
         *(ptr++) = local_rand_ctx.rand32();
 }

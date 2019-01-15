@@ -104,22 +104,22 @@ std::string CTxOutBase::ToString() const
     {
         case OUTPUT_STANDARD:
             {
-            CTxOutStandard *so = (CTxOutStandard*)this;
+                auto *so = (CTxOutStandard*)this;
             return strprintf("CTxOutStandard(nValue=%d.%08d, scriptPubKey=%s)", so->nValue / COIN, so->nValue % COIN, HexStr(so->scriptPubKey).substr(0, 30));
             }
         case OUTPUT_DATA:
             {
-            CTxOutData *dout = (CTxOutData*)this;
+                auto *dout = (CTxOutData*)this;
             return strprintf("CTxOutData(data=%s)", HexStr(dout->vData).substr(0, 30));
             }
         case OUTPUT_CT:
             {
-            CTxOutCT *cto = (CTxOutCT*)this;
+                auto *cto = (CTxOutCT*)this;
             return strprintf("CTxOutCT(data=%s, scriptPubKey=%s)", HexStr(cto->vData).substr(0, 30), HexStr(cto->scriptPubKey).substr(0, 30));
             }
         case OUTPUT_RINGCT:
             {
-            CTxOutRingCT *rcto = (CTxOutRingCT*)this;
+                auto *rcto = (CTxOutRingCT*)this;
             return strprintf("CTxOutRingCT(data=%s, pk=%s)", HexStr(rcto->vData).substr(0, 30), HexStr(rcto->pk).substr(0, 30));
             }
         default:
@@ -237,7 +237,7 @@ unsigned int CTransaction::CalculateModifiedSize(unsigned int nTxSize) const
     // risk encouraging people to create junk outputs to redeem later.
     if (nTxSize == 0)
         nTxSize = ::GetSerializeSize(*this, PROTOCOL_VERSION);
-    for (std::vector<CTxIn>::const_iterator it(vin.begin()); it != vin.end(); ++it)
+    for (auto it(vin.begin()); it != vin.end(); ++it)
     {
         unsigned int offset = 41U + std::min(110U, (unsigned int)it->scriptSig.size());
         if (nTxSize > offset)

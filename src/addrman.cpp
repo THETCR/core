@@ -67,12 +67,12 @@ double CAddrInfo::GetChance(int64_t nNow) const
 
 CAddrInfo* CAddrMan::Find(const CNetAddr& addr, int* pnId)
 {
-    std::map<CNetAddr, int>::iterator it = mapAddr.find(addr);
+    auto it = mapAddr.find(addr);
     if (it == mapAddr.end())
         return nullptr;
     if (pnId)
         *pnId = (*it).second;
-    std::map<int, CAddrInfo>::iterator it2 = mapInfo.find((*it).second);
+    auto it2 = mapInfo.find((*it).second);
     if (it2 != mapInfo.end())
         return &(*it2).second;
     return nullptr;
@@ -536,7 +536,7 @@ int CAddrMan::RandomInt(int nMax){
 
 void CAddrMan::ResolveCollisions_()
 {
-    for (std::set<int>::iterator it = m_tried_collisions.begin(); it != m_tried_collisions.end();) {
+    for (auto it = m_tried_collisions.begin(); it != m_tried_collisions.end();) {
         int id_new = *it;
 
         bool erase_collision = false;
@@ -590,7 +590,7 @@ CAddrInfo CAddrMan::SelectTriedCollision_()
 {
     if (m_tried_collisions.size() == 0) return CAddrInfo();
 
-    std::set<int>::iterator it = m_tried_collisions.begin();
+    auto it = m_tried_collisions.begin();
 
     // Selects a random element from m_tried_collisions
     std::advance(it, GetRandInt(m_tried_collisions.size()));

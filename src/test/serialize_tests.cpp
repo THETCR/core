@@ -305,7 +305,7 @@ BOOST_AUTO_TEST_CASE(insert_delete)
     ss.write("\x00\x01\x02\xff", 4);
     BOOST_CHECK_EQUAL(ss.size(), 4U);
 
-    char c = (char)11;
+    auto c = (char)11;
 
     // Inserting at beginning/end/middle:
     ss.insert(ss.begin(), c);

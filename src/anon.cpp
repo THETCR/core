@@ -262,7 +262,7 @@ bool AllAnonOutputsUnknown(const CTransaction &tx, CValidationState &state)
         }
         state.fHasAnonOutput = true;
 
-        CTxOutRingCT *txout = (CTxOutRingCT*)tx.vpout[k].get();
+        auto *txout = (CTxOutRingCT*)tx.vpout[k].get();
 
         int64_t nTestExists;
         if (pblocktree->ReadRCTOutputLink(txout->pk, nTestExists)) {
