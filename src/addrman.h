@@ -474,14 +474,14 @@ public:
         LOCK(cs);
         std::vector<int>().swap(vRandom);
         nKey = GetRandHash();
-        for (auto &bucket : vvNew) {
+        for (size_t bucket = 0; bucket < ADDRMAN_NEW_BUCKET_COUNT; bucket++) {
             for (size_t entry = 0; entry < ADDRMAN_BUCKET_SIZE; entry++) {
-                bucket[entry] = -1;
+                vvNew[bucket][entry] = -1;
             }
         }
-        for (auto &bucket : vvTried) {
+        for (size_t bucket = 0; bucket < ADDRMAN_TRIED_BUCKET_COUNT; bucket++) {
             for (size_t entry = 0; entry < ADDRMAN_BUCKET_SIZE; entry++) {
-                bucket[entry] = -1;
+                vvTried[bucket][entry] = -1;
             }
         }
 
@@ -543,8 +543,8 @@ public:
         LOCK(cs);
         int nAdd = 0;
         Check();
-        for (const auto &it : vAddr)
-            nAdd += Add_(it, source, nTimePenalty) ? 1 : 0;
+        for (auto it = vAddr.begin(); it != vAddr.end(); it++)
+            nAdd += Add_(*it, source, nTimePenalty) ? 1 : 0;
         Check();
         if (nAdd) {
             LogPrint(BCLog::ADDRMAN, "Added %i addresses from %s: %i tried, %i new\n", nAdd, source.ToString(), nTried, nNew);

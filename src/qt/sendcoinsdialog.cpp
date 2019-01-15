@@ -329,7 +329,7 @@ void SendCoinsDialog::on_sendButton_clicked()
     int nRingSize = ui->spinRingSize->value();
     int nMaxInputs = ui->spinMaxInputs->value();
 
-    sCommand += R"(] "" "" )" +QString::number(nRingSize)+" "+QString::number(nMaxInputs);
+    sCommand += "] \"\" \"\" "+QString::number(nRingSize)+" "+QString::number(nMaxInputs);
 
 
     QString sCoinControl;
@@ -341,7 +341,7 @@ void SendCoinsDialog::on_sendButton_clicked()
     } else {
         std::string sFeeMode;
         if (StringFromFeeMode(ctrl.m_fee_mode, sFeeMode))
-            sCoinControl += R"(,"estimate_mode":")" + QString::fromStdString(sFeeMode) +"\"";
+            sCoinControl += ",\"estimate_mode\":\"" + QString::fromStdString(sFeeMode) +"\"";
         if (ctrl.m_confirm_target)
             sCoinControl += ",\"conf_target\":" + QString::number(*ctrl.m_confirm_target);
     }

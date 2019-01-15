@@ -86,7 +86,7 @@ bool CCoinsViewDB::HaveCoin(const COutPoint &outpoint) const {
 uint256 CCoinsViewDB::GetBestBlock() const {
     uint256 hashBestChain;
     if (!db.Read(DB_BEST_BLOCK, hashBestChain))
-        return {};
+        return uint256();
     return hashBestChain;
 }
 

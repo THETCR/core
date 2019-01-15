@@ -25,9 +25,9 @@ enum isminetype : uint8_t
     ISMINE_ALL = ISMINE_WATCH_ONLY | ISMINE_SPENDABLE
 };
 /** used for bitflags of isminetype */
-using isminefilter = uint8_t;
+typedef uint8_t isminefilter;
 
-using valtype = std::vector<unsigned char>;
+typedef std::vector<unsigned char> valtype;
 bool HaveKeys(const std::vector<valtype>& pubkeys, const CKeyStore& keystore);
 
 /* isInvalid becomes true when the script is found invalid by consensus or policy. This will terminate the recursion

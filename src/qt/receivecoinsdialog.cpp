@@ -256,7 +256,7 @@ void ReceiveCoinsDialog::keyPressEvent(QKeyEvent *event)
 QModelIndex ReceiveCoinsDialog::selectedRow()
 {
     if(!model || !model->getRecentRequestsTableModel() || !ui->recentRequestsView->selectionModel())
-        return {};
+        return QModelIndex();
     QModelIndexList selection = ui->recentRequestsView->selectionModel()->selectedRows();
     if(selection.empty())
         return QModelIndex();

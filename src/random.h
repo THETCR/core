@@ -125,7 +125,7 @@ public:
     bool randbool() { return randbits(1); }
 
     // Compatibility with the C++11 UniformRandomBitGenerator concept
-    using result_type = uint64_t;
+    typedef uint64_t result_type;
     static constexpr uint64_t min() { return 0; }
     static constexpr uint64_t max() { return std::numeric_limits<uint64_t>::max(); }
     inline uint64_t operator()() { return rand64(); }

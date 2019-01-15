@@ -85,7 +85,7 @@ typedef unsigned int SOCKET;
 #ifdef _MSC_VER
 #if !defined(ssize_t)
 #ifdef _WIN64
-using ssize_t = int64_t;
+typedef int64_t ssize_t;
 #else
 typedef int32_t ssize_t;
 #endif
@@ -99,7 +99,7 @@ size_t strnlen( const char *start, size_t max_len);
 #ifndef WIN32
 typedef void* sockopt_arg_type;
 #else
-using sockopt_arg_type = char *;
+typedef char* sockopt_arg_type;
 #endif
 
 bool static inline IsSelectableSocket(const SOCKET& s) {

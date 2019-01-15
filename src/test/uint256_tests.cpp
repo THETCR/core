@@ -44,7 +44,8 @@ const uint256 OneL = uint256(std::vector<unsigned char>(OneArray,OneArray+32));
 const uint160 OneS = uint160(std::vector<unsigned char>(OneArray,OneArray+20));
 
 const unsigned char MaxArray[] =
-        R"(ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ)";
+    "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff"
+    "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
 const uint256 MaxL = uint256(std::vector<unsigned char>(MaxArray,MaxArray+32));
 const uint160 MaxS = uint160(std::vector<unsigned char>(MaxArray,MaxArray+20));
 

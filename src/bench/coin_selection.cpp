@@ -58,7 +58,7 @@ static void CoinSelection(benchmark::State& state)
     }
 }
 
-using CoinSet = int;
+typedef std::set<CInputCoin> CoinSet;
 static auto testChain = interfaces::MakeChain();
 static const CWallet testWallet(*testChain, WalletLocation(), WalletDatabase::CreateDummy());
 std::vector<std::unique_ptr<CWalletTx>> wtxn;

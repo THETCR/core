@@ -1057,7 +1057,7 @@ TxMempoolInfo CTxMemPool::info(const uint256& hash) const
     LOCK(cs);
     indexed_transaction_set::const_iterator i = mapTx.find(hash);
     if (i == mapTx.end())
-        return {};
+        return TxMempoolInfo();
     return GetInfo(i);
 }
 

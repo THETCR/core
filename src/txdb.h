@@ -78,7 +78,7 @@ public:
 class CCoinsViewDBCursor: public CCoinsViewCursor
 {
 public:
-    ~CCoinsViewDBCursor() = default;
+    ~CCoinsViewDBCursor() {}
 
     bool GetKey(COutPoint &key) const override;
     bool GetValue(Coin &coin) const override;

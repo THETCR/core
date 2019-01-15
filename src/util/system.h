@@ -205,8 +205,7 @@ public:
         std::string m_help_text;
         bool m_debug_only;
 
-        Arg(std::string help_param, std::string help_text, bool debug_only) : m_help_param(std::move(help_param)), m_help_text(
-                std::move(help_text)), m_debug_only(debug_only) {};
+        Arg(const std::string& help_param, const std::string& help_text, bool debug_only) : m_help_param(help_param), m_help_text(help_text), m_debug_only(debug_only) {};
     };
 
     mutable CCriticalSection cs_args;

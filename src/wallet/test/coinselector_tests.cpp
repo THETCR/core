@@ -25,7 +25,7 @@ BOOST_FIXTURE_TEST_SUITE(coinselector_tests, WalletTestingSetup)
 
 std::vector<std::unique_ptr<CWalletTx>> wtxn;
 
-    using CoinSet = int;
+typedef std::set<CInputCoin> CoinSet;
 
 static std::vector<COutput> vCoins;
 static auto testChain = interfaces::MakeChain();
@@ -78,7 +78,7 @@ static void add_coin(const CAmount& nValue, int nAge = 6*24, bool fIsFromMe = fa
     wtxn.emplace_back(std::move(wtx));
 }
 
-static void empty_wallet()
+static void empty_wallet(void)
 {
     vCoins.clear();
     wtxn.clear();

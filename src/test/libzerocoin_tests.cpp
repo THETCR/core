@@ -323,10 +323,10 @@ Test_MintCoin()
 
 	try {
 		// Generate a list of coins
-		for (auto &gCoin : gCoins) {
-            gCoin = new PrivateCoin(g_Params,libzerocoin::CoinDenomination::ZQ_ONE);
+		for (uint32_t i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
+            gCoins[i] = new PrivateCoin(g_Params,libzerocoin::CoinDenomination::ZQ_ONE);
 
-			PublicCoin pc = gCoin->getPublicCoin();
+			PublicCoin pc = gCoins[i]->getPublicCoin();
 			CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
 			ss << pc;
 			gCoinSize += ss.size();
@@ -408,9 +408,9 @@ Test_MintAndSpend()
         Accumulator acc(&g_Params->accumulatorParams,CoinDenomination::ZQ_ONE);
 		AccumulatorWitness wAcc(g_Params, acc, gCoins[0]->getPublicCoin());
 
-		for (auto &gCoin : gCoins) {
-			acc += gCoin->getPublicCoin();
-			wAcc += gCoin->getPublicCoin();
+		for (uint32_t i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
+			acc += gCoins[i]->getPublicCoin();
+			wAcc +=gCoins[i]->getPublicCoin();
 		}
 
 		// Now spend the coin
@@ -451,8 +451,8 @@ Test_RunAllTests()
 	g_Params = new ZerocoinParams(GetTestModulus());
 
 	gNumTests = gSuccessfulTests = gProofSize = 0;
-	for (auto &gCoin : gCoins) {
-        gCoin = nullptr;
+	for (uint32_t i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
+		gCoins[i] = nullptr;
 	}
 
 	// Run through all of the Zerocoin tests
@@ -476,8 +476,8 @@ Test_RunAllTests()
 	}
 
 	// Clear any generated coins
-	for (auto &gCoin : gCoins) {
-		delete gCoin;
+	for (uint32_t i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
+		delete gCoins[i];
 	}
 
 	cout << endl << gSuccessfulTests << " out of " << gNumTests << " tests passed." << endl << endl;

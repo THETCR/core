@@ -7,7 +7,7 @@
 #define BITCOIN_SCRIPT_SIGN_H
 
 #include <boost/optional.hpp>
-#include <utility> #include <hash.h>
+#include <hash.h>
 #include <pubkey.h>
 #include <script/interpreter.h>
 #include <streams.h>
@@ -30,8 +30,7 @@ struct KeyOriginInfo
 class SigningProvider
 {
 public:
-    virtual ~SigningProvider() = default;
-
+    virtual ~SigningProvider() {}
     virtual bool GetCScript(const CScriptID &scriptid, CScript& script) const { return false; }
     virtual bool GetPubKey(const CKeyID &address, CPubKey& pubkey) const { return false; }
     virtual bool GetKey(const CKeyID &address, CKey& key) const { return false; }
@@ -73,8 +72,7 @@ FlatSigningProvider Merge(const FlatSigningProvider& a, const FlatSigningProvide
 /** Interface for signature creators. */
 class BaseSignatureCreator {
 public:
-    virtual ~BaseSignatureCreator() = default;
-
+    virtual ~BaseSignatureCreator() {}
     virtual const BaseSignatureChecker& Checker() const =0;
 
     virtual bool IsWisprVersion() const { return false; }
@@ -122,9 +120,8 @@ struct SignatureData {
     std::map<CKeyID, SigPair> signatures; ///< BIP 174 style partial signatures for the input. May contain all signatures necessary for producing a final scriptSig or scriptWitness.
     std::map<CKeyID, std::pair<CPubKey, KeyOriginInfo>> misc_pubkeys;
 
-    SignatureData() = default;
-
-    explicit SignatureData(CScript script) : scriptSig(std::move(script)) {}
+    SignatureData() {}
+    explicit SignatureData(const CScript& script) : scriptSig(script) {}
     void MergeSignatureData(SignatureData sigdata);
 };
 
@@ -247,7 +244,7 @@ struct PSBTInput
     void FromSignatureData(const SignatureData& sigdata);
     void Merge(const PSBTInput& input);
     bool IsSane() const;
-    PSBTInput() = default;
+    PSBTInput() {}
 
     template <typename Stream>
     inline void Serialize(Stream& s) const {
@@ -466,7 +463,7 @@ struct PSBTOutput
     void FromSignatureData(const SignatureData& sigdata);
     void Merge(const PSBTOutput& output);
     bool IsSane() const;
-    PSBTOutput() = default;
+    PSBTOutput() {}
 
     template <typename Stream>
     inline void Serialize(Stream& s) const {
@@ -577,12 +574,8 @@ struct PartiallySignedTransaction
     bool IsNull() const;
     void Merge(const PartiallySignedTransaction& psbt);
     bool IsSane() const;
-    PartiallySignedTransaction() = default;
-
-    PartiallySignedTransaction(const PartiallySignedTransaction& psbt_in) : , , ,
-
-    = default;
-
+    PartiallySignedTransaction() {}
+    PartiallySignedTransaction(const PartiallySignedTransaction& psbt_in) : tx(psbt_in.tx), inputs(psbt_in.inputs), outputs(psbt_in.outputs), unknown(psbt_in.unknown) {}
     explicit PartiallySignedTransaction(const CTransaction& tx);
 
     // Only checks if they refer to the same transaction

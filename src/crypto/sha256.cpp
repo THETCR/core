@@ -414,9 +414,8 @@ void TransformD64(unsigned char* out, const unsigned char* in)
 
 } // namespace sha256
 
-    using TransformType = void (*)(uint32_t *, const unsigned char *, size_t);
-
-    using TransformD64Type = void (*)(unsigned char *, const unsigned char *);
+typedef void (*TransformType)(uint32_t*, const unsigned char*, size_t);
+typedef void (*TransformD64Type)(unsigned char*, const unsigned char*);
 
 template<TransformType tr>
 void TransformD64Wrapper(unsigned char* out, const unsigned char* in)

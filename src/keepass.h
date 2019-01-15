@@ -8,7 +8,6 @@
 #include <support/allocators/secure.h>
 
 #include <univalue.h>
-#include <utility>
 
 class CKeePassIntegrator;
 
@@ -63,9 +62,8 @@ private:
         SecureString sPassword;
 
     public:
-        CKeePassEntry(SecureString sUuid, SecureString sName, SecureString sLogin,
-                      SecureString sPassword) :
-            sUuid(std::move(sUuid)), sName(std::move(sName)), sLogin(std::move(sLogin)), sPassword(std::move(sPassword)) {
+        CKeePassEntry(const SecureString& sUuid, const SecureString& sName, const SecureString& sLogin, const SecureString& sPassword) :
+            sUuid(sUuid), sName(sName), sLogin(sLogin), sPassword(sPassword) {
         }
 
         SecureString getUuid() {

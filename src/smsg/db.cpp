@@ -67,9 +67,9 @@ public:
     std::string needle;
     bool *deleted;
     std::string* foundValue;
-    bool foundEntry{false};
+    bool foundEntry;
 
-    SecMsgBatchScanner() : {}
+    SecMsgBatchScanner() : foundEntry(false) {}
 
     virtual void Put(const leveldb::Slice &key, const leveldb::Slice &value)
     {

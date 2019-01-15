@@ -55,7 +55,7 @@ using WalletValueMap = std::map<std::string, std::string>;
 class Wallet
 {
 public:
-    virtual ~Wallet() = default;
+    virtual ~Wallet() {}
 
     //! Encrypt wallet.
     virtual bool encryptWallet(const SecureString& wallet_passphrase) = 0;
@@ -303,7 +303,7 @@ public:
 class PendingWalletTx
 {
 public:
-    virtual ~PendingWalletTx() = default;
+    virtual ~PendingWalletTx() {}
 
     //! Get transaction data.
     virtual const CTransaction& get() = 0;

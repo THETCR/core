@@ -43,10 +43,10 @@ public:
 private:
     //! Whether this private key is valid. We check for correctness when modifying the key
     //! data, so fValid should always correspond to the actual state.
-    bool fValid{false};
+    bool fValid;
 
     //! Whether the public key corresponding to this private key is (to be) compressed.
-    bool fCompressed{false};
+    bool fCompressed;
 
     //! The actual byte data
     std::vector<unsigned char, secure_allocator<unsigned char> > keydata;
@@ -56,7 +56,8 @@ private:
 
 public:
     //! Construct an invalid private key.
-    CKey() : , {
+    CKey() : fValid(false), fCompressed(false)
+    {
         // Important: vch must be 32 bytes in length to not break serialization
         keydata.resize(32);
     }

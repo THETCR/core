@@ -74,9 +74,9 @@ public:
         strMessage = ostr.str();
     }
 
-    virtual ~CGovernanceException() noexcept = default;
+    virtual ~CGovernanceException() throw() {}
 
-    virtual const char* what() const noexcept override
+    virtual const char* what() const throw() override 
     {
         return strMessage.c_str();
     }

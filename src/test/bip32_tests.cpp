@@ -14,7 +14,7 @@
 #include <streams.h>
 
 #include <string>
-#include <utility> #include <vector>
+#include <vector>
 
 #include <key/extkey.h>
 
@@ -28,7 +28,7 @@ struct TestVector {
     std::string strHexMaster;
     std::vector<TestDerivation> vDerive;
 
-    explicit TestVector(std::string strHexMasterIn) : strHexMaster(std::move(strHexMasterIn)) {}
+    explicit TestVector(std::string strHexMasterIn) : strHexMaster(strHexMasterIn) {}
 
     TestVector& operator()(std::string pub, std::string prv, unsigned int nChild) {
         vDerive.push_back(TestDerivation());

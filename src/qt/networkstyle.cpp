@@ -77,14 +77,15 @@ NetworkStyle::NetworkStyle(const QString &_appName, const int iconColorHueShift,
 
 const NetworkStyle *NetworkStyle::instantiate(const QString &networkId)
 {
-    for (const auto &network_style : network_styles) {
-        if (networkId == network_style.networkId)
+    for (unsigned x=0; x<network_styles_count; ++x)
+    {
+        if (networkId == network_styles[x].networkId)
         {
             return new NetworkStyle(
-                    network_style.appName,
-                    network_style.iconColorHueShift,
-                    network_style.iconColorSaturationReduction,
-                    network_style.titleAddText);
+                    network_styles[x].appName,
+                    network_styles[x].iconColorHueShift,
+                    network_styles[x].iconColorSaturationReduction,
+                    network_styles[x].titleAddText);
         }
     }
     return nullptr;

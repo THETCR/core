@@ -477,7 +477,7 @@ UniValue masternode(const JSONRPCRequest& request)
         }
 
         if (request.params.size() > 3)
-            throw JSONRPCError(RPC_INVALID_PARAMETER, R"(Correct usage is 'masternode winners ( "count" "filter" )')");
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Correct usage is 'masternode winners ( \"count\" \"filter\" )'");
 
         UniValue obj(UniValue::VOBJ);
 

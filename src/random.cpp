@@ -455,8 +455,8 @@ bool Random_SanityCheck()
         }
 
         num_overwritten = 0;
-        for (bool x : overwritten) {
-            if (x) {
+        for (int x=0; x < NUM_OS_RANDOM_BYTES; ++x) {
+            if (overwritten[x]) {
                 num_overwritten += 1;
             }
         }

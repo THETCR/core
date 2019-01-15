@@ -43,12 +43,14 @@ private:
 
     CService addr;
     CDarksendAccept dsa;
-    int64_t nTimeCreated{0};
+    int64_t nTimeCreated;
 
 public:
     CPendingDsaRequest():
         addr(CService()),
-        dsa(CDarksendAccept()), {};
+        dsa(CDarksendAccept()),
+        nTimeCreated(0)
+    {};
 
     CPendingDsaRequest(const CService& addr_, const CDarksendAccept& dsa_):
         addr(addr_),
@@ -84,8 +86,8 @@ private:
     std::vector<CAmount> vecDenominationsSkipped;
     std::vector<COutPoint> vecOutPointLocked;
 
-    int nCachedLastSuccessBlock{0};
-    int nMinBlocksToWait{1}; // how many blocks to wait after one successful mixing tx in non-multisession mode
+    int nCachedLastSuccessBlock;
+    int nMinBlocksToWait; // how many blocks to wait after one successful mixing tx in non-multisession mode
 
     // Keep track of current block height
     int nCachedBlockHeight;
@@ -146,20 +148,23 @@ public:
     int nPrivateSendRounds;
     int nPrivateSendAmount;
     int nLiquidityProvider;
-    bool fEnablePrivateSend{false};
+    bool fEnablePrivateSend;
     bool fPrivateSendMultiSession;
 
     int nCachedNumBlocks; //used for the overview screen
-    bool fCreateAutoBackups{true}; //builtin support for automatic backups
+    bool fCreateAutoBackups; //builtin support for automatic backups
 
     CPrivateSendClient() :
-            , ,
+        nCachedLastSuccessBlock(0),
+        nMinBlocksToWait(1),
         txMyCollateral(CMutableTransaction()),
         nPrivateSendRounds(DEFAULT_PRIVATESEND_ROUNDS),
         nPrivateSendAmount(DEFAULT_PRIVATESEND_AMOUNT),
-        nLiquidityProvider(DEFAULT_PRIVATESEND_LIQUIDITY), ,
+        nLiquidityProvider(DEFAULT_PRIVATESEND_LIQUIDITY),
+        fEnablePrivateSend(false),
         fPrivateSendMultiSession(DEFAULT_PRIVATESEND_MULTISESSION),
-        nCachedNumBlocks(std::numeric_limits<int>::max()), { SetNull(); }
+        nCachedNumBlocks(std::numeric_limits<int>::max()),
+        fCreateAutoBackups(true) { SetNull(); }
 
     void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman& connman);
 

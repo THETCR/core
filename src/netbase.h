@@ -28,13 +28,13 @@ static const int DEFAULT_NAME_LOOKUP = true;
 class proxyType
 {
 public:
-    proxyType(): {}
+    proxyType(): randomize_credentials(false) {}
     explicit proxyType(const CService &_proxy, bool _randomize_credentials=false): proxy(_proxy), randomize_credentials(_randomize_credentials) {}
 
     bool IsValid() const { return proxy.IsValid(); }
 
     CService proxy;
-    bool randomize_credentials{false};
+    bool randomize_credentials;
 };
 
 enum Network ParseNetwork(std::string net);

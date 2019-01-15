@@ -45,15 +45,19 @@ class CRateCheckBuffer
 private:
     std::vector<int64_t> vecTimestamps;
 
-    int nDataStart{0};
+    int nDataStart;
 
-    int nDataEnd{0};
+    int nDataEnd;
 
-    bool fBufferEmpty{true};
+    bool fBufferEmpty;
 
 public:
     CRateCheckBuffer()
-        : vecTimestamps(RATE_BUFFER_SIZE), , , {}
+        : vecTimestamps(RATE_BUFFER_SIZE),
+          nDataStart(0),
+          nDataEnd(0),
+          fBufferEmpty(true)
+        {}
 
     void AddTimestamp(int64_t nTimestamp)
     {
@@ -171,49 +175,49 @@ public: // Types
 
     typedef std::map<uint256, CGovernanceObject> object_m_t;
 
-    using object_m_it = int;
+    typedef object_m_t::iterator object_m_it;
 
-    using object_m_cit = int;
+    typedef object_m_t::const_iterator object_m_cit;
 
     typedef CacheMap<uint256, CGovernanceObject*> object_ref_cm_t;
 
     typedef std::map<uint256, CGovernanceVote> vote_m_t;
 
-    using vote_m_it = int;
+    typedef vote_m_t::iterator vote_m_it;
 
-    using vote_m_cit = int;
+    typedef vote_m_t::const_iterator vote_m_cit;
 
     typedef CacheMap<uint256, CGovernanceVote> vote_cm_t;
 
     typedef CacheMultiMap<uint256, vote_time_pair_t> vote_cmm_t;
 
-    using size_type = int;
+    typedef object_m_t::size_type size_type;
 
     typedef std::map<COutPoint, last_object_rec > txout_m_t;
 
-    using txout_m_it = int;
+    typedef txout_m_t::iterator txout_m_it;
 
-    using txout_m_cit = int;
+    typedef txout_m_t::const_iterator txout_m_cit;
 
     typedef std::map<COutPoint, int> txout_int_m_t;
 
-    using hash_s_t = int;
+    typedef std::set<uint256> hash_s_t;
 
-    using hash_s_it = int;
+    typedef hash_s_t::iterator hash_s_it;
 
-    using hash_s_cit = int;
+    typedef hash_s_t::const_iterator hash_s_cit;
 
     typedef std::map<uint256, object_info_pair_t> object_info_m_t;
 
-    using object_info_m_it = int;
+    typedef object_info_m_t::iterator object_info_m_it;
 
-    using object_info_m_cit = int;
+    typedef object_info_m_t::const_iterator object_info_m_cit;
 
     typedef std::map<uint256, int64_t> hash_time_m_t;
 
-    using hash_time_m_it = int;
+    typedef hash_time_m_t::iterator hash_time_m_it;
 
-    using hash_time_m_cit = int;
+    typedef hash_time_m_t::const_iterator hash_time_m_cit;
 
 private:
     static const int MAX_CACHE_SIZE = 1000000;
@@ -281,7 +285,7 @@ public:
 
     CGovernanceManager();
 
-    virtual ~CGovernanceManager() = default;
+    virtual ~CGovernanceManager() {}
 
     /**
      * This is called by AlreadyHave in net_processing.cpp as part of the inventory

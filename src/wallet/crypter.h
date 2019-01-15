@@ -128,7 +128,7 @@ private:
     std::atomic<bool> fUseCrypto;
 
     //! keeps track of whether Unlock has run a thorough check before
-    bool fDecryptionThoroughlyChecked{false};
+    bool fDecryptionThoroughlyChecked;
     //! if fOnlyMixingAllowed is true, only mixing should be allowed in unlocked wallet
     bool fOnlyMixingAllowed;
 
@@ -144,7 +144,8 @@ protected:
     CryptedKeyMap mapCryptedKeys GUARDED_BY(cs_KeyStore);
 
 public:
-    CCryptoKeyStore() : fUseCrypto(false), {
+    CCryptoKeyStore() : fUseCrypto(false), fDecryptionThoroughlyChecked(false)
+    {
     }
 
     bool IsCrypted() const { return fUseCrypto; }

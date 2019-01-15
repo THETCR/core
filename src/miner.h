@@ -67,7 +67,7 @@ struct CompareCTxMemPoolIter {
 };
 
 struct modifiedentry_iter {
-    using result_type = int;
+    typedef CTxMemPool::txiter result_type;
     result_type operator() (const CTxMemPoolModifiedEntry &entry) const
     {
         return entry.iter;

@@ -17,9 +17,9 @@ class CMasternodeMan
 {
 public:
     typedef std::pair<arith_uint256, const CMasternode*> score_pair_t;
-    using score_pair_vec_t = int;
+    typedef std::vector<score_pair_t> score_pair_vec_t;
     typedef std::pair<int, const CMasternode> rank_pair_t;
-    using rank_pair_vec_t = int;
+    typedef std::vector<rank_pair_t> rank_pair_vec_t;
 
 private:
     static const std::string SERIALIZATION_VERSION_STRING;

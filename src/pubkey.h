@@ -33,7 +33,7 @@ public:
     explicit CKeyID256(const uint256& in) : uint256(in) {}
 };
 
-using ChainCode = uint256;
+typedef uint256 ChainCode;
 
 /** An encapsulated public key. */
 class CPubKey

@@ -27,7 +27,7 @@
 #include <QDebug>
 #include <QIcon>
 #include <QList>
-#include <utility>
+
 
 // Amount column is right-aligned it contains numbers
 static int column_alignments[] = {
@@ -705,7 +705,7 @@ QModelIndex TransactionTableModel::index(int row, int column, const QModelIndex 
     {
         return createIndex(row, column, priv->index(walletModel->wallet(), row));
     }
-    return {};
+    return QModelIndex();
 }
 
 void TransactionTableModel::updateDisplayUnit()
@@ -719,10 +719,9 @@ void TransactionTableModel::updateDisplayUnit()
 struct TransactionNotification
 {
 public:
-    TransactionNotification() = default;
-
+    TransactionNotification() {}
     TransactionNotification(uint256 _hash, ChangeType _status, bool _showTransaction):
-        hash(std::move(_hash)), status(_status), showTransaction(_showTransaction) {}
+        hash(_hash), status(_status), showTransaction(_showTransaction) {}
 
     void invoke(QObject *ttm)
     {

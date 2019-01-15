@@ -27,7 +27,7 @@ public:
     static QString toHTML(interfaces::Node& node, interfaces::Wallet& wallet, TransactionRecord *rec, int unit);
 
 private:
-    TransactionDesc() = default;
+    TransactionDesc() {}
 
     static QString FormatTxStatus(const interfaces::WalletTx& wtx, const interfaces::WalletTxStatus& status, bool inMempool, int numBlocks);
 };

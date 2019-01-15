@@ -74,8 +74,7 @@ public:
     uint256 blockhash;
     std::vector<CTransactionRef> txn;
 
-    BlockTransactions() = default;
-
+    BlockTransactions() {}
     explicit BlockTransactions(const BlockTransactionsRequest& req) :
         blockhash(req.blockhash), txn(req.indexes.size()) {}
 
@@ -148,7 +147,7 @@ public:
     std::vector<uint8_t> vchBlockSig;
 
     // Dummy for deserialization
-    CBlockHeaderAndShortTxIDs() = default;
+    CBlockHeaderAndShortTxIDs() {}
 
     CBlockHeaderAndShortTxIDs(const CBlock& block, bool fUseWTXID);
 

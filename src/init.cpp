@@ -1073,7 +1073,7 @@ bool AppInitBasicSetup()
     // which is not correct. Can be removed, when GCCs winbase.h is fixed!
 #define PROCESS_DEP_ENABLE 0x00000001
 #endif
-    using PSETPROCDEPPOL = BOOL (*)(DWORD);
+    typedef BOOL (WINAPI *PSETPROCDEPPOL)(DWORD);
     auto setProcDEPPol = (PSETPROCDEPPOL)GetProcAddress(GetModuleHandleA("Kernel32.dll"), "SetProcessDEPPolicy");
     if (setProcDEPPol != nullptr) setProcDEPPol(PROCESS_DEP_ENABLE);
 #endif

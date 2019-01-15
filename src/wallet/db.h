@@ -65,7 +65,7 @@ public:
     enum class VerifyResult { VERIFY_OK,
                         RECOVER_OK,
                         RECOVER_FAIL };
-    using recoverFunc_type = bool (*)(const fs::path &, std::string &);
+    typedef bool (*recoverFunc_type)(const fs::path& file_path, std::string& out_backup_filename);
     VerifyResult Verify(const std::string& strFile, recoverFunc_type recoverFunc, std::string& out_backup_filename);
     /**
      * Salvage data from a file that Verify says is bad.
@@ -106,7 +106,8 @@ class BerkeleyDatabase
     friend class BerkeleyBatch;
 public:
     /** Create dummy DB handle */
-    BerkeleyDatabase() : nUpdateCounter(0), , , , {
+    BerkeleyDatabase() : nUpdateCounter(0), nLastSeen(0), nLastFlushed(0), nLastWalletUpdate(0), env(nullptr)
+    {
     }
 
     /** Create DB handle to real database */
@@ -156,13 +157,13 @@ public:
     void ReloadDbEnv();
 
     std::atomic<unsigned int> nUpdateCounter;
-    unsigned int nLastSeen{0};
-    unsigned int nLastFlushed{0};
-    int64_t nLastWalletUpdate{0};
+    unsigned int nLastSeen;
+    unsigned int nLastFlushed;
+    int64_t nLastWalletUpdate;
 
 private:
     /** BerkeleyDB specific */
-    BerkeleyEnvironment *env{nullptr};
+    BerkeleyEnvironment *env;
     std::string strFile;
 
     /** Return whether this database handle is a dummy for testing.

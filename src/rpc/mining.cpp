@@ -29,7 +29,7 @@
 #include <warnings.h>
 
 #include <memory>
-#include <utility> #include <stdint.h>
+#include <stdint.h>
 
 unsigned int ParseConfirmTarget(const UniValue& value)
 {
@@ -687,7 +687,7 @@ public:
     bool found;
     CValidationState state;
 
-    explicit submitblock_StateCatcher(uint256 hashIn) : hash(std::move(hashIn)), found(false), state() {}
+    explicit submitblock_StateCatcher(const uint256 &hashIn) : hash(hashIn), found(false), state() {}
 
 protected:
     void BlockChecked(const CBlock& block, const CValidationState& stateIn) override {

@@ -11,7 +11,6 @@
 #include <masternode/masternode.h>
 #include <net_processing.h>
 #include <util/strencodings.h>
-#include <utility>
 
 class CMasternodePayments;
 class CMasternodePaymentVote;
@@ -53,7 +52,7 @@ public:
         {}
 
     CMasternodePayee(CScript payee, uint256 hashIn) :
-        scriptPubKey(std::move(payee)),
+        scriptPubKey(payee),
         vecVoteHashes()
     {
         vecVoteHashes.push_back(hashIn);
@@ -78,11 +77,11 @@ public:
 class CMasternodeBlockPayees
 {
 public:
-    int nBlockHeight{0};
+    int nBlockHeight;
     std::vector<CMasternodePayee> vecPayees;
 
     CMasternodeBlockPayees() :
-            ,
+        nBlockHeight(0),
         vecPayees()
         {}
     CMasternodeBlockPayees(int nBlockHeightIn) :
@@ -113,20 +112,21 @@ class CMasternodePaymentVote
 public:
     COutPoint masternodeOutpoint;
 
-    int nBlockHeight{0};
+    int nBlockHeight;
     CScript payee;
     std::vector<unsigned char> vchSig;
 
     CMasternodePaymentVote() :
-        masternodeOutpoint(), ,
+        masternodeOutpoint(),
+        nBlockHeight(0),
         payee(),
         vchSig()
         {}
 
     CMasternodePaymentVote(COutPoint outpoint, int nBlockHeight, CScript payee) :
-        masternodeOutpoint(std::move(outpoint)),
+        masternodeOutpoint(outpoint),
         nBlockHeight(nBlockHeight),
-        payee(std::move(payee)),
+        payee(payee),
         vchSig()
         {}
 
@@ -180,9 +180,9 @@ class CMasternodePayments
 {
 private:
     // masternode count times nStorageCoeff payments blocks should be stored ...
-    const float nStorageCoeff{1.25};
+    const float nStorageCoeff;
     // ... but at least nMinBlocksToStore (payments blocks)
-    const int nMinBlocksToStore{6000};
+    const int nMinBlocksToStore;
 
     // Keep track of current block height
     int nCachedBlockHeight;
@@ -193,7 +193,7 @@ public:
     std::map<COutPoint, int> mapMasternodesLastVote;
     std::map<COutPoint, int> mapMasternodesDidNotVote;
 
-    CMasternodePayments() : , {}
+    CMasternodePayments() : nStorageCoeff(1.25), nMinBlocksToStore(6000) {}
 
     ADD_SERIALIZE_METHODS;
 

@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <regex>
 #include <numeric>
-#include <utility>
 
 void benchmark::ConsolePrinter::header()
 {
@@ -45,7 +44,7 @@ void benchmark::ConsolePrinter::result(const State& state)
 
 void benchmark::ConsolePrinter::footer() {}
 benchmark::PlotlyPrinter::PlotlyPrinter(std::string plotly_url, int64_t width, int64_t height)
-    : m_plotly_url(std::move(plotly_url)), m_width(width), m_height(height)
+    : m_plotly_url(plotly_url), m_width(width), m_height(height)
 {
 }
 
@@ -53,7 +52,7 @@ void benchmark::PlotlyPrinter::header()
 {
     std::cout << "<html><head>"
               << "<script src=\"" << m_plotly_url << "\"></script>"
-              << R"(</head><body><div id="myDiv" style="width:)" << m_width << "px; height:" << m_height << "px\"></div>"
+              << "</head><body><div id=\"myDiv\" style=\"width:" << m_width << "px; height:" << m_height << "px\"></div>"
               << "<script> var data = ["
               << std::endl;
 }

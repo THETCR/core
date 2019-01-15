@@ -31,8 +31,8 @@ namespace RPCServer
  * Used to denote don't care type. */
 struct UniValueType {
     UniValueType(UniValue::VType _type) : typeAny(false), type(_type) {}
-    UniValueType() : {}
-    bool typeAny{true};
+    UniValueType() : typeAny(true) {}
+    bool typeAny;
     UniValue::VType type;
 };
 
@@ -42,13 +42,13 @@ public:
     UniValue id;
     std::string strMethod;
     UniValue params;
-    bool fHelp{false};
+    bool fHelp;
     bool fSkipBlock = false;
     std::string URI;
     std::string authUser;
     std::string peerAddr;
 
-    JSONRPCRequest() : id(NullUniValue), params(NullUniValue), {}
+    JSONRPCRequest() : id(NullUniValue), params(NullUniValue), fHelp(false) {}
     void parse(const UniValue& valRequest);
 };
 
@@ -93,7 +93,7 @@ void RPCTypeCheckObj(const UniValue& o,
 class RPCTimerBase
 {
 public:
-    virtual ~RPCTimerBase() = default;
+    virtual ~RPCTimerBase() {}
 };
 
 /**
@@ -102,8 +102,7 @@ public:
 class RPCTimerInterface
 {
 public:
-    virtual ~RPCTimerInterface() = default;
-
+    virtual ~RPCTimerInterface() {}
     /** Implementation name */
     virtual const char *Name() = 0;
     /** Factory function for timers.
@@ -129,7 +128,7 @@ void RPCUnsetTimerInterface(RPCTimerInterface *iface);
 void RPCRunLater(const std::string& name, std::function<void()> func, int64_t nSeconds);
 void RPCRunLaterErase(const std::string &name);
 
-using rpcfn_type = UniValue (*)(const JSONRPCRequest &);
+typedef UniValue(*rpcfn_type)(const JSONRPCRequest& jsonRequest);
 
 class CRPCCommand
 {

@@ -101,7 +101,7 @@ public:
 
     inline QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
     {
-        return {DECORATION_SIZE, DECORATION_SIZE};
+        return QSize(DECORATION_SIZE, DECORATION_SIZE);
     }
 
     int unit;

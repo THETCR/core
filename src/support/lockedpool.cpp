@@ -53,7 +53,8 @@ Arena::Arena(void *base_in, size_t size_in, size_t alignment_in):
 }
 
 Arena::~Arena()
-= default;
+{
+}
 
 void* Arena::alloc(size_t size)
 {
@@ -282,8 +283,8 @@ LockedPool::LockedPool(std::unique_ptr<LockedPageAllocator> allocator_in, Lockin
 }
 
 LockedPool::~LockedPool()
-= default;
-
+{
+}
 void* LockedPool::alloc(size_t size)
 {
     std::lock_guard<std::mutex> lock(mutex);

@@ -757,7 +757,7 @@ struct CoinSelectionParams
     size_t tx_noinputs_size = 0;
 
     CoinSelectionParams(bool use_bnb, size_t change_output_size, size_t change_spend_size, CFeeRate effective_fee, size_t tx_noinputs_size) : use_bnb(use_bnb), change_output_size(change_output_size), change_spend_size(change_spend_size), effective_fee(effective_fee), tx_noinputs_size(tx_noinputs_size) {}
-    CoinSelectionParams() = default;
+    CoinSelectionParams() {}
 };
 
 class WalletRescanReserver; //forward declarations for ScanForWalletTransactions/RescanFromTime
@@ -918,15 +918,14 @@ public:
     bool fFileBacked;
 
     /** Construct wallet with specified name and database implementation. */
-    CWallet(interfaces::Chain& chain, WalletLocation location, std::unique_ptr<WalletDatabase> database) : m_chain(chain), m_location(
-            std::move(location)), database(std::move(database))
+    CWallet(interfaces::Chain& chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database) : m_chain(chain), m_location(location), database(std::move(database))
     {
         if (!fWisprMode) {
             m_min_fee = CFeeRate(DEFAULT_TRANSACTION_MINFEE_BTC);
         }
     }
-    CWallet(interfaces::Chain& chain, std::string strWalletFileIn)
-            : m_chain(chain), strWalletFile(std::move(strWalletFileIn))
+    CWallet(interfaces::Chain& chain, const std::string& strWalletFileIn)
+            : m_chain(chain), strWalletFile(strWalletFileIn)
     {
         fFileBacked = true;
     }

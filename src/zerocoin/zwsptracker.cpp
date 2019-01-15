@@ -83,7 +83,7 @@ bool CzWSPTracker::UnArchive(CHDWallet *pwallet, const uint256& hashPubcoin, boo
 CMintMeta CzWSPTracker::Get(const uint256 &hashSerial)
 {
     if (!mapSerialHashes.count(hashSerial))
-        return {};
+        return CMintMeta();
 
     return mapSerialHashes.at(hashSerial);
 }
@@ -96,7 +96,7 @@ CMintMeta CzWSPTracker::GetMetaFromPubcoin(const uint256& hashPubcoin)
             return meta;
     }
 
-    return {};
+    return CMintMeta();
 }
 
 bool CzWSPTracker::GetMetaFromStakeHash(const uint256& hashStake, CMintMeta& meta) const

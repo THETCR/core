@@ -12,7 +12,7 @@
 #include <boost/variant/static_visitor.hpp>
 
 #include <string>
-#include <utility> #include <vector>
+#include <vector>
 
 class CKeyStore;
 class CPubKey;
@@ -49,14 +49,14 @@ struct RPCArg {
     const std::vector<RPCArg> m_inner; //!< Only used for arrays or dicts
     const bool m_optional;
 
-    RPCArg(std::string name, const Type& type, const bool optional)
-        : m_name{std::move(name)}, m_type{type}, m_optional{optional}
+    RPCArg(const std::string& name, const Type& type, const bool optional)
+        : m_name{name}, m_type{type}, m_optional{optional}
     {
         assert(type != Type::ARR && type != Type::OBJ);
     }
 
-    RPCArg(std::string name, const Type& type, const std::vector<RPCArg>& inner, const bool optional)
-        : m_name{std::move(name)}, m_type{type}, m_inner{inner}, m_optional{optional}
+    RPCArg(const std::string& name, const Type& type, const std::vector<RPCArg>& inner, const bool optional)
+        : m_name{name}, m_type{type}, m_inner{inner}, m_optional{optional}
     {
         assert(type == Type::ARR || type == Type::OBJ);
     }
@@ -70,8 +70,8 @@ private:
 class RPCHelpMan
 {
 public:
-    RPCHelpMan(std::string name, const std::vector<RPCArg>& args)
-        : m_name{std::move(name)}, m_args{args}
+    RPCHelpMan(const std::string& name, const std::vector<RPCArg>& args)
+        : m_name{name}, m_args{args}
     {
     }
 

@@ -26,14 +26,13 @@
 #include <memory>
 
 #include <boost/test/unit_test.hpp>
-#include <utility>
 
 BOOST_FIXTURE_TEST_SUITE(miner_tests, TestingSetup)
 
 // BOOST_CHECK_EXCEPTION predicates to check the specific validation error
 class HasReason {
 public:
-    explicit HasReason(std::string reason) : m_reason(std::move(reason)) {}
+    explicit HasReason(const std::string& reason) : m_reason(reason) {}
     bool operator() (const std::runtime_error& e) const {
         return std::string(e.what()).find(m_reason) != std::string::npos;
     };
@@ -231,7 +230,8 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
     // Therefore, load 100 blocks :)
     int baseheight = 0;
     std::vector<CTransactionRef> txFirst;
-    for (auto &i : blockinfo) {
+    for (unsigned int i = 0; i < sizeof(blockinfo)/sizeof(*blockinfo); ++i)
+    {
         CBlock *pblock = &pblocktemplate->block; // pointer for convenience
         {
             LOCK(cs_main);
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
             if (txFirst.size() < 4)
                 txFirst.push_back(pblock->vtx[0]);
             pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
-            pblock->nNonce = i.nonce;
+            pblock->nNonce = blockinfo[i].nonce;
         }
         std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
         BOOST_CHECK(ProcessNewBlock(chainparams, shared_pblock, true, nullptr));

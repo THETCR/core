@@ -45,7 +45,7 @@
 #include <obfuscation/privatesend-server.h>
 
 #include <boost/thread.hpp>
-#include <utility> #if defined(NDEBUG)
+#if defined(NDEBUG)
 # error "Bitcoin cannot be compiled without assertions."
 #endif
 
@@ -293,7 +293,7 @@ struct CNodeState {
     //! Count of times this nodehas tried to send duplicate headers/blocks, decreased in DecMisbehaving
     int m_duplicate_count;
 
-    CNodeState(CAddress addrIn, std::string addrNameIn) : address(addrIn), name(std::move(addrNameIn)) {
+    CNodeState(CAddress addrIn, std::string addrNameIn) : address(addrIn), name(addrNameIn) {
         fCurrentlyConnected = false;
         nMisbehavior = 0;
         fShouldBan = false;
@@ -3265,7 +3265,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         else
         {
             LOCK(pfrom->cs_filter);
-            pfrom->pfilter = std::make_unique<CBloomFilter>(filter);
+            pfrom->pfilter.reset(new CBloomFilter(filter));
             pfrom->pfilter->UpdateEmptyFull();
             pfrom->fRelayTxes = true;
         }
@@ -3299,7 +3299,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
     if (strCommand == NetMsgType::FILTERCLEAR) {
         LOCK(pfrom->cs_filter);
         if (pfrom->GetLocalServices() & NODE_BLOOM) {
-            pfrom->pfilter = std::make_unique<CBloomFilter>();
+            pfrom->pfilter.reset(new CBloomFilter());
         }
         pfrom->fRelayTxes = true;
         return true;
@@ -4203,8 +4203,7 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
 class CNetProcessingCleanup
 {
 public:
-    CNetProcessingCleanup() = default;
-
+    CNetProcessingCleanup() {}
     ~CNetProcessingCleanup() {
         // orphan transactions
         mapOrphanTransactions.clear();

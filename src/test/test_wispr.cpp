@@ -182,7 +182,8 @@ TestChain100Setup::CreateAndProcessBlock(const std::vector<CMutableTransaction>&
 }
 
 TestChain100Setup::~TestChain100Setup()
-= default;
+{
+}
 
 
 CTxMemPoolEntry TestMemPoolEntryHelper::FromTx(const CMutableTransaction &tx) {

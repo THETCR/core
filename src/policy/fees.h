@@ -261,9 +261,9 @@ private:
 
     struct TxStatsInfo
     {
-        unsigned int blockHeight{0};
-        unsigned int bucketIndex{0};
-        TxStatsInfo() : , {}
+        unsigned int blockHeight;
+        unsigned int bucketIndex;
+        TxStatsInfo() : blockHeight(0), bucketIndex(0) {}
     };
 
     // map of txids to information about that transaction

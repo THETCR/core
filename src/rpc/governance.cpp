@@ -72,7 +72,7 @@ UniValue gobject(const JSONRPCRequest& request)
         }
 
         if (request.params.size() > 2 || (strMode != "json" && strMode != "all")) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, R"(Correct usage is 'gobject count ( "json"|"all" )')");
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Correct usage is 'gobject count ( \"json\"|\"all\" )'");
         }
 
         return strMode == "json" ? governance.ToJson() : governance.ToString();

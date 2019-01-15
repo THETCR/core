@@ -10,7 +10,7 @@ extern "C" {
 # endif
 
 /** Opaque structure representing a large number of NUMS generators */
-using secp256k1_bulletproof_generators = struct secp256k1_bulletproof_generators ;
+typedef struct secp256k1_bulletproof_generators secp256k1_bulletproof_generators;
 
 /* Maximum depth of 31 lets us validate an aggregate of 2^25 64-bit proofs */
 #define SECP256K1_BULLETPROOF_MAX_DEPTH 31

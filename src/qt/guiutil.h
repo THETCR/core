@@ -234,7 +234,7 @@ namespace GUIUtil
         void mouseReleaseEvent(QMouseEvent *event);
     };
 
-    using ProgressBar = ClickableProgressBar;
+    typedef ClickableProgressBar ProgressBar;
 
     class ItemDelegate : public QItemDelegate
     {

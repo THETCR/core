@@ -37,7 +37,7 @@ void StopHTTPServer();
 bool UpdateHTTPServerLogging(bool enable);
 
 /** Handler for requests to a certain HTTP path */
-using HTTPRequestHandler = std::function<bool(HTTPRequest *, const std::string &)>;
+typedef std::function<bool(HTTPRequest* req, const std::string &)> HTTPRequestHandler;
 /** Register handler for prefix.
  * If multiple handlers match a prefix, the first-registered one will
  * be invoked.
@@ -123,7 +123,7 @@ class HTTPClosure
 {
 public:
     virtual void operator()() = 0;
-    virtual ~HTTPClosure() = default;
+    virtual ~HTTPClosure() {}
 };
 
 /** Event class. This can be used either as a cross-thread trigger or as a timer.

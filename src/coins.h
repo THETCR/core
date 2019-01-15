@@ -18,7 +18,7 @@
 #include <stdint.h>
 
 #include <unordered_map>
-#include <utility> #include <insight/addressindex.h>
+#include <insight/addressindex.h>
 #include <insight/spentindex.h>
 #include <rctindex.h>
 
@@ -52,7 +52,7 @@ public:
 
     //! construct a Coin from a CTxOut and height/coinbase information.
     Coin(CTxOut&& outIn, int nHeightIn, bool fCoinBaseIn) : out(std::move(outIn)), fCoinBase(fCoinBaseIn), nHeight(nHeightIn) {}
-    Coin(CTxOut outIn, int nHeightIn, bool fCoinBaseIn) : out(std::move(outIn)), fCoinBase(fCoinBaseIn),nHeight(nHeightIn) {}
+    Coin(const CTxOut& outIn, int nHeightIn, bool fCoinBaseIn) : out(outIn), fCoinBase(fCoinBaseIn),nHeight(nHeightIn) {}
 
     bool Matches(CTxOutBase *txo) const
     {
@@ -164,7 +164,7 @@ public:
 struct CCoinsCacheEntry
 {
     Coin coin; // The actual cached data.
-    unsigned char flags{0};
+    unsigned char flags;
 
     enum Flags {
         DIRTY = (1 << 0), // This cache entry is potentially different from the version in the parent view.
@@ -176,7 +176,7 @@ struct CCoinsCacheEntry
          */
     };
 
-    CCoinsCacheEntry() : {}
+    CCoinsCacheEntry() : flags(0) {}
     explicit CCoinsCacheEntry(Coin&& coin_) : coin(std::move(coin_)), flags(0) {}
 };
 
@@ -186,8 +186,8 @@ typedef std::unordered_map<COutPoint, CCoinsCacheEntry, SaltedOutpointHasher> CC
 class CCoinsViewCursor
 {
 public:
-    CCoinsViewCursor(uint256 hashBlockIn): hashBlock(std::move(hashBlockIn)) {}
-    virtual ~CCoinsViewCursor() = default;
+    CCoinsViewCursor(const uint256 &hashBlockIn): hashBlock(hashBlockIn) {}
+    virtual ~CCoinsViewCursor() {}
 
     virtual bool GetKey(COutPoint &key) const = 0;
     virtual bool GetValue(Coin &coin) const = 0;
@@ -232,7 +232,7 @@ public:
     virtual CCoinsViewCursor *Cursor() const;
 
     //! As we use CCoinsViews polymorphically, have a virtual destructor
-    virtual ~CCoinsView() = default;
+    virtual ~CCoinsView() {}
 
     //! Estimate database size (0 if not implemented)
     virtual size_t EstimateSize() const { return 0; }

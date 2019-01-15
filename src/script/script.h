@@ -424,8 +424,7 @@ protected:
         return *this;
     }
 public:
-    CScript() = default;
-
+    CScript() { }
     CScript(const_iterator pbegin, const_iterator pend) : CScriptBase(pbegin, pend) { }
     CScript(std::vector<unsigned char>::const_iterator pbegin, std::vector<unsigned char>::const_iterator pend) : CScriptBase(pbegin, pend) { }
     CScript(const unsigned char* pbegin, const unsigned char* pend) : CScriptBase(pbegin, pend) { }
@@ -612,7 +611,7 @@ struct CScriptWitness
     std::vector<std::vector<unsigned char> > stack;
 
     // Some compilers complain without a default constructor
-    CScriptWitness() = default;
+    CScriptWitness() { }
 
     bool IsNull() const { return stack.empty(); }
 
@@ -626,9 +625,8 @@ class CReserveScript
 public:
     CScript reserveScript;
     virtual void KeepScript() {}
-    CReserveScript() = default;
-
-    virtual ~CReserveScript() = default;
+    CReserveScript() {}
+    virtual ~CReserveScript() {}
 };
 
 #endif // BITCOIN_SCRIPT_SCRIPT_H

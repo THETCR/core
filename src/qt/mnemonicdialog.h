@@ -7,14 +7,14 @@
 
 #include <QDialog>
 #include <QThread>
-#include <utility> #include <univalue.h>
+#include <univalue.h>
 
 class RPCThread : public QThread
 {
     Q_OBJECT
 public:
-    RPCThread(QString command, QString walletID, UniValue *rv)
-        : QThread(), m_command(std::move(command)), m_wallet(std::move(walletID)), m_rv(rv) {};
+    RPCThread(const QString &command, const QString &walletID, UniValue *rv)
+        : QThread(), m_command(command), m_wallet(walletID), m_rv(rv) {};
     void run() override;
     QString m_command;
     QString m_wallet;

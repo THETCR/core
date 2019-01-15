@@ -3616,9 +3616,7 @@ struct PerBlockConnectTrace {
     CBlockIndex* pindex = nullptr;
     std::shared_ptr<const CBlock> pblock;
     std::shared_ptr<std::vector<CTransactionRef>> conflictedTxs;
-    PerBlockConnectTrace() : conflictedTxs(std::make_shared<std::vector<CTransactionRef>>())
-
-    = default;
+    PerBlockConnectTrace() : conflictedTxs(std::make_shared<std::vector<CTransactionRef>>()) {}
 };
 /**
  * Used to track blocks whose transactions were applied to the UTXO state as a
@@ -5357,7 +5355,7 @@ static CDiskBlockPos SaveBlockToDisk(const CBlock& block, int nHeight, const CCh
         blockPos = *dbp;
     if (!FindBlockPos(blockPos, nBlockSize+8, nHeight, block.GetBlockTime(), dbp != nullptr)) {
         error("%s: FindBlockPos failed", __func__);
-        return {};
+        return CDiskBlockPos();
     }
     if (dbp == nullptr) {
         if (!WriteBlockToDisk(block, blockPos, chainparams.MessageStart())) {
@@ -6983,8 +6981,7 @@ double GuessVerificationProgress(const ChainTxData& data, const CBlockIndex *pin
 class CMainCleanup
 {
 public:
-    CMainCleanup() = default;
-
+    CMainCleanup() {}
     ~CMainCleanup() {
         // block headers
         BlockMap::iterator it1 = mapBlockIndex.begin();

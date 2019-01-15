@@ -13,7 +13,6 @@
 #include <key/keyutil.h>
 #include <sync.h>
 #include <script/ismine.h>
-#include <utility>
 
 static const uint32_t MAX_DERIVE_TRIES = 16;
 static const uint32_t BIP32_KEY_LEN = 82;       // raw, 74 + 4 bytes id + 4 checksum
@@ -182,7 +181,7 @@ public:
     CKey key;
     CPubKey pubkey;
 
-    CExtKeyPair() = default;;
+    CExtKeyPair() {};
     CExtKeyPair(CExtKey &vk)
     {
         nDepth = vk.nDepth;
@@ -436,7 +435,7 @@ public:
 class CEKAKey
 {
 public:
-    CEKAKey() : , {};
+    CEKAKey() : nParent(0), nKey(0) {};
     CEKAKey(uint32_t nParent_, uint32_t nKey_) : nParent(nParent_), nKey(nKey_) {};
 
     template<typename Stream>
@@ -454,8 +453,8 @@ public:
         s >> sLabel;
     };
 
-    uint32_t nParent{0}; // chain identifier, vExtKeys
-    uint32_t nKey{0};
+    uint32_t nParent; // chain identifier, vExtKeys
+    uint32_t nKey;
 
     //uint32_t nChecksum; // TODO: is it worth storing 4 bytes of the id (160 hash here)
     std::string sLabel; // TODO: remove
@@ -466,7 +465,7 @@ class CEKASCKey
 {
 // Key derived from stealth key
 public:
-    CEKASCKey() = default;;
+    CEKASCKey() {};
     CEKASCKey(CKeyID &idStealthKey_, CKey &sShared_) : idStealthKey(idStealthKey_), sShared(sShared_) {};
 
     template<typename Stream>
@@ -495,7 +494,7 @@ public:
 class CEKAStealthKey
 {
 public:
-    CEKAStealthKey() = default;;
+    CEKAStealthKey() {};
     CEKAStealthKey(uint32_t nScanParent_, uint32_t nScanKey_, const CKey &scanSecret_,
         uint32_t nSpendParent_, uint32_t nSpendKey_, const CPubKey &pkSpendSecret,
         uint8_t nPrefixBits_, uint32_t nPrefix_)
@@ -575,8 +574,8 @@ public:
 class CEKAKeyPack
 {
 public:
-    CEKAKeyPack() = default;;
-    CEKAKeyPack(CKeyID id_, CEKAKey ak_) : id(std::move(id_)), ak(std::move(ak_)) {};
+    CEKAKeyPack() {};
+    CEKAKeyPack(CKeyID id_, const CEKAKey &ak_) : id(id_), ak(ak_) {};
 
     template<typename Stream>
     void Serialize(Stream &s) const
@@ -598,8 +597,8 @@ public:
 class CEKASCKeyPack
 {
 public:
-    CEKASCKeyPack() = default;;
-    CEKASCKeyPack(CKeyID id_, CEKASCKey asck_) : id(std::move(id_)), asck(std::move(asck_)) {};
+    CEKASCKeyPack() {};
+    CEKASCKeyPack(CKeyID id_, const CEKASCKey &asck_) : id(id_), asck(asck_) {};
 
     template<typename Stream>
     void Serialize(Stream &s) const
@@ -621,8 +620,8 @@ public:
 class CEKAStealthKeyPack
 {
 public:
-    CEKAStealthKeyPack() = default;;
-    CEKAStealthKeyPack(CKeyID id_, CEKAStealthKey aks_) : id(std::move(id_)), aks(std::move(aks_)) {};
+    CEKAStealthKeyPack() {};
+    CEKAStealthKeyPack(CKeyID id_, const CEKAStealthKey &aks_) : id(id_), aks(aks_) {};
 
     template<typename Stream>
     void Serialize(Stream &s) const
@@ -677,7 +676,7 @@ public:
     CKeyID GetID() const
     {
         if (vExtKeyIDs.size() < 1) {
-            return {}; // CKeyID inits to 0
+            return CKeyID(); // CKeyID inits to 0
         }
         return vExtKeyIDs[0];
     };

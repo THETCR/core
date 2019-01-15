@@ -237,8 +237,9 @@ unsigned int CTransaction::CalculateModifiedSize(unsigned int nTxSize) const
     // risk encouraging people to create junk outputs to redeem later.
     if (nTxSize == 0)
         nTxSize = ::GetSerializeSize(*this, PROTOCOL_VERSION);
-    for (const auto &it : vin) {
-        unsigned int offset = 41U + std::min(110U, (unsigned int) it.scriptSig.size());
+    for (auto it(vin.begin()); it != vin.end(); ++it)
+    {
+        unsigned int offset = 41U + std::min(110U, (unsigned int)it->scriptSig.size());
         if (nTxSize > offset)
             nTxSize -= offset;
     }
@@ -297,8 +298,8 @@ std::string CTransaction::ToString() const
         str += "    " + tx_in.scriptWitness.ToString() + "\n";
     for (const auto& tx_out : vout)
         str += "    " + tx_out.ToString() + "\n";
-    for (const auto &i : vpout)
-        str += "    " + i->ToString() + "\n";
+    for (unsigned int i = 0; i < vpout.size(); i++)
+        str += "    " + vpout[i]->ToString() + "\n";
     return str;
 }
 std::string CMutableTransaction::ToString() const
@@ -311,10 +312,10 @@ std::string CMutableTransaction::ToString() const
                      vin.size(),
                      vout.size(),
                      nLockTime);
-    for (const auto &i : vin)
-        str += "    " + i.ToString() + "\n";
-    for (const auto &i : vout)
-        str += "    " + i.ToString() + "\n";
+    for (unsigned int i = 0; i < vin.size(); i++)
+        str += "    " + vin[i].ToString() + "\n";
+    for (unsigned int i = 0; i < vout.size(); i++)
+        str += "    " + vout[i].ToString() + "\n";
     return str;
 }
 CAmount CTransaction::GetZerocoinMinted() const

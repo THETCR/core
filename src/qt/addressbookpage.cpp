@@ -20,16 +20,15 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
-#include <utility>
 
 class AddressBookSortFilterProxyModel final : public QSortFilterProxyModel
 {
     const QString m_type;
 
 public:
-    AddressBookSortFilterProxyModel(QString type, QObject* parent)
+    AddressBookSortFilterProxyModel(const QString& type, QObject* parent)
         : QSortFilterProxyModel(parent)
-        , m_type(std::move(type))
+        , m_type(type)
     {
         setDynamicSortFilter(true);
         setFilterCaseSensitivity(Qt::CaseInsensitive);

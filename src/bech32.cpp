@@ -7,7 +7,7 @@
 namespace
 {
 
-    using data = std::vector<uint8_t>;
+typedef std::vector<uint8_t> data;
 
 /** The Bech32 character set for encoding. */
 const char* CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
@@ -158,7 +158,8 @@ std::string Encode(const std::string& hrp, const data& values) {
 /** Decode a Bech32 string. */
 std::pair<std::string, data> Decode(const std::string& str) {
     bool lower = false, upper = false;
-    for (unsigned char c : str) {
+    for (size_t i = 0; i < str.size(); ++i) {
+        unsigned char c = str[i];
         if (c >= 'a' && c <= 'z') lower = true;
         else if (c >= 'A' && c <= 'Z') upper = true;
         else if (c < 33 || c > 126) return {};

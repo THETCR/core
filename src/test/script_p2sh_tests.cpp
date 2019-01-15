@@ -62,9 +62,10 @@ BOOST_AUTO_TEST_CASE(sign)
     // Test SignSignature() (and therefore the version of Solver() that signs transactions)
     CBasicKeyStore keystore;
     CKey key[4];
-    for (auto &i : key) {
-        i.MakeNewKey(true);
-        keystore.AddKey(i);
+    for (int i = 0; i < 4; i++)
+    {
+        key[i].MakeNewKey(true);
+        keystore.AddKey(key[i]);
     }
 
     // 8 Scripts: checking all combinations of
@@ -75,8 +76,9 @@ BOOST_AUTO_TEST_CASE(sign)
     standardScripts[2] << ToByteVector(key[1].GetPubKey()) << OP_CHECKSIG;
     standardScripts[3] = GetScriptForDestination(key[2].GetPubKey().GetID());
     CScript evalScripts[4];
-    for (const auto &standardScript : standardScripts) {
-        keystore.AddCScript(standardScript);
+    for (int i = 0; i < 4; i++)
+    {
+        keystore.AddCScript(standardScripts[i]);
         evalScripts[i] = GetScriptForDestination(CScriptID(standardScripts[i]));
     }
 
@@ -158,9 +160,10 @@ BOOST_AUTO_TEST_CASE(set)
     CBasicKeyStore keystore;
     CKey key[4];
     std::vector<CPubKey> keys;
-    for (auto &i : key) {
-        i.MakeNewKey(true);
-        keystore.AddKey(i);
+    for (int i = 0; i < 4; i++)
+    {
+        key[i].MakeNewKey(true);
+        keystore.AddKey(key[i]);
         keys.push_back(key[i].GetPubKey());
     }
 
@@ -171,9 +174,10 @@ BOOST_AUTO_TEST_CASE(set)
     inner[3] = GetScriptForMultisig(2, std::vector<CPubKey>(keys.begin(), keys.begin()+3));
 
     CScript outer[4];
-    for (const auto &i : inner) {
+    for (int i = 0; i < 4; i++)
+    {
         outer[i] = GetScriptForDestination(CScriptID(inner[i]));
-        keystore.AddCScript(i);
+        keystore.AddCScript(inner[i]);
     }
 
     CMutableTransaction txFrom;  // Funding transaction:
@@ -263,9 +267,10 @@ BOOST_AUTO_TEST_CASE(AreInputsStandard)
     CBasicKeyStore keystore;
     CKey key[6];
     std::vector<CPubKey> keys;
-    for (auto &i : key) {
-        i.MakeNewKey(true);
-        keystore.AddKey(i);
+    for (int i = 0; i < 6; i++)
+    {
+        key[i].MakeNewKey(true);
+        keystore.AddKey(key[i]);
     }
     for (int i = 0; i < 3; i++)
         keys.push_back(key[i].GetPubKey());

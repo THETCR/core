@@ -84,7 +84,8 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
 }
 
 WalletView::~WalletView()
-= default;
+{
+}
 
 void WalletView::setBitcoinGUI(BitcoinGUI *gui)
 {

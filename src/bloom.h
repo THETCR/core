@@ -45,11 +45,11 @@ class CBloomFilter
 {
 private:
     std::vector<unsigned char> vData;
-    bool isFull{true};
-    bool isEmpty{false};
-    unsigned int nHashFuncs{0};
-    unsigned int nTweak{0};
-    unsigned char nFlags{0};
+    bool isFull;
+    bool isEmpty;
+    unsigned int nHashFuncs;
+    unsigned int nTweak;
+    unsigned char nFlags;
 
     unsigned int Hash(unsigned int nHashNum, const std::vector<unsigned char>& vDataToHash) const;
 
@@ -64,7 +64,7 @@ public:
      * nFlags should be one of the BLOOM_UPDATE_* enums (not _MASK)
      */
     CBloomFilter(const unsigned int nElements, const double nFPRate, const unsigned int nTweak, unsigned char nFlagsIn);
-    CBloomFilter() : , , , , {}
+    CBloomFilter() : isFull(true), isEmpty(false), nHashFuncs(0), nTweak(0), nFlags(0) {}
 
     ADD_SERIALIZE_METHODS;
 

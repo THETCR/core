@@ -15,7 +15,6 @@
 #include <consensus/consensus.h>
 
 #include <secp256k1_rangeproof.h>
-#include <utility>
 
 static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x04;
 
@@ -73,7 +72,7 @@ public:
     static const uint32_t ANON_MARKER = 0xffffffa0;
 
     COutPoint(): n((uint32_t) -1) { }
-    COutPoint(uint256 hashIn, uint32_t nIn): hash(std::move(hashIn)), n(nIn) { }
+    COutPoint(const uint256& hashIn, uint32_t nIn): hash(hashIn), n(nIn) { }
 
     ADD_SERIALIZE_METHODS;
 
@@ -221,7 +220,7 @@ class CTxOutBase
 {
 public:
     CTxOutBase(uint8_t v) : nVersion(v) {};
-    virtual ~CTxOutBase() = default;;
+    virtual ~CTxOutBase() {};
     uint8_t nVersion;
 
     template<typename Stream>
@@ -311,7 +310,7 @@ public:
 };
 
 #define OUTPUT_PTR std::shared_ptr
-using CTxOutBaseRef = std::shared_ptr<CTxOutBase>;
+typedef OUTPUT_PTR<CTxOutBase> CTxOutBaseRef;
 #define MAKE_OUTPUT std::make_shared
 
 class CTxOutStandard : public CTxOutBase
@@ -489,7 +488,7 @@ class CTxOutData : public CTxOutBase
 {
 public:
     CTxOutData() : CTxOutBase(OUTPUT_DATA) {};
-    CTxOutData(std::vector<uint8_t> vData_) : CTxOutBase(OUTPUT_DATA), vData(std::move(vData_)) {};
+    CTxOutData(const std::vector<uint8_t> &vData_) : CTxOutBase(OUTPUT_DATA), vData(vData_) {};
 
     std::vector<uint8_t> vData;
 
@@ -844,7 +843,7 @@ private:
 public:
     /** Construct a CTransaction that qualifies as IsNull() */
     CTransaction();
-    ~CTransaction() = default;;
+    ~CTransaction() {};
 
     /** Convert a CMutableTransaction into a CTransaction. */
     CTransaction(const CMutableTransaction &tx);
@@ -998,8 +997,8 @@ public:
 
     bool HasWitness() const
     {
-        for (const auto &i : vin) {
-            if (!i.scriptWitness.IsNull()) {
+        for (size_t i = 0; i < vin.size(); i++) {
+            if (!vin[i].scriptWitness.IsNull()) {
                 return true;
             }
         }
@@ -1068,8 +1067,8 @@ struct CMutableTransaction
 
     bool HasWitness() const
     {
-        for (const auto &i : vin) {
-            if (!i.scriptWitness.IsNull()) {
+        for (size_t i = 0; i < vin.size(); i++) {
+            if (!vin[i].scriptWitness.IsNull()) {
                 return true;
             }
         }
@@ -1088,7 +1087,7 @@ struct CMutableTransaction
     std::string ToString() const;
 };
 
-using CTransactionRef = std::shared_ptr<const CTransaction>;
+typedef std::shared_ptr<const CTransaction> CTransactionRef;
 static inline CTransactionRef MakeTransactionRef() { return std::make_shared<const CTransaction>(); }
 template <typename Tx> static inline CTransactionRef MakeTransactionRef(Tx&& txIn) { return std::make_shared<const CTransaction>(std::forward<Tx>(txIn)); }
 
@@ -1104,7 +1103,7 @@ struct CompareInputBIP69
         uint256 hasha = a.prevout.hash;
         uint256 hashb = b.prevout.hash;
 
-        using rev_it = std::reverse_iterator<const unsigned char *>;
+        typedef std::reverse_iterator<const unsigned char*> rev_it;
         rev_it rita = rev_it(hasha.end());
         rev_it ritb = rev_it(hashb.end());
 

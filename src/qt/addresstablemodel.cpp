@@ -20,7 +20,6 @@
 #include <QDebug>
 
 #include <QMessageBox>
-#include <utility>
 
 const QString AddressTableModel::Send = "S";
 const QString AddressTableModel::Receive = "R";
@@ -37,10 +36,9 @@ struct AddressTableEntry
     QString label;
     QString address;
 
-    AddressTableEntry() = default;
-
-    AddressTableEntry(Type _type, QString _label, QString _address):
-        type(_type), label(std::move(_label)), address(std::move(_address)) {}
+    AddressTableEntry() {}
+    AddressTableEntry(Type _type, const QString &_label, const QString &_address):
+        type(_type), label(_label), address(_address) {}
 };
 
 struct AddressTableEntryLessThan
@@ -337,7 +335,7 @@ QModelIndex AddressTableModel::index(int row, int column, const QModelIndex &par
     }
     else
     {
-        return {};
+        return QModelIndex();
     }
 }
 

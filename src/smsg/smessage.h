@@ -116,7 +116,7 @@ inline bool GetFundingTxid(const uint8_t *pPayload, size_t nPayload, uint256 &tx
 class SecureMessage
 {
 public:
-    SecureMessage() = default;;
+    SecureMessage() {};
     SecureMessage(bool fPaid, size_t nDaysRetention)
     {
         if (fPaid) {
@@ -190,7 +190,7 @@ public:
 class SecMsgToken
 {
 public:
-    SecMsgToken() = default;;
+    SecMsgToken() {};
     SecMsgToken(int64_t ts, const uint8_t *p, int np, long int o, uint8_t ttl_)
     {
         timestamp = ts;
@@ -223,7 +223,7 @@ public:
 class SecMsgPurged // Purged token marker
 {
 public:
-    SecMsgPurged() = default;;
+    SecMsgPurged() {};
     SecMsgPurged(int64_t ts, int64_t tp)
     {
         timestamp = ts;
@@ -287,7 +287,7 @@ public:
 class SecMsgAddress
 {
 public:
-    SecMsgAddress() = default;;
+    SecMsgAddress() {};
     SecMsgAddress(CKeyID addr, bool receiveOn, bool receiveAnon)
     {
         address         = addr;

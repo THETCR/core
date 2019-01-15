@@ -9,7 +9,6 @@
 #include <primitives/transaction.h>
 #include <serialize.h>
 #include <uint256.h>
-#include <utility>
 
 /** Nodes collect new transactions into a block, hash them into a hash tree,
  * and scan through nonce values to make the block's hash satisfy proof-of-work
@@ -94,7 +93,7 @@ public:
 class CBlockGetHeader : public CBlockHeader
 {
     public:
-        CBlockGetHeader() = default;;
+        CBlockGetHeader() {};
         CBlockGetHeader(const CBlockHeader &header) { *((CBlockHeader*)this) = header; };
         std::vector<CTransactionRef> vtx;
         ADD_SERIALIZE_METHODS;
@@ -191,9 +190,9 @@ struct CBlockLocator
 {
     std::vector<uint256> vHave;
 
-    CBlockLocator() = default;
+    CBlockLocator() {}
 
-    explicit CBlockLocator(std::vector<uint256> vHaveIn) : vHave(std::move(vHaveIn)) {}
+    explicit CBlockLocator(const std::vector<uint256>& vHaveIn) : vHave(vHaveIn) {}
 
     ADD_SERIALIZE_METHODS;
 

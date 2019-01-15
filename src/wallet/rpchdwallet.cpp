@@ -5125,7 +5125,7 @@ static UniValue createsignatureinner(const JSONRPCRequest &request, CHDWallet *c
     std::vector<uint8_t> vchAmount;
     if (prevOut.exists("amount")) {
         if (prevOut.exists("amount_commitment")) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, R"(Both "amount" and "amount_commitment" found.)");
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Both \"amount\" and \"amount_commitment\" found.");
         }
         CAmount nValue = AmountFromValue(prevOut["amount"]);
         vchAmount.resize(8);
@@ -5139,7 +5139,7 @@ static UniValue createsignatureinner(const JSONRPCRequest &request, CHDWallet *c
         vchAmount = ParseHex(s);
     } else {
         if (!txout.get() || !txout->PutValue(vchAmount)) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, R"("amount" or "amount_commitment" is required)");
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "\"amount\" or \"amount_commitment\" is required");
         }
     }
 
@@ -6667,7 +6667,7 @@ static UniValue createrawparttransaction(const JSONRPCRequest& request)
         if (o["data_ct_fee"].isStr() || o["data_ct_fee"].isNum())
         {
             if (nType != OUTPUT_DATA) {
-                throw JSONRPCError(RPC_INVALID_PARAMETER, R"("data_ct_fee" can only appear in output of type "data".)");
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "\"data_ct_fee\" can only appear in output of type \"data\".");
             }
 
             if (idx != 0) {
@@ -6677,7 +6677,7 @@ static UniValue createrawparttransaction(const JSONRPCRequest& request)
         };
 
         if (o["address"].isStr() && o["script"].isStr()) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, R"(Can't specify both "address" and "script".)");
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Can't specify both \"address\" and \"script\".");
         }
 
         if (o["address"].isStr()) {
@@ -7552,7 +7552,7 @@ static UniValue verifyrawtransaction(const JSONRPCRequest &request)
         for (unsigned int idx = 0; idx < prevTxs.size(); ++idx) {
             const UniValue& p = prevTxs[idx];
             if (!p.isObject()) {
-                throw JSONRPCError(RPC_DESERIALIZATION_ERROR, R"(expected object with {"txid'","vout","scriptPubKey"})");
+                throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "expected object with {\"txid'\",\"vout\",\"scriptPubKey\"}");
             }
 
             UniValue prevOut = p.get_obj();
@@ -7592,7 +7592,7 @@ static UniValue verifyrawtransaction(const JSONRPCRequest &request)
             newcoin.out.nValue = 0;
             if (prevOut.exists("amount")) {
                 if (prevOut.exists("amount_commitment")) {
-                    throw JSONRPCError(RPC_INVALID_PARAMETER, R"(Both "amount" and "amount_commitment" found.)");
+                    throw JSONRPCError(RPC_INVALID_PARAMETER, "Both \"amount\" and \"amount_commitment\" found.");
                 }
                 newcoin.nType = OUTPUT_STANDARD;
                 newcoin.out.nValue = AmountFromValue(find_value(prevOut, "amount"));
@@ -7607,7 +7607,7 @@ static UniValue verifyrawtransaction(const JSONRPCRequest &request)
                 memcpy(newcoin.commitment.data, vchCommitment.data(), 33);
                 newcoin.nType = OUTPUT_CT;
             } else {
-                throw JSONRPCError(RPC_INVALID_PARAMETER, R"("amount" or "amount_commitment" is required)");
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "\"amount\" or \"amount_commitment\" is required");
             }
 
             newcoin.nHeight = 1;

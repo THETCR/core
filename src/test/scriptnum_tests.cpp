@@ -164,32 +164,35 @@ static void RunOperators(const int64_t& num1, const int64_t& num2)
 
 BOOST_AUTO_TEST_CASE(creation)
 {
-    for (long long value : values) {
-        for (long long offset : offsets) {
-            RunCreate(value);
-            RunCreate(value + offset);
-            RunCreate(value - offset);
+    for(size_t i = 0; i < sizeof(values) / sizeof(values[0]); ++i)
+    {
+        for(size_t j = 0; j < sizeof(offsets) / sizeof(offsets[0]); ++j)
+        {
+            RunCreate(values[i]);
+            RunCreate(values[i] + offsets[j]);
+            RunCreate(values[i] - offsets[j]);
         }
     }
 }
 
 BOOST_AUTO_TEST_CASE(operators)
 {
-    for (long long value : values) {
+    for(size_t i = 0; i < sizeof(values) / sizeof(values[0]); ++i)
+    {
         for(size_t j = 0; j < sizeof(offsets) / sizeof(offsets[0]); ++j)
         {
-            RunOperators(value, value);
-            RunOperators(value, -value);
-            RunOperators(value, values[j]);
-            RunOperators(value, -values[j]);
-            RunOperators(value + values[j], values[j]);
-            RunOperators(value + values[j], -values[j]);
-            RunOperators(value - values[j], values[j]);
-            RunOperators(value - values[j], -values[j]);
-            RunOperators(value + values[j], value + values[j]);
-            RunOperators(value + values[j], value - values[j]);
-            RunOperators(value - values[j], value + values[j]);
-            RunOperators(value - values[j], value - values[j]);
+            RunOperators(values[i], values[i]);
+            RunOperators(values[i], -values[i]);
+            RunOperators(values[i], values[j]);
+            RunOperators(values[i], -values[j]);
+            RunOperators(values[i] + values[j], values[j]);
+            RunOperators(values[i] + values[j], -values[j]);
+            RunOperators(values[i] - values[j], values[j]);
+            RunOperators(values[i] - values[j], -values[j]);
+            RunOperators(values[i] + values[j], values[i] + values[j]);
+            RunOperators(values[i] + values[j], values[i] - values[j]);
+            RunOperators(values[i] - values[j], values[i] + values[j]);
+            RunOperators(values[i] - values[j], values[i] - values[j]);
         }
     }
 }

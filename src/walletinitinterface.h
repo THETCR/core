@@ -22,7 +22,7 @@ public:
     /** Add wallets that should be opened to list of init interfaces. */
     virtual void Construct(InitInterfaces& interfaces) const = 0;
 
-    virtual ~WalletInitInterface() = default;
+    virtual ~WalletInitInterface() {}
 };
 
 extern const WalletInitInterface& g_wallet_init_interface;

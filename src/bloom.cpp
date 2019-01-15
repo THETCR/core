@@ -229,9 +229,10 @@ void CBloomFilter::UpdateEmptyFull()
 {
     bool full = true;
     bool empty = true;
-    for (unsigned char i : vData) {
-        full &= i == 0xff;
-        empty &= i == 0;
+    for (unsigned int i = 0; i < vData.size(); i++)
+    {
+        full &= vData[i] == 0xff;
+        empty &= vData[i] == 0;
     }
     isFull = full;
     isEmpty = empty;

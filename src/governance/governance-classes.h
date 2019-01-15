@@ -23,7 +23,7 @@ class CSuperblockManager;
 static const int TRIGGER_UNKNOWN            = -1;
 static const int TRIGGER_SUPERBLOCK         = 1000;
 
-using CSuperblock_sptr = boost::shared_ptr<CSuperblock>;
+typedef boost::shared_ptr<CSuperblock> CSuperblock_sptr;
 
 // DECLARE GLOBAL VARIABLES FOR GOVERNANCE CLASSES
 extern CGovernanceTriggerManager triggerman;
@@ -42,17 +42,17 @@ class CGovernanceTriggerManager
 
 private:
     typedef std::map<uint256, CSuperblock_sptr> trigger_m_t;
-    using trigger_m_it = int;
-    using trigger_m_cit = int;
+    typedef trigger_m_t::iterator trigger_m_it;
+    typedef trigger_m_t::const_iterator trigger_m_cit;
 
-    trigger_m_t mapTrigger{};
+    trigger_m_t mapTrigger;
 
     std::vector<CSuperblock_sptr> GetActiveTriggers();
     bool AddNewTrigger(uint256 nHash);
     void CleanAndRemove();
 
 public:
-    CGovernanceTriggerManager() : {}
+    CGovernanceTriggerManager() : mapTrigger() {}
 };
 
 /**
@@ -85,15 +85,17 @@ public:
 class CGovernancePayment
 {
 private:
-    bool fValid{false};
+    bool fValid;
 
 public:
     CScript script;
-    CAmount nAmount{0};
+    CAmount nAmount;
 
     CGovernancePayment()
-            : ,
-             script(), {}
+            :fValid(false),
+             script(),
+             nAmount(0)
+    {}
 
     CGovernancePayment(std::string addrIn, CAmount nAmountIn)
             :fValid(false),

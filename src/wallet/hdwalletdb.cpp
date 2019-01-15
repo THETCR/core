@@ -8,13 +8,12 @@
 #include <serialize.h>
 #include <txdb.h>
 #include <primitives/deterministicmint.h>
-#include <utility>
 
 class PackKey
 {
 public:
-    PackKey(std::string s, CKeyID keyId, uint32_t nPack)
-        : m_prefix(std::move(s)), m_keyId(std::move(keyId)), m_nPack(nPack) { };
+    PackKey(std::string s, const CKeyID &keyId, uint32_t nPack)
+        : m_prefix(s), m_keyId(keyId), m_nPack(nPack) { };
 
     std::string m_prefix;
     CKeyID m_keyId;

@@ -647,9 +647,9 @@ static bool findSighashFlags(int& flags, const std::string& flagStr)
 {
     flags = 0;
 
-    for (auto sighashOption : sighashOptions) {
+    for (unsigned int i = 0; i < N_SIGHASH_OPTS; i++) {
         if (flagStr == sighashOptions[i].flagStr) {
-            flags = sighashOption.flags;
+            flags = sighashOptions[i].flags;
             return true;
         }
     }

@@ -45,9 +45,9 @@ BOOST_FIXTURE_TEST_SUITE(checkqueue_tests, TestingSetup)
     };
 
     struct FailingCheck {
-        bool fails{true};
+        bool fails;
         FailingCheck(bool _fails) : fails(_fails){};
-        FailingCheck() : {};
+        FailingCheck() : fails(true){};
         bool operator()()
         {
             return !fails;
@@ -61,9 +61,9 @@ BOOST_FIXTURE_TEST_SUITE(checkqueue_tests, TestingSetup)
     struct UniqueCheck {
         static std::mutex m;
         static std::unordered_multiset<size_t> results;
-        size_t check_id{0};
+        size_t check_id;
         UniqueCheck(size_t check_id_in) : check_id(check_id_in){};
-        UniqueCheck() : {};
+        UniqueCheck() : check_id(0){};
         bool operator()()
         {
             std::lock_guard<std::mutex> l(m);
@@ -81,7 +81,7 @@ BOOST_FIXTURE_TEST_SUITE(checkqueue_tests, TestingSetup)
         {
             return true;
         }
-        MemoryCheck() = default;;
+        MemoryCheck(){};
         MemoryCheck(const MemoryCheck& x)
         {
             // We have to do this to make sure that destructor calls are paired
@@ -112,8 +112,7 @@ BOOST_FIXTURE_TEST_SUITE(checkqueue_tests, TestingSetup)
         {
             return true;
         }
-        FrozenCleanupCheck() = default;
-
+        FrozenCleanupCheck() {}
         ~FrozenCleanupCheck()
         {
             if (should_freeze) {
@@ -136,12 +135,12 @@ BOOST_FIXTURE_TEST_SUITE(checkqueue_tests, TestingSetup)
     std::atomic<size_t> MemoryCheck::fake_allocated_memory{0};
 
 // Queue Typedefs
-    using Correct_Queue = CCheckQueue<FakeCheckCheckCompletion>;
-    using Standard_Queue = CCheckQueue<FakeCheck>;
-    using Failing_Queue = CCheckQueue<FailingCheck>;
-    using Unique_Queue = CCheckQueue<UniqueCheck>;
-    using Memory_Queue = CCheckQueue<MemoryCheck>;
-    using FrozenCleanup_Queue = CCheckQueue<FrozenCleanupCheck>;
+    typedef CCheckQueue<FakeCheckCheckCompletion> Correct_Queue;
+    typedef CCheckQueue<FakeCheck> Standard_Queue;
+    typedef CCheckQueue<FailingCheck> Failing_Queue;
+    typedef CCheckQueue<UniqueCheck> Unique_Queue;
+    typedef CCheckQueue<MemoryCheck> Memory_Queue;
+    typedef CCheckQueue<FrozenCleanupCheck> FrozenCleanup_Queue;
 
 
 /** This test case checks that the CCheckQueue works properly

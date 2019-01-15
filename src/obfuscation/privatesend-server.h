@@ -22,7 +22,7 @@ private:
     // to behave honestly. If they don't it takes their money.
     std::vector<CTransactionRef> vecSessionCollaterals;
 
-    bool fUnitTest{false};
+    bool fUnitTest;
 
     /// Add a clients entry to the pool
     bool AddEntry(const CDarkSendEntry& entryNew, PoolMessage& nMessageIDRet);
@@ -66,7 +66,8 @@ private:
     void SetNull();
 
 public:
-    CPrivateSendServer() : { SetNull(); }
+    CPrivateSendServer() :
+        fUnitTest(false) { SetNull(); }
 
     void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman& connman);
 

@@ -262,7 +262,9 @@ int MnemonicEncode(int nLanguage, const std::vector<uint8_t> &vEntropy, std::str
     auto *pwl = (char*) mnLanguages[nLanguage];
     int m = mnLanguageLens[nLanguage];
 
-    for (int o : vWord) {
+    for (size_t k = 0; k < vWord.size(); ++k) {
+        int o = vWord[k];
+
         std::string sWord;
         if (0 != GetWord(o, pwl, m, sWord)) {
             sError = strprintf("Word extract failed %d, language %d.", o, nLanguage);

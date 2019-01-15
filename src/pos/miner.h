@@ -19,7 +19,7 @@ class StakeThread
 public:
     void condWaitFor(int ms);
 
-    StakeThread() = default;;
+    StakeThread() {};
     std::thread thread;
     std::condition_variable condMinerProc;
     std::mutex mtxMinerProc;

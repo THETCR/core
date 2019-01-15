@@ -17,7 +17,7 @@ namespace interfaces {
 class Chain
 {
 public:
-    virtual ~Chain() = default;
+    virtual ~Chain() {}
 
     //! Interface for querying locked chain state, used by legacy code that
     //! assumes state won't change between calls. New code should avoid using
@@ -27,7 +27,7 @@ public:
     class Lock
     {
     public:
-        virtual ~Lock() = default;
+        virtual ~Lock() {}
     };
 
     //! Return Lock interface. Chain is locked when this is called, and
@@ -45,7 +45,7 @@ public:
 class ChainClient
 {
 public:
-    virtual ~ChainClient() = default;
+    virtual ~ChainClient() {}
 
     //! Register rpcs.
     virtual void registerRpcs() = 0;

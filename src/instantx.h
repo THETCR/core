@@ -7,7 +7,6 @@
 #include <chain.h>
 #include <net.h>
 #include <primitives/transaction.h>
-#include <utility>
 
 class CTxLockVote;
 class COutPointLock;
@@ -145,10 +144,7 @@ public:
 
     CTransactionRef tx;
 
-    CTxLockRequest() : tx(MakeTransactionRef())
-
-    = default;
-
+    CTxLockRequest() : tx(MakeTransactionRef()) {}
     CTxLockRequest(const CTransaction& _tx) : tx(MakeTransactionRef(_tx)) {};
 
     ADD_SERIALIZE_METHODS;
@@ -201,7 +197,7 @@ private:
     COutPoint outpointMasternode;
     std::vector<unsigned char> vchMasternodeSignature;
     // local memory only
-    int nConfirmedHeight{-1}; ///< When corresponding tx is 0-confirmed or conflicted, nConfirmedHeight is -1
+    int nConfirmedHeight; ///< When corresponding tx is 0-confirmed or conflicted, nConfirmedHeight is -1
     int64_t nTimeCreated;
 
 public:
@@ -209,14 +205,15 @@ public:
         txHash(),
         outpoint(),
         outpointMasternode(),
-        vchMasternodeSignature(), ,
+        vchMasternodeSignature(),
+        nConfirmedHeight(-1),
         nTimeCreated(GetTime())
         {}
 
-    CTxLockVote(uint256 txHashIn, COutPoint outpointIn, COutPoint outpointMasternodeIn) :
-        txHash(std::move(txHashIn)),
-        outpoint(std::move(outpointIn)),
-        outpointMasternode(std::move(outpointMasternodeIn)),
+    CTxLockVote(const uint256& txHashIn, const COutPoint& outpointIn, const COutPoint& outpointMasternodeIn) :
+        txHash(txHashIn),
+        outpoint(outpointIn),
+        outpointMasternode(outpointMasternodeIn),
         vchMasternodeSignature(),
         nConfirmedHeight(-1),
         nTimeCreated(GetTime())
@@ -267,8 +264,8 @@ public:
     static const int SIGNATURES_REQUIRED        = 6;
     static const int SIGNATURES_TOTAL           = 10;
 
-    COutPointLock(COutPoint outpointIn) :
-        outpoint(std::move(outpointIn)),
+    COutPointLock(const COutPoint& outpointIn) :
+        outpoint(outpointIn),
         mapMasternodeVotes()
         {}
 

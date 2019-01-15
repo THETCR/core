@@ -51,9 +51,9 @@ private:
     std::vector<unsigned char> vchSig;
 
 public:
-    int nSporkID{0};
-    int64_t nValue{0};
-    int64_t nTimeSigned{0};
+    int nSporkID;
+    int64_t nValue;
+    int64_t nTimeSigned;
 
     CSporkMessage(int nSporkID, int64_t nValue, int64_t nTimeSigned) :
             nSporkID(nSporkID),
@@ -62,7 +62,10 @@ public:
     {}
 
     CSporkMessage() :
-            , , {}
+            nSporkID(0),
+            nValue(0),
+            nTimeSigned(0)
+    {}
 
 
     ADD_SERIALIZE_METHODS;
@@ -96,7 +99,7 @@ private:
 
 public:
 
-    CSporkManager() = default;
+    CSporkManager() {}
 
     void ProcessSpork(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman& connman);
     void ExecuteSpork(int nSporkID, int nValue);

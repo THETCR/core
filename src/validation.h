@@ -176,7 +176,7 @@ struct BlockHasher
     size_t operator()(const uint256& hash) const { return hash.GetCheapHash(); }
 };
 
-using NodeId = int64_t;
+typedef int64_t NodeId;
 class StakeConflict
 {
 public:
@@ -481,30 +481,30 @@ class CScriptCheck
 {
 private:
     CScript scriptPubKey;
-    CAmount amount{0};
+    CAmount amount;
     std::vector<uint8_t> vchAmount;
     CTxOut m_tx_out;
-    const CTransaction *ptxTo{nullptr};
-    unsigned int nIn{0};
-    unsigned int nFlags{0};
-    bool cacheStore{false};
-    ScriptError error{SCRIPT_ERR_UNKNOWN_ERROR};
+    const CTransaction *ptxTo;
+    unsigned int nIn;
+    unsigned int nFlags;
+    bool cacheStore;
+    ScriptError error;
     PrecomputedTransactionData *txdata;
 public:
-    CScriptCheck(CScript scriptPubKeyIn, const std::vector<uint8_t> &vchAmountIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, bool cacheIn, PrecomputedTransactionData* txdataIn) :
-        scriptPubKey(std::move(scriptPubKeyIn)), vchAmount(vchAmountIn),
+    CScriptCheck(const CScript& scriptPubKeyIn, const std::vector<uint8_t> &vchAmountIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, bool cacheIn, PrecomputedTransactionData* txdataIn) :
+        scriptPubKey(scriptPubKeyIn), vchAmount(vchAmountIn),
         ptxTo(&txToIn), nIn(nInIn), nFlags(nFlagsIn), cacheStore(cacheIn), error(SCRIPT_ERR_UNKNOWN_ERROR), txdata(txdataIn) { }
 
-    CScriptCheck(CScript scriptPubKeyIn, const CAmount amountIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, bool cacheIn, PrecomputedTransactionData* txdataIn) :
-        scriptPubKey(std::move(scriptPubKeyIn)), amount(amountIn),
+    CScriptCheck(const CScript& scriptPubKeyIn, const CAmount amountIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, bool cacheIn, PrecomputedTransactionData* txdataIn) :
+        scriptPubKey(scriptPubKeyIn), amount(amountIn),
         ptxTo(&txToIn), nIn(nInIn), nFlags(nFlagsIn), cacheStore(cacheIn), error(SCRIPT_ERR_UNKNOWN_ERROR), txdata(txdataIn)
         {
             vchAmount.resize(8);
             memcpy(&vchAmount[0], &amountIn, 8);
         };
-    CScriptCheck(): , , , , , {}
-    CScriptCheck(CTxOut outIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, bool cacheIn, PrecomputedTransactionData* txdataIn) :
-        m_tx_out(std::move(outIn)), ptxTo(&txToIn), nIn(nInIn), nFlags(nFlagsIn), cacheStore(cacheIn), error(SCRIPT_ERR_UNKNOWN_ERROR), txdata(txdataIn)
+    CScriptCheck(): amount(0), ptxTo(nullptr), nIn(0), nFlags(0), cacheStore(false), error(SCRIPT_ERR_UNKNOWN_ERROR) {}
+    CScriptCheck(const CTxOut& outIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, bool cacheIn, PrecomputedTransactionData* txdataIn) :
+        m_tx_out(outIn), ptxTo(&txToIn), nIn(nInIn), nFlags(nFlagsIn), cacheStore(cacheIn), error(SCRIPT_ERR_UNKNOWN_ERROR), txdata(txdataIn)
     {
         vchAmount.resize(8);
         memcpy(&vchAmount[0], &m_tx_out.nValue, 8);

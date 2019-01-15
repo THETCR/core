@@ -25,8 +25,8 @@ static void CCheckQueueSpeedPrevectorJob(benchmark::State& state)
 {
     struct PrevectorJob {
         prevector<PREVECTOR_SIZE, uint8_t> p;
-        PrevectorJob() = default;
-
+        PrevectorJob(){
+        }
         explicit PrevectorJob(FastRandomContext& insecure_rand){
             p.resize(insecure_rand.randrange(PREVECTOR_SIZE*2));
         }

@@ -19,11 +19,11 @@ extern const std::string CURRENCY_UNIT;
 class CFeeRate
 {
 private:
-    CAmount nSatoshisPerK{0}; // unit is satoshis-per-1,000-bytes
+    CAmount nSatoshisPerK; // unit is satoshis-per-1,000-bytes
 
 public:
     /** Fee rate of 0 satoshis per kB */
-    CFeeRate() : { }
+    CFeeRate() : nSatoshisPerK(0) { }
     template<typename I>
     CFeeRate(const I _nSatoshisPerK): nSatoshisPerK(_nSatoshisPerK) {
         // We've previously had bugs creep in from silent double->int conversion...

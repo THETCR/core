@@ -19,8 +19,7 @@
 class LockedPageAllocator
 {
 public:
-    virtual ~LockedPageAllocator() = default;
-
+    virtual ~LockedPageAllocator() {}
     /** Allocate and lock memory pages.
      * If len is not a multiple of the system page size, it is rounded up.
      * Returns 0 in case of allocation failure.
@@ -140,7 +139,7 @@ public:
 
     /** Callback when allocation succeeds but locking fails.
      */
-    using LockingFailed_Callback = bool (*)();
+    typedef bool (*LockingFailed_Callback)();
 
     /** Memory statistics. */
     struct Stats

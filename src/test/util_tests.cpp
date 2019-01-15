@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(util_criticalsection)
         break;
 
         BOOST_ERROR("break was swallowed!");
-    } while(false);
+    } while(0);
 
     do {
         TRY_LOCK(cs, lockTest);
@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(util_criticalsection)
             break;
 
         BOOST_ERROR("break was swallowed!");
-    } while(false);
+    } while(0);
 }
 
 static const unsigned char ParseHex_expected[65] = {

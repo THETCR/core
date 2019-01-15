@@ -10,8 +10,8 @@
 #include <bench/bench.h>
 
 struct nontrivial_t {
-    int x{-1};
-    nontrivial_t() : {}
+    int x;
+    nontrivial_t() :x(-1) {}
     ADD_SERIALIZE_METHODS
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {READWRITE(x);}
@@ -19,7 +19,7 @@ struct nontrivial_t {
 static_assert(!IS_TRIVIALLY_CONSTRUCTIBLE<nontrivial_t>::value,
               "expected nontrivial_t to not be trivially constructible");
 
-using trivial_t = unsigned char;
+typedef unsigned char trivial_t;
 static_assert(IS_TRIVIALLY_CONSTRUCTIBLE<trivial_t>::value,
               "expected trivial_t to be trivially constructible");
 

@@ -26,9 +26,10 @@ static const std::string SAFE_CHARS[] =
 std::string SanitizeString(const std::string& str, int rule)
 {
     std::string strResult;
-    for (char i : str) {
-        if (SAFE_CHARS[rule].find(i) != std::string::npos)
-            strResult.push_back(i);
+    for (std::string::size_type i = 0; i < str.size(); i++)
+    {
+        if (SAFE_CHARS[rule].find(str[i]) != std::string::npos)
+            strResult.push_back(str[i]);
     }
     return strResult;
 }
@@ -58,8 +59,9 @@ signed char HexDigit(char c)
 
 bool IsHex(const std::string& str)
 {
-    for (char it : str) {
-        if (HexDigit(it) < 0)
+    for(std::string::const_iterator it(str.begin()); it != str.end(); ++it)
+    {
+        if (HexDigit(*it) < 0)
             return false;
     }
     return (str.size() > 0) && (str.size()%2 == 0);

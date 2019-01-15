@@ -22,7 +22,7 @@ const uint32_t MAX_STEALTH_NARRATION_SIZE = 48;
 const uint32_t MIN_STEALTH_RAW_SIZE = 1 + 33 + 1 + 33 + 1 + 1; // without checksum (4bytes) or version (1byte)
 
 
-using stealth_bitfield = uint32_t;
+typedef uint32_t stealth_bitfield;
 
 struct stealth_prefix
 {
