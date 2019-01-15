@@ -6,6 +6,7 @@
 #define WISPR_INSIGHT_CSINDEX_H
 
 #include <script/standard.h>
+#include <utility>
 
 constexpr char DB_TXINDEX_CSOUTPUT = 'O';
 constexpr char DB_TXINDEX_CSLINK = 'L';
@@ -22,8 +23,8 @@ public:
     uint256 m_txnid;
     int m_n;
 
-    ColdStakeIndexOutputKey() {};
-    ColdStakeIndexOutputKey(uint256 txnid, int n) : m_txnid(txnid), m_n(n) {};
+    ColdStakeIndexOutputKey() = default;;
+    ColdStakeIndexOutputKey(uint256 txnid, int n) : m_txnid(std::move(txnid)), m_n(n) {};
 
     template<typename Stream>
     void Serialize(Stream& s) const {

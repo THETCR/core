@@ -561,8 +561,8 @@ CBlockPolicyEstimator::CBlockPolicyEstimator()
 }
 
 CBlockPolicyEstimator::~CBlockPolicyEstimator()
-{
-}
+= default;
+
 CFeeRate CBlockPolicyEstimator::estimateFee(int confTarget)
 {
 

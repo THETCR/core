@@ -23,7 +23,7 @@
 
 #include <zerocoin/zwspchain.h>
 
-typedef CWallet* CWalletRef;
+using CWalletRef = CWallet *;
 std::vector<StakeThread*> vStakeThreads;
 
 void StakeThread::condWaitFor(int ms)

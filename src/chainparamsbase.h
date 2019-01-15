@@ -7,7 +7,7 @@
 
 #include <memory>
 #include <string>
-#include <vector>
+#include <utility> #include <vector>
 
 /**
  * CBaseChainParams defines the base parameters (shared between bitcoin-cli and bitcoind)
@@ -25,7 +25,7 @@ public:
     int RPCPort() const { return nRPCPort; }
 
     CBaseChainParams() = delete;
-    CBaseChainParams(const std::string& data_dir, int rpc_port) : nRPCPort(rpc_port), strDataDir(data_dir) {}
+    CBaseChainParams(std::string data_dir, int rpc_port) : nRPCPort(rpc_port), strDataDir(std::move(data_dir)) {}
 
 private:
     int nRPCPort;

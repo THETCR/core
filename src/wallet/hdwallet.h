@@ -19,6 +19,7 @@
 #include <zerocoin/zwsptracker.h>
 #include <zerocoin/zwspwallet.h>
 #include <wallet/stakeinput.h>
+#include <utility>
 
 typedef std::map<CKeyID, CStealthKeyMetadata> StealthKeyMetaMap;
 typedef std::map<CKeyID, CExtKeyAccount*> ExtKeyAccountMap;
@@ -60,11 +61,11 @@ enum OutputRecordAddressTypes
 class COutputRecord
 {
 public:
-    COutputRecord() : nType(0), nFlags(0), n(0), nValue(-1) {};
-    uint8_t nType;
-    uint8_t nFlags;
-    uint16_t n;
-    CAmount nValue;
+    COutputRecord() : , , , {};
+    uint8_t nType{0};
+    uint8_t nFlags{0};
+    uint16_t n{0};
+    CAmount nValue{-1};
     CScript scriptPubKey;
     std::string sNarration;
 
@@ -118,17 +119,17 @@ class CTransactionRecord
 // Stored by uint256 txnHash;
 public:
     CTransactionRecord() :
-        nFlags(0), nIndex(0), nBlockTime(0) , nTimeReceived(0) , nFee(0) {};
+            , , , , {};
 
 
     // Conflicted state is marked by set blockHash and nIndex -1
     uint256 blockHash;
-    int16_t nFlags;
-    int16_t nIndex;
+    int16_t nFlags{0};
+    int16_t nIndex{0};
 
-    int64_t nBlockTime;
-    int64_t nTimeReceived;
-    CAmount nFee;
+    int64_t nBlockTime{0};
+    int64_t nTimeReceived{0};
+    CAmount nFee{0};
     mapRTxValue_t mapValue;
 
     std::vector<COutPoint> vin;
@@ -204,9 +205,10 @@ public:
 class CTempRecipient
 {
 public:
-    CTempRecipient() : nType(0), nAmount(0), nAmountSelected(0), fSubtractFeeFromAmount(false) {SetNull();};
+    CTempRecipient() : , , , {SetNull();};
     CTempRecipient(CAmount nAmount_, bool fSubtractFeeFromAmount_, CScript scriptPubKey_)
-        : nAmount(nAmount_), nAmountSelected(nAmount_), fSubtractFeeFromAmount(fSubtractFeeFromAmount_), scriptPubKey(scriptPubKey_) {SetNull();};
+        : nAmount(nAmount_), nAmountSelected(nAmount_), fSubtractFeeFromAmount(fSubtractFeeFromAmount_), scriptPubKey(
+            std::move(scriptPubKey_)) {SetNull();};
 
     void SetNull()
     {
@@ -228,10 +230,10 @@ public:
 
     bool ApplySubFee(CAmount nFee, size_t nSubtractFeeFromAmount, bool &fFirst);
 
-    uint8_t nType;
-    CAmount nAmount;            // If fSubtractFeeFromAmount, nAmount = nAmountSelected - feeForOutput
-    CAmount nAmountSelected;
-    bool fSubtractFeeFromAmount;
+    uint8_t nType{0};
+    CAmount nAmount{0};            // If fSubtractFeeFromAmount, nAmount = nAmountSelected - feeForOutput
+    CAmount nAmountSelected{0};
+    bool fSubtractFeeFromAmount{false};
     bool fSplitBlindOutput;
     bool fExemptFeeSub;         // Value too low to sub fee when blinded value split into two outputs
     CTxDestination address;
@@ -266,11 +268,11 @@ public:
 class COutputR
 {
 public:
-    COutputR() {};
+    COutputR() = default;;
 
-    COutputR(const uint256 &txhash_, MapRecords_t::const_iterator rtx_, int i_, int nDepth_,
+    COutputR(uint256 txhash_, MapRecords_t::const_iterator rtx_, int i_, int nDepth_,
         bool fSpendable_, bool fSolvable_, bool fSafe_, bool fMature_, bool fNeedHardwareKey_)
-        : txhash(txhash_), rtx(rtx_), i(i_), nDepth(nDepth_),
+        : txhash(std::move(txhash_)), rtx(rtx_), i(i_), nDepth(nDepth_),
         fSpendable(fSpendable_), fSolvable(fSolvable_), fSafe(fSafe_), fMature(fMature_), fNeedHardwareKey(fNeedHardwareKey_) {};
 
     uint256 txhash;

@@ -128,15 +128,14 @@ QIcon PlatformStyle::TextColorIcon(const QIcon& icon) const
 
 const PlatformStyle *PlatformStyle::instantiate(const QString &platformId)
 {
-    for (unsigned x=0; x<platform_styles_count; ++x)
-    {
-        if (platformId == platform_styles[x].platformId)
+    for (auto platform_style : platform_styles) {
+        if (platformId == platform_style.platformId)
         {
             return new PlatformStyle(
-                    platform_styles[x].platformId,
-                    platform_styles[x].imagesOnButtons,
-                    platform_styles[x].colorizeIcons,
-                    platform_styles[x].useExtraSpacing);
+                    platform_style.platformId,
+                    platform_style.imagesOnButtons,
+                    platform_style.colorizeIcons,
+                    platform_style.useExtraSpacing);
         }
     }
     return nullptr;

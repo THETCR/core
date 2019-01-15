@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test241)
     int nCoinsReturned;
     int nNeededSpends = 0;  // Number of spends which would be needed if selection failed
 
-    bool fDebug = 0;
+    bool fDebug = false;
 
     // Go through all possible spend between 1 and 241 and see if it's possible or not
     for (int i = 0; i < CoinsHeld; i++) {

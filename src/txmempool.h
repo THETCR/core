@@ -60,14 +60,14 @@ struct LockPoints
     // Will be set to the blockchain height and median time past
     // values that would be necessary to satisfy all relative locktime
     // constraints (BIP68) of this tx given our view of block chain history
-    int height;
-    int64_t time;
+    int height{0};
+    int64_t time{0};
     // As long as the current chain descends from the highest height block
     // containing one of the inputs used in the calculation, then the cached
     // values are still valid even after a reorg.
-    CBlockIndex* maxInputBlock;
+    CBlockIndex* maxInputBlock{nullptr};
 
-    LockPoints() : height(0), time(0), maxInputBlock(nullptr) { }
+    LockPoints() : , , { }
 };
 
 class CTxMemPool;
@@ -208,7 +208,7 @@ private:
 // extracts a transaction hash from CTxMempoolEntry or CTransactionRef
 struct mempoolentry_txid
 {
-    typedef uint256 result_type;
+    using result_type = uint256;
     result_type operator() (const CTxMemPoolEntry &entry) const
     {
         return entry.GetTx().GetHash();

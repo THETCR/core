@@ -15,7 +15,7 @@
 
 #include <memory>
 #include <string>
-#include <vector>
+#include <utility> #include <vector>
 
 namespace {
 
@@ -23,7 +23,7 @@ namespace {
 // Internal representation                                                //
 ////////////////////////////////////////////////////////////////////////////
 
-typedef std::vector<uint32_t> KeyPath;
+    using KeyPath = int;
 
 std::string FormatKeyPath(const KeyPath& path)
 {
@@ -246,7 +246,8 @@ class SingleKeyDescriptor final : public Descriptor
     std::unique_ptr<PubkeyProvider> m_provider;
 
 public:
-    SingleKeyDescriptor(std::unique_ptr<PubkeyProvider> prov, const std::function<CScript(const CPubKey&)>& fn, const std::string& name) : m_script_fn(fn), m_fn_name(name), m_provider(std::move(prov)) {}
+    SingleKeyDescriptor(std::unique_ptr<PubkeyProvider> prov, const std::function<CScript(const CPubKey&)>& fn,
+                        std::string name) : m_script_fn(fn), m_fn_name(std::move(name)), m_provider(std::move(prov)) {}
 
     bool IsRange() const override { return m_provider->IsRange(); }
     std::string ToString() const override { return m_fn_name + "(" + m_provider->ToString() + ")"; }
@@ -340,7 +341,8 @@ class ConvertorDescriptor : public Descriptor
     std::unique_ptr<Descriptor> m_descriptor;
 
 public:
-    ConvertorDescriptor(std::unique_ptr<Descriptor> descriptor, const std::function<CScript(const CScript&)>& fn, const std::string& name) : m_convert_fn(fn), m_fn_name(name), m_descriptor(std::move(descriptor)) {}
+    ConvertorDescriptor(std::unique_ptr<Descriptor> descriptor, const std::function<CScript(const CScript&)>& fn,
+                        std::string name) : m_convert_fn(fn), m_fn_name(std::move(name)), m_descriptor(std::move(descriptor)) {}
 
     bool IsRange() const override { return m_descriptor->IsRange(); }
     std::string ToString() const override { return m_fn_name + "(" + m_descriptor->ToString() + ")"; }

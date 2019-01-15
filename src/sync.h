@@ -104,10 +104,10 @@ public:
  * Wrapped mutex: supports recursive locking, but no waiting
  * TODO: We should move away from using the recursive lock by default.
  */
-typedef AnnotatedMixin<std::recursive_mutex> CCriticalSection;
+using CCriticalSection = AnnotatedMixin<std::recursive_mutex>;
 
 /** Wrapped mutex: supports waiting but not recursive locking */
-typedef AnnotatedMixin<std::mutex> Mutex;
+using Mutex = AnnotatedMixin<std::mutex>;
 
 #ifdef DEBUG_LOCKCONTENTION
 void PrintLockContention(const char* pszName, const char* pszFile, int nLine);
@@ -237,8 +237,8 @@ public:
 class CSemaphoreGrant
 {
 private:
-    CSemaphore* sem;
-    bool fHaveGrant;
+    CSemaphore* sem{nullptr};
+    bool fHaveGrant{false};
 
 public:
     void Acquire()
@@ -272,7 +272,7 @@ public:
         fHaveGrant = false;
     }
 
-    CSemaphoreGrant() : sem(nullptr), fHaveGrant(false) {}
+    CSemaphoreGrant() : , {}
 
     explicit CSemaphoreGrant(CSemaphore& sema, bool fTry = false) : sem(&sema), fHaveGrant(false)
     {

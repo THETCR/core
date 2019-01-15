@@ -35,7 +35,7 @@ class Wallet;
 class Node
 {
 public:
-    virtual ~Node() {}
+    virtual ~Node() = default;
 
     //! Set command line arguments.
     virtual bool parseParameters(int argc, const char* const argv[], std::string& error) = 0;

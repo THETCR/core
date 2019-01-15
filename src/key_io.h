@@ -89,7 +89,8 @@ public:
     bool IsValid(const CChainParams &params) const;
     bool IsValid(CChainParams::Base58Type prefix) const;
 
-    CBitcoinAddress() {}
+    CBitcoinAddress() = default;
+
     CBitcoinAddress(const CTxDestination &dest) { Set(dest); }
     CBitcoinAddress(const CTxDestination &dest, bool fBech32) { Set(dest, fBech32); }
     CBitcoinAddress(const std::string& strAddress) { SetString(strAddress); }
@@ -134,7 +135,7 @@ public:
     bool SetString(const std::string& strSecret);
 
     CBitcoinSecret(const CKey& vchSecret) { SetKey(vchSecret); }
-    CBitcoinSecret() {}
+    CBitcoinSecret() = default;
 };
 
 template<typename K, int Size, CChainParams::Base58Type Type> class CBitcoinExtKeyBase : public CBase58Data
@@ -192,7 +193,7 @@ typedef CBitcoinExtKeyBase<CExtPubKey, BIP32_EXTKEY_SIZE, CChainParams::EXT_PUBL
 class CExtKey58 : public CBase58Data
 {
 public:
-    CExtKey58() {};
+    CExtKey58() = default;;
 
     CExtKey58(const CExtKeyPair &key, CChainParams::Base58Type type)
     {

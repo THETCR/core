@@ -21,7 +21,7 @@ protected:
     CBlockIndex* pindexFrom;
 
 public:
-    virtual ~CStakeInput(){};
+    virtual ~CStakeInput() = default;;
     virtual CBlockIndex* GetIndexFrom() = 0;
     virtual bool CreateTxIn(CHDWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = 0) = 0;
     virtual bool GetTxFrom(CTransaction& tx) = 0;

@@ -46,12 +46,12 @@ static const struct {
 };
 
 struct CCoin {
-    uint32_t nHeight;
+    uint32_t nHeight{0};
     CTxOut out;
 
     ADD_SERIALIZE_METHODS;
 
-    CCoin() : nHeight(0) {}
+    CCoin() : {}
     explicit CCoin(Coin&& in) : nHeight(in.nHeight), out(std::move(in.out)) {}
 
     template <typename Stream, typename Operation>
@@ -83,9 +83,9 @@ static RetFormat ParseDataFormat(std::string& param, const std::string& strReq)
     param = strReq.substr(0, pos);
     const std::string suff(strReq, pos + 1);
 
-    for (unsigned int i = 0; i < ARRAYLEN(rf_names); i++)
+    for (auto rf_name : rf_names)
         if (suff == rf_names[i].name)
-            return rf_names[i].rf;
+            return rf_name.rf;
 
     /* If no suffix is found, return original string.  */
     param = strReq;
@@ -95,10 +95,10 @@ static RetFormat ParseDataFormat(std::string& param, const std::string& strReq)
 static std::string AvailableDataFormatsString()
 {
     std::string formats;
-    for (unsigned int i = 0; i < ARRAYLEN(rf_names); i++)
-        if (strlen(rf_names[i].name) > 0) {
+    for (auto rf_name : rf_names)
+        if (strlen(rf_name.name) > 0) {
             formats.append(".");
-            formats.append(rf_names[i].name);
+            formats.append(rf_name.name);
             formats.append(", ");
         }
 
@@ -615,6 +615,6 @@ void InterruptREST()
 
 void StopREST()
 {
-    for (unsigned int i = 0; i < ARRAYLEN(uri_prefixes); i++)
-        UnregisterHTTPHandler(uri_prefixes[i].prefix, false);
+    for (auto uri_prefixe : uri_prefixes)
+        UnregisterHTTPHandler(uri_prefixe.prefix, false);
 }

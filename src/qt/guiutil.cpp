@@ -264,7 +264,7 @@ QString getSaveFileName(QWidget *parent, const QString &caption, const QString &
     QString result = QDir::toNativeSeparators(QFileDialog::getSaveFileName(parent, caption, myDir, filter, &selectedFilter));
 
     /* Extract first suffix from filter pattern "Description (*.foo)" or "Description (*.foo *.bar ...) */
-    QRegExp filter_re(".* \\(\\*\\.(.*)[ \\)]");
+    QRegExp filter_re(R"(.* \(\*\.(.*)[ \)])");
     QString selectedSuffix;
     if(filter_re.exactMatch(selectedFilter))
     {
@@ -312,7 +312,7 @@ QString getOpenFileName(QWidget *parent, const QString &caption, const QString &
     if(selectedSuffixOut)
     {
         /* Extract first suffix from filter pattern "Description (*.foo)" or "Description (*.foo *.bar ...) */
-        QRegExp filter_re(".* \\(\\*\\.(.*)[ \\)]");
+        QRegExp filter_re(R"(.* \(\*\.(.*)[ \)])");
         QString selectedSuffix;
         if(filter_re.exactMatch(selectedFilter))
         {

@@ -8,6 +8,7 @@
 #include <key.h>
 #include <validation.h>
 #include <spork/spork.h>
+#include <utility>
 
 class CMasternode;
 class CMasternodeBroadcast;
@@ -116,10 +117,10 @@ struct masternode_info_t
         nActiveState{activeState}, nProtocolVersion{protoVer}, sigTime{sTime} {}
 
     masternode_info_t(int activeState, int protoVer, int64_t sTime,
-                      COutPoint const& outpnt, CService const& addr,
+                      COutPoint outpnt, CService const& addr,
                       CPubKey const& pkCollAddr, CPubKey const& pkMN) :
         nActiveState{activeState}, nProtocolVersion{protoVer}, sigTime{sTime},
-        outpoint{outpnt}, addr{addr},
+        outpoint{std::move(outpnt)}, addr{addr},
         pubKeyCollateralAddress{pkCollAddr}, pubKeyMasternode{pkMN} {}
 
     int nActiveState = 0;
@@ -337,9 +338,9 @@ class CMasternodeBroadcast : public CMasternode
 {
 public:
 
-    bool fRecovery;
+    bool fRecovery{false};
 
-    CMasternodeBroadcast() : CMasternode(), fRecovery(false) {}
+    CMasternodeBroadcast() : CMasternode(), {}
     CMasternodeBroadcast(const CMasternode& mn) : CMasternode(mn), fRecovery(false) {}
     CMasternodeBroadcast(CService addrNew, COutPoint outpointNew, CPubKey pubKeyCollateralAddressNew, CPubKey pubKeyMasternodeNew, int nProtocolVersionIn) :
         CMasternode(addrNew, outpointNew, pubKeyCollateralAddressNew, pubKeyMasternodeNew, nProtocolVersionIn), fRecovery(false) {}

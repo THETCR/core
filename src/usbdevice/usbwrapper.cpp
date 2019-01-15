@@ -39,7 +39,7 @@ int webusb_exit()
     return 0;
 }
 
-static webusb_device *new_webusb_device(void)
+static webusb_device *new_webusb_device()
 {
     webusb_device *dev = (webusb_device*) calloc(1, sizeof(webusb_device));
     return dev;

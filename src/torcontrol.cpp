@@ -10,7 +10,7 @@
 #include <util/system.h>
 #include <crypto/hmac_sha256.h>
 
-#include <vector>
+#include <utility> #include <vector>
 #include <deque>
 #include <set>
 #include <stdlib.h>
@@ -70,8 +70,8 @@ public:
 class TorControlConnection
 {
 public:
-    typedef std::function<void(TorControlConnection&)> ConnectionCB;
-    typedef std::function<void(TorControlConnection &,const TorControlReply &)> ReplyHandlerCB;
+    using ConnectionCB = std::function<void(TorControlConnection &)>;
+    using ReplyHandlerCB = std::function<void(TorControlConnection &, const TorControlReply &)>;
 
     /** Create a new TorControlConnection.
      */
@@ -409,7 +409,7 @@ static bool WriteBinaryFile(const fs::path &filename, const std::string &data)
 class TorController
 {
 public:
-    TorController(struct event_base* base, const std::string& target);
+    TorController(struct event_base* base, std::string target);
     ~TorController();
 
     /** Get name fo file to store private key in */
@@ -449,9 +449,9 @@ private:
     static void reconnect_cb(evutil_socket_t fd, short what, void *arg);
 };
 
-TorController::TorController(struct event_base* _base, const std::string& _target):
+TorController::TorController(struct event_base* _base, std::string _target):
     base(_base),
-    target(_target), conn(base), reconnect(true), reconnect_ev(nullptr),
+    target(std::move(_target)), conn(base), reconnect(true), reconnect_ev(nullptr),
     reconnect_timeout(RECONNECT_TIMEOUT_START)
 {
     reconnect_ev = event_new(base, -1, 0, reconnect_cb, this);

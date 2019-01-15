@@ -764,7 +764,7 @@ bool CNode::ReceiveMsgBytes(const char *pch, unsigned int nBytes, bool& complete
         // get current incomplete message, or create a new one
         if (vRecvMsg.empty() ||
             vRecvMsg.back().complete())
-            vRecvMsg.push_back(CNetMessage(Params().MessageStart(), SER_NETWORK, INIT_PROTO_VERSION));
+            vRecvMsg.emplace_back(Params().MessageStart(), SER_NETWORK, INIT_PROTO_VERSION);
 
         CNetMessage& msg = vRecvMsg.back();
 
@@ -2198,7 +2198,7 @@ bool CConnman::BindListenPort(const CService &addrBind, std::string& strError, b
         return false;
     }
 
-    vhListenSocket.push_back(ListenSocket(hListenSocket, fWhitelisted));
+    vhListenSocket.emplace_back(hListenSocket, fWhitelisted);
 
     if (addrBind.IsRoutable() && fDiscover && !fWhitelisted)
         AddLocal(addrBind, LOCAL_BIND);
@@ -2449,7 +2449,7 @@ bool CConnman::Start(CScheduler& scheduler, const Options& connOptions)
 class CNetCleanup
 {
 public:
-    CNetCleanup() {}
+    CNetCleanup() = default;
 
     ~CNetCleanup()
     {
@@ -2658,8 +2658,7 @@ std::vector<CNode*> CConnman::CopyNodeVector(std::function<bool(const CNode* pno
 {
     std::vector<CNode*> vecNodesCopy;
     LOCK(cs_vNodes);
-    for(size_t i = 0; i < vNodes.size(); ++i) {
-        CNode* pnode = vNodes[i];
+    for (auto pnode : vNodes) {
         if (!cond(pnode))
             continue;
         pnode->AddRef();

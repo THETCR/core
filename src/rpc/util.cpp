@@ -71,7 +71,7 @@ CScript CreateMultisigRedeemscript(const int required, const std::vector<CPubKey
 class DescribeAddressVisitor : public boost::static_visitor<UniValue>
 {
 public:
-    explicit DescribeAddressVisitor() {}
+    explicit DescribeAddressVisitor() = default;
 
     UniValue operator()(const CNoDestination& dest) const
     {

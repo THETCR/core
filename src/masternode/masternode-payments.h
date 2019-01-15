@@ -11,6 +11,7 @@
 #include <masternode/masternode.h>
 #include <net_processing.h>
 #include <util/strencodings.h>
+#include <utility>
 
 class CMasternodePayments;
 class CMasternodePaymentVote;
@@ -52,7 +53,7 @@ public:
         {}
 
     CMasternodePayee(CScript payee, uint256 hashIn) :
-        scriptPubKey(payee),
+        scriptPubKey(std::move(payee)),
         vecVoteHashes()
     {
         vecVoteHashes.push_back(hashIn);
@@ -77,11 +78,11 @@ public:
 class CMasternodeBlockPayees
 {
 public:
-    int nBlockHeight;
+    int nBlockHeight{0};
     std::vector<CMasternodePayee> vecPayees;
 
     CMasternodeBlockPayees() :
-        nBlockHeight(0),
+            ,
         vecPayees()
         {}
     CMasternodeBlockPayees(int nBlockHeightIn) :
@@ -112,21 +113,20 @@ class CMasternodePaymentVote
 public:
     COutPoint masternodeOutpoint;
 
-    int nBlockHeight;
+    int nBlockHeight{0};
     CScript payee;
     std::vector<unsigned char> vchSig;
 
     CMasternodePaymentVote() :
-        masternodeOutpoint(),
-        nBlockHeight(0),
+        masternodeOutpoint(), ,
         payee(),
         vchSig()
         {}
 
     CMasternodePaymentVote(COutPoint outpoint, int nBlockHeight, CScript payee) :
-        masternodeOutpoint(outpoint),
+        masternodeOutpoint(std::move(outpoint)),
         nBlockHeight(nBlockHeight),
-        payee(payee),
+        payee(std::move(payee)),
         vchSig()
         {}
 
@@ -180,9 +180,9 @@ class CMasternodePayments
 {
 private:
     // masternode count times nStorageCoeff payments blocks should be stored ...
-    const float nStorageCoeff;
+    const float nStorageCoeff{1.25};
     // ... but at least nMinBlocksToStore (payments blocks)
-    const int nMinBlocksToStore;
+    const int nMinBlocksToStore{6000};
 
     // Keep track of current block height
     int nCachedBlockHeight;
@@ -193,7 +193,7 @@ public:
     std::map<COutPoint, int> mapMasternodesLastVote;
     std::map<COutPoint, int> mapMasternodesDidNotVote;
 
-    CMasternodePayments() : nStorageCoeff(1.25), nMinBlocksToStore(6000) {}
+    CMasternodePayments() : , {}
 
     ADD_SERIALIZE_METHODS;
 

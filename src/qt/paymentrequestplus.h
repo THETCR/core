@@ -29,7 +29,7 @@ static const bool DEFAULT_SELFSIGNED_ROOTCERTS = false;
 class PaymentRequestPlus
 {
 public:
-    PaymentRequestPlus() { }
+    PaymentRequestPlus() = default;
 
     bool parse(const QByteArray& data);
     bool SerializeToString(std::string* output) const;

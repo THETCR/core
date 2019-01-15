@@ -62,7 +62,7 @@ struct SCOPED_LOCKABLE LockAnnotation
     explicit LockAnnotation(Mutex& mutex) EXCLUSIVE_LOCK_FUNCTION(mutex)
     {
     }
-    ~LockAnnotation() UNLOCK_FUNCTION() {}
+    ~LockAnnotation() UNLOCK_FUNCTION() = default;
 };
 
 #endif // BITCOIN_THREADSAFETY_H

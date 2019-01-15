@@ -92,7 +92,8 @@ struct OutputGroup
     CAmount fee{0};
     CAmount long_term_fee{0};
 
-    OutputGroup() {}
+    OutputGroup() = default;
+
     OutputGroup(std::vector<CInputCoin>&& outputs, bool from_me, CAmount value, int depth, size_t ancestors, size_t descendants)
     : m_outputs(std::move(outputs))
     , m_from_me(from_me)

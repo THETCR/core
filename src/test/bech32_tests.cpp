@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(bip173_testvectors_invalid)
         "1pzry9x0s0muk",
         "x1b4n0q5v",
         "li1dgmt3",
-        "de1lg7wt\xff",
+        R"(de1lg7wtÿ)",
         "A1G7SGD8",
         "10a06t8",
         "1qzzfhee",

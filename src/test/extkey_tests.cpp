@@ -11,13 +11,14 @@
 
 #include <string>
 #include <boost/test/unit_test.hpp>
+#include <utility>
 
 BOOST_FIXTURE_TEST_SUITE(extkey_tests, WisprBasicTestingSetup)
 
 class FailTest
 {
 public:
-    FailTest(std::string _sTest, int _rv) : sTest(_sTest), rv(_rv) {};
+    FailTest(std::string _sTest, int _rv) : sTest(std::move(_sTest)), rv(_rv) {};
     std::string sTest;
     int rv;
 };
@@ -41,7 +42,7 @@ FailTest failTests[] = {
 class PassTest
 {
 public:
-    PassTest(std::string _sTest, int _rv, std::initializer_list<uint32_t> expect) : sTest(_sTest), rv(_rv), vExpect(expect.begin(), expect.end()) {};
+    PassTest(std::string _sTest, int _rv, std::initializer_list<uint32_t> expect) : sTest(std::move(_sTest)), rv(_rv), vExpect(expect.begin(), expect.end()) {};
     std::string sTest;
     int rv;
     std::vector<uint32_t> vExpect;
@@ -120,7 +121,9 @@ void RunPathTest()
 class DeriveTestData
 {
 public:
-    DeriveTestData(uint32_t _nDerives, std::string _vKey58, std::string _pKey58) : nDerives(_nDerives), vKey58(_vKey58), pKey58(_pKey58) { };
+    DeriveTestData(uint32_t _nDerives, std::string _vKey58, std::string _pKey58) : nDerives(_nDerives), vKey58(
+            std::move(_vKey58)), pKey58(
+            std::move(_pKey58)) { };
 
     uint32_t nDerives;
     std::string vKey58;

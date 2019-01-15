@@ -13,7 +13,7 @@
 #include <protocol.h>
 
 #include <memory>
-#include <vector>
+#include <utility> #include <vector>
 #include "libzerocoin/Params.h"
 
 static const uint32_t CHAIN_NO_GENESIS = 444444;
@@ -45,7 +45,7 @@ struct ChainTxData {
 class CImportedCoinbaseTxn
 {
 public:
-    CImportedCoinbaseTxn(uint32_t nHeightIn, uint256 hashIn) : nHeight(nHeightIn), hash(hashIn) {};
+    CImportedCoinbaseTxn(uint32_t nHeightIn, uint256 hashIn) : nHeight(nHeightIn), hash(std::move(hashIn)) {};
     uint32_t nHeight;
     uint256 hash; // hash of output data
 };
@@ -54,7 +54,7 @@ class DevFundSettings
 {
 public:
     DevFundSettings(std::string sAddrTo, int nMinDevStakePercent_, int nDevOutputPeriod_)
-        : sDevFundAddresses(sAddrTo), nMinDevStakePercent(nMinDevStakePercent_), nDevOutputPeriod(nDevOutputPeriod_) {};
+        : sDevFundAddresses(std::move(sAddrTo)), nMinDevStakePercent(nMinDevStakePercent_), nDevOutputPeriod(nDevOutputPeriod_) {};
 
     std::string sDevFundAddresses;
     int nMinDevStakePercent; // [0, 100]
@@ -192,7 +192,7 @@ public:
     int LAST_POW_BLOCK() const { return nLastPOWBlock; }
 
 protected:
-    CChainParams() {}
+    CChainParams() = default;
 
     void SetLastImportHeight()
     {

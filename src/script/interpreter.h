@@ -171,7 +171,7 @@ public:
         return false;
     }
 
-    virtual ~BaseSignatureChecker() {}
+    virtual ~BaseSignatureChecker() = default;
 };
 
 template <class T>

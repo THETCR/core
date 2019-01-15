@@ -22,7 +22,7 @@
 class GCSFilter
 {
 public:
-    typedef std::vector<unsigned char> Element;
+    using Element = int;
     typedef std::unordered_set<Element, ByteVectorHash> ElementSet;
 
 private:

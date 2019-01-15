@@ -205,7 +205,7 @@ CKeyID GetKeyForDestination(const CKeyStore& store, const CTxDestination& dest)
             }
         }
     }
-    return CKeyID();
+    return {};
 }
 
 bool HaveKey(const CKeyStore& store, const CKey& key)

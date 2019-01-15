@@ -32,8 +32,7 @@ WalletFrame::WalletFrame(const PlatformStyle *_platformStyle, BitcoinGUI *_gui) 
 }
 
 WalletFrame::~WalletFrame()
-{
-}
+= default;
 
 void WalletFrame::setClientModel(ClientModel *_clientModel)
 {

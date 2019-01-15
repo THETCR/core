@@ -72,6 +72,6 @@ static const CRPCCommand commands[] =
 
 void RegisterAnonRPCCommands(CRPCTable &tableRPC)
 {
-    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
-        tableRPC.appendCommand(commands[vcidx].name, &commands[vcidx]);
+    for (const auto &command : commands)
+        tableRPC.appendCommand(command.name, &command);
 }

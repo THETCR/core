@@ -96,8 +96,8 @@ extern const DeviceType usbDeviceTypes[];
 class CUSBDevice
 {
 public:
-    CUSBDevice() {};
-    virtual ~CUSBDevice() {};
+    CUSBDevice() = default;;
+    virtual ~CUSBDevice() = default;;
     CUSBDevice(const DeviceType *pType_, const char *cPath_, const char *cSerialNo_, int nInterface_) : pType(pType_)
     {
         assert(strlen(cPath_) < sizeof(cPath));

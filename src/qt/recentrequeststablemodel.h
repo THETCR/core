@@ -14,11 +14,11 @@
 class RecentRequestEntry
 {
 public:
-    RecentRequestEntry() : nVersion(RecentRequestEntry::CURRENT_VERSION), id(0) { }
+    RecentRequestEntry() : nVersion(RecentRequestEntry::CURRENT_VERSION), { }
 
     static const int CURRENT_VERSION = 1;
     int nVersion;
-    int64_t id;
+    int64_t id{0};
     QDateTime date;
     SendCoinsRecipient recipient;
 

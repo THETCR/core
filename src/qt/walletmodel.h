@@ -25,7 +25,7 @@
 
 
 #include <map>
-#include <vector>
+#include <utility> #include <vector>
 
 #include <QObject>
 #include <QMessageBox>
@@ -60,9 +60,9 @@ QT_END_NAMESPACE
 class SendCoinsRecipient
 {
 public:
-    explicit SendCoinsRecipient() : amount(0), fSubtractFeeFromAmount(false), nVersion(SendCoinsRecipient::CURRENT_VERSION) { }
-    explicit SendCoinsRecipient(const QString &addr, const QString &_label, const CAmount& _amount, const QString &_message):
-        address(addr), label(_label), amount(_amount), message(_message), fSubtractFeeFromAmount(false), nVersion(SendCoinsRecipient::CURRENT_VERSION) {}
+    explicit SendCoinsRecipient() : , , nVersion(SendCoinsRecipient::CURRENT_VERSION) { }
+    explicit SendCoinsRecipient(QString addr, QString _label, const CAmount& _amount, QString _message):
+        address(std::move(addr)), label(std::move(_label)), amount(_amount), message(std::move(_message)), fSubtractFeeFromAmount(false), nVersion(SendCoinsRecipient::CURRENT_VERSION) {}
 
     // If from an unauthenticated payment request, this is used for storing
     // the addresses, e.g. address-A<br />address-B<br />address-C.
@@ -71,7 +71,7 @@ public:
     // Todo: This is a hack, should be replaced with a cleaner solution!
     QString address;
     QString label;
-    CAmount amount;
+    CAmount amount{0};
     // If from a payment request, this is used for storing the memo
     QString message;
     QString narration;
@@ -87,7 +87,7 @@ public:
     // Empty if no authentication or invalid signature/cert/etc.
     QString authenticatedMerchant;
 
-    bool fSubtractFeeFromAmount; // memory only
+    bool fSubtractFeeFromAmount{false}; // memory only
 
     static const int CURRENT_VERSION = 1;
     int nVersion;
@@ -178,7 +178,7 @@ public:
     {
         SendCoinsReturn(StatusCode _status = OK, QString _reasonCommitFailed = "")
             : status(_status),
-              reasonCommitFailed(_reasonCommitFailed)
+              reasonCommitFailed(std::move(_reasonCommitFailed))
         {
         }
         StatusCode status;

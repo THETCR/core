@@ -74,13 +74,13 @@ void ColdStakingDialog::on_btnApply_clicked()
 
         sCommand = "walletsettings changeaddress {";
         if (!change_spend.isEmpty()) {
-            sCommand += "\"address_standard\":\""+change_spend+"\"";
+            sCommand += R"("address_standard":")" +change_spend+"\"";
         }
         if (!newColdStakeChangeAddress.isEmpty()) {
             if (!change_spend.isEmpty()) {
                 sCommand += ",";
             }
-            sCommand += "\"coldstakingaddress\":\""+newColdStakeChangeAddress+"\"";
+            sCommand += R"("coldstakingaddress":")" +newColdStakeChangeAddress+"\"";
         }
         sCommand += "}";
     }

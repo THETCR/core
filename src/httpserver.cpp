@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <future>
-
+#include <utility>
 #include <event2/thread.h>
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
@@ -45,8 +45,8 @@ static const size_t MAX_HEADERS_SIZE = 8192;
 class HTTPWorkItem final : public HTTPClosure
 {
 public:
-    HTTPWorkItem(std::unique_ptr<HTTPRequest> _req, const std::string &_path, const HTTPRequestHandler& _func):
-        req(std::move(_req)), path(_path), func(_func)
+    HTTPWorkItem(std::unique_ptr<HTTPRequest> _req, std::string _path, const HTTPRequestHandler& _func):
+        req(std::move(_req)), path(std::move(_path)), func(_func)
     {
     }
     void operator()() override
@@ -124,9 +124,10 @@ public:
 
 struct HTTPPathHandler
 {
-    HTTPPathHandler() {}
+    HTTPPathHandler() = default;
+
     HTTPPathHandler(std::string _prefix, bool _exactMatch, HTTPRequestHandler _handler):
-        prefix(_prefix), exactMatch(_exactMatch), handler(_handler)
+        prefix(std::move(_prefix)), exactMatch(_exactMatch), handler(_handler)
     {
     }
     std::string prefix;

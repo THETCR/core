@@ -10,6 +10,7 @@
 
 #include <QList>
 #include <QString>
+#include <utility>
 
 namespace interfaces {
 class Node;
@@ -24,9 +25,7 @@ class TransactionStatus
 {
 public:
     TransactionStatus():
-        countsForBalance(false), sortKey(""),
-        matures_in(0), status(Unconfirmed), depth(0), open_for(0), cur_num_blocks(-1)
-    { }
+            , sortKey(""), , , , , { }
 
     enum Status {
         Confirmed,          /**< Have 6 or more confirmations (normal tx) or fully mature (mined tx) **/
@@ -43,26 +42,26 @@ public:
     };
 
     /// Transaction counts towards available balance
-    bool countsForBalance;
+    bool countsForBalance{false};
     /// Sorting key based on status
     std::string sortKey;
 
     /** @name Generated (mined) transactions
        @{*/
-    int matures_in;
+    int matures_in{0};
     /**@}*/
 
     /** @name Reported status
        @{*/
-    Status status;
-    qint64 depth;
-    qint64 open_for; /**< Timestamp if status==OpenUntilDate, otherwise number
+    Status status{Unconfirmed};
+    qint64 depth{0};
+    qint64 open_for{0}; /**< Timestamp if status==OpenUntilDate, otherwise number
                       of additional blocks that need to be mined before
                       finalization */
     /**@}*/
 
     /** Current number of blocks (to know whether cached status is still valid) */
-    int cur_num_blocks;
+    int cur_num_blocks{-1};
 
     bool needsUpdate;
 };
@@ -89,21 +88,19 @@ public:
     static const int RecommendedNumConfirmations = 6;
 
     TransactionRecord():
-            hash(), time(0), type(Other), address(""), debit(0), credit(0),
-            typeIn('P'), typeOut('P'), idx(0)
-    {
+            hash(), , , address(""), , , , , {
     }
 
     TransactionRecord(uint256 _hash, qint64 _time):
-            hash(_hash), time(_time), type(Other), address(""), debit(0), credit(0),
+            hash(std::move(_hash)), time(_time), type(Other), address(""), debit(0), credit(0),
             typeIn('P'), typeOut('P'), idx(0)
     {
     }
 
     TransactionRecord(uint256 _hash, qint64 _time,
-                Type _type, const std::string &_address,
+                Type _type, std::string _address,
                 const CAmount& _debit, const CAmount& _credit):
-            hash(_hash), time(_time), type(_type), address(_address), debit(_debit), credit(_credit),
+            hash(std::move(_hash)), time(_time), type(_type), address(std::move(_address)), debit(_debit), credit(_credit),
             typeIn('P'), typeOut('P'), idx(0)
     {
     }
@@ -116,20 +113,20 @@ public:
     /** @name Immutable transaction attributes
       @{*/
     uint256 hash;
-    qint64 time;
-    Type type;
+    qint64 time{0};
+    Type type{Other};
     std::string address;
-    CAmount debit;
-    CAmount credit;
+    CAmount debit{0};
+    CAmount credit{0};
 
-    char typeIn;
-    char typeOut;
+    char typeIn{'P'};
+    char typeOut{'P'};
 
 
     /**@}*/
 
     /** Subtransaction index, for sort key */
-    int idx;
+    int idx{0};
 
     /** Status: can change with block chain update */
     TransactionStatus status;

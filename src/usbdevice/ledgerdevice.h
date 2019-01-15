@@ -8,7 +8,7 @@
 #include <usbdevice/usbdevice.h>
 
 struct hid_device_;
-typedef struct hid_device_ hid_device;
+using hid_device = struct hid_device_;
 
 namespace usb_device {
 

@@ -50,8 +50,8 @@ BOOST_AUTO_TEST_CASE(multisig_verify)
     std::vector<uint8_t> vchAmount(8);
     memcpy(&vchAmount[0], &amount, 8);
 
-    for (int i = 0; i < 4; i++)
-        key[i].MakeNewKey(true);
+    for (auto &i : key)
+        i.MakeNewKey(true);
 
     CScript a_and_b;
     a_and_b << OP_2 << ToByteVector(key[0].GetPubKey()) << ToByteVector(key[1].GetPubKey()) << OP_2 << OP_CHECKMULTISIG;
@@ -145,8 +145,8 @@ BOOST_AUTO_TEST_CASE(multisig_verify)
 BOOST_AUTO_TEST_CASE(multisig_IsStandard)
 {
     CKey key[4];
-    for (int i = 0; i < 4; i++)
-        key[i].MakeNewKey(true);
+    for (auto &i : key)
+        i.MakeNewKey(true);
 
     txnouttype whichType;
 
@@ -193,10 +193,9 @@ BOOST_AUTO_TEST_CASE(multisig_Solver1)
     CBasicKeyStore keystore, emptykeystore, partialkeystore;
     CKey key[3];
     std::vector<CTxDestination> keyaddr(3); // Wmaybe-uninitialized
-    for (int i = 0; i < 3; i++)
-    {
-        key[i].MakeNewKey(true);
-        keystore.AddKey(key[i]);
+    for (auto &i : key) {
+        i.MakeNewKey(true);
+        keystore.AddKey(i);
         keyaddr[i] = key[i].GetPubKey().GetID();
     }
     partialkeystore.AddKey(key[0]);
@@ -268,10 +267,9 @@ BOOST_AUTO_TEST_CASE(multisig_Sign)
     // Test SignSignature() (and therefore the version of Solver() that signs transactions)
     CBasicKeyStore keystore;
     CKey key[4];
-    for (int i = 0; i < 4; i++)
-    {
-        key[i].MakeNewKey(true);
-        keystore.AddKey(key[i]);
+    for (auto &i : key) {
+        i.MakeNewKey(true);
+        keystore.AddKey(i);
     }
 
     CScript a_and_b;

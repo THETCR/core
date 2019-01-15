@@ -10,7 +10,7 @@
 
 bool CCoinsView::GetCoin(const COutPoint &outpoint, Coin &coin) const { return false; }
 
-uint256 CCoinsView::GetBestBlock() const { return uint256(); }
+uint256 CCoinsView::GetBestBlock() const { return {}; }
 std::vector<uint256> CCoinsView::GetHeadBlocks() const { return std::vector<uint256>(); }
 bool CCoinsView::BatchWrite(CCoinsMap &mapCoins, const uint256 &hashBlock) { return false; }
 CCoinsViewCursor *CCoinsView::Cursor() const { return nullptr; }
@@ -265,15 +265,14 @@ CAmount CCoinsViewCache::GetPlainValueIn(const CTransaction &tx,
         return 0;
 
     CAmount nResult = 0;
-    for (unsigned int i = 0; i < tx.vin.size(); i++)
-    {
-        if (tx.vin[i].IsAnonInput())
+    for (const auto &i : tx.vin) {
+        if (i.IsAnonInput())
         {
             nRingCT++;
             continue;
         };
 
-        const Coin &coin = AccessCoin(tx.vin[i].prevout);
+        const Coin &coin = AccessCoin(i.prevout);
         switch (coin.nType)
         {
             case OUTPUT_STANDARD:
@@ -298,8 +297,8 @@ CAmount CCoinsViewCache::GetValueIn(const CTransaction& tx) const
         return 0;
 
     CAmount nResult = 0;
-    for (unsigned int i = 0; i < tx.vin.size(); i++)
-        nResult += AccessCoin(tx.vin[i].prevout).out.nValue;
+    for (const auto &i : tx.vin)
+        nResult += AccessCoin(i.prevout).out.nValue;
 
     return nResult;
 }
@@ -307,10 +306,10 @@ CAmount CCoinsViewCache::GetValueIn(const CTransaction& tx) const
 bool CCoinsViewCache::HaveInputs(const CTransaction& tx) const
 {
     if (!tx.IsCoinBase() && !tx.IsZerocoinSpend()) {
-        for (unsigned int i = 0; i < tx.vin.size(); i++) {
-            const COutPoint& prevout = tx.vin[i].prevout;
+        for (const auto &i : tx.vin) {
+            const COutPoint& prevout = i.prevout;
             const Coin coins = AccessCoin(COutPoint(prevout.hash, 0));
-            if (tx.vin[i].IsAnonInput())
+            if (i.IsAnonInput())
                 continue;
             if (!coins.IsAvailable(prevout.n)) {
                 return false;

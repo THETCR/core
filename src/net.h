@@ -89,7 +89,7 @@ static const size_t DEFAULT_MAXSENDBUFFER    = 1 * 1000;
 // NOTE: When adjusting this, update rpcnet:setban's help ("24h")
 static const unsigned int DEFAULT_MISBEHAVING_BANTIME = 60 * 60 * 24;  // Default 24-hour ban
 
-typedef int64_t NodeId;
+using NodeId = int64_t;
 
 
 extern CCriticalSection cs_main;
@@ -564,7 +564,7 @@ bool BindListenPort(const CService &bindAddr, std::string& strError, bool fWhite
 
 struct CombinerAll
 {
-    typedef bool result_type;
+    using result_type = bool;
 
     template<typename I>
     bool operator()(I first, I last) const

@@ -858,17 +858,17 @@ static UniValue getblock(const JSONRPCRequest& request)
 
 struct CCoinsStats
 {
-    int nHeight;
+    int nHeight{0};
     uint256 hashBlock;
-    uint64_t nTransactions;
-    uint64_t nTransactionOutputs;
-    uint64_t nBlindedTransactionOutputs;
-    uint64_t nBogoSize;
+    uint64_t nTransactions{0};
+    uint64_t nTransactionOutputs{0};
+    uint64_t nBlindedTransactionOutputs{0};
+    uint64_t nBogoSize{0};
     uint256 hashSerialized;
-    uint64_t nDiskSize;
-    CAmount nTotalAmount;
+    uint64_t nDiskSize{0};
+    CAmount nTotalAmount{0};
 
-    CCoinsStats() : nHeight(0), nTransactions(0), nTransactionOutputs(0), nBlindedTransactionOutputs(0), nBogoSize(0), nDiskSize(0), nTotalAmount(0) {}
+    CCoinsStats() : , , , , , , {}
 };
 
 static void ApplyStats(CCoinsStats &stats, CHashWriter& ss, const uint256& hash, const std::map<uint32_t, Coin>& outputs)
@@ -1955,8 +1955,8 @@ static UniValue getblockstats(const JSONRPCRequest& request)
     CalculatePercentilesByWeight(feerate_percentiles, feerate_array, total_weight);
 
     UniValue feerates_res(UniValue::VARR);
-    for (int64_t i = 0; i < NUM_GETBLOCKSTATS_PERCENTILES; i++) {
-        feerates_res.push_back(feerate_percentiles[i]);
+    for (long long feerate_percentile : feerate_percentiles) {
+        feerates_res.push_back(feerate_percentile);
     }
 
     UniValue ret_all(UniValue::VOBJ);
@@ -2065,9 +2065,9 @@ static std::atomic<bool> g_should_abort_scan;
 class CoinsViewScanReserver
 {
 private:
-    bool m_could_reserve;
+    bool m_could_reserve{false};
 public:
-    explicit CoinsViewScanReserver() : m_could_reserve(false) {}
+    explicit CoinsViewScanReserver() : {}
 
     bool reserve() {
         assert (!m_could_reserve);
@@ -2158,7 +2158,7 @@ UniValue scantxoutset(const JSONRPCRequest& request)
     } else if (request.params[0].get_str() == "start") {
         CoinsViewScanReserver reserver;
         if (!reserver.reserve()) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Scan already in progress, use action \"abort\" or \"status\"");
+            throw JSONRPCError(RPC_INVALID_PARAMETER, R"(Scan already in progress, use action "abort" or "status")");
         }
         std::set<CScript> needles;
         CAmount total_in = 0;

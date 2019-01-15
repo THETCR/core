@@ -24,17 +24,17 @@
 class CGovernanceObjectVoteFile
 {
 public: // Types
-    typedef std::list<CGovernanceVote> vote_l_t;
+    using vote_l_t = int;
 
-    typedef vote_l_t::iterator vote_l_it;
+    using vote_l_it = int;
 
-    typedef vote_l_t::const_iterator vote_l_cit;
+    using vote_l_cit = int;
 
     typedef std::map<uint256,vote_l_it> vote_m_t;
 
-    typedef vote_m_t::iterator vote_m_it;
+    using vote_m_it = int;
 
-    typedef vote_m_t::const_iterator vote_m_cit;
+    using vote_m_cit = int;
 
 private:
     static const int MAX_MEMORY_VOTES = -1;

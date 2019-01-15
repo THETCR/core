@@ -104,9 +104,9 @@ BOOST_AUTO_TEST_CASE(manythreads)
     microThreads.join_all(); // ... wait until all the threads are done
 
     int counterSum = 0;
-    for (int i = 0; i < 10; i++) {
+    for (int i : counter) {
         BOOST_CHECK(counter[i] != 0);
-        counterSum += counter[i];
+        counterSum += i;
     }
     BOOST_CHECK_EQUAL(counterSum, 200);
 }

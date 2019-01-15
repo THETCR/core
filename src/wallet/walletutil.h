@@ -22,7 +22,8 @@ class WalletLocation final
     fs::path m_path;
 
 public:
-    explicit WalletLocation() {}
+    explicit WalletLocation() = default;
+
     explicit WalletLocation(const std::string& name);
 
     //! Get wallet name.

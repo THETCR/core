@@ -31,7 +31,7 @@
 
 #include <univalue.h>
 
-typedef std::vector<unsigned char> valtype;
+using valtype = int;
 
 // In script_tests.cpp
 extern UniValue read_json(const std::string& jsondata);

@@ -101,7 +101,7 @@ class CStealthKeyMetadata
 {
 // Used to get secret for keys created by stealth transaction with wallet locked
 public:
-    CStealthKeyMetadata() {}
+    CStealthKeyMetadata() = default;
 
     CStealthKeyMetadata(CPubKey pkEphem_, CPubKey pkScan_)
     {
@@ -126,7 +126,7 @@ class CLockedAnonOutput
 // expand key for anon output received with wallet locked
 // stored in walletdb, key is pubkey hash160
 public:
-    CLockedAnonOutput() {}
+    CLockedAnonOutput() = default;
 
     CLockedAnonOutput(CPubKey pkEphem_, CPubKey pkScan_, COutPoint outpoint_)
     {
@@ -154,7 +154,7 @@ class COwnedAnonOutput
 // stored in walletdb, key is keyimage
 // TODO: store nValue?
 public:
-    COwnedAnonOutput() {};
+    COwnedAnonOutput() = default;;
 
     COwnedAnonOutput(COutPoint outpoint_, bool fSpent_)
     {
@@ -180,7 +180,7 @@ public:
 class CStealthAddressIndexed
 {
 public:
-    CStealthAddressIndexed() {};
+    CStealthAddressIndexed() = default;;
 
     CStealthAddressIndexed(std::vector<uint8_t> &addrRaw_) : addrRaw(addrRaw_) {};
     std::vector<uint8_t> addrRaw;
@@ -196,7 +196,7 @@ public:
 class CVoteToken
 {
 public:
-    CVoteToken() {};
+    CVoteToken() = default;;
     CVoteToken(uint32_t nToken_, int nStart_, int nEnd_, int64_t nTimeAdded_) :
         nToken(nToken_), nStart(nStart_), nEnd(nEnd_), nTimeAdded(nTimeAdded_) {};
 

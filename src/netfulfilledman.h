@@ -27,7 +27,7 @@ private:
     void RemoveFulfilledRequest(const CService& addr, const std::string& strRequest);
 
 public:
-    CNetFulfilledRequestManager() {}
+    CNetFulfilledRequestManager() = default;
 
     ADD_SERIALIZE_METHODS;
 

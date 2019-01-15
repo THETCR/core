@@ -29,17 +29,17 @@ private:
         MODE_VALID,   //!< everything ok
         MODE_INVALID, //!< network rule violation (DoS value may be set)
         MODE_ERROR,   //!< run-time error
-    } mode;
-    int nDoS;
+    } mode{MODE_VALID};
+    int nDoS{0};
     std::string strRejectReason;
-    unsigned int chRejectCode;
-    bool corruptionPossible;
+    unsigned int chRejectCode{0};
+    bool corruptionPossible{false};
     std::string strDebugMessage;
 public:
     int nodeId;
     int nFlags;
 
-    CValidationState() : mode(MODE_VALID), nDoS(0), chRejectCode(0), corruptionPossible(false) { nodeId = -1; nFlags = 0;}
+    CValidationState() : , , , { nodeId = -1; nFlags = 0;}
     bool DoS(int level, bool ret = false,
              unsigned int chRejectCodeIn=0, const std::string &strRejectReasonIn="",
              bool corruptionIn=false,

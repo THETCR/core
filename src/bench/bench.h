@@ -9,7 +9,7 @@
 #include <limits>
 #include <map>
 #include <string>
-#include <vector>
+#include <utility> #include <vector>
 #include <chrono>
 
 #include <boost/preprocessor/cat.hpp>
@@ -63,7 +63,7 @@ public:
 
     bool UpdateTimer(time_point finish_time);
 
-    State(std::string name, uint64_t num_evals, double num_iters, Printer& printer) : m_name(name), m_num_iters_left(0), m_num_iters(num_iters), m_num_evals(num_evals)
+    State(std::string name, uint64_t num_evals, double num_iters, Printer& printer) : m_name(std::move(name)), m_num_iters_left(0), m_num_iters(num_iters), m_num_evals(num_evals)
     {
     }
 
@@ -80,7 +80,7 @@ public:
     }
 };
 
-typedef std::function<void(State&)> BenchFunction;
+    using BenchFunction = std::function<void(State &)>;
 
 class BenchRunner
 {
@@ -101,7 +101,8 @@ public:
 class Printer
 {
 public:
-    virtual ~Printer() {}
+    virtual ~Printer() = default;
+
     virtual void header() = 0;
     virtual void result(const State& state) = 0;
     virtual void footer() = 0;

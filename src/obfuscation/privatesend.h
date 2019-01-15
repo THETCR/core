@@ -13,6 +13,7 @@
 #include <tinyformat.h>
 #include <timedata.h>
 #include <shutdown.h>
+#include <utility>
 
 class CPrivateSend;
 class CConnman;
@@ -82,31 +83,28 @@ class CTxDSIn : public CTxIn
 public:
     // memory only
     CScript prevPubKey;
-    bool fHasSig; // flag to indicate if signed
+    bool fHasSig{false}; // flag to indicate if signed
 
-    CTxDSIn(const CTxIn& txin, const CScript& script) :
+    CTxDSIn(const CTxIn& txin, CScript script) :
         CTxIn(txin),
-        prevPubKey(script),
+        prevPubKey(std::move(script)),
         fHasSig(false)
         {}
 
     CTxDSIn() :
         CTxIn(),
-        prevPubKey(),
-        fHasSig(false)
-        {}
+        prevPubKey(), {}
 };
 
 class CDarksendAccept
 {
 public:
-    int nDenom;
-    int nInputCount;
+    int nDenom{0};
+    int nInputCount{0};
     CMutableTransaction txCollateral;
 
     CDarksendAccept() :
-        nDenom(0),
-        nInputCount(0),
+            , ,
         txCollateral(CMutableTransaction())
         {};
 
@@ -179,29 +177,24 @@ public:
 class CDarksendQueue
 {
 public:
-    int nDenom;
-    int nInputCount;
+    int nDenom{0};
+    int nInputCount{0};
     COutPoint masternodeOutpoint;
-    int64_t nTime;
-    bool fReady; //ready for submit
+    int64_t nTime{0};
+    bool fReady{false}; //ready for submit
     std::vector<unsigned char> vchSig;
     // memory only
-    bool fTried;
+    bool fTried{false};
 
     CDarksendQueue() :
-        nDenom(0),
-        nInputCount(0),
-        masternodeOutpoint(COutPoint()),
-        nTime(0),
-        fReady(false),
-        vchSig(std::vector<unsigned char>()),
-        fTried(false)
-        {}
+            , ,
+        masternodeOutpoint(COutPoint()), , ,
+        vchSig(std::vector<unsigned char>()), {}
 
     CDarksendQueue(int nDenom, int nInputCount, COutPoint outpoint, int64_t nTime, bool fReady) :
         nDenom(nDenom),
         nInputCount(nInputCount),
-        masternodeOutpoint(outpoint),
+        masternodeOutpoint(std::move(outpoint)),
         nTime(nTime),
         fReady(fReady),
         vchSig(std::vector<unsigned char>()),
@@ -276,26 +269,24 @@ class CDarksendBroadcastTx
 private:
     // memory only
     // when corresponding tx is 0-confirmed or conflicted, nConfirmedHeight is -1
-    int nConfirmedHeight;
+    int nConfirmedHeight{-1};
 
 public:
     CTransactionRef tx;
     COutPoint masternodeOutpoint;
     std::vector<unsigned char> vchSig;
-    int64_t sigTime;
+    int64_t sigTime{0};
 
     CDarksendBroadcastTx() :
-        nConfirmedHeight(-1),
+            ,
         tx(MakeTransactionRef()),
         masternodeOutpoint(),
-        vchSig(),
-        sigTime(0)
-        {}
+        vchSig(), {}
 
     CDarksendBroadcastTx(const CTransactionRef& _tx, COutPoint _outpoint, int64_t _sigTime) :
         nConfirmedHeight(-1),
         tx(_tx),
-        masternodeOutpoint(_outpoint),
+        masternodeOutpoint(std::move(_outpoint)),
         vchSig(),
         sigTime(_sigTime)
         {}
@@ -387,8 +378,10 @@ class CPrivateSend
 {
 private:
     // make constructor, destructor and copying not available
-    CPrivateSend() {}
-    ~CPrivateSend() {}
+    CPrivateSend() = default;
+
+    ~CPrivateSend() = default;
+
     CPrivateSend(CPrivateSend const&) = delete;
     CPrivateSend& operator= (CPrivateSend const&) = delete;
 

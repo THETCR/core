@@ -77,7 +77,7 @@
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
 #include <openssl/conf.h>
-#include <thread>
+#include <memory> #include <thread>
 
 //DASH
 //#include <util/splitstring.h>
@@ -143,7 +143,7 @@ public:
     CInit()
     {
         // Init OpenSSL library multithreading support
-        ppmutexOpenSSL.reset(new CCriticalSection[CRYPTO_num_locks()]);
+        ppmutexOpenSSL = std::make_unique<CCriticalSection[]>(CRYPTO_num_locks());
         CRYPTO_set_locking_callback(locking_callback);
 
         // OpenSSL can optionally load a config file which lists optional loadable modules and engines.
@@ -669,7 +669,7 @@ bool stringsMatchI(const std::string &sString, const std::string &sFind, int typ
             return std::search(sString.begin(), sString.end(), sFind.begin(), sFind.end(), icompare_pred) != sString.end();
     };
 
-    return 0; // unknown type
+    return false; // unknown type
 };
 
 std::string &TrimQuotes(std::string &s)

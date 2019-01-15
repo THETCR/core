@@ -24,10 +24,14 @@ private:
     typedef std::map<const K*, T, DereferencingComparator<const K*> > base;
     base m;
 public:
-    typedef typename base::iterator iterator;
-    typedef typename base::const_iterator const_iterator;
-    typedef typename base::size_type size_type;
-    typedef typename base::value_type value_type;
+    using iterator = int
+    iterator;
+    using const_iterator = int
+    const_iterator;
+    using size_type = int
+    size_type;
+    using value_type = int
+    value_type;
 
     // passthrough (pointer interface)
     std::pair<iterator, bool> insert(const value_type& value) { return m.insert(value); }

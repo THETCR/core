@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <boost/test/unit_test.hpp>
+#include <utility>
 
 // Test if a string consists entirely of null characters
 static bool is_null_key(const std::vector<unsigned char>& key) {
@@ -286,8 +287,9 @@ struct StringContentsSerializer {
     // Used to make two serialized objects the same while letting them have different lengths
     // This is a terrible idea
     std::string str;
-    StringContentsSerializer() {}
-    explicit StringContentsSerializer(const std::string& inp) : str(inp) {}
+    StringContentsSerializer() = default;
+
+    explicit StringContentsSerializer(std::string inp) : str(std::move(inp)) {}
 
     StringContentsSerializer& operator+=(const std::string& s) {
         str += s;

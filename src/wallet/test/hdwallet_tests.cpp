@@ -11,6 +11,7 @@
 #include <smsg/crypter.h>
 
 #include <boost/test/unit_test.hpp>
+#include <utility>
 
 BOOST_FIXTURE_TEST_SUITE(hdwallet_tests, HDWalletTestingSetup)
 
@@ -18,7 +19,8 @@ BOOST_FIXTURE_TEST_SUITE(hdwallet_tests, HDWalletTestingSetup)
 class Test1
 {
 public:
-    Test1(std::string s1, std::string s2, int nH, std::string s3) : sPassphrase(s1), sSeed(s2), nHash(nH), sOutput(s3) {};
+    Test1(std::string s1, std::string s2, int nH, std::string s3) : sPassphrase(std::move(s1)), sSeed(std::move(s2)), nHash(nH), sOutput(
+            std::move(s3)) {};
     std::string sPassphrase;
     std::string sSeed;
     int nHash;

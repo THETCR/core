@@ -349,7 +349,7 @@ void CAddrMan::Attempt_(const CService& addr, bool fCountFailure, int64_t nTime)
 CAddrInfo CAddrMan::Select_(bool newOnly)
 {
     if (size() == 0)
-        return CAddrInfo();
+        return {};
 
     if (newOnly && nNew == 0)
         return CAddrInfo();
@@ -359,7 +359,7 @@ CAddrInfo CAddrMan::Select_(bool newOnly)
        (nTried > 0 && (nNew == 0 || RandomInt(2) == 0))) {
         // use a tried node
         double fChanceFactor = 1.0;
-        while (1) {
+        while (true) {
             int nKBucket = RandomInt(ADDRMAN_TRIED_BUCKET_COUNT);
             int nKBucketPos = RandomInt(ADDRMAN_BUCKET_SIZE);
             while (vvTried[nKBucket][nKBucketPos] == -1) {
@@ -376,7 +376,7 @@ CAddrInfo CAddrMan::Select_(bool newOnly)
     } else {
         // use a new node
         double fChanceFactor = 1.0;
-        while (1) {
+        while (true) {
             int nUBucket = RandomInt(ADDRMAN_NEW_BUCKET_COUNT);
             int nUBucketPos = RandomInt(ADDRMAN_BUCKET_SIZE);
             while (vvNew[nUBucket][nUBucketPos] == -1) {
@@ -588,7 +588,7 @@ void CAddrMan::ResolveCollisions_()
 
 CAddrInfo CAddrMan::SelectTriedCollision_()
 {
-    if (m_tried_collisions.size() == 0) return CAddrInfo();
+    if (m_tried_collisions.size() == 0) return {};
 
     auto it = m_tried_collisions.begin();
 

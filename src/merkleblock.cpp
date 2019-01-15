@@ -79,7 +79,7 @@ uint256 CPartialMerkleTree::TraverseAndExtract(int height, unsigned int pos, uns
     if (nBitsUsed >= vBits.size()) {
         // overflowed the bits array - failure
         fBad = true;
-        return uint256();
+        return {};
     }
     bool fParentOfMatch = vBits[nBitsUsed++];
     if (height==0 || !fParentOfMatch) {
@@ -133,7 +133,7 @@ uint256 CPartialMerkleTree::ExtractMatches(std::vector<uint256> &vMatch, std::ve
     vMatch.clear();
     // An empty set will not work
     if (nTransactions == 0)
-        return uint256();
+        return {};
     // check for excessively high numbers of transactions
     if (nTransactions > MAX_BLOCK_WEIGHT / MIN_TRANSACTION_WEIGHT)
         return uint256();

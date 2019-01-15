@@ -17,7 +17,7 @@ struct TrafficSample
 
     TrafficSample operator+(const TrafficSample&  other) const
     {
-        return TrafficSample(this->in + other.in, this->out + other.out);
+        return {this->in + other.in, this->out + other.out};
     }
 
     TrafficSample& operator+=(const TrafficSample& rhs)
@@ -49,7 +49,7 @@ public:
     static const int DESIRED_DATA_SAMPLES;
     static const int SMALLEST_SAMPLE_PERIOD;
 
-    typedef QQueue<TrafficSample> SampleQueue;
+    using SampleQueue = QQueue<TrafficSample>;
     typedef QHash<GraphRange,SampleQueue> SampleQueueMap;
 
     TrafficGraphData(GraphRange range);

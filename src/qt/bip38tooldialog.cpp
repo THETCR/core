@@ -93,12 +93,12 @@ QString specialChar = "\"@!#$%&'()*+,-./:;<=>?`{|}~^_[]\\";
 QString validChar = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" + specialChar;
 bool isValidPassphrase(QString strPassphrase, QString& strInvalid)
 {
-    for (int i = 0; i < strPassphrase.size(); i++) {
-        if (!validChar.contains(strPassphrase[i], Qt::CaseSensitive)) {
-            if (QString("\"'").contains(strPassphrase[i]))
+    for (const auto &i : strPassphrase) {
+        if (!validChar.contains(i, Qt::CaseSensitive)) {
+            if (QString("\"'").contains(i))
                 continue;
 
-            strInvalid = strPassphrase[i];
+            strInvalid = i;
             return false;
         }
     }

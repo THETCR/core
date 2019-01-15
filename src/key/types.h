@@ -6,7 +6,7 @@
 #ifndef WISPR_KEY_TYPES_H
 #define WISPR_KEY_TYPES_H
 
-typedef std::vector<uint8_t> ec_point;
+using ec_point = int;
 
 const size_t EC_SECRET_SIZE = 32;
 const size_t EC_COMPRESSED_SIZE = 33;

@@ -213,7 +213,7 @@ QModelIndex PeerTableModel::index(int row, int column, const QModelIndex &parent
 
     if (data)
         return createIndex(row, column, data);
-    return QModelIndex();
+    return {};
 }
 
 const CNodeCombinedStats *PeerTableModel::getNodeStats(int idx)

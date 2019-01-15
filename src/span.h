@@ -17,10 +17,10 @@ template<typename C>
 class Span
 {
     C* m_data;
-    std::ptrdiff_t m_size;
+    std::ptrdiff_t m_size{0};
 
 public:
-    constexpr Span() noexcept : m_data(nullptr), m_size(0) {}
+    constexpr Span() noexcept : m_data(nullptr), {}
     constexpr Span(C* data, std::ptrdiff_t size) noexcept : m_data(data), m_size(size) {}
     constexpr Span(C* data, C* end) noexcept : m_data(data), m_size(end - data) {}
 

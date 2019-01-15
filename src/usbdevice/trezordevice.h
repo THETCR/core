@@ -6,11 +6,11 @@
 #define WISPR_USBDEVICE_TREZORDEVICE_H
 
 #include <usbdevice/usbdevice.h>
-
+#include <utility>
 
 namespace usb_device {
 
-typedef struct webusb_device webusb_device;
+    using webusb_device = struct webusb_device;
 
 class CTrezorDevice : public CUSBDevice
 {
@@ -18,13 +18,13 @@ private:
     class SignData
     {
     public:
-        SignData() {};
-        SignData(const CScript &scriptCode, int hashType, const std::vector<uint8_t> &amount)
-            : m_scriptCode(scriptCode), m_hashType(hashType), m_amount(amount) {};
+        SignData() = default;;
+        SignData(CScript scriptCode, int hashType, const std::vector<uint8_t> &amount)
+            : m_scriptCode(std::move(scriptCode)), m_hashType(hashType), m_amount(amount) {};
         SignData(const std::vector<uint32_t> &path, const std::vector<uint8_t> &shared_secret,
-                 const CScript &scriptCode, int hashType, const std::vector<uint8_t> &amount, SigVersion sigversion)
+                 CScript scriptCode, int hashType, const std::vector<uint8_t> &amount, SigVersion sigversion)
             : m_path(path), m_shared_secret(shared_secret),
-              m_scriptCode(scriptCode), m_hashType(hashType), m_amount(amount), m_sigversion(sigversion) {};
+              m_scriptCode(std::move(scriptCode)), m_hashType(hashType), m_amount(amount), m_sigversion(sigversion) {};
         std::vector<uint32_t> m_path;
         std::vector<uint8_t> m_shared_secret;
         CScript m_scriptCode;

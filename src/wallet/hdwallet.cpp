@@ -345,7 +345,7 @@ bool CHDWallet::ProcessStakingSettings(std::string &sError)
     }
 
     if (nStakeSplitThreshold < nStakeCombineThreshold * 2 || nStakeSplitThreshold > 10000 * COIN) {
-        AppendError(sError, "\"stakesplitthreshold\" must be >= 2x \"stakecombinethreshold\" and <= 10000.");
+        AppendError(sError, R"("stakesplitthreshold" must be >= 2x "stakecombinethreshold" and <= 10000.)");
         nStakeSplitThreshold = nStakeCombineThreshold * 2;
     }
 
@@ -3358,7 +3358,7 @@ static bool ExpandChangeAddress(CHDWallet *phdw, CTempRecipient &r, std::string 
             }
         } else {
             if (0 != MakeStealthData(r.sNarration, sx.prefix, sShared, pkEphem, r.vData, r.nStealthPrefix, sError)) {
-                return 1;
+                return true;
             }
         }
         return true;

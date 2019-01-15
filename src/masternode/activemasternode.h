@@ -33,9 +33,9 @@ private:
     // critical section to protect the inner data structures
     mutable CCriticalSection cs;
 
-    masternode_type_enum_t eType;
+    masternode_type_enum_t eType{MASTERNODE_UNKNOWN};
 
-    bool fPingerEnabled;
+    bool fPingerEnabled{false};
 
     /// Ping Masternode
     bool SendMasternodePing(CConnman& connman);
@@ -58,8 +58,7 @@ public:
 
 
     CActiveMasternode()
-        : eType(MASTERNODE_UNKNOWN),
-          fPingerEnabled(false),
+        : , ,
           pubKeyMasternode(),
           keyMasternode(),
           outpoint(),
