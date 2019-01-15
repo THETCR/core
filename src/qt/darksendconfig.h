@@ -16,7 +16,7 @@ class DarksendConfig : public QDialog
 
 public:
 
-    DarksendConfig(QWidget *parent = 0);
+    DarksendConfig(QWidget *parent = nullptr);
     ~DarksendConfig();
 
     void setModel(WalletModel *model);

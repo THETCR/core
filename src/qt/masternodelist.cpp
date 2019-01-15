@@ -31,8 +31,8 @@ int GetOffsetFromUtc()
 MasternodeList::MasternodeList(const PlatformStyle *platformStyle, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MasternodeList),
-    clientModel(0),
-    walletModel(0)
+    clientModel(nullptr),
+    walletModel(nullptr)
 {
     ui->setupUi(this);
 

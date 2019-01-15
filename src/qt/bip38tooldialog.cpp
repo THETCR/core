@@ -22,7 +22,7 @@
 
 Bip38ToolDialog::Bip38ToolDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
                                                     ui(new Ui::Bip38ToolDialog),
-                                                    model(0)
+                                                    model(nullptr)
 {
     ui->setupUi(this);
 

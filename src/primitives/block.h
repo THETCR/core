@@ -179,7 +179,7 @@ public:
     // If non-NULL, *mutated is set to whether mutation was detected in the merkle
     // tree (a duplication of transactions in the block leading to an identical
     // merkle root).
-    uint256 BuildMerkleTree(bool* mutated = NULL) const;
+    uint256 BuildMerkleTree(bool* mutated = nullptr) const;
 };
 
 /** Describes a place in the block chain to another node such that if the

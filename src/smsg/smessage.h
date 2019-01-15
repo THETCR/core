@@ -435,7 +435,7 @@ public:
 
     int Send(CKeyID &addressFrom, CKeyID &addressTo, std::string &message,
         SecureMessage &smsg, std::string &sError, bool fPaid=false,
-        size_t nDaysRetention=0, bool fTestFee=false, CAmount *nFee=NULL, bool fFromFile=false);
+        size_t nDaysRetention=0, bool fTestFee=false, CAmount *nFee= nullptr, bool fFromFile=false);
 
 
     int HashMsg(const SecureMessage &smsg, const uint8_t *pPayload, uint32_t nPayload, uint160 &hash);

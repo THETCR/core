@@ -174,7 +174,7 @@ int CreateMessageWindow()
         return 1;
     }
 
-    winHwnd = CreateWindowEx(0, lpcszClassName, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, nullptr, NULL);
+    winHwnd = CreateWindowEx(0, lpcszClassName, nullptr, 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, nullptr, nullptr);
     if (!winHwnd) {
         fprintf(stderr, "CreateWindowEx failed: %d.\n", GetLastError());
         return 1;
@@ -235,7 +235,7 @@ bool ShutdownRequestedMainThread()
 {
 #ifdef WIN32
     // Only wisprd will create a hidden window to receive messages
-    while (winHwnd && PeekMessage(&winMsg, 0, 0, 0, PM_REMOVE)) {
+    while (winHwnd && PeekMessage(&winMsg, nullptr, 0, 0, PM_REMOVE)) {
         TranslateMessage(&winMsg);
         DispatchMessage(&winMsg);
     }

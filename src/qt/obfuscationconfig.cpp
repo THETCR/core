@@ -19,7 +19,7 @@
 
 ObfuscationConfig::ObfuscationConfig(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
                                                         ui(new Ui::ObfuscationConfig),
-                                                        model(0)
+                                                        model(nullptr)
 {
     ui->setupUi(this);
 

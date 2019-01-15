@@ -96,7 +96,7 @@ public:
         if (idx >= 0 && idx < cachedNodeStats.size())
             return &cachedNodeStats[idx];
 
-        return 0;
+        return nullptr;
     }
 };
 
@@ -104,7 +104,7 @@ PeerTableModel::PeerTableModel(interfaces::Node& node, ClientModel *parent) :
     QAbstractTableModel(parent),
     m_node(node),
     clientModel(parent),
-    timer(0)
+    timer(nullptr)
 {
     columns << tr("NodeId") << tr("Node/Service") << tr("Ping") << tr("Sent") << tr("Received") << tr("User Agent");
     priv.reset(new PeerTablePriv());

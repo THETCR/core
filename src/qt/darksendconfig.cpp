@@ -15,7 +15,7 @@
 DarksendConfig::DarksendConfig(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DarksendConfig),
-    model(0)
+    model(nullptr)
 {
     ui->setupUi(this);
 

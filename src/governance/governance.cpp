@@ -64,7 +64,7 @@ bool CGovernanceManager::HaveVoteForHash(const uint256& nHash) const
 {
     LOCK(cs);
 
-    CGovernanceObject* pGovobj = NULL;
+    CGovernanceObject* pGovobj = nullptr;
     return cmapVoteToObject.Get(nHash, pGovobj) && pGovobj->GetVoteFile().HasVote(nHash);
 }
 
@@ -78,7 +78,7 @@ bool CGovernanceManager::SerializeVoteForHash(const uint256& nHash, CDataStream&
 {
     LOCK(cs);
 
-    CGovernanceObject* pGovobj = NULL;
+    CGovernanceObject* pGovobj = nullptr;
     return cmapVoteToObject.Get(nHash,pGovobj) && pGovobj->GetVoteFile().SerializeVoteToStream(nHash, ss);
 }
 
@@ -482,7 +482,7 @@ CGovernanceObject* CGovernanceManager::FindGovernanceObject(const uint256& nHash
     if(mapObjects.count(nHash))
         return &mapObjects[nHash];
 
-    return NULL;
+    return nullptr;
 }
 
 std::vector<CGovernanceVote> CGovernanceManager::GetMatchingVotes(const uint256& nParentHash) const
@@ -626,7 +626,7 @@ bool CGovernanceManager::ConfirmInventoryRequest(const CInv& inv)
     }
 
 
-    hash_s_t* setHash = NULL;
+    hash_s_t* setHash = nullptr;
     switch(inv.type) {
     case MSG_GOVERNANCE_OBJECT:
         setHash = &setRequestedObjects;

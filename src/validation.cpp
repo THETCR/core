@@ -1686,7 +1686,7 @@ CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
 bool GetBlockHash(uint256& hashRet, int nBlockHeight)
 {
     LOCK(cs_main);
-    if(chainActive.Tip() == NULL) return false;
+    if(chainActive.Tip() == nullptr) return false;
     if(nBlockHeight < -1 || nBlockHeight > chainActive.Height()) return false;
     if(nBlockHeight == -1) nBlockHeight = chainActive.Height();
     hashRet = chainActive[nBlockHeight]->GetBlockHash();
@@ -7052,7 +7052,7 @@ bool static DisconnectTip(CValidationState& state, const CChainParams& chainpara
     // Resurrect mempool transactions from the disconnected block.
     std::vector<uint256> vHashUpdate;
     bool *pfMissingInputs;
-    pfMissingInputs = NULL;
+    pfMissingInputs = nullptr;
     for (const auto& it : block.vtx) {
         const CTransaction& tx = *it;
         // ignore validation errors in resurrected transactions

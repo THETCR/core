@@ -4691,7 +4691,7 @@ int CWallet::GetRealOutpointPrivateSendRounds(const COutPoint& outpoint, int nRo
     unsigned int nout = outpoint.n;
 
     const CWalletTx* wtx = GetWalletTx(hash);
-    if(wtx != NULL)
+    if(wtx != nullptr)
     {
         std::map<uint256, CMutableTransaction>::const_iterator mdwi = mDenomWtxes.find(hash);
         if (mdwi == mDenomWtxes.end()) {
@@ -5201,7 +5201,7 @@ bool CWallet::GetCollateralTxDSIn(CTxDSIn& txdsinRet, CAmount& nValueRet) const
 }
 CAmount CWalletTx::GetDenominatedCredit(bool unconfirmed, bool fUseCache) const
 {
-    if (pwallet == 0)
+    if (pwallet == nullptr)
         return 0;
     auto locked_chain = pwallet->chain().lock();
 
@@ -5269,7 +5269,7 @@ CAmount CWallet::GetAnonymizedBalance() const
 }
 CAmount CWalletTx::GetAnonymizedCredit(bool fUseCache) const
 {
-    if (pwallet == 0)
+    if (pwallet == nullptr)
         return 0;
 
     auto locked_chain = pwallet->chain().lock();
@@ -5389,7 +5389,7 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block)
 
 bool CWallet::SelectCoinsDark(CAmount nValueMin, CAmount nValueMax, std::vector<CTxIn>& vecTxInRet, CAmount& nValueRet, int nPrivateSendRoundsMin, int nPrivateSendRoundsMax) const
 {
-    CCoinControl *coinControl=NULL;
+    CCoinControl *coinControl= nullptr;
     auto locked_chain = chain().lock();
 
     vecTxInRet.clear();

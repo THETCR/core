@@ -308,7 +308,7 @@ int MnemonicDecode(int &nLanguage, const std::string &sWordListIn, std::vector<u
         return errorN(2, "%s: %s", __func__, sError.c_str());
     }
 
-    if (strstr(sWordList.c_str(), "  ") != NULL) {
+    if (strstr(sWordList.c_str(), "  ") != nullptr) {
         sError = "Multiple spaces between words";
         return errorN(4, "%s: %s", __func__, sError.c_str());
     }
@@ -465,7 +465,7 @@ int MnemonicToSeed(const std::string &sMnemonic, const std::string &sPasswordIn,
     std::string sPassword = sPasswordIn;
     NormaliseInput(sPassword);
 
-    if (strstr(sWordList.c_str(), "  ") != NULL) {
+    if (strstr(sWordList.c_str(), "  ") != nullptr) {
         return errorN(1, "%s: Multiple spaces between words.", __func__);
     }
 

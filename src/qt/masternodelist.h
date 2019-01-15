@@ -31,7 +31,7 @@ class MasternodeList : public QWidget
     Q_OBJECT
 
 public:
-    explicit MasternodeList(const PlatformStyle *platformStyle, QWidget *parent = 0);
+    explicit MasternodeList(const PlatformStyle *platformStyle, QWidget *parent = nullptr);
     ~MasternodeList();
 
     void setClientModel(ClientModel *clientModel);

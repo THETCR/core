@@ -146,7 +146,7 @@ public:
 
             return reinterpret_cast<void*>(0x08000000 + (count<<24)); // Fake address, do not actually use this memory
         }
-        return 0;
+        return nullptr;
     }
     void FreeLocked(void* addr, size_t len) override
     {

@@ -29,7 +29,7 @@ class QRGeneralImageWidget : public QLabel
     Q_OBJECT
 
 public:
-    explicit QRGeneralImageWidget(QWidget *parent = 0);
+    explicit QRGeneralImageWidget(QWidget *parent = nullptr);
     QImage exportImage();
 
 public Q_SLOTS:
@@ -49,7 +49,7 @@ class QRDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit QRDialog(QWidget *parent = 0);
+    explicit QRDialog(QWidget *parent = nullptr);
     ~QRDialog();
 
     void setModel(OptionsModel *model);

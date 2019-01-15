@@ -76,7 +76,7 @@ public:
         if (idx >= 0 && idx < cachedBanlist.size())
             return &cachedBanlist[idx];
 
-        return 0;
+        return nullptr;
     }
 };
 
@@ -148,7 +148,7 @@ QVariant BanTableModel::headerData(int section, Qt::Orientation orientation, int
 Qt::ItemFlags BanTableModel::flags(const QModelIndex &index) const
 {
     if(!index.isValid())
-        return 0;
+        return nullptr;
 
     Qt::ItemFlags retval = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     return retval;

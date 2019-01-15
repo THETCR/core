@@ -21,7 +21,7 @@ class ObfuscationConfig : public QDialog
     Q_OBJECT
 
 public:
-    ObfuscationConfig(QWidget* parent = 0);
+    ObfuscationConfig(QWidget* parent = nullptr);
     ~ObfuscationConfig();
 
     void setModel(WalletModel* model);

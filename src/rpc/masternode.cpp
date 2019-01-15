@@ -241,7 +241,7 @@ UniValue masternode(const JSONRPCRequest& request)
         int nCount;
         int nHeight;
         masternode_info_t mnInfo;
-        CBlockIndex* pindex = NULL;
+        CBlockIndex* pindex = nullptr;
         {
             LOCK(cs_main);
             pindex = chainActive.Tip();
@@ -539,7 +539,7 @@ UniValue masternodelist(const JSONRPCRequest& request)
     }
 
     if (strMode == "full" || strMode == "json" || strMode == "lastpaidtime" || strMode == "lastpaidblock") {
-        CBlockIndex* pindex = NULL;
+        CBlockIndex* pindex = nullptr;
         {
             LOCK(cs_main);
             pindex = chainActive.Tip();

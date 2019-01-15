@@ -30,7 +30,7 @@
 #endif
 
 QRGeneralImageWidget::QRGeneralImageWidget(QWidget *parent):
-    QLabel(parent), contextMenu(0)
+    QLabel(parent), contextMenu(nullptr)
 {
     contextMenu = new QMenu(this);
     QAction *saveImageAction = new QAction(tr("&Save Image..."), this);
@@ -92,7 +92,7 @@ void QRGeneralImageWidget::contextMenuEvent(QContextMenuEvent *event)
 QRDialog::QRDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QRDialog),
-    model(0)
+    model(nullptr)
 {
     ui->setupUi(this);
 
