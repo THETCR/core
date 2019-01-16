@@ -286,8 +286,8 @@ Testb_MintCoin()
 	try {
 		// Generate a list of coins
 		timer.start();
-		for (uint32_t i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
-            ggCoins[i] = new PrivateCoin(gg_Params,CoinDenomination::ZQ_ONE);
+		for (auto &ggCoin : ggCoins) {
+            ggCoin = new PrivateCoin(gg_Params,CoinDenomination::ZQ_ONE);
 		}
 		timer.stop();
 	} catch (exception &e) {
@@ -320,16 +320,16 @@ Testb_MintAndSpend()
 		AccumulatorWitness wAcc(gg_Params, acc, ggCoins[0]->getPublicCoin());
 
 		timer.start();
-		for (uint32_t i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
-			acc += ggCoins[i]->getPublicCoin();
+		for (auto &ggCoin : ggCoins) {
+			acc += ggCoin->getPublicCoin();
 		}
 		timer.stop();
 
 		cout << "\tACCUMULATOR ELAPSED TIME:\n\t\tTotal: " << timer.duration() << " ms\t" << timer.duration()*0.001 << " s\n\t\tPer Element: " << timer.duration()/TESTS_COINS_TO_ACCUMULATE << " ms\t" << (timer.duration()/TESTS_COINS_TO_ACCUMULATE)*0.001 << " s" << endl;
 
 		timer.start();
-		for (uint32_t i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
-			wAcc +=ggCoins[i]->getPublicCoin();
+		for (auto &ggCoin : ggCoins) {
+			wAcc += ggCoin->getPublicCoin();
 		}
 		timer.stop();
 
@@ -376,8 +376,8 @@ Testb_RunAllTests()
 	gg_Params = new ZerocoinParams(gGetTestModulus());
 
 	ggNumTests = ggSuccessfulTests = 0;
-	for (uint32_t i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
-		ggCoins[i] = nullptr;
+	for (auto &ggCoin : ggCoins) {
+        ggCoin = nullptr;
 	}
 
 	// Run through all of the Zerocoin tests
@@ -395,8 +395,8 @@ Testb_RunAllTests()
 	}
 
 	// Clear any generated coins
-	for (uint32_t i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
-		delete ggCoins[i];
+	for (auto &ggCoin : ggCoins) {
+		delete ggCoin;
 	}
 
 	cout << ggSuccessfulTests << " out of " << ggNumTests << " tests passed." << endl << endl;

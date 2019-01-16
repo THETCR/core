@@ -94,23 +94,23 @@ static bool CheckTxScriptsSanity(const CMutableTransaction& tx)
 {
     // Check input scripts for non-coinbase txs
     if (!CTransaction(tx).IsCoinBase()) {
-        for (unsigned int i = 0; i < tx.vin.size(); i++) {
-            if (tx.vin[i].IsAnonInput())
+        for (const auto &i : tx.vin) {
+            if (i.IsAnonInput())
                 continue;
-            if (!tx.vin[i].scriptSig.HasValidOps() || tx.vin[i].scriptSig.size() > MAX_SCRIPT_SIZE) {
+            if (!i.scriptSig.HasValidOps() || i.scriptSig.size() > MAX_SCRIPT_SIZE) {
                 return false;
             }
         }
     }
     // Check output scripts
-    for (unsigned int i = 0; i < tx.vout.size(); i++) {
-        if (!tx.vout[i].scriptPubKey.HasValidOps() || tx.vout[i].scriptPubKey.size() > MAX_SCRIPT_SIZE) {
+    for (const auto &i : tx.vout) {
+        if (!i.scriptPubKey.HasValidOps() || i.scriptPubKey.size() > MAX_SCRIPT_SIZE) {
             return false;
         }
     }
 
-    for (unsigned int i = 0; i < tx.vpout.size(); i++) {
-        const CScript *pscript = tx.vpout[i]->GetPScriptPubKey();
+    for (const auto &i : tx.vpout) {
+        const CScript *pscript = i->GetPScriptPubKey();
         if (!pscript) // anon output
             continue;
         if (!pscript->HasValidOps() || pscript->size() > MAX_SCRIPT_SIZE) {

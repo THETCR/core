@@ -1955,8 +1955,8 @@ static UniValue getblockstats(const JSONRPCRequest& request)
     CalculatePercentilesByWeight(feerate_percentiles, feerate_array, total_weight);
 
     UniValue feerates_res(UniValue::VARR);
-    for (int64_t i = 0; i < NUM_GETBLOCKSTATS_PERCENTILES; i++) {
-        feerates_res.push_back(feerate_percentiles[i]);
+    for (long long feerate_percentile : feerate_percentiles) {
+        feerates_res.push_back(feerate_percentile);
     }
 
     UniValue ret_all(UniValue::VOBJ);

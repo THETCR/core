@@ -206,8 +206,8 @@ namespace {
                 // in shared-wallet situations.
                 std::vector<valtype> keys(vSolutions.begin()+1, vSolutions.begin()+vSolutions.size()-1);
                 if (!PermitsUncompressed(sigversion)) {
-                    for (size_t i = 0; i < keys.size(); i++) {
-                        if (keys[i].size() != 33) {
+                    for (auto &key : keys) {
+                        if (key.size() != 33) {
                             isInvalid = true;
                             return ISMINE_NO;
                         }

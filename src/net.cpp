@@ -2658,8 +2658,7 @@ std::vector<CNode*> CConnman::CopyNodeVector(std::function<bool(const CNode* pno
 {
     std::vector<CNode*> vecNodesCopy;
     LOCK(cs_vNodes);
-    for(size_t i = 0; i < vNodes.size(); ++i) {
-        CNode* pnode = vNodes[i];
+    for (auto pnode : vNodes) {
         if (!cond(pnode))
             continue;
         pnode->AddRef();

@@ -1044,9 +1044,8 @@ void RPCConsole::peerLayoutAboutToChange()
 {
     QModelIndexList selected = ui->peerWidget->selectionModel()->selectedIndexes();
     cachedNodeids.clear();
-    for(int i = 0; i < selected.size(); i++)
-    {
-        const CNodeCombinedStats *stats = clientModel->getPeerTableModel()->getNodeStats(selected.at(i).row());
+    for (auto i : selected) {
+        const CNodeCombinedStats *stats = clientModel->getPeerTableModel()->getNodeStats(i.row());
         cachedNodeids.append(stats->nodeStats.nodeid);
     }
 }

@@ -158,8 +158,7 @@ std::string Encode(const std::string& hrp, const data& values) {
 /** Decode a Bech32 string. */
 std::pair<std::string, data> Decode(const std::string& str) {
     bool lower = false, upper = false;
-    for (size_t i = 0; i < str.size(); ++i) {
-        unsigned char c = str[i];
+    for (unsigned char c : str) {
         if (c >= 'a' && c <= 'z') lower = true;
         else if (c >= 'A' && c <= 'Z') upper = true;
         else if (c < 33 || c > 126) return {};

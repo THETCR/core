@@ -823,8 +823,8 @@ inline void formatImpl(std::ostream& out, const char* fmt,
             tmpStream.setf(std::ios::showpos);
             arg.format(tmpStream, fmt, fmtEnd, ntrunc);
             std::string result = tmpStream.str(); // allocates... yuck.
-            for(size_t i = 0, iend = result.size(); i < iend; ++i)
-                if(result[i] == '+') result[i] = ' ';
+            for (char &i : result)
+                if(i == '+') i = ' ';
             out << result;
         }
         fmt = fmtEnd;
