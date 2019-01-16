@@ -153,7 +153,7 @@ static bool SignStep(const SigningProvider& provider, const BaseSignatureCreator
         else
             return false;
         if (GetCScript(provider, sigdata, idScript, scriptRet)) {
-            ret.push_back(std::vector<unsigned char>(scriptRet.begin(), scriptRet.end()));
+            ret.emplace_back(scriptRet.begin(), scriptRet.end());
             return true;
         }
         }
@@ -162,7 +162,7 @@ static bool SignStep(const SigningProvider& provider, const BaseSignatureCreator
     case TX_MULTISIG:
     case TX_TIMELOCKED_MULTISIG: {
         size_t required = vSolutions.front()[0];
-        ret.push_back(valtype()); // workaround CHECKMULTISIG bug
+        ret.emplace_back(); // workaround CHECKMULTISIG bug
         for (size_t i = 1; i < vSolutions.size() - 1; ++i) {
             CPubKey pubkey = CPubKey(vSolutions[i]);
             if (ret.size() < required + 1 && CreateSig(creator, sigdata, provider, sig, pubkey, scriptPubKey, sigversion)) {
@@ -171,7 +171,7 @@ static bool SignStep(const SigningProvider& provider, const BaseSignatureCreator
         }
         bool ok = ret.size() == required + 1;
         for (size_t i = 0; i + ret.size() < required + 1; ++i) {
-            ret.push_back(valtype());
+            ret.emplace_back();
         }
         return ok;
     }
@@ -186,7 +186,7 @@ static bool SignStep(const SigningProvider& provider, const BaseSignatureCreator
             return false;
         CRIPEMD160().Write(&vSolutions[0][0], vSolutions[0].size()).Finalize(h160.begin());
         if (GetCScript(provider, sigdata, h160, scriptRet)) {
-            ret.push_back(std::vector<unsigned char>(scriptRet.begin(), scriptRet.end()));
+            ret.emplace_back(scriptRet.begin(), scriptRet.end());
             return true;
         }
         return false;
@@ -257,7 +257,7 @@ bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreato
         sigdata.witness_script = witnessscript;
         txnouttype subType;
         solved = solved && SignStep(provider, creator, witnessscript, result, subType, SigVersion::WITNESS_V0, sigdata) && subType != TX_SCRIPTHASH && subType != TX_WITNESS_V0_SCRIPTHASH && subType != TX_WITNESS_V0_KEYHASH;
-        result.push_back(std::vector<unsigned char>(witnessscript.begin(), witnessscript.end()));
+        result.emplace_back(witnessscript.begin(), witnessscript.end());
         sigdata.scriptWitness.stack = result;
         sigdata.witness = true;
         result.clear();
@@ -266,7 +266,7 @@ bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreato
     }
 
     if (P2SH) {
-        result.push_back(std::vector<unsigned char>(subscript.begin(), subscript.end()));
+        result.emplace_back(subscript.begin(), subscript.end());
     }
 
     if (creator.IsWisprVersion()) {
