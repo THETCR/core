@@ -115,7 +115,7 @@ static const char *FormatScriptError(ScriptError_t err)
 static ScriptError_t ParseScriptError(const std::string &name)
 {
     for (auto &script_error : script_errors)
-        if (script_errors[i].name == name)
+        if (script_error.name == name)
             return script_error.err;
     BOOST_ERROR("Unknown scripterror \"" << name << "\" in test description");
     return SCRIPT_ERR_UNKNOWN_ERROR;
