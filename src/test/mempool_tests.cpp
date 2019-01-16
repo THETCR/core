@@ -692,8 +692,8 @@ BOOST_AUTO_TEST_CASE(MempoolAncestryTests)
     CTransactionRef ty1, ty2, ty3, ty4, ty5;
     CTransactionRef* ty[5] = {&ty1, &ty2, &ty3, &ty4, &ty5};
     CAmount v = 5 * COIN;
-    for (auto &i : ty) {
-        CTransactionRef& tyi = *i;
+    for (uint64_t i = 0; i < 5; i++) {
+        CTransactionRef& tyi = *ty[i];
         tyi = make_tx(/* output_values */ {v}, /* inputs */ i > 0 ? std::vector<CTransactionRef>{*ty[i - 1]} : std::vector<CTransactionRef>{});
         v -= 50 * CENT;
         pool.addUnchecked(entry.Fee(10000LL).FromTx(tyi));
