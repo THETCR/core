@@ -84,7 +84,7 @@ static RetFormat ParseDataFormat(std::string& param, const std::string& strReq)
     const std::string suff(strReq, pos + 1);
 
     for (auto rf_name : rf_names)
-        if (suff == rf_names[i].name)
+        if (suff == rf_name.name)
             return rf_name.rf;
 
     /* If no suffix is found, return original string.  */
