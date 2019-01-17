@@ -2670,6 +2670,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     if(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()) {
         pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
+    pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
 
     if (block.IsProofOfStake()) {
         //        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
@@ -2690,7 +2691,11 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
     }
     pindex->hashProofOfStake = mapProofOfStake[hash];
-    pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
+    if(block.GetHash() == chainparams.GetConsensus().hashGenesisBlock){
+        pindex->nStakeModifierChecksum = 0xfd11f4e7u;
+    }else{
+        pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
+    }
     if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
         LogPrintf("%s : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", __func__, pindex->nHeight, std::to_string(nStakeModifier));
 
