@@ -42,6 +42,9 @@ const char *CMPCTBLOCK="cmpctblock";
 const char *GETBLOCKTXN="getblocktxn";
 const char *BLOCKTXN="blocktxn";
 // Dash message types
+const char *FILTEREDBLOCK="filtered block";
+const char *MNW="mn winner";
+const char *MNSE="mn scan error";
 const char *TXLOCKREQUEST="ix";
 const char *TXLOCKVOTE="txlvote";
 const char *SPORK="spork";
@@ -71,6 +74,7 @@ const char *MNGOVERNANCESYNC="govsync";
 const char *MNGOVERNANCEOBJECT="govobj";
 const char *MNGOVERNANCEOBJECTVOTE="govobjvote";
 const char *MNVERIFY="mnv";
+const char *MNGET="mnget";
 } // namespace NetMsgType
 
 /** All known message types. Keep this in the same order as the list of
@@ -128,6 +132,12 @@ const static std::string allNetMessageTypes[] = {
     NetMsgType::MNGOVERNANCEOBJECT,
     NetMsgType::MNGOVERNANCEOBJECTVOTE,
     NetMsgType::MNVERIFY,
+
+
+    //old
+    NetMsgType::MNGET,
+    NetMsgType::MNW,
+
     
 };
 const static std::vector<std::string> allNetMessageTypesVec(allNetMessageTypes, allNetMessageTypes+ARRAYLEN(allNetMessageTypes));
