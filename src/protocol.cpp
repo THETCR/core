@@ -15,17 +15,18 @@
 static std::atomic<bool> g_initial_block_download_completed(false);
 
 namespace NetMsgType {
-const char *VERSION="version";
-const char *VERACK="verack";
-const char *ADDR="addr";
-const char *INV="inv";
-const char *GETDATA="getdata";
-const char *MERKLEBLOCK="merkleblock";
-const char *GETBLOCKS="getblocks";
-const char *GETHEADERS="getheaders";
-const char *TX="tx";
-const char *HEADERS="headers";
-const char *BLOCK="block";
+    const char *UNKNOWN="UNKNOWN";
+    const char *TX="tx";
+    const char *BLOCK="block";
+    const char *VERSION="version";
+    const char *VERACK="verack";
+    const char *ADDR="addr";
+    const char *INV="inv";
+    const char *GETDATA="getdata";
+    const char *MERKLEBLOCK="merkleblock";
+    const char *GETBLOCKS="getblocks";
+    const char *GETHEADERS="getheaders";
+    const char *HEADERS="headers";
 const char *GETADDR="getaddr";
 const char *MEMPOOL="mempool";
 const char *PING="ping";
@@ -81,7 +82,9 @@ const char *MNGET="mnget";
  * messages above and in protocol.h.
  */
 const static std::string allNetMessageTypes[] = {
-    NetMsgType::VERSION,
+        NetMsgType::TX,
+        NetMsgType::BLOCK,
+        NetMsgType::VERSION,
     NetMsgType::VERACK,
     NetMsgType::ADDR,
     NetMsgType::INV,
@@ -89,9 +92,7 @@ const static std::string allNetMessageTypes[] = {
     NetMsgType::MERKLEBLOCK,
     NetMsgType::GETBLOCKS,
     NetMsgType::GETHEADERS,
-    NetMsgType::TX,
     NetMsgType::HEADERS,
-    NetMsgType::BLOCK,
     NetMsgType::GETADDR,
     NetMsgType::MEMPOOL,
     NetMsgType::PING,
