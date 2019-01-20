@@ -135,7 +135,7 @@ void RegisterValidationInterface(CValidationInterface* pwalletIn) {
     conns.NotifyTransactionLock = g_signals.m_internals->NotifyTransactionLock.connect(std::bind(&CValidationInterface::NotifyTransactionLock, pwalletIn, std::placeholders::_1));
     conns.UpdatedTransaction = g_signals.m_internals->UpdatedTransaction.connect(std::bind(&CValidationInterface::UpdatedTransaction, pwalletIn, std::placeholders::_1));
     conns.AcceptedBlockHeader = g_signals.m_internals->AcceptedBlockHeader.connect(std::bind(&CValidationInterface::AcceptedBlockHeader, pwalletIn, std::placeholders::_1));
-    conns.Inventory = g_signals.m_internals->AcceptedBlockHeader.connect(std::bind(&CValidationInterface::Inventory, pwalletIn, std::placeholders::_1));
+    conns.Inventory = g_signals.m_internals->Inventory.connect(std::bind(&CValidationInterface::Inventory, pwalletIn, std::placeholders::_1));
 
 }
 
