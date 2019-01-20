@@ -2304,18 +2304,19 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                     // fell back to inv we probably have a reorg which we should get the headers for first,
                     // we now only provide a getheaders response here. When we receive the headers, we will
                     // then ask for the blocks we need.
-                    if(pfrom->nVersion >= GETHEADERS_VERSION){
-                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexBestHeader), inv.hash));
-                        LogPrint(BCLog::NET, "getheaders (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
-                    }else{
+                    connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexBestHeader), inv.hash));
+                    LogPrint(BCLog::NET, "getheaders (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
+                    if(pfrom->nVersion < GETHEADERS_VERSION){
+                        vToFetch.emplace_back(inv);
+                    }
+//                    else{
                         // Old version node
 //                        std::vector<CInv> ask(1);
 //                        ask[0] = CInv(MSG_BLOCK | GetFetchFlags(pfrom), inv.hash);
-                        vToFetch.emplace_back(inv);
 //                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, ask));
 //                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(pindexBestHeader), inv.hash));
 //                        LogPrint(BCLog::NET, "getblocks (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
-                    }
+//                    }
                 }
             }
             else
@@ -2330,7 +2331,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         }
         if (!vToFetch.empty()) {
             connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, vToFetch));
-            LogPrint(BCLog::NET, "getdata (%d) to peer=%d\n", pindexBestHeader->nHeight, pfrom->GetId());
+            LogPrint(BCLog::NET, "getdata (%d) to old peer=%d\n", vToFetch.size(), pfrom->GetId());
         }
         return true;
     }
