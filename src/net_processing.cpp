@@ -1684,7 +1684,7 @@ bool static ProcessHeadersMessage(CNode *pfrom, CConnman *connman, const std::ve
         if (!LookupBlockIndex(headers[0].hashPrevBlock) && nCount < MAX_BLOCKS_TO_ANNOUNCE) {
             nodestate->nUnconnectingHeaders++;
             connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexBestHeader), uint256()));
-            connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(pindexBestHeader), uint256()));
+            connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(chainActive.Tip()), uint256()));
             LogPrint(BCLog::NET, "received header %s: missing prev block %s, sending getheaders (%d) to end (peer=%d, nUnconnectingHeaders=%d)\n",
                     headers[0].GetHash().ToString(),
                     headers[0].hashPrevBlock.ToString(),
@@ -1792,7 +1792,7 @@ bool static ProcessHeadersMessage(CNode *pfrom, CConnman *connman, const std::ve
             // from there instead.
             LogPrint(BCLog::NET, "more getheaders (%d) to end to peer=%d (startheight:%d)\n", pindexLast->nHeight, pfrom->GetId(), pfrom->nStartingHeight);
             connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexLast), uint256()));
-            connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(pindexLast), uint256()));
+            connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(chainActive.Tip()), uint256()));
         }
 
         bool fCanDirectFetch = CanDirectFetch(chainparams.GetConsensus());
@@ -2272,6 +2272,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             Misbehaving(pfrom->GetId(), 20, strprintf("message inv size() = %u", vInv.size()));
             return false;
         }
+        std::vector<CInv> vToFetch;
 
         bool fBlocksOnly = !fRelayTxes;
 
@@ -2298,14 +2299,6 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             if (inv.type == MSG_BLOCK) {
                 UpdateBlockAvailability(pfrom->GetId(), inv.hash);
                 if (!fAlreadyHave && !fImporting && !fReindex && !mapBlocksInFlight.count(inv.hash)) {
-                    if(pfrom->nVersion == MIN_WISPR_VERSION){
-                        // Old version node
-                        std::vector<CInv> ask(1);
-                        ask[0] = CInv(MSG_BLOCK | GetFetchFlags(pfrom), inv.hash);
-                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, ask));
-                        LogPrint(BCLog::NET, "getdata (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
-
-                    }
                     // We used to request the full block here, but since headers-announcements are now the
                     // primary method of announcement on the network, and since, in the case that a node
                     // fell back to inv we probably have a reorg which we should get the headers for first,
@@ -2315,10 +2308,14 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexBestHeader), inv.hash));
                         LogPrint(BCLog::NET, "getheaders (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
                     }else{
-                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexBestHeader), inv.hash));
-                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(pindexBestHeader), inv.hash));
-                        LogPrint(BCLog::NET, "getheaders (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
-                        LogPrint(BCLog::NET, "getblocks (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
+                        // Old version node
+//                        std::vector<CInv> ask(1);
+//                        ask[0] = CInv(MSG_BLOCK | GetFetchFlags(pfrom), inv.hash);
+                        vToFetch.emplace_back(inv);
+//                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, ask));
+                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, vToFetch));
+                        LogPrint(BCLog::NET, "getdata (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
+
                     }
                 }
             }
