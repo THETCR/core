@@ -2525,13 +2525,8 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             {
                 break;
             };
-//            if(pfrom->nVersion >= CHAINHEIGHT_VERSION) {
-                // we must use CBlockGetHeader, as CBlockHeaders won't include the 0x00 nTx count at the end
-                vHeaders.emplace_back(pindex->GetBlockHeader());
-//            }else{
-//                vHeadersOld.emplace_back(pindex->GetBlockHeader());
-//            }
-//            vHeaders.push_back(pindex->GetBlockHeader());
+            // we must use CBlockGetHeader, as CBlockHeaders won't include the 0x00 nTx count at the end
+            vHeaders.emplace_back(pindex->GetBlockHeader());
             if (--nLimit <= 0 || pindex->GetBlockHash() == hashStop)
                 break;
         }
