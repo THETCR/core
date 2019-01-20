@@ -15,7 +15,7 @@
 static std::atomic<bool> g_initial_block_download_completed(false);
 
 namespace NetMsgType {
-    const char *UNKNOWN="UNKNOWN";
+    const char *UNDEFINED="UNDEFINED";
     const char *TX="tx";
     const char *BLOCK="block";
     const char *VERSION="version";
@@ -82,6 +82,7 @@ const char *MNGET="mnget";
  * messages above and in protocol.h.
  */
 const static std::string allNetMessageTypes[] = {
+        NetMsgType::UNDEFINED,
         NetMsgType::TX,
         NetMsgType::BLOCK,
         NetMsgType::VERSION,
