@@ -2313,9 +2313,8 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 //                        ask[0] = CInv(MSG_BLOCK | GetFetchFlags(pfrom), inv.hash);
                         vToFetch.emplace_back(inv);
 //                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, ask));
-                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, vToFetch));
-                        LogPrint(BCLog::NET, "getdata (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
-
+                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(pindexBestHeader), inv.hash));
+                        LogPrint(BCLog::NET, "getblocks (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
                     }
                 }
             }
@@ -2328,6 +2327,10 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                     pfrom->AskFor(inv);
                 }
             }
+        }
+        if (!vToFetch.empty()) {
+            connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, vToFetch));
+            LogPrint(BCLog::NET, "getdata (%d) to peer=%d\n", pindexBestHeader->nHeight, pfrom->GetId());
         }
         return true;
     }
