@@ -436,8 +436,8 @@ enum GetDataMsg
 //    MSG_TXLOCK_REQUEST,
 //    MSG_TXLOCK_VOTE,
 //    MSG_SPORK,
-//    MSG_MASTERNODE_PAYMENT_VOTE,
-//    MSG_MASTERNODE_PAYMENT_BLOCK, // reusing, was MSG_MASTERNODE_SCANNING_ERROR previousely, was NOT used in 12.0
+    MSG_MASTERNODE_PAYMENT_VOTE,
+    MSG_MASTERNODE_PAYMENT_BLOCK, // reusing, was MSG_MASTERNODE_SCANNING_ERROR previousely, was NOT used in 12.0
 //    MSG_BUDGET_VOTE, // deprecated since 12.1
 //    MSG_BUDGET_PROPOSAL, // deprecated since 12.1
 //    MSG_BUDGET_FINALIZED, // deprecated since 12.1
@@ -446,9 +446,9 @@ enum GetDataMsg
 //    MSG_MASTERNODE_ANNOUNCE,
 //    MSG_MASTERNODE_PING,
 //    MSG_DSTX,
-//    MSG_GOVERNANCE_OBJECT,
-//    MSG_GOVERNANCE_OBJECT_VOTE,
-//    MSG_MASTERNODE_VERIFY,
+    MSG_GOVERNANCE_OBJECT,
+    MSG_GOVERNANCE_OBJECT_VOTE,
+    MSG_MASTERNODE_VERIFY,
 //    // Nodes may always request a MSG_CMPCT_BLOCK in a getdata, however,
 //    // MSG_CMPCT_BLOCK should not appear in any invs except as a part of getdata.
 //    MSG_CMPCT_BLOCK = 20, //!< Defined in BIP152
