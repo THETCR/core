@@ -3090,10 +3090,12 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         if (!mapBlockIndex.count(pblock->hashPrevBlock)) {
             if (find(pfrom->vBlockRequested.begin(), pfrom->vBlockRequested.end(), hashBlock) != pfrom->vBlockRequested.end()) {
                 //we already asked for this block, so lets work backwards and ask for the previous block
+                LogPrint(BCLog::NET, "we already asked for this block, so lets work backwards and ask for the previous block\n");
                 connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(), pblock->hashPrevBlock));
                 pfrom->vBlockRequested.emplace_back(pblock->hashPrevBlock);
             } else {
                 //ask to sync to this block
+                LogPrint(BCLog::NET, "ask to sync to this block\n");
                 connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(), hashBlock));
                 pfrom->vBlockRequested.emplace_back(hashBlock);
             }
@@ -3112,6 +3114,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 mapBlockSource.emplace(hash, std::make_pair(pfrom->GetId(), true));
             }
             bool fNewBlock = false;
+            LogPrint(BCLog::NET, "ProcessNewBlock %s peer=%d\n", pblock->GetHash().ToString(), pfrom->GetId());
             ProcessNewBlock(chainparams, pblock, forceProcessing, &fNewBlock);
             if (fNewBlock) {
                 pfrom->nLastBlockTime = GetTime();
