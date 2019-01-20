@@ -162,6 +162,8 @@ protected:
 
     virtual void TransactionAddedToWallet(const std::string &sWalletName, const CTransactionRef& tx) {};
     virtual void NewSecureMessage(const smsg::SecureMessage *psmsg, const uint160 &hash) {};
+    virtual void Inventory(const uint256 &hash) {}
+
 };
 
 struct MainSignalsInstance;
@@ -218,6 +220,7 @@ public:
     void UpdatedTransaction(const uint256 &hash);
     void NotifyHeaderTip(const CBlockIndex *pindexNew, bool fInitialDownload);
     void AcceptedBlockHeader(const CBlockIndex *pindexNew);
+    void Inventory(const uint256 &hash);
 
 };
 

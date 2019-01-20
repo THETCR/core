@@ -34,6 +34,7 @@ struct ValidationInterfaceConnections {
     boost::signals2::scoped_connection SyncTransaction;
     boost::signals2::scoped_connection NotifyTransactionLock;
     boost::signals2::scoped_connection UpdatedTransaction;
+    boost::signals2::scoped_connection Inventory;
 };
 struct MainSignalsInstance {
     boost::signals2::signal<void (const CBlockIndex *, const CBlockIndex *, bool fInitialDownload)> UpdatedBlockTip;
@@ -47,6 +48,7 @@ struct MainSignalsInstance {
     boost::signals2::signal<void (const CBlockIndex *, const std::shared_ptr<const CBlock>&)> NewPoWValidBlock;
     boost::signals2::signal<void (const smsg::SecureMessage *psmsg, const uint160 &)> NewSecureMessage;
     boost::signals2::signal<void (const std::string &, const CTransactionRef &)> TransactionAddedToWallet;
+    boost::signals2::signal<void (const uint256 &)> Inventory;
 
     /** Notifies listeners of accepted block header */
     boost::signals2::signal<void (const CBlockIndex *)> AcceptedBlockHeader;
@@ -133,6 +135,7 @@ void RegisterValidationInterface(CValidationInterface* pwalletIn) {
     conns.NotifyTransactionLock = g_signals.m_internals->NotifyTransactionLock.connect(std::bind(&CValidationInterface::NotifyTransactionLock, pwalletIn, std::placeholders::_1));
     conns.UpdatedTransaction = g_signals.m_internals->UpdatedTransaction.connect(std::bind(&CValidationInterface::UpdatedTransaction, pwalletIn, std::placeholders::_1));
     conns.AcceptedBlockHeader = g_signals.m_internals->AcceptedBlockHeader.connect(std::bind(&CValidationInterface::AcceptedBlockHeader, pwalletIn, std::placeholders::_1));
+    conns.Inventory = g_signals.m_internals->AcceptedBlockHeader.connect(std::bind(&CValidationInterface::Inventory, pwalletIn, std::placeholders::_1));
 
 }
 
@@ -238,4 +241,7 @@ void CMainSignals::UpdatedTransaction(const uint256 &hash){
 };
 void CMainSignals::AcceptedBlockHeader(const CBlockIndex *pindexNew){
     m_internals->AcceptedBlockHeader(pindexNew);
+};
+void CMainSignals::Inventory(const uint256 &hash){
+    m_internals->Inventory(hash);
 };
