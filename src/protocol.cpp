@@ -81,6 +81,32 @@ namespace NetMsgType {
     const char *MQUORUM="mn quorum"; // not implemented
 } // namespace NetMsgType
 
+const static std::string ppszTypeName[] = {
+                "ERROR", // Should never occur
+                NetMsgType::TX,
+                NetMsgType::BLOCK,
+                "filtered block", // Should never occur
+                // Dash message types
+                // NOTE: include non-implmented here, we must keep this list in sync with enum in protocol.h
+                NetMsgType::TXLOCKREQUEST,
+                NetMsgType::TXLOCKVOTE,
+                NetMsgType::SPORK,
+                NetMsgType::MASTERNODEPAYMENTVOTE,
+                NetMsgType::MASTERNODEPAYMENTBLOCK, // reusing, was MNSCANERROR previousely, was NOT used in 12.0, we need this for inv
+                NetMsgType::MNBUDGETVOTE, // deprecated since 12.1
+                NetMsgType::MNBUDGETPROPOSAL, // deprecated since 12.1
+                NetMsgType::MNBUDGETFINAL, // deprecated since 12.1
+                NetMsgType::MNBUDGETFINALVOTE, // deprecated since 12.1
+                NetMsgType::MNQUORUM, // not implemented
+                NetMsgType::MNANNOUNCE,
+                NetMsgType::MNPING,
+                NetMsgType::DSTX,
+                NetMsgType::MNGOVERNANCEOBJECT,
+                NetMsgType::MNGOVERNANCEOBJECTVOTE,
+                NetMsgType::MNVERIFY,
+                "compact block", // Should never occur
+        };
+
 /** All known message types. Keep this in the same order as the list of
  * messages above and in protocol.h.
  */
@@ -259,11 +285,9 @@ bool operator<(const CInv& a, const CInv& b)
 //}
 std::string CInv::GetCommand() const
 {
-    if (!IsKnownType()) {
-        return "UNKNOWN";
-    }
-
-    return allNetMessageTypes[type];
+    if (!IsKnownType())
+        throw std::out_of_range(strprintf("CInv::GetCommand(): type=%d unknown type", type));
+    return ppszTypeName[type];
 }
 std::string CInv::ToString() const
 {
@@ -280,7 +304,7 @@ const std::vector<std::string> &getAllNetMessageTypes()
 }
 bool CInv::IsKnownType() const
 {
-    return (type >= 1 && type < (int)ARRAYLEN(allNetMessageTypes));
+    return (type >= 1 && type < (int)ARRAYLEN(ppszTypeName));
 }
 
 bool CInv::IsMasterNodeType() const{
