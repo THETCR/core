@@ -3106,7 +3106,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 pfrom->vBlockRequested.emplace_back(pblock->hashPrevBlock);
             } else {
                 //ask to sync to this block
-                LogPrint(BCLog::NET, "ask to sync to this block\n");
+                LogPrint(BCLog::NET, "ask to sync to this block = %s\n", hashBlock);
 //                connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(), hashBlock));
                 connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(), hashBlock));
                 pfrom->vBlockRequested.emplace_back(hashBlock);
