@@ -5576,7 +5576,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
         // belt-and-suspenders.
         bool ret = CheckBlock(*pblock, state, chainparams.GetConsensus());
 
-        LogPrintf("CheckBlock = %s, %s\n", pblock->ToString().c_str(), ret ? "success" : "failed");
+        LogPrintf("CheckBlock = %s, %s\n", pblock->GetHash().ToString().c_str(), ret ? "success" : "failed");
 
         LOCK(cs_main);
 
@@ -5584,10 +5584,10 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
             // Store to disk
             ret = g_chainstate.AcceptBlock(pblock, state, chainparams, &pindex, fForceProcessing, nullptr, fNewBlock);
         }
-        LogPrintf("AcceptBlock = %s, %s\n", pblock->ToString().c_str(), ret ? "success" : "failed");
+        LogPrintf("AcceptBlock = %s, %s\n", pblock->GetHash().ToString().c_str(), ret ? "success" : "failed");
 
         if (state.nFlags & BLOCK_DELAYED) {
-            LogPrintf("BLOCK_DELAYED = %s\n", pblock->ToString().c_str());
+            LogPrintf("BLOCK_DELAYED = %s\n", pblock->GetHash().ToString().c_str());
             return true;
         }
         if (!ret) {
