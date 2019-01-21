@@ -2284,7 +2284,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
         uint32_t nFetchFlags = GetFetchFlags(pfrom);
 
-        for (const CInv &inv : vInv)
+        for (CInv &inv : vInv)
         {
             if (interruptMsgProc)
                 return true;
@@ -2307,7 +2307,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                     connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexBestHeader), inv.hash));
                     LogPrint(BCLog::NET, "getheaders (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
                     if(pfrom->nVersion < GETHEADERS_VERSION){
-                        vToFetch.emplace_back(inv);
+                        vToFetch.emplace_back((const CInv) inv);
                     }
 //                    else{
                         // Old version node
