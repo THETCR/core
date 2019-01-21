@@ -274,6 +274,13 @@ extern const char *FEEFILTER;
     extern const char *MNGOVERNANCEOBJECT;
     extern const char *MNGOVERNANCEOBJECTVOTE;
     extern const char *MNVERIFY;
+
+    //old
+    extern const char *BUDGETVOTE; // deprecated since 12.1
+    extern const char *BUDGETPROPOSAL; // deprecated since 12.1
+    extern const char *BUDGETFINALIZED; // deprecated since 12.1
+    extern const char *BUDGETFINALIZEDVOTE; // deprecated since 12.1
+    extern const char *MQUORUM; // not implemented
 };
 
 /* Get a vector of all valid message types (see above) */

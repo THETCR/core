@@ -72,6 +72,13 @@ namespace NetMsgType {
     const char *MNGOVERNANCEOBJECT="govobj";
     const char *MNGOVERNANCEOBJECTVOTE="govobjvote";
     const char *MNVERIFY="mnv";
+
+    //old
+    const char *BUDGETVOTE="mn budget vote"; // deprecated since 12.1
+    const char *BUDGETPROPOSAL="mn budget proposal"; // deprecated since 12.1
+    const char *BUDGETFINALIZED="mn budget finalized"; // deprecated since 12.1
+    const char *BUDGETFINALIZEDVOTE="mn budget finalized vote"; // deprecated since 12.1
+    const char *MQUORUM="mn quorum"; // not implemented
 } // namespace NetMsgType
 
 /** All known message types. Keep this in the same order as the list of
@@ -130,6 +137,12 @@ const static std::string allNetMessageTypes[] = {
         NetMsgType::MNGOVERNANCEOBJECT,
         NetMsgType::MNGOVERNANCEOBJECTVOTE,
         NetMsgType::MNVERIFY,
+        //old
+        NetMsgType::BUDGETVOTE, // deprecated since 12.1
+        NetMsgType::BUDGETPROPOSAL, // deprecated since 12.1
+        NetMsgType::BUDGETFINALIZED, // deprecated since 12.1
+        NetMsgType::BUDGETFINALIZEDVOTE, // deprecated since 12.1
+        NetMsgType::MQUORUM,
 };
 const static std::vector<std::string> allNetMessageTypesVec(allNetMessageTypes, allNetMessageTypes+ARRAYLEN(allNetMessageTypes));
 
