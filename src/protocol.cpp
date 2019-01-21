@@ -15,9 +15,6 @@
 static std::atomic<bool> g_initial_block_download_completed(false);
 
 namespace NetMsgType {
-    const char *UNDEFINED="UNDEFINED";
-    const char *TX="tx";
-    const char *BLOCK="block";
     const char *VERSION="version";
     const char *VERACK="verack";
     const char *ADDR="addr";
@@ -26,121 +23,112 @@ namespace NetMsgType {
     const char *MERKLEBLOCK="merkleblock";
     const char *GETBLOCKS="getblocks";
     const char *GETHEADERS="getheaders";
+    const char *TX="tx";
     const char *HEADERS="headers";
-const char *GETADDR="getaddr";
-const char *MEMPOOL="mempool";
-const char *PING="ping";
-const char *PONG="pong";
-const char *NOTFOUND="notfound";
-const char *FILTERLOAD="filterload";
-const char *FILTERADD="filteradd";
-const char *FILTERCLEAR="filterclear";
-const char *REJECT="reject";
-const char *SENDHEADERS="sendheaders";
-const char *FEEFILTER="feefilter";
-const char *SENDCMPCT="sendcmpct";
-const char *CMPCTBLOCK="cmpctblock";
-const char *GETBLOCKTXN="getblocktxn";
-const char *BLOCKTXN="blocktxn";
+    const char *BLOCK="block";
+    const char *GETADDR="getaddr";
+    const char *MEMPOOL="mempool";
+    const char *PING="ping";
+    const char *PONG="pong";
+    const char *ALERT="alert";
+    const char *NOTFOUND="notfound";
+    const char *FILTERLOAD="filterload";
+    const char *FILTERADD="filteradd";
+    const char *FILTERCLEAR="filterclear";
+    const char *REJECT="reject";
+    const char *SENDHEADERS="sendheaders";
+    const char *SENDCMPCT="sendcmpct";
+    const char *CMPCTBLOCK="cmpctblock";
+    const char *GETBLOCKTXN="getblocktxn";
+    const char *BLOCKTXN="blocktxn";
 // Dash message types
-const char *FILTEREDBLOCK="filtered block";
-const char *MNW="mn winner";
-const char *MNSE="mn scan error";
-const char *TXLOCKREQUEST="ix";
-const char *TXLOCKVOTE="txlvote";
-const char *SPORK="spork";
-const char *GETSPORKS="getsporks";
-const char *MASTERNODEPAYMENTVOTE="mnw";
-const char *MASTERNODEPAYMENTBLOCK="mnwb";
-const char *MASTERNODEPAYMENTSYNC="mnget";
-const char *MNBUDGETSYNC="mnvs"; // deprecated since 12.1
-const char *MNBUDGETVOTE="mvote"; // deprecated since 12.1
-const char *MNBUDGETPROPOSAL="mprop"; // deprecated since 12.1
-const char *MNBUDGETFINAL="fbs"; // deprecated since 12.1
-const char *MNBUDGETFINALVOTE="fbvote"; // deprecated since 12.1
-const char *MNQUORUM="mn quorum"; // not implemented
-const char *MNANNOUNCE="mnb";
-const char *MNPING="mnp";
-const char *DSACCEPT="dsa";
-const char *DSVIN="dsi";
-const char *DSFINALTX="dsf";
-const char *DSSIGNFINALTX="dss";
-const char *DSCOMPLETE="dsc";
-const char *DSSTATUSUPDATE="dssu";
-const char *DSTX="dstx";
-const char *DSQUEUE="dsq";
-const char *DSEG="dseg";
-const char *SYNCSTATUSCOUNT="ssc";
-const char *MNGOVERNANCESYNC="govsync";
-const char *MNGOVERNANCEOBJECT="govobj";
-const char *MNGOVERNANCEOBJECTVOTE="govobjvote";
-const char *MNVERIFY="mnv";
-const char *MNGET="mnget";
+    const char *TXLOCKREQUEST="ix";
+    const char *TXLOCKVOTE="txlvote";
+    const char *SPORK="spork";
+    const char *GETSPORKS="getsporks";
+    const char *MASTERNODEPAYMENTVOTE="mnw";
+    const char *MASTERNODEPAYMENTBLOCK="mnwb";
+    const char *MASTERNODEPAYMENTSYNC="mnget";
+    const char *MNBUDGETSYNC="mnvs"; // deprecated since 12.1
+    const char *MNBUDGETVOTE="mvote"; // deprecated since 12.1
+    const char *MNBUDGETPROPOSAL="mprop"; // deprecated since 12.1
+    const char *MNBUDGETFINAL="fbs"; // deprecated since 12.1
+    const char *MNBUDGETFINALVOTE="fbvote"; // deprecated since 12.1
+    const char *MNQUORUM="mn quorum"; // not implemented
+    const char *MNANNOUNCE="mnb";
+    const char *MNPING="mnp";
+    const char *DSACCEPT="dsa";
+    const char *DSVIN="dsi";
+    const char *DSFINALTX="dsf";
+    const char *DSSIGNFINALTX="dss";
+    const char *DSCOMPLETE="dsc";
+    const char *DSSTATUSUPDATE="dssu";
+    const char *DSTX="dstx";
+    const char *DSQUEUE="dsq";
+    const char *DSEG="dseg";
+    const char *SYNCSTATUSCOUNT="ssc";
+    const char *MNGOVERNANCESYNC="govsync";
+    const char *MNGOVERNANCEOBJECT="govobj";
+    const char *MNGOVERNANCEOBJECTVOTE="govobjvote";
+    const char *MNVERIFY="mnv";
 } // namespace NetMsgType
 
 /** All known message types. Keep this in the same order as the list of
  * messages above and in protocol.h.
  */
 const static std::string allNetMessageTypes[] = {
-        NetMsgType::UNDEFINED,
-        NetMsgType::TX,
-        NetMsgType::BLOCK,
         NetMsgType::VERSION,
-    NetMsgType::VERACK,
-    NetMsgType::ADDR,
-    NetMsgType::INV,
-    NetMsgType::GETDATA,
-    NetMsgType::MERKLEBLOCK,
-    NetMsgType::GETBLOCKS,
-    NetMsgType::GETHEADERS,
-    NetMsgType::HEADERS,
-    NetMsgType::GETADDR,
-    NetMsgType::MEMPOOL,
-    NetMsgType::PING,
-    NetMsgType::PONG,
-    NetMsgType::NOTFOUND,
-    NetMsgType::FILTERLOAD,
-    NetMsgType::FILTERADD,
-    NetMsgType::FILTERCLEAR,
-    NetMsgType::REJECT,
-    NetMsgType::SENDHEADERS,
+        NetMsgType::VERACK,
+        NetMsgType::ADDR,
+        NetMsgType::INV,
+        NetMsgType::GETDATA,
+        NetMsgType::MERKLEBLOCK,
+        NetMsgType::GETBLOCKS,
+        NetMsgType::GETHEADERS,
+        NetMsgType::TX,
+        NetMsgType::HEADERS,
+        NetMsgType::BLOCK,
+        NetMsgType::GETADDR,
+        NetMsgType::MEMPOOL,
+        NetMsgType::PING,
+        NetMsgType::PONG,
+        NetMsgType::ALERT,
+        NetMsgType::NOTFOUND,
+        NetMsgType::FILTERLOAD,
+        NetMsgType::FILTERADD,
+        NetMsgType::FILTERCLEAR,
+        NetMsgType::REJECT,
+        NetMsgType::SENDHEADERS,
     NetMsgType::FEEFILTER,
-    NetMsgType::SENDCMPCT,
-    NetMsgType::CMPCTBLOCK,
-    NetMsgType::GETBLOCKTXN,
-    NetMsgType::BLOCKTXN,
+        NetMsgType::SENDCMPCT,
+        NetMsgType::CMPCTBLOCK,
+        NetMsgType::GETBLOCKTXN,
+        NetMsgType::BLOCKTXN,
         // Dash message types
         // NOTE: do NOT include non-implmented here, we want them to be "Unknown command" in ProcessMessage()
-    NetMsgType::TXLOCKREQUEST,
-    NetMsgType::TXLOCKVOTE,
-    NetMsgType::SPORK,
-    NetMsgType::GETSPORKS,
-    NetMsgType::MASTERNODEPAYMENTVOTE,
+        NetMsgType::TXLOCKREQUEST,
+        NetMsgType::TXLOCKVOTE,
+        NetMsgType::SPORK,
+        NetMsgType::GETSPORKS,
+        NetMsgType::MASTERNODEPAYMENTVOTE,
         // NetMsgType::MASTERNODEPAYMENTBLOCK, // there is no message for this, only inventory
-    NetMsgType::MASTERNODEPAYMENTSYNC,
-    NetMsgType::MNANNOUNCE,
-    NetMsgType::MNPING,
-    NetMsgType::DSACCEPT,
-    NetMsgType::DSVIN,
-    NetMsgType::DSFINALTX,
-    NetMsgType::DSSIGNFINALTX,
-    NetMsgType::DSCOMPLETE,
-    NetMsgType::DSSTATUSUPDATE,
-    NetMsgType::DSTX,
-    NetMsgType::DSQUEUE,
-    NetMsgType::DSEG,
-    NetMsgType::SYNCSTATUSCOUNT,
-    NetMsgType::MNGOVERNANCESYNC,
-    NetMsgType::MNGOVERNANCEOBJECT,
-    NetMsgType::MNGOVERNANCEOBJECTVOTE,
-    NetMsgType::MNVERIFY,
-
-
-    //old
-    NetMsgType::MNGET,
-    NetMsgType::MNW,
-
-    
+        NetMsgType::MASTERNODEPAYMENTSYNC,
+        NetMsgType::MNANNOUNCE,
+        NetMsgType::MNPING,
+        NetMsgType::DSACCEPT,
+        NetMsgType::DSVIN,
+        NetMsgType::DSFINALTX,
+        NetMsgType::DSSIGNFINALTX,
+        NetMsgType::DSCOMPLETE,
+        NetMsgType::DSSTATUSUPDATE,
+        NetMsgType::DSTX,
+        NetMsgType::DSQUEUE,
+        NetMsgType::DSEG,
+        NetMsgType::SYNCSTATUSCOUNT,
+        NetMsgType::MNGOVERNANCESYNC,
+        NetMsgType::MNGOVERNANCEOBJECT,
+        NetMsgType::MNGOVERNANCEOBJECTVOTE,
+        NetMsgType::MNVERIFY,
 };
 const static std::vector<std::string> allNetMessageTypesVec(allNetMessageTypes, allNetMessageTypes+ARRAYLEN(allNetMessageTypes));
 
