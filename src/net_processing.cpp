@@ -2288,7 +2288,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 return true;
 
             bool fAlreadyHave = AlreadyHave(inv);
-            LogPrint(BCLog::NET, "got inv: %s  %s type=%d peer=%d\n", inv.ToString(), fAlreadyHave ? "have" : "new", inv.type, pfrom->GetId());
+            LogPrint(BCLog::NET, "got inv: %s  %s peer=%d\n", inv.ToString(), fAlreadyHave ? "have" : "new", pfrom->GetId());
 
             if (chainActive.NewProtocolsStarted() && inv.type == MSG_TX) {
                 inv.type |= nFetchFlags;
