@@ -3098,9 +3098,6 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 pfrom->vBlockRequested.emplace_back(hashBlock);
             }
         } else {
-            if(!ProcessHeadersMessage(pfrom, connman, {pblock->GetBlockHeader()}, chainparams, /*punish_duplicate_invalid=*/false)){
-                LogPrint(BCLog::NET, "Peer %d sent us invalid header via block\n", pfrom->GetId());
-            }
             pfrom->PushInventory(CInv(MSG_BLOCK, inv.hash));
             bool forceProcessing = false;
             const uint256 hash(pblock->GetHash());
