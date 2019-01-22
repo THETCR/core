@@ -3112,9 +3112,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             }
             bool fNewBlock = false;
             LogPrint(BCLog::NET, "ProcessNewBlock %s peer=%d\n", pblock->GetHash().ToString(), pfrom->GetId());
-            const CBlockIndex *pindex = nullptr;
-            CValidationState state;
-            if(!ProcessNewBlockHeaders({pblock->GetBlockHeader()}, state, chainparams, &pindex)){
+            if(!ProcessHeadersMessage(pfrom, connman, {pblock->GetBlockHeader()}, chainparams, /*punish_duplicate_invalid=*/false)){
                 LogPrint(BCLog::NET, "Peer %d sent us invalid header via block\n", pfrom->GetId());
             }else{
                 ProcessNewBlock(chainparams, pblock, forceProcessing, &fNewBlock);
