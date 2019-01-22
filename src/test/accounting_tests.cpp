@@ -23,8 +23,7 @@ GetResults(CWalletDB& walletdb, std::map<CAmount, CAccountingEntry>& results)
     results.clear();
     BOOST_CHECK(walletdb.ReorderTransactions(pwalletMain) == DB_LOAD_OK);
     walletdb.ListAccountCreditDebit("", aes);
-    for(CAccountingEntry& ae: aes)
-    {
+    for (CAccountingEntry& ae : aes) {
         results[ae.nOrderPos] = ae;
     }
 }
@@ -86,7 +85,7 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
     wtx.mapValue["comment"] = "y";
     {
         CMutableTransaction tx(wtx);
-        --tx.nLockTime;  // Just to change the hash :)
+        --tx.nLockTime; // Just to change the hash :)
         *static_cast<CTransaction*>(&wtx) = CTransaction(tx);
     }
     pwalletMain->AddToWallet(wtx);
@@ -96,7 +95,7 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
     wtx.mapValue["comment"] = "x";
     {
         CMutableTransaction tx(wtx);
-        --tx.nLockTime;  // Just to change the hash :)
+        --tx.nLockTime; // Just to change the hash :)
         *static_cast<CTransaction*>(&wtx) = CTransaction(tx);
     }
     pwalletMain->AddToWallet(wtx);

@@ -119,24 +119,24 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test241)
     CAmount OneCoinAmount = ZerocoinDenominationToAmount(ZQ_ONE);
     CAmount nValueTarget = OneCoinAmount;
     int nCoinsReturned;
-    int nNeededSpends = 0;  // Number of spends which would be needed if selection failed
+    int nNeededSpends = 0; // Number of spends which would be needed if selection failed
 
     bool fDebug = 0;
 
     // Go through all possible spend between 1 and 241 and see if it's possible or not
     for (int i = 0; i < CoinsHeld; i++) {
         std::vector<CMintMeta> vSpends = SelectMintsFromList(nValueTarget, nSelectedValue,
-                                                                 nMaxNumberOfSpends,
-                                                                 fMinimizeChange,
-                                                                 nCoinsReturned,
-                                                                 listMints,
-                                                                 mapDenom,
-                                                                 nNeededSpends);
-        
+            nMaxNumberOfSpends,
+            fMinimizeChange,
+            nCoinsReturned,
+            listMints,
+            mapDenom,
+            nNeededSpends);
+
         if (fDebug) {
             if (vSpends.size() > 0) {
                 std::cout << "SUCCESS : Coins = " << nValueTarget / COIN << " # spends used = " << vSpends.size()
-                << " # of coins returned = " << nCoinsReturned
+                          << " # of coins returned = " << nCoinsReturned
                           << " Spend Amount = " << nSelectedValue / COIN << " Held = " << CoinsHeld << "\n";
             } else {
                 std::cout << "FAILED : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
@@ -202,25 +202,25 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test115)
 
     //bool fDebug = 0;
     int nCoinsReturned;
-    int nNeededSpends = 0;  // Number of spends which would be needed if selection failed
+    int nNeededSpends = 0; // Number of spends which would be needed if selection failed
 
     std::vector<CMintMeta> vSpends = SelectMintsFromList(nValueTarget, nSelectedValue,
-                                                             nMaxNumberOfSpends,
-                                                             fMinimizeChange,
-                                                             nCoinsReturned,
-                                                             listMints,
-                                                             mapDenom,
-                                                             nNeededSpends);
+        nMaxNumberOfSpends,
+        fMinimizeChange,
+        nCoinsReturned,
+        listMints,
+        mapDenom,
+        nNeededSpends);
 
-//    if (fDebug) {
-//        if (vSpends.size() > 0) {
-//            std::cout << "SUCCESS : Coins = " << nValueTarget / COIN << " # spends used = " << vSpends.size()
-//            << " # of coins returned = " << nCoinsReturned
-//                      << " Spend Amount = " << nSelectedValue / COIN << " Held = " << CoinsHeld << "\n";
-//        } else {
-//            std::cout << "FAILED : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
-//        }
-//    }
+    //    if (fDebug) {
+    //        if (vSpends.size() > 0) {
+    //            std::cout << "SUCCESS : Coins = " << nValueTarget / COIN << " # spends used = " << vSpends.size()
+    //            << " # of coins returned = " << nCoinsReturned
+    //                      << " Spend Amount = " << nSelectedValue / COIN << " Held = " << CoinsHeld << "\n";
+    //        } else {
+    //            std::cout << "FAILED : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
+    //        }
+    //    }
 
     BOOST_CHECK_MESSAGE(vSpends.size() < 5, "Too many spends");
     BOOST_CHECK_MESSAGE(vSpends.size() > 0, "No spends");
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test_from_245)
     //    const int DenomAmounts[] = {0, 1, 4, 0, 0, 0, 0, 0};
     // For 51
     //const int nSpendValue = 51;
-    
+
     // CoinsHeld = 245
     const int DenomAmounts[] = {0, 1, 4, 2, 1, 0, 0, 0};
     // We can spend up to this amount for above set for less 6 spends
@@ -284,57 +284,61 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test_from_245)
     CAmount OneCoinAmount = ZerocoinDenominationToAmount(ZQ_ONE);
     CAmount nValueTarget = OneCoinAmount;
 
-  //  bool fDebug = 0;
+    //  bool fDebug = 0;
     int nCoinsReturned;
-    int nNeededSpends = 0;  // Number of spends which would be needed if selection failed
-    
+    int nNeededSpends = 0; // Number of spends which would be needed if selection failed
+
     // Go through all possible spend between 1 and 241 and see if it's possible or not
     for (int i = 0; i < CoinsHeld; i++) {
         std::vector<CMintMeta> vSpends = SelectMintsFromList(nValueTarget, nSelectedValue,
-                                                                 nMaxNumberOfSpends,
-                                                                 false,
-                                                                 nCoinsReturned,
-                                                                 listMints,
-                                                                 mapOfDenomsHeld,
-                                                                 nNeededSpends);
-        
-//        if (fDebug) {
-//            if (vSpends.size() > 0) {
-//                std::cout << "SUCCESS : Coins = " << nValueTarget / COIN << " # spends = " << vSpends.size()
-//                          << " # coins returned = " << nCoinsReturned
-//                          << " Amount = " << nSelectedValue / COIN << " Held = " << CoinsHeld << " ";
-//            } else {
-//                std::cout << "UNABLE TO SPEND : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
-//            }
-//        }
+            nMaxNumberOfSpends,
+            false,
+            nCoinsReturned,
+            listMints,
+            mapOfDenomsHeld,
+            nNeededSpends);
+
+        //        if (fDebug) {
+        //            if (vSpends.size() > 0) {
+        //                std::cout << "SUCCESS : Coins = " << nValueTarget / COIN << " # spends = " << vSpends.size()
+        //                          << " # coins returned = " << nCoinsReturned
+        //                          << " Amount = " << nSelectedValue / COIN << " Held = " << CoinsHeld << " ";
+        //            } else {
+        //                std::cout << "UNABLE TO SPEND : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
+        //            }
+        //        }
 
         bool spends_not_ok = ((vSpends.size() > nMaxNumberOfSpends) || (vSpends.size() == 0));
-        if (i < nMaxSpendAmount) BOOST_CHECK_MESSAGE(!spends_not_ok, "Too many spends");
-        else BOOST_CHECK_MESSAGE(spends_not_ok, "Expected to fail but didn't");
-        
+        if (i < nMaxSpendAmount)
+            BOOST_CHECK_MESSAGE(!spends_not_ok, "Too many spends");
+        else
+            BOOST_CHECK_MESSAGE(spends_not_ok, "Expected to fail but didn't");
+
         std::vector<CMintMeta> vSpendsAlt = SelectMintsFromList(nValueTarget, nSelectedValue,
-                                                                    nMaxNumberOfSpends,
-                                                                    true,
-                                                                    nCoinsReturned,
-                                                                    listMints,
-                                                                    mapOfDenomsHeld,
-                                                                    nNeededSpends);
-        
-        
-//        if (fDebug) {
-//            if (vSpendsAlt.size() > 0) {
-//                std::cout << "# spends = " << vSpendsAlt.size()
-//                          << " # coins returned = " << nCoinsReturned
-//                          << " Amount = " << nSelectedValue / COIN << "\n";
-//            } else {
-//                std::cout << "UNABLE TO SPEND : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
-//            }
-//        }
-        
+            nMaxNumberOfSpends,
+            true,
+            nCoinsReturned,
+            listMints,
+            mapOfDenomsHeld,
+            nNeededSpends);
+
+
+        //        if (fDebug) {
+        //            if (vSpendsAlt.size() > 0) {
+        //                std::cout << "# spends = " << vSpendsAlt.size()
+        //                          << " # coins returned = " << nCoinsReturned
+        //                          << " Amount = " << nSelectedValue / COIN << "\n";
+        //            } else {
+        //                std::cout << "UNABLE TO SPEND : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
+        //            }
+        //        }
+
         spends_not_ok = ((vSpendsAlt.size() > nMaxNumberOfSpends) || (vSpendsAlt.size() == 0));
-        if (i < nMaxSpendAmount) BOOST_CHECK_MESSAGE(!spends_not_ok, "Too many spends");
-        else BOOST_CHECK_MESSAGE(spends_not_ok, "Expected to fail but didn't");
-        
+        if (i < nMaxSpendAmount)
+            BOOST_CHECK_MESSAGE(!spends_not_ok, "Too many spends");
+        else
+            BOOST_CHECK_MESSAGE(spends_not_ok, "Expected to fail but didn't");
+
         nValueTarget += OneCoinAmount;
     }
 }
@@ -391,56 +395,60 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test_from_145)
 
     //bool fDebug = 0;
     int nCoinsReturned;
-    int nNeededSpends = 0;  // Number of spends which would be needed if selection failed
-    
+    int nNeededSpends = 0; // Number of spends which would be needed if selection failed
+
     // Go through all possible spend between 1 and 241 and see if it's possible or not
     for (int i = 0; i < CoinsHeld; i++) {
         std::vector<CMintMeta> vSpends = SelectMintsFromList(nValueTarget, nSelectedValue,
-                                                                 nMaxNumberOfSpends,
-                                                                 false,
-                                                                 nCoinsReturned,
-                                                                 listMints,
-                                                                 mapOfDenomsHeld,
-                                                                 nNeededSpends);
-        
-//        if (fDebug) {
-//            if (vSpends.size() > 0) {
-//                std::cout << "SUCCESS : Coins = " << nValueTarget / COIN << " # spends = " << vSpends.size()
-//                          << " # coins returned = " << nCoinsReturned
-//                          << " Amount = " << nSelectedValue / COIN << " Held = " << CoinsHeld << " ";
-//            } else {
-//                std::cout << "UNABLE TO SPEND : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
-//            }
-//        }
-        
-        bool spends_not_ok = ((vSpends.size() > nMaxNumberOfSpends) || (vSpends.size() == 0));
-        if (i < nMaxSpendAmount) BOOST_CHECK_MESSAGE(!spends_not_ok, "Too many spends");
-        else BOOST_CHECK_MESSAGE(spends_not_ok, "Expected to fail but didn't");
-        
-        std::vector<CMintMeta> vSpendsAlt = SelectMintsFromList(nValueTarget, nSelectedValue,
-                                                                    nMaxNumberOfSpends,
-                                                                    true,
-                                                                    nCoinsReturned,
-                                                                    listMints,
-                                                                    mapOfDenomsHeld,
-                                                                    nNeededSpends);
-        
-        
-//        if (fDebug) {
-//            if (vSpendsAlt.size() > 0) {
-//                std::cout << "# spends = " << vSpendsAlt.size()
-//                          << " # coins returned = " << nCoinsReturned
-//                          << " Amount = " << nSelectedValue / COIN << "\n";
-//            } else {
-//                std::cout << "UNABLE TO SPEND : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
-//            }
-//        }
-        
-        spends_not_ok = ((vSpendsAlt.size() > nMaxNumberOfSpends) || (vSpendsAlt.size() == 0));
-        if (i < nMaxSpendAmount) BOOST_CHECK_MESSAGE(!spends_not_ok, "Too many spends");
-        else BOOST_CHECK_MESSAGE(spends_not_ok, "Expected to fail but didn't");
+            nMaxNumberOfSpends,
+            false,
+            nCoinsReturned,
+            listMints,
+            mapOfDenomsHeld,
+            nNeededSpends);
 
-        
+        //        if (fDebug) {
+        //            if (vSpends.size() > 0) {
+        //                std::cout << "SUCCESS : Coins = " << nValueTarget / COIN << " # spends = " << vSpends.size()
+        //                          << " # coins returned = " << nCoinsReturned
+        //                          << " Amount = " << nSelectedValue / COIN << " Held = " << CoinsHeld << " ";
+        //            } else {
+        //                std::cout << "UNABLE TO SPEND : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
+        //            }
+        //        }
+
+        bool spends_not_ok = ((vSpends.size() > nMaxNumberOfSpends) || (vSpends.size() == 0));
+        if (i < nMaxSpendAmount)
+            BOOST_CHECK_MESSAGE(!spends_not_ok, "Too many spends");
+        else
+            BOOST_CHECK_MESSAGE(spends_not_ok, "Expected to fail but didn't");
+
+        std::vector<CMintMeta> vSpendsAlt = SelectMintsFromList(nValueTarget, nSelectedValue,
+            nMaxNumberOfSpends,
+            true,
+            nCoinsReturned,
+            listMints,
+            mapOfDenomsHeld,
+            nNeededSpends);
+
+
+        //        if (fDebug) {
+        //            if (vSpendsAlt.size() > 0) {
+        //                std::cout << "# spends = " << vSpendsAlt.size()
+        //                          << " # coins returned = " << nCoinsReturned
+        //                          << " Amount = " << nSelectedValue / COIN << "\n";
+        //            } else {
+        //                std::cout << "UNABLE TO SPEND : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
+        //            }
+        //        }
+
+        spends_not_ok = ((vSpendsAlt.size() > nMaxNumberOfSpends) || (vSpendsAlt.size() == 0));
+        if (i < nMaxSpendAmount)
+            BOOST_CHECK_MESSAGE(!spends_not_ok, "Too many spends");
+        else
+            BOOST_CHECK_MESSAGE(spends_not_ok, "Expected to fail but didn't");
+
+
         nValueTarget += OneCoinAmount;
     }
 }
@@ -492,27 +500,27 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test99)
     CAmount OneCoinAmount = ZerocoinDenominationToAmount(ZQ_ONE);
     CAmount nValueTarget = 99 * OneCoinAmount;
 
-//    bool fDebug = 0;
+    //    bool fDebug = 0;
     int nCoinsReturned;
-    int nNeededSpends = 0;  // Number of spends which would be needed if selection failed
+    int nNeededSpends = 0; // Number of spends which would be needed if selection failed
 
     std::vector<CMintMeta> vSpends = SelectMintsFromList(nValueTarget, nSelectedValue,
-                                                             nMaxNumberOfSpends,
-                                                             fMinimizeChange,
-                                                             nCoinsReturned,
-                                                            listMints,
-                                                             mapOfDenomsHeld,
-                                                             nNeededSpends);
+        nMaxNumberOfSpends,
+        fMinimizeChange,
+        nCoinsReturned,
+        listMints,
+        mapOfDenomsHeld,
+        nNeededSpends);
 
-//    if (fDebug) {
-//        if (vSpends.size() > 0) {
-//            std::cout << "SUCCESS : Coins = " << nValueTarget / COIN << " # spends used = " << vSpends.size()
-//            << " # of coins returned = " << nCoinsReturned
-//                      << " Spend Amount = " << nSelectedValue / COIN << " Held = " << CoinsHeld << "\n";
-//        } else {
-//            std::cout << "FAILED : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
-//        }
-//    }
+    //    if (fDebug) {
+    //        if (vSpends.size() > 0) {
+    //            std::cout << "SUCCESS : Coins = " << nValueTarget / COIN << " # spends used = " << vSpends.size()
+    //            << " # of coins returned = " << nCoinsReturned
+    //                      << " Spend Amount = " << nSelectedValue / COIN << " Held = " << CoinsHeld << "\n";
+    //        } else {
+    //            std::cout << "FAILED : Coins = " << nValueTarget / COIN << " Held = " << CoinsHeld << "\n";
+    //        }
+    //    }
 
     BOOST_CHECK_MESSAGE(vSpends.size() < 5, "Too many spends");
     BOOST_CHECK_MESSAGE(vSpends.size() > 0, "No spends");
