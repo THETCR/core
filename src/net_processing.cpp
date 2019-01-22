@@ -3085,19 +3085,19 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         CInv inv(MSG_BLOCK, hashBlock);
         LogPrint(BCLog::NET, "received block %s peer=%d\n", pblock->GetHash().ToString(), pfrom->GetId());
         //sometimes we will be sent their most recent block and its not the one we want, in that case tell where we are
-        if (!mapBlockIndex.count(pblock->hashPrevBlock)) {
-            if (find(pfrom->vBlockRequested.begin(), pfrom->vBlockRequested.end(), hashBlock) != pfrom->vBlockRequested.end()) {
-                //we already asked for this block, so lets work backwards and ask for the previous block
-                LogPrint(BCLog::NET, "we already asked for this block, so lets work backwards and ask for the previous block\n");
-                connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(), pblock->hashPrevBlock));
-                pfrom->vBlockRequested.emplace_back(pblock->hashPrevBlock);
-            } else {
-                //ask to sync to this block
-                LogPrint(BCLog::NET, "ask to sync to this block = %s\n", hashBlock.ToString());
-                connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(), hashBlock));
-                pfrom->vBlockRequested.emplace_back(hashBlock);
-            }
-        } else {
+//        if (!mapBlockIndex.count(pblock->hashPrevBlock)) {
+//            if (find(pfrom->vBlockRequested.begin(), pfrom->vBlockRequested.end(), hashBlock) != pfrom->vBlockRequested.end()) {
+//                //we already asked for this block, so lets work backwards and ask for the previous block
+//                LogPrint(BCLog::NET, "we already asked for this block, so lets work backwards and ask for the previous block\n");
+//                connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(), pblock->hashPrevBlock));
+//                pfrom->vBlockRequested.emplace_back(pblock->hashPrevBlock);
+//            } else {
+//                //ask to sync to this block
+//                LogPrint(BCLog::NET, "ask to sync to this block = %s\n", hashBlock.ToString());
+//                connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(), hashBlock));
+//                pfrom->vBlockRequested.emplace_back(hashBlock);
+//            }
+//        } else {
             pfrom->PushInventory(CInv(MSG_BLOCK, inv.hash));
             bool forceProcessing = false;
             const uint256 hash(pblock->GetHash());
@@ -3116,15 +3116,16 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             CValidationState state;
             if(!ProcessNewBlockHeaders({pblock->GetBlockHeader()}, state, chainparams, &pindex)){
                 LogPrint(BCLog::NET, "Peer %d sent us invalid header via block\n", pfrom->GetId());
+            }else{
+                ProcessNewBlock(chainparams, pblock, forceProcessing, &fNewBlock);
+                if (fNewBlock) {
+                    pfrom->nLastBlockTime = GetTime();
+                } else {
+                    LOCK(cs_main);
+                    mapBlockSource.erase(pblock->GetHash());
+                }
             }
-            ProcessNewBlock(chainparams, pblock, forceProcessing, &fNewBlock);
-            if (fNewBlock) {
-                pfrom->nLastBlockTime = GetTime();
-            } else {
-                LOCK(cs_main);
-                mapBlockSource.erase(pblock->GetHash());
-            }
-        }
+//        }
         return true;
     }
 
