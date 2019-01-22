@@ -11,9 +11,9 @@
 #include "db.h"
 #include "key.h"
 #include "keystore.h"
-#include "primitives/zerocoin.h"
 #include "libzerocoin/Accumulator.h"
 #include "libzerocoin/Denominations.h"
+#include "primitives/zerocoin.h"
 #include "zwsptracker.h"
 
 #include <list>
@@ -116,8 +116,8 @@ public:
 
     // presstab
     bool WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold);
-    bool WriteMultiSend(std::vector<std::pair<std::string, int> > vMultiSend);
-    bool EraseMultiSend(std::vector<std::pair<std::string, int> > vMultiSend);
+    bool WriteMultiSend(std::vector<std::pair<std::string, int>> vMultiSend);
+    bool EraseMultiSend(std::vector<std::pair<std::string, int>> vMultiSend);
     bool WriteMSettings(bool fMultiSendStake, bool fMultiSendMasternode, int nLastMultiSendHeight);
     bool WriteMSDisabledAddresses(std::vector<std::string> vDisabledAddresses);
     bool EraseMSDisabledAddresses(std::vector<std::string> vDisabledAddresses);
@@ -158,7 +158,7 @@ public:
     bool EraseDeterministicMint(const uint256& hashPubcoin);
     bool WriteZerocoinMint(const CZerocoinMint& zerocoinMint);
     bool EraseZerocoinMint(const CZerocoinMint& zerocoinMint);
-    bool ReadZerocoinMint(const CBigNum &bnPubcoinValue, CZerocoinMint& zerocoinMint);
+    bool ReadZerocoinMint(const CBigNum& bnPubcoinValue, CZerocoinMint& zerocoinMint);
     bool ReadZerocoinMint(const uint256& hashPubcoin, CZerocoinMint& mint);
     bool ArchiveMintOrphan(const CZerocoinMint& zerocoinMint);
     bool ArchiveDeterministicOrphan(const CDeterministicMint& dMint);
@@ -183,7 +183,7 @@ public:
 
     bool WriteZWSPCount(const uint32_t& nCount);
     bool ReadZWSPCount(uint32_t& nCount);
-    std::map<uint256, std::vector<pair<uint256, uint32_t> > > MapMintPool();
+    std::map<uint256, std::vector<pair<uint256, uint32_t>>> MapMintPool();
     bool WriteMintPoolPair(const uint256& hashMasterSeed, const uint256& hashPubcoin, const uint32_t& nCount);
 
 

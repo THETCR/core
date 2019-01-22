@@ -36,8 +36,7 @@ class CBlockIndex;
 class CScheduler;
 class CNode;
 
-namespace boost
-{
+namespace boost {
 class thread_group;
 } // namespace boost
 
@@ -134,7 +133,7 @@ extern int nMaxConnections;
 extern std::vector<CNode*> vNodes;
 extern CCriticalSection cs_vNodes;
 extern std::map<CInv, CDataStream> mapRelay;
-extern std::deque<std::pair<int64_t, CInv> > vRelayExpiration;
+extern std::deque<std::pair<int64_t, CInv>> vRelayExpiration;
 extern CCriticalSection cs_mapRelay;
 extern limitedmap<CInv, int64_t> mapAlreadyAskedFor;
 
@@ -219,17 +218,16 @@ public:
 };
 
 
-typedef enum BanReason
-{
-    BanReasonUnknown          = 0,
-    BanReasonNodeMisbehaving  = 1,
-    BanReasonManuallyAdded    = 2
+typedef enum BanReason {
+    BanReasonUnknown = 0,
+    BanReasonNodeMisbehaving = 1,
+    BanReasonManuallyAdded = 2
 } BanReason;
 
 class CBanEntry
 {
 public:
-    static const int CURRENT_VERSION=1;
+    static const int CURRENT_VERSION = 1;
     int nVersion;
     int64_t nCreateTime;
     int64_t nBanUntil;
@@ -249,7 +247,8 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    {
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
         READWRITE(nCreateTime);
@@ -411,7 +410,7 @@ public:
     unsigned int GetTotalRecvSize()
     {
         unsigned int total = 0;
-        for (const CNetMessage& msg: vRecvMsg)
+        for (const CNetMessage& msg : vRecvMsg)
             total += msg.vRecv.size() + 24;
         return total;
     }
@@ -423,7 +422,7 @@ public:
     void SetRecvVersion(int nVersionIn)
     {
         nRecvVersion = nVersionIn;
-        for (CNetMessage& msg: vRecvMsg)
+        for (CNetMessage& msg : vRecvMsg)
             msg.SetVersion(nVersionIn);
     }
 
@@ -659,7 +658,7 @@ public:
 
     bool HasFulfilledRequest(std::string strRequest)
     {
-        for (std::string& type: vecRequestsFulfilled) {
+        for (std::string& type : vecRequestsFulfilled) {
             if (type == strRequest) return true;
         }
         return false;
@@ -706,17 +705,17 @@ public:
     static void ClearBanned(); // needed for unit testing
     static bool IsBanned(CNetAddr ip);
     static bool IsBanned(CSubNet subnet);
-    static void Ban(const CNetAddr &ip, const BanReason &banReason, int64_t bantimeoffset = 0, bool sinceUnixEpoch = false);
-    static void Ban(const CSubNet &subNet, const BanReason &banReason, int64_t bantimeoffset = 0, bool sinceUnixEpoch = false);
-    static bool Unban(const CNetAddr &ip);
-    static bool Unban(const CSubNet &ip);
-    static void GetBanned(banmap_t &banmap);
-    static void SetBanned(const banmap_t &banmap);
+    static void Ban(const CNetAddr& ip, const BanReason& banReason, int64_t bantimeoffset = 0, bool sinceUnixEpoch = false);
+    static void Ban(const CSubNet& subNet, const BanReason& banReason, int64_t bantimeoffset = 0, bool sinceUnixEpoch = false);
+    static bool Unban(const CNetAddr& ip);
+    static bool Unban(const CSubNet& ip);
+    static void GetBanned(banmap_t& banmap);
+    static void SetBanned(const banmap_t& banmap);
 
     //!check is the banlist has unwritten changes
     static bool BannedSetIsDirty();
     //!set the "dirty" flag for the banlist
-    static void SetBannedSetDirty(bool dirty=true);
+    static void SetBannedSetDirty(bool dirty = true);
     //!clean unused entires (if bantime has expired)
     static void SweepBanned();
 
@@ -762,6 +761,7 @@ class CBanDB
 {
 private:
     boost::filesystem::path pathBanlist;
+
 public:
     CBanDB();
     bool Write(const banmap_t& banSet);

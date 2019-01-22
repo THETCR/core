@@ -68,6 +68,7 @@ class CWspStake : public CStakeInput
 private:
     CTransaction txFrom;
     unsigned int nPosition;
+
 public:
     CWspStake()
     {

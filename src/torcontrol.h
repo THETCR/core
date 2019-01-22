@@ -11,8 +11,8 @@
 
 #include <string>
 
-#include <boost/function.hpp>
 #include <boost/chrono/chrono.hpp>
+#include <boost/function.hpp>
 #include <boost/thread.hpp>
 
 extern const std::string DEFAULT_TOR_CONTROL;

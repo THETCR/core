@@ -3,8 +3,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "pubkey.h"
 #include "key.h"
+#include "pubkey.h"
 #include "script/script.h"
 #include "script/standard.h"
 #include "uint256.h"
@@ -46,8 +46,7 @@ BOOST_AUTO_TEST_CASE(GetSigOpCount)
     BOOST_CHECK_EQUAL(p2sh.GetSigOpCount(scriptSig), 3U);
 
     std::vector<CPubKey> keys;
-    for (int i = 0; i < 3; i++)
-    {
+    for (int i = 0; i < 3; i++) {
         CKey k;
         k.MakeNewKey(true);
         keys.push_back(k.GetPubKey());

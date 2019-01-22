@@ -5,11 +5,11 @@
 #ifndef WISPR_MINTPOOL_H
 #define WISPR_MINTPOOL_H
 
-#include <map>
 #include <list>
+#include <map>
 
-#include "primitives/zerocoin.h"
 #include "libzerocoin/bignum.h"
+#include "primitives/zerocoin.h"
 #include "uint256.h"
 
 /**
@@ -35,7 +35,7 @@ public:
     void Remove(const CBigNum& bnValue);
     void Remove(const uint256& hashPubcoin);
     std::pair<uint256, uint32_t> Get(const CBigNum& bnValue);
-    std::list<std::pair<uint256, uint32_t> > List();
+    std::list<std::pair<uint256, uint32_t>> List();
     void Reset();
 
     bool Front(std::pair<uint256, uint32_t>& pMint);

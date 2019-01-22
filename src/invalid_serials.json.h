@@ -3,7 +3,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 
-
 #ifndef WISPR_INVALID_SERIALS_JSON_H
 #define WISPR_INVALID_SERIALS_JSON_H
 
@@ -12,10 +11,10 @@
 std::string LoadInvalidSerials()
 {
     std::string str = "[\n"
-            "  {\n"
-            "    \"s\": \"0\"\n"
-            "  }\n"
-            "]";
+                      "  {\n"
+                      "    \"s\": \"0\"\n"
+                      "  }\n"
+                      "]";
     return str;
 }
 

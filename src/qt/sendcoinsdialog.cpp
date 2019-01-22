@@ -163,10 +163,10 @@ void SendCoinsDialog::setModel(WalletModel* model)
         }
 
         setBalance(model->getBalance(), model->getUnconfirmedBalance(), model->getImmatureBalance(),
-                   model->getZerocoinBalance (), model->getUnconfirmedZerocoinBalance (), model->getImmatureZerocoinBalance (),
-                   model->getWatchBalance(), model->getWatchUnconfirmedBalance(), model->getWatchImmatureBalance());
-        connect(model, SIGNAL(balanceChanged(CAmount, CAmount,  CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)), this, 
-                         SLOT(setBalance(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)));
+            model->getZerocoinBalance(), model->getUnconfirmedZerocoinBalance(), model->getImmatureZerocoinBalance(),
+            model->getWatchBalance(), model->getWatchUnconfirmedBalance(), model->getWatchImmatureBalance());
+        connect(model, SIGNAL(balanceChanged(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)), this,
+            SLOT(setBalance(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)));
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
         updateDisplayUnit();
 
@@ -280,7 +280,7 @@ void SendCoinsDialog::on_sendButton_clicked()
 
     // Format confirmation message
     QStringList formatted;
-    for (const SendCoinsRecipient& rcp: recipients) {
+    for (const SendCoinsRecipient& rcp : recipients) {
         // generate bold amount string
         QString amount = "<b>" + BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), rcp.amount);
         amount.append("</b> ").append(strFunds);
@@ -377,7 +377,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee,
     questionString.append("<hr />");
     CAmount totalAmount = currentTransaction.getTotalTransactionAmount() + txFee;
     QStringList alternativeUnits;
-    for (BitcoinUnits::Unit u: BitcoinUnits::availableUnits()) {
+    for (BitcoinUnits::Unit u : BitcoinUnits::availableUnits()) {
         if (u != model->getOptionsModel()->getDisplayUnit())
             alternativeUnits.append(BitcoinUnits::formatHtmlWithUnit(u, totalAmount));
     }
@@ -546,9 +546,7 @@ bool SendCoinsDialog::handlePaymentRequest(const SendCoinsRecipient& rv)
     return true;
 }
 
-void SendCoinsDialog::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, 
-                                 const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance,
-                                 const CAmount& watchBalance, const CAmount& watchUnconfirmedBalance, const CAmount& watchImmatureBalance)
+void SendCoinsDialog::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance, const CAmount& watchBalance, const CAmount& watchUnconfirmedBalance, const CAmount& watchImmatureBalance)
 {
     Q_UNUSED(unconfirmedBalance);
     Q_UNUSED(immatureBalance);
@@ -571,9 +569,9 @@ void SendCoinsDialog::updateDisplayUnit()
     TRY_LOCK(cs_main, lockMain);
     if (!lockMain) return;
 
-    setBalance(model->getBalance(), model->getUnconfirmedBalance(), model->getImmatureBalance(), 
-               model->getZerocoinBalance (), model->getUnconfirmedZerocoinBalance (), model->getImmatureZerocoinBalance (),
-               model->getWatchBalance(), model->getWatchUnconfirmedBalance(), model->getWatchImmatureBalance());
+    setBalance(model->getBalance(), model->getUnconfirmedBalance(), model->getImmatureBalance(),
+        model->getZerocoinBalance(), model->getUnconfirmedZerocoinBalance(), model->getImmatureZerocoinBalance(),
+        model->getWatchBalance(), model->getWatchUnconfirmedBalance(), model->getWatchImmatureBalance());
     coinControlUpdateLabels();
     ui->customFee->setDisplayUnit(model->getOptionsModel()->getDisplayUnit());
     updateMinFeeLabel();
@@ -608,7 +606,7 @@ void SendCoinsDialog::updateSwiftTX()
 void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn& sendCoinsReturn, const QString& msgArg, bool fPrepare)
 {
     bool fAskForUnlock = false;
-    
+
     QPair<QString, CClientUIInterface::MessageBoxFlags> msgParams;
     // Default to a warning message, override if error message is needed
     msgParams.second = CClientUIInterface::MSG_WARNING;
@@ -642,7 +640,7 @@ void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn&
         break;
     case WalletModel::AnonymizeOnlyUnlocked:
         // Unlock is only need when the coins are send
-        if(!fPrepare)
+        if (!fPrepare)
             fAskForUnlock = true;
         else
             msgParams.first = tr("Error: The wallet was unlocked only to anonymize coins.");
@@ -658,12 +656,11 @@ void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn&
     }
 
     // Unlock wallet if it wasn't fully unlocked already
-    if(fAskForUnlock) {
+    if (fAskForUnlock) {
         model->requestUnlock(AskPassphraseDialog::Context::Unlock_Full, false);
-        if(model->getEncryptionStatus () != WalletModel::Unlocked) {
+        if (model->getEncryptionStatus() != WalletModel::Unlocked) {
             msgParams.first = tr("Error: The wallet was unlocked only to anonymize coins. Unlock canceled.");
-        }
-        else {
+        } else {
             // Wallet unlocked
             return;
         }
@@ -758,8 +755,7 @@ void SendCoinsDialog::updateSmartFeeLabel()
     int nBlocksToConfirm = (int)25 - (int)std::max(0, std::min(24, ui->sliderSmartFee->value()));
     CFeeRate feeRate = mempool.estimateFee(nBlocksToConfirm);
     // if SwiftX checked, display it in the label
-    if (ui->checkSwiftTX->isChecked())
-    {
+    if (ui->checkSwiftTX->isChecked()) {
         ui->labelFeeEstimation->setText(tr("Estimated to get 6 confirmations near instantly with <b>SwiftX</b>!"));
         ui->labelSmartFee2->hide();
     } else if (feeRate <= CFeeRate(0)) // not enough data => minfee

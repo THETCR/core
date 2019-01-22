@@ -7,11 +7,10 @@
 #ifndef BITCOIN_PRIMITIVES_BLOCK_H
 #define BITCOIN_PRIMITIVES_BLOCK_H
 
-#include "primitives/transaction.h"
 #include "keystore.h"
+#include "primitives/transaction.h"
 #include "serialize.h"
 #include "uint256.h"
-
 
 
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
@@ -29,7 +28,7 @@ class CBlockHeader
 {
 public:
     // header
-    static const int32_t CURRENT_VERSION=9;     // Version 9 supports CLTV activation
+    static const int32_t CURRENT_VERSION = 9; // Version 9 supports CLTV activation
     int32_t nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
@@ -46,7 +45,8 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    {
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
         READWRITE(hashPrevBlock);
@@ -56,7 +56,7 @@ public:
         READWRITE(nNonce);
 
         //zerocoin active, header changes to include accumulator checksum
-        if(nVersion > 7)
+        if (nVersion > 7)
             READWRITE(nAccumulatorCheckpoint);
     }
 
@@ -91,13 +91,14 @@ public:
 class CBlockGetHeader : public CBlockHeader
 {
 public:
-    CBlockGetHeader() {};
-    CBlockGetHeader(const CBlockHeader &header) { *((CBlockHeader*)this) = header; };
+    CBlockGetHeader(){};
+    CBlockGetHeader(const CBlockHeader& header) { *((CBlockHeader*)this) = header; };
     std::vector<CTransaction> vtx;
 
     ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    {
         READWRITE(*(CBlockHeader*)this);
         READWRITE(vtx);
     }
@@ -121,7 +122,7 @@ public:
         SetNull();
     }
 
-    CBlock(const CBlockHeader &header)
+    CBlock(const CBlockHeader& header)
     {
         SetNull();
         *((CBlockHeader*)this) = header;
@@ -130,11 +131,12 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    {
         READWRITE(*(CBlockHeader*)this);
         READWRITE(vtx);
         READWRITE(vchBlockSig);
-//	if(vtx.size() > 1 && vtx[1].IsCoinStake())
+        //	if(vtx.size() > 1 && vtx[1].IsCoinStake())
     }
 
     void SetNull()
@@ -149,12 +151,12 @@ public:
     CBlockHeader GetBlockHeader() const
     {
         CBlockHeader block;
-        block.nVersion       = nVersion;
-        block.hashPrevBlock  = hashPrevBlock;
+        block.nVersion = nVersion;
+        block.hashPrevBlock = hashPrevBlock;
         block.hashMerkleRoot = hashMerkleRoot;
-        block.nTime          = nTime;
-        block.nBits          = nBits;
-        block.nNonce         = nNonce;
+        block.nTime = nTime;
+        block.nBits = nBits;
+        block.nNonce = nNonce;
         block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
         return block;
     }
@@ -174,8 +176,8 @@ public:
     int64_t GetMaxTransactionTime() const
     {
         int64_t maxTransactionTime = 0;
-        for(const CTransaction& tx: vtx)
-        maxTransactionTime = std::max(maxTransactionTime, (int64_t)tx.nTime);
+        for (const CTransaction& tx : vtx)
+            maxTransactionTime = std::max(maxTransactionTime, (int64_t)tx.nTime);
         return maxTransactionTime;
     }
 
@@ -183,7 +185,7 @@ public:
 
     std::pair<COutPoint, unsigned int> GetProofOfStake() const
     {
-        return IsProofOfStake()? std::make_pair(vtx[1].vin[0].prevout, nTime) : std::make_pair(COutPoint(), (unsigned int)0);
+        return IsProofOfStake() ? std::make_pair(vtx[1].vin[0].prevout, nTime) : std::make_pair(COutPoint(), (unsigned int)0);
     }
     // Build the in-memory merkle tree for this block and return the merkle root.
     // If non-NULL, *mutated is set to whether mutation was detected in the merkle
@@ -202,8 +204,7 @@ public:
  * other node doesn't have the same branch, it can find a recent common trunk.
  * The further back it is, the further before the fork it may be.
  */
-struct CBlockLocator
-{
+struct CBlockLocator {
     std::vector<uint256> vHave;
 
     CBlockLocator() {}
@@ -216,7 +217,8 @@ struct CBlockLocator
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    {
         if (!(nType & SER_GETHASH))
             READWRITE(nVersion);
         READWRITE(vHave);

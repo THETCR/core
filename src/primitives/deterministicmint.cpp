@@ -2,9 +2,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "deterministicmint.h"
 #include <libzerocoin/Coin.h>
 #include <tinyformat.h>
-#include "deterministicmint.h"
 
 using namespace libzerocoin;
 
@@ -41,5 +41,5 @@ void CDeterministicMint::SetNull()
 std::string CDeterministicMint::ToString() const
 {
     return strprintf(" DeterministicMint:\n   version=%d\n   count=%d\n   hashseed=%s\n   hashSerial=%s\n   hashStake=%s\n   hashPubcoin=%s\n   txid=%s\n   height=%d\n   denom=%d\n   isUsed=%d\n",
-    nVersion, nCount, hashSeed.GetHex(), hashSerial.GetHex(), hashStake.GetHex(), hashPubcoin.GetHex(), txid.GetHex(), nHeight, denom, isUsed);
+        nVersion, nCount, hashSeed.GetHex(), hashSerial.GetHex(), hashStake.GetHex(), hashPubcoin.GetHex(), txid.GetHex(), nHeight, denom, isUsed);
 }

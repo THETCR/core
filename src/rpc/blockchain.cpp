@@ -5,6 +5,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "accumulatormap.h"
+#include "accumulators.h"
 #include "base58.h"
 #include "checkpoints.h"
 #include "clientversion.h"
@@ -14,8 +16,6 @@
 #include "txdb.h"
 #include "util.h"
 #include "utilmoneystr.h"
-#include "accumulatormap.h"
-#include "accumulators.h"
 
 #include <stdint.h>
 #include <univalue.h>
@@ -75,7 +75,7 @@ UniValue blockheaderToJSON(const CBlockIndex* blockindex)
 
     if (blockindex->pprev)
         result.push_back(Pair("previousblockhash", blockindex->pprev->GetBlockHash().GetHex()));
-    CBlockIndex *pnext = chainActive.Next(blockindex);
+    CBlockIndex* pnext = chainActive.Next(blockindex);
     if (pnext)
         result.push_back(Pair("nextblockhash", pnext->GetBlockHash().GetHex()));
     return result;
@@ -96,7 +96,7 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
     result.push_back(Pair("merkleroot", block.hashMerkleRoot.GetHex()));
     result.push_back(Pair("acc_checkpoint", block.nAccumulatorCheckpoint.GetHex()));
     UniValue txs(UniValue::VARR);
-    for (const CTransaction& tx: block.vtx) {
+    for (const CTransaction& tx : block.vtx) {
         if (txDetails) {
             UniValue objTx(UniValue::VOBJ);
             TxToJSON(tx, uint256(0), objTx);
@@ -118,11 +118,11 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
     if (pnext)
         result.push_back(Pair("nextblockhash", pnext->GetBlockHash().GetHex()));
 
-    result.push_back(Pair("moneysupply",ValueFromAmount(blockindex->nMoneySupply)));
+    result.push_back(Pair("moneysupply", ValueFromAmount(blockindex->nMoneySupply)));
 
     UniValue zwspObj(UniValue::VOBJ);
     for (auto denom : libzerocoin::zerocoinDenomList) {
-        zwspObj.push_back(Pair(to_string(denom), ValueFromAmount(blockindex->mapZerocoinSupply.at(denom) * (denom*COIN))));
+        zwspObj.push_back(Pair(to_string(denom), ValueFromAmount(blockindex->mapZerocoinSupply.at(denom) * (denom * COIN))));
     }
     zwspObj.push_back(Pair("total", ValueFromAmount(blockindex->GetZerocoinSupply())));
     result.push_back(Pair("zWSPsupply", zwspObj));
@@ -187,7 +187,7 @@ UniValue mempoolToJSON(bool fVerbose = false)
     if (fVerbose) {
         LOCK(mempool.cs);
         UniValue o(UniValue::VOBJ);
-        for (const std::pair<uint256, CTxMemPoolEntry> & entry: mempool.mapTx) {
+        for (const std::pair<uint256, CTxMemPoolEntry>& entry : mempool.mapTx) {
             const uint256& hash = entry.first;
             const CTxMemPoolEntry& e = entry.second;
             UniValue info(UniValue::VOBJ);
@@ -199,13 +199,13 @@ UniValue mempoolToJSON(bool fVerbose = false)
             info.push_back(Pair("currentpriority", e.GetPriority(chainActive.Height())));
             const CTransaction& tx = e.GetTx();
             set<string> setDepends;
-            for (const CTxIn& txin: tx.vin) {
+            for (const CTxIn& txin : tx.vin) {
                 if (mempool.exists(txin.prevout.hash))
                     setDepends.insert(txin.prevout.hash.ToString());
             }
 
             UniValue depends(UniValue::VARR);
-            for(const string& dep: setDepends) {
+            for (const string& dep : setDepends) {
                 depends.push_back(dep);
             }
 
@@ -218,7 +218,7 @@ UniValue mempoolToJSON(bool fVerbose = false)
         mempool.queryHashes(vtxid);
 
         UniValue a(UniValue::VARR);
-        for (const uint256& hash: vtxid)
+        for (const uint256& hash : vtxid)
             a.push_back(hash.ToString());
 
         return a;
@@ -583,8 +583,7 @@ static UniValue SoftForkMajorityDesc(int minVersion, CBlockIndex* pindex, int nR
 {
     int nFound = 0;
     CBlockIndex* pstart = pindex;
-    for (int i = 0; i < Params().ToCheckBlockUpgradeMajority() && pstart != nullptr; i++)
-    {
+    for (int i = 0; i < Params().ToCheckBlockUpgradeMajority() && pstart != nullptr; i++) {
         if (pstart->nVersion >= minVersion)
             ++nFound;
         pstart = pstart->pprev;
@@ -596,7 +595,7 @@ static UniValue SoftForkMajorityDesc(int minVersion, CBlockIndex* pindex, int nR
     rv.push_back(Pair("window", Params().ToCheckBlockUpgradeMajority()));
     return rv;
 }
-static UniValue SoftForkDesc(const std::string &name, int version, CBlockIndex* pindex)
+static UniValue SoftForkDesc(const std::string& name, int version, CBlockIndex* pindex)
 {
     UniValue rv(UniValue::VOBJ);
     rv.push_back(Pair("id", name));
@@ -653,7 +652,7 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp)
     CBlockIndex* tip = chainActive.Tip();
     UniValue softforks(UniValue::VARR);
     softforks.push_back(SoftForkDesc("bip65", 5, tip));
-    obj.push_back(Pair("softforks",             softforks));
+    obj.push_back(Pair("softforks", softforks));
     return obj;
 }
 
@@ -711,9 +710,9 @@ UniValue getchaintips(const UniValue& params, bool fHelp)
        known blocks, and successively remove blocks that appear as pprev
        of another block.  */
     std::set<const CBlockIndex*, CompareBlocksByHeight> setTips;
-    for (const std::pair<const uint256, CBlockIndex*> & item : mapBlockIndex)
+    for (const std::pair<const uint256, CBlockIndex*>& item : mapBlockIndex)
         setTips.insert(item.second);
-    for (const std::pair<const uint256, CBlockIndex*> & item : mapBlockIndex) {
+    for (const std::pair<const uint256, CBlockIndex*>& item : mapBlockIndex) {
         const CBlockIndex* pprev = item.second->pprev;
         if (pprev)
             setTips.erase(pprev);
@@ -724,7 +723,7 @@ UniValue getchaintips(const UniValue& params, bool fHelp)
 
     /* Construct the output array.  */
     UniValue res(UniValue::VARR);
-    for (const CBlockIndex* block: setTips) {
+    for (const CBlockIndex* block : setTips) {
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("height", block->nHeight));
         obj.push_back(Pair("hash", block->phashBlock->GetHex()));
@@ -814,7 +813,7 @@ UniValue getfeeinfo(const UniValue& params, bool fHelp)
                 COutPoint prevout = tx.vin[j].prevout;
                 CTransaction txPrev;
                 uint256 hashBlock;
-                if(!GetTransaction(prevout.hash, txPrev, hashBlock, true))
+                if (!GetTransaction(prevout.hash, txPrev, hashBlock, true))
                     throw JSONRPCError(RPC_DATABASE_ERROR, "failed to read tx from disk");
                 nValueIn += txPrev.vout[prevout.n].nValue;
             }
@@ -847,8 +846,8 @@ UniValue getfeeinfo(const UniValue& params, bool fHelp)
 UniValue mempoolInfoToJSON()
 {
     UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("size", (int64_t) mempool.size()));
-    ret.push_back(Pair("bytes", (int64_t) mempool.GetTotalTxSize()));
+    ret.push_back(Pair("size", (int64_t)mempool.size()));
+    ret.push_back(Pair("bytes", (int64_t)mempool.GetTotalTxSize()));
     //ret.push_back(Pair("usage", (int64_t) mempool.DynamicMemoryUsage()));
 
     return ret;
@@ -950,7 +949,7 @@ UniValue reconsiderblock(const UniValue& params, bool fHelp)
 
 UniValue findserial(const UniValue& params, bool fHelp)
 {
-    if(fHelp || params.size() != 1)
+    if (fHelp || params.size() != 1)
         throw runtime_error(
             "findserial \"serial\"\n"
             "\nSearches the zerocoin database for a zerocoin spend transaction that contains the specified serial\n"
@@ -971,7 +970,7 @@ UniValue findserial(const UniValue& params, bool fHelp)
     CBigNum bnSerial = 0;
     bnSerial.SetHex(strSerial);
     if (!bnSerial)
-	throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid serial");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid serial");
 
     uint256 txid = 0;
     bool fSuccess = zerocoinDB->ReadCoinSpend(bnSerial, txid);
@@ -987,12 +986,12 @@ UniValue getaccumulatorvalues(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaccumulatorvalues \"height\"\n"
-                    "\nReturns the accumulator values associated with a block height\n"
+            "\nReturns the accumulator values associated with a block height\n"
 
-                    "\nArguments:\n"
-                    "1. height   (numeric, required) the height of the checkpoint.\n"
+            "\nArguments:\n"
+            "1. height   (numeric, required) the height of the checkpoint.\n"
 
-                    "\nExamples:\n" +
+            "\nExamples:\n" +
             HelpExampleCli("getaccumulatorvalues", "\"height\"") + HelpExampleRpc("getaccumulatorvalues", "\"height\""));
 
     int nHeight = params[0].get_int();
@@ -1004,7 +1003,7 @@ UniValue getaccumulatorvalues(const UniValue& params, bool fHelp)
     UniValue ret(UniValue::VARR);
     for (libzerocoin::CoinDenomination denom : libzerocoin::zerocoinDenomList) {
         CBigNum bnValue;
-        if(!GetAccumulatorValueFromDB(pindex->nAccumulatorCheckpoint, denom, bnValue))
+        if (!GetAccumulatorValueFromDB(pindex->nAccumulatorCheckpoint, denom, bnValue))
             throw JSONRPCError(RPC_DATABASE_ERROR, "failed to find value in database");
 
         UniValue obj(UniValue::VOBJ);

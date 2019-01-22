@@ -16,8 +16,8 @@
 #include "multisigdialog.h"
 #include "optionsmodel.h"
 #include "overviewpage.h"
-#include "receivecoinsdialog.h"
 #include "privacydialog.h"
+#include "receivecoinsdialog.h"
 #include "sendcoinsdialog.h"
 #include "signverifymessagedialog.h"
 #include "transactiontablemodel.h"
@@ -39,14 +39,14 @@
 WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
                                           clientModel(0),
                                           walletModel(0)
-{   
+{
     // Create tabs
     overviewPage = new OverviewPage();
     explorerWindow = new BlockExplorer(this);
     transactionsPage = new QWidget(this);
 
     // Create Header with the same names as the other forms to be CSS-Id compatible
-    QFrame *frame_Header = new QFrame(transactionsPage);
+    QFrame* frame_Header = new QFrame(transactionsPage);
     frame_Header->setObjectName(QStringLiteral("frame_Header"));
 
     QVBoxLayout* verticalLayout_8 = new QVBoxLayout(frame_Header);
@@ -79,7 +79,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     QFont fontHeaderRight;
     fontHeaderRight.setPointSize(14);
     labelOverviewHeaderRight->setFont(fontHeaderRight);
-    labelOverviewHeaderRight->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+    labelOverviewHeaderRight->setAlignment(Qt::AlignRight | Qt::AlignTrailing | Qt::AlignVCenter);
 
     horizontalLayout_Header->addWidget(labelOverviewHeaderRight);
     horizontalLayout_Header->setStretch(0, 1);
@@ -349,8 +349,8 @@ void WalletView::encryptWallet(bool status)
 {
     if (!walletModel)
         return;
-    AskPassphraseDialog dlg(status ? AskPassphraseDialog::Mode::Encrypt : AskPassphraseDialog::Mode::Decrypt, this, 
-                            walletModel, AskPassphraseDialog::Context::Encrypt);
+    AskPassphraseDialog dlg(status ? AskPassphraseDialog::Mode::Encrypt : AskPassphraseDialog::Mode::Decrypt, this,
+        walletModel, AskPassphraseDialog::Context::Encrypt);
     dlg.exec();
 
     updateEncryptionStatus();
@@ -407,7 +407,7 @@ void WalletView::toggleLockWallet()
     }
 
     else if (encStatus == walletModel->Unlocked || encStatus == walletModel->UnlockedForAnonymizationOnly) {
-            walletModel->setWalletLocked(true);
+        walletModel->setWalletLocked(true);
     }
 }
 

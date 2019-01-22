@@ -5,16 +5,17 @@
 #ifndef WISPR_ACCUMULATORMAP_H
 #define WISPR_ACCUMULATORMAP_H
 
+#include "accumulatorcheckpoints.h"
 #include "libzerocoin/Accumulator.h"
 #include "libzerocoin/Coin.h"
-#include "accumulatorcheckpoints.h"
 
 //A map with an accumulator for each denomination
 class AccumulatorMap
 {
 private:
     libzerocoin::ZerocoinParams* params;
-    std::map<libzerocoin::CoinDenomination, std::unique_ptr<libzerocoin::Accumulator> > mapAccumulators;
+    std::map<libzerocoin::CoinDenomination, std::unique_ptr<libzerocoin::Accumulator>> mapAccumulators;
+
 public:
     explicit AccumulatorMap(libzerocoin::ZerocoinParams* params);
     bool Load(uint256 nCheckpoint);

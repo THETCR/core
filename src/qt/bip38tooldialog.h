@@ -9,8 +9,7 @@
 
 class WalletModel;
 
-namespace Ui
-{
+namespace Ui {
 class Bip38ToolDialog;
 }
 

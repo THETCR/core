@@ -152,7 +152,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         //
         // Credit
         //
-        for (const CTxOut& txout: wtx.vout) {
+        for (const CTxOut& txout : wtx.vout) {
             isminetype mine = wallet->IsMine(txout);
             if (mine) {
                 TransactionRecord sub(hash, nTime);
@@ -182,7 +182,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         int nFromMe = 0;
         bool involvesWatchAddress = false;
         isminetype fAllFromMe = ISMINE_SPENDABLE;
-        for (const CTxIn& txin: wtx.vin) {
+        for (const CTxIn& txin : wtx.vin) {
             if (wallet->IsMine(txin)) {
                 fAllFromMeDenom = fAllFromMeDenom && wallet->IsDenominated(txin);
                 nFromMe++;
@@ -195,7 +195,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         isminetype fAllToMe = ISMINE_SPENDABLE;
         bool fAllToMeDenom = true;
         int nToMe = 0;
-        for (const CTxOut& txout: wtx.vout) {
+        for (const CTxOut& txout : wtx.vout) {
             if (wallet->IsMine(txout)) {
                 fAllToMeDenom = fAllToMeDenom && wallet->IsDenominatedAmount(txout.nValue);
                 nToMe++;
@@ -272,7 +272,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                     // Sent to WISPR Address
                     sub.type = TransactionRecord::SendToAddress;
                     sub.address = CBitcoinAddress(address).ToString();
-                } else if (txout.IsZerocoinMint()){
+                } else if (txout.IsZerocoinMint()) {
                     sub.type = TransactionRecord::ZerocoinMint;
                     sub.address = mapValue["zerocoinmint"];
                     sub.credit += txout.nValue;
@@ -311,15 +311,15 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
 bool IsZWSPType(TransactionRecord::Type type)
 {
     switch (type) {
-        case TransactionRecord::StakeZWSP:
-        case TransactionRecord::ZerocoinMint:
-        case TransactionRecord::ZerocoinSpend:
-        case TransactionRecord::RecvFromZerocoinSpend:
-        case TransactionRecord::ZerocoinSpend_Change_zWsp:
-        case TransactionRecord::ZerocoinSpend_FromMe:
-            return true;
-        default:
-            return false;
+    case TransactionRecord::StakeZWSP:
+    case TransactionRecord::ZerocoinMint:
+    case TransactionRecord::ZerocoinSpend:
+    case TransactionRecord::RecvFromZerocoinSpend:
+    case TransactionRecord::ZerocoinSpend_Change_zWsp:
+    case TransactionRecord::ZerocoinSpend_FromMe:
+        return true;
+    default:
+        return false;
     }
 }
 

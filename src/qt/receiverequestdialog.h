@@ -14,8 +14,7 @@
 
 class OptionsModel;
 
-namespace Ui
-{
+namespace Ui {
 class ReceiveRequestDialog;
 }
 

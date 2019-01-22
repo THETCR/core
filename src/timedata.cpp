@@ -12,7 +12,6 @@
 #include "utilstrencodings.h"
 
 
-
 using namespace std;
 
 static CCriticalSection cs_nTimeOffset;
@@ -84,7 +83,7 @@ void AddTimeData(const CNetAddr& ip, int64_t nOffsetSample)
             if (!fDone) {
                 // If nobody has a time different than ours but within 5 minutes of ours, give a warning
                 bool fMatch = false;
-                for (int64_t nOffset: vSorted)
+                for (int64_t nOffset : vSorted)
                     if (nOffset != 0 && abs64(nOffset) < 5 * 60)
                         fMatch = true;
 
@@ -98,7 +97,7 @@ void AddTimeData(const CNetAddr& ip, int64_t nOffsetSample)
             }
         }
         if (fDebug) {
-            for (int64_t n: vSorted)
+            for (int64_t n : vSorted)
                 LogPrintf("%+d  ", n);
             LogPrintf("|  ");
         }

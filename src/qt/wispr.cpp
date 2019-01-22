@@ -496,9 +496,9 @@ int main(int argc, char* argv[])
     // Command-line options take precedence:
     ParseParameters(argc, argv);
 
-// Do not refer to data directory yet, this can be overridden by Intro::pickDataDirectory
+    // Do not refer to data directory yet, this can be overridden by Intro::pickDataDirectory
 
-/// 2. Basic Qt initialization (not dependent on parameters or configuration)
+    /// 2. Basic Qt initialization (not dependent on parameters or configuration)
     Q_INIT_RESOURCE(wispr_locale);
     Q_INIT_RESOURCE(wispr);
 

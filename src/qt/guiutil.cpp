@@ -53,11 +53,11 @@
 #include <QFileDialog>
 #include <QFont>
 #include <QLineEdit>
+#include <QMouseEvent>
 #include <QSettings>
 #include <QTextDocument> // for Qt::mightBeRichText
 #include <QThread>
 #include <QUrlQuery>
-#include <QMouseEvent>
 
 
 #if BOOST_FILESYSTEM_VERSION >= 3
@@ -76,8 +76,7 @@ extern double NSAppKitVersionNumber;
 
 #define URI_SCHEME "wispr"
 
-namespace GUIUtil
-{
+namespace GUIUtil {
 QString dateTimeStr(const QDateTime& date)
 {
     return date.date().toString(Qt::SystemLocaleShortDate) + QString(" ") + date.toString("hh:mm");
@@ -131,9 +130,8 @@ bool parseBitcoinURI(const QUrl& uri, SendCoinsRecipient* out)
     rv.amount = 0;
 
     QUrlQuery uriQuery(uri);
-    QList<QPair<QString, QString> > items = uriQuery.queryItems();
-    for (QList<QPair<QString, QString> >::iterator i = items.begin(); i != items.end(); i++)
-    {
+    QList<QPair<QString, QString>> items = uriQuery.queryItems();
+    for (QList<QPair<QString, QString>>::iterator i = items.begin(); i != items.end(); i++) {
         bool fShouldReturnFalse = false;
         if (i->first.startsWith("req-")) {
             i->first.remove(0, 4);
@@ -238,13 +236,13 @@ void copyEntryData(QAbstractItemView* view, int column, int role)
     }
 }
 
-QString getEntryData(QAbstractItemView *view, int column, int role)
+QString getEntryData(QAbstractItemView* view, int column, int role)
 {
-    if(!view || !view->selectionModel())
+    if (!view || !view->selectionModel())
         return QString();
     QModelIndexList selection = view->selectionModel()->selectedRows(column);
 
-    if(!selection.isEmpty()) {
+    if (!selection.isEmpty()) {
         // Return first item
         return (selection.at(0).data(role).toString());
     }
@@ -258,9 +256,7 @@ QString getSaveFileName(QWidget* parent, const QString& caption, const QString& 
     if (dir.isEmpty()) // Default to user documents location
     {
         myDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    }
-    else
-    {
+    } else {
         myDir = dir;
     }
     /* Directly convert path to native OS path separators */
@@ -298,9 +294,7 @@ QString getOpenFileName(QWidget* parent, const QString& caption, const QString& 
     if (dir.isEmpty()) // Default to user documents location
     {
         myDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    }
-    else
-    {
+    } else {
         myDir = dir;
     }
     /* Directly convert path to native OS path separators */
@@ -717,17 +711,17 @@ LSSharedFileListItemRef findStartupItemInList(LSSharedFileListRef list, CFURLRef
         CFURLRef currentItemURL = NULL;
 
 #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && MAC_OS_X_VERSION_MAX_ALLOWED >= 10100
-    if(&LSSharedFileListItemCopyResolvedURL)
-        currentItemURL = LSSharedFileListItemCopyResolvedURL(item, resolutionFlags, NULL);
+        if (&LSSharedFileListItemCopyResolvedURL)
+            currentItemURL = LSSharedFileListItemCopyResolvedURL(item, resolutionFlags, NULL);
 #if defined(MAC_OS_X_VERSION_MIN_REQUIRED) && MAC_OS_X_VERSION_MIN_REQUIRED < 10100
-    else
-        LSSharedFileListItemResolve(item, resolutionFlags, &currentItemURL, NULL);
+        else
+            LSSharedFileListItemResolve(item, resolutionFlags, &currentItemURL, NULL);
 #endif
 #else
-    LSSharedFileListItemResolve(item, resolutionFlags, &currentItemURL, NULL);
+        LSSharedFileListItemResolve(item, resolutionFlags, &currentItemURL, NULL);
 #endif
 
-        if(currentItemURL && CFEqual(currentItemURL, findUrl)) {
+        if (currentItemURL && CFEqual(currentItemURL, findUrl)) {
             // found
             CFRelease(currentItemURL);
             return item;
@@ -921,7 +915,7 @@ QString formatPingTime(double dPingTime)
 
 QString formatTimeOffset(int64_t nTimeOffset)
 {
-  return QString(QObject::tr("%1 s")).arg(QString::number((int)nTimeOffset, 10));
+    return QString(QObject::tr("%1 s")).arg(QString::number((int)nTimeOffset, 10));
 }
 
 } // namespace GUIUtil

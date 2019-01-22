@@ -8,15 +8,13 @@
 
 #include "chainparams.h"
 #include "main.h"
-#include "uint256.h"
 #include "reverse_iterate.h"
+#include "uint256.h"
 
 #include <stdint.h>
 
 
-
-namespace Checkpoints
-{
+namespace Checkpoints {
 /**
      * How many times we expect transactions after the last checkpoint to
      * be slower. This number is a compromise, as it can't be accurate for
@@ -91,7 +89,7 @@ CBlockIndex* GetLastCheckpoint()
 
     const MapCheckpoints& checkpoints = *Params().Checkpoints().mapCheckpoints;
 
-    for (const MapCheckpoints::value_type& i: reverse_iterate(checkpoints)) {
+    for (const MapCheckpoints::value_type& i : reverse_iterate(checkpoints)) {
         const uint256& hash = i.second;
         BlockMap::const_iterator t = mapBlockIndex.find(hash);
         if (t != mapBlockIndex.end())

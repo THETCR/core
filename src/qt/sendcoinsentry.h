@@ -12,8 +12,7 @@
 
 class WalletModel;
 
-namespace Ui
-{
+namespace Ui {
 class SendCoinsEntry;
 }
 

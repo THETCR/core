@@ -4,9 +4,9 @@
 
 #include "accumulatormap.h"
 #include "accumulators.h"
+#include "libzerocoin/Denominations.h"
 #include "main.h"
 #include "txdb.h"
-#include "libzerocoin/Denominations.h"
 
 using namespace libzerocoin;
 using namespace std;
@@ -55,8 +55,8 @@ bool AccumulatorMap::Load(uint256 nCheckpoint)
 //Load accumulator map from a hard-checkpoint
 void AccumulatorMap::Load(const AccumulatorCheckpoints::Checkpoint& checkpoint)
 {
-     for (auto it : checkpoint)
-         mapAccumulators.at(it.first)->setValue(it.second);
+    for (auto it : checkpoint)
+        mapAccumulators.at(it.first)->setValue(it.second);
 }
 
 //Add a zerocoin to the accumulator of its denomination.
@@ -96,5 +96,3 @@ uint256 AccumulatorMap::GetCheckpoint()
 
     return nCheckpoint;
 }
-
-

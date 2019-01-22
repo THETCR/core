@@ -7,6 +7,7 @@
 #include "ui_masternodelist.h"
 
 #include "activemasternode.h"
+#include "askpassphrasedialog.h"
 #include "clientmodel.h"
 #include "guiutil.h"
 #include "init.h"
@@ -16,7 +17,6 @@
 #include "sync.h"
 #include "wallet.h"
 #include "walletmodel.h"
-#include "askpassphrasedialog.h"
 
 #include <QMessageBox>
 #include <QTimer>
@@ -90,7 +90,7 @@ void MasternodeList::StartAlias(std::string strAlias)
     std::string strStatusHtml;
     strStatusHtml += "<center>Alias: " + strAlias;
 
-    for (CMasternodeConfig::CMasternodeEntry mne: masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
         if (mne.getAlias() == strAlias) {
             std::string strError;
             CMasternodeBroadcast mnb;
@@ -122,12 +122,12 @@ void MasternodeList::StartAll(std::string strCommand)
     int nCountFailed = 0;
     std::string strFailedHtml;
 
-    for (CMasternodeConfig::CMasternodeEntry mne: masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
         std::string strError;
         CMasternodeBroadcast mnb;
 
         int nIndex;
-        if(!mne.castOutputIndex(nIndex))
+        if (!mne.castOutputIndex(nIndex))
             continue;
 
         CTxIn txin = CTxIn(uint256S(mne.getTxHash()), uint32_t(nIndex));
@@ -210,9 +210,9 @@ void MasternodeList::updateMyNodeList(bool fForce)
     nTimeMyListUpdated = GetTime();
 
     ui->tableWidgetMyMasternodes->setSortingEnabled(false);
-    for (CMasternodeConfig::CMasternodeEntry mne: masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
         int nIndex;
-        if(!mne.castOutputIndex(nIndex))
+        if (!mne.castOutputIndex(nIndex))
             continue;
 
         CTxIn txin = CTxIn(uint256S(mne.getTxHash()), uint32_t(nIndex));

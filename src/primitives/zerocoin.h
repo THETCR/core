@@ -5,16 +5,15 @@
 #ifndef WISPR_ZEROCOIN_H
 #define WISPR_ZEROCOIN_H
 
+#include "key.h"
+#include "libzerocoin/Denominations.h"
+#include "libzerocoin/bignum.h"
+#include "serialize.h"
 #include <amount.h>
 #include <limits.h>
-#include "libzerocoin/bignum.h"
-#include "libzerocoin/Denominations.h"
-#include "key.h"
-#include "serialize.h"
 
 //struct that is safe to store essential mint data, without holding any information that allows for actual spending (serial, randomness, private key)
-struct CMintMeta
-{
+struct CMintMeta {
     int nHeight;
     uint256 hashSerial;
     uint256 hashPubcoin;
@@ -27,7 +26,7 @@ struct CMintMeta
     bool isDeterministic;
     bool isSeedCorrect;
 
-    bool operator <(const CMintMeta& a) const;
+    bool operator<(const CMintMeta& a) const;
 };
 
 uint256 GetSerialHash(const CBigNum& bnSerial);
@@ -83,18 +82,18 @@ public:
     uint256 GetHash() const;
 
     CBigNum GetValue() const { return value; }
-    void SetValue(CBigNum value){ this->value = value; }
+    void SetValue(CBigNum value) { this->value = value; }
     libzerocoin::CoinDenomination GetDenomination() const { return denomination; }
     int64_t GetDenominationAsAmount() const { return denomination * COIN; }
-    void SetDenomination(libzerocoin::CoinDenomination denom){ this->denomination = denom; }
+    void SetDenomination(libzerocoin::CoinDenomination denom) { this->denomination = denom; }
     int GetHeight() const { return nHeight; }
-    void SetHeight(int nHeight){ this->nHeight = nHeight; }
+    void SetHeight(int nHeight) { this->nHeight = nHeight; }
     bool IsUsed() const { return this->isUsed; }
-    void SetUsed(bool isUsed){ this->isUsed = isUsed; }
-    CBigNum GetRandomness() const{ return randomness; }
-    void SetRandomness(CBigNum rand){ this->randomness = rand; }
+    void SetUsed(bool isUsed) { this->isUsed = isUsed; }
+    CBigNum GetRandomness() const { return randomness; }
+    void SetRandomness(CBigNum rand) { this->randomness = rand; }
     CBigNum GetSerialNumber() const { return serialNumber; }
-    void SetSerialNumber(CBigNum serial){ this->serialNumber = serial; }
+    void SetSerialNumber(CBigNum serial) { this->serialNumber = serial; }
     uint256 GetTxHash() const { return this->txid; }
     void SetTxHash(uint256 txid) { this->txid = txid; }
     uint8_t GetVersion() const { return this->version; }
@@ -103,9 +102,10 @@ public:
     void SetPrivKey(const CPrivKey& privkey) { this->privkey = privkey; }
     bool GetKeyPair(CKey& key) const;
 
-    inline bool operator <(const CZerocoinMint& a) const { return GetHeight() < a.GetHeight(); }
+    inline bool operator<(const CZerocoinMint& a) const { return GetHeight() < a.GetHeight(); }
 
-    CZerocoinMint(const CZerocoinMint& other) {
+    CZerocoinMint(const CZerocoinMint& other)
+    {
         denomination = other.GetDenomination();
         nHeight = other.GetHeight();
         value = other.GetValue();
@@ -119,13 +119,14 @@ public:
 
     std::string ToString() const;
 
-    bool operator == (const CZerocoinMint& other) const
+    bool operator==(const CZerocoinMint& other) const
     {
         return this->GetValue() == other.GetValue();
     }
-    
+
     // Copy another CZerocoinMint
-    inline CZerocoinMint& operator=(const CZerocoinMint& other) {
+    inline CZerocoinMint& operator=(const CZerocoinMint& other)
+    {
         denomination = other.GetDenomination();
         nHeight = other.GetHeight();
         value = other.GetValue();
@@ -137,9 +138,10 @@ public:
         privkey = other.GetPrivKey();
         return *this;
     }
-    
+
     // why 6 below (SPOCK)
-    inline bool checkUnused(int denom, int Height) const {
+    inline bool checkUnused(int denom, int Height) const
+    {
         if (IsUsed() == false && GetDenomination() == denomination && GetRandomness() != 0 && GetSerialNumber() != 0 && GetHeight() != -1 && GetHeight() != INT_MAX && GetHeight() >= 1 && (GetHeight() + 6 <= Height)) {
             return true;
         } else {
@@ -150,7 +152,8 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    {
         READWRITE(isUsed);
         READWRITE(randomness);
         READWRITE(serialNumber);
@@ -218,11 +221,12 @@ public:
     uint256 GetHash() const;
     void SetMintCount(int nMintsAdded) { this->nMintCount = nMintsAdded; }
     int GetMintCount() const { return nMintCount; }
- 
+
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    {
         READWRITE(coinSerial);
         READWRITE(hashTx);
         READWRITE(pubCoin);

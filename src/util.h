@@ -27,9 +27,9 @@
 #include <vector>
 
 #include <boost/filesystem/path.hpp>
-#include <boost/thread/exceptions.hpp>
 #include <boost/thread/condition_variable.hpp> // for boost::thread_interrupted
-#define CVOIDBEGIN(a)        ((const void*)&(a))
+#include <boost/thread/exceptions.hpp>
+#define CVOIDBEGIN(a) ((const void*)&(a))
 
 //WISPR only features
 
@@ -51,7 +51,7 @@ extern std::vector<int64_t> obfuScationDenominations;
 extern std::string strBudgetMode;
 
 extern std::map<std::string, std::string> mapArgs;
-extern std::map<std::string, std::vector<std::string> > mapMultiArgs;
+extern std::map<std::string, std::vector<std::string>> mapMultiArgs;
 extern bool fDebug;
 extern bool fPrintToConsole;
 extern bool fPrintToDebugLog;
@@ -75,20 +75,20 @@ int LogPrintStr(const std::string& str);
  * When we switch to C++11, this can be switched to variadic templates instead
  * of this macro-based construction (see tinyformat.h).
  */
-#define MAKE_ERROR_AND_LOG_FUNC(n)                                                              \
-    /**   Print to debug.log if -debug=category switch is given OR category is NULL. */         \
-    template <TINYFORMAT_ARGTYPES(n)>                                                           \
-    static inline int LogPrint(const char* category, const char* format, TINYFORMAT_VARARGS(n)) \
-    {                                                                                           \
-        if (!LogAcceptCategory(category)) return 0;                                             \
-        return LogPrintStr(tfm::format(format, TINYFORMAT_PASSARGS(n)));                        \
-    }                                                                                           \
-    /**   Log error and return false */                                                         \
-    template <TINYFORMAT_ARGTYPES(n)>                                                           \
-    static inline bool error(const char* format, TINYFORMAT_VARARGS(n))                         \
-    {                                                                                           \
-        LogPrintStr(std::string("ERROR: ") + tfm::format(format, TINYFORMAT_PASSARGS(n)) + "\n");            \
-        return false;                                                                           \
+#define MAKE_ERROR_AND_LOG_FUNC(n)                                                                \
+    /**   Print to debug.log if -debug=category switch is given OR category is NULL. */           \
+    template <TINYFORMAT_ARGTYPES(n)>                                                             \
+    static inline int LogPrint(const char* category, const char* format, TINYFORMAT_VARARGS(n))   \
+    {                                                                                             \
+        if (!LogAcceptCategory(category)) return 0;                                               \
+        return LogPrintStr(tfm::format(format, TINYFORMAT_PASSARGS(n)));                          \
+    }                                                                                             \
+    /**   Log error and return false */                                                           \
+    template <TINYFORMAT_ARGTYPES(n)>                                                             \
+    static inline bool error(const char* format, TINYFORMAT_VARARGS(n))                           \
+    {                                                                                             \
+        LogPrintStr(std::string("ERROR: ") + tfm::format(format, TINYFORMAT_PASSARGS(n)) + "\n"); \
+        return false;                                                                             \
     }
 
 TINYFORMAT_FOREACH_ARGNUM(MAKE_ERROR_AND_LOG_FUNC)
@@ -126,7 +126,7 @@ boost::filesystem::path GetMasternodeConfigFile();
 boost::filesystem::path GetPidFile();
 void CreatePidFile(const boost::filesystem::path& path, pid_t pid);
 #endif
-void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map<std::string, std::vector<std::string> >& mapMultiSettingsRet);
+void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map<std::string, std::vector<std::string>>& mapMultiSettingsRet);
 #ifdef WIN32
 boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 #endif

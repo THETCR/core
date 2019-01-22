@@ -6,8 +6,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "libzerocoin/Params.h"
 #include "chainparams.h"
+#include "libzerocoin/Params.h"
 #include "random.h"
 #include "util.h"
 #include "utilstrencodings.h"
@@ -53,43 +53,41 @@ static void convertSeed6(std::vector<CAddress>& vSeedsOut, const SeedSpec6* data
 //    timestamp before)
 // + Contains no strange transactions
 static Checkpoints::MapCheckpoints mapCheckpoints =
-        boost::assign::map_list_of
-                (0, uint256("0x0000ec93e0a3fe0aafa3be7dafe1290f5fca039a4037dd5174bc3dd7a35d67f0"))
-                (14317, uint256("0x50929653a7146de37b82b9125e55ea03aa4ae062ce3a2e3098026eea07e5bc81")) // 125.000 Coin Burn Confirmation
-                (50000, uint256("0xb177127054381243141e809bbfb2d568aeae2dd9b3c486e54f0989d4546d0d80")) // Block 50.000
-                (75000, uint256("06f162fe22851c400c1532a6d49d7894640ea0aa292fad5f02f348480da6b20d")) // Block 75.000
-                (100000, uint256("ed8cccfb51c901af271892966160686177a05f101bd3fd517d5b82274a8f6611")) // Block 100.000
-                (125000, uint256("76d5412ec389433de6cd22345209c859b4c18b6d8f8893df479c9f7520d19901")) // Block 125.000
-                (150000, uint256("a7e0dfdc9c3197e9e763e858aafa9553c0235c0e328371a5f8c5ba0b6e44919d")) // Block 150.000
-                (200000, uint256("385e915b52f0ad669b91005ab7ddb22356b6a220e8b98cbcf2c8aca5c5dd3b03")) // Block 200.000
-                (250000, uint256("40ee22bd8b2cc23f83e16d19a53aa8591617772f9722c56b86d16163b2a10416")) // Block 250.000
-                (300000, uint256("700c33f9bf03c018f33167c2c455f05762b49e1f1f06e14833a5e8e269beebe7")) // Block 300.000
-                (350000, uint256("ffb49991aa635992305029cb629037cf5d08e945d2027c79f4f737c11e7d680e")) // Block 350.000
-                (400000, uint256("cf86529d0243cb653da92cbbaddc7f0a4f275bcf557cc112d03c33b756af25d3")); // Block 400.000
+    boost::assign::map_list_of(0, uint256("0x0000ec93e0a3fe0aafa3be7dafe1290f5fca039a4037dd5174bc3dd7a35d67f0"))(14317, uint256("0x50929653a7146de37b82b9125e55ea03aa4ae062ce3a2e3098026eea07e5bc81")) // 125.000 Coin Burn Confirmation
+    (50000, uint256("0xb177127054381243141e809bbfb2d568aeae2dd9b3c486e54f0989d4546d0d80"))                                                                                                             // Block 50.000
+    (75000, uint256("06f162fe22851c400c1532a6d49d7894640ea0aa292fad5f02f348480da6b20d"))                                                                                                               // Block 75.000
+    (100000, uint256("ed8cccfb51c901af271892966160686177a05f101bd3fd517d5b82274a8f6611"))                                                                                                              // Block 100.000
+    (125000, uint256("76d5412ec389433de6cd22345209c859b4c18b6d8f8893df479c9f7520d19901"))                                                                                                              // Block 125.000
+    (150000, uint256("a7e0dfdc9c3197e9e763e858aafa9553c0235c0e328371a5f8c5ba0b6e44919d"))                                                                                                              // Block 150.000
+    (200000, uint256("385e915b52f0ad669b91005ab7ddb22356b6a220e8b98cbcf2c8aca5c5dd3b03"))                                                                                                              // Block 200.000
+    (250000, uint256("40ee22bd8b2cc23f83e16d19a53aa8591617772f9722c56b86d16163b2a10416"))                                                                                                              // Block 250.000
+    (300000, uint256("700c33f9bf03c018f33167c2c455f05762b49e1f1f06e14833a5e8e269beebe7"))                                                                                                              // Block 300.000
+    (350000, uint256("ffb49991aa635992305029cb629037cf5d08e945d2027c79f4f737c11e7d680e"))                                                                                                              // Block 350.000
+    (400000, uint256("cf86529d0243cb653da92cbbaddc7f0a4f275bcf557cc112d03c33b756af25d3"));                                                                                                             // Block 400.000
 static const Checkpoints::CCheckpointData data = {
-        &mapCheckpoints,
-        1540087953, // * UNIX timestamp of last checkpoint block (Done)
-        815060,    // * total number of transactions between genesis and last checkpoint TODO: keep using correct number
-        //   (the tx=... number in the SetBestChain debug.log lines)
-        2000        // * estimated number of transactions per day after checkpoint
+    &mapCheckpoints,
+    1540087953, // * UNIX timestamp of last checkpoint block (Done)
+    815060,     // * total number of transactions between genesis and last checkpoint TODO: keep using correct number
+    //   (the tx=... number in the SetBestChain debug.log lines)
+    2000 // * estimated number of transactions per day after checkpoint
 };
 
 
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
-        boost::assign::map_list_of(0, uint256("0x001"));
+    boost::assign::map_list_of(0, uint256("0x001"));
 static const Checkpoints::CCheckpointData dataTestnet = {
-        &mapCheckpointsTestnet,
-        1512932225,
-        0,
-        450};
+    &mapCheckpointsTestnet,
+    1512932225,
+    0,
+    450};
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
-        boost::assign::map_list_of(0, uint256("0x001"));
+    boost::assign::map_list_of(0, uint256("0x001"));
 static const Checkpoints::CCheckpointData dataRegtest = {
-        &mapCheckpointsRegtest,
-        1411111111,
-        0,
-        100};
+    &mapCheckpointsRegtest,
+    1411111111,
+    0,
+    100};
 
 libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params(bool useModulusV1) const
 {
@@ -125,7 +123,7 @@ public:
         pchMessageStart[1] = 0x45;
         pchMessageStart[2] = 0x12;
         pchMessageStart[3] = 0x77;
-        vAlertPubKey=ParseHex("0411f84b889c61c1842ec84a15e3093d7dd99d955ab797b24c984cdcfe3aca23f04ec06bd840e8093aaf83488c039027ecc4ad704261245be30289be166f667c61");
+        vAlertPubKey = ParseHex("0411f84b889c61c1842ec84a15e3093d7dd99d955ab797b24c984cdcfe3aca23f04ec06bd840e8093aaf83488c039027ecc4ad704261245be30289be166f667c61");
         nDefaultPort = 17000;
         bnProofOfWorkLimit = ~uint256(0) >> 16; // WISPR starting difficulty is 1 / 2^12
         bnProofOfStakeLimit = ~uint256(0) >> 48;
@@ -135,10 +133,10 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 0;
-        nTargetTimespanV1 =  16 * 60; // WISPR Old: 1 day
-        nTargetTimespanV2 =  1 * 60; // WISPR New: 1 day
-        nTargetSpacingV1 = 64;  // WISPR Old: 1 minute
-        nTargetSpacingV2 = 1 * 60;  // WISPR New: 1 minute
+        nTargetTimespanV1 = 16 * 60; // WISPR Old: 1 day
+        nTargetTimespanV2 = 1 * 60;  // WISPR New: 1 day
+        nTargetSpacingV1 = 64;       // WISPR Old: 1 minute
+        nTargetSpacingV2 = 1 * 60;   // WISPR New: 1 minute
         nMaturity = 100;
         nMasternodeCountDrift = 20;
         nMaxMoneyOut = 120000000 * COIN;
@@ -181,18 +179,18 @@ public:
         assert(hashGenesisBlock == uint256("0x0000ec93e0a3fe0aafa3be7dafe1290f5fca039a4037dd5174bc3dd7a35d67f0"));
         assert(genesis.hashMerkleRoot == uint256("0xbcd0064f46daed0b3c1ccff16656a0da04b5509924118b7c13d21c81d62ec521"));
 
-        vSeeds.push_back(CDNSSeedData("wispr.tech", "dnsseed.wispr.tech"));     // Primary DNS Seeder for wispr
-        vSeeds.push_back(CDNSSeedData("wispr-seeds.nl", "main.wispr-seeds.nl"));     // Secondary DNS Seeder for wispr
+        vSeeds.push_back(CDNSSeedData("wispr.tech", "dnsseed.wispr.tech"));      // Primary DNS Seeder for wispr
+        vSeeds.push_back(CDNSSeedData("wispr-seeds.nl", "main.wispr-seeds.nl")); // Secondary DNS Seeder for wispr
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 73);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 135);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1, 145);
-        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x04)(0x88)(0xB2)(0x1E).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x04)(0x88)(0xAD)(0xE4).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_COIN_TYPE] = boost::assign::list_of(0x80)(0x00)(0x00)(0x77).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 145);
+        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x04)(0x88)(0xB2)(0x1E).convert_to_container<std::vector<unsigned char>>();
+        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x04)(0x88)(0xAD)(0xE4).convert_to_container<std::vector<unsigned char>>();
+        base58Prefixes[EXT_COIN_TYPE] = boost::assign::list_of(0x80)(0x00)(0x00)(0x77).convert_to_container<std::vector<unsigned char>>();
 
         // 	BIP44 coin type is from https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-//        base58Prefixes[EXT_COIN_TYPE] = {0x80, 0x00, 0x00, 0x77};
+        //        base58Prefixes[EXT_COIN_TYPE] = {0x80, 0x00, 0x00, 0x77};
 
         convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
 
@@ -218,11 +216,11 @@ public:
                           "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
                           "31438167899885040445364023527381951378636564391212010397122822120720357";
         nMaxZerocoinSpendsPerTransaction = 7; // Assume about 20kb each
-        nMinZerocoinMintFee = 1 * CENT; //high fee required for zerocoin mints
-        nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
+        nMinZerocoinMintFee = 1 * CENT;       //high fee required for zerocoin mints
+        nMintRequiredConfirmations = 20;      //the maximum amount of confirmations until accumulated in 19
         nRequiredAccumulation = 1;
-        nDefaultSecurityLevel = 100; //full security level for accumulators
-        nZerocoinHeaderVersion = 8; //Block headers must be this version once zerocoin is active
+        nDefaultSecurityLevel = 100;       //full security level for accumulators
+        nZerocoinHeaderVersion = 8;        //Block headers must be this version once zerocoin is active
         nZerocoinRequiredStakeDepth = 200; //The required confirmations for a zwsp to be stakable
 
         nBudget_Fee_Confirmations = 6; // Number of confirmations for the finalization fee
@@ -249,16 +247,16 @@ public:
         pchMessageStart[1] = 0x46;
         pchMessageStart[2] = 0x13;
         pchMessageStart[3] = 0x78;
-        vAlertPubKey=ParseHex("04b20dd657f5e4fe0cf9aebb956498c383bac98a079c1003df02c2f121574cd280b8900248a8c6a43074b356e670ef83ec1aadfec60602df7c2366bae732372bba");
+        vAlertPubKey = ParseHex("04b20dd657f5e4fe0cf9aebb956498c383bac98a079c1003df02c2f121574cd280b8900248a8c6a43074b356e670ef83ec1aadfec60602df7c2366bae732372bba");
         nDefaultPort = 17002;
         nEnforceBlockUpgradeMajority = 51;
         nRejectBlockOutdatedMajority = 75;
         nToCheckBlockUpgradeMajority = 100;
         nMinerThreads = 0;
-        nTargetTimespanV1 =  16 * 60; // WISPR Old: 1 day
-        nTargetTimespanV2 =  1 * 60; // WISPR New: 1 day
-        nTargetSpacingV1 = 64;  // WISPR Old: 1 minute
-        nTargetSpacingV2 = 1 * 60;  // WISPR New: 1 minute
+        nTargetTimespanV1 = 16 * 60; // WISPR Old: 1 day
+        nTargetTimespanV2 = 1 * 60;  // WISPR New: 1 day
+        nTargetSpacingV1 = 64;       // WISPR Old: 1 minute
+        nTargetSpacingV2 = 1 * 60;   // WISPR New: 1 minute
         nLastPOWBlock = 450;
         nMaturity = 10;
         nMasternodeCountDrift = 4;
@@ -282,9 +280,9 @@ public:
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1512932225;
-        genesis.nBits    = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce   = 142000;
+        genesis.nTime = 1512932225;
+        genesis.nBits = bnProofOfWorkLimit.GetCompact();
+        genesis.nNonce = 142000;
 
         hashGenesisBlock = genesis.GetHash();
 
@@ -294,16 +292,16 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("wispr.tech", "testnet-seed.wispr.tech"));     // Primary DNS Seeder for testnet wispr
-        vSeeds.push_back(CDNSSeedData("wispr-seeds.nl", "test.wispr-seeds.nl"));     // Secondary DNS Seeder for testnet wispr
+        vSeeds.push_back(CDNSSeedData("wispr.tech", "testnet-seed.wispr.tech")); // Primary DNS Seeder for testnet wispr
+        vSeeds.push_back(CDNSSeedData("wispr-seeds.nl", "test.wispr-seeds.nl")); // Secondary DNS Seeder for testnet wispr
 
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 110);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 8);
-        base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1, 239);
-        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x04)(0x35)(0x87)(0xCF).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x04)(0x35)(0x83)(0x94).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_COIN_TYPE] = boost::assign::list_of(0x80)(0x00)(0x00)(0x01).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 239);
+        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x04)(0x35)(0x87)(0xCF).convert_to_container<std::vector<unsigned char>>();
+        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x04)(0x35)(0x83)(0x94).convert_to_container<std::vector<unsigned char>>();
+        base58Prefixes[EXT_COIN_TYPE] = boost::assign::list_of(0x80)(0x00)(0x00)(0x01).convert_to_container<std::vector<unsigned char>>();
 
         convertSeed6(vFixedSeeds, pnSeed6_test, ARRAYLEN(pnSeed6_test));
 
@@ -349,18 +347,18 @@ public:
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 1;
         nTargetTimespanV1 = 16 * 60; // WISPR Old: 1 day
-        nTargetTimespanV2 = 1 * 60; // WISPR New: 1 day
-        nTargetSpacingV1 = 64;        // WISPR Old: 1 minutes
-        nTargetSpacingV2 = 1 * 60;        // WISPR New: 1 minute
+        nTargetTimespanV2 = 1 * 60;  // WISPR New: 1 day
+        nTargetSpacingV1 = 64;       // WISPR Old: 1 minutes
+        nTargetSpacingV2 = 1 * 60;   // WISPR New: 1 minute
         bnProofOfWorkLimit = ~uint256(0) >> 1;
         genesis.nTime = 1411111111;
-        genesis.nBits  = bnProofOfWorkLimit.GetCompact();
+        genesis.nBits = bnProofOfWorkLimit.GetCompact();
         genesis.nNonce = 2;
 
         hashGenesisBlock = genesis.GetHash();
         nDefaultPort = 17004;
-//        printf("Req net\n");
-//        printf("genesis = %s\n", genesis.ToString().c_str());
+        //        printf("Req net\n");
+        //        printf("genesis = %s\n", genesis.ToString().c_str());
         assert(hashGenesisBlock == uint256("0302157c185ae0018bb60f0c506087be772aa2015150f994cc1a6db55e8e23bd"));
 
         vFixedSeeds.clear(); //! Testnet mode doesn't have any fixed seeds.
@@ -436,17 +434,17 @@ const CChainParams& Params()
 CChainParams& Params(CBaseChainParams::Network network)
 {
     switch (network) {
-        case CBaseChainParams::MAIN:
-            return mainParams;
-        case CBaseChainParams::TESTNET:
-            return testNetParams;
-        case CBaseChainParams::REGTEST:
-            return regTestParams;
-        case CBaseChainParams::UNITTEST:
-            return unitTestParams;
-        default:
-            assert(false && "Unimplemented network");
-            return mainParams;
+    case CBaseChainParams::MAIN:
+        return mainParams;
+    case CBaseChainParams::TESTNET:
+        return testNetParams;
+    case CBaseChainParams::REGTEST:
+        return regTestParams;
+    case CBaseChainParams::UNITTEST:
+        return unitTestParams;
+    default:
+        assert(false && "Unimplemented network");
+        return mainParams;
     }
 }
 

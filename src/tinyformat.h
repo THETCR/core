@@ -101,8 +101,7 @@
 #ifndef TINYFORMAT_H_INCLUDED
 #define TINYFORMAT_H_INCLUDED
 
-namespace tinyformat
-{
+namespace tinyformat {
 }
 //------------------------------------------------------------------------------
 // Config section.  Customize to your liking!
@@ -149,11 +148,9 @@ namespace tfm = tinyformat;
 #define TINYFORMAT_OLD_LIBSTDCPLUSPLUS_WORKAROUND
 #endif
 
-namespace tinyformat
-{
+namespace tinyformat {
 //------------------------------------------------------------------------------
-namespace detail
-{
+namespace detail {
 // Test whether type T1 is convertible to type T2
 template <typename T1, typename T2>
 struct is_convertible {
@@ -450,8 +447,7 @@ cog.outl('#define TINYFORMAT_FOREACH_ARGNUM(m) \\\n    ' +
 //[[[end]]]
 
 
-namespace detail
-{
+namespace detail {
 // Class holding current position in format string and an output stream into
 // which arguments are formatted.
 class FormatIterator
@@ -964,7 +960,7 @@ TINYFORMAT_FOREACH_ARGNUM(TINYFORMAT_MAKE_FORMAT_FUNCS)
 // 1.x.  Will be removed in version 2!
 #define TINYFORMAT_WRAP_FORMAT_EXTRA_ARGS
 #define TINYFORMAT_WRAP_FORMAT_N(n, returnType, funcName, funcDeclSuffix,  \
-                                 bodyPrefix, streamName, bodySuffix)       \
+    bodyPrefix, streamName, bodySuffix)                                    \
     template <TINYFORMAT_ARGTYPES(n)>                                      \
     returnType funcName(TINYFORMAT_WRAP_FORMAT_EXTRA_ARGS const char* fmt, \
         TINYFORMAT_VARARGS(n)) funcDeclSuffix                              \
@@ -975,7 +971,7 @@ TINYFORMAT_FOREACH_ARGNUM(TINYFORMAT_MAKE_FORMAT_FUNCS)
     }
 
 #define TINYFORMAT_WRAP_FORMAT(returnType, funcName, funcDeclSuffix,                                       \
-                               bodyPrefix, streamName, bodySuffix)                                         \
+    bodyPrefix, streamName, bodySuffix)                                                                    \
     inline returnType funcName(TINYFORMAT_WRAP_FORMAT_EXTRA_ARGS const char* fmt) funcDeclSuffix           \
     {                                                                                                      \
         bodyPrefix                                                                                         \

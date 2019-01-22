@@ -19,12 +19,12 @@
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 
+#include <boost/algorithm/string/case_conv.hpp> // for to_upper()
 #include <boost/iostreams/concepts.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/thread.hpp>
-#include <boost/algorithm/string/case_conv.hpp> // for to_upper()
 
 #include <univalue.h>
 
@@ -40,49 +40,48 @@ static CCriticalSection cs_rpcWarmup;
 static RPCTimerInterface* timerInterface = nullptr;
 /* Map of name to timer.
  * @note Can be changed to std::unique_ptr when C++11 */
-static std::map<std::string, boost::shared_ptr<RPCTimerBase> > deadlineTimers;
+static std::map<std::string, boost::shared_ptr<RPCTimerBase>> deadlineTimers;
 
-static struct CRPCSignals
-{
-    boost::signals2::signal<void ()> Started;
-    boost::signals2::signal<void ()> Stopped;
-    boost::signals2::signal<void (const CRPCCommand&)> PreCommand;
-    boost::signals2::signal<void (const CRPCCommand&)> PostCommand;
+static struct CRPCSignals {
+    boost::signals2::signal<void()> Started;
+    boost::signals2::signal<void()> Stopped;
+    boost::signals2::signal<void(const CRPCCommand&)> PreCommand;
+    boost::signals2::signal<void(const CRPCCommand&)> PostCommand;
 } g_rpcSignals;
 
-void RPCServer::OnStarted(boost::function<void ()> slot)
+void RPCServer::OnStarted(boost::function<void()> slot)
 {
     g_rpcSignals.Started.connect(slot);
 }
 
-void RPCServer::OnStopped(boost::function<void ()> slot)
+void RPCServer::OnStopped(boost::function<void()> slot)
 {
     g_rpcSignals.Stopped.connect(slot);
 }
 
-void RPCServer::OnPreCommand(boost::function<void (const CRPCCommand&)> slot)
+void RPCServer::OnPreCommand(boost::function<void(const CRPCCommand&)> slot)
 {
     g_rpcSignals.PreCommand.connect(boost::bind(slot, _1));
 }
 
-void RPCServer::OnPostCommand(boost::function<void (const CRPCCommand&)> slot)
+void RPCServer::OnPostCommand(boost::function<void(const CRPCCommand&)> slot)
 {
     g_rpcSignals.PostCommand.connect(boost::bind(slot, _1));
 }
 
 void RPCTypeCheck(const UniValue& params,
-                  const list<UniValue::VType>& typesExpected,
-                  bool fAllowNull)
+    const list<UniValue::VType>& typesExpected,
+    bool fAllowNull)
 {
     unsigned int i = 0;
-    for(UniValue::VType t: typesExpected) {
+    for (UniValue::VType t : typesExpected) {
         if (params.size() <= i)
             break;
 
         const UniValue& v = params[i];
         if (!((v.type() == t) || (fAllowNull && (v.isNull())))) {
             string err = strprintf("Expected type %s, got %s",
-                                   uvTypeName(t), uvTypeName(v.type()));
+                uvTypeName(t), uvTypeName(v.type()));
             throw JSONRPCError(RPC_TYPE_ERROR, err);
         }
         i++;
@@ -90,17 +89,17 @@ void RPCTypeCheck(const UniValue& params,
 }
 
 void RPCTypeCheckObj(const UniValue& o,
-                  const map<string, UniValue::VType>& typesExpected,
-                  bool fAllowNull)
+    const map<string, UniValue::VType>& typesExpected,
+    bool fAllowNull)
 {
-    for(const std::pair<string, UniValue::VType>& t: typesExpected) {
+    for (const std::pair<string, UniValue::VType>& t : typesExpected) {
         const UniValue& v = find_value(o, t.first);
         if (!fAllowNull && v.isNull())
             throw JSONRPCError(RPC_TYPE_ERROR, strprintf("Missing %s", t.first));
 
         if (!((v.type() == t.second) || (fAllowNull && (v.isNull())))) {
             string err = strprintf("Expected type %s for %s, got %s",
-                                   uvTypeName(t.second), t.first, uvTypeName(v.type()));
+                uvTypeName(t.second), t.first, uvTypeName(v.type()));
             throw JSONRPCError(RPC_TYPE_ERROR, err);
         }
     }
@@ -132,7 +131,7 @@ UniValue ValueFromAmount(const CAmount& amount)
     int64_t quotient = n_abs / COIN;
     int64_t remainder = n_abs % COIN;
     return UniValue(UniValue::VNUM,
-            strprintf("%s%d.%08d", sign ? "-" : "", quotient, remainder));
+        strprintf("%s%d.%08d", sign ? "-" : "", quotient, remainder));
 }
 
 uint256 ParseHashV(const UniValue& v, string strName)
@@ -192,13 +191,13 @@ string CRPCTable::help(string strCommand) const
     string strRet;
     string category;
     set<rpcfn_type> setDone;
-    vector<pair<string, const CRPCCommand*> > vCommands;
+    vector<pair<string, const CRPCCommand*>> vCommands;
 
     for (map<string, const CRPCCommand*>::const_iterator mi = mapCommands.begin(); mi != mapCommands.end(); ++mi)
         vCommands.push_back(make_pair(mi->second->category + mi->first, mi->second));
     sort(vCommands.begin(), vCommands.end());
 
-    for (const std::pair<string, const CRPCCommand*> & command: vCommands) {
+    for (const std::pair<string, const CRPCCommand*>& command : vCommands) {
         const CRPCCommand* pcmd = command.second;
         string strMethod = pcmd->name;
         // We already filter duplicates, but these deprecated screw up the sort order
@@ -470,7 +469,7 @@ CRPCTable::CRPCTable()
     }
 }
 
-const CRPCCommand *CRPCTable::operator[](const std::string &name) const
+const CRPCCommand* CRPCTable::operator[](const std::string& name) const
 {
     map<string, const CRPCCommand*>::const_iterator it = mapCommands.find(name);
     if (it == mapCommands.end())
@@ -586,7 +585,7 @@ std::string JSONRPCExecBatch(const UniValue& vReq)
     return ret.write() + "\n";
 }
 
-UniValue CRPCTable::execute(const std::string &strMethod, const UniValue &params) const
+UniValue CRPCTable::execute(const std::string& strMethod, const UniValue& params) const
 {
     // Find method
     const CRPCCommand* pcmd = tableRPC[strMethod];
@@ -610,9 +609,9 @@ std::vector<std::string> CRPCTable::listCommands() const
     std::vector<std::string> commandList;
     typedef std::map<std::string, const CRPCCommand*> commandMap;
 
-    std::transform( mapCommands.begin(), mapCommands.end(),
-                   std::back_inserter(commandList),
-                   boost::bind(&commandMap::value_type::first,_1) );
+    std::transform(mapCommands.begin(), mapCommands.end(),
+        std::back_inserter(commandList),
+        boost::bind(&commandMap::value_type::first, _1));
     return commandList;
 }
 
@@ -628,18 +627,18 @@ std::string HelpExampleRpc(string methodname, string args)
            methodname + "\", \"params\": [" + args + "] }' -H 'content-type: text/plain;' http://127.0.0.1:17001/\n";
 }
 
-void RPCSetTimerInterfaceIfUnset(RPCTimerInterface *iface)
+void RPCSetTimerInterfaceIfUnset(RPCTimerInterface* iface)
 {
     if (!timerInterface)
         timerInterface = iface;
 }
 
-void RPCSetTimerInterface(RPCTimerInterface *iface)
+void RPCSetTimerInterface(RPCTimerInterface* iface)
 {
     timerInterface = iface;
 }
 
-void RPCUnsetTimerInterface(RPCTimerInterface *iface)
+void RPCUnsetTimerInterface(RPCTimerInterface* iface)
 {
     if (timerInterface == iface)
         timerInterface = nullptr;
@@ -651,7 +650,7 @@ void RPCRunLater(const std::string& name, boost::function<void(void)> func, int6
         throw JSONRPCError(RPC_INTERNAL_ERROR, "No timer handler registered for RPC");
     deadlineTimers.erase(name);
     LogPrint("rpc", "queue run of timer %s in %i seconds (using %s)\n", name, nSeconds, timerInterface->Name());
-    deadlineTimers.insert(std::make_pair(name, boost::shared_ptr<RPCTimerBase>(timerInterface->NewTimer(func, nSeconds*1000))));
+    deadlineTimers.insert(std::make_pair(name, boost::shared_ptr<RPCTimerBase>(timerInterface->NewTimer(func, nSeconds * 1000))));
 }
 
 const CRPCTable tableRPC;

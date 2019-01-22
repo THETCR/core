@@ -19,8 +19,7 @@
 #define MASTERNODELIST_UPDATE_SECONDS 15
 #define MASTERNODELIST_FILTER_COOLDOWN_SECONDS 3
 
-namespace Ui
-{
+namespace Ui {
 class MasternodeList;
 }
 

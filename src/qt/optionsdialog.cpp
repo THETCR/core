@@ -54,7 +54,7 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
 
     /*Disable minting option until new protocol start*/
     bool newProtocolStart = GetAdjustedTime() >= Params().NEW_PROTOCOLS_STARTTIME();
-    if(!newProtocolStart){
+    if (!newProtocolStart) {
         ui->checkBoxZeromintEnable->setEnabled(false);
     }
     ui->proxyIp->setEnabled(false);
@@ -115,17 +115,14 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
     /* Language selector */
     QDir translations(":translations");
     ui->lang->addItem(QString("(") + tr("default") + QString(")"), QVariant(""));
-    for (const QString& langStr: translations.entryList()) {
+    for (const QString& langStr : translations.entryList()) {
         QLocale locale(langStr);
 
         /** check if the locale name consists of 2 parts (language_country) */
-        if(langStr.contains("_"))
-        {
+        if (langStr.contains("_")) {
             /** display language strings as "native language - native country (locale name)", e.g. "Deutsch - Deutschland (de)" */
             ui->lang->addItem(locale.nativeLanguageName() + QString(" - ") + locale.nativeCountryName() + QString(" (") + langStr + QString(")"), QVariant(langStr));
-        }
-        else
-        {
+        } else {
             /** display language strings as "native language (locale name)", e.g. "Deutsch (de)" */
             ui->lang->addItem(locale.nativeLanguageName() + QString(" (") + langStr + QString(")"), QVariant(langStr));
         }
@@ -303,7 +300,7 @@ void OptionsDialog::clearStatusLabel()
 
 void OptionsDialog::updateHideOrphans(bool fHide)
 {
-    if(ui->checkBoxHideOrphans->isChecked() != fHide)
+    if (ui->checkBoxHideOrphans->isChecked() != fHide)
         ui->checkBoxHideOrphans->setChecked(fHide);
 }
 
@@ -321,7 +318,7 @@ void OptionsDialog::doProxyIpChecks(QValidatedLineEdit* pUiProxyIp, QLineEdit* p
         return;
     }
     // Check proxy port
-    if (!pUiProxyPort->hasAcceptableInput()){
+    if (!pUiProxyPort->hasAcceptableInput()) {
         disableOkButton();
         ui->statusLabel->setStyleSheet("QLabel { color: red; }");
         ui->statusLabel->setText(tr("The supplied proxy port is invalid."));

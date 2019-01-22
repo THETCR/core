@@ -135,7 +135,7 @@ public:
                 {
                     parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex + toInsert.size() - 1);
                     int insert_idx = lowerIndex;
-                    for (const TransactionRecord& rec: toInsert) {
+                    for (const TransactionRecord& rec : toInsert) {
                         cachedWallet.insert(insert_idx, rec);
                         insert_idx += 1;
                     }
@@ -575,7 +575,7 @@ QVariant TransactionTableModel::data(const QModelIndex& index, int role) const
     case Qt::ForegroundRole:
         // Minted
         if (rec->type == TransactionRecord::Generated || rec->type == TransactionRecord::StakeMint ||
-                rec->type == TransactionRecord::StakeZWSP || rec->type == TransactionRecord::MNReward) {
+            rec->type == TransactionRecord::StakeZWSP || rec->type == TransactionRecord::MNReward) {
             if (rec->status.status == TransactionStatus::Conflicted || rec->status.status == TransactionStatus::NotAccepted)
                 return COLOR_ORPHAN;
             else

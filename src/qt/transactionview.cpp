@@ -88,7 +88,7 @@ TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), t
     typeWidget->addItem(tr("Received with"), TransactionFilterProxy::TYPE(TransactionRecord::RecvWithAddress) | TransactionFilterProxy::TYPE(TransactionRecord::RecvFromOther));
     typeWidget->addItem(tr("Sent to"), TransactionFilterProxy::TYPE(TransactionRecord::SendToAddress) | TransactionFilterProxy::TYPE(TransactionRecord::SendToOther));
 
-/* Obsolete Obfuscation entries. Remove once the corresponding TYPES are removed:
+    /* Obsolete Obfuscation entries. Remove once the corresponding TYPES are removed:
  *
     typeWidget->addItem(tr("Obfuscated"), TransactionFilterProxy::TYPE(TransactionRecord::Obfuscated));
     typeWidget->addItem(tr("Obfuscation Make Collateral Inputs"), TransactionFilterProxy::TYPE(TransactionRecord::ObfuscationMakeCollaterals));
@@ -343,7 +343,6 @@ void TransactionView::updateHideOrphans(bool fHide)
     // retain consistency with other checkboxes
     if (hideOrphansAction->isChecked() != fHide)
         hideOrphansAction->setChecked(fHide);
-
 }
 
 
@@ -412,11 +411,10 @@ void TransactionView::exportClicked()
 
     if (fExport) {
         emit message(tr("Exporting Successful"), tr("The transaction history was successfully saved to %1.").arg(filename),
-                     CClientUIInterface::MSG_INFORMATION);
-    }
-    else {
+            CClientUIInterface::MSG_INFORMATION);
+    } else {
         emit message(tr("Exporting Failed"), tr("There was an error trying to save the transaction history to %1.").arg(filename),
-                     CClientUIInterface::MSG_ERROR);
+            CClientUIInterface::MSG_ERROR);
     }
 }
 
@@ -507,7 +505,7 @@ void TransactionView::computeSum()
         return;
     QModelIndexList selection = transactionView->selectionModel()->selectedRows();
 
-    for (QModelIndex index: selection) {
+    for (QModelIndex index : selection) {
         amount += index.data(TransactionTableModel::AmountRole).toLongLong();
     }
     QString strAmount(BitcoinUnits::formatWithUnit(nDisplayUnit, amount, true, BitcoinUnits::separatorAlways));

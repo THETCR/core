@@ -61,7 +61,7 @@ public:
 
     bool CheckAndUpdate(int& nDos, bool fRequireEnabled = true, bool fCheckSigTimeOnly = false);
     bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
-    bool VerifySignature(CPubKey& pubKeyMasternode, int &nDos);
+    bool VerifySignature(CPubKey& pubKeyMasternode, int& nDos);
     void Relay();
 
     uint256 GetHash()

@@ -11,8 +11,8 @@
 #include "bitcoingui.h"
 #include "clientmodel.h"
 #include "guiconstants.h"
-#include "intro.h"
 #include "guiutil.h"
+#include "intro.h"
 
 #include "clientversion.h"
 #include "init.h"
@@ -23,8 +23,8 @@
 #include <QCloseEvent>
 #include <QLabel>
 #include <QRegExp>
-#include <QTextTable>
 #include <QTextCursor>
+#include <QTextTable>
 #include <QVBoxLayout>
 
 /** "Help message" or "About" dialog box */
@@ -95,16 +95,15 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, bool about) : QDialog(pare
         QTextCharFormat bold;
         bold.setFontWeight(QFont::Bold);
 
-        for (const QString &line: coreOptions.split("\n")) {
-            if (line.startsWith("  -"))
-            {
+        for (const QString& line : coreOptions.split("\n")) {
+            if (line.startsWith("  -")) {
                 cursor.currentTable()->appendRows(1);
                 cursor.movePosition(QTextCursor::PreviousCell);
                 cursor.movePosition(QTextCursor::NextRow);
                 cursor.insertText(line.trimmed());
                 cursor.movePosition(QTextCursor::NextCell);
             } else if (line.startsWith("   ")) {
-                cursor.insertText(line.trimmed()+' ');
+                cursor.insertText(line.trimmed() + ' ');
             } else if (line.size() > 0) {
                 //Title of a group
                 if (cursor.currentTable())

@@ -23,19 +23,18 @@ class MultisigDialog;
 class CCoinControl;
 class CTxMemPool;
 
-namespace Ui
-{
+namespace Ui {
 class CoinControlDialog;
 }
 
 class CCoinControlWidgetItem : public QTreeWidgetItem
 {
 public:
-    explicit CCoinControlWidgetItem(QTreeWidget *parent, int type = Type) : QTreeWidgetItem(parent, type) {}
+    explicit CCoinControlWidgetItem(QTreeWidget* parent, int type = Type) : QTreeWidgetItem(parent, type) {}
     explicit CCoinControlWidgetItem(int type = Type) : QTreeWidgetItem(type) {}
-    explicit CCoinControlWidgetItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type) {}
+    explicit CCoinControlWidgetItem(QTreeWidgetItem* parent, int type = Type) : QTreeWidgetItem(parent, type) {}
 
-    bool operator<(const QTreeWidgetItem &other) const;
+    bool operator<(const QTreeWidgetItem& other) const;
 };
 
 class CoinControlDialog : public QDialog

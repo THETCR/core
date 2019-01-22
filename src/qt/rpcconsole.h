@@ -11,14 +11,13 @@
 
 #include "net.h"
 
-#include <QDialog>
 #include <QCompleter>
+#include <QDialog>
 
 class ClientModel;
 class RPCTimerInterface;
 
-namespace Ui
-{
+namespace Ui {
 class RPCConsole;
 }
 
@@ -150,10 +149,10 @@ private:
     QStringList history;
     int historyPtr;
     NodeId cachedNodeid;
-    QCompleter *autoCompleter;
-    QMenu *peersTableContextMenu;
-    QMenu *banTableContextMenu;
-    RPCTimerInterface *rpcTimerInterface;
+    QCompleter* autoCompleter;
+    QMenu* peersTableContextMenu;
+    QMenu* banTableContextMenu;
+    RPCTimerInterface* rpcTimerInterface;
 };
 
 #endif // BITCOIN_QT_RPCCONSOLE_H

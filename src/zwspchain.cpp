@@ -11,21 +11,21 @@
 // 6 comes from OPCODE (1) + vch.size() (1) + BIGNUM size (4)
 #define SCRIPT_OFFSET 6
 // For Script size (BIGNUM/Uint256 size)
-#define BIGNUM_SIZE   4
+#define BIGNUM_SIZE 4
 
 bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomination denom, vector<CBigNum>& vValues)
 {
     for (const CTransaction& tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if (!tx.IsZerocoinMint())
             continue;
 
         for (const CTxOut& txOut : tx.vout) {
-            if(!txOut.scriptPubKey.IsZerocoinMint())
+            if (!txOut.scriptPubKey.IsZerocoinMint())
                 continue;
 
             CValidationState state;
             libzerocoin::PublicCoin coin(Params().Zerocoin_Params(false));
-            if(!TxOutToPublicCoin(txOut, coin, state))
+            if (!TxOutToPublicCoin(txOut, coin, state))
                 return false;
 
             if (coin.getDenomination() != denom)
@@ -41,7 +41,7 @@ bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomina
 bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>& listPubcoins, bool fFilterInvalid)
 {
     for (const CTransaction& tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if (!tx.IsZerocoinMint())
             continue;
 
         // Filter out mints that have used invalid outpoints
@@ -64,12 +64,12 @@ bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>&
                 break;
 
             const CTxOut txOut = tx.vout[i];
-            if(!txOut.scriptPubKey.IsZerocoinMint())
+            if (!txOut.scriptPubKey.IsZerocoinMint())
                 continue;
 
             CValidationState state;
             libzerocoin::PublicCoin pubCoin(Params().Zerocoin_Params(false));
-            if(!TxOutToPublicCoin(txOut, pubCoin, state))
+            if (!TxOutToPublicCoin(txOut, pubCoin, state))
                 return false;
 
             listPubcoins.emplace_back(pubCoin);
@@ -83,7 +83,7 @@ bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>&
 bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMints, bool fFilterInvalid)
 {
     for (const CTransaction& tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if (!tx.IsZerocoinMint())
             continue;
 
         // Filter out mints that have used invalid outpoints
@@ -106,12 +106,12 @@ bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMin
                 break;
 
             const CTxOut txOut = tx.vout[i];
-            if(!txOut.scriptPubKey.IsZerocoinMint())
+            if (!txOut.scriptPubKey.IsZerocoinMint())
                 continue;
 
             CValidationState state;
             libzerocoin::PublicCoin pubCoin(Params().Zerocoin_Params(false));
-            if(!TxOutToPublicCoin(txOut, pubCoin, state))
+            if (!TxOutToPublicCoin(txOut, pubCoin, state))
                 return false;
 
             //version should not actually matter here since it is just a reference to the pubcoin, not to the privcoin
@@ -262,8 +262,8 @@ std::string ReindexZerocoinDB()
     uiInterface.ShowProgress(_("Reindexing zerocoin database..."), 0);
 
     CBlockIndex* pindex = chainActive[Params().NEW_PROTOCOLS_STARTHEIGHT()];
-    std::vector<std::pair<libzerocoin::CoinSpend, uint256> > vSpendInfo;
-    std::vector<std::pair<libzerocoin::PublicCoin, uint256> > vMintInfo;
+    std::vector<std::pair<libzerocoin::CoinSpend, uint256>> vSpendInfo;
+    std::vector<std::pair<libzerocoin::PublicCoin, uint256>> vMintInfo;
     while (pindex) {
         uiInterface.ShowProgress(_("Reindexing zerocoin database..."), std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().NEW_PROTOCOLS_STARTHEIGHT()) / (double)(chainActive.Height() - Params().NEW_PROTOCOLS_STARTHEIGHT()) * 100))));
 
@@ -338,7 +338,7 @@ bool RemoveSerialFromDB(const CBigNum& bnSerial)
 libzerocoin::CoinSpend TxInToZerocoinSpend(const CTxIn& txin)
 {
     // extract the CoinSpend from the txin
-    std::vector<char, zero_after_free_allocator<char> > dataTxIn;
+    std::vector<char, zero_after_free_allocator<char>> dataTxIn;
     dataTxIn.insert(dataTxIn.end(), txin.scriptSig.begin() + BIGNUM_SIZE, txin.scriptSig.end());
     CDataStream serializedCoinSpend(dataTxIn, SER_NETWORK, PROTOCOL_VERSION);
 
@@ -353,7 +353,7 @@ bool TxOutToPublicCoin(const CTxOut& txout, libzerocoin::PublicCoin& pubCoin, CV
     CBigNum publicZerocoin;
     vector<unsigned char> vchZeroMint;
     vchZeroMint.insert(vchZeroMint.end(), txout.scriptPubKey.begin() + SCRIPT_OFFSET,
-                       txout.scriptPubKey.begin() + txout.scriptPubKey.size());
+        txout.scriptPubKey.begin() + txout.scriptPubKey.size());
     publicZerocoin.setvch(vchZeroMint);
 
     libzerocoin::CoinDenomination denomination = libzerocoin::AmountToZerocoinDenomination(txout.nValue);
@@ -391,4 +391,3 @@ std::list<libzerocoin::CoinDenomination> ZerocoinSpendListFromBlock(const CBlock
     }
     return vSpends;
 }
-

@@ -16,8 +16,7 @@ class CBlockIndex;
  * Block-chain checkpoints are compiled-in sanity checks.
  * They are updated every release or three.
  */
-namespace Checkpoints
-{
+namespace Checkpoints {
 typedef std::map<int, uint256> MapCheckpoints;
 
 struct CCheckpointData {

@@ -16,8 +16,7 @@ QT_BEGIN_NAMESPACE
 class QDataWidgetMapper;
 QT_END_NAMESPACE
 
-namespace Ui
-{
+namespace Ui {
 class OptionsDialog;
 }
 

@@ -3,12 +3,12 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "zwspwallet.h"
-#include "main.h"
-#include "txdb.h"
-#include "walletdb.h"
 #include "init.h"
-#include "wallet.h"
+#include "main.h"
 #include "primitives/deterministicmint.h"
+#include "txdb.h"
+#include "wallet.h"
+#include "walletdb.h"
 #include "zwspchain.h"
 
 using namespace libzerocoin;
@@ -70,7 +70,6 @@ CzWSPWallet::CzWSPWallet(std::string strWalletFile)
 
 bool CzWSPWallet::SetMasterSeed(const uint256& seedMaster, bool fResetCount)
 {
-
     CWalletDB walletdb(strWalletFile);
     if (pwalletMain->IsLocked())
         return false;
@@ -106,7 +105,6 @@ void CzWSPWallet::AddToMintPool(const std::pair<uint256, uint32_t>& pMint, bool 
 //Add the next 20 mints to the mint pool
 void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
 {
-
     //Is locked
     if (seedMaster == 0)
         return;
@@ -132,13 +130,13 @@ void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
 
         // Prevent unnecessary repeated minted
         for (auto& pair : mintPool) {
-            if(pair.second == i) {
+            if (pair.second == i) {
                 fFound = true;
                 break;
             }
         }
 
-        if(fFound)
+        if (fFound)
             continue;
 
         uint512 seedZerocoin = GetZerocoinSeed(i);
@@ -157,7 +155,7 @@ void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
 // pubcoin hashes are stored to db so that a full accounting of mints belonging to the seed can be tracked without regenerating
 bool CzWSPWallet::LoadMintPoolFromDB()
 {
-    map<uint256, vector<pair<uint256, uint32_t> > > mapMintPool = CWalletDB(strWalletFile).MapMintPool();
+    map<uint256, vector<pair<uint256, uint32_t>>> mapMintPool = CWalletDB(strWalletFile).MapMintPool();
 
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
     for (auto& pair : mapMintPool[hashSeed])
@@ -193,7 +191,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
         LogPrintf("%s: Mintpool size=%d\n", __func__, mintPool.size());
 
         std::set<uint256> setChecked;
-        list<pair<uint256,uint32_t> > listMints = mintPool.List();
+        list<pair<uint256, uint32_t>> listMints = mintPool.List();
         for (pair<uint256, uint32_t> pMint : listMints) {
             LOCK(cs_main);
             if (setChecked.count(pMint.first))
@@ -328,7 +326,7 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
 
     // Add to zwspTracker which also adds to database
     pwalletMain->zwspTracker->Add(dMint, true);
-    
+
     //Update the count if it is less than the mint's count
     if (nCountLastUsed < pMint.second) {
         CWalletDB walletdb(strWalletFile);
@@ -346,8 +344,8 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
 bool IsValidCoinValue(const CBigNum& bnValue)
 {
     return bnValue >= Params().Zerocoin_Params(false)->accumulatorParams.minCoinValue &&
-    bnValue <= Params().Zerocoin_Params(false)->accumulatorParams.maxCoinValue &&
-    bnValue.isPrime();
+           bnValue <= Params().Zerocoin_Params(false)->accumulatorParams.maxCoinValue &&
+           bnValue.isPrime();
 }
 
 void CzWSPWallet::SeedToZWSP(const uint512& seedZerocoin, CBigNum& bnValue, CBigNum& bnSerial, CBigNum& bnRandomness, CKey& key)
@@ -372,9 +370,7 @@ void CzWSPWallet::SeedToZWSP(const uint512& seedZerocoin, CBigNum& bnValue, CBig
 
     //See if serial and randomness make a valid commitment
     // Generate a Pedersen commitment to the serial number
-    CBigNum commitmentValue = params->coinCommitmentGroup.g.pow_mod(bnSerial, params->coinCommitmentGroup.modulus).mul_mod(
-                        params->coinCommitmentGroup.h.pow_mod(bnRandomness, params->coinCommitmentGroup.modulus),
-                        params->coinCommitmentGroup.modulus);
+    CBigNum commitmentValue = params->coinCommitmentGroup.g.pow_mod(bnSerial, params->coinCommitmentGroup.modulus).mul_mod(params->coinCommitmentGroup.h.pow_mod(bnRandomness, params->coinCommitmentGroup.modulus), params->coinCommitmentGroup.modulus);
 
     CBigNum random;
     uint256 attempts256 = 0;
@@ -392,7 +388,7 @@ void CzWSPWallet::SeedToZWSP(const uint512& seedZerocoin, CBigNum& bnValue, CBig
         //Change randomness to something new and random and try again
         attempts256++;
         hashRandomness = Hash(randomnessSeed.begin(), randomnessSeed.end(),
-                              attempts256.begin(), attempts256.end());
+            attempts256.begin(), attempts256.end());
         random.setuint256(hashRandomness);
         bnRandomness = (bnRandomness + random) % params->coinCommitmentGroup.groupOrder;
         commitmentValue = commitmentValue.mul_mod(params->coinCommitmentGroup.h.pow_mod(random, params->coinCommitmentGroup.modulus), params->coinCommitmentGroup.modulus);

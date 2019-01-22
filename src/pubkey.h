@@ -33,10 +33,10 @@ public:
     /**
      * secp256k1:
      */
-    static const unsigned int PUBLIC_KEY_SIZE             = 65;
-    static const unsigned int COMPRESSED_PUBLIC_KEY_SIZE  = 33;
-    static const unsigned int SIGNATURE_SIZE              = 72;
-    static const unsigned int COMPACT_SIGNATURE_SIZE      = 65;
+    static const unsigned int PUBLIC_KEY_SIZE = 65;
+    static const unsigned int COMPRESSED_PUBLIC_KEY_SIZE = 33;
+    static const unsigned int SIGNATURE_SIZE = 72;
+    static const unsigned int COMPACT_SIGNATURE_SIZE = 65;
     /**
      * see www.keylength.com
      * script supports up to 75 for single byte push
@@ -197,13 +197,12 @@ public:
     bool Decompress();
 
     //! Derive BIP32 child pubkey.
-    bool Derive(CPubKey& pubkeyChild, ChainCode &ccChild, unsigned int nChild, const ChainCode& cc) const;
+    bool Derive(CPubKey& pubkeyChild, ChainCode& ccChild, unsigned int nChild, const ChainCode& cc) const;
 
     std::vector<unsigned char> Raw() const
     {
         return std::vector<unsigned char>(vch, vch + size());
     }
-
 };
 
 struct CExtPubKey {
@@ -216,10 +215,10 @@ struct CExtPubKey {
     friend bool operator==(const CExtPubKey& a, const CExtPubKey& b)
     {
         return a.nDepth == b.nDepth &&
-            memcmp(&a.vchFingerprint[0], &b.vchFingerprint[0], sizeof(vchFingerprint)) == 0 &&
-            a.nChild == b.nChild &&
-            a.chaincode == b.chaincode &&
-            a.pubkey == b.pubkey;
+               memcmp(&a.vchFingerprint[0], &b.vchFingerprint[0], sizeof(vchFingerprint)) == 0 &&
+               a.nChild == b.nChild &&
+               a.chaincode == b.chaincode &&
+               a.pubkey == b.pubkey;
     }
 
     void Encode(unsigned char code[BIP32_EXTKEY_SIZE]) const;
@@ -238,7 +237,7 @@ struct CExtPubKey {
         ::WriteCompactSize(s, len);
         unsigned char code[BIP32_EXTKEY_SIZE];
         Encode(code);
-        s.write((const char *)&code[0], len);
+        s.write((const char*)&code[0], len);
     }
     template <typename Stream>
     void Unserialize(Stream& s)
@@ -247,7 +246,7 @@ struct CExtPubKey {
         unsigned char code[BIP32_EXTKEY_SIZE];
         if (len != BIP32_EXTKEY_SIZE)
             throw std::runtime_error("Invalid extended key size\n");
-        s.read((char *)&code[0], len);
+        s.read((char*)&code[0], len);
         Decode(code);
     }
 };

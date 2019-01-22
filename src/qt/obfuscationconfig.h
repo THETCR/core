@@ -8,8 +8,7 @@
 
 #include <QDialog>
 
-namespace Ui
-{
+namespace Ui {
 class ObfuscationConfig;
 }
 class WalletModel;

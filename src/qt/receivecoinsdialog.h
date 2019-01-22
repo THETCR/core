@@ -19,8 +19,7 @@
 class OptionsModel;
 class WalletModel;
 
-namespace Ui
-{
+namespace Ui {
 class ReceiveCoinsDialog;
 }
 

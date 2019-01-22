@@ -9,11 +9,11 @@
 #include "guiutil.h"
 #include "walletmodel.h"
 
+#include "askpassphrasedialog.h"
 #include "base58.h"
 #include "bip38.h"
 #include "init.h"
 #include "wallet.h"
-#include "askpassphrasedialog.h"
 
 #include <string>
 #include <vector>

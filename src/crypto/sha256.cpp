@@ -9,11 +9,9 @@
 #include <string.h>
 
 // Internal implementation code.
-namespace
-{
+namespace {
 /// Internal SHA-256 implementation.
-namespace sha256
-{
+namespace sha256 {
 uint32_t inline Ch(uint32_t x, uint32_t y, uint32_t z) { return z ^ (x & (y ^ z)); }
 uint32_t inline Maj(uint32_t x, uint32_t y, uint32_t z) { return (x & y) | (z & (x | y)); }
 uint32_t inline Sigma0(uint32_t x) { return (x >> 2 | x << 30) ^ (x >> 13 | x << 19) ^ (x >> 22 | x << 10); }

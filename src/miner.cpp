@@ -21,12 +21,12 @@
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
-#include "validationinterface.h"
-#include "masternode-payments.h"
 #include "accumulators.h"
 #include "blocksignature.h"
-#include "spork.h"
 #include "invalid.h"
+#include "masternode-payments.h"
+#include "spork.h"
+#include "validationinterface.h"
 #include "zwspchain.h"
 
 
@@ -102,7 +102,7 @@ void UpdateTime(CBlockHeader* pblock, const CBlockIndex* pindexPrev)
     }
 }
 
-std::pair<int, std::pair<uint256, uint256> > pCheckpointCache;
+std::pair<int, std::pair<uint256, uint256>> pCheckpointCache;
 CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, bool fProofOfStake)
 {
     CReserveKey reservekey(pwallet);
@@ -119,7 +119,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         pblock->nVersion = GetArg("-blockversion", pblock->nVersion);
 
     bool fZerocoinActive = (chainActive.Height() + 1) >= Params().NEW_PROTOCOLS_STARTHEIGHT();
-    pblock->nVersion = 9;   // Supports CLTV activation
+    pblock->nVersion = 9; // Supports CLTV activation
 
     // Create coinbase tx
     CMutableTransaction txNew;
@@ -186,7 +186,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
         // Priority order to process transactions
         list<COrphan> vOrphan; // list memory doesn't move
-        map<uint256, vector<COrphan*> > mapDependers;
+        map<uint256, vector<COrphan*>> mapDependers;
         bool fPrintPriority = GetBoolArg("-printpriority", false);
 
         // This vector will be sorted into a priority queue:
@@ -195,10 +195,10 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         for (map<uint256, CTxMemPoolEntry>::iterator mi = mempool.mapTx.begin();
              mi != mempool.mapTx.end(); ++mi) {
             const CTransaction& tx = mi->second.GetTx();
-            if (tx.IsCoinBase() || tx.IsCoinStake() || !IsFinalTx(tx, nHeight)){
+            if (tx.IsCoinBase() || tx.IsCoinStake() || !IsFinalTx(tx, nHeight)) {
                 continue;
             }
-            if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE) && tx.ContainsZerocoins()){
+            if (GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE) && tx.ContainsZerocoins()) {
                 continue;
             }
 
@@ -278,7 +278,6 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
                 // zWSP spends can have very large priority, use non-overflowing safe functions
                 dPriority = double_safe_addition(dPriority, ((double)nValueIn * nConf));
-
             }
             if (fMissingInputs) continue;
 
@@ -407,12 +406,12 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
             if (fPrintPriority) {
                 LogPrintf("priority %.1f fee %s txid %s\n",
-                          dPriority, feeRate.ToString(), tx.GetHash().ToString());
+                    dPriority, feeRate.ToString(), tx.GetHash().ToString());
             }
 
             // Add transactions that depend on this one to the priority queue
             if (mapDependers.count(hash)) {
-                for (COrphan* porphan: mapDependers[hash]) {
+                for (COrphan* porphan : mapDependers[hash]) {
                     if (!porphan->setDependsOn.empty()) {
                         porphan->setDependsOn.erase(hash);
                         if (porphan->setDependsOn.empty()) {
@@ -483,10 +482,10 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             return nullptr;
         }
 
-//        if (pblock->IsZerocoinStake()) {
-//            CWalletTx wtx(pwalletMain, pblock->vtx[1]);
-//            pwalletMain->AddToWallet(wtx);
-//        }
+        //        if (pblock->IsZerocoinStake()) {
+        //            CWalletTx wtx(pwalletMain, pblock->vtx[1]);
+        //            pwalletMain->AddToWallet(wtx);
+        //        }
     }
 
     return pblocktemplate.release();

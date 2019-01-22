@@ -14,8 +14,8 @@
 #include "utiltime.h"
 #include "version.h"
 
-#include <stdint.h>
 #include <fstream>
+#include <stdint.h>
 
 using namespace std;
 
@@ -78,11 +78,11 @@ boost::filesystem::path GetAuthCookieFile()
     return path;
 }
 
-bool GenerateAuthCookie(std::string *cookie_out)
+bool GenerateAuthCookie(std::string* cookie_out)
 {
     unsigned char rand_pwd[32];
     GetRandBytes(rand_pwd, 32);
-    std::string cookie = COOKIEAUTH_USER + ":" + EncodeBase64(&rand_pwd[0],32);
+    std::string cookie = COOKIEAUTH_USER + ":" + EncodeBase64(&rand_pwd[0], 32);
 
     /** the umask determines what permissions are used to create this file -
      * these are set to 077 in init.cpp unless overridden with -sysperms.
@@ -103,7 +103,7 @@ bool GenerateAuthCookie(std::string *cookie_out)
     return true;
 }
 
-bool GetAuthCookie(std::string *cookie_out)
+bool GetAuthCookie(std::string* cookie_out)
 {
     std::ifstream file;
     std::string cookie;

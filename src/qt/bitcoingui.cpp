@@ -550,10 +550,10 @@ void BitcoinGUI::createToolBars()
         QToolBar* toolbar = new QToolBar(tr("Tabs toolbar"));
         toolbar->setObjectName("Main-Toolbar"); // Name for CSS addressing
         toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-//        // Add some empty space at the top of the toolbars
-//        QAction* spacer = new QAction(this);
-//        toolbar->addAction(spacer);
-//        toolbar->widgetForAction(spacer)->setObjectName("ToolbarSpacer");
+        //        // Add some empty space at the top of the toolbars
+        //        QAction* spacer = new QAction(this);
+        //        toolbar->addAction(spacer);
+        //        toolbar->widgetForAction(spacer)->setObjectName("ToolbarSpacer");
 
         toolbar->addAction(overviewAction);
         toolbar->addAction(sendCoinsAction);
@@ -567,7 +567,7 @@ void BitcoinGUI::createToolBars()
         }
         toolbar->setMovable(false); // remove unused icon in upper left corner
         toolbar->setOrientation(Qt::Vertical);
-        toolbar->setIconSize(QSize(40,40));
+        toolbar->setIconSize(QSize(40, 40));
         overviewAction->setChecked(true);
 
         /** Create additional container for toolbar and walletFrame and make it the central widget.
@@ -619,9 +619,8 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel)
         connect(clientModel->getOptionsModel(), SIGNAL(zeromintEnableChanged(bool)), this, SLOT(setAutoMintStatus()));
 
         //Show trayIcon
-        if (trayIcon)
-        {
-          trayIcon->show();
+        if (trayIcon) {
+            trayIcon->show();
         }
     } else {
         // Disable possibility to show main window via action
@@ -841,17 +840,17 @@ void BitcoinGUI::gotoVerifyMessageTab(QString addr)
 
 void BitcoinGUI::gotoMultisigCreate()
 {
-    if(walletFrame) walletFrame->gotoMultisigDialog(0);
+    if (walletFrame) walletFrame->gotoMultisigDialog(0);
 }
 
 void BitcoinGUI::gotoMultisigSpend()
 {
-    if(walletFrame) walletFrame->gotoMultisigDialog(1);
+    if (walletFrame) walletFrame->gotoMultisigDialog(1);
 }
 
 void BitcoinGUI::gotoMultisigSign()
 {
-    if(walletFrame) walletFrame->gotoMultisigDialog(2);
+    if (walletFrame) walletFrame->gotoMultisigDialog(2);
 }
 
 void BitcoinGUI::gotoBip38Tool()
@@ -1116,7 +1115,7 @@ void BitcoinGUI::closeEvent(QCloseEvent* event)
 void BitcoinGUI::incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address)
 {
     // Only send notifications when not disabled
-    if(!bdisableSystemnotifications){
+    if (!bdisableSystemnotifications) {
         // On new transaction, make an info balloon
         message((amount) < 0 ? (pwalletMain->fMultiSendNotify == true ? tr("Sent MultiSend transaction") : tr("Sent transaction")) : tr("Incoming transaction"),
             tr("Date: %1\n"
@@ -1144,7 +1143,7 @@ void BitcoinGUI::dragEnterEvent(QDragEnterEvent* event)
 void BitcoinGUI::dropEvent(QDropEvent* event)
 {
     if (event->mimeData()->hasUrls()) {
-        for (const QUrl& uri: event->mimeData()->urls()) {
+        for (const QUrl& uri : event->mimeData()->urls()) {
             emit receivedURI(uri.toString());
         }
     }
@@ -1173,13 +1172,13 @@ void BitcoinGUI::setStakingStatus()
             labelStakingIcon->show();
             labelStakingIcon->setPixmap(QIcon(":/icons/staking_active").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
             labelStakingIcon->setToolTip(
-                    tr("Staking is active\n MultiSend: %1").arg(fMultiSend ? tr("Active") : tr("Not Active")));
+                tr("Staking is active\n MultiSend: %1").arg(fMultiSend ? tr("Active") : tr("Not Active")));
         } else {
             labelStakingIcon->show();
             labelStakingIcon->setPixmap(
-                    QIcon(":/icons/staking_inactive").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+                QIcon(":/icons/staking_inactive").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
             labelStakingIcon->setToolTip(
-                    tr("Staking is not active\n MultiSend: %1").arg(fMultiSend ? tr("Active") : tr("Not Active")));
+                tr("Staking is not active\n MultiSend: %1").arg(fMultiSend ? tr("Active") : tr("Not Active")));
         }
     }
 }
@@ -1191,11 +1190,11 @@ void BitcoinGUI::setAutoMintStatus()
             labelAutoMintIcon->show();
             labelAutoMintIcon->setIcon(QIcon(":/icons/automint_active").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
             labelAutoMintIcon->setToolTip(
-                    tr("AutoMint is currently enabled and set to ") + QString::number(nZeromintPercentage) + "%.\n");
+                tr("AutoMint is currently enabled and set to ") + QString::number(nZeromintPercentage) + "%.\n");
         } else {
             labelAutoMintIcon->show();
             labelAutoMintIcon->setIcon(
-                    QIcon(":/icons/automint_inactive").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+                QIcon(":/icons/automint_inactive").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
             labelAutoMintIcon->setToolTip(tr("AutoMint is disabled"));
         }
     }
@@ -1379,7 +1378,7 @@ void UnitDisplayStatusBarControl::mousePressEvent(QMouseEvent* event)
 void UnitDisplayStatusBarControl::createContextMenu()
 {
     menu = new QMenu();
-    for (BitcoinUnits::Unit u: BitcoinUnits::availableUnits()) {
+    for (BitcoinUnits::Unit u : BitcoinUnits::availableUnits()) {
         QAction* menuAction = new QAction(QString(BitcoinUnits::name(u)), this);
         menuAction->setData(QVariant(u));
         menu->addAction(menuAction);
