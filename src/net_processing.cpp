@@ -3114,7 +3114,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 mapBlockSource.emplace(hash, std::make_pair(pfrom->GetId(), true));
             }
             bool fNewBlock = false;
-            LogPrint(BCLog::NET, "ProcessNewBlock %s peer=%d\n", pblock->GetHash().ToString(), pfrom->GetId());
+//            LogPrint(BCLog::NET, "ProcessNewBlock %s peer=%d\n", pblock->GetHash().ToString(), pfrom->GetId());
             ProcessNewBlock(chainparams, pblock, forceProcessing, &fNewBlock);
             if (fNewBlock) {
                 pfrom->nLastBlockTime = GetTime();
