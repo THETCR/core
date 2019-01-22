@@ -78,7 +78,7 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(*this);
+        READWRITE(FLATDATA(*this));
 //        READWRITE(hash);
 //        READWRITE(n);
     }
