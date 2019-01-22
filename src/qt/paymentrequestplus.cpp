@@ -104,8 +104,8 @@ bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) c
             qWarning() << "PaymentRequestPlus::getMerchant : Payment request: certificate blacklisted: " << qCert;
             return false;
         }
-        const unsigned char* data = (const unsigned char*)certChain.certificate(i).data();
-        X509* cert = d2i_X509(nullptr, &data, certChain.certificate(i).size());
+        const unsigned char *data = (const unsigned char *)certChain.certificate(i).data();
+        X509 *cert = d2i_X509(nullptr, &data, certChain.certificate(i).size());
         if (cert)
             certs.push_back(cert);
     }
@@ -153,11 +153,11 @@ bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) c
         rcopy.SerializeToString(&data_to_verify);
 
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-        EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+        EVP_MD_CTX *ctx = EVP_MD_CTX_new();
         if (!ctx) throw SSLVerifyError("Error allocating OpenSSL context.");
 #else
         EVP_MD_CTX _ctx;
-        EVP_MD_CTX* ctx;
+        EVP_MD_CTX *ctx;
         ctx = &_ctx;
 #endif
         EVP_PKEY* pubkey = X509_get_pubkey(signing_cert);
@@ -194,9 +194,9 @@ bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) c
     return fResult;
 }
 
-QList<std::pair<CScript, CAmount>> PaymentRequestPlus::getPayTo() const
+QList<std::pair<CScript, CAmount> > PaymentRequestPlus::getPayTo() const
 {
-    QList<std::pair<CScript, CAmount>> result;
+    QList<std::pair<CScript, CAmount> > result;
     for (int i = 0; i < details.outputs_size(); i++) {
         const unsigned char* scriptStr = (const unsigned char*)details.outputs(i).script().data();
         CScript s(scriptStr, scriptStr + details.outputs(i).script().size());

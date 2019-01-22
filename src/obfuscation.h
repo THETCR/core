@@ -117,10 +117,10 @@ public:
             return false;
         }
 
-        for (const CTxIn& in : vinIn)
+        for (const CTxIn& in: vinIn)
             sev.push_back(in);
 
-        for (const CTxOut& out : voutIn)
+        for (const CTxOut& out: voutIn)
             vout.push_back(out);
 
         amount = amountIn;
@@ -133,7 +133,7 @@ public:
 
     bool AddSig(const CTxIn& vin)
     {
-        for (CTxDSIn& s : sev) {
+        for (CTxDSIn& s: sev) {
             if (s.prevout == vin.prevout && s.nSequence == vin.nSequence) {
                 if (s.fHasSig) {
                     return false;

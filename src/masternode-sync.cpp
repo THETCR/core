@@ -222,7 +222,7 @@ void CMasternodeSync::ClearFulfilledRequest()
     TRY_LOCK(cs_vNodes, lockRecv);
     if (!lockRecv) return;
 
-    for (CNode* pnode : vNodes) {
+    for (CNode* pnode: vNodes) {
         pnode->ClearFulfilledRequest("getspork");
         pnode->ClearFulfilledRequest("mnsync");
         pnode->ClearFulfilledRequest("mnwsync");
@@ -261,7 +261,7 @@ void CMasternodeSync::Process()
     if (Params().NetworkID() != CBaseChainParams::REGTEST &&
         !IsBlockchainSynced() && RequestedMasternodeAssets > MASTERNODE_SYNC_SPORKS) return;
 
-    if (chainActive.Height() < Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+    if(chainActive.Height() < Params().NEW_PROTOCOLS_STARTHEIGHT()){
         RequestedMasternodeAssets = MASTERNODE_SYNC_FINISHED;
         return;
     }
@@ -269,7 +269,7 @@ void CMasternodeSync::Process()
     TRY_LOCK(cs_vNodes, lockRecv);
     if (!lockRecv) return;
 
-    for (CNode* pnode : vNodes) {
+    for (CNode* pnode: vNodes) {
         if (Params().NetworkID() == CBaseChainParams::REGTEST) {
             if (RequestedMasternodeAttempt <= 2) {
                 pnode->PushMessage("getsporks"); //get current network sporks
@@ -371,8 +371,10 @@ void CMasternodeSync::Process()
 
         if (pnode->nVersion >= ActiveProtocol()) {
             if (RequestedMasternodeAssets == MASTERNODE_SYNC_BUDGET) {
+                
                 // We'll start rejecting votes if we accidentally get set as synced too soon
-                if (lastBudgetItem > 0 && lastBudgetItem < GetTime() - MASTERNODE_SYNC_TIMEOUT * 2 && RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD) {
+                if (lastBudgetItem > 0 && lastBudgetItem < GetTime() - MASTERNODE_SYNC_TIMEOUT * 2 && RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD) { 
+                    
                     // Hasn't received a new item in the last five seconds, so we'll move to the
                     GetNextAsset();
 

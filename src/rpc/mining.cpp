@@ -36,7 +36,7 @@ using namespace std;
  */
 UniValue GetNetworkHashPS(int lookup, int height)
 {
-    CBlockIndex* pb = chainActive.Tip();
+    CBlockIndex *pb = chainActive.Tip();
 
     if (height >= 0 && height < chainActive.Height())
         pb = chainActive[height];
@@ -467,7 +467,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
             WaitableLock lock(csBestBlock);
             while (chainActive.Tip()->GetBlockHash() == hashWatchedChain && IsRPCRunning()) {
-                if (cvBlockChange.wait_until(lock, checktxtime) == std::cv_status::timeout) {
+                if (cvBlockChange.wait_until(lock, checktxtime) == std::cv_status::timeout)
+                {
                     // Timeout: Check transactions for update
                     if (mempool.GetTransactionsUpdated() != nTransactionsUpdatedLastLP)
                         break;
@@ -515,13 +516,12 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     UpdateTime(pblock, pindexPrev);
     pblock->nNonce = 0;
 
-    UniValue aCaps(UniValue::VARR);
-    aCaps.push_back("proposal");
+    UniValue aCaps(UniValue::VARR); aCaps.push_back("proposal");
 
     UniValue transactions(UniValue::VARR);
     map<uint256, int64_t> setTxIndex;
     int i = 0;
-    for (CTransaction& tx : pblock->vtx) {
+    for (CTransaction& tx: pblock->vtx) {
         uint256 txHash = tx.GetHash();
         setTxIndex[txHash] = i++;
 
@@ -535,7 +535,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         entry.push_back(Pair("hash", txHash.GetHex()));
 
         UniValue deps(UniValue::VARR);
-        for (const CTxIn& in : tx.vin) {
+        for (const CTxIn& in: tx.vin) {
             if (setTxIndex.count(in.prevout.hash))
                 deps.push_back(setTxIndex[in.prevout.hash]);
         }
@@ -574,8 +574,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     result.push_back(Pair("mintime", (int64_t)pindexPrev->GetMedianTimePast() + 1));
     result.push_back(Pair("mutable", aMutable));
     result.push_back(Pair("noncerange", "00000000ffffffff"));
-    //    result.push_back(Pair("sigoplimit", (int64_t)MAX_BLOCK_SIGOPS));
-    //    result.push_back(Pair("sizelimit", (int64_t)MAX_BLOCK_SIZE));
+//    result.push_back(Pair("sigoplimit", (int64_t)MAX_BLOCK_SIGOPS));
+//    result.push_back(Pair("sizelimit", (int64_t)MAX_BLOCK_SIZE));
     result.push_back(Pair("curtime", pblock->GetBlockTime()));
     result.push_back(Pair("bits", strprintf("%08x", pblock->nBits)));
     result.push_back(Pair("height", (int64_t)(pindexPrev->nHeight + 1)));

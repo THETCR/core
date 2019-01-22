@@ -7,8 +7,8 @@
 #ifndef BITCOIN_QT_CLIENTMODEL_H
 #define BITCOIN_QT_CLIENTMODEL_H
 
-#include <QDateTime>
 #include <QObject>
+#include <QDateTime>
 
 class AddressTableModel;
 class BanTableModel;
@@ -48,7 +48,7 @@ public:
 
     OptionsModel* getOptionsModel();
     PeerTableModel* getPeerTableModel();
-    BanTableModel* getBanTableModel();
+    BanTableModel *getBanTableModel();
 
     //! Return number of connections, default is in- and outbound (total)
     int getNumConnections(unsigned int flags = CONNECTIONS_ALL) const;
@@ -80,7 +80,7 @@ public:
 private:
     OptionsModel* optionsModel;
     PeerTableModel* peerTableModel;
-    BanTableModel* banTableModel;
+    BanTableModel *banTableModel;
 
     int cachedNumBlocks;
     QString cachedMasternodeCountString;

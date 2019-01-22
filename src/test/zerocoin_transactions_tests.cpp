@@ -2,14 +2,14 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "libzerocoin/Denominations.h"
 #include "amount.h"
 #include "chainparams.h"
 #include "coincontrol.h"
-#include "libzerocoin/Denominations.h"
 #include "main.h"
-#include "txdb.h"
 #include "wallet.h"
 #include "walletdb.h"
+#include "txdb.h"
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 
@@ -23,7 +23,7 @@ static CWallet cWallet("unlocked.dat");
 BOOST_AUTO_TEST_CASE(zerocoin_spend_test)
 {
     SelectParams(CBaseChainParams::MAIN);
-    ZerocoinParams* ZCParams = Params().Zerocoin_Params(false);
+    ZerocoinParams *ZCParams = Params().Zerocoin_Params(false);
     (void)ZCParams;
 
     bool fFirstRun;
@@ -31,8 +31,8 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test)
     cWallet.zwspTracker = unique_ptr<CzWSPTracker>(new CzWSPTracker(cWallet.strWalletFile));
     CMutableTransaction tx;
     CWalletTx* wtx = new CWalletTx(&cWallet, tx);
-    bool fMintChange = true;
-    bool fMinimizeChange = true;
+    bool fMintChange=true;
+    bool fMinimizeChange=true;
     std::vector<CZerocoinSpend> vSpends;
     std::vector<CZerocoinMint> vMints;
     CAmount nAmount = COIN;
@@ -51,6 +51,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test)
     /// BOOST_CHECK_MESSAGE(vString == "Error: Wallet locked, unable to create transaction!"," Locked Wallet Check Failed");
 
     BOOST_CHECK_MESSAGE(receipt2.GetStatus() == ZWSP_TRX_FUNDS_PROBLEMS, "Failed Invalid Amount Check");
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

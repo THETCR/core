@@ -15,9 +15,9 @@
 #include <boost/filesystem/operations.hpp>
 #include <stdio.h>
 
-#include <event2/buffer.h>
 #include <event2/event.h>
 #include <event2/http.h>
+#include <event2/buffer.h>
 #include <event2/keyvalq_struct.h>
 
 #include <univalue.h>
@@ -26,7 +26,7 @@
 
 using namespace std;
 
-static const int DEFAULT_HTTP_CLIENT_TIMEOUT = 900;
+static const int DEFAULT_HTTP_CLIENT_TIMEOUT=900;
 
 std::string HelpMessageCli()
 {
@@ -100,7 +100,8 @@ static bool AppInitRPC(int argc, char* argv[])
         fprintf(stderr, "Error: Invalid combination of -regtest and -testnet.\n");
         return false;
     }
-    if (GetBoolArg("-rpcssl", false)) {
+    if (GetBoolArg("-rpcssl", false))
+    {
         fprintf(stderr, "Error: SSL mode for RPC (-rpcssl) is no longer supported.\n");
         return false;
     }
@@ -109,14 +110,15 @@ static bool AppInitRPC(int argc, char* argv[])
 
 
 /** Reply structure for request_done to fill in */
-struct HTTPReply {
+struct HTTPReply
+{
     int status;
     std::string body;
 };
 
-static void http_request_done(struct evhttp_request* req, void* ctx)
+static void http_request_done(struct evhttp_request *req, void *ctx)
 {
-    HTTPReply* reply = static_cast<HTTPReply*>(ctx);
+    HTTPReply *reply = static_cast<HTTPReply*>(ctx);
 
     if (req == nullptr) {
         /* If req is NULL, it means an error occurred while connecting, but
@@ -128,10 +130,11 @@ static void http_request_done(struct evhttp_request* req, void* ctx)
 
     reply->status = evhttp_request_get_response_code(req);
 
-    struct evbuffer* buf = evhttp_request_get_input_buffer(req);
-    if (buf) {
+    struct evbuffer *buf = evhttp_request_get_input_buffer(req);
+    if (buf)
+    {
         size_t size = evbuffer_get_length(buf);
-        const char* data = (const char*)evbuffer_pullup(buf, size);
+        const char *data = (const char*)evbuffer_pullup(buf, size);
         if (data)
             reply->body = std::string(data, size);
         evbuffer_drain(buf, size);
@@ -144,18 +147,18 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
     int port = GetArg("-rpcport", BaseParams().RPCPort());
 
     // Create event base
-    struct event_base* base = event_base_new(); // TODO RAII
+    struct event_base *base = event_base_new(); // TODO RAII
     if (!base)
         throw runtime_error("cannot create event_base");
 
     // Synchronously look up hostname
-    struct evhttp_connection* evcon = evhttp_connection_base_new(base, NULL, host.c_str(), port); // TODO RAII
+    struct evhttp_connection *evcon = evhttp_connection_base_new(base, NULL, host.c_str(), port); // TODO RAII
     if (evcon == nullptr)
         throw runtime_error("create connection failed");
     evhttp_connection_set_timeout(evcon, GetArg("-rpcclienttimeout", DEFAULT_HTTP_CLIENT_TIMEOUT));
 
     HTTPReply response;
-    struct evhttp_request* req = evhttp_request_new(http_request_done, (void*)&response); // TODO RAII
+    struct evhttp_request *req = evhttp_request_new(http_request_done, (void*)&response); // TODO RAII
     if (req == nullptr)
         throw runtime_error("create http request failed");
 
@@ -165,14 +168,15 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
         // Try fall back to cookie-based authentication if no password is provided
         if (!GetAuthCookie(&strRPCUserColonPass)) {
             throw runtime_error(strprintf(
-                _("Could not locate RPC credentials. No authentication cookie could be found, and no rpcpassword is set in the configuration file (%s)"),
-                GetConfigFile().string().c_str()));
+                 _("Could not locate RPC credentials. No authentication cookie could be found, and no rpcpassword is set in the configuration file (%s)"),
+                    GetConfigFile().string().c_str()));
+
         }
     } else {
         strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
     }
 
-    struct evkeyvalq* output_headers = evhttp_request_get_output_headers(req);
+    struct evkeyvalq *output_headers = evhttp_request_get_output_headers(req);
     assert(output_headers);
     evhttp_add_header(output_headers, "Host", host.c_str());
     evhttp_add_header(output_headers, "Connection", "close");
@@ -180,7 +184,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
 
     // Attach request data
     std::string strRequest = JSONRPCRequest(strMethod, params, 1);
-    struct evbuffer* output_buffer = evhttp_request_get_output_buffer(req);
+    struct evbuffer * output_buffer = evhttp_request_get_output_buffer(req);
     assert(output_buffer);
     evbuffer_add(output_buffer, strRequest.data(), strRequest.size());
 

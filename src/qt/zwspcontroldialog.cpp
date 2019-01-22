@@ -15,8 +15,7 @@ using namespace libzerocoin;
 std::set<std::string> ZWspControlDialog::setSelectedMints;
 std::set<CMintMeta> ZWspControlDialog::setMints;
 
-bool CZWspControlWidgetItem::operator<(const QTreeWidgetItem& other) const
-{
+bool CZWspControlWidgetItem::operator<(const QTreeWidgetItem &other) const {
     int column = treeWidget()->sortColumn();
     if (column == ZWspControlDialog::COLUMN_DENOMINATION || column == ZWspControlDialog::COLUMN_VERSION || column == ZWspControlDialog::COLUMN_CONFIRMATIONS)
         return data(column, Qt::UserRole).toLongLong() < other.data(column, Qt::UserRole).toLongLong();
@@ -24,9 +23,10 @@ bool CZWspControlWidgetItem::operator<(const QTreeWidgetItem& other) const
 }
 
 
-ZWspControlDialog::ZWspControlDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
-                                                        ui(new Ui::ZWspControlDialog),
-                                                        model(nullptr)
+ZWspControlDialog::ZWspControlDialog(QWidget *parent) :
+    QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+    ui(new Ui::ZWspControlDialog),
+    model(nullptr)
 {
     ui->setupUi(this);
     setMints.clear();
@@ -44,7 +44,7 @@ ZWspControlDialog::~ZWspControlDialog()
     delete ui;
 }
 
-void ZWspControlDialog::setModel(WalletModel* model)
+void ZWspControlDialog::setModel(WalletModel *model)
 {
     this->model = model;
     updateList();
@@ -70,7 +70,7 @@ void ZWspControlDialog::updateList()
 
         itemDenom->setFlags(flgTristate);
         itemDenom->setText(COLUMN_DENOMINATION, QString::number(denom));
-        itemDenom->setData(COLUMN_DENOMINATION, Qt::UserRole, QVariant((qlonglong)denom));
+        itemDenom->setData(COLUMN_DENOMINATION, Qt::UserRole, QVariant((qlonglong) denom));
     }
 
     // select all unused coins - including not mature and mismatching seed. Update status of coins too.
@@ -84,7 +84,7 @@ void ZWspControlDialog::updateList()
     for (const CMintMeta& mint : setMints) {
         // assign this mint to the correct denomination in the tree view
         libzerocoin::CoinDenomination denom = mint.denom;
-        CZWspControlWidgetItem* itemMint = new CZWspControlWidgetItem(ui->treeWidget->topLevelItem(mapDenomPosition.at(denom)));
+        CZWspControlWidgetItem *itemMint = new CZWspControlWidgetItem(ui->treeWidget->topLevelItem(mapDenomPosition.at(denom)));
 
         // if the mint is already selected, then it needs to have the checkbox checked
         std::string strPubCoinHash = mint.hashPubcoin.GetHex();
@@ -95,10 +95,10 @@ void ZWspControlDialog::updateList()
             itemMint->setCheckState(COLUMN_CHECKBOX, Qt::Unchecked);
 
         itemMint->setText(COLUMN_DENOMINATION, QString::number(mint.denom));
-        itemMint->setData(COLUMN_DENOMINATION, Qt::UserRole, QVariant((qlonglong)denom));
+        itemMint->setData(COLUMN_DENOMINATION, Qt::UserRole, QVariant((qlonglong) denom));
         itemMint->setText(COLUMN_PUBCOIN, QString::fromStdString(strPubCoinHash));
         itemMint->setText(COLUMN_VERSION, QString::number(mint.nVersion));
-        itemMint->setData(COLUMN_VERSION, Qt::UserRole, QVariant((qlonglong)mint.nVersion));
+        itemMint->setData(COLUMN_VERSION, Qt::UserRole, QVariant((qlonglong) mint.nVersion));
 
         int nConfirmations = (mint.nHeight ? nBestHeight - mint.nHeight : 0);
         if (nConfirmations < 0) {
@@ -107,7 +107,7 @@ void ZWspControlDialog::updateList()
         }
 
         itemMint->setText(COLUMN_CONFIRMATIONS, QString::number(nConfirmations));
-        itemMint->setData(COLUMN_CONFIRMATIONS, Qt::UserRole, QVariant((qlonglong)nConfirmations));
+        itemMint->setData(COLUMN_CONFIRMATIONS, Qt::UserRole, QVariant((qlonglong) nConfirmations));
 
         // check for maturity
         bool isMature = false;
@@ -116,7 +116,7 @@ void ZWspControlDialog::updateList()
 
         // disable selecting this mint if it is not spendable - also display a reason why
         bool fSpendable = isMature && nConfirmations >= Params().Zerocoin_MintRequiredConfirmations() && mint.isSeedCorrect;
-        if (!fSpendable) {
+        if(!fSpendable) {
             itemMint->setDisabled(true);
             itemMint->setCheckState(COLUMN_CHECKBOX, Qt::Unchecked);
 
@@ -125,7 +125,7 @@ void ZWspControlDialog::updateList()
                 setSelectedMints.erase(strPubCoinHash);
 
             string strReason = "";
-            if (nConfirmations < Params().Zerocoin_MintRequiredConfirmations())
+            if(nConfirmations < Params().Zerocoin_MintRequiredConfirmations())
                 strReason = strprintf("Needs %d more confirmations", Params().Zerocoin_MintRequiredConfirmations() - nConfirmations);
             else if (!mint.isSeedCorrect)
                 strReason = "The zWSP seed used to mint this zWSP is not the same as currently hold in the wallet";
@@ -146,7 +146,8 @@ void ZWspControlDialog::updateList()
 void ZWspControlDialog::updateSelection(QTreeWidgetItem* item, int column)
 {
     // only want updates from non top level items that are available to spend
-    if (item->parent() && column == COLUMN_CHECKBOX && !item->isDisabled()) {
+    if (item->parent() && column == COLUMN_CHECKBOX && !item->isDisabled()){
+
         // see if this mint is already selected in the selection list
         std::string strPubcoin = item->text(COLUMN_PUBCOIN).toStdString();
         bool fSelected = setSelectedMints.count(strPubcoin);
@@ -197,7 +198,7 @@ void ZWspControlDialog::ButtonAllClicked()
     ui->treeWidget->blockSignals(true);
     Qt::CheckState state = Qt::Checked;
     for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
-        if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != Qt::Unchecked) {
+        if(ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != Qt::Unchecked) {
             state = Qt::Unchecked;
             break;
         }
@@ -207,7 +208,7 @@ void ZWspControlDialog::ButtonAllClicked()
     ui->treeWidget->clear();
 
     if (state == Qt::Checked) {
-        for (const CMintMeta& mint : setMints)
+        for(const CMintMeta& mint : setMints)
             setSelectedMints.insert(mint.hashPubcoin.GetHex());
     } else {
         setSelectedMints.clear();

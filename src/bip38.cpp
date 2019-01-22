@@ -6,9 +6,9 @@
 #include "base58.h"
 #include "hash.h"
 #include "pubkey.h"
-#include "random.h"
 #include "util.h"
 #include "utilstrencodings.h"
+#include "random.h"
 
 #include <openssl/aes.h>
 #include <openssl/sha.h>
@@ -50,7 +50,7 @@ void ComputePassfactor(std::string ownersalt, uint256 prefactor, uint256& passfa
 bool ComputePasspoint(uint256 passfactor, CPubKey& passpoint)
 {
     size_t clen = 65;
-    secp256k1_context* ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
+    secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
     assert(ctx != nullptr);
     {
         // Pass in a random blinding seed to the secp256k1 context.
@@ -253,7 +253,7 @@ bool BIP38_Decrypt(std::string strPassphrase, std::string strEncryptedKey, uint2
     ComputeFactorB(seedB, factorB);
 
     //multiply passfactor by factorb mod N to yield the priv key
-    secp256k1_context* ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
+    secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
     assert(ctx != nullptr);
     {
         // Pass in a random blinding seed to the secp256k1 context.

@@ -61,7 +61,7 @@ public:
     bool WriteReindexing(bool fReindex);
     bool ReadReindexing(bool& fReindex);
     bool ReadTxIndex(const uint256& txid, CDiskTxPos& pos);
-    bool WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos>>& list);
+    bool WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& list);
     bool WriteFlag(const std::string& name, bool fValue);
     bool ReadFlag(const std::string& name, bool& fValue);
     bool WriteInt(const std::string& name, int nValue);
@@ -81,13 +81,13 @@ private:
 
 public:
     /** Write zWSP mints to the zerocoinDB in a batch */
-    bool WriteCoinMintBatch(const std::vector<std::pair<libzerocoin::PublicCoin, uint256>>& mintInfo);
+    bool WriteCoinMintBatch(const std::vector<std::pair<libzerocoin::PublicCoin, uint256> >& mintInfo);
     bool ReadCoinMint(const CBigNum& bnPubcoin, uint256& txHash);
     bool ReadCoinMint(const uint256& hashPubcoin, uint256& hashTx);
     /** Write zWSP spends to the zerocoinDB in a batch */
-    bool WriteCoinSpendBatch(const std::vector<std::pair<libzerocoin::CoinSpend, uint256>>& spendInfo);
+    bool WriteCoinSpendBatch(const std::vector<std::pair<libzerocoin::CoinSpend, uint256> >& spendInfo);
     bool ReadCoinSpend(const CBigNum& bnSerial, uint256& txHash);
-    bool ReadCoinSpend(const uint256& hashSerial, uint256& txHash);
+    bool ReadCoinSpend(const uint256& hashSerial, uint256 &txHash);
     bool EraseCoinMint(const CBigNum& bnPubcoin);
     bool EraseCoinSpend(const CBigNum& bnSerial);
     bool WipeCoins(std::string strType);

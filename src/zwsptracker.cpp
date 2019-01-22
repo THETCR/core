@@ -2,15 +2,15 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <primitives/deterministicmint.h>
 #include "zwsptracker.h"
-#include "accumulators.h"
-#include "main.h"
-#include "sync.h"
-#include "txdb.h"
 #include "util.h"
+#include "sync.h"
+#include "main.h"
+#include "txdb.h"
 #include "walletdb.h"
 #include "zwspwallet.h"
-#include <primitives/deterministicmint.h>
+#include "accumulators.h"
 
 using namespace std;
 
@@ -79,7 +79,7 @@ bool CzWSPTracker::UnArchive(const uint256& hashPubcoin, bool isDeterministic)
     return true;
 }
 
-CMintMeta CzWSPTracker::Get(const uint256& hashSerial)
+CMintMeta CzWSPTracker::Get(const uint256 &hashSerial)
 {
     if (!mapSerialHashes.count(hashSerial))
         return CMintMeta();
@@ -151,7 +151,7 @@ CAmount CzWSPTracker::GetBalance(bool fConfirmedOnly, bool fUnconfirmedOnly) con
         }
     }
 
-    if (nTotal < 0) nTotal = 0; // Sanity never hurts
+    if (nTotal < 0 ) nTotal = 0; // Sanity never hurts
 
     return nTotal;
 }
@@ -187,7 +187,7 @@ bool CzWSPTracker::HasMintTx(const uint256& txid)
     return false;
 }
 
-bool CzWSPTracker::HasPubcoin(const CBigNum& bnValue) const
+bool CzWSPTracker::HasPubcoin(const CBigNum &bnValue) const
 {
     // Check if this mint's pubcoin value belongs to our mapSerialHashes (which includes hashpubcoin values)
     uint256 hash = GetPubCoinHash(bnValue);
@@ -291,10 +291,10 @@ void CzWSPTracker::Add(const CDeterministicMint& dMint, bool isNew, bool isArchi
     meta.denom = dMint.GetDenomination();
     meta.isArchived = isArchived;
     meta.isDeterministic = true;
-    if (!iszWSPWalletInitialized)
+    if (! iszWSPWalletInitialized)
         zWSPWallet = new CzWSPWallet(strWalletFile);
     meta.isSeedCorrect = zWSPWallet->CheckSeed(dMint);
-    if (!iszWSPWalletInitialized)
+    if (! iszWSPWalletInitialized)
         delete zWSPWallet;
     mapSerialHashes[meta.hashSerial] = meta;
 

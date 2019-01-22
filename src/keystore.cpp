@@ -13,6 +13,7 @@
 #include "util.h"
 
 
+
 bool CKeyStore::GetPubKey(const CKeyID& address, CPubKey& vchPubKeyOut) const
 {
     CKey key;

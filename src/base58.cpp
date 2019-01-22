@@ -218,7 +218,8 @@ int CBase58Data::CompareTo(const CBase58Data& b58) const
     return 0;
 }
 
-namespace {
+namespace
+{
 class CBitcoinAddressVisitor : public boost::static_visitor<bool>
 {
 private:
@@ -232,7 +233,7 @@ public:
     bool operator()(const CNoDestination& no) const { return false; }
 };
 
-} // namespace
+} // anon namespace
 
 bool CBitcoinAddress::Set(const CKeyID& id)
 {

@@ -39,8 +39,8 @@ BOOST_AUTO_TEST_CASE(base58_EncodeBase58)
         std::vector<unsigned char> sourcedata = ParseHex(test[0].get_str());
         std::string base58string = test[1].get_str();
         BOOST_CHECK_MESSAGE(
-            EncodeBase58(begin_ptr(sourcedata), end_ptr(sourcedata)) == base58string,
-            strTest);
+                    EncodeBase58(begin_ptr(sourcedata), end_ptr(sourcedata)) == base58string,
+                    strTest);
     }
 }
 
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(base58_DecodeBase58)
 
     // check that DecodeBase58 skips whitespace, but still fails with unexpected non-whitespace at the end.
     BOOST_CHECK(!DecodeBase58(" \t\n\v\f\r skip \r\f\v\n\t a", result));
-    BOOST_CHECK(DecodeBase58(" \t\n\v\f\r skip \r\f\v\n\t ", result));
+    BOOST_CHECK( DecodeBase58(" \t\n\v\f\r skip \r\f\v\n\t ", result));
     std::vector<unsigned char> expected = ParseHex("971a55");
     BOOST_CHECK_EQUAL_COLLECTIONS(result.begin(), result.end(), expected.begin(), expected.end());
 }
@@ -78,18 +78,17 @@ class TestAddrTypeVisitor : public boost::static_visitor<bool>
 {
 private:
     std::string exp_addrType;
-
 public:
-    TestAddrTypeVisitor(const std::string& exp_addrType) : exp_addrType(exp_addrType) {}
-    bool operator()(const CKeyID& id) const
+    TestAddrTypeVisitor(const std::string &exp_addrType) : exp_addrType(exp_addrType) { }
+    bool operator()(const CKeyID &id) const
     {
         return (exp_addrType == "pubkey");
     }
-    bool operator()(const CScriptID& id) const
+    bool operator()(const CScriptID &id) const
     {
         return (exp_addrType == "script");
     }
-    bool operator()(const CNoDestination& no) const
+    bool operator()(const CNoDestination &no) const
     {
         return (exp_addrType == "none");
     }
@@ -100,20 +99,19 @@ class TestPayloadVisitor : public boost::static_visitor<bool>
 {
 private:
     std::vector<unsigned char> exp_payload;
-
 public:
-    TestPayloadVisitor(std::vector<unsigned char>& exp_payload) : exp_payload(exp_payload) {}
-    bool operator()(const CKeyID& id) const
+    TestPayloadVisitor(std::vector<unsigned char> &exp_payload) : exp_payload(exp_payload) { }
+    bool operator()(const CKeyID &id) const
     {
         uint160 exp_key(exp_payload);
         return exp_key == id;
     }
-    bool operator()(const CScriptID& id) const
+    bool operator()(const CScriptID &id) const
     {
         uint160 exp_key(exp_payload);
         return exp_key == id;
     }
-    bool operator()(const CNoDestination& no) const
+    bool operator()(const CNoDestination &no) const
     {
         return exp_payload.size() == 0;
     }
@@ -137,18 +135,19 @@ BOOST_AUTO_TEST_CASE(base58_keys_valid_parse)
         }
         std::string exp_base58string = test[0].get_str();
         std::vector<unsigned char> exp_payload = ParseHex(test[1].get_str());
-        const UniValue& metadata = test[2].get_obj();
+        const UniValue &metadata = test[2].get_obj();
         bool isPrivkey = find_value(metadata, "isPrivkey").get_bool();
         bool isTestnet = find_value(metadata, "isTestnet").get_bool();
         if (isTestnet)
             SelectParams(CBaseChainParams::TESTNET);
         else
             SelectParams(CBaseChainParams::MAIN);
-        if (isPrivkey) {
+        if(isPrivkey)
+        {
             bool isCompressed = find_value(metadata, "isCompressed").get_bool();
             // Must be valid private key
             // Note: CBitcoinSecret::SetString tests isValid, whereas CBitcoinAddress does not!
-            BOOST_CHECK_MESSAGE(secret.SetString(exp_base58string), "!SetString:" + strTest);
+            BOOST_CHECK_MESSAGE(secret.SetString(exp_base58string), "!SetString:"+ strTest);
             BOOST_CHECK_MESSAGE(secret.IsValid(), "!IsValid:" + strTest);
             CKey privkey = secret.GetKey();
             BOOST_CHECK_MESSAGE(privkey.IsCompressed() == isCompressed, "compressed mismatch:" + strTest);
@@ -157,7 +156,9 @@ BOOST_AUTO_TEST_CASE(base58_keys_valid_parse)
             // Private key must be invalid public key
             addr.SetString(exp_base58string);
             BOOST_CHECK_MESSAGE(!addr.IsValid(), "IsValid privkey as pubkey:" + strTest);
-        } else {
+        }
+        else
+        {
             std::string exp_addrType = find_value(metadata, "addrType").get_str(); // "script" or "pubkey"
             // Must be valid public key
             BOOST_CHECK_MESSAGE(addr.SetString(exp_base58string), "SetString:" + strTest);
@@ -190,14 +191,15 @@ BOOST_AUTO_TEST_CASE(base58_keys_valid_gen)
         }
         std::string exp_base58string = test[0].get_str();
         std::vector<unsigned char> exp_payload = ParseHex(test[1].get_str());
-        const UniValue& metadata = test[2].get_obj();
+        const UniValue &metadata = test[2].get_obj();
         bool isPrivkey = find_value(metadata, "isPrivkey").get_bool();
         bool isTestnet = find_value(metadata, "isTestnet").get_bool();
         if (isTestnet)
             SelectParams(CBaseChainParams::TESTNET);
         else
             SelectParams(CBaseChainParams::MAIN);
-        if (isPrivkey) {
+        if(isPrivkey)
+        {
             bool isCompressed = find_value(metadata, "isCompressed").get_bool();
             CKey key;
             key.Set(exp_payload.begin(), exp_payload.end(), isCompressed);
@@ -205,16 +207,25 @@ BOOST_AUTO_TEST_CASE(base58_keys_valid_gen)
             CBitcoinSecret secret;
             secret.SetKey(key);
             BOOST_CHECK_MESSAGE(secret.ToString() == exp_base58string, "result mismatch: " + strTest);
-        } else {
+        }
+        else
+        {
             std::string exp_addrType = find_value(metadata, "addrType").get_str();
             CTxDestination dest;
-            if (exp_addrType == "pubkey") {
+            if(exp_addrType == "pubkey")
+            {
                 dest = CKeyID(uint160(exp_payload));
-            } else if (exp_addrType == "script") {
+            }
+            else if(exp_addrType == "script")
+            {
                 dest = CScriptID(uint160(exp_payload));
-            } else if (exp_addrType == "none") {
+            }
+            else if(exp_addrType == "none")
+            {
                 dest = CNoDestination();
-            } else {
+            }
+            else
+            {
                 BOOST_ERROR("Bad addrtype: " << strTest);
                 continue;
             }
@@ -260,3 +271,4 @@ BOOST_AUTO_TEST_CASE(base58_keys_invalid)
 
 
 BOOST_AUTO_TEST_SUITE_END()
+

@@ -12,11 +12,11 @@
 #include "net.h"
 #include "obfuscation.h"
 #include "protocol.h"
-#include "reverse_iterate.h"
 #include "spork.h"
 #include "sync.h"
 #include "util.h"
 #include "validationinterface.h"
+#include "reverse_iterate.h"
 
 using namespace std;
 using namespace boost;
@@ -60,7 +60,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
             return;
         }
 
-        for (const CTxOut o : tx.vout) {
+        for (const CTxOut o: tx.vout) {
             // IX supports normal scripts and unspendable scripts (used in DS collateral and Budget collateral).
             // TODO: Look into other script types that are normal and can be included
             if (!o.scriptPubKey.IsNormalPaymentScript() && !o.scriptPubKey.IsUnspendable()) {
@@ -105,7 +105,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
                 pfrom->addr.ToString().c_str(), pfrom->cleanSubVer.c_str(),
                 tx.GetHash().ToString().c_str());
 
-            for (const CTxIn& in : tx.vin) {
+            for (const CTxIn& in: tx.vin) {
                 if (!mapLockedInputs.count(in.prevout)) {
                     mapLockedInputs.insert(make_pair(in.prevout, tx.GetHash()));
                 }
@@ -184,10 +184,10 @@ bool IsIXTXValid(const CTransaction& txCollateral)
     CAmount nValueOut = 0;
     bool missingTx = false;
 
-    for (const CTxOut o : txCollateral.vout)
+    for (const CTxOut o: txCollateral.vout)
         nValueOut += o.nValue;
 
-    for (const CTxIn i : txCollateral.vin) {
+    for (const CTxIn i: txCollateral.vin) {
         CTransaction tx2;
         uint256 hash;
         if (GetTransaction(i.prevout.hash, tx2, hash, true)) {
@@ -225,7 +225,7 @@ bool IsIXTXValid(const CTransaction& txCollateral)
 int64_t CreateNewLock(CTransaction tx)
 {
     int64_t nTxAge = 0;
-    for (CTxIn i : reverse_iterate(tx.vin)) {
+    for (CTxIn i: reverse_iterate(tx.vin)) {
         nTxAge = GetInputAge(i);
         if (nTxAge < 5) //1 less than the "send IX" gui requires, incase of a block propagating the network at the time
         {
@@ -369,7 +369,7 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx)
 #endif
 
                 if (mapTxLockReq.count(ctx.txHash)) {
-                    for (const CTxIn& in : tx.vin) {
+                    for (const CTxIn& in: tx.vin) {
                         if (!mapLockedInputs.count(in.prevout)) {
                             mapLockedInputs.insert(make_pair(in.prevout, ctx.txHash));
                         }
@@ -401,7 +401,7 @@ bool CheckForConflictingLocks(CTransaction& tx)
         Blocks could have been rejected during this time, which is OK. After they cancel out, the client will
         rescan the blocks and find they're acceptable and then take the chain with the most work.
     */
-    for (const CTxIn& in : tx.vin) {
+    for (const CTxIn& in: tx.vin) {
         if (mapLockedInputs.count(in.prevout)) {
             if (mapLockedInputs[in.prevout] != tx.GetHash()) {
                 LogPrintf("SwiftX::CheckForConflictingLocks - found two complete conflicting locks - removing both. %s %s", tx.GetHash().ToString().c_str(), mapLockedInputs[in.prevout].ToString().c_str());
@@ -443,13 +443,13 @@ void CleanTransactionLocksList()
             if (mapTxLockReq.count(it->second.txHash)) {
                 CTransaction& tx = mapTxLockReq[it->second.txHash];
 
-                for (const CTxIn& in : tx.vin)
+                for (const CTxIn& in: tx.vin)
                     mapLockedInputs.erase(in.prevout);
 
                 mapTxLockReq.erase(it->second.txHash);
                 mapTxLockReqRejected.erase(it->second.txHash);
 
-                for (CConsensusVote& v : it->second.vecConsensusVotes)
+                for (CConsensusVote& v: it->second.vecConsensusVotes)
                     mapTxLockVote.erase(v.GetHash());
             }
 
@@ -462,11 +462,11 @@ void CleanTransactionLocksList()
 
 int GetTransactionLockSignatures(uint256 txHash)
 {
-    if (fLargeWorkForkFound || fLargeWorkInvalidChainFound) return -2;
+    if(fLargeWorkForkFound || fLargeWorkInvalidChainFound) return -2;
     if (!IsSporkActive(SPORK_2_SWIFTTX)) return -1;
 
     std::map<uint256, CTransactionLock>::iterator it = mapTxLocks.find(txHash);
-    if (it != mapTxLocks.end()) return it->second.CountSignatures();
+    if(it != mapTxLocks.end()) return it->second.CountSignatures();
 
     return -1;
 }
@@ -529,7 +529,7 @@ bool CConsensusVote::Sign()
 
 bool CTransactionLock::SignaturesValid()
 {
-    for (CConsensusVote vote : vecConsensusVotes) {
+    for (CConsensusVote vote: vecConsensusVotes) {
         int n = mnodeman.GetMasternodeRank(vote.vinMasternode, vote.nBlockHeight, MIN_SWIFTTX_PROTO_VERSION);
 
         if (n == -1) {
@@ -566,7 +566,7 @@ int CTransactionLock::CountSignatures()
     if (nBlockHeight == 0) return -1;
 
     int n = 0;
-    for (CConsensusVote v : vecConsensusVotes) {
+    for (CConsensusVote v: vecConsensusVotes) {
         if (v.nBlockHeight == nBlockHeight) {
             n++;
         }

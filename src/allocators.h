@@ -259,9 +259,9 @@ struct zero_after_free_allocator : public std::allocator<T> {
 };
 
 // This is exactly like std::string, but with a custom allocator.
-typedef std::basic_string<char, std::char_traits<char>, secure_allocator<char>> SecureString;
+typedef std::basic_string<char, std::char_traits<char>, secure_allocator<char> > SecureString;
 
 // Byte-vector that clears its contents before deletion.
-typedef std::vector<char, zero_after_free_allocator<char>> CSerializeData;
+typedef std::vector<char, zero_after_free_allocator<char> > CSerializeData;
 
 #endif // BITCOIN_ALLOCATORS_H

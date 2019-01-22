@@ -121,10 +121,10 @@ UniValue getinfo(const UniValue& params, bool fHelp)
         return obj;
     }
 
-    obj.push_back(Pair("moneysupply", ValueFromAmount(chainActive.Tip()->nMoneySupply)));
+    obj.push_back(Pair("moneysupply",ValueFromAmount(chainActive.Tip()->nMoneySupply)));
     UniValue zwspObj(UniValue::VOBJ);
     for (auto denom : libzerocoin::zerocoinDenomList) {
-        zwspObj.push_back(Pair(to_string(denom), ValueFromAmount(chainActive.Tip()->mapZerocoinSupply.at(denom) * (denom * COIN))));
+        zwspObj.push_back(Pair(to_string(denom), ValueFromAmount(chainActive.Tip()->mapZerocoinSupply.at(denom) * (denom*COIN))));
     }
     zwspObj.push_back(Pair("total", ValueFromAmount(chainActive.Tip()->GetZerocoinSupply())));
     obj.push_back(Pair("zWSPsupply", zwspObj));
@@ -229,10 +229,9 @@ private:
 public:
     DescribeAddressVisitor(isminetype mineIn) : mine(mineIn) {}
 
-    UniValue operator()(const CNoDestination& dest) const { return UniValue(UniValue::VOBJ); }
+    UniValue operator()(const CNoDestination &dest) const { return UniValue(UniValue::VOBJ); }
 
-    UniValue operator()(const CKeyID& keyID) const
-    {
+    UniValue operator()(const CKeyID &keyID) const {
         UniValue obj(UniValue::VOBJ);
         CPubKey vchPubKey;
         obj.push_back(Pair("isscript", false));
@@ -244,8 +243,7 @@ public:
         return obj;
     }
 
-    UniValue operator()(const CScriptID& scriptID) const
-    {
+    UniValue operator()(const CScriptID &scriptID) const {
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("isscript", true));
         CScript subscript;
@@ -257,7 +255,7 @@ public:
         obj.push_back(Pair("script", GetTxnOutputType(whichType)));
         obj.push_back(Pair("hex", HexStr(subscript.begin(), subscript.end())));
         UniValue a(UniValue::VARR);
-        for (const CTxDestination& addr : addresses)
+        for (const CTxDestination& addr: addresses)
             a.push_back(CBitcoinAddress(addr).ToString());
         obj.push_back(Pair("addresses", a));
         if (whichType == TX_MULTISIG)

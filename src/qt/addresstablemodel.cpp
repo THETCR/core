@@ -9,9 +9,9 @@
 #include "guiutil.h"
 #include "walletmodel.h"
 
-#include "askpassphrasedialog.h"
 #include "base58.h"
 #include "wallet.h"
+#include "askpassphrasedialog.h"
 
 #include <QDebug>
 #include <QFont>
@@ -34,7 +34,7 @@ struct AddressTableEntry {
     QString pubcoin;
 
     AddressTableEntry() {}
-    AddressTableEntry(Type type, const QString& pubcoin) : type(type), pubcoin(pubcoin) {}
+    AddressTableEntry(Type type, const QString &pubcoin):    type(type), pubcoin(pubcoin) {}
     AddressTableEntry(Type type, const QString& label, const QString& address) : type(type), label(label), address(address) {}
 };
 
@@ -82,7 +82,7 @@ public:
         cachedAddressTable.clear();
         {
             LOCK(wallet->cs_wallet);
-            for (const std::pair<CTxDestination, CAddressBookData>& item : wallet->mapAddressBook) {
+            for (const std::pair<CTxDestination, CAddressBookData> & item: wallet->mapAddressBook) {
                 const CBitcoinAddress& address = item.first;
                 bool fMine = IsMine(*wallet, address.Get());
                 AddressTableEntry::Type addressType = translateTransactionType(
@@ -141,37 +141,41 @@ public:
             break;
         }
     }
-
-    void updateEntry(const QString& pubCoin, const QString& isUsed, int status)
+    
+    void updateEntry(const QString &pubCoin, const QString &isUsed, int status)
     {
         // Find address / label in model
         QList<AddressTableEntry>::iterator lower = qLowerBound(
-            cachedAddressTable.begin(), cachedAddressTable.end(), pubCoin, AddressTableEntryLessThan());
+                                                               cachedAddressTable.begin(), cachedAddressTable.end(), pubCoin, AddressTableEntryLessThan());
         QList<AddressTableEntry>::iterator upper = qUpperBound(
-            cachedAddressTable.begin(), cachedAddressTable.end(), pubCoin, AddressTableEntryLessThan());
+                                                               cachedAddressTable.begin(), cachedAddressTable.end(), pubCoin, AddressTableEntryLessThan());
         int lowerIndex = (lower - cachedAddressTable.begin());
         bool inModel = (lower != upper);
         AddressTableEntry::Type newEntryType = AddressTableEntry::Zerocoin;
-
-        switch (status) {
-        case CT_NEW:
-            if (inModel) {
-                qWarning() << "AddressTablePriv_ZC::updateEntry : Warning: Got CT_NEW, but entry is already in model";
-            }
-            parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex);
-            cachedAddressTable.insert(lowerIndex, AddressTableEntry(newEntryType, isUsed, pubCoin));
-            parent->endInsertRows();
-            break;
-        case CT_UPDATED:
-            if (!inModel) {
-                qWarning() << "AddressTablePriv_ZC::updateEntry : Warning: Got CT_UPDATED, but entry is not in model";
+        
+        switch(status)
+        {
+            case CT_NEW:
+                if(inModel)
+                {
+                    qWarning() << "AddressTablePriv_ZC::updateEntry : Warning: Got CT_NEW, but entry is already in model";
+                }
+                parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex);
+                cachedAddressTable.insert(lowerIndex, AddressTableEntry(newEntryType, isUsed, pubCoin));
+                parent->endInsertRows();
                 break;
-            }
-            lower->type = newEntryType;
-            lower->label = isUsed;
-            parent->emitDataChanged(lowerIndex);
-            break;
+            case CT_UPDATED:
+                if(!inModel)
+                {
+                    qWarning() << "AddressTablePriv_ZC::updateEntry : Warning: Got CT_UPDATED, but entry is not in model";
+                    break;
+                }
+                lower->type = newEntryType;
+                lower->label = isUsed;
+                parent->emitDataChanged(lowerIndex);
+                break;
         }
+        
     }
 
 
@@ -348,11 +352,12 @@ void AddressTableModel::updateEntry(const QString& address,
 }
 
 
-void AddressTableModel::updateEntry(const QString& pubCoin, const QString& isUsed, int status)
+void AddressTableModel::updateEntry(const QString &pubCoin, const QString &isUsed, int status)
 {
     // Update stealth address book model from Bitcoin core
     priv->updateEntry(pubCoin, isUsed, status);
 }
+
 
 
 QString AddressTableModel::addRow(const QString& type, const QString& label, const QString& address)

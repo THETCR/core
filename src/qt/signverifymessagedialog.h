@@ -10,7 +10,8 @@
 
 class WalletModel;
 
-namespace Ui {
+namespace Ui
+{
 class SignVerifyMessageDialog;
 }
 

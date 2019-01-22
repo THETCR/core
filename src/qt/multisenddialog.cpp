@@ -153,7 +153,7 @@ void MultiSendDialog::on_addButton_clicked()
     }
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    if (!walletdb.WriteMultiSend(pwalletMain->vMultiSend)) {
+    if(!walletdb.WriteMultiSend(pwalletMain->vMultiSend)) {
         ui->message->setProperty("status", "error");
         ui->message->style()->polish(ui->message);
         ui->message->setText(tr("Saved the MultiSend to memory, but failed saving properties to the database."));
@@ -165,7 +165,7 @@ void MultiSendDialog::on_addButton_clicked()
 
 void MultiSendDialog::on_deleteButton_clicked()
 {
-    std::vector<std::pair<std::string, int>> vMultiSendTemp = pwalletMain->vMultiSend;
+    std::vector<std::pair<std::string, int> > vMultiSendTemp = pwalletMain->vMultiSend;
     std::string strAddress = ui->multiSendAddressEdit->text().toStdString();
     bool fRemoved = false;
     for (int i = 0; i < (int)pwalletMain->vMultiSend.size(); i++) {

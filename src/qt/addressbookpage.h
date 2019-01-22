@@ -11,7 +11,8 @@
 class AddressTableModel;
 class OptionsModel;
 
-namespace Ui {
+namespace Ui
+{
 class AddressBookPage;
 }
 

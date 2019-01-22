@@ -28,31 +28,31 @@ public:
     explicit OptionsModel(QObject* parent = 0);
 
     enum OptionID {
-        StartAtStartup,       // bool
-        MinimizeToTray,       // bool
-        MapPortUPnP,          // bool
-        MinimizeOnClose,      // bool
-        ProxyUse,             // bool
-        ProxyIP,              // QString
-        ProxyPort,            // int
-        DisplayUnit,          // BitcoinUnits::Unit
-        ThirdPartyTxUrls,     // QString
-        Digits,               // QString
-        Theme,                // QString
-        Language,             // QString
-        CoinControlFeatures,  // bool
-        ThreadsScriptVerif,   // int
-        DatabaseCache,        // int
-        SpendZeroConfChange,  // bool
-        ZeromintEnable,       // bool
-        ZeromintPercentage,   // int
-        ZeromintPrefDenom,    // int
-        HideZeroBalances,     // bool
-        HideOrphans,          // bool
+        StartAtStartup,      // bool
+        MinimizeToTray,      // bool
+        MapPortUPnP,         // bool
+        MinimizeOnClose,     // bool
+        ProxyUse,            // bool
+        ProxyIP,             // QString
+        ProxyPort,           // int
+        DisplayUnit,         // BitcoinUnits::Unit
+        ThirdPartyTxUrls,    // QString
+        Digits,              // QString
+        Theme,               // QString
+        Language,            // QString
+        CoinControlFeatures, // bool
+        ThreadsScriptVerif,  // int
+        DatabaseCache,       // int
+        SpendZeroConfChange, // bool
+        ZeromintEnable,      // bool
+        ZeromintPercentage,  // int
+        ZeromintPrefDenom,   // int
+        HideZeroBalances,    // bool
+        HideOrphans,    // bool
         AnonymizeWisprAmount, //int
-        ShowMasternodesTab,   // bool
-        Listen,               // bool
-        StakeSplitThreshold,  // int
+        ShowMasternodesTab,  // bool
+        Listen,              // bool
+        StakeSplitThreshold, // int
         OptionIDRowCount,
     };
 

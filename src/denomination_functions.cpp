@@ -338,8 +338,8 @@ int calculateChange(
         if (fMinimizeChange) {
             CoinDenomination nextToMaxDenom = getNextLowerDenomHeld(minDenomOverTarget, mapOfDenomsHeld);
             int newChangeCount = minimizeChange(nMaxNumberOfSpends, nChangeCount,
-                nextToMaxDenom, nValueTarget,
-                mapOfDenomsHeld, mapOfDenomsUsed);
+                                                nextToMaxDenom, nValueTarget,
+                                                mapOfDenomsHeld, mapOfDenomsUsed);
 
             // Alternative method yields less mints and is less than MaxNumberOfSpends if true
             if (newChangeCount < nChangeCount) return newChangeCount;
@@ -384,8 +384,8 @@ int calculateChange(
         std::map<CoinDenomination, CAmount> mapOfMinDenomsUsed = mapOfDenomsUsed;
 
         int nChangeCount = minimizeChange(nMaxNumberOfSpends, nMaxChangeCount,
-            maxDenomHeld, nValueTarget,
-            mapOfDenomsHeld, mapOfMinDenomsUsed);
+                                          maxDenomHeld, nValueTarget,
+                                          mapOfDenomsHeld, mapOfMinDenomsUsed);
 
         int nNumSpends = getNumberOfCoinsUsed(mapOfMinDenomsUsed);
 
@@ -402,7 +402,9 @@ int calculateChange(
 // Given a Target Spend Amount, attempt to meet it with a set of coins where less than nMaxNumberOfSpends
 // 'spends' are required
 // -------------------------------------------------------------------------------------------------------
-std::vector<CMintMeta> SelectMintsFromList(const CAmount nValueTarget, CAmount& nSelectedValue, int nMaxNumberOfSpends, bool fMinimizeChange, int& nCoinsReturned, const std::list<CMintMeta>& listMints, const std::map<CoinDenomination, CAmount> mapOfDenomsHeld, int& nNeededSpends)
+std::vector<CMintMeta> SelectMintsFromList(const CAmount nValueTarget, CAmount& nSelectedValue, int nMaxNumberOfSpends, bool fMinimizeChange,
+                                               int& nCoinsReturned, const std::list<CMintMeta>& listMints,
+                                               const std::map<CoinDenomination, CAmount> mapOfDenomsHeld, int& nNeededSpends)
 {
     std::vector<CMintMeta> vSelectedMints;
     std::map<CoinDenomination, CAmount> mapOfDenomsUsed;
@@ -416,7 +418,8 @@ std::vector<CMintMeta> SelectMintsFromList(const CAmount nValueTarget, CAmount& 
         // If true, we are good and done!
         if (vSelectedMints.size() <= (size_t)nMaxNumberOfSpends) {
             return vSelectedMints;
-        } else {
+        }
+        else {
             nNeededSpends = vSelectedMints.size();
         }
     }

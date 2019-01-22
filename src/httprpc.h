@@ -5,8 +5,8 @@
 #ifndef BITCOIN_HTTPRPC_H
 #define BITCOIN_HTTPRPC_H
 
-#include <map>
 #include <string>
+#include <map>
 
 class HTTPRequest;
 

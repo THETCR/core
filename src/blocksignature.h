@@ -6,8 +6,8 @@
 #define WISPR_BLOCKSIGNATURE_H
 
 #include "key.h"
-#include "keystore.h"
 #include "primitives/block.h"
+#include "keystore.h"
 
 bool SignBlockWithKey(CBlock& block, const CKey& key);
 bool SignBlock(CBlock& block, const CKeyStore& keystore);

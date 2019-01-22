@@ -52,9 +52,9 @@ bool SortSmallest(const pair<uint256, uint32_t>& a, const pair<uint256, uint32_t
     return a.second < b.second;
 }
 
-std::list<pair<uint256, uint32_t>> CMintPool::List()
+std::list<pair<uint256, uint32_t> > CMintPool::List()
 {
-    list<pair<uint256, uint32_t>> listMints;
+    list<pair<uint256, uint32_t> > listMints;
     for (auto pMint : *(this)) {
         listMints.emplace_back(pMint);
     }
@@ -104,3 +104,6 @@ void CMintPool::Remove(const uint256& hashPubcoin)
     nCountLastRemoved = it->second;
     erase(it);
 }
+
+
+

@@ -3,8 +3,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "rpc/client.h"
 #include "rpc/server.h"
+#include "rpc/client.h"
 
 #include "base58.h"
 #include "netbase.h"
@@ -18,7 +18,7 @@
 using namespace std;
 
 UniValue
-createArgs(int nRequired, const char* address1 = nullptr, const char* address2 = nullptr)
+createArgs(int nRequired, const char* address1= nullptr, const char* address2= nullptr)
 {
     UniValue result(UniValue::VARR);
     result.push_back(nRequired);
@@ -41,7 +41,8 @@ UniValue CallRPC(string args)
     try {
         UniValue result = (*method)(params, false);
         return result;
-    } catch (const UniValue& objError) {
+    }
+    catch (const UniValue& objError) {
         throw runtime_error(find_value(objError, "message").get_str());
     }
 }
@@ -70,24 +71,24 @@ BOOST_AUTO_TEST_CASE(rpc_rawparams)
     BOOST_CHECK_THROW(CallRPC("decoderawtransaction null"), runtime_error);
     BOOST_CHECK_THROW(CallRPC("decoderawtransaction DEADBEEF"), runtime_error);
     string rawtx = "0100000020fa905b01c300debee79c8061f8fa5e6b252435a26e3fe006dd13e19cf0a00757136c5c01010000004847304402200da2e47992271f1256d68f10df7113f3179b3eab11e8e38fa2d2b8bfb1a10bc0022052bce179d580f0150d67b686c891b2e6d863f1314404f27caba599dc14a92d0c01ffffffff020000000000000000000011c9d20c0000004341044815561eba60fd39e32b76f349ff8fcd9119f71d07e567eace3b125b0e6dd1e0e6508d29917b3329ae4aee4e0484984979a76692a33faa5644c1e4331e838115ac00000000";
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("decoderawtransaction ") + rawtx));
+    BOOST_CHECK_NO_THROW(r = CallRPC(string("decoderawtransaction ")+rawtx));
     BOOST_CHECK_EQUAL(find_value(r.get_obj(), "version").get_int(), 1);
     BOOST_CHECK_EQUAL(find_value(r.get_obj(), "locktime").get_int(), 0);
-    BOOST_CHECK_THROW(r = CallRPC(string("decoderawtransaction ") + rawtx + " extra"), runtime_error);
+    BOOST_CHECK_THROW(r = CallRPC(string("decoderawtransaction ")+rawtx+" extra"), runtime_error);
 
     BOOST_CHECK_THROW(CallRPC("signrawtransaction"), runtime_error);
     BOOST_CHECK_THROW(CallRPC("signrawtransaction null"), runtime_error);
     BOOST_CHECK_THROW(CallRPC("signrawtransaction ff00"), runtime_error);
-    BOOST_CHECK_NO_THROW(CallRPC(string("signrawtransaction ") + rawtx));
-    BOOST_CHECK_NO_THROW(CallRPC(string("signrawtransaction ") + rawtx + " null null NONE|ANYONECANPAY"));
-    BOOST_CHECK_NO_THROW(CallRPC(string("signrawtransaction ") + rawtx + " [] [] NONE|ANYONECANPAY"));
-    BOOST_CHECK_THROW(CallRPC(string("signrawtransaction ") + rawtx + " null null badenum"), runtime_error);
+    BOOST_CHECK_NO_THROW(CallRPC(string("signrawtransaction ")+rawtx));
+    BOOST_CHECK_NO_THROW(CallRPC(string("signrawtransaction ")+rawtx+" null null NONE|ANYONECANPAY"));
+    BOOST_CHECK_NO_THROW(CallRPC(string("signrawtransaction ")+rawtx+" [] [] NONE|ANYONECANPAY"));
+    BOOST_CHECK_THROW(CallRPC(string("signrawtransaction ")+rawtx+" null null badenum"), runtime_error);
 
     // Only check failure cases for sendrawtransaction, there's no network to send to...
     BOOST_CHECK_THROW(CallRPC("sendrawtransaction"), runtime_error);
     BOOST_CHECK_THROW(CallRPC("sendrawtransaction null"), runtime_error);
     BOOST_CHECK_THROW(CallRPC("sendrawtransaction DEADBEEF"), runtime_error);
-    BOOST_CHECK_THROW(CallRPC(string("sendrawtransaction ") + rawtx + " extra"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC(string("sendrawtransaction ")+rawtx+" extra"), runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(rpc_rawsign)
@@ -95,18 +96,18 @@ BOOST_AUTO_TEST_CASE(rpc_rawsign)
     UniValue r;
     // input is a 1-of-2 multisig (so is output):
     string prevout =
-        "[{\"txid\":\"204542c7d2f37b6dab7c71eead3ba017afd21fd2dc6ee57b5a32db1e672474ec\","
-        "\"vout\":1,\"scriptPubKey\":\"a914f5404a39a4799d8710e15db4c4512c5e06f97fed87\","
-        "\"redeemScript\":\"5121021431a18c7039660cd9e3612a2a47dc53b69cb38ea4ad743b7df8245fd0438f8e21029bbeff390ce736bd396af43b52a1c14ed52c086b1e5585c15931f68725772bac52ae\"}]";
-    r = CallRPC(string("createrawtransaction ") + prevout + " " +
-                "{\"Wa4qRD6Eg9zZAUGA9NYgRDVeW3VEXC1x3N\":1}");
+      "[{\"txid\":\"204542c7d2f37b6dab7c71eead3ba017afd21fd2dc6ee57b5a32db1e672474ec\","
+      "\"vout\":1,\"scriptPubKey\":\"a914f5404a39a4799d8710e15db4c4512c5e06f97fed87\","
+      "\"redeemScript\":\"5121021431a18c7039660cd9e3612a2a47dc53b69cb38ea4ad743b7df8245fd0438f8e21029bbeff390ce736bd396af43b52a1c14ed52c086b1e5585c15931f68725772bac52ae\"}]";
+    r = CallRPC(string("createrawtransaction ")+prevout+" "+
+      "{\"Wa4qRD6Eg9zZAUGA9NYgRDVeW3VEXC1x3N\":1}");
     string notsigned = r.get_str();
     string privkey1 = "\"5t9pdUbF2atWYjj5DgFyzbiJyghzkFfFcjj9NqLkGGc3vDbngLf\"";
     string privkey2 = "\"NYmwDzn8uzaMR5ahcxH8ZEDLMCFwsuhqWjb1yNN9xPshsWru8NBX\"";
-    r = CallRPC(string("signrawtransaction ") + notsigned + " " + prevout + " " + "[]");
+    r = CallRPC(string("signrawtransaction ")+notsigned+" "+prevout+" "+"[]");
     BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == false);
-    r = CallRPC(string("signrawtransaction ") + notsigned + " " + prevout + " " + "[" + privkey1 + "," + privkey2 + "]");
-    //    BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == true);
+    r = CallRPC(string("signrawtransaction ")+notsigned+" "+prevout+" "+"["+privkey1+","+privkey2+"]");
+//    BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == true);
 }
 
 BOOST_AUTO_TEST_CASE(rpc_format_monetary_values)
@@ -121,30 +122,30 @@ BOOST_AUTO_TEST_CASE(rpc_format_monetary_values)
     BOOST_CHECK(ValueFromAmount(2099999999999999LL).write() == "20999999.99999999");
 
     BOOST_CHECK_EQUAL(ValueFromAmount(0).write(), "0.00000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount((COIN / 10000) * 123456789).write(), "12345.67890000");
+    BOOST_CHECK_EQUAL(ValueFromAmount((COIN/10000)*123456789).write(), "12345.67890000");
     BOOST_CHECK_EQUAL(ValueFromAmount(-COIN).write(), "-1.00000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(-COIN / 10).write(), "-0.10000000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(-COIN/10).write(), "-0.10000000");
 
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN * 100000000).write(), "100000000.00000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN * 10000000).write(), "10000000.00000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN * 1000000).write(), "1000000.00000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN * 100000).write(), "100000.00000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN * 10000).write(), "10000.00000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN * 1000).write(), "1000.00000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN * 100).write(), "100.00000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN * 10).write(), "10.00000000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN*100000000).write(), "100000000.00000000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN*10000000).write(), "10000000.00000000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN*1000000).write(), "1000000.00000000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN*100000).write(), "100000.00000000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN*10000).write(), "10000.00000000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN*1000).write(), "1000.00000000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN*100).write(), "100.00000000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN*10).write(), "10.00000000");
     BOOST_CHECK_EQUAL(ValueFromAmount(COIN).write(), "1.00000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN / 10).write(), "0.10000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN / 100).write(), "0.01000000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN / 1000).write(), "0.00100000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN / 10000).write(), "0.00010000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN / 100000).write(), "0.00001000");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN / 1000000).write(), "0.00000100");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN / 10000000).write(), "0.00000010");
-    BOOST_CHECK_EQUAL(ValueFromAmount(COIN / 100000000).write(), "0.00000001");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN/10).write(), "0.10000000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN/100).write(), "0.01000000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN/1000).write(), "0.00100000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN/10000).write(), "0.00010000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN/100000).write(), "0.00001000");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN/1000000).write(), "0.00000100");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN/10000000).write(), "0.00000010");
+    BOOST_CHECK_EQUAL(ValueFromAmount(COIN/100000000).write(), "0.00000001");
 }
 
-static UniValue ValueFromString(const std::string& str)
+static UniValue ValueFromString(const std::string &str)
 {
     UniValue value;
     BOOST_CHECK(value.setNumStr(str));
@@ -193,8 +194,7 @@ BOOST_AUTO_TEST_CASE(rpc_ban)
     UniValue o1 = ar[0].get_obj();
     UniValue adr = find_value(o1, "address");
     BOOST_CHECK_EQUAL(adr.get_str(), "127.0.0.0/32");
-    BOOST_CHECK_NO_THROW(CallRPC(string("setban 127.0.0.0 remove")));
-    ;
+    BOOST_CHECK_NO_THROW(CallRPC(string("setban 127.0.0.0 remove")));;
     BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
     ar = r.get_array();
     BOOST_CHECK_EQUAL(ar.size(), 0);
@@ -219,13 +219,12 @@ BOOST_AUTO_TEST_CASE(rpc_ban)
     BOOST_CHECK_EQUAL(adr.get_str(), "127.0.0.0/24");
     int64_t now = GetTime();
     BOOST_CHECK(banned_until.get_int64() > now);
-    BOOST_CHECK(banned_until.get_int64() - now <= 200);
+    BOOST_CHECK(banned_until.get_int64()-now <= 200);
 
     // must throw an exception because 127.0.0.1 is in already banned suubnet range
     BOOST_CHECK_THROW(r = CallRPC(string("setban 127.0.0.1 add")), runtime_error);
 
-    BOOST_CHECK_NO_THROW(CallRPC(string("setban 127.0.0.0/24 remove")));
-    ;
+    BOOST_CHECK_NO_THROW(CallRPC(string("setban 127.0.0.0/24 remove")));;
     BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
     ar = r.get_array();
     BOOST_CHECK_EQUAL(ar.size(), 0);

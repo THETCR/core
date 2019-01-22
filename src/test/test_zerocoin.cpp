@@ -5,9 +5,9 @@
 #define BOOST_TEST_MODULE Zerocoin Test Suite
 #define BOOST_TEST_MAIN
 
+#include "libzerocoin/Denominations.h"
 #include "amount.h"
 #include "chainparams.h"
-#include "libzerocoin/Denominations.h"
 #include "main.h"
 #include "txdb.h"
 
@@ -15,8 +15,7 @@
 #include <iostream>
 
 struct ZeroSetup {
-    ZeroSetup()
-    {
+    ZeroSetup() {
         std::cout << "global setup\n";
     }
     ~ZeroSetup()
@@ -26,3 +25,4 @@ struct ZeroSetup {
 };
 
 BOOST_GLOBAL_FIXTURE(ZeroSetup);
+

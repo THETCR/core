@@ -58,20 +58,19 @@ const char* BIP71_MIMETYPE_PAYMENTREQUEST = "application/wispr-paymentrequest";
 const qint64 BIP70_MAX_PAYMENTREQUEST_SIZE = 50000;
 
 struct X509StoreDeleter {
-    void operator()(X509_STORE* b)
-    {
-        X509_STORE_free(b);
-    }
+      void operator()(X509_STORE* b) {
+          X509_STORE_free(b);
+      }
 };
 
 struct X509Deleter {
-    void operator()(X509* b) { X509_free(b); }
+      void operator()(X509* b) { X509_free(b); }
 };
 
 namespace // Anon namespace
 {
 
-std::unique_ptr<X509_STORE, X509StoreDeleter> certStore;
+    std::unique_ptr<X509_STORE, X509StoreDeleter> certStore;
 }
 
 //
@@ -136,7 +135,7 @@ void PaymentServer::LoadRootCAs(X509_STORE* _store)
 
     int nRootCerts = 0;
     const QDateTime currentTime = QDateTime::currentDateTime();
-    for (const QSslCertificate& cert : certList) {
+    for (const QSslCertificate& cert: certList) {
         if (currentTime < cert.effectiveDate() || currentTime > cert.expiryDate()) {
             ReportInvalidCertificate(cert);
             continue;
@@ -235,7 +234,7 @@ void PaymentServer::ipcParseCommandLine(int argc, char* argv[])
 bool PaymentServer::ipcSendCommandLine()
 {
     bool fResult = false;
-    for (const QString& r : savedPaymentRequests) {
+    for (const QString& r: savedPaymentRequests) {
         QLocalSocket* socket = new QLocalSocket();
         socket->connectToServer(ipcServerName(), QIODevice::WriteOnly);
         if (!socket->waitForConnected(BITCOIN_IPC_CONNECT_TIMEOUT)) {
@@ -354,7 +353,7 @@ void PaymentServer::uiReady()
     initNetManager();
 
     saveURIs = false;
-    for (const QString& s : savedPaymentRequests) {
+    for (const QString& s: savedPaymentRequests) {
         handleURIOrFile(s);
     }
     savedPaymentRequests.clear();
@@ -505,10 +504,10 @@ bool PaymentServer::processPaymentRequest(PaymentRequestPlus& request, SendCoins
 
     request.getMerchant(certStore.get(), recipient.authenticatedMerchant);
 
-    QList<std::pair<CScript, CAmount>> sendingTos = request.getPayTo();
+    QList<std::pair<CScript, CAmount> > sendingTos = request.getPayTo();
     QStringList addresses;
 
-    for (const std::pair<CScript, CAmount>& sendingTo : sendingTos) {
+    for (const std::pair<CScript, CAmount> & sendingTo: sendingTos) {
         // Extract and check destination addresses
         CTxDestination dest;
         if (ExtractDestination(sendingTo.first, dest)) {
@@ -669,7 +668,7 @@ void PaymentServer::reportSslErrors(QNetworkReply* reply, const QList<QSslError>
     Q_UNUSED(reply);
 
     QString errString;
-    for (const QSslError& err : errs) {
+    for (const QSslError& err: errs) {
         qWarning() << "PaymentServer::reportSslErrors : " << err;
         errString += err.errorString() + "\n";
     }

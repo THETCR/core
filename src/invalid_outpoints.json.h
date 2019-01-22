@@ -9,11 +9,11 @@
 std::string LoadInvalidOutPoints()
 {
     std::string str = "[\n"
-                      "  {\n"
-                      "    \"txid\": \"0\",\n"
-                      "    \"n\": 0\n"
-                      "  }\n"
-                      "]";
+            "  {\n"
+            "    \"txid\": \"0\",\n"
+            "    \"n\": 0\n"
+            "  }\n"
+            "]";
     return str;
 }
 

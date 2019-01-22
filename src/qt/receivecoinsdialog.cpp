@@ -20,8 +20,8 @@
 #include <QItemSelection>
 #include <QMessageBox>
 #include <QScrollBar>
-#include <QSettings>
 #include <QTextDocument>
+#include <QSettings>
 
 ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
                                                           ui(new Ui::ReceiveCoinsDialog),
@@ -206,7 +206,7 @@ void ReceiveCoinsDialog::on_showRequestButton_clicked()
         return;
     QModelIndexList selection = ui->recentRequestsView->selectionModel()->selectedRows();
 
-    for (QModelIndex index : selection) {
+    for (QModelIndex index: selection) {
         on_recentRequestsView_doubleClicked(index);
     }
 }
@@ -300,3 +300,4 @@ void ReceiveCoinsDialog::receiveAddressUsed()
         clear();
     }
 }
+

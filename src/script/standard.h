@@ -26,7 +26,7 @@ public:
     CScriptID(const uint160& in) : uint160(in) {}
 };
 
-static const unsigned int MAX_OP_RETURN_RELAY = 83; //!< bytes (+1 for OP_RETURN, +2 for the pushdata opcodes)
+static const unsigned int MAX_OP_RETURN_RELAY = 83;      //!< bytes (+1 for OP_RETURN, +2 for the pushdata opcodes)
 extern unsigned nMaxDatacarrierBytes;
 
 /**
@@ -55,7 +55,8 @@ static const unsigned int STANDARD_SCRIPT_VERIFY_FLAGS = MANDATORY_SCRIPT_VERIFY
 /** For convenience, standard but not mandatory verify flags. */
 static const unsigned int STANDARD_NOT_MANDATORY_VERIFY_FLAGS = STANDARD_SCRIPT_VERIFY_FLAGS & ~MANDATORY_SCRIPT_VERIFY_FLAGS;
 
-enum txnouttype {
+enum txnouttype
+{
     TX_NONSTANDARD,
     // 'standard' transaction types:
     TX_PUBKEY,
@@ -66,11 +67,10 @@ enum txnouttype {
     TX_ZEROCOINMINT,
 };
 
-class CNoDestination
-{
+class CNoDestination {
 public:
-    friend bool operator==(const CNoDestination& a, const CNoDestination& b) { return true; }
-    friend bool operator<(const CNoDestination& a, const CNoDestination& b) { return true; }
+    friend bool operator==(const CNoDestination &a, const CNoDestination &b) { return true; }
+    friend bool operator<(const CNoDestination &a, const CNoDestination &b) { return true; }
 };
 
 /** 
@@ -84,8 +84,8 @@ typedef boost::variant<CNoDestination, CKeyID, CScriptID> CTxDestination;
 
 const char* GetTxnOutputType(txnouttype t);
 
-bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::vector<unsigned char>>& vSolutionsRet);
-int ScriptSigArgsExpected(txnouttype t, const std::vector<std::vector<unsigned char>>& vSolutions);
+bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::vector<unsigned char> >& vSolutionsRet);
+int ScriptSigArgsExpected(txnouttype t, const std::vector<std::vector<unsigned char> >& vSolutions);
 bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType);
 bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet);
 bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<CTxDestination>& addressRet, int& nRequiredRet);

@@ -8,8 +8,8 @@
 #include "config/wispr-config.h"
 #endif
 
-#include "uritests.h"
 #include "util.h"
+#include "uritests.h"
 
 #ifdef ENABLE_WALLET
 #include "paymentservertests.h"
@@ -38,7 +38,7 @@ Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
 extern void noui_connect();
 
 // This is all you need to run all the tests
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     SetupEnvironment();
     bool fInvalid = false;

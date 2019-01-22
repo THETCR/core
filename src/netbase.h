@@ -122,7 +122,7 @@ public:
     explicit CSubNet(const std::string& strSubnet, bool fAllowLookup = false);
 
     //constructor for single ip subnet (<ipv4>/32 or <ipv6>/128)
-    explicit CSubNet(const CNetAddr& addr);
+    explicit CSubNet(const CNetAddr &addr);
 
     bool Match(const CNetAddr& addr) const;
 
@@ -136,8 +136,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
-    {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(network);
         READWRITE(FLATDATA(netmask));
         READWRITE(FLATDATA(valid));
@@ -191,8 +190,8 @@ public:
 class proxyType
 {
 public:
-    proxyType() : randomize_credentials(false) {}
-    proxyType(const CService& proxy, bool randomize_credentials = false) : proxy(proxy), randomize_credentials(randomize_credentials) {}
+    proxyType(): randomize_credentials(false) {}
+    proxyType(const CService &proxy, bool randomize_credentials=false): proxy(proxy), randomize_credentials(randomize_credentials) {}
 
     bool IsValid() const { return proxy.IsValid(); }
 
@@ -203,10 +202,10 @@ public:
 enum Network ParseNetwork(std::string net);
 std::string GetNetworkName(enum Network net);
 void SplitHostPort(std::string in, int& portOut, std::string& hostOut);
-bool SetProxy(enum Network net, const proxyType& addrProxy);
+bool SetProxy(enum Network net, const proxyType &addrProxy);
 bool GetProxy(enum Network net, proxyType& proxyInfoOut);
 bool IsProxy(const CNetAddr& addr);
-bool SetNameProxy(const proxyType& addrProxy);
+bool SetNameProxy(const proxyType &addrProxy);
 bool HaveNameProxy();
 bool LookupHost(const char* pszName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions = 0, bool fAllowLookup = true);
 bool Lookup(const char* pszName, CService& addr, int portDefault = 0, bool fAllowLookup = true);

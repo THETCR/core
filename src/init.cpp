@@ -18,8 +18,8 @@
 #include "amount.h"
 #include "checkpoints.h"
 #include "compat/sanity.h"
-#include "httprpc.h"
 #include "httpserver.h"
+#include "httprpc.h"
 #include "invalid.h"
 #include "key.h"
 #include "main.h"
@@ -29,25 +29,25 @@
 #include "masternodeman.h"
 #include "miner.h"
 #include "net.h"
-#include "reverse_iterate.h"
 #include "rpc/server.h"
-#include "scheduler.h"
 #include "script/standard.h"
+#include "scheduler.h"
 #include "spork.h"
 #include "sporkdb.h"
-#include "torcontrol.h"
 #include "txdb.h"
+#include "torcontrol.h"
 #include "ui_interface.h"
 #include "util.h"
 #include "utilmoneystr.h"
 #include "validationinterface.h"
 #include "zwspchain.h"
+#include "reverse_iterate.h"
 
 #ifdef ENABLE_WALLET
-#include "accumulators.h"
 #include "db.h"
 #include "wallet.h"
 #include "walletdb.h"
+#include "accumulators.h"
 
 #endif
 
@@ -362,6 +362,7 @@ void OnRPCPreCommand(const CRPCCommand& cmd)
 
 std::string HelpMessage(HelpMessageMode mode)
 {
+
     // When adding new options to the categories, please keep and ensure alphabetical ordering.
     string strUsage = HelpMessageGroup(_("Options:"));
     strUsage += HelpMessageOpt("-?", _("This help message"));
@@ -432,7 +433,7 @@ std::string HelpMessage(HelpMessageMode mode)
 #endif
     strUsage += HelpMessageOpt("-whitebind=<addr>", _("Bind to given address and whitelist peers connecting to it. Use [host]:port notation for IPv6"));
     strUsage += HelpMessageOpt("-whitelist=<netmask>", _("Whitelist peers connecting from the given netmask or IP address. Can be specified multiple times.") +
-                                                           " " + _("Whitelisted peers cannot be DoS banned and their transactions are always relayed, even if they are already in the mempool, useful e.g. for a gateway"));
+        " " + _("Whitelisted peers cannot be DoS banned and their transactions are always relayed, even if they are already in the mempool, useful e.g. for a gateway"));
 
 
 #ifdef ENABLE_WALLET
@@ -444,7 +445,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-keypool=<n>", strprintf(_("Set key pool size to <n> (default: %u)"), 100));
     if (GetBoolArg("-help-debug", false))
         strUsage += HelpMessageOpt("-mintxfee=<amt>", strprintf(_("Fees (in WSP/Kb) smaller than this are considered zero fee for transaction creation (default: %s)"),
-                                                          FormatMoney(CWallet::minTxFee.GetFeePerK())));
+            FormatMoney(CWallet::minTxFee.GetFeePerK())));
     strUsage += HelpMessageOpt("-paytxfee=<amt>", strprintf(_("Fee (in WSP/kB) to add to transactions you send (default: %s)"), FormatMoney(payTxFee.GetFeePerK())));
     strUsage += HelpMessageOpt("-rescan", _("Rescan the block chain for missing wallet transactions") + " " + _("on startup"));
     strUsage += HelpMessageOpt("-salvagewallet", _("Attempt to recover private keys from a corrupt wallet.dat") + " " + _("on startup"));
@@ -453,14 +454,14 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-disablesystemnotifications", strprintf(_("Disable OS notifications for incoming transactions (default: %u)"), 0));
     strUsage += HelpMessageOpt("-txconfirmtarget=<n>", strprintf(_("If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)"), 1));
     strUsage += HelpMessageOpt("-maxtxfee=<amt>", strprintf(_("Maximum total fees to use in a single wallet transaction, setting too low may abort large transactions (default: %s)"),
-                                                      FormatMoney(maxTxFee)));
+        FormatMoney(maxTxFee)));
     strUsage += HelpMessageOpt("-upgradewallet", _("Upgrade wallet to latest format") + " " + _("on startup"));
     strUsage += HelpMessageOpt("-wallet=<file>", _("Specify wallet file (within data directory)") + " " + strprintf(_("(default: %s)"), "wallet.dat"));
     strUsage += HelpMessageOpt("-walletnotify=<cmd>", _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)"));
     if (mode == HMM_BITCOIN_QT)
         strUsage += HelpMessageOpt("-windowtitle=<name>", _("Wallet window title"));
     strUsage += HelpMessageOpt("-zapwallettxes=<mode>", _("Delete all wallet transactions and only recover those parts of the blockchain through -rescan on startup") +
-                                                            " " + _("(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)"));
+        " " + _("(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)"));
 #endif
 
 #if ENABLE_ZMQ
@@ -493,7 +494,7 @@ std::string HelpMessage(HelpMessageMode mode)
     if (mode == HMM_BITCOIN_QT)
         debugCategories += ", qt";
     strUsage += HelpMessageOpt("-debug=<category>", strprintf(_("Output debugging information (default: %u, supplying <category> is optional)"), 0) + ". " +
-                                                        _("If <category> is not supplied, output all debugging information.") + _("<category> can be:") + " " + debugCategories + ".");
+        _("If <category> is not supplied, output all debugging information.") + _("<category> can be:") + " " + debugCategories + ".");
     if (GetBoolArg("-help-debug", false))
         strUsage += HelpMessageOpt("-nodebug", "Turn off debugging messages, same as -debug=0");
 #ifdef ENABLE_WALLET
@@ -514,8 +515,8 @@ std::string HelpMessage(HelpMessageMode mode)
         strUsage += HelpMessageOpt("-printpriority", strprintf(_("Log transaction priority and fee per kB when mining blocks (default: %u)"), 0));
         strUsage += HelpMessageOpt("-privdb", strprintf(_("Sets the DB_PRIVATE flag in the wallet db environment (default: %u)"), 1));
         strUsage += HelpMessageOpt("-regtest", _("Enter regression test mode, which uses a special chain in which blocks can be solved instantly.") + " " +
-                                                   _("This is intended for regression testing tools and app development.") + " " +
-                                                   _("In this mode -genproclimit controls how many blocks are generated immediately."));
+            _("This is intended for regression testing tools and app development.") + " " +
+            _("In this mode -genproclimit controls how many blocks are generated immediately."));
     }
     strUsage += HelpMessageOpt("-shrinkdebugfile", _("Shrink debug.log file on client startup (default: 1 when no -debug)"));
     strUsage += HelpMessageOpt("-testnet", _("Use the test network"));
@@ -551,8 +552,8 @@ std::string HelpMessage(HelpMessageMode mode)
 #endif // ENABLE_WALLET
     strUsage += HelpMessageOpt("-reindexzerocoin=<n>", strprintf(_("Delete all zerocoin spends and mints that have been recorded to the blockchain database and reindex them (0-1, default: %u)"), 0));
 
-    //    strUsage += "  -anonymizewispramount=<n>     " + strprintf(_("Keep N WSP anonymized (default: %u)"), 0) + "\n";
-    //    strUsage += "  -liquidityprovider=<n>       " + strprintf(_("Provide liquidity to Obfuscation by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)"), 0) + "\n";
+//    strUsage += "  -anonymizewispramount=<n>     " + strprintf(_("Keep N WSP anonymized (default: %u)"), 0) + "\n";
+//    strUsage += "  -liquidityprovider=<n>       " + strprintf(_("Provide liquidity to Obfuscation by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)"), 0) + "\n";
 
     strUsage += HelpMessageGroup(_("SwiftX options:"));
     strUsage += HelpMessageOpt("-enableswifttx=<n>", strprintf(_("Enable SwiftX, show confirmations for locked transactions (bool, default: %s)"), "true"));
@@ -678,7 +679,7 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
     }
 
     // -loadblock=
-    for (boost::filesystem::path& path : vImportFiles) {
+    for (boost::filesystem::path& path: vImportFiles) {
         FILE* file = fopen(path.string().c_str(), "rb");
         if (file) {
             CImportingNow imp;
@@ -1123,7 +1124,7 @@ bool AppInit2()
                 }
                 // Loop backward through backup files and keep the N newest ones (1 <= N <= 10)
                 int counter = 0;
-                for (std::pair<const std::time_t, boost::filesystem::path> file : reverse_iterate(folder_set)) {
+                for (std::pair<const std::time_t, boost::filesystem::path> file: reverse_iterate(folder_set)) {
                     counter++;
                     if (counter > nWalletBackups) {
                         // More than nWalletBackups backups: delete oldest one(s)
@@ -1149,22 +1150,22 @@ bool AppInit2()
             LogPrintf("Deleting blockchain folders blocks, chainstate, sporks and zerocoin\n");
             // We delete in 4 individual steps in case one of the folder is missing already
             try {
-                if (filesystem::exists(blocksDir)) {
+                if (filesystem::exists(blocksDir)){
                     boost::filesystem::remove_all(blocksDir);
                     LogPrintf("-resync: folder deleted: %s\n", blocksDir.string().c_str());
                 }
 
-                if (filesystem::exists(chainstateDir)) {
+                if (filesystem::exists(chainstateDir)){
                     boost::filesystem::remove_all(chainstateDir);
                     LogPrintf("-resync: folder deleted: %s\n", chainstateDir.string().c_str());
                 }
 
-                if (filesystem::exists(sporksDir)) {
+                if (filesystem::exists(sporksDir)){
                     boost::filesystem::remove_all(sporksDir);
                     LogPrintf("-resync: folder deleted: %s\n", sporksDir.string().c_str());
                 }
 
-                if (filesystem::exists(zerocoinDir)) {
+                if (filesystem::exists(zerocoinDir)){
                     boost::filesystem::remove_all(zerocoinDir);
                     LogPrintf("-resync: folder deleted: %s\n", zerocoinDir.string().c_str());
                 }
@@ -1238,7 +1239,7 @@ bool AppInit2()
 
     if (mapArgs.count("-onlynet")) {
         std::set<enum Network> nets;
-        for (std::string snet : mapMultiArgs["-onlynet"]) {
+        for (std::string snet: mapMultiArgs["-onlynet"]) {
             enum Network net = ParseNetwork(snet);
             if (net == NET_UNROUTABLE)
                 return InitError(strprintf(_("Unknown network specified in -onlynet: '%s'"), snet));
@@ -1252,7 +1253,7 @@ bool AppInit2()
     }
 
     if (mapArgs.count("-whitelist")) {
-        for (const std::string& net : mapMultiArgs["-whitelist"]) {
+        for (const std::string& net: mapMultiArgs["-whitelist"]) {
             CSubNet subnet(net);
             if (!subnet.IsValid())
                 return InitError(strprintf(_("Invalid netmask specified in -whitelist: '%s'"), net));
@@ -1290,7 +1291,7 @@ bool AppInit2()
     // An empty string is used to not override the onion proxy (in which case it defaults to -proxy set above, or none)
     std::string onionArg = GetArg("-onion", "");
     if (onionArg != "") {
-        if (onionArg == "0") {   // Handle -noonion/-onion=0
+        if (onionArg == "0") { // Handle -noonion/-onion=0
             SetLimited(NET_TOR); // set onions as unreachable
         } else {
             CService onionProxy;
@@ -1312,13 +1313,13 @@ bool AppInit2()
     bool fBound = false;
     if (fListen) {
         if (mapArgs.count("-bind") || mapArgs.count("-whitebind")) {
-            for (std::string strBind : mapMultiArgs["-bind"]) {
+            for (std::string strBind: mapMultiArgs["-bind"]) {
                 CService addrBind;
                 if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false))
                     return InitError(strprintf(_("Cannot resolve -bind address: '%s'"), strBind));
                 fBound |= Bind(addrBind, (BF_EXPLICIT | BF_REPORT_ERROR));
             }
-            for (std::string strBind : mapMultiArgs["-whitebind"]) {
+            for (std::string strBind: mapMultiArgs["-whitebind"]) {
                 CService addrBind;
                 if (!Lookup(strBind.c_str(), addrBind, 0, false))
                     return InitError(strprintf(_("Cannot resolve -whitebind address: '%s'"), strBind));
@@ -1337,7 +1338,7 @@ bool AppInit2()
     }
 
     if (mapArgs.count("-externalip")) {
-        for (string strAddr : mapMultiArgs["-externalip"]) {
+        for (string strAddr: mapMultiArgs["-externalip"]) {
             CService addrLocal(strAddr, GetListenPort(), fNameLookup);
             if (!addrLocal.IsValid())
                 return InitError(strprintf(_("Cannot resolve -externalip address: '%s'"), strAddr));
@@ -1345,7 +1346,7 @@ bool AppInit2()
         }
     }
 
-    for (string strDest : mapMultiArgs["-seednode"])
+    for (string strDest: mapMultiArgs["-seednode"])
         AddOneShot(strDest);
 
 #if ENABLE_ZMQ
@@ -1489,10 +1490,10 @@ bool AppInit2()
                 // Force recalculation of accumulators.
                 if (GetBoolArg("-reindexaccumulators", false)) {
                     if (chainActive.Height() > Params().NEW_PROTOCOLS_STARTHEIGHT()) {
-                        CBlockIndex* pindex = chainActive[Params().NEW_PROTOCOLS_STARTHEIGHT()];
+                        CBlockIndex *pindex = chainActive[Params().NEW_PROTOCOLS_STARTHEIGHT()];
                         while (pindex->nHeight < chainActive.Height()) {
                             if (!count(listAccCheckpointsNoDB.begin(), listAccCheckpointsNoDB.end(),
-                                    pindex->nAccumulatorCheckpoint))
+                                       pindex->nAccumulatorCheckpoint))
                                 listAccCheckpointsNoDB.emplace_back(pindex->nAccumulatorCheckpoint);
                             pindex = chainActive.Next(pindex);
                         }
@@ -1615,7 +1616,7 @@ bool AppInit2()
 
         if (GetBoolArg("-upgradewallet", fFirstRun)) {
             int nMaxVersion = GetArg("-upgradewallet", 0);
-            if (nMaxVersion < FEATURE_LATEST) {
+            if(nMaxVersion < FEATURE_LATEST){
                 nMaxVersion = FEATURE_LATEST;
             }
             if (nMaxVersion == 0) // the -upgradewallet without argument case
@@ -1623,7 +1624,7 @@ bool AppInit2()
                 LogPrintf("Performing wallet upgrade to %i\n", FEATURE_LATEST);
                 nMaxVersion = CLIENT_VERSION;
                 // TODO Remove with version 0.6.1
-                if (nMaxVersion < FEATURE_LATEST) {
+                if(nMaxVersion < FEATURE_LATEST){
                     nMaxVersion = FEATURE_LATEST;
                     LogPrintf("nMaxVersion: %d,  pwalletMain->GetVersion(): %d\n", nMaxVersion, pwalletMain->GetVersion());
                 }
@@ -1678,7 +1679,7 @@ bool AppInit2()
 
             // Restore wallet transaction metadata after -zapwallettxes=1
             if (GetBoolArg("-zapwallettxes", false) && GetArg("-zapwallettxes", "1") != "2") {
-                for (const CWalletTx& wtxOld : vWtx) {
+                for (const CWalletTx& wtxOld: vWtx) {
                     uint256 hash = wtxOld.GetHash();
                     std::map<uint256, CWalletTx>::iterator mi = pwalletMain->mapWallet.find(hash);
                     if (mi != pwalletMain->mapWallet.end()) {
@@ -1727,7 +1728,7 @@ bool AppInit2()
 
     std::vector<boost::filesystem::path> vImportFiles;
     if (mapArgs.count("-loadblock")) {
-        for (string strFile : mapMultiArgs["-loadblock"])
+        for (string strFile: mapMultiArgs["-loadblock"])
             vImportFiles.push_back(strFile);
     }
     threadGroup.create_thread(boost::bind(&ThreadImport, vImportFiles));
@@ -1833,18 +1834,18 @@ bool AppInit2()
         LOCK(pwalletMain->cs_wallet);
         LogPrintf("Locking Masternodes:\n");
         uint256 mnTxHash;
-        for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
+        for (CMasternodeConfig::CMasternodeEntry mne: masternodeConfig.getEntries()) {
             LogPrintf("  %s %s\n", mne.getTxHash(), mne.getOutputIndex());
             mnTxHash.SetHex(mne.getTxHash());
-            COutPoint outpoint = COutPoint(mnTxHash, (unsigned int)std::stoul(mne.getOutputIndex().c_str()));
+            COutPoint outpoint = COutPoint(mnTxHash, (unsigned int) std::stoul(mne.getOutputIndex().c_str()));
             pwalletMain->LockCoin(outpoint);
         }
     }
 
     bool newProtocolStart = GetAdjustedTime() >= Params().NEW_PROTOCOLS_STARTTIME();
-    if (newProtocolStart) {
+    if(newProtocolStart){
         fEnableZeromint = GetBoolArg("-enablezeromint", true);
-    } else {
+    }else{
         fEnableZeromint = false;
     }
 
@@ -1852,26 +1853,26 @@ bool AppInit2()
     if (nZeromintPercentage > 100) nZeromintPercentage = 100;
     if (nZeromintPercentage < 1) nZeromintPercentage = 1;
 
-    nPreferredDenom = GetArg("-preferredDenom", 0);
+    nPreferredDenom  = GetArg("-preferredDenom", 0);
     if (nPreferredDenom != 0 && nPreferredDenom != 1 && nPreferredDenom != 5 && nPreferredDenom != 10 && nPreferredDenom != 50 &&
-        nPreferredDenom != 100 && nPreferredDenom != 500 && nPreferredDenom != 1000 && nPreferredDenom != 5000) {
+        nPreferredDenom != 100 && nPreferredDenom != 500 && nPreferredDenom != 1000 && nPreferredDenom != 5000){
         LogPrintf("-preferredDenom: invalid denomination parameter %d. Default value used\n", nPreferredDenom);
         nPreferredDenom = 0;
     }
 
-    // XX42 Remove/refactor code below. Until then provide safe defaults
+// XX42 Remove/refactor code below. Until then provide safe defaults
     nAnonymizeWisprAmount = 2;
 
-    //    nLiquidityProvider = GetArg("-liquidityprovider", 0); //0-100
-    //    if (nLiquidityProvider != 0) {
-    //        obfuScationPool.SetMinBlockSpacing(std::min(nLiquidityProvider, 100) * 15);
-    //        fEnableZeromint = true;
-    //        nZeromintPercentage = 99999;
-    //    }
-    //
-    //    nAnonymizeWisprAmount = GetArg("-anonymizewispramount", 0);
-    //    if (nAnonymizeWisprAmount > 999999) nAnonymizeWisprAmount = 999999;
-    //    if (nAnonymizeWisprAmount < 2) nAnonymizeWisprAmount = 2;
+//    nLiquidityProvider = GetArg("-liquidityprovider", 0); //0-100
+//    if (nLiquidityProvider != 0) {
+//        obfuScationPool.SetMinBlockSpacing(std::min(nLiquidityProvider, 100) * 15);
+//        fEnableZeromint = true;
+//        nZeromintPercentage = 99999;
+//    }
+//
+//    nAnonymizeWisprAmount = GetArg("-anonymizewispramount", 0);
+//    if (nAnonymizeWisprAmount > 999999) nAnonymizeWisprAmount = 999999;
+//    if (nAnonymizeWisprAmount < 2) nAnonymizeWisprAmount = 2;
 
     fEnableSwiftTX = GetBoolArg("-enableswifttx", fEnableSwiftTX);
     nSwiftTXDepth = GetArg("-swifttxdepth", nSwiftTXDepth);

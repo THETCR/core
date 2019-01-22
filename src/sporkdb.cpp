@@ -11,6 +11,7 @@ bool CSporkDB::WriteSpork(const int nSporkId, const CSporkMessage& spork)
 {
     LogPrintf("Wrote spork %s to database\n", sporkManager.GetSporkNameByID(nSporkId));
     return Write(nSporkId, spork);
+
 }
 
 bool CSporkDB::ReadSpork(const int nSporkId, CSporkMessage& spork)

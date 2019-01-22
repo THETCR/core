@@ -7,8 +7,6 @@
 #ifndef WISPR_SERIALIZE_H
 #define WISPR_SERIALIZE_H
 
-#include "libzerocoin/Denominations.h"
-#include "libzerocoin/SpendType.h"
 #include <algorithm>
 #include <assert.h>
 #include <ios>
@@ -20,6 +18,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "libzerocoin/Denominations.h"
+#include "libzerocoin/SpendType.h"
 
 class CScript;
 
@@ -82,7 +82,7 @@ inline const T* end_ptr(const std::vector<T, TAl>& v)
 
 enum {
     // primary actions
-    SER_NETWORK = (1 << 0),
+            SER_NETWORK = (1 << 0),
     SER_DISK = (1 << 1),
     SER_GETHASH = (1 << 2),
 };
@@ -297,7 +297,7 @@ inline void Serialize(Stream& s, libzerocoin::CoinDenomination a, int, int = 0)
 template <typename Stream>
 inline void Unserialize(Stream& s, libzerocoin::CoinDenomination& a, int, int = 0)
 {
-    int f = 0;
+    int f=0;
     READDATA(s, f);
     a = libzerocoin::IntToZerocoinDenomination(f);
 }
@@ -312,9 +312,9 @@ inline void Serialize(Stream& s, libzerocoin::SpendType a, int, int = 0)
 }
 
 template <typename Stream>
-inline void Unserialize(Stream& s, libzerocoin::SpendType& a, int, int = 0)
+inline void Unserialize(Stream& s, libzerocoin::SpendType & a, int, int = 0)
 {
-    uint8_t f = 0;
+    uint8_t f=0;
     READDATA(s, f);
     a = static_cast<libzerocoin::SpendType>(f);
 }

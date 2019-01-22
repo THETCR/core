@@ -12,7 +12,8 @@
 class BitcoinGUI;
 class ClientModel;
 
-namespace Ui {
+namespace Ui
+{
 class HelpMessageDialog;
 }
 

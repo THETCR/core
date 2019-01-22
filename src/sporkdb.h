@@ -5,9 +5,9 @@
 #ifndef WISPR_CSPORKDB_H
 #define WISPR_CSPORKDB_H
 
+#include <boost/filesystem/path.hpp>
 #include "leveldbwrapper.h"
 #include "spork.h"
-#include <boost/filesystem/path.hpp>
 
 class CSporkDB : public CLevelDBWrapper
 {

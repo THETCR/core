@@ -10,8 +10,8 @@
 #include "masternode-budget.h"
 #include "net.h"
 #include "protocol.h"
-#include "sporkdb.h"
 #include "sync.h"
+#include "sporkdb.h"
 #include "util.h"
 
 using namespace std;
@@ -47,11 +47,11 @@ void LoadSporksFromDB()
         // If SPORK Value is greater than 1,000,000 assume it's actually a Date and then convert to a more readable format
         if (spork.nValue > 1000000) {
             LogPrintf("%s : loaded spork %s with value %d : %s", __func__,
-                sporkManager.GetSporkNameByID(spork.nSporkID), spork.nValue,
-                std::ctime(&result));
+                      sporkManager.GetSporkNameByID(spork.nSporkID), spork.nValue,
+                      std::ctime(&result));
         } else {
             LogPrintf("%s : loaded spork %s with value %d\n", __func__,
-                sporkManager.GetSporkNameByID(spork.nSporkID), spork.nValue);
+                      sporkManager.GetSporkNameByID(spork.nSporkID), spork.nValue);
         }
     }
 }
@@ -84,11 +84,11 @@ void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
 
         LogPrintf("%s : new %s ID %d Time %d bestHeight %d\n", __func__, hash.ToString(), spork.nSporkID, spork.nValue, chainActive.Tip()->nHeight);
 
-        if (!sporkManager.CheckSignature(spork, true)) {
-            LogPrintf("%s : Invalid Signature\n", __func__);
-            Misbehaving(pfrom->GetId(), 100);
-            return;
-        }
+            if (!sporkManager.CheckSignature(spork, true)) {
+                LogPrintf("%s : Invalid Signature\n", __func__);
+                Misbehaving(pfrom->GetId(), 100);
+                return;
+            }
 
         mapSporks[hash] = spork;
         mapSporksActive[spork.nSporkID] = spork;
@@ -181,16 +181,16 @@ bool CSporkManager::CheckSignature(CSporkMessage& spork, bool fCheckSigner)
     CPubKey pubkeynew(ParseHex(Params().SporkKey()));
     std::string errorMessage = "";
 
-    bool fValidWithNewKey = obfuScationSigner.VerifyMessage(pubkeynew, spork.vchSig, strMessage, errorMessage);
+    bool fValidWithNewKey = obfuScationSigner.VerifyMessage(pubkeynew, spork.vchSig,strMessage, errorMessage);
 
     if (fCheckSigner && !fValidWithNewKey)
         return false;
 
     // See if window is open that allows for old spork key to sign messages
-    //    if (!fValidWithNewKey && GetAdjustedTime() < Params().RejectOldSporkKey()) {
-    //        CPubKey pubkeyold(ParseHex(Params().SporkKeyOld()));
-    //        return obfuScationSigner.VerifyMessage(pubkeyold, spork.vchSig, strMessage, errorMessage);
-    //    }
+//    if (!fValidWithNewKey && GetAdjustedTime() < Params().RejectOldSporkKey()) {
+//        CPubKey pubkeyold(ParseHex(Params().SporkKeyOld()));
+//        return obfuScationSigner.VerifyMessage(pubkeyold, spork.vchSig, strMessage, errorMessage);
+//    }
 
     return fValidWithNewKey;
 }

@@ -5,16 +5,16 @@
 
 #include "crypter.h"
 
-#include "init.h"
 #include "script/script.h"
 #include "script/standard.h"
-#include "uint256.h"
 #include "util.h"
+#include "init.h"
+#include "uint256.h"
 
 
-#include "wallet.h"
 #include <openssl/aes.h>
 #include <openssl/evp.h>
+#include "wallet.h"
 
 bool CCrypter::SetKeyFromPassphrase(const SecureString& strKeyData, const std::vector<unsigned char>& chSalt, const unsigned int nRounds, const unsigned int nDerivationMethod)
 {
@@ -256,6 +256,7 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn)
 
         uint256 hashSeed;
         if (CWalletDB(pwalletMain->strWalletFile).ReadCurrentSeedHash(hashSeed)) {
+
             uint256 nSeed;
             if (!GetDeterministicSeed(hashSeed, nSeed)) {
                 return error("Failed to read zWSP seed from DB. Wallet is probably corrupt.");
@@ -358,7 +359,7 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
             return false;
 
         fUseCrypto = true;
-        for (KeyMap::value_type& mKey : mapKeys) {
+        for (KeyMap::value_type& mKey: mapKeys) {
             const CKey& key = mKey.second;
             CPubKey vchPubKey = key.GetPubKey();
             CKeyingMaterial vchSecret(key.begin(), key.end());
@@ -379,7 +380,7 @@ bool CCryptoKeyStore::AddDeterministicSeed(const uint256& seed)
     string strErr;
     uint256 hashSeed = Hash(seed.begin(), seed.end());
 
-    if (IsCrypted()) {
+    if(IsCrypted()) {
         if (!IsLocked()) { //if we have password
 
             CKeyingMaterial kmSeed(seed.begin(), seed.end());
@@ -402,17 +403,18 @@ bool CCryptoKeyStore::AddDeterministicSeed(const uint256& seed)
         }
         strErr = "save zwspseed to wallet";
     }
-    //the use case for this is no password set seed, mint dzWSP,
+                //the use case for this is no password set seed, mint dzWSP,
 
     return error("s%: Failed to %s\n", __func__, strErr);
 }
 
 bool CCryptoKeyStore::GetDeterministicSeed(const uint256& hashSeed, uint256& seedOut)
 {
+
     CWalletDB db(pwalletMain->strWalletFile);
     string strErr;
     if (IsCrypted()) {
-        if (!IsLocked()) { //if we have password
+        if(!IsLocked()) { //if we have password
 
             vector<unsigned char> vchCryptedSeed;
             //read encrypted seed
@@ -420,7 +422,7 @@ bool CCryptoKeyStore::GetDeterministicSeed(const uint256& hashSeed, uint256& see
                 uint256 seedRetrieved = uint256(ReverseEndianString(HexStr(vchCryptedSeed)));
                 //this checks if the hash of the seed we just read matches the hash given, meaning it is not encrypted
                 //the use case for this is when not crypted, seed is set, then password set, the seed not yet crypted in memory
-                if (hashSeed == Hash(seedRetrieved.begin(), seedRetrieved.end())) {
+                if(hashSeed == Hash(seedRetrieved.begin(), seedRetrieved.end())) {
                     seedOut = seedRetrieved;
                     return true;
                 }
@@ -432,12 +434,8 @@ bool CCryptoKeyStore::GetDeterministicSeed(const uint256& hashSeed, uint256& see
                     return true;
                 }
                 strErr = "decrypt seed";
-            } else {
-                strErr = "read seed from wallet";
-            }
-        } else {
-            strErr = "read seed; wallet is locked";
-        }
+            } else { strErr = "read seed from wallet"; }
+        } else { strErr = "read seed; wallet is locked"; }
     } else {
         vector<unsigned char> vchSeed;
         // wallet not crypted
@@ -451,5 +449,5 @@ bool CCryptoKeyStore::GetDeterministicSeed(const uint256& hashSeed, uint256& see
     return error("%s: Failed to %s\n", __func__, strErr);
 
 
-    //    return error("Failed to decrypt deterministic seed %s", IsLocked() ? "Wallet is locked!" : "");
+//    return error("Failed to decrypt deterministic seed %s", IsLocked() ? "Wallet is locked!" : "");
 }

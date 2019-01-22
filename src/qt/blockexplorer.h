@@ -11,7 +11,8 @@
 #include "uint256.h"
 #undef loop
 
-namespace Ui {
+namespace Ui
+{
 class BlockExplorer;
 }
 

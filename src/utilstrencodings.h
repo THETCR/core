@@ -25,10 +25,11 @@
 //#define PAIRTYPE(t1, t2) std::pair<t1, t2>
 
 /** Used by SanitizeString() */
-enum SafeChars {
-    SAFE_CHARS_DEFAULT,    //!< The full set of allowed chars
+enum SafeChars
+{
+    SAFE_CHARS_DEFAULT, //!< The full set of allowed chars
     SAFE_CHARS_UA_COMMENT, //!< BIP-0014 subset
-    SAFE_CHARS_FILENAME,   //!< Chars allowed in filenames
+    SAFE_CHARS_FILENAME, //!< Chars allowed in filenames
 };
 
 /**
@@ -65,21 +66,21 @@ int atoi(const std::string& str);
  * @returns true if the entire string could be parsed as valid integer,
  *   false if not the entire string could be parsed or when overflow or underflow occurred.
  */
-bool ParseInt32(const std::string& str, int32_t* out);
+bool ParseInt32(const std::string& str, int32_t *out);
 
 /**
  * Convert string to signed 64-bit integer with strict parse error feedback.
  * @returns true if the entire string could be parsed as valid integer,
  *   false if not the entire string could be parsed or when overflow or underflow occurred.
  */
-bool ParseInt64(const std::string& str, int64_t* out);
+bool ParseInt64(const std::string& str, int64_t *out);
 
 /**
  * Convert string to double with strict parse error feedback.
  * @returns true if the entire string could be parsed as valid double,
  *   false if not the entire string could be parsed or when overflow or underflow occurred.
  */
-bool ParseDouble(const std::string& str, double* out);
+bool ParseDouble(const std::string& str, double *out);
 
 template <typename T>
 std::string HexStr(const T itbegin, const T itend, bool fSpaces = false)

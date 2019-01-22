@@ -5,10 +5,10 @@
 #ifndef ZWSPCONTROLDIALOG_H
 #define ZWSPCONTROLDIALOG_H
 
-#include "primitives/zerocoin.h"
-#include "privacydialog.h"
 #include <QDialog>
 #include <QTreeWidgetItem>
+#include "primitives/zerocoin.h"
+#include "privacydialog.h"
 
 class CZerocoinMint;
 class WalletModel;
@@ -20,11 +20,11 @@ class ZWspControlDialog;
 class CZWspControlWidgetItem : public QTreeWidgetItem
 {
 public:
-    explicit CZWspControlWidgetItem(QTreeWidget* parent, int type = Type) : QTreeWidgetItem(parent, type) {}
+    explicit CZWspControlWidgetItem(QTreeWidget *parent, int type = Type) : QTreeWidgetItem(parent, type) {}
     explicit CZWspControlWidgetItem(int type = Type) : QTreeWidgetItem(type) {}
-    explicit CZWspControlWidgetItem(QTreeWidgetItem* parent, int type = Type) : QTreeWidgetItem(parent, type) {}
+    explicit CZWspControlWidgetItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type) {}
 
-    bool operator<(const QTreeWidgetItem& other) const;
+    bool operator<(const QTreeWidgetItem &other) const;
 };
 
 class ZWspControlDialog : public QDialog
@@ -32,7 +32,7 @@ class ZWspControlDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit ZWspControlDialog(QWidget* parent);
+    explicit ZWspControlDialog(QWidget *parent);
     ~ZWspControlDialog();
 
     void setModel(WalletModel* model);
@@ -42,7 +42,7 @@ public:
     static std::vector<CMintMeta> GetSelectedMints();
 
 private:
-    Ui::ZWspControlDialog* ui;
+    Ui::ZWspControlDialog *ui;
     WalletModel* model;
     PrivacyDialog* privacyDialog;
 

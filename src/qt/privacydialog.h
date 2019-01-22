@@ -19,7 +19,8 @@
 class OptionsModel;
 class WalletModel;
 
-namespace Ui {
+namespace Ui
+{
 class PrivacyDialog;
 }
 
@@ -48,8 +49,9 @@ public:
     void setZWspControlLabels(int64_t nAmount, int nQuantity);
 
 public slots:
-    void setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance, const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
-
+    void setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, 
+                    const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance,
+                    const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
 protected:
     virtual void keyPressEvent(QKeyEvent* event);
 
@@ -68,7 +70,7 @@ private:
     CAmount currentWatchOnlyBalance;
     CAmount currentWatchUnconfBalance;
     CAmount currentWatchImmatureBalance;
-
+    
     int nSecurityLevel = 0;
     bool fMinimizeChange = false;
     bool fDenomsMinimized;
@@ -80,20 +82,20 @@ private:
 private slots:
     void on_payTo_textChanged(const QString& address);
     void on_addressBookButton_clicked();
-    //    void coinControlFeatureChanged(bool);
+//    void coinControlFeatureChanged(bool);
     void coinControlButtonClicked();
-    //    void coinControlChangeChecked(int);
-    //    void coinControlChangeEdited(const QString&);
+//    void coinControlChangeChecked(int);
+//    void coinControlChangeEdited(const QString&);
     void coinControlUpdateLabels();
 
     void coinControlClipboardQuantity();
     void coinControlClipboardAmount();
-    //    void coinControlClipboardFee();
-    //    void coinControlClipboardAfterFee();
-    //    void coinControlClipboardBytes();
-    //    void coinControlClipboardPriority();
-    //    void coinControlClipboardLowOutput();
-    //    void coinControlClipboardChange();
+//    void coinControlClipboardFee();
+//    void coinControlClipboardAfterFee();
+//    void coinControlClipboardBytes();
+//    void coinControlClipboardPriority();
+//    void coinControlClipboardLowOutput();
+//    void coinControlClipboardChange();
 
     void on_pushButtonMintzWSP_clicked();
     void on_pushButtonMintReset_clicked();

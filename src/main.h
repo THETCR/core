@@ -106,7 +106,7 @@ static const unsigned int DATABASE_WRITE_INTERVAL = 3600;
 static const unsigned int MAX_REJECT_MESSAGE_LENGTH = 111;
 
 /** Enable bloom filter */
-static const bool DEFAULT_PEERBLOOMFILTERS = true;
+ static const bool DEFAULT_PEERBLOOMFILTERS = true;
 
 /** "reject" message codes */
 static const unsigned char REJECT_MALFORMED = 0x01;
@@ -155,7 +155,7 @@ extern int64_t nReserveBalance;
 
 extern std::map<uint256, int64_t> mapRejectedBlocks;
 extern std::map<unsigned int, unsigned int> mapHashedBlocks;
-extern std::set<std::pair<COutPoint, unsigned int>> setStakeSeen;
+extern std::set<std::pair<COutPoint, unsigned int> > setStakeSeen;
 extern std::map<uint256, int64_t> mapZerocoinspends; //txid, time received
 
 /** Best header we've seen so far (used for getheaders queries' starting points). */

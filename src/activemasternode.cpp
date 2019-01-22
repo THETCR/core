@@ -68,7 +68,7 @@ void CActiveMasternode::ManageStatus()
         }
 
         // The service needs the correct default port to work properly
-        if (!CMasternodeBroadcast::CheckDefaultPort(strMasterNodeAddr, errorMessage, "CActiveMasternode::ManageStatus()"))
+        if(!CMasternodeBroadcast::CheckDefaultPort(strMasterNodeAddr, errorMessage, "CActiveMasternode::ManageStatus()"))
             return;
 
         LogPrintf("CActiveMasternode::ManageStatus() - Checking inbound connection to '%s'\n", service.ToString());
@@ -137,18 +137,18 @@ void CActiveMasternode::ManageStatus()
 std::string CActiveMasternode::GetStatus()
 {
     switch (status) {
-    case ACTIVE_MASTERNODE_INITIAL:
-        return "Node just started, not yet activated";
-    case ACTIVE_MASTERNODE_SYNC_IN_PROCESS:
-        return "Sync in progress. Must wait until sync is complete to start Masternode";
-    case ACTIVE_MASTERNODE_INPUT_TOO_NEW:
-        return strprintf("Masternode input must have at least %d confirmations", MASTERNODE_MIN_CONFIRMATIONS);
-    case ACTIVE_MASTERNODE_NOT_CAPABLE:
-        return "Not capable masternode: " + notCapableReason;
-    case ACTIVE_MASTERNODE_STARTED:
-        return "Masternode successfully started";
-    default:
-        return "unknown";
+        case ACTIVE_MASTERNODE_INITIAL:
+            return "Node just started, not yet activated";
+        case ACTIVE_MASTERNODE_SYNC_IN_PROCESS:
+            return "Sync in progress. Must wait until sync is complete to start Masternode";
+        case ACTIVE_MASTERNODE_INPUT_TOO_NEW:
+            return strprintf("Masternode input must have at least %d confirmations", MASTERNODE_MIN_CONFIRMATIONS);
+        case ACTIVE_MASTERNODE_NOT_CAPABLE:
+            return "Not capable masternode: " + notCapableReason;
+        case ACTIVE_MASTERNODE_STARTED:
+            return "Masternode successfully started";
+        default:
+            return "unknown";
     }
 }
 
@@ -218,8 +218,8 @@ bool CActiveMasternode::SendMasternodePing(std::string& errorMessage)
 
         LogPrint("masternode", "dseep - relaying from active mn, %s \n", vin.ToString().c_str());
         LOCK(cs_vNodes);
-        for (CNode* pnode : vNodes)
-            pnode->PushMessage("dseep", vin, vchMasterNodeSignature, masterNodeSignatureTime, false);
+        for (CNode* pnode: vNodes)
+        pnode->PushMessage("dseep", vin, vchMasterNodeSignature, masterNodeSignatureTime, false);
 
         /*
          * END OF "REMOVE"
@@ -235,7 +235,7 @@ bool CActiveMasternode::SendMasternodePing(std::string& errorMessage)
     }
 }
 
-bool CActiveMasternode::CreateBroadcast(std::string strService, std::string strKeyMasternode, std::string strTxHash, std::string strOutputIndex, std::string& errorMessage, CMasternodeBroadcast& mnb, bool fOffline)
+bool CActiveMasternode::CreateBroadcast(std::string strService, std::string strKeyMasternode, std::string strTxHash, std::string strOutputIndex, std::string& errorMessage, CMasternodeBroadcast &mnb, bool fOffline)
 {
     CTxIn vin;
     CPubKey pubKeyCollateralAddress;
@@ -265,7 +265,7 @@ bool CActiveMasternode::CreateBroadcast(std::string strService, std::string strK
     CService service = CService(strService);
 
     // The service needs the correct default port to work properly
-    if (!CMasternodeBroadcast::CheckDefaultPort(strService, errorMessage, "CActiveMasternode::CreateBroadcast()"))
+    if(!CMasternodeBroadcast::CheckDefaultPort(strService, errorMessage, "CActiveMasternode::CreateBroadcast()"))
         return false;
 
     addrman.Add(CAddress(service), CNetAddr("127.0.0.1"), 2 * 60 * 60);
@@ -273,7 +273,7 @@ bool CActiveMasternode::CreateBroadcast(std::string strService, std::string strK
     return CreateBroadcast(vin, CService(strService), keyCollateralAddress, pubKeyCollateralAddress, keyMasternode, pubKeyMasternode, errorMessage, mnb);
 }
 
-bool CActiveMasternode::CreateBroadcast(CTxIn vin, CService service, CKey keyCollateralAddress, CPubKey pubKeyCollateralAddress, CKey keyMasternode, CPubKey pubKeyMasternode, std::string& errorMessage, CMasternodeBroadcast& mnb)
+bool CActiveMasternode::CreateBroadcast(CTxIn vin, CService service, CKey keyCollateralAddress, CPubKey pubKeyCollateralAddress, CKey keyMasternode, CPubKey pubKeyMasternode, std::string& errorMessage, CMasternodeBroadcast &mnb)
 {
     // wait for reindex and/or import to finish
     if (fImporting || fReindex) return false;
@@ -326,8 +326,8 @@ bool CActiveMasternode::CreateBroadcast(CTxIn vin, CService service, CKey keyCol
     }
 
     LOCK(cs_vNodes);
-    for (CNode* pnode : vNodes)
-        pnode->PushMessage("dsee", vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION, donationAddress, donationPercantage);
+    for (CNode* pnode: vNodes)
+    pnode->PushMessage("dsee", vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION, donationAddress, donationPercantage);
 
     /*
      * END OF "REMOVE"
@@ -366,7 +366,7 @@ bool CActiveMasternode::GetMasterNodeVin(CTxIn& vin, CPubKey& pubkey, CKey& secr
         }
 
         bool found = false;
-        for (COutput& out : possibleCoins) {
+        for (COutput& out: possibleCoins) {
             if (out.tx->GetHash() == txHash && out.i == outputIndex) {
                 selectedOutput = &out;
                 found = true;
@@ -432,11 +432,11 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode()
     // Temporary unlock MN coins from masternode.conf
     if (GetBoolArg("-mnconflock", true)) {
         uint256 mnTxHash;
-        for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
+        for (CMasternodeConfig::CMasternodeEntry mne: masternodeConfig.getEntries()) {
             mnTxHash.SetHex(mne.getTxHash());
 
             int nIndex;
-            if (!mne.castOutputIndex(nIndex))
+            if(!mne.castOutputIndex(nIndex))
                 continue;
 
             COutPoint outpoint = COutPoint(mnTxHash, nIndex);
@@ -450,12 +450,12 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode()
 
     // Lock MN coins from masternode.conf back if they where temporary unlocked
     if (!confLockedCoins.empty()) {
-        for (COutPoint outpoint : confLockedCoins)
-            pwalletMain->LockCoin(outpoint);
+        for (COutPoint outpoint: confLockedCoins)
+        pwalletMain->LockCoin(outpoint);
     }
 
     // Filter
-    for (const COutput& out : vCoins) {
+    for (const COutput& out: vCoins) {
         if (out.tx->vout[out.i].nValue == 125000 * COIN) { //exactly
             filteredCoins.push_back(out);
         }

@@ -93,8 +93,10 @@
 // /usr/include/boost/program_options/detail/config_file.hpp:163:17: error: call to function 'to_internal' that is neither visible in the template definition nor found by argument-dependent lookup
 // See also: http://stackoverflow.com/questions/10020179/compilation-fail-in-boost-librairies-program-options
 //           http://clang.debian.net/status.php?version=3.0&key=CANNOT_FIND_FUNCTION
-namespace boost {
-namespace program_options {
+namespace boost
+{
+namespace program_options
+{
 std::string to_internal(const std::string&);
 }
 
@@ -127,7 +129,7 @@ std::vector<int64_t> obfuScationDenominations;
 string strBudgetMode = "";
 
 map<string, string> mapArgs;
-map<string, vector<string>> mapMultiArgs;
+map<string, vector<string> > mapMultiArgs;
 bool fDebug = false;
 bool fPrintToConsole = false;
 bool fPrintToDebugLog = true;
@@ -229,7 +231,7 @@ bool LogAcceptCategory(const char* category)
         // This helps prevent issues debugging global destructors,
         // where mapMultiArgs might be deleted before another
         // global destructor calls LogPrint()
-        static boost::thread_specific_ptr<set<string>> ptrCategory;
+        static boost::thread_specific_ptr<set<string> > ptrCategory;
         if (ptrCategory.get() == NULL) {
             const vector<string>& categories = mapMultiArgs["-debug"];
             ptrCategory.reset(new set<string>(categories.begin(), categories.end()));
@@ -303,7 +305,7 @@ static bool InterpretBool(const std::string& strValue)
 /** Turn -noX into -X=0 */
 static void InterpretNegativeSetting(std::string& strKey, std::string& strValue)
 {
-    if (strKey.length() > 3 && strKey[0] == '-' && strKey[1] == 'n' && strKey[2] == 'o') {
+    if (strKey.length()>3 && strKey[0]=='-' && strKey[1]=='n' && strKey[2]=='o') {
         strKey = "-" + strKey.substr(3);
         strValue = InterpretBool(strValue) ? "0" : "1";
     }
@@ -383,15 +385,13 @@ static const int screenWidth = 79;
 static const int optIndent = 2;
 static const int msgIndent = 7;
 
-std::string HelpMessageGroup(const std::string& message)
-{
+std::string HelpMessageGroup(const std::string &message) {
     return std::string(message) + std::string("\n\n");
 }
 
-std::string HelpMessageOpt(const std::string& option, const std::string& message)
-{
-    return std::string(optIndent, ' ') + std::string(option) +
-           std::string("\n") + std::string(msgIndent, ' ') +
+std::string HelpMessageOpt(const std::string &option, const std::string &message) {
+    return std::string(optIndent,' ') + std::string(option) +
+           std::string("\n") + std::string(msgIndent,' ') +
            FormatParagraph(message, screenWidth - msgIndent, msgIndent) +
            std::string("\n\n");
 }
@@ -506,7 +506,7 @@ boost::filesystem::path GetMasternodeConfigFile()
 }
 
 void ReadConfigFile(map<string, string>& mapSettingsRet,
-    map<string, vector<string>>& mapMultiSettingsRet)
+    map<string, vector<string> >& mapMultiSettingsRet)
 {
     boost::filesystem::ifstream streamConfig(GetConfigFile());
     if (!streamConfig.good()) {
@@ -812,8 +812,8 @@ bool SetupNetworking()
 #ifdef WIN32
     // Initialize Windows Sockets
     WSADATA wsadata;
-    int ret = WSAStartup(MAKEWORD(2, 2), &wsadata);
-    if (ret != NO_ERROR || LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wVersion) != 2)
+    int ret = WSAStartup(MAKEWORD(2,2), &wsadata);
+    if (ret != NO_ERROR || LOBYTE(wsadata.wVersion ) != 2 || HIBYTE(wsadata.wVersion) != 2)
         return false;
 #endif
     return true;

@@ -53,7 +53,7 @@ int64_t static DecodeDumpTime(const std::string& str)
 std::string static EncodeDumpString(const std::string& str)
 {
     std::stringstream ret;
-    for (unsigned char c : str) {
+    for (unsigned char c: str) {
         if (c <= 32 || c >= 128 || c == '%') {
             ret << '%' << HexStr(&c, &c + 1);
         } else {
@@ -86,15 +86,15 @@ UniValue importprivkey(const UniValue& params, bool fHelp)
             "\nAdds a private key (as returned by dumpprivkey) to your wallet.\n" +
             HelpRequiringPassphrase() + "\n"
 
-                                        "\nArguments:\n"
-                                        "1. \"wisprprivkey\"   (string, required) The private key (see dumpprivkey)\n"
-                                        "2. \"label\"            (string, optional, default=\"\") An optional label\n"
-                                        "3. rescan               (boolean, optional, default=true) Rescan the wallet for transactions\n"
+            "\nArguments:\n"
+            "1. \"wisprprivkey\"   (string, required) The private key (see dumpprivkey)\n"
+            "2. \"label\"            (string, optional, default=\"\") An optional label\n"
+            "3. rescan               (boolean, optional, default=true) Rescan the wallet for transactions\n"
 
-                                        "\nNote: This call can take minutes to complete if rescan is true.\n"
+            "\nNote: This call can take minutes to complete if rescan is true.\n"
 
-                                        "\nExamples:\n"
-                                        "\nDump a private key\n" +
+            "\nExamples:\n"
+            "\nDump a private key\n" +
             HelpExampleCli("dumpprivkey", "\"myaddress\"") +
             "\nImport the private key with rescan\n" +
             HelpExampleCli("importprivkey", "\"mykey\"") +
@@ -231,11 +231,11 @@ UniValue importwallet(const UniValue& params, bool fHelp)
             "\nImports keys from a wallet dump file (see dumpwallet).\n" +
             HelpRequiringPassphrase() + "\n"
 
-                                        "\nArguments:\n"
-                                        "1. \"filename\"    (string, required) The wallet file\n"
+            "\nArguments:\n"
+            "1. \"filename\"    (string, required) The wallet file\n"
 
-                                        "\nExamples:\n"
-                                        "\nDump the wallet\n" +
+            "\nExamples:\n"
+            "\nDump the wallet\n" +
             HelpExampleCli("dumpwallet", "\"test\"") +
             "\nImport the wallet\n" +
             HelpExampleCli("importwallet", "\"test\"") +
@@ -335,13 +335,13 @@ UniValue dumpprivkey(const UniValue& params, bool fHelp)
             "Then the importprivkey can be used with this output\n" +
             HelpRequiringPassphrase() + "\n"
 
-                                        "\nArguments:\n"
-                                        "1. \"wispraddress\"   (string, required) The wispr address for the private key\n"
+            "\nArguments:\n"
+            "1. \"wispraddress\"   (string, required) The wispr address for the private key\n"
 
-                                        "\nResult:\n"
-                                        "\"key\"                (string) The private key\n"
+            "\nResult:\n"
+            "\"key\"                (string) The private key\n"
 
-                                        "\nExamples:\n" +
+            "\nExamples:\n" +
             HelpExampleCli("dumpprivkey", "\"myaddress\"") + HelpExampleCli("importprivkey", "\"mykey\"") + HelpExampleRpc("dumpprivkey", "\"myaddress\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -370,10 +370,10 @@ UniValue dumpwallet(const UniValue& params, bool fHelp)
             "\nDumps all wallet keys in a human-readable format.\n" +
             HelpRequiringPassphrase() + "\n"
 
-                                        "\nArguments:\n"
-                                        "1. \"filename\"    (string, required) The filename\n"
+            "\nArguments:\n"
+            "1. \"filename\"    (string, required) The filename\n"
 
-                                        "\nExamples:\n" +
+            "\nExamples:\n" +
             HelpExampleCli("dumpwallet", "\"test\"") + HelpExampleRpc("dumpwallet", "\"test\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -391,7 +391,7 @@ UniValue dumpwallet(const UniValue& params, bool fHelp)
     pwalletMain->GetAllReserveKeys(setKeyPool);
 
     // sort time/key pairs
-    std::vector<std::pair<int64_t, CKeyID>> vKeyBirth;
+    std::vector<std::pair<int64_t, CKeyID> > vKeyBirth;
     for (std::map<CKeyID, int64_t>::const_iterator it = mapKeyBirth.begin(); it != mapKeyBirth.end(); it++) {
         vKeyBirth.push_back(std::make_pair(it->second, it->first));
     }
@@ -404,7 +404,7 @@ UniValue dumpwallet(const UniValue& params, bool fHelp)
     file << strprintf("# * Best block at time of backup was %i (%s),\n", chainActive.Height(), chainActive.Tip()->GetBlockHash().ToString());
     file << strprintf("#   mined on %s\n", EncodeDumpTime(chainActive.Tip()->GetBlockTime()));
     file << "\n";
-    for (std::vector<std::pair<int64_t, CKeyID>>::const_iterator it = vKeyBirth.begin(); it != vKeyBirth.end(); it++) {
+    for (std::vector<std::pair<int64_t, CKeyID> >::const_iterator it = vKeyBirth.begin(); it != vKeyBirth.end(); it++) {
         const CKeyID& keyid = it->second;
         std::string strTime = EncodeDumpTime(it->first);
         std::string strAddr = CBitcoinAddress(keyid).ToString();
@@ -433,14 +433,14 @@ UniValue bip38encrypt(const UniValue& params, bool fHelp)
             "\nEncrypts a private key corresponding to 'wispraddress'.\n" +
             HelpRequiringPassphrase() + "\n"
 
-                                        "\nArguments:\n"
-                                        "1. \"wispraddress\"   (string, required) The wispr address for the private key (you must hold the key already)\n"
-                                        "2. \"passphrase\"   (string, required) The passphrase you want the private key to be encrypted with - Valid special chars: !#$%&'()*+,-./:;<=>?`{|}~ \n"
+            "\nArguments:\n"
+            "1. \"wispraddress\"   (string, required) The wispr address for the private key (you must hold the key already)\n"
+            "2. \"passphrase\"   (string, required) The passphrase you want the private key to be encrypted with - Valid special chars: !#$%&'()*+,-./:;<=>?`{|}~ \n"
 
-                                        "\nResult:\n"
-                                        "\"key\"                (string) The encrypted private key\n"
+            "\nResult:\n"
+            "\"key\"                (string) The encrypted private key\n"
 
-                                        "\nExamples:\n" +
+            "\nExamples:\n" +
             HelpExampleCli("bip38encrypt", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" \"mypasphrase\"") +
             HelpExampleRpc("bip38encrypt", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" \"mypasphrase\""));
 
@@ -479,14 +479,14 @@ UniValue bip38decrypt(const UniValue& params, bool fHelp)
             "\nDecrypts and then imports password protected private key.\n" +
             HelpRequiringPassphrase() + "\n"
 
-                                        "\nArguments:\n"
-                                        "1. \"encryptedkey\"   (string, required) The encrypted private key\n"
-                                        "2. \"passphrase\"   (string, required) The passphrase you want the private key to be encrypted with\n"
+            "\nArguments:\n"
+            "1. \"encryptedkey\"   (string, required) The encrypted private key\n"
+            "2. \"passphrase\"   (string, required) The passphrase you want the private key to be encrypted with\n"
 
-                                        "\nResult:\n"
-                                        "\"key\"                (string) The decrypted private key\n"
+            "\nResult:\n"
+            "\"key\"                (string) The decrypted private key\n"
 
-                                        "\nExamples:\n" +
+            "\nExamples:\n" +
             HelpExampleCli("bip38decrypt", "\"encryptedkey\" \"mypassphrase\"") +
             HelpExampleRpc("bip38decrypt", "\"encryptedkey\" \"mypassphrase\""));
 

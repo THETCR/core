@@ -54,7 +54,7 @@ void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fInclud
     out.push_back(Pair("type", GetTxnOutputType(type)));
 
     UniValue a(UniValue::VARR);
-    for (const CTxDestination& addr : addresses)
+    for (const CTxDestination& addr: addresses)
         a.push_back(CBitcoinAddress(addr).ToString());
     out.push_back(Pair("addresses", a));
 }
@@ -65,7 +65,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
     entry.push_back(Pair("version", tx.nVersion));
     entry.push_back(Pair("locktime", (int64_t)tx.nLockTime));
     UniValue vin(UniValue::VARR);
-    for (const CTxIn& txin : tx.vin) {
+    for (const CTxIn& txin: tx.vin) {
         UniValue in(UniValue::VOBJ);
         if (tx.IsCoinBase())
             in.push_back(Pair("coinbase", HexStr(txin.scriptSig.begin(), txin.scriptSig.end())));
@@ -260,7 +260,7 @@ UniValue listunspent(const UniValue& params, bool fHelp)
     }
 
     int nWatchonlyConfig = 1;
-    if (params.size() > 3) {
+    if(params.size() > 3) {
         nWatchonlyConfig = params[3].get_int();
         if (nWatchonlyConfig > 3 || nWatchonlyConfig < 1)
             nWatchonlyConfig = 1;
@@ -271,7 +271,7 @@ UniValue listunspent(const UniValue& params, bool fHelp)
     assert(pwalletMain != nullptr);
     LOCK2(cs_main, pwalletMain->cs_wallet);
     pwalletMain->AvailableCoins(vecOutputs, false, NULL, false, ALL_COINS, false, nWatchonlyConfig);
-    for (const COutput& out : vecOutputs) {
+    for (const COutput& out: vecOutputs) {
         if (out.nDepth < nMinDepth || out.nDepth > nMaxDepth)
             continue;
 
@@ -373,13 +373,13 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
 
     set<CBitcoinAddress> setAddress;
     vector<string> addrList = sendTo.getKeys();
-    for (const string& name_ : addrList) {
+    for(const string& name_: addrList) {
         CBitcoinAddress address(name_);
         if (!address.IsValid())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid WISPR address: ") + name_);
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid WISPR address: ")+name_);
 
         if (setAddress.count(address))
-            throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, duplicated address: ") + name_);
+            throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, duplicated address: ")+name_);
         setAddress.insert(address);
 
         CScript scriptPubKey = GetScriptForDestination(address.Get());
@@ -524,48 +524,48 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
             + HelpRequiringPassphrase() + "\n"
 #endif
 
-                                          "\nArguments:\n"
-                                          "1. \"hexstring\"     (string, required) The transaction hex string\n"
-                                          "2. \"prevtxs\"       (string, optional) An json array of previous dependent transaction outputs\n"
-                                          "     [               (json array of json objects, or 'null' if none provided)\n"
-                                          "       {\n"
-                                          "         \"txid\":\"id\",             (string, required) The transaction id\n"
-                                          "         \"vout\":n,                  (numeric, required) The output number\n"
-                                          "         \"scriptPubKey\": \"hex\",   (string, required) script key\n"
-                                          "         \"redeemScript\": \"hex\"    (string, required for P2SH) redeem script\n"
-                                          "       }\n"
-                                          "       ,...\n"
-                                          "    ]\n"
-                                          "3. \"privatekeys\"     (string, optional) A json array of base58-encoded private keys for signing\n"
-                                          "    [                  (json array of strings, or 'null' if none provided)\n"
-                                          "      \"privatekey\"   (string) private key in base58-encoding\n"
-                                          "      ,...\n"
-                                          "    ]\n"
-                                          "4. \"sighashtype\"     (string, optional, default=ALL) The signature hash type. Must be one of\n"
-                                          "       \"ALL\"\n"
-                                          "       \"NONE\"\n"
-                                          "       \"SINGLE\"\n"
-                                          "       \"ALL|ANYONECANPAY\"\n"
-                                          "       \"NONE|ANYONECANPAY\"\n"
-                                          "       \"SINGLE|ANYONECANPAY\"\n"
+            "\nArguments:\n"
+            "1. \"hexstring\"     (string, required) The transaction hex string\n"
+            "2. \"prevtxs\"       (string, optional) An json array of previous dependent transaction outputs\n"
+            "     [               (json array of json objects, or 'null' if none provided)\n"
+            "       {\n"
+            "         \"txid\":\"id\",             (string, required) The transaction id\n"
+            "         \"vout\":n,                  (numeric, required) The output number\n"
+            "         \"scriptPubKey\": \"hex\",   (string, required) script key\n"
+            "         \"redeemScript\": \"hex\"    (string, required for P2SH) redeem script\n"
+            "       }\n"
+            "       ,...\n"
+            "    ]\n"
+            "3. \"privatekeys\"     (string, optional) A json array of base58-encoded private keys for signing\n"
+            "    [                  (json array of strings, or 'null' if none provided)\n"
+            "      \"privatekey\"   (string) private key in base58-encoding\n"
+            "      ,...\n"
+            "    ]\n"
+            "4. \"sighashtype\"     (string, optional, default=ALL) The signature hash type. Must be one of\n"
+            "       \"ALL\"\n"
+            "       \"NONE\"\n"
+            "       \"SINGLE\"\n"
+            "       \"ALL|ANYONECANPAY\"\n"
+            "       \"NONE|ANYONECANPAY\"\n"
+            "       \"SINGLE|ANYONECANPAY\"\n"
 
-                                          "\nResult:\n"
-                                          "{\n"
-                                          "  \"hex\" : \"value\",           (string) The hex-encoded raw transaction with signature(s)\n"
-                                          "  \"complete\" : true|false,   (boolean) If the transaction has a complete set of signatures\n"
-                                          "  \"errors\" : [                 (json array of objects) Script verification errors (if there are any)\n"
-                                          "    {\n"
-                                          "      \"txid\" : \"hash\",           (string) The hash of the referenced, previous transaction\n"
-                                          "      \"vout\" : n,                (numeric) The index of the output to spent and used as input\n"
-                                          "      \"scriptSig\" : \"hex\",       (string) The hex-encoded signature script\n"
-                                          "      \"sequence\" : n,            (numeric) Script sequence number\n"
-                                          "      \"error\" : \"text\"           (string) Verification or signing error related to the input\n"
-                                          "    }\n"
-                                          "    ,...\n"
-                                          "  ]\n"
-                                          "}\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"hex\" : \"value\",           (string) The hex-encoded raw transaction with signature(s)\n"
+            "  \"complete\" : true|false,   (boolean) If the transaction has a complete set of signatures\n"
+            "  \"errors\" : [                 (json array of objects) Script verification errors (if there are any)\n"
+            "    {\n"
+            "      \"txid\" : \"hash\",           (string) The hash of the referenced, previous transaction\n"
+            "      \"vout\" : n,                (numeric) The index of the output to spent and used as input\n"
+            "      \"scriptSig\" : \"hex\",       (string) The hex-encoded signature script\n"
+            "      \"sequence\" : n,            (numeric) Script sequence number\n"
+            "      \"error\" : \"text\"           (string) Verification or signing error related to the input\n"
+            "    }\n"
+            "    ,...\n"
+            "  ]\n"
+            "}\n"
 
-                                          "\nExamples:\n" +
+            "\nExamples:\n" +
             HelpExampleCli("signrawtransaction", "\"myhex\"") + HelpExampleRpc("signrawtransaction", "\"myhex\""));
 
 #ifdef ENABLE_WALLET
@@ -604,7 +604,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
         CCoinsViewMemPool viewMempool(&viewChain, mempool);
         view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
 
-        for (const CTxIn& txin : mergedTx.vin) {
+        for (const CTxIn& txin: mergedTx.vin) {
             const uint256& prevHash = txin.prevout.hash;
             CCoins coins;
             view.AccessCoins(prevHash); // this is certainly allowed to fail
@@ -673,7 +673,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
             // if redeemScript given and not using the local wallet (private keys
             // given), add redeemScript to the tempKeystore so it can be signed:
             if (fGivenKeys && scriptPubKey.IsPayToScriptHash()) {
-                RPCTypeCheckObj(prevOut, boost::assign::map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR)("redeemScript", UniValue::VSTR));
+                RPCTypeCheckObj(prevOut, boost::assign::map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR)("redeemScript",UniValue::VSTR));
                 UniValue v = find_value(prevOut, "redeemScript");
                 if (!v.isNull()) {
                     vector<unsigned char> rsData(ParseHexV(v, "redeemScript"));
@@ -722,7 +722,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
             SignSignature(keystore, prevPubKey, mergedTx, i, nHashType);
 
         // ... and merge in other signatures:
-        for (const CMutableTransaction& txv : txVariants) {
+        for (const CMutableTransaction& txv: txVariants) {
             txin.scriptSig = CombineSignatures(prevPubKey, mergedTx, i, txin.scriptSig, txv.vin[i].scriptSig);
         }
         ScriptError serror = SCRIPT_ERR_OK;

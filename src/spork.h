@@ -50,10 +50,10 @@ using namespace boost;
 #define SPORK_9_MASTERNODE_BUDGET_ENFORCEMENT_DEFAULT 4070908800  //OFF
 #define SPORK_10_MASTERNODE_PAY_UPDATED_NODES_DEFAULT 4070908800  //OFF
 //#define SPORK_11_LOCK_INVALID_UTXO_DEFAULT 4070908800             //OFF - NOTE: this is block height not time!
-#define SPORK_13_ENABLE_SUPERBLOCKS_DEFAULT 4070908800         //OFF
-#define SPORK_14_NEW_PROTOCOL_ENFORCEMENT_DEFAULT 4070908800   //OFF
-#define SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2_DEFAULT 4070908800 //OFF
-#define SPORK_16_ZEROCOIN_MAINTENANCE_MODE_DEFAULT 4070908800  //OFF
+#define SPORK_13_ENABLE_SUPERBLOCKS_DEFAULT 4070908800            //OFF
+#define SPORK_14_NEW_PROTOCOL_ENFORCEMENT_DEFAULT 4070908800      //OFF
+#define SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2_DEFAULT 4070908800    //OFF
+#define SPORK_16_ZEROCOIN_MAINTENANCE_MODE_DEFAULT 4070908800     //OFF
 
 class CSporkMessage;
 class CSporkManager;
@@ -89,8 +89,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
-    {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nSporkID);
         READWRITE(nValue);
         READWRITE(nTimeSigned);

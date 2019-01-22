@@ -10,7 +10,8 @@
 
 class AddressTableModel;
 
-namespace Ui {
+namespace Ui
+{
 class EditAddressDialog;
 }
 

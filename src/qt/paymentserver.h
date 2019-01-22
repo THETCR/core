@@ -132,7 +132,7 @@ private:
 
     bool saveURIs; // true during startup
     QLocalServer* uriServer;
-    QNetworkAccessManager* netManager; // Used to fetch payment requests
+    QNetworkAccessManager* netManager;  // Used to fetch payment requests
     OptionsModel* optionsModel;
 };
 

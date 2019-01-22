@@ -6,12 +6,13 @@
 #include "random.h"
 #include "uint256.h"
 
-#include <map>
 #include <vector>
+#include <map>
 
 #include <boost/test/unit_test.hpp>
 
-namespace {
+namespace
+{
 class CCoinsViewTest : public CCoinsView
 {
     uint256 hashBestBlock_;
@@ -42,7 +43,7 @@ public:
 
     bool BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock)
     {
-        for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end();) {
+        for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end(); ) {
             map_[it->first] = it->second.coins;
             if (it->second.coins.IsPruned() && insecure_rand() % 3 == 0) {
                 // Randomly delete empty entries on write.
@@ -57,7 +58,7 @@ public:
 
     bool GetStats(CCoinsStats& stats) const { return false; }
 };
-} // namespace
+}
 
 BOOST_AUTO_TEST_SUITE(coins_tests)
 
@@ -87,8 +88,8 @@ BOOST_AUTO_TEST_CASE(coins_cache_simulation_test)
     std::map<uint256, CCoins> result;
 
     // The cache stack.
-    CCoinsViewTest base;                         // A CCoinsViewTest at the bottom.
-    std::vector<CCoinsViewCache*> stack;         // A stack of CCoinsViewCaches on top.
+    CCoinsViewTest base; // A CCoinsViewTest at the bottom.
+    std::vector<CCoinsViewCache*> stack; // A stack of CCoinsViewCaches on top.
     stack.push_back(new CCoinsViewCache(&base)); // Start with one cache.
 
     // Use a limited set of random transaction ids, so we do test overwriting entries.

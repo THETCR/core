@@ -13,7 +13,8 @@ class CScheduler;
 class CWallet;
 class CzWSPWallet;
 
-namespace boost {
+namespace boost
+{
 class thread_group;
 } // namespace boost
 

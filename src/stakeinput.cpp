@@ -2,11 +2,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "stakeinput.h"
 #include "accumulators.h"
 #include "chain.h"
-#include "main.h"
 #include "primitives/deterministicmint.h"
+#include "main.h"
+#include "stakeinput.h"
 #include "wallet.h"
 
 CZWspStake::CZWspStake(const libzerocoin::CoinSpend& spend)
@@ -79,7 +79,7 @@ bool CZWspStake::GetModifier(uint64_t& nStakeModifier)
 
     int64_t nTimeBlockFrom = pindex->GetBlockTime();
     while (true) {
-        if (pindex->GetBlockTime() - nTimeBlockFrom > 60 * 60) {
+        if (pindex->GetBlockTime() - nTimeBlockFrom > 60*60) {
             nStakeModifier = pindex->nAccumulatorCheckpoint.Get64();
             return true;
         }
@@ -153,7 +153,7 @@ bool CZWspStake::GetTxFrom(CTransaction& tx)
     return false;
 }
 
-bool CZWspStake::MarkSpent(CWallet* pwallet, const uint256& txid)
+bool CZWspStake::MarkSpent(CWallet *pwallet, const uint256& txid)
 {
     CzWSPTracker* zwspTracker = pwallet->zwspTracker.get();
     CMintMeta meta;

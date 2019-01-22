@@ -11,9 +11,9 @@
 #include "netbase.h"
 
 #include "hash.h"
-#include "random.h"
 #include "sync.h"
 #include "uint256.h"
+#include "random.h"
 #include "util.h"
 #include "utilstrencodings.h"
 
@@ -289,13 +289,14 @@ bool static InterruptibleRecv(char* data, size_t len, int timeout, SOCKET& hSock
     return len == 0;
 }
 
-struct ProxyCredentials {
+struct ProxyCredentials
+{
     std::string username;
     std::string password;
 };
 
 /** Connect using SOCKS5 (as described in RFC1928) */
-bool static Socks5(string strDest, int port, const ProxyCredentials* auth, SOCKET& hSocket)
+bool static Socks5(string strDest, int port, const ProxyCredentials *auth, SOCKET& hSocket)
 {
     LogPrintf("SOCKS5 connecting %s\n", strDest);
     if (strDest.size() > 255) {
@@ -359,10 +360,10 @@ bool static Socks5(string strDest, int port, const ProxyCredentials* auth, SOCKE
         return error("Proxy requested wrong authentication method %02x", pchRet1[1]);
     }
     std::vector<uint8_t> vSocks5;
-    vSocks5.push_back(0x05);           // VER protocol version
-    vSocks5.push_back(0x01);           // CMD CONNECT
-    vSocks5.push_back(0x00);           // RSV Reserved
-    vSocks5.push_back(0x03);           // ATYP DOMAINNAME
+    vSocks5.push_back(0x05); // VER protocol version
+    vSocks5.push_back(0x01); // CMD CONNECT
+    vSocks5.push_back(0x00); // RSV Reserved
+    vSocks5.push_back(0x03); // ATYP DOMAINNAME
     vSocks5.push_back(strDest.size()); // Length<=255 is checked at beginning of function
     vSocks5.insert(vSocks5.end(), strDest.begin(), strDest.end());
     vSocks5.push_back((port >> 8) & 0xFF);
@@ -519,7 +520,7 @@ bool static ConnectSocketDirectly(const CService& addrConnect, SOCKET& hSocketRe
     return true;
 }
 
-bool SetProxy(enum Network net, const proxyType& addrProxy)
+bool SetProxy(enum Network net, const proxyType &addrProxy)
 {
     assert(net >= 0 && net < NET_MAX);
     if (!addrProxy.IsValid())
@@ -539,7 +540,7 @@ bool GetProxy(enum Network net, proxyType& proxyInfoOut)
     return true;
 }
 
-bool SetNameProxy(const proxyType& addrProxy)
+bool SetNameProxy(const proxyType &addrProxy)
 {
     if (!addrProxy.IsValid())
         return false;
@@ -548,7 +549,7 @@ bool SetNameProxy(const proxyType& addrProxy)
     return true;
 }
 
-bool GetNameProxy(proxyType& nameProxyOut)
+bool GetNameProxy(proxyType &nameProxyOut)
 {
     LOCK(cs_proxyInfos);
     if (!nameProxy.IsValid())
@@ -573,7 +574,7 @@ bool IsProxy(const CNetAddr& addr)
     return false;
 }
 
-static bool ConnectThroughProxy(const proxyType& proxy, const std::string strDest, int port, SOCKET& hSocketRet, int nTimeout, bool* outProxyConnectionFailed)
+static bool ConnectThroughProxy(const proxyType &proxy, const std::string strDest, int port, SOCKET& hSocketRet, int nTimeout, bool *outProxyConnectionFailed)
 {
     SOCKET hSocket = INVALID_SOCKET;
     // first connect to proxy server
@@ -598,7 +599,7 @@ static bool ConnectThroughProxy(const proxyType& proxy, const std::string strDes
     return true;
 }
 
-bool ConnectSocket(const CService& addrDest, SOCKET& hSocketRet, int nTimeout, bool* outProxyConnectionFailed)
+bool ConnectSocket(const CService &addrDest, SOCKET& hSocketRet, int nTimeout, bool *outProxyConnectionFailed)
 {
     proxyType proxy;
     if (outProxyConnectionFailed)
@@ -1304,7 +1305,8 @@ CSubNet::CSubNet(const std::string& strSubnet, bool fAllowLookup)
         network.ip[x] &= netmask[x];
 }
 
-CSubNet::CSubNet(const CNetAddr& addr) : valid(addr.IsValid())
+CSubNet::CSubNet(const CNetAddr &addr):
+    valid(addr.IsValid())
 {
     memset(netmask, 255, sizeof(netmask));
     network = addr;
@@ -1322,37 +1324,17 @@ bool CSubNet::Match(const CNetAddr& addr) const
 
 static inline int NetmaskBits(uint8_t x)
 {
-    switch (x) {
-    case 0x00:
-        return 0;
-        break;
-    case 0x80:
-        return 1;
-        break;
-    case 0xc0:
-        return 2;
-        break;
-    case 0xe0:
-        return 3;
-        break;
-    case 0xf0:
-        return 4;
-        break;
-    case 0xf8:
-        return 5;
-        break;
-    case 0xfc:
-        return 6;
-        break;
-    case 0xfe:
-        return 7;
-        break;
-    case 0xff:
-        return 8;
-        break;
-    default:
-        return -1;
-        break;
+    switch(x) {
+    case 0x00: return 0; break;
+    case 0x80: return 1; break;
+    case 0xc0: return 2; break;
+    case 0xe0: return 3; break;
+    case 0xf0: return 4; break;
+    case 0xf8: return 5; break;
+    case 0xfc: return 6; break;
+    case 0xfe: return 7; break;
+    case 0xff: return 8; break;
+    default: return -1; break;
     }
 }
 
@@ -1385,10 +1367,10 @@ std::string CSubNet::ToString() const
             strNetmask = strprintf("%u.%u.%u.%u", netmask[12], netmask[13], netmask[14], netmask[15]);
         else
             strNetmask = strprintf("%x:%x:%x:%x:%x:%x:%x:%x",
-                netmask[0] << 8 | netmask[1], netmask[2] << 8 | netmask[3],
-                netmask[4] << 8 | netmask[5], netmask[6] << 8 | netmask[7],
-                netmask[8] << 8 | netmask[9], netmask[10] << 8 | netmask[11],
-                netmask[12] << 8 | netmask[13], netmask[14] << 8 | netmask[15]);
+                             netmask[0] << 8 | netmask[1], netmask[2] << 8 | netmask[3],
+                             netmask[4] << 8 | netmask[5], netmask[6] << 8 | netmask[7],
+                             netmask[8] << 8 | netmask[9], netmask[10] << 8 | netmask[11],
+                             netmask[12] << 8 | netmask[13], netmask[14] << 8 | netmask[15]);
     }
 
     return network.ToString() + "/" + strNetmask;
@@ -1420,7 +1402,7 @@ std::string NetworkErrorString(int err)
     char buf[256];
     buf[0] = 0;
     if (FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_MAX_WIDTH_MASK,
-            nullptr, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                       nullptr, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             buf, sizeof(buf), nullptr)) {
         return strprintf("%s (%d)", buf, err);
     } else {

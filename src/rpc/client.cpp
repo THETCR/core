@@ -143,12 +143,13 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"searchdzwsp", 1},
         {"searchdzwsp", 2},
         {"getaccumulatorvalues", 0},
-        {"getfeeinfo", 0}};
+        {"getfeeinfo", 0}
+    };
 
 class CRPCConvertTable
 {
 private:
-    std::set<std::pair<std::string, int>> members;
+    std::set<std::pair<std::string, int> > members;
 
 public:
     CRPCConvertTable();
@@ -178,14 +179,14 @@ static CRPCConvertTable rpcCvtTable;
 UniValue ParseNonRFCJSONValue(const std::string& strVal)
 {
     UniValue jVal;
-    if (!jVal.read(std::string("[") + strVal + std::string("]")) ||
-        !jVal.isArray() || jVal.size() != 1)
-        throw runtime_error(string("Error parsing JSON:") + strVal);
+    if (!jVal.read(std::string("[")+strVal+std::string("]")) ||
+        !jVal.isArray() || jVal.size()!=1)
+        throw runtime_error(string("Error parsing JSON:")+strVal);
     return jVal[0];
 }
 
 /** Convert strings to command-specific RPC representation */
-UniValue RPCConvertValues(const std::string& strMethod, const std::vector<std::string>& strParams)
+UniValue RPCConvertValues(const std::string &strMethod, const std::vector<std::string> &strParams)
 {
     UniValue params(UniValue::VARR);
 
