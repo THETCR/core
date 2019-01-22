@@ -5618,9 +5618,11 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
     NotifyHeaderTip();
 
     CValidationState state; // Only used to report errors, not invalidity - ignore it
-    if (!g_chainstate.ActivateBestChain(state, chainparams, pblock))
+    if (!g_chainstate.ActivateBestChain(state, chainparams, pblock)){
         return error("%s: ActivateBestChain failed (%s)", __func__, FormatStateMessage(state));
+    }
 
+    LogPrintf("ActivateBestChain = %s, success\n", pblock->GetHash().ToString().c_str());
     if (smsg::fSecMsgEnabled && gArgs.GetBoolArg("-smsgscanincoming", false)) {
         smsgModule.ScanBlock(*pblock);
     }
