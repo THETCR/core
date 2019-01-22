@@ -3852,6 +3852,7 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
     std::vector<CBlockIndex*> vpindexToConnect;
     bool fContinue = true;
     int nHeight = pindexFork ? pindexFork->nHeight : -1;
+    LogPrint(BCLog::NET, "ActivateBestChainStep: Build list of new blocks to connect\n");
     while (fContinue && nHeight != pindexMostWork->nHeight) {
         // Don't iterate the entire list of potential improvements toward the best tip, as we likely only need
         // a few blocks along the way.
@@ -3885,9 +3886,11 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
                     return false;
                 }
             } else {
+                LogPrint(BCLog::NET, "ActivateBestChainStep: PruneBlockIndexCandidates.\n");
                 PruneBlockIndexCandidates();
                 if (!pindexOldTip || chainActive.Tip()->nChainWork > pindexOldTip->nChainWork) {
                     // We're in a better position than we were. Return temporarily to release the lock.
+                    LogPrint(BCLog::NET, "ActivateBestChainStep: We're in a better position than we were. Return temporarily to release the lock.\n");
                     fContinue = false;
                     break;
                 }
@@ -3986,6 +3989,8 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
 
                 // Whether we have anything to do at all.
                 if (pindexMostWork == nullptr || pindexMostWork == chainActive.Tip()) {
+                    // Whether we have anything to do at all.
+                    LogPrint(BCLog::NET, "ActivateBestChain: We have nothing to do\n");
                     break;
                 }
 
