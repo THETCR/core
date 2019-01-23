@@ -5432,6 +5432,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     if (block.IsProofOfStake()) {
         pindex->SetProofOfStake();
         pindex->prevoutStake = pblock->vtx[1]->vin[0].prevout;
+        pindex->nStakeTime = pblock->nTime;
         if (!pindex->pprev
             || (pindex->pprev->bnStakeModifierV2.IsNull()
                 && pindex->pprev->GetBlockHash() != chainparams.GetConsensus().hashGenesisBlock)) {
