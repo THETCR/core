@@ -5390,7 +5390,10 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 
     CBlockIndex *pindexDummy = nullptr;
     CBlockIndex *&pindex = ppindex ? *ppindex : pindexDummy;
-//    if (!AcceptBlockHeader(block, state, chainparams, &pindex))
+    if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
+        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
+    }
+    //    if (!AcceptBlockHeader(block, state, chainparams, &pindex))
 //        return false;
 
     // Try to process all requested blocks that we don't have, but only
@@ -5473,9 +5476,6 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     }
     if (!AcceptBlockHeader(block, state, chainparams, &pindex)){
       return false;
-    }
-    if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
-      pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
     if (!ContextualCheckBlock(block, state, chainparams.GetConsensus(), pindex->pprev, true)) {
         if (state.IsInvalid() && !state.CorruptionPossible()) {
