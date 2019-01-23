@@ -383,7 +383,7 @@ bool CheckZerocoinMint(const uint256& txHash, const CTxOut& txout, CValidationSt
 
 bool ContextualCheckZerocoinMint(const CTransaction& tx, const PublicCoin& coin, const CBlockIndex* pindex)
 {
-    if (pindex->nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT() && Params().NetworkID() != CBaseChainParams::TESTNET) {
+    if (Params().PivProtocolsStartHeightEqualOrGreaterThen(pindex->nHeight) && Params().NetworkID() != CBaseChainParams::TESTNET) {
         //See if this coin has already been added to the blockchain
         uint256 txid;
         int nHeight;
@@ -399,7 +399,7 @@ bool ContextualCheckZerocoinMint(const CTransaction& tx, const PublicCoin& coin,
 bool ContextualCheckZerocoinSpend(const CTransaction& tx, const CoinSpend& spend, CBlockIndex* pindex, const uint256& hashBlock)
 {
     //Check to see if the zWSP is properly signed
-    if (pindex->nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+    if (Params().PivProtocolsStartHeightEqualOrGreaterThen(pindex->nHeight)) {
         if (!spend.HasValidSignature())
             return error("%s: V2 zWSP spend does not have a valid signature", __func__);
 
@@ -482,7 +482,7 @@ bool CheckZerocoinSpend(const CTransaction& tx, bool fVerifySignature, CValidati
                 return state.DoS(100, error("%s: Zerocoinspend could not find accumulator associated with checksum %s", __func__, HexStr(BEGIN(nChecksum), END(nChecksum))));
             }
 
-            Accumulator accumulator(Params().Zerocoin_Params(chainActive.Height() < Params().NEW_PROTOCOLS_STARTHEIGHT()),
+            Accumulator accumulator(Params().Zerocoin_Params(!chainActive.PivProtocolsStarted()),
                                     newSpend.getDenomination(), bnAccumulatorValue);
 
             //Check that the coin has been accumulated

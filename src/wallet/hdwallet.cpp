@@ -12455,7 +12455,7 @@ bool CHDWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listI
     }
 
     //zWSP
-    if (gArgs.GetBoolArg("-zwspstake", true) && chainActive.Height() > Params().NEW_PROTOCOLS_STARTHEIGHT() && !sporkManager.IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
+    if (gArgs.GetBoolArg("-zwspstake", true) && chainActive.PivProtocolsStarted() && !sporkManager.IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
         //Only update zWSP set once per update interval
         bool fUpdate = false;
         static int64_t nTimeLastUpdate = 0;

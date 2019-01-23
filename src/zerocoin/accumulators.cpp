@@ -201,7 +201,7 @@ bool InitializeAccumulators(const int nHeight, int& nHeightCheckpoint, Accumulat
 //        return true;
 //    }
 
-    if (nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+    if (Params().PivProtocolsStartHeightEqualOrGreaterThen(nHeight)) {
         //after v2_start, accumulators need to use v2 params
         mapAccumulators.Reset(Params().Zerocoin_Params(false));
 
@@ -541,7 +541,7 @@ map<CoinDenomination, int> GetMintMaturityHeight()
     int nMinimumMaturityHeight = nConfirmedHeight - (nConfirmedHeight % 10);
     CBlockIndex* pindex = chainActive[nConfirmedHeight];
 
-    while (pindex && pindex->nHeight > Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+    while (pindex && Params().PivProtocolsStartHeightEqualOrGreaterThen(pindex->nHeight)) {
         bool isFinished = true;
         for (auto denom : libzerocoin::zerocoinDenomList) {
             //If the denom has not already had a mint added to it, then see if it has a mint added on this block

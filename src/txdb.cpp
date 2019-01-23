@@ -491,7 +491,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 //populate accumulator checksum map in memory
                 if(pindexNew->nAccumulatorCheckpoint != 0 && pindexNew->nAccumulatorCheckpoint != nPreviousCheckpoint) {
                     //Don't load any checkpoints that exist before v2 zwsp. The accumulator is invalid for v1 and not used.
-                    if (pindexNew->nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT())
+                    if (Params().PivProtocolsStartHeightEqualOrGreaterThen(pindexNew->nHeight))
                         LoadAccumulatorValuesFromDB(pindexNew->nAccumulatorCheckpoint);
 
                     nPreviousCheckpoint = pindexNew->nAccumulatorCheckpoint;

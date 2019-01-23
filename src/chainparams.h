@@ -158,6 +158,8 @@ public:
     const std::string& SporkAddress() const { return strSporkAddress; }
     //WISPR
     int NEW_PROTOCOLS_STARTHEIGHT() const { return nNewProtocolStartHeightPiv; }
+    bool PivProtocolsStartHeightEqualOrGreaterThen(int nHeight) const { return nHeight >= nNewProtocolStartHeightPiv; }
+    bool PivProtocolsStartHeightSmallerThen(int nHeight) const { return nHeight < nNewProtocolStartHeightPiv; }
     int NEW_PROTOCOLS_STARTTIME() const { return nNewProtocolStartTime; }
     /** Zerocoin **/
     std::string Zerocoin_Modulus() const { return zerocoinModulus; }

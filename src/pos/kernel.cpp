@@ -36,7 +36,7 @@ bool fTestNet = false; //Params().NetworkID() == CBaseChainParams::TESTNET;
 int nStakeTargetSpacing = 60;
 unsigned int getIntervalVersion(bool fTestNet)
 {
-    bool newVersion = chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT();
+    bool newVersion = chainActive.PivProtocolsStarted();
     if (fTestNet) {
         if(newVersion){
             return MODIFIER_INTERVAL_TESTNETV2;
@@ -50,15 +50,14 @@ unsigned int getIntervalVersion(bool fTestNet)
     }
 }
 unsigned int GetTargetSpacing() {
-    bool newVersion = chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT();
+    bool newVersion = chainActive.PivProtocolsStarted();
     if(newVersion){
         return nStakeTargetSpacing;
-
     }
     return 64;
 }
 unsigned int GetStakeMinAge(){
-    bool newVersion = chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT();
+    bool newVersion = chainActive.PivProtocolsStarted();
     if(newVersion){
         return nStakeMinAgeV2;
 
@@ -134,7 +133,7 @@ static bool SelectBlockFromCandidates(
 
         //if the lowest block height (vSortedByTimestamp[0]) is >= switch height, use new modifier calc
         if (fFirstRun){
-            fModifierV2 = pindex->nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT();
+            fModifierV2 = Params().PivProtocolsStartHeightEqualOrGreaterThen(pindex->nHeight);
             fFirstRun = false;
         }
 
@@ -531,7 +530,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
 // Check whether the coinstake timestamp meets protocol
 bool CheckCoinStakeTimestamp(int64_t nTimeBlock, int64_t nTimeTx)
 {
-    bool newVersion = chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT();
+    bool newVersion = chainActive.PivProtocolsStarted();
     if(newVersion){
         return (nTimeBlock == nTimeTx);
     }
