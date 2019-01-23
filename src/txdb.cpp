@@ -486,7 +486,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 }
                 // ppcoin: build setStakeSeen
                 if (pindexNew->IsProofOfStake()) {
-                    setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
+                  setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
                 }
                 //populate accumulator checksum map in memory
                 if(pindexNew->nAccumulatorCheckpoint != 0 && pindexNew->nAccumulatorCheckpoint != nPreviousCheckpoint) {
