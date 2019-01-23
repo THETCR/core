@@ -159,12 +159,6 @@ public:
     //WISPR
     int NEW_PROTOCOLS_STARTHEIGHT() const { return nNewProtocolStartHeightPiv; }
     int NEW_PROTOCOLS_STARTTIME() const { return nNewProtocolStartTime; }
-    bool PartProtocolsStarted() {
-      return chainActive.Height() >= nNewProtocolStartHeightPart;
-    }
-    bool PivProtocolsStarted() {
-      return chainActive.Height() >= nNewProtocolStartHeightPiv;
-    }
     /** Zerocoin **/
     std::string Zerocoin_Modulus() const { return zerocoinModulus; }
     libzerocoin::ZerocoinParams* Zerocoin_Params(bool useModulusV1) const;

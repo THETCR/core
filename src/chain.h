@@ -13,6 +13,7 @@
 #include <uint256.h>
 
 #include <vector>
+#include <chainparams.h>
 
 enum eBlockFlags
 {
@@ -685,12 +686,12 @@ public:
     CBlockIndex* FindEarliestAtLeast(int64_t nTime) const;
 
     //!WISPR
-//    bool PartProtocolsStarted() {
-//        return Height() >= Params().GetConsensus().nNewProtocolStartHeightPart;
-//    }
-//    bool PivProtocolsStarted() {
-//      return Height() >= Params().GetConsensus().nNewProtocolStartHeightPiv;
-//    }
+    bool PartProtocolsStarted() {
+        return Height() >= Params().GetConsensus().nNewProtocolStartHeightPart;
+    }
+    bool PivProtocolsStarted() {
+      return Height() >= Params().GetConsensus().nNewProtocolStartHeightPiv;
+    }
 };
 
 #endif // BITCOIN_CHAIN_H
