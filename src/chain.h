@@ -685,12 +685,12 @@ public:
     CBlockIndex* FindEarliestAtLeast(int64_t nTime) const;
 
     //!WISPR
-    bool PartProtocolsStarted() {
-        return Height() >= Consensus::Params().nNewProtocolStartHeightPart;
-    }
-    bool PivProtocolsStarted() {
-      return Height() >= Consensus::Params().nNewProtocolStartHeightPiv;
-    }
+//    bool PartProtocolsStarted() {
+//        return Height() >= Params().GetConsensus().nNewProtocolStartHeightPart;
+//    }
+//    bool PivProtocolsStarted() {
+//      return Height() >= Params().GetConsensus().nNewProtocolStartHeightPiv;
+//    }
 };
 
 #endif // BITCOIN_CHAIN_H

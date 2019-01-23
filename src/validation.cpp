@@ -2861,7 +2861,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     int64_t nAnonIn = 0;
     int64_t nStakeReward = 0;
 
-    blockundo.vtxundo.reserve(block.vtx.size() - (fWisprMode && chainActive.PartProtocolsStarted() ? 0 : 1));
+    blockundo.vtxundo.reserve(block.vtx.size() - (fWisprMode && Params().PartProtocolsStarted() ? 0 : 1));
 
     std::vector<PrecomputedTransactionData> txdata;
     txdata.reserve(block.vtx.size()); // Required so that pointers to individual PrecomputedTransactionData don't get invalidated
@@ -2877,7 +2877,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
             if (!tx.IsCoinBase() && !tx.IsZerocoinSpend()) {
                 CAmount txfee = 0;
-                if (chainActive.PartProtocolsStarted() &&
+                if (Params().PartProtocolsStarted() &&
                     !Consensus::CheckTxInputs(tx, state, view, pindex->nHeight, txfee)) {
                     control.Wait();
                     return error("%s: Consensus::CheckTxInputs: %s, %s", __func__, tx.GetHash().ToString(),
@@ -2902,7 +2902,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 // BIP68 lock checks (as opposed to nLockTime checks) must
                 // be in ConnectBlock because they require the UTXO set
 //                printf("%s\n", "BIP68 lock checks");
-                if (chainActive.PartProtocolsStarted()) {
+                if (Params().PartProtocolsStarted()) {
                     prevheights.resize(tx.vin.size());
                     for (size_t j = 0; j < tx.vin.size(); j++) {
                         if (tx.vin[j].IsAnonInput())
@@ -4394,7 +4394,7 @@ static bool FindUndoPos(CValidationState &state, int nFile, CDiskBlockPos &pos, 
 static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW = true)
 {
 //    printf("%s\n", __func__);
-    if (chainActive.PartProtocolsStarted() && fWisprMode
+    if (Params().PartProtocolsStarted() && fWisprMode
         && !block.IsWisprVersion())
         return state.DoS(100, false, REJECT_INVALID, "block-version", false, "bad block version");
 
@@ -4434,7 +4434,7 @@ bool CheckBlockSignature(const CBlock &block)
     if (fzWSPStake) {
         libzerocoin::CoinSpend spend = TxInToZerocoinSpend(block.vtx[1]->vin[0]);
         pubKey = spend.getPubKey();
-    } else if(!chainActive.PartProtocolsStarted()) {
+    } else if(!Params().PartProtocolsStarted()) {
         txnouttype whichType;
         std::vector<valtype> vSolutions;
         const CTxOut& txout = block.vtx[1]->vout[1];
@@ -4629,7 +4629,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     {
         nSigOps += GetLegacySigOpCount(*tx);
     }
-    if (chainActive.PartProtocolsStarted() && nSigOps * WITNESS_SCALE_FACTOR > MAX_BLOCK_SIGOPS_COST) {
+    if (Params().PartProtocolsStarted() && nSigOps * WITNESS_SCALE_FACTOR > MAX_BLOCK_SIGOPS_COST) {
         return state.DoS(100, false, REJECT_INVALID, "bad-blk-sigops", false, "out-of-bounds SigOpCount");
     }
     if (fCheckPOW && fCheckMerkleRoot)
@@ -4918,7 +4918,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
         }
     }
 
-    if (chainActive.PartProtocolsStarted() && fWisprMode) {
+    if (Params().PartProtocolsStarted() && fWisprMode) {
 //        printf("%s\n", "fWisprMode");
         // Enforce rule that the coinbase/coinstake ends with serialized block height
         // genesis block scriptSig size will be different
@@ -4933,11 +4933,11 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
 
             // coinstake output 0 must be data output of blockheight
             int i;
-            if (chainActive.PartProtocolsStarted() && !block.vtx[1]->GetCoinStakeHeight(i)) {
+            if (Params().PartProtocolsStarted() && !block.vtx[1]->GetCoinStakeHeight(i)) {
                 return state.DoS(100, false, REJECT_INVALID, "bad-cs-malformed", false, "coinstake txn is malformed");
             }
 
-            if (chainActive.PartProtocolsStarted() && i != nHeight) {
+            if (Params().PartProtocolsStarted() && i != nHeight) {
                 return state.DoS(100, false, REJECT_INVALID, "bad-cs-height", false, "block height mismatch in coinstake");
             }
 
@@ -4998,10 +4998,10 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
             }
         };
 
-        if (chainActive.PartProtocolsStarted() && nHeight > 0 && !block.vtx[0]->IsCoinStake()) // only genesis block can start with coinbase
+        if (Params().PartProtocolsStarted() && nHeight > 0 && !block.vtx[0]->IsCoinStake()) // only genesis block can start with coinbase
             return state.DoS(100, false, REJECT_INVALID, "bad-cs-missing", false, "first tx is not coinstake");
 
-        if (chainActive.PartProtocolsStarted() && nHeight > 0 // skip genesis
+        if (Params().PartProtocolsStarted() && nHeight > 0 // skip genesis
             && Params().GetLastImportHeight() >= (uint32_t)nHeight)
         {
             // 2nd txn must be coinbase
