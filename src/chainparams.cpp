@@ -523,9 +523,12 @@ public:
         //!WISPR
         /** Height or Time Based Activations **/
         nLastPOWBlock = 450;
-        nNewProtocolStartHeight = 400000;
+        nNewProtocolStartHeightPiv = 400000;
+        consensus.nNewProtocolStartHeightPiv = 400000;
+        consensus.nNewProtocolStartHeightPart = 600000;
+        nNewProtocolStartHeightPart = 600000;
         nNewProtocolStartTime = 1539963322; //Friday, October 19, 2018 3:35:22 PM
-        nZerocoinStartHeight = nNewProtocolStartHeight;
+        nZerocoinStartHeight = nNewProtocolStartHeightPiv;
         nZerocoinStartTime = nNewProtocolStartTime;
         /** Zerocoin */
         zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"

@@ -105,6 +105,8 @@ struct Params {
     /** Block height at which DIP0001 becomes active */
     int DIP0001Height;
     int lastPowBlock;
+    int nNewProtocolStartHeightPiv;
+    int nNewProtocolStartHeightPart;
 };
 } // namespace Consensus
 

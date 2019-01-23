@@ -157,7 +157,7 @@ public:
     int FulfilledRequestExpireTime() const { return nFulfilledRequestExpireTime; }
     const std::string& SporkAddress() const { return strSporkAddress; }
     //WISPR
-    int NEW_PROTOCOLS_STARTHEIGHT() const { return nNewProtocolStartHeight; }
+    int NEW_PROTOCOLS_STARTHEIGHT() const { return nNewProtocolStartHeightPiv; }
     int NEW_PROTOCOLS_STARTTIME() const { return nNewProtocolStartTime; }
     /** Zerocoin **/
     std::string Zerocoin_Modulus() const { return zerocoinModulus; }
@@ -256,7 +256,8 @@ protected:
     int nZerocoinHeaderVersion;
     int64_t nBudget_Fee_Confirmations;
     int nZerocoinStartHeight;
-    int nNewProtocolStartHeight;
+    int nNewProtocolStartHeightPiv;
+    int nNewProtocolStartHeightPart;
     int nZerocoinStartTime;
     int nNewProtocolStartTime;
     int nZerocoinRequiredStakeDepth;

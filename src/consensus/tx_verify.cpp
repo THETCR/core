@@ -136,7 +136,7 @@ unsigned int GetLegacySigOpCount(const CTransaction& tx)
             nSigOps += txout.scriptPubKey.GetSigOpCount(false);
         }
     }
-    if(chainActive.NewProtocolsStarted()){
+    if(chainActive.PartProtocolsStarted()){
         for (const auto &txout : tx.vpout)
         {
             const CScript *pScriptPubKey = txout->GetPScriptPubKey();
@@ -487,7 +487,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
 //    printf("%s: nPlainValueOut =%lli\n", __func__, nPlainValueOut);
 
     nTxFee = 0;
-    if (fWisprMode && chainActive.NewProtocolsStarted())
+    if (fWisprMode && chainActive.PartProtocolsStarted())
     {
         if (!tx.IsCoinStake())
         {

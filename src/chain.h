@@ -685,8 +685,11 @@ public:
     CBlockIndex* FindEarliestAtLeast(int64_t nTime) const;
 
     //!WISPR
-    bool NewProtocolsStarted () {
-        return Height() >= 600000;
+    bool PartProtocolsStarted() {
+        return Height() >= Consensus::Params().nNewProtocolStartHeightPart;
+    }
+    bool PivProtocolsStarted() {
+      return Height() >= Consensus::Params().nNewProtocolStartHeightPiv;
     }
 };
 
