@@ -5390,11 +5390,9 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 
     CBlockIndex *pindexDummy = nullptr;
     CBlockIndex *&pindex = ppindex ? *ppindex : pindexDummy;
-    if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
-        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
+    if (!AcceptBlockHeader(block, state, chainparams, &pindex)){
+        return false;
     }
-    //    if (!AcceptBlockHeader(block, state, chainparams, &pindex))
-//        return false;
 
     // Try to process all requested blocks that we don't have, but only
     // process an unrequested block if it's new and has enough work to
@@ -5468,15 +5466,18 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         pindex->nFlags &= ~BLOCK_DELAYED;
         setDirtyBlockIndex.insert(pindex);
     }
+
     if(block.IsProofOfWork()){
         uint256 hashProofOfStake = block.GetPoWHash();
 //        uint256 hash = block.GetHash();
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
             mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
     }
-    if (!AcceptBlockHeader(block, state, chainparams, &pindex)){
-      return false;
+
+    if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
+        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
+
     if (!ContextualCheckBlock(block, state, chainparams.GetConsensus(), pindex->pprev, true)) {
         if (state.IsInvalid() && !state.CorruptionPossible()) {
             pindex->nStatus |= BLOCK_FAILED_VALID;
