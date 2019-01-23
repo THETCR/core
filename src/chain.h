@@ -314,6 +314,8 @@ public:
         nNonce                  = block.nNonce;
         if(block.nVersion > 7) {
             nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
+        }
+        if(block.nVersion == WISPR_BLOCK_VERSION){
             hashWitnessMerkleRoot = block.hashWitnessMerkleRoot;
         }
 

@@ -2677,7 +2677,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         setDirtyBlockIndex.insert(pindex);
 
         uint256 hashProof = 0;
-        uint256 targetProofOfStake;
+//        uint256 targetProofOfStake;
         unique_ptr<CStakeInput> stake;
         if (!CheckProofOfStake(block, hashProof, stake)) {
             return error("%s: Check proof of stake failed.", __func__);
@@ -4969,7 +4969,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
             }
 
             uint256 hashProof = 0;
-            uint256 targetProofOfStake;
+//            uint256 targetProofOfStake;
             unique_ptr<CStakeInput> stake;
             // Blocks are connected at end of import / reindex
             // CheckProofOfStake is run again during connectblock
@@ -5492,7 +5492,8 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
                 LogPrintf("%s : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", __func__, pindex->nHeight, std::to_string(nStakeModifier));
 
-            uint256 hashProof, targetProofOfStake;
+            uint256 hashProof = 0;
+//            uint256 targetProofOfStake;
             unique_ptr<CStakeInput> stake;
             printf("AcceptBlock() : CheckProofOfStake() \n");
             if (!CheckProofOfStake(block, hashProof, stake)) {
