@@ -16,8 +16,6 @@
 #include <vector>
 #include "libzerocoin/Params.h"
 
-class CBlockIndex;
-
 static const uint32_t CHAIN_NO_GENESIS = 444444;
 static const uint32_t CHAIN_NO_STEALTH_SPEND = 444445; // used hardened
 
