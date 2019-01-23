@@ -551,7 +551,7 @@ public:
         READWRITE(nMint);
         READWRITE(nMoneySupply);
         READWRITE(nFlags);
-        READWRITE(bnStakeModifierV2);
+        READWRITE(nStakeModifier);
         if (IsProofOfStake()) {
             READWRITE(prevoutStake);
             READWRITE(nStakeTime);
@@ -589,11 +589,11 @@ public:
         block.nVersion              = nVersion;
         block.hashPrevBlock         = hashPrev;
         block.hashMerkleRoot        = hashMerkleRoot;
-        block.hashWitnessMerkleRoot = hashWitnessMerkleRoot;
         block.nTime                 = nTime;
         block.nBits                 = nBits;
         block.nNonce                = nNonce;
         block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
+        block.hashWitnessMerkleRoot = hashWitnessMerkleRoot;
         return block.GetHash();
     }
 
