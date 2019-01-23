@@ -83,7 +83,8 @@ double GetPoSKernelPS()
 
 bool CheckStake(CBlock *pblock)
 {
-    uint256 proofHash, hashTarget;
+    uint256 proofHash = 0;
+    uint256 hashTarget;
     uint256 hashBlock = pblock->GetHash();
 
     if (!pblock->IsProofOfStake()) {

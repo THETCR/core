@@ -2676,7 +2676,8 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         //        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, pindex->prevoutStake.hash);
         setDirtyBlockIndex.insert(pindex);
 
-        uint256 hashProof, targetProofOfStake;
+        uint256 hashProof = 0;
+        uint256 targetProofOfStake;
         unique_ptr<CStakeInput> stake;
         if (!CheckProofOfStake(block, hashProof, stake)) {
             return error("%s: Check proof of stake failed.", __func__);
@@ -4967,7 +4968,8 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
                 return state.DoS(50, false, REJECT_INVALID, "bad-block-time", true, strprintf("%s: block's timestamp is too early", __func__));
             }
 
-            uint256 hashProof, targetProofOfStake;
+            uint256 hashProof = 0;
+            uint256 targetProofOfStake;
             unique_ptr<CStakeInput> stake;
             // Blocks are connected at end of import / reindex
             // CheckProofOfStake is run again during connectblock
