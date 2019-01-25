@@ -295,8 +295,8 @@ void BitcoinGUI::createActions()
         masternodeAction->setToolTip(masternodeAction->statusTip());
         masternodeAction->setCheckable(true);
         tabGroup->addAction(masternodeAction);
-        connect(masternodeAction, &QAction::triggered, [this]{showNormalIfMinimized();});
-        connect(masternodeAction, &QAction::triggered, this, &BitcoinGUI::gotoMasternodePage());
+        connect(masternodeAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
+        connect(masternodeAction, &QAction::triggered, this, &BitcoinGUI::gotoMasternodePage);
     }
     // These showNormalIfMinimized are needed because Send Coins and Receive Coins
     // can be triggered from the tray menu, and need to show the GUI to be useful.
