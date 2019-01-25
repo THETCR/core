@@ -4205,11 +4205,11 @@ CBlockIndex* CChainState::AddToBlockIndex(const CBlockHeader& block)
       }
 
       // ppcoin: record proof-of-stake hash value
-      if (!mapProofOfStake.count(hash)){
-        LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
-      }
-
-      pindexNew->hashProofOfStake = mapProofOfStake[hash];
+//      if (!mapProofOfStake.count(hash)){
+//        LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
+//      }
+//
+//      pindexNew->hashProofOfStake = mapProofOfStake[hash];
       uint64_t nStakeModifier = 0;
       bool fGeneratedStakeModifier = false;
       if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier)){
@@ -5473,7 +5473,12 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
             mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
     }
+  // ppcoin: record proof-of-stake hash value
+  if (!mapProofOfStake.count(hash)){
+    LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
+  }
 
+  pindex->hashProofOfStake = mapProofOfStake[hash];
     if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
         pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
