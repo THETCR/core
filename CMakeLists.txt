@@ -1,8 +1,9 @@
 # Copyright (c) 2017 The Bitcoin developers
 
-cmake_minimum_required(VERSION 3.13.1)
+cmake_minimum_required(VERSION 3.13.3)
 project(WISPR)
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 #set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add path for custom modules

@@ -1,9 +1,10 @@
 # Copyright (c) 2017 The Bitcoin developers
 
-cmake_minimum_required(VERSION 3.13.1)
+cmake_minimum_required(VERSION 3.13.3)
 project(WISPR)
 
 set(CMAKE_CXX_STANDARD 11)
+find_package(Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test CONFIG REQUIRED )
 
 # Default visibility is hidden on all targets.
 set(CMAKE_C_VISIBILITY_PRESET hidden)
