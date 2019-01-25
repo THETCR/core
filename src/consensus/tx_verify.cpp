@@ -349,7 +349,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
             return state.DoS(100, false, REJECT_INVALID, "too-many-data-outputs");
     } else
     {
-        if (fWisprMode && chainActive.Height() >= 500000)
+        if (fWisprMode && chainActive.PartProtocolsStarted())
             return state.DoS(100, false, REJECT_INVALID, "bad-txn-version");
 
         if (tx.vout.empty())
