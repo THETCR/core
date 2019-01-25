@@ -39,6 +39,7 @@ class WalletFrame;
 class WalletModel;
 class HelpMessageDialog;
 class ModalOverlay;
+class MasternodeList;
 
 namespace interfaces {
 class Handler;
@@ -139,6 +140,7 @@ private:
     QAction* m_wallet_selector_action = nullptr;
     QAction *coldstakingAction = nullptr;
     QAction *mnemonicAction = nullptr;
+    QAction *masternodeAction = nullptr;
 
     QLabel *m_wallet_selector_label = nullptr;
     QComboBox* m_wallet_selector = nullptr;
@@ -250,6 +252,8 @@ public Q_SLOTS:
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
+    /** Switch to masternode page */
+    void gotoMasternodePage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
