@@ -216,7 +216,8 @@ public:
     //! Change to 64-bit type when necessary; won't happen before 2030
     unsigned int nChainTx;
     //! Verification status of this block. See enum BlockStatus
-    unsigned int nStatus;
+    uint32_t nStatus;
+//    unsigned int nStatus;
 
 
     // proof-of-stake specific fields
@@ -233,9 +234,6 @@ public:
     int64_t nMint;
     CAmount nMoneySupply;
     int64_t nAnonOutputs; // last index
-
-    //! Verification status of this block. See enum BlockStatus
-//    uint32_t nStatus;
 
 
     //! block header
@@ -266,7 +264,7 @@ public:
         nFile = 0;
         nDataPos = 0;
         nUndoPos = 0;
-        nChainWork = arith_uint256();
+        nChainWork = 0;
         nTx = 0;
         nChainTx = 0;
         nStatus = 0;
@@ -274,7 +272,7 @@ public:
         nTimeMax = 0;
 
         nFlags = 0;
-        bnStakeModifierV2 = uint256();
+        bnStakeModifierV2 = 0;
         prevoutStake.SetNull();
         nStakeModifierChecksum = 0;
         nStakeTime = 0;
