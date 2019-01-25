@@ -4960,11 +4960,11 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
             uint256 hash = block.GetHash();
             if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
                 mapProofOfStake.insert(make_pair(hash, hashProof));
-        } else
-        {
+        } else {
             bool fCheckPOW = true; // TODO: pass properly
-            if (fCheckPOW && !CheckProofOfWork(block.GetPoWHash(), block.nBits, consensusParams, nHeight, Params().GetLastImportHeight()))
+            if (fCheckPOW && !CheckProofOfWork(block.GetPoWHash(), block.nBits, consensusParams, nHeight, Params().GetLastImportHeight())){
                 return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
+            }
 
             if (nHeight >= consensusParams.BIP34Height) {
                 // Enforce rule that the coinbase/ ends with serialized block height
@@ -4977,6 +4977,12 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
                                      "block height mismatch in coinbase");
                 }
             }
+            uint256 hashProofOfStake = block.GetPoWHash();
+             uint256 hash = block.GetHash();
+             // add to mapProofOfStake
+             if(!mapProofOfStake.count(hash)){
+                 mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
+             }
         };
 
         if (chainActive.PartProtocolsStarted() && nHeight > 0 && !block.vtx[0]->IsCoinStake()) // only genesis block can start with coinbase
