@@ -7,8 +7,7 @@
 
 #include <amount.h>
 #include <qt/masternodelist.h>
-#include <qt/privacydialog.h>
-#include <qt/blockexplorer.h>
+#include <qt/askpassphrasedialog.h>
 
 #include <QStackedWidget>
 
@@ -22,6 +21,8 @@ class SendCoinsRecipient;
 class TransactionView;
 class WalletModel;
 class AddressBookPage;
+class PrivacyDialog;
+class BlockExplorer;
 
 QT_BEGIN_NAMESPACE
 class QModelIndex;
