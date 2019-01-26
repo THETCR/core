@@ -7,6 +7,7 @@
 #include <primitives/transaction.h>
 
 #include <QStringList>
+#include <QSettings>
 
 BitcoinUnits::BitcoinUnits(QObject *parent):
         QAbstractListModel(parent),
