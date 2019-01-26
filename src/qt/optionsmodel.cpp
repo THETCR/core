@@ -19,6 +19,12 @@
 #include <txdb.h> // for -dbcache defaults
 #include <qt/intro.h>
 
+#ifdef ENABLE_WALLET
+#include <masternode/masternodeconfig.h>
+#include <wallet/wallet.h>
+#include <wallet/walletdb.h>
+#endif
+
 #include <QNetworkProxy>
 #include <QSettings>
 #include <QStringList>
@@ -168,6 +174,49 @@ void OptionsModel::Init(bool resetSettings)
     if (!gArgs.SoftSetArg("-reservebalance", FormatMoney(settings.value("reservebalance").toLongLong())))
         addOverriddenOption("-reservebalance");
     nReserveBalance = settings.value("reservebalance").toLongLong();
+
+    if (!settings.contains("fHideOrphans"))
+        settings.setValue("fHideOrphans", false);
+    fHideOrphans = settings.value("fHideOrphans").toBool();
+
+    if (!settings.contains("fCoinControlFeatures"))
+        settings.setValue("fCoinControlFeatures", false);
+    fCoinControlFeatures = settings.value("fCoinControlFeatures", false).toBool();
+
+    if (!settings.contains("fZeromintEnable"))
+        settings.setValue("fZeromintEnable", true);
+    fEnableZeromint = settings.value("fZeromintEnable").toBool();
+
+    if (!settings.contains("nZeromintPercentage"))
+        settings.setValue("nZeromintPercentage", 10);
+    nZeromintPercentage = settings.value("nZeromintPercentage").toLongLong();
+
+    if (!settings.contains("nPreferredDenom"))
+        settings.setValue("nPreferredDenom", 0);
+    nPreferredDenom = settings.value("nPreferredDenom", "0").toLongLong();
+
+    if (!settings.contains("nAnonymizeWisprAmount"))
+        settings.setValue("nAnonymizeWisprAmount", 1000);
+
+    nAnonymizeWisprAmount = settings.value("nAnonymizeWisprAmount").toLongLong();
+
+    if (!settings.contains("fShowMasternodesTab"))
+        settings.setValue("fShowMasternodesTab", masternodeConfig.getCount());
+
+    if (!settings.contains("digits"))
+        settings.setValue("digits", "2");
+    if (!settings.contains("theme"))
+        settings.setValue("theme", "");
+
+    if (settings.contains("fZeromintEnable"))
+        settings.setValue("-enablezeromint", settings.value("fZeromintEnable").toBool());
+    if (settings.contains("nZeromintPercentage"))
+        settings.setValue("-zeromintpercentage", settings.value("nZeromintPercentage").toString().toStdString());
+    if (settings.contains("nPreferredDenom"))
+        settings.setValue("-preferredDenom", settings.value("nPreferredDenom").toString().toStdString());
+    if (settings.contains("nAnonymizeWisprAmount"))
+        settings.setValue("-anonymizewispramount", settings.value("nAnonymizeWisprAmount").toString().toStdString());
+
 }
 
 /** Helper function to copy contents from one QSettings to another.

@@ -57,7 +57,17 @@ public:
         ShowIncomingStakeNotifications, // bool
         Listen,                 // bool
         ReserveBalance,         // int
+        ZeromintEnable,      // bool
+        ZeromintPercentage,  // int
+        ZeromintPrefDenom,   // int
+        HideOrphans,    // bool
+        AnonymizeWisprAmount, //int
+        ShowMasternodesTab,  // bool
+        StakeSplitThreshold, // int
+        Digits,              // QString
+        Theme,               // QString
         OptionIDRowCount,
+
     };
 
     void Init(bool resetSettings = false);
@@ -102,6 +112,7 @@ private:
     QString strOverriddenByCommandLine;
 
     CAmount nReserveBalance;
+    bool fHideOrphans;
 
     // Add option to list of GUI options overridden through command line/config file
     void addOverriddenOption(const std::string &option);
@@ -113,6 +124,12 @@ Q_SIGNALS:
     void coinControlFeaturesChanged(bool);
     void hideTrayIconChanged(bool);
     void setReserveBalance(CAmount);
+    void zeromintEnableChanged(bool);
+    void zeromintPercentageChanged(int);
+    void preferredDenomChanged(int);
+    void anonymizeWisprAmountChanged(int);
+    void hideZeroBalancesChanged(bool);
+    void hideOrphansChanged(bool);
 
 public Q_SLOTS:
     void updateReservedBalance(CAmount reservedBalance);
