@@ -749,7 +749,7 @@ public:
     //WISPR
     bool SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount);
     // Zerocoin additions
-    CAmount GetZerocoinBalance(bool fMatureOnly) const;
+//    CAmount GetZerocoinBalance(bool fMatureOnly) const;
     std::map<libzerocoin::CoinDenomination, CAmount> GetMyZerocoinDistribution();
     bool CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransaction& txNew, vector<CDeterministicMint>& vDMints, CReserveKey* reservekey, int64_t& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl = nullptr, const bool isZCSpendChange = false);
     bool CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLevel, CWalletTx& wtxNew, CReserveKey& reserveKey, CZerocoinSpendReceipt& receipt, vector<CZerocoinMint>& vSelectedMints, vector<CDeterministicMint>& vNewMints, bool fMintChange,  bool fMinimizeChange, CBitcoinAddress* address = nullptr);

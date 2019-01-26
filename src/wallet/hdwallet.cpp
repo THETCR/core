@@ -13496,27 +13496,27 @@ std::map<libzerocoin::CoinDenomination, CAmount> CHDWallet::GetMyZerocoinDistrib
     }
     return spread;
 }
-std::map<libzerocoin::CoinDenomination, int> mapMintMaturity;
-int nLastMaturityCheck = 0;
-CAmount CHDWallet::GetZerocoinBalance(bool fMatureOnly) const
-{
-    if (fMatureOnly) {
-        if (chainActive.Height() > nLastMaturityCheck)
-            mapMintMaturity = GetMintMaturityHeight();
-        nLastMaturityCheck = chainActive.Height();
-
-        CAmount nBalance = 0;
-        vector<CMintMeta> vMints = zwspTracker->GetMints(true);
-        for (auto meta : vMints) {
-            if (meta.nHeight >= mapMintMaturity.at(meta.denom) || meta.nHeight >= chainActive.Height() || meta.nHeight == 0)
-                continue;
-            nBalance += libzerocoin::ZerocoinDenominationToAmount(meta.denom);
-        }
-        return nBalance;
-    }
-
-    return zwspTracker->GetBalance(false, false);
-}
+//std::map<libzerocoin::CoinDenomination, int> mapMintMaturity;
+//int nLastMaturityCheck = 0;
+//CAmount CHDWallet::GetZerocoinBalance(bool fMatureOnly) const
+//{
+//    if (fMatureOnly) {
+//        if (chainActive.Height() > nLastMaturityCheck)
+//            mapMintMaturity = GetMintMaturityHeight();
+//        nLastMaturityCheck = chainActive.Height();
+//
+//        CAmount nBalance = 0;
+//        vector<CMintMeta> vMints = zwspTracker->GetMints(true);
+//        for (auto meta : vMints) {
+//            if (meta.nHeight >= mapMintMaturity.at(meta.denom) || meta.nHeight >= chainActive.Height() || meta.nHeight == 0)
+//                continue;
+//            nBalance += libzerocoin::ZerocoinDenominationToAmount(meta.denom);
+//        }
+//        return nBalance;
+//    }
+//
+//    return zwspTracker->GetBalance(false, false);
+//}
 bool CHDWallet::GetZerocoinKey(const CBigNum& bnSerial, CKey& key)
 {
 //    CHDWalletDB walletdb(strWalletFile);
