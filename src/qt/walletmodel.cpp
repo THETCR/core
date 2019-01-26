@@ -554,7 +554,7 @@ WalletModel::UnlockContext WalletModel::requestUnlock(AskPassphraseDialog::Conte
 
     if (was_locked) {
         // Request UI to unlock wallet
-        Q_EMIT requireUnlock(context);
+        Q_EMIT requireUnlock(fWalletUnlockAnonymizeOnly);
     }
     // If wallet is still locked, unlock was failed or cancelled, mark context as invalid
     bool valid = getEncryptionStatus() != Locked;

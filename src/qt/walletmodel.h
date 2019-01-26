@@ -308,7 +308,7 @@ Q_SIGNALS:
     // Signal emitted when wallet needs to be unlocked
     // It is valid behaviour for listeners to keep the wallet locked after this signal;
     // this means that the unlocking failed or was cancelled.
-    void requireUnlock(AskPassphraseDialog::Context context);
+//    void requireUnlock(AskPassphraseDialog::Context context);
     // Fired when a message should be reported to the user
     void message(const QString &title, const QString &message, unsigned int style) const;
 
