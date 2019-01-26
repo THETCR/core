@@ -17,6 +17,8 @@
 #include <qt/paymentrequestplus.h>
 #endif
 #include <qt/walletmodeltransaction.h>
+#include <qt/askpassphrasedialog.h>
+
 #include <amount.h>
 
 #include <interfaces/wallet.h>
@@ -216,11 +218,13 @@ public:
         bool valid;
         mutable bool relock; // mutable, as it can be set to false by copying
         bool was_unlocked_for_staking;
+        bool fWalletUnlockAnonymizeOnly;
 
         void CopyFrom(const UnlockContext& rhs);
     };
 
     UnlockContext requestUnlock(bool fForMixingOnly=false);
+    UnlockContext requestUnlock(AskPassphraseDialog::Context context, bool relock = false);
 
 
     void loadReceiveRequests(std::vector<std::string>& vReceiveRequests);
