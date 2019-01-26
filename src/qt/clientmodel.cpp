@@ -22,7 +22,8 @@
 #include <ui_interface.h>
 #include <util/system.h>
 #include <warnings.h>
-
+#include <masternode/masternode-sync.h>
+#include <masternode/masternodeman.h>
 #include <stdint.h>
 
 #include <QDebug>
@@ -41,12 +42,18 @@ ClientModel::ClientModel(interfaces::Node& node, OptionsModel *_optionsModel, QO
 {
     cachedBestHeaderHeight = -1;
     cachedBestHeaderTime = -1;
+    cachedNumBlocks = -1;
+    cachedReindexing = false;
+    cachedImporting = false;
+    cachedMasternodeCountString = "";
     peerTableModel = new PeerTableModel(m_node, this);
     banTableModel = new BanTableModel(m_node, this);
     pollTimer = new QTimer(this);
     connect(pollTimer, &QTimer::timeout, this, &ClientModel::updateTimer);
     pollTimer->start(MODEL_UPDATE_DELAY);
-
+    pollMnTimer = new QTimer(this);
+    connect(pollMnTimer, &QTimer::timeout, this, &ClientModel::updateMnTimer);
+    pollMnTimer->start(MODEL_UPDATE_DELAY * 4);
     subscribeToCoreSignals();
 }
 
@@ -102,6 +109,24 @@ void ClientModel::updateTimer()
     // no locking required at this point
     // the following calls will acquire the required lock
     Q_EMIT mempoolSizeChanged(m_node.getMempoolSize(), m_node.getMempoolDynamicUsage());
+       // Some quantities (such as number of blocks) change so fast that we don't want to be notified for each change.
+    // Periodically check and update with a timer.
+    int newNumBlocks = getNumBlocks();
+
+    static int prevAttempt = -1;
+    static int prevAssets = -1;
+
+        if (cachedNumBlocks != newNumBlocks ||
+        cachedReindexing != fReindex || cachedImporting != fImporting ||
+        masternodeSync.GetAttempt() != prevAttempt || masternodeSync.GetAssetID() != prevAssets) {
+        cachedNumBlocks = newNumBlocks;
+        cachedReindexing = fReindex;
+        cachedImporting = fImporting;
+        prevAttempt = masternodeSync.GetAttempt();
+        prevAssets = masternodeSync.GetAssetID();
+
+        emit numBlocksChanged(newNumBlocks);
+    }
     Q_EMIT bytesChanged(m_node.getTotalBytesRecv(), m_node.getTotalBytesSent());
 }
 
@@ -291,4 +316,34 @@ bool ClientModel::getProxyInfo(std::string& ip_port) const
       return true;
     }
     return false;
+}
+QString ClientModel::getMasternodeCountString() const
+{
+    int ipv4 = 0, ipv6 = 0, onion = 0;
+    mnodeman.CountNetworks(ActiveProtocol(), ipv4, ipv6, onion);
+    int nUnknown = mnodeman.size() - ipv4 - ipv6 - onion;
+    if(nUnknown < 0) nUnknown = 0;
+    return tr("Total: %1 (IPv4: %2 / IPv6: %3 / Tor: %4 / Unknown: %5)").arg(QString::number((int)mnodeman.size())).arg(QString::number((int)ipv4)).arg(QString::number((int)ipv6)).arg(QString::number((int)onion)).arg(QString::number((int)nUnknown));
+}
+
+void ClientModel::updateMnTimer()
+{
+    // Get required lock upfront. This avoids the GUI from getting stuck on
+    // periodical polls if the core is holding the locks for a longer time -
+    // for example, during a wallet rescan.
+    TRY_LOCK(cs_main, lockMain);
+    if (!lockMain)
+        return;
+    QString newMasternodeCountString = getMasternodeCountString();
+
+    if (cachedMasternodeCountString != newMasternodeCountString) {
+        cachedMasternodeCountString = newMasternodeCountString;
+
+        Q_EMIT strMasternodesChanged(cachedMasternodeCountString);
+    }
+}
+int ClientModel::getNumBlocks() const
+{
+    LOCK(cs_main);
+    return chainActive.Height();
 }

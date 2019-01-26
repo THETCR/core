@@ -335,6 +335,8 @@ bool LoadBlockIndex(const CChainParams& chainparams) EXCLUSIVE_LOCKS_REQUIRED(cs
 bool LoadChainTip(const CChainParams& chainparams) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 /** Unload database information */
 void UnloadBlockIndex();
+/** See whether the protocol update is enforced for connected nodes */
+int ActiveProtocol();
 /** Start script checking threads */
 void StartScriptCheck();
 /** Interrupt script checking threads */

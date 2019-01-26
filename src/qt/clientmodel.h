@@ -72,6 +72,8 @@ public:
     QString blocksDir() const;
 
     bool getProxyInfo(std::string& ip_port) const;
+    QString getMasternodeCountString() const;
+    int getNumBlocks() const;
 
     // caches for the best header
     mutable std::atomic<int> cachedBestHeaderHeight;
@@ -90,7 +92,14 @@ private:
     PeerTableModel *peerTableModel;
     BanTableModel *banTableModel;
 
+    int cachedNumBlocks;
+    bool cachedReindexing;
+    bool cachedImporting;
+
+    QString cachedMasternodeCountString;
+
     QTimer *pollTimer;
+    QTimer *pollMnTimer;
 
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();
@@ -113,9 +122,13 @@ Q_SIGNALS:
 
     // Waiting for hardware device
     void waitingForDevice(bool fCompleted);
+    void strMasternodesChanged(const QString& strMasternodes);
+
 
 public Q_SLOTS:
     void updateTimer();
+    void updateMnTimer();
+
     void updateNumConnections(int numConnections);
     void updateNetworkActive(bool networkActive);
     void updateAlert();

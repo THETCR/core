@@ -1764,3 +1764,29 @@ void CMasternodeMan::NotifyMasternodeUpdates(CConnman& connman)
     fMasternodesAdded = false;
     fMasternodesRemoved = false;
 }
+void CMasternodeMan::CountNetworks(int protocolVersion, int& ipv4, int& ipv6, int& onion)
+{
+    protocolVersion = protocolVersion == -1 ? mnpayments.GetMinMasternodePaymentsProto() : protocolVersion;
+
+    for (auto& mnpair : mapMasternodes) {
+        mnpair.second.Check();
+        std::string strHost;
+        int port;
+        SplitHostPort(mnpair.second.addr.ToString(), port, strHost);
+        CNetAddr node = CNetAddr(mnpair.second.addr);
+        int nNetwork = node.GetNetwork();
+        switch (nNetwork) {
+            case 1 :
+                ipv4++;
+                break;
+            case 2 :
+                ipv6++;
+                break;
+            case 3 :
+                onion++;
+                break;
+            default:
+                break;
+        }
+    }
+}
