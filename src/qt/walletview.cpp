@@ -20,7 +20,6 @@
 #include <qt/transactionview.h>
 #include <qt/transactionrecord.h>
 #include <qt/walletmodel.h>
-#include <qt/privacydialog.h>
 
 #include <interfaces/node.h>
 #include <ui_interface.h>

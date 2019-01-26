@@ -7,6 +7,8 @@
 
 #include <amount.h>
 #include <qt/masternodelist.h>
+#include <qt/privacydialog.h>
+#include <qt/blockexplorer.h>
 
 #include <QStackedWidget>
 
