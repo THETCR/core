@@ -17,7 +17,6 @@
 #include "zwspcontroldialog.h"
 #include "spork/spork.h"
 #include "askpassphrasedialog.h"
-#include <qt/platformstyle.h>
 
 #include <QClipboard>
 #include <QSettings>
