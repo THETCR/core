@@ -208,7 +208,7 @@ void PrivacyDialog::on_pushButtonMintzWSP_clicked()
 
     CWalletTx wtx;
     vector<CDeterministicMint> vMints;
-    string strError = walletModel->wallet().getWisprWallet()->MintZerocoin(nAmount, wtx, vMints, CoinControlDialog::coinControl);
+    string strError = walletModel->wallet().getWisprWallet()->MintZerocoin(nAmount, wtx, vMints, CoinControlDialog::coinControl());
 
     // Return if something went wrong during minting
     if (strError != ""){
@@ -569,7 +569,7 @@ void PrivacyDialog::coinControlButtonClicked()
     if (!walletModel || !walletModel->getOptionsModel())
         return;
 
-    CoinControlDialog dlg;
+    CoinControlDialog dlg(platformStyle, this);
     dlg.setModel(walletModel);
     dlg.exec();
     coinControlUpdateLabels();
@@ -584,7 +584,7 @@ void PrivacyDialog::coinControlUpdateLabels()
      // set pay amounts
     CoinControlDialog::payAmounts.clear();
 
-    if (CoinControlDialog::coinControl->HasSelected()) {
+    if (CoinControlDialog::coinControl()->HasSelected()) {
         // Actual coin control calculation
         CoinControlDialog::updateLabels(walletModel, this);
     } else {
