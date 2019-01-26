@@ -5,7 +5,7 @@
 
 #include <boost/assign/list_of.hpp>
 
-#include "db.h"
+#include <wallet/db.h>
 #include "kernel.h"
 #include "spork.h"
 #include "script/interpreter.h"

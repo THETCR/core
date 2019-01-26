@@ -22,7 +22,7 @@
 #include "utilmoneystr.h"
 #include "zwspchain.h"
 #ifdef ENABLE_WALLET
-#include "wallet.h"
+#include <wallet/wallet.h>
 #endif
 
 #include <stdint.h>

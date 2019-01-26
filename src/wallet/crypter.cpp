@@ -3,7 +3,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "crypter.h"
+#include <wallet/crypter.h>
 
 #include "script/script.h"
 #include "script/standard.h"
@@ -14,7 +14,7 @@
 
 #include <openssl/aes.h>
 #include <openssl/evp.h>
-#include "wallet.h"
+#include <wallet/wallet.h>
 
 bool CCrypter::SetKeyFromPassphrase(const SecureString& strKeyData, const std::vector<unsigned char>& chSalt, const unsigned int nRounds, const unsigned int nDerivationMethod)
 {

@@ -7,7 +7,7 @@
 #include "primitives/deterministicmint.h"
 #include "main.h"
 #include "stakeinput.h"
-#include "wallet.h"
+#include <wallet/wallet.h>
 
 CZWspStake::CZWspStake(const libzerocoin::CoinSpend& spend)
 {

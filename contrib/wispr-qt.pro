@@ -70,16 +70,16 @@ HEADERS += src/activemasternode.h \
            src/checkpoints.h \
            src/checkqueue.h \
            src/clientversion.h \
-           src/coincontrol.h \
+           src/wallet/coincontrol.h \
            src/coins.h \
            src/compat.h \
            src/compressor.h \
            src/core_io.h \
-           src/crypter.h \
+           src/wallet/crypter.h \
            src/obfuscation-relay.h \
            src/obfuscation.h \
            src/wispr-config.h \
-           src/db.h \
+           src/wallet/db.h \
            src/eccryptoverify.h \
            src/ecwrapper.h \
            src/hash.h \
@@ -127,9 +127,9 @@ HEADERS += src/activemasternode.h \
            src/utilstrencodings.h \
            src/utiltime.h \
            src/version.h \
-           src/wallet.h \
-           src/wallet_ismine.h \
-           src/walletdb.h \
+           src/wallet/wallet.h \
+           src/wallet/wallet_ismine.h \
+           src/wallet/walletdb.h \
            src/compat/sanity.h \
            src/config/wispr-config.h \
            src/crypto/common.h \
@@ -359,13 +359,13 @@ SOURCES += src/activemasternode.cpp \
            src/compressor.cpp \
            src/core_read.cpp \
            src/core_write.cpp \
-           src/crypter.cpp \
+           src/wallet/crypter.cpp \
            src/obfuscation-relay.cpp \
            src/obfuscation.cpp \
            src/wispr-cli.cpp \
            src/wispr-tx.cpp \
            src/wispr.cpp \
-           src/db.cpp \
+           src/wallet/db.cpp \
            src/eccryptoverify.cpp \
            src/ecwrapper.cpp \
            src/editaddressdialog.cpp \
@@ -395,7 +395,7 @@ SOURCES += src/activemasternode.cpp \
            src/rest.cpp \
            src/rpcblockchain.cpp \
            src/rpcclient.cpp \
-           src/rpcdump.cpp \
+           src/wallet/rpcdump.cpp \
            src/rpcmasternode-budget.cpp \
            src/rpcmasternode.cpp \
            src/rpcmining.cpp \
@@ -404,7 +404,7 @@ SOURCES += src/activemasternode.cpp \
            src/rpcprotocol.cpp \
            src/rpcrawtransaction.cpp \
            src/rpcserver.cpp \
-           src/rpcwallet.cpp \
+           src/wallet/rpcwallet.cpp \
            src/spork.cpp \
            src/sync.cpp \
            src/timedata.cpp \
@@ -415,9 +415,9 @@ SOURCES += src/activemasternode.cpp \
            src/utilmoneystr.cpp \
            src/utilstrencodings.cpp \
            src/utiltime.cpp \
-           src/wallet.cpp \
-           src/wallet_ismine.cpp \
-           src/walletdb.cpp \
+           src/wallet/wallet.cpp \
+           src/wallet/wallet_ismine.cpp \
+           src/wallet/walletdb.cpp \
            src/compat/glibc_compat.cpp \
            src/compat/glibc_sanity.cpp \
            src/compat/glibcxx_compat.cpp \

@@ -10,7 +10,7 @@
 
 #include "amount.h"
 #include "base58.h"
-#include "crypter.h"
+#include <wallet/crypter.h>
 #include "kernel.h"
 #include "key.h"
 #include "keystore.h"
@@ -21,8 +21,8 @@
 #include "ui_interface.h"
 #include "util.h"
 #include "validationinterface.h"
-#include "wallet_ismine.h"
-#include "walletdb.h"
+#include <wallet/wallet_ismine.h>
+#include <wallet/walletdb.h>
 #include "zwspwallet.h"
 #include "zwsptracker.h"
 
