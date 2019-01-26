@@ -211,11 +211,11 @@ void OptionsModel::Init(bool resetSettings)
     if (settings.contains("fZeromintEnable"))
         settings.setValue("-enablezeromint", settings.value("fZeromintEnable").toBool());
     if (settings.contains("nZeromintPercentage"))
-        settings.setValue("-zeromintpercentage", settings.value("nZeromintPercentage").toString().toStdString());
+        settings.setValue("-zeromintpercentage", settings.value("nZeromintPercentage").toString());
     if (settings.contains("nPreferredDenom"))
-        settings.setValue("-preferredDenom", settings.value("nPreferredDenom").toString().toStdString());
+        settings.setValue("-preferredDenom", settings.value("nPreferredDenom").toString());
     if (settings.contains("nAnonymizeWisprAmount"))
-        settings.setValue("-anonymizewispramount", settings.value("nAnonymizeWisprAmount").toString().toStdString());
+        settings.setValue("-anonymizewispramount", settings.value("nAnonymizeWisprAmount").toString());
 
 }
 
