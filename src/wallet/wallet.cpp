@@ -5556,7 +5556,7 @@ CAmount CWallet::GetUnlockedCoins(interfaces::Chain::Lock& locked_chain) const
             const CWalletTx* pcoin = &(*it).second;
 
             if (pcoin->IsTrusted(locked_chain) && pcoin->GetDepthInMainChain(locked_chain) > 0)
-                nTotal += pcoin->GetUnlockedCredit();
+                nTotal += pcoin->GetUnlockedCredit(locked_chain);
         }
     }
 

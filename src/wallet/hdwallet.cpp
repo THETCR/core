@@ -2670,7 +2670,7 @@ bool CHDWallet::GetBalances(CHDWalletBalances &bal)
             }
         }
     }
-            bal.nZwsp = GetZerocoinBalance();
+            bal.nZwsp = GetZerocoinBalance(true);
             bal.nZwspUnconf = GetUnconfirmedZerocoinBalance();
             bal.nZwspImmature= GetImmatureZerocoinBalance();
     //if (!MoneyRange(nBalance))
