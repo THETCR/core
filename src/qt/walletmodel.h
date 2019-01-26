@@ -247,7 +247,14 @@ public:
     //!WISPR
     void listZerocoinMints(std::set<CMintMeta>& setMints, bool fUnusedOnly = false, bool fMaturedOnly = false, bool fUpdateStatus = false);
     CAmount getLockedBalance() const;
-
+    bool isZeromintEnabled()
+    {
+        return fEnableZeromint;
+    }
+    int getZeromintPercentage()
+    {
+        return nZeromintPercentage;
+    }
 private:
     std::unique_ptr<interfaces::Wallet> m_wallet;
     std::unique_ptr<interfaces::Handler> m_handler_unload;

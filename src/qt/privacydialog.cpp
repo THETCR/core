@@ -792,7 +792,7 @@ void PrivacyDialog::updateDisplayUnit()
 {
     if (walletModel && walletModel->getOptionsModel()) {
         nDisplayUnit = walletModel->getOptionsModel()->getDisplayUnit();
-        if (m_balances != -1)
+        if (m_balances.balance != -1)
             setBalance(m_balances);
     }
 }
