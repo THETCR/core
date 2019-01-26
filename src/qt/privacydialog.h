@@ -7,6 +7,7 @@
 
 #include "guiutil.h"
 #include <interfaces/wallet.h>
+#include <qt/platformstyle.h>
 
 #include <QDialog>
 #include <QHeaderView>
