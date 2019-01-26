@@ -86,7 +86,7 @@ public Q_SLOTS:
     /** Switch to masternode page */
     void gotoMasternodePage();
     /** Switch to explorer page */
-    void gotoBlockExplorerPage();
+//    void gotoBlockExplorerPage();
     /** Switch to privacy page */
     void gotoPrivacyPage();
     /** Switch to receive coins page */
