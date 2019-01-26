@@ -17,6 +17,7 @@
 #include "zwspcontroldialog.h"
 #include "spork/spork.h"
 #include "askpassphrasedialog.h"
+#include "wallet/hdwallet.h"
 
 #include <QClipboard>
 #include <QSettings>
@@ -740,7 +741,7 @@ void PrivacyDialog::setBalance(const interfaces::WalletBalances& balances)
     ui->labelzAvailableAmount->setText(QString::number(zerocoinBalance/COIN) + QString(" zWSP "));
     ui->labelzAvailableAmount_2->setText(QString::number(matureZerocoinBalance/COIN) + QString(" zWSP "));
     ui->labelzAvailableAmount_4->setText(QString::number(zerocoinBalance/COIN) + QString(" zWSP "));
-    ui->labelzWSPAmountValue->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, balance - immatureBalance - nLockedBalance, false, BitcoinUnits::separatorAlways));
+    ui->labelzWSPAmountValue->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, m_balances.balance - m_balances.immature_balance - nLockedBalance, false, BitcoinUnits::separatorAlways));
 
     // Display AutoMint status
     updateAutomintStatus();
