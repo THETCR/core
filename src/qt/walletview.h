@@ -112,6 +112,8 @@ public Q_SLOTS:
     /** Ask for passphrase to unlock wallet temporarily */
     void unlockWalletSlot() { unlockWallet(false); };
     void unlockWallet(bool iconClicked=false);
+    void unlockWallet(AskPassphraseDialog::Context context);
+
     /** lock wallet */
     void lockWallet();
 

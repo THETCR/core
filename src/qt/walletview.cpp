@@ -167,6 +167,7 @@ void WalletView::setWalletModel(WalletModel *_walletModel)
 
         // Show progress dialog
         connect(_walletModel, &WalletModel::showProgress, this, &WalletView::showProgress);
+
     }
 }
 
@@ -320,6 +321,18 @@ void WalletView::unlockWallet(bool iconClicked)
         AskPassphraseDialog dlg(
             iconClicked ? AskPassphraseDialog::UnlockManual : AskPassphraseDialog::Unlock, this);
         dlg.setModel(walletModel);
+        dlg.exec();
+    }
+}
+
+void WalletView::unlockWallet(AskPassphraseDialog::Context context)
+{
+    if (!walletModel)
+        return;
+    // Unlock wallet when requested by wallet model
+
+    if (walletModel->getEncryptionStatus() == WalletModel::Locked || walletModel->getEncryptionStatus() == WalletModel::UnlockedForAnonymizationOnly) {
+        AskPassphraseDialog dlg(AskPassphraseDialog::Mode::UnlockAnonymize, this, walletModel, context);
         dlg.exec();
     }
 }

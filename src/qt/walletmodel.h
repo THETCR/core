@@ -218,7 +218,6 @@ public:
         bool valid;
         mutable bool relock; // mutable, as it can be set to false by copying
         bool was_unlocked_for_staking;
-        bool fWalletUnlockAnonymizeOnly;
 
         void CopyFrom(const UnlockContext& rhs);
     };
@@ -251,6 +250,7 @@ public:
     //!WISPR
     void listZerocoinMints(std::set<CMintMeta>& setMints, bool fUnusedOnly = false, bool fMaturedOnly = false, bool fUpdateStatus = false);
     CAmount getLockedBalance() const;
+    bool isAnonymizeOnlyUnlocked();
     bool isZeromintEnabled()
     {
         return fEnableZeromint;
@@ -273,7 +273,7 @@ private:
 
     bool fHaveWatchOnly;
     bool fForceCheckBalanceChanged;
-
+    bool fWalletUnlockAnonymizeOnly;
     // Wallet has an options model for wallet-specific options
     // (transaction fee, for example)
     OptionsModel *optionsModel;
@@ -305,7 +305,10 @@ Q_SIGNALS:
     // It is valid behaviour for listeners to keep the wallet locked after this signal;
     // this means that the unlocking failed or was cancelled.
     void requireUnlock(bool fForMixingOnly=false);
-
+    // Signal emitted when wallet needs to be unlocked
+    // It is valid behaviour for listeners to keep the wallet locked after this signal;
+    // this means that the unlocking failed or was cancelled.
+    void requireUnlock(AskPassphraseDialog::Context context);
     // Fired when a message should be reported to the user
     void message(const QString &title, const QString &message, unsigned int style) const;
 
