@@ -125,7 +125,7 @@ void ClientModel::updateTimer()
         prevAttempt = masternodeSync.GetAttempt();
         prevAssets = masternodeSync.GetAssetID();
 
-        Q_EMIT numBlocksChanged(newNumBlocks);
+//        Q_EMIT numBlocksChanged(newNumBlocks);
     }
     Q_EMIT bytesChanged(m_node.getTotalBytesRecv(), m_node.getTotalBytesSent());
 }
