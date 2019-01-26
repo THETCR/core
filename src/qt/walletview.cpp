@@ -20,6 +20,7 @@
 #include <qt/transactionview.h>
 #include <qt/transactionrecord.h>
 #include <qt/walletmodel.h>
+#include <qt/privacydialog.h>
 
 #include <interfaces/node.h>
 #include <ui_interface.h>
@@ -59,12 +60,14 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
 
     receiveCoinsPage = new ReceiveCoinsDialog(platformStyle);
     sendCoinsPage = new SendCoinsDialog(platformStyle);
+    privacyPage = new PrivacyDialog(platformStyle);
 
     usedSendingAddressesPage = new AddressBookPage(platformStyle, AddressBookPage::ForEditing, AddressBookPage::SendingTab, this);
     usedReceivingAddressesPage = new AddressBookPage(platformStyle, AddressBookPage::ForEditing, AddressBookPage::ReceivingTab, this);
 
     addWidget(overviewPage);
     addWidget(transactionsPage);
+    addWidget(privacyPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
     QSettings settings;
@@ -136,6 +139,7 @@ void WalletView::setWalletModel(WalletModel *_walletModel)
     transactionView->setModel(_walletModel);
     overviewPage->setWalletModel(_walletModel);
     receiveCoinsPage->setModel(_walletModel);
+    privacyPage->setModel(_walletModel);
     sendCoinsPage->setModel(_walletModel);
     usedReceivingAddressesPage->setModel(_walletModel ? _walletModel->getAddressTableModel() : nullptr);
     usedSendingAddressesPage->setModel(_walletModel ? _walletModel->getAddressTableModel() : nullptr);
@@ -206,6 +210,14 @@ void WalletView::gotoMasternodePage()
         setCurrentWidget(masternodeListPage);
     }
 }
+
+void WalletView::gotoPrivacyPage()
+{
+    setCurrentWidget(privacyPage);
+    // Refresh UI-elements in case coins were locked/unlocked in CoinControl
+    walletModel->updateTransaction();
+}
+
 void WalletView::gotoReceiveCoinsPage()
 {
     setCurrentWidget(receiveCoinsPage);
@@ -251,6 +263,7 @@ bool WalletView::handlePaymentRequest(const SendCoinsRecipient& recipient)
 void WalletView::showOutOfSyncWarning(bool fShow)
 {
     overviewPage->showOutOfSyncWarning(fShow);
+    privacyPage->showOutOfSyncWarning(fShow);
 }
 
 void WalletView::updateEncryptionStatus()

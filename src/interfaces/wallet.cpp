@@ -499,6 +499,9 @@ public:
             result.unconfirmed_balance = bal.nPartUnconf + bal.nBlindUnconf + bal.nAnonUnconf;
             result.immature_balance = bal.nPartImmature;
             result.have_watch_only = bal.nPartWatchOnly || bal.nPartWatchOnlyUnconf || bal.nPartWatchOnlyStaked;
+            result.zerocoinBalance = bal.nZwsp;
+            result.unconfirmedZerocoinBalance = bal.nZwspUnconf;
+            result.immatureZerocoinBalance = bal.nZwspImmature;
             if (result.have_watch_only) {
                 result.watch_only_balance = bal.nPartWatchOnly;
                 result.unconfirmed_watch_only_balance = bal.nPartWatchOnlyUnconf;
@@ -513,6 +516,9 @@ public:
         result.unconfirmed_balance = m_wallet.GetUnconfirmedBalance();
         result.immature_balance = m_wallet.GetImmatureBalance();
         result.have_watch_only = m_wallet.HaveWatchOnly();
+        result.zerocoinBalance = m_wallet.GetZerocoinBalance(true);
+        result.unconfirmedZerocoinBalance = m_wallet.GetUnconfirmedZerocoinBalance();
+        result.immatureZerocoinBalance = m_wallet.GetImmatureZerocoinBalance();
         if (result.have_watch_only) {
             result.watch_only_balance = m_wallet.GetBalance(ISMINE_WATCH_ONLY);
             result.unconfirmed_watch_only_balance = m_wallet.GetUnconfirmedWatchOnlyBalance();
@@ -769,6 +775,20 @@ public:
     }
 
     CHDWallet *m_wallet_part = nullptr;
+
+    //!WISPR
+        CAmount GetLockedCoins() override
+    {
+        auto locked_chain = m_wallet.chain().lock();
+        LOCK(m_wallet.cs_wallet);
+        return m_wallet.GetLockedCoins(*locked_chain);
+    }
+        CAmount GetUnlockedCoins() override
+    {
+        auto locked_chain = m_wallet.chain().lock();
+        LOCK(m_wallet.cs_wallet);
+        return m_wallet.GetUnlockedCoins(*locked_chain);
+    }
 };
 
 class WalletClientImpl : public ChainClient

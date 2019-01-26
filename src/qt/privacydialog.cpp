@@ -17,6 +17,7 @@
 #include "zwspcontroldialog.h"
 #include "spork/spork.h"
 #include "askpassphrasedialog.h"
+#include <qt/platformstyle.h>
 
 #include <QClipboard>
 #include <QSettings>
@@ -25,11 +26,11 @@
 #include <primitives/deterministicmint.h>
 #include <zerocoin/accumulators.h>
 
-PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowCloseButtonHint),
+PrivacyDialog::PrivacyDialog(const PlatformStyle *_platformStyle, QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowCloseButtonHint),
                                                           ui(new Ui::PrivacyDialog),
                                                           walletModel(nullptr),
-                                                          currentBalance(-1),
-                                                          fDenomsMinimized(true)
+                                                          fDenomsMinimized(true),
+                                                          platformStyle(_platformStyle)
 {
     nDisplayUnit = 0; // just make sure it's not unitialized
     ui->setupUi(this);
@@ -50,13 +51,13 @@ PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystem
     ui->TEMintStatus->setPlainText(tr("Mint Status: Okay"));
 
     // Coin Control signals
-    connect(ui->pushButtonCoinControl, SIGNAL(clicked()), this, SLOT(coinControlButtonClicked()));
+    connect(ui->pushButtonCoinControl, &QPushButton::clicked, this, &PrivacyDialog::coinControlButtonClicked);
 
     // Coin Control: clipboard actions
     QAction* clipboardQuantityAction = new QAction(tr("Copy quantity"), this);
     QAction* clipboardAmountAction = new QAction(tr("Copy amount"), this);
-    connect(clipboardQuantityAction, SIGNAL(triggered()), this, SLOT(coinControlClipboardQuantity()));
-    connect(clipboardAmountAction, SIGNAL(triggered()), this, SLOT(coinControlClipboardAmount()));
+    connect(clipboardQuantityAction, &QAction::triggered, this, &PrivacyDialog::coinControlClipboardQuantity);
+    connect(clipboardAmountAction, &QAction::triggered, this, &PrivacyDialog::coinControlClipboardAmount);
     ui->labelCoinControlQuantity->addAction(clipboardQuantityAction);
     ui->labelCoinControlAmount->addAction(clipboardAmountAction);
 
@@ -132,14 +133,16 @@ void PrivacyDialog::setModel(WalletModel* walletModel)
 
     if (walletModel && walletModel->getOptionsModel()) {
         // Keep up to date with wallet
-        setBalance(walletModel->getBalance(), walletModel->getUnconfirmedBalance(), walletModel->getImmatureBalance(),
-                   walletModel->getZerocoinBalance(), walletModel->getUnconfirmedZerocoinBalance(), walletModel->getImmatureZerocoinBalance(),
-                   walletModel->getWatchBalance(), walletModel->getWatchUnconfirmedBalance(), walletModel->getWatchImmatureBalance());
-
-        connect(walletModel, SIGNAL(balanceChanged(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)), this,
-                               SLOT(setBalance(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)));
-        connect(walletModel->getOptionsModel(), SIGNAL(zeromintEnableChanged(bool)), this, SLOT(updateAutomintStatus()));
-        connect(walletModel->getOptionsModel(), SIGNAL(zeromintPercentageChanged(int)), this, SLOT(updateAutomintStatus()));
+        interfaces::Wallet& wallet = walletModel->wallet();
+        interfaces::WalletBalances balances = wallet.getBalances();
+        setBalance(balances);
+        connect(walletModel, &WalletModel::balanceChanged, this, &PrivacyDialog::setBalance);
+        connect(walletModel->getOptionsModel(), &OptionsModel::zeromintEnableChanged, this, &PrivacyDialog::updateAutomintStatus);
+        connect(walletModel->getOptionsModel(), &OptionsModel::zeromintPercentageChanged, this, &PrivacyDialog::updateAutomintStatus);
+//        connect(walletModel, SIGNAL(balanceChanged(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)), this,
+//                               SLOT(setBalance(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)));
+//        connect(walletModel->getOptionsModel(), SIGNAL(zeromintEnableChanged(bool)), this, SLOT(updateAutomintStatus()));
+//        connect(walletModel->getOptionsModel(), SIGNAL(zeromintPercentageChanged(int)), this, SLOT(updateAutomintStatus()));
         ui->securityLevel->setValue(nSecurityLevel);
     }
 }
@@ -168,7 +171,7 @@ void PrivacyDialog::on_pushButtonMintzWSP_clicked()
     if (!walletModel || !walletModel->getOptionsModel())
         return;
 
-    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
+    if(GetAdjustedTime() > sporkManager.GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
         QMessageBox::information(this, tr("Mint Zerocoin"),
                                  tr("zWSP is currently undergoing maintenance."), QMessageBox::Ok,
                                  QMessageBox::Ok);
@@ -205,7 +208,7 @@ void PrivacyDialog::on_pushButtonMintzWSP_clicked()
 
     CWalletTx wtx;
     vector<CDeterministicMint> vMints;
-    string strError = pwalletMain->MintZerocoin(nAmount, wtx, vMints, CoinControlDialog::coinControl);
+    string strError = walletModel->wallet().getWisprWallet()->MintZerocoin(nAmount, wtx, vMints, CoinControlDialog::coinControl);
 
     // Return if something went wrong during minting
     if (strError != ""){
@@ -236,9 +239,9 @@ void PrivacyDialog::on_pushButtonMintzWSP_clicked()
     ui->TEMintStatus->verticalScrollBar()->setValue(ui->TEMintStatus->verticalScrollBar()->maximum()); // Automatically scroll to end of text
 
     // Available balance isn't always updated, so force it.
-    setBalance(walletModel->getBalance(), walletModel->getUnconfirmedBalance(), walletModel->getImmatureBalance(),
-               walletModel->getZerocoinBalance(), walletModel->getUnconfirmedZerocoinBalance(), walletModel->getImmatureZerocoinBalance(),
-               walletModel->getWatchBalance(), walletModel->getWatchUnconfirmedBalance(), walletModel->getWatchImmatureBalance());
+    interfaces::Wallet& wallet = walletModel->wallet();
+    interfaces::WalletBalances balances = wallet.getBalances();
+    setBalance(balances);
     coinControlUpdateLabels();
 
     return;
@@ -250,7 +253,7 @@ void PrivacyDialog::on_pushButtonMintReset_clicked()
     ui->TEMintStatus->repaint ();
 
     int64_t nTime = GetTimeMillis();
-    string strResetMintResult = pwalletMain->ResetMintZerocoin();
+    string strResetMintResult = walletModel->wallet().getWisprWallet()->ResetMintZerocoin();
     double fDuration = (double)(GetTimeMillis() - nTime)/1000.0;
     ui->TEMintStatus->setPlainText(QString::fromStdString(strResetMintResult) + tr("Duration: ") + QString::number(fDuration) + tr(" sec.\n"));
     ui->TEMintStatus->repaint ();
@@ -265,7 +268,7 @@ void PrivacyDialog::on_pushButtonSpentReset_clicked()
     ui->TEMintStatus->setPlainText(tr("Starting ResetSpentZerocoin: "));
     ui->TEMintStatus->repaint ();
     int64_t nTime = GetTimeMillis();
-    string strResetSpentResult = pwalletMain->ResetSpentZerocoin();
+    string strResetSpentResult = walletModel->wallet().getWisprWallet()->ResetSpentZerocoin();
     double fDuration = (double)(GetTimeMillis() - nTime)/1000.0;
     ui->TEMintStatus->setPlainText(QString::fromStdString(strResetSpentResult) + tr("Duration: ") + QString::number(fDuration) + tr(" sec.\n"));
     ui->TEMintStatus->repaint ();
@@ -277,10 +280,10 @@ void PrivacyDialog::on_pushButtonSpentReset_clicked()
 void PrivacyDialog::on_pushButtonSpendzWSP_clicked()
 {
 
-    if (!walletModel || !walletModel->getOptionsModel() || !pwalletMain)
+    if (!walletModel || !walletModel->getOptionsModel() || !walletModel->wallet().getWisprWallet())
         return;
 
-    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
+    if(GetAdjustedTime() > sporkManager.GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
         QMessageBox::information(this, tr("Mint Zerocoin"),
                                  tr("zWSP is currently undergoing maintenance."), QMessageBox::Ok, QMessageBox::Ok);
         return;
@@ -326,7 +329,7 @@ static inline int64_t roundint64(double d)
 void PrivacyDialog::sendzWSP()
 {
     QSettings settings;
-
+    CHDWallet *pwalletMain = walletModel->wallet().getWisprWallet();
     // Handle 'Pay To' address options
     CBitcoinAddress address(ui->payTo->text().toStdString());
     if(ui->payTo->text().isEmpty()){
@@ -490,9 +493,9 @@ void PrivacyDialog::sendzWSP()
         // If zWSP was spent successfully update the addressbook with the label
         std::string labelText = ui->addAsLabel->text().toStdString();
         if (!labelText.empty())
-            walletModel->updateAddressBookLabels(address.Get(), labelText, "send");
+            walletModel->updateAddressBook(QString::fromStdString(address.ToString()), QString::fromStdString(labelText), true, "send", CT_UPDATED);
         else
-            walletModel->updateAddressBookLabels(address.Get(), "(no label)", "send");
+            walletModel->updateAddressBook(QString::fromStdString(address.ToString()), "(no label)", true, "send", CT_UPDATED);
     }
 
     // Clear zwsp selector in case it was used
@@ -514,7 +517,7 @@ void PrivacyDialog::sendzWSP()
     }
 
     CAmount nValueOut = 0;
-    for (const CTxOut& txout: wtxNew.vout) {
+    for (const CTxOut& txout: wtxNew.tx->vout) {
         strStats += tr("value out: ") + FormatMoney(txout.nValue).c_str() + " Wsp, ";
         nValueOut += txout.nValue;
 
@@ -628,19 +631,22 @@ bool PrivacyDialog::updateLabel(const QString& address)
     return false;
 }
 
-void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance,
-                               const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance,
-                               const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance)
+void PrivacyDialog::setBalance(const interfaces::WalletBalances& balances)
 {
-    currentBalance = balance;
-    currentUnconfirmedBalance = unconfirmedBalance;
-    currentImmatureBalance = immatureBalance;
-    currentZerocoinBalance = zerocoinBalance;
-    currentUnconfirmedZerocoinBalance = unconfirmedZerocoinBalance;
-    currentImmatureZerocoinBalance = immatureZerocoinBalance;
-    currentWatchOnlyBalance = watchOnlyBalance;
-    currentWatchUnconfBalance = watchUnconfBalance;
-    currentWatchImmatureBalance = watchImmatureBalance;
+    m_balances = balances;
+    CAmount zerocoinBalance = balances.zerocoinBalance;
+    CAmount unconfirmedZerocoinBalance = balances.unconfirmedZerocoinBalance;
+    CAmount immatureZerocoinBalance = balances.immatureZerocoinBalance;
+    CAmount currentBalance =balances.balance;
+    CAmount currentUnconfirmedBalance = balances.unconfirmed_balance;
+    CAmount currentImmatureBalance = balances.immature_balance;
+    CAmount currentZerocoinBalance = balances.zerocoinBalance;
+    CAmount currentUnconfirmedZerocoinBalance = balances.unconfirmedZerocoinBalance;
+    CAmount currentImmatureZerocoinBalance = balances.immatureZerocoinBalance;
+    CAmount currentWatchOnlyBalance = balances.watch_only_balance;
+    CAmount currentWatchUnconfBalance = balances.unconfirmed_watch_only_balance;
+    CAmount currentWatchImmatureBalance = balances.immature_watch_only_balance;
+    CHDWallet *pwalletMain = walletModel->wallet().getWisprWallet();
 
     std::map<libzerocoin::CoinDenomination, CAmount> mapDenomBalances;
     std::map<libzerocoin::CoinDenomination, int> mapUnconfirmed;
@@ -787,10 +793,8 @@ void PrivacyDialog::updateDisplayUnit()
 {
     if (walletModel && walletModel->getOptionsModel()) {
         nDisplayUnit = walletModel->getOptionsModel()->getDisplayUnit();
-        if (currentBalance != -1)
-            setBalance(currentBalance, currentUnconfirmedBalance, currentImmatureBalance,
-                       currentZerocoinBalance, currentUnconfirmedZerocoinBalance, currentImmatureZerocoinBalance,
-                       currentWatchOnlyBalance, currentWatchUnconfBalance, currentWatchImmatureBalance);
+        if (m_balances != -1)
+            setBalance(m_balances);
     }
 }
 
@@ -813,14 +817,14 @@ void PrivacyDialog::updateAutomintStatus()
 {
     QString strAutomintStatus = tr("AutoMint Status:");
 
-    if (pwalletMain->isZeromintEnabled ()) {
+    if (walletModel->isZeromintEnabled ()) {
        strAutomintStatus += tr(" <b>enabled</b>.");
     }
     else {
        strAutomintStatus += tr(" <b>disabled</b>.");
     }
 
-    strAutomintStatus += tr(" Configured target percentage: <b>") + QString::number(pwalletMain->getZeromintPercentage()) + "%</b>";
+    strAutomintStatus += tr(" Configured target percentage: <b>") + QString::number(walletModel->getZeromintPercentage()) + "%</b>";
     ui->label_AutoMintStatus->setText(strAutomintStatus);
 }
 
@@ -828,7 +832,7 @@ void PrivacyDialog::updateSPORK16Status()
 {
     // Update/enable labels, buttons and tooltips depending on the current SPORK_16 status
     bool fButtonsEnabled =  ui->pushButtonMintzWSP->isEnabled();
-    bool fMaintenanceMode = GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE);
+    bool fMaintenanceMode = GetAdjustedTime() > sporkManager.GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE);
     if (fMaintenanceMode && fButtonsEnabled) {
         // Mint zWSP
         ui->pushButtonMintzWSP->setEnabled(false);

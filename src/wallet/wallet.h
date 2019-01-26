@@ -665,6 +665,10 @@ public:
     // in place.
     std::set<uint256> GetConflicts() const NO_THREAD_SAFETY_ANALYSIS;
 
+    // Return sum of unlocked coins
+    CAmount GetUnlockedCredit(interfaces::Chain::Lock& locked_chain) const;
+    // Return sum of unlocked coins
+    CAmount GetLockedCredit(interfaces::Chain::Lock& locked_chain) const;
     CAmount GetAnonymizedCredit(bool fUseCache=true) const;
     CAmount GetDenominatedCredit(bool unconfirmed, bool fUseCache=true) const;
 };
@@ -1369,9 +1373,12 @@ public:
     int CountInputsWithAmount(CAmount nInputAmount);
     bool SelectCoinsGrouppedByAddresses(std::vector<CompactTallyItem>& vecTallyRet, bool fSkipDenominated = true, bool fAnonymizable = true, bool fSkipUnconfirmed = true) const;
     bool GetCollateralTxDSIn(CTxDSIn& txdsinRet, CAmount& nValueRet) const;
-
+    CAmount GetLockedCoins(interfaces::Chain::Lock& locked_chain) const;
+    CAmount GetUnlockedCoins(interfaces::Chain::Lock& locked_chain) const;
     // Zerocoin additions
-
+    CAmount GetZerocoinBalance(bool fMatureOnly) const;
+    CAmount GetUnconfirmedZerocoinBalance() const;
+    CAmount GetImmatureZerocoinBalance() const;
     /** Zerocin entry changed.
     * @note called with lock cs_wallet held.
     */

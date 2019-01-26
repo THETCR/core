@@ -67,6 +67,8 @@ private:
     AddressBookPage *usedSendingAddressesPage;
     AddressBookPage *usedReceivingAddressesPage;
     MasternodeList *masternodeListPage;
+    PrivacyDialog *privacyPage;
+    BlockExplorer *explorerWindow;
 
     TransactionView *transactionView;
 
@@ -80,11 +82,14 @@ public Q_SLOTS:
     void gotoHistoryPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
+    /** Switch to explorer page */
+    void gotoBlockExplorerPage();
+    /** Switch to privacy page */
+    void gotoPrivacyPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
-
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
     /** Show Sign/Verify Message dialog and switch to verify message tab */

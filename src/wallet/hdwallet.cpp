@@ -2670,7 +2670,9 @@ bool CHDWallet::GetBalances(CHDWalletBalances &bal)
             }
         }
     }
-
+            bal.nZwsp = GetZerocoinBalance();
+            bal.nZwspUnconf = GetUnconfirmedZerocoinBalance();
+            bal.nZwspImmature= GetImmatureZerocoinBalance();
     //if (!MoneyRange(nBalance))
     //    throw std::runtime_error(std::string(__func__) + ": value out of range");
 

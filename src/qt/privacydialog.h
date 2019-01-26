@@ -41,7 +41,7 @@ public:
         MINIMUM_COLUMN_WIDTH = 130
     };
 
-    explicit PrivacyDialog(QWidget* parent = nullptr);
+    explicit PrivacyDialog(const PlatformStyle *platformStyle, QWidget* parent = nullptr);
     ~PrivacyDialog();
 
     void setModel(WalletModel* model);
@@ -49,9 +49,8 @@ public:
     void setZWspControlLabels(int64_t nAmount, int nQuantity);
 
 public Q_SLOTS:
-    void setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, 
-                    const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance,
-                    const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
+    void setBalance(const interfaces::WalletBalances& balances);
+
 protected:
     virtual void keyPressEvent(QKeyEvent* event);
 
@@ -61,16 +60,16 @@ private:
     GUIUtil::TableViewLastColumnResizingFixer* columnResizingFixer;
     WalletModel* walletModel;
     QMenu* contextMenu;
-    CAmount currentBalance;
-    CAmount currentUnconfirmedBalance;
-    CAmount currentImmatureBalance;
-    CAmount currentZerocoinBalance;
-    CAmount currentUnconfirmedZerocoinBalance;
-    CAmount currentImmatureZerocoinBalance;
-    CAmount currentWatchOnlyBalance;
-    CAmount currentWatchUnconfBalance;
-    CAmount currentWatchImmatureBalance;
-    
+//    CAmount currentBalance;
+//    CAmount currentUnconfirmedBalance;
+//    CAmount currentImmatureBalance;
+//    CAmount currentZerocoinBalance;
+//    CAmount currentUnconfirmedZerocoinBalance;
+//    CAmount currentImmatureZerocoinBalance;
+//    CAmount currentWatchOnlyBalance;
+//    CAmount currentWatchUnconfBalance;
+//    CAmount currentWatchImmatureBalance;
+    interfaces::WalletBalances m_balances;
     int nSecurityLevel = 0;
     bool fMinimizeChange = false;
     bool fDenomsMinimized;
@@ -78,6 +77,7 @@ private:
     int nDisplayUnit;
     bool updateLabel(const QString& address);
     void sendzWSP();
+    const PlatformStyle *platformStyle;
 
 private Q_SLOTS:
     void on_payTo_textChanged(const QString& address);

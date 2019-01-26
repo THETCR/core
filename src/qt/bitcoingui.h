@@ -141,6 +141,7 @@ private:
     QAction *coldstakingAction = nullptr;
     QAction *mnemonicAction = nullptr;
     QAction *masternodeAction = nullptr;
+    QAction *privacyAction= nullptr;
 
     QLabel *m_wallet_selector_label = nullptr;
     QComboBox* m_wallet_selector = nullptr;
@@ -256,6 +257,8 @@ public Q_SLOTS:
     void gotoMasternodePage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
+    /** Switch to privacy page */
+    void gotoPrivacyPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
 

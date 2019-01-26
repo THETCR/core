@@ -287,6 +287,12 @@ void BitcoinGUI::createActions()
     historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_4));
     tabGroup->addAction(historyAction);
 
+    privacyAction = new QAction(platformStyle->SingleColorIcon(":/icons/privacy"), tr("&Privacy"), this);
+    privacyAction->setStatusTip(tr("Privacy Actions for zWSP"));
+    privacyAction->setToolTip(privacyAction->statusTip());
+    privacyAction->setCheckable(true);
+    privacyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+    tabGroup->addAction(privacyAction);
 #ifdef ENABLE_WALLET
     QSettings settings;
     if (!fLiteMode && settings.value("fShowMasternodesTab").toBool()) {
@@ -294,6 +300,7 @@ void BitcoinGUI::createActions()
         masternodeAction->setStatusTip(tr("Browse masternodes"));
         masternodeAction->setToolTip(masternodeAction->statusTip());
         masternodeAction->setCheckable(true);
+        masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
         tabGroup->addAction(masternodeAction);
         connect(masternodeAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
         connect(masternodeAction, &QAction::triggered, this, &BitcoinGUI::gotoMasternodePage);
@@ -312,6 +319,8 @@ void BitcoinGUI::createActions()
     connect(receiveCoinsMenuAction, &QAction::triggered, this, &BitcoinGUI::gotoReceiveCoinsPage);
     connect(historyAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
     connect(historyAction, &QAction::triggered, this, &BitcoinGUI::gotoHistoryPage);
+    connect(privacyAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
+    connect(privacyAction, &QAction::triggered, this, &BitcoinGUI::gotoPrivacyPage);
 #endif // ENABLE_WALLET
 
     quitAction = new QAction(platformStyle->TextColorIcon(":/icons/quit"), tr("E&xit"), this);
@@ -452,6 +461,7 @@ void BitcoinGUI::createToolBars()
     {
         QToolBar *toolbar = addToolBar(tr("Tabs toolbar"));
         appToolBar = toolbar;
+        toolbar->setObjectName("Main-Toolbar"); // Name for CSS addressing
         toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
         toolbar->setMovable(false);
         toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -459,6 +469,9 @@ void BitcoinGUI::createToolBars()
         toolbar->addAction(sendCoinsAction);
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
+        toolbar->addAction(privacyAction);
+        toolbar->setOrientation(Qt::Vertical);
+        toolbar->setIconSize(QSize(40,40));
         overviewAction->setChecked(true);
 
 #ifdef ENABLE_WALLET
@@ -634,6 +647,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     receiveCoinsAction->setEnabled(enabled);
     receiveCoinsMenuAction->setEnabled(enabled);
     historyAction->setEnabled(enabled);
+    privacyAction->setEnabled(enabled);
     QSettings settings;
     if (!fLiteMode && settings.value("fShowMasternodesTab").toBool() && masternodeAction) {
         masternodeAction->setEnabled(enabled);
@@ -692,6 +706,7 @@ void BitcoinGUI::createTrayIconMenu()
     if (enableWallet) {
         trayIconMenu->addAction(sendCoinsMenuAction);
         trayIconMenu->addAction(receiveCoinsMenuAction);
+        trayIconMenu->addAction(privacyAction);
         trayIconMenu->addSeparator();
         trayIconMenu->addAction(signMessageAction);
         trayIconMenu->addAction(verifyMessageAction);
@@ -827,6 +842,12 @@ void BitcoinGUI::gotoReceiveCoinsPage()
 {
     receiveCoinsAction->setChecked(true);
     if (walletFrame) walletFrame->gotoReceiveCoinsPage();
+}
+
+void BitcoinGUI::gotoPrivacyPage()
+{
+    privacyAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoPrivacyPage();
 }
 
 void BitcoinGUI::gotoSendCoinsPage(QString addr)

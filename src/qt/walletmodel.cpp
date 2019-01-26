@@ -726,3 +726,7 @@ void WalletModel::listZerocoinMints(std::set<CMintMeta>& setMints, bool fUnusedO
     CHDWallet *pwallet = m_wallet->getWisprWallet();
     setMints = pwallet->zwspTracker->ListMints(pwallet ,fUnusedOnly, fMaturedOnly, fUpdateStatus);
 }
+CAmount WalletModel::getLockedBalance() const
+{
+    return m_wallet->GetLockedCoins();
+}

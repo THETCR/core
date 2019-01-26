@@ -5514,3 +5514,133 @@ bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, CAmount a
     return true;
 }
 
+std::map<libzerocoin::CoinDenomination, int> mapMintMaturity;
+int nLastMaturityCheck = 0;
+CAmount CWallet::GetZerocoinBalance(bool fMatureOnly) const
+{
+    if (fMatureOnly) {
+        if (chainActive.Height() > nLastMaturityCheck)
+            mapMintMaturity = GetMintMaturityHeight();
+        nLastMaturityCheck = chainActive.Height();
+
+        CAmount nBalance = 0;
+        vector<CMintMeta> vMints = zwspTracker->GetMints(true);
+        for (auto meta : vMints) {
+            if (meta.nHeight >= mapMintMaturity.at(meta.denom) || meta.nHeight >= chainActive.Height() || meta.nHeight == 0)
+                continue;
+            nBalance += libzerocoin::ZerocoinDenominationToAmount(meta.denom);
+        }
+        return nBalance;
+    }
+
+    return zwspTracker->GetBalance(false, false);
+}
+
+CAmount CWallet::GetImmatureZerocoinBalance() const
+{
+    return GetZerocoinBalance(false) - GetZerocoinBalance(true) - GetUnconfirmedZerocoinBalance();
+}
+
+CAmount CWallet::GetUnconfirmedZerocoinBalance() const
+{
+    return zwspTracker->GetUnconfirmedBalance();
+}
+CAmount CWallet::GetUnlockedCoins(interfaces::Chain::Lock& locked_chain) const
+{
+    if (fLiteMode) return 0;
+
+    CAmount nTotal = 0;
+    {
+        LOCK2(cs_main, cs_wallet);
+        for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
+            const CWalletTx* pcoin = &(*it).second;
+
+            if (pcoin->IsTrusted(locked_chain) && pcoin->GetDepthInMainChain(locked_chain) > 0)
+                nTotal += pcoin->GetUnlockedCredit();
+        }
+    }
+
+    return nTotal;
+}
+
+CAmount CWallet::GetLockedCoins(interfaces::Chain::Lock& locked_chain) const
+{
+    if (fLiteMode) return 0;
+
+    CAmount nTotal = 0;
+    {
+        LOCK2(cs_main, cs_wallet);
+        for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
+            const CWalletTx* pcoin = &(*it).second;
+
+            if (pcoin->IsTrusted(locked_chain) && pcoin->GetDepthInMainChain(locked_chain) > 0)
+                nTotal += pcoin->GetLockedCredit(locked_chain);
+        }
+    }
+
+    return nTotal;
+}
+// Return sum of unlocked coins
+CAmount CWalletTx::GetUnlockedCredit(interfaces::Chain::Lock& locked_chain) const
+{
+    if (pwallet == nullptr)
+        return 0;
+
+    // Must wait until coinbase is safely deep enough in the chain before valuing it
+    if (IsCoinBase() && GetBlocksToMaturity(locked_chain) > 0)
+        return 0;
+
+    CAmount nCredit = 0;
+    uint256 hashTx = GetHash();
+//    CTransactionRef tx =
+    std::vector<CTxOut> vout = tx->vout;
+    for (unsigned int i = 0; i < vout.size(); i++) {
+        const CTxOut& txout = vout[i];
+
+        if (pwallet->IsSpent(locked_chain, hashTx, i) || pwallet->IsLockedCoin(hashTx, i)) continue;
+        if (fMasternodeMode && vout[i].nValue == 125000 * COIN) continue; // do not count MN-like outputs
+
+        nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
+        if (!MoneyRange(nCredit))
+            throw std::runtime_error("CWalletTx::GetUnlockedCredit() : value out of range");
+    }
+
+    return nCredit;
+}
+
+    // Return sum of unlocked coins
+CAmount CWalletTx::GetLockedCredit(interfaces::Chain::Lock& locked_chain) const
+{
+    if (pwallet == nullptr)
+        return 0;
+
+
+    // Must wait until coinbase is safely deep enough in the chain before valuing it
+    if (IsCoinBase() && GetBlocksToMaturity(locked_chain) > 0)
+        return 0;
+
+    CAmount nCredit = 0;
+    uint256 hashTx = GetHash();
+    std::vector<CTxOut> vout = tx->vout;
+    for (unsigned int i = 0; i < vout.size(); i++) {
+        const CTxOut& txout = vout[i];
+
+        // Skip spent coins
+        if (pwallet->IsSpent(locked_chain, hashTx, i)) continue;
+
+        // Add locked coins
+        if (pwallet->IsLockedCoin(hashTx, i)) {
+            nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
+        }
+
+        // Add masternode collaterals which are handled likc locked coins
+        else if (fMasternodeMode && vout[i].nValue == 125000 * COIN) {
+            nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
+        }
+
+        if (!MoneyRange(nCredit))
+            throw std::runtime_error("CWalletTx::GetLockedCredit() : value out of range");
+    }
+
+    return nCredit;
+}

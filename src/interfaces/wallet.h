@@ -297,6 +297,9 @@ public:
     virtual bool isDefaultAccountSet() = 0;
     virtual CAmount getCredit(const CTxOutBase *txout, isminefilter filter) = 0;
     virtual isminetype txoutIsMine(const CTxOutBase *txout) = 0;
+    virtual CAmount GetLockedCoins() = 0;
+    virtual CAmount GetUnlockedCoins() = 0;
+
 };
 
 //! Tracking object returned by CreateTransaction and passed to CommitTransaction.
@@ -348,6 +351,10 @@ struct WalletBalances
     CAmount balanceAnon = 0;
     CAmount balanceWatchStaked = 0;
 
+    CAmount zerocoinBalance= 0;
+    CAmount unconfirmedZerocoinBalance= 0;
+    CAmount immatureZerocoinBalance= 0;
+
     bool balanceChanged(const WalletBalances& prev) const
     {
         return balance != prev.balance || unconfirmed_balance != prev.unconfirmed_balance ||
@@ -358,7 +365,10 @@ struct WalletBalances
                || balanceStaked != prev.balanceStaked
                || balanceBlind != prev.balanceBlind
                || balanceAnon != prev.balanceAnon
-               || balanceWatchStaked != prev.balanceWatchStaked;
+               || balanceWatchStaked != prev.balanceWatchStaked
+               || zerocoinBalance != prev.zerocoinBalance
+               || unconfirmedZerocoinBalance != prev.unconfirmedZerocoinBalance
+               || immatureZerocoinBalance != prev.immatureZerocoinBalance;
     }
 };
 

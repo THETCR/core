@@ -160,7 +160,8 @@ public:
         Locked,       // wallet->IsCrypted() && wallet->IsLocked()
         Unlocked,     // wallet->IsCrypted() && !wallet->IsLocked()
         UnlockedForMixingOnly,  // wallet->IsCrypted() && !wallet->IsLocked(true) && wallet->IsLocked()
-        UnlockedForStaking
+        UnlockedForStaking,
+        UnlockedForAnonymizationOnly // wallet->IsCrypted() && !wallet->IsLocked() && wallet->fWalletUnlockAnonymizeOnly
     };
 
     OptionsModel *getOptionsModel();
@@ -245,6 +246,7 @@ public:
 
     //!WISPR
     void listZerocoinMints(std::set<CMintMeta>& setMints, bool fUnusedOnly = false, bool fMaturedOnly = false, bool fUpdateStatus = false);
+    CAmount getLockedBalance() const;
 
 private:
     std::unique_ptr<interfaces::Wallet> m_wallet;
