@@ -753,5 +753,5 @@ CAmount WalletModel::getLockedBalance() const
 }
 bool WalletModel::isAnonymizeOnlyUnlocked()
 {
-    return fWalletUnlockAnonymizeOnly;
+    return m_wallet->isAnonymizeOnlyUnlocked();
 }

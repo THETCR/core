@@ -273,7 +273,6 @@ private:
 
     bool fHaveWatchOnly;
     bool fForceCheckBalanceChanged;
-    bool fWalletUnlockAnonymizeOnly;
     // Wallet has an options model for wallet-specific options
     // (transaction fee, for example)
     OptionsModel *optionsModel;

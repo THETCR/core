@@ -299,6 +299,7 @@ public:
     virtual isminetype txoutIsMine(const CTxOutBase *txout) = 0;
     virtual CAmount GetLockedCoins() = 0;
     virtual CAmount GetUnlockedCoins() = 0;
+    virtual bool isAnonymizeOnlyUnlocked() = 0;
 
 };
 

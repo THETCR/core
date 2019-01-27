@@ -879,6 +879,7 @@ private:
     mutable bool fAnonymizableTallyCachedNonDenom;
     mutable std::vector<CompactTallyItem> vecAnonymizableTallyCachedNonDenom;
 public:
+      mutable bool fWalletUnlockAnonymizeOnly;
     /*
      * Main wallet lock.
      * This lock protects all the fields added by CWallet.

@@ -789,6 +789,11 @@ public:
         LOCK(m_wallet.cs_wallet);
         return m_wallet.GetUnlockedCoins(*locked_chain);
     }
+    bool isAnonymizeOnlyUnlocked() override
+    {
+        LOCK(m_wallet.cs_wallet);
+        return m_wallet.fWalletUnlockAnonymizeOnly;
+    }
 };
 
 class WalletClientImpl : public ChainClient
