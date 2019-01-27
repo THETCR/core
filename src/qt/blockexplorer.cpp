@@ -8,9 +8,10 @@
 #include "clientmodel.h"
 #include "core_io.h"
 #include "guiutil.h"
-#include "main.h"
+#include "validation.h"
 #include "net.h"
 #include "txdb.h"
+#include "key_io.h"
 #include "ui_blockexplorer.h"
 #include "ui_interface.h"
 #include <util/system.h>
