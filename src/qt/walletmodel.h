@@ -223,7 +223,7 @@ public:
     };
 
     UnlockContext requestUnlock(bool fForMixingOnly=false);
-    UnlockContext requestUnlock(AskPassphraseDialog::Context context, bool relock = false);
+//    UnlockContext requestUnlock(AskPassphraseDialog::Context context, bool relock = false);
 
 
     void loadReceiveRequests(std::vector<std::string>& vReceiveRequests);

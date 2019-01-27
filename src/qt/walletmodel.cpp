@@ -542,26 +542,26 @@ WalletModel::UnlockContext WalletModel::requestUnlock(bool fForMixingOnly)
     return UnlockContext(this, valid, was_locked, was_unlocked_for_staking);
 }
 // WalletModel::UnlockContext implementation
-WalletModel::UnlockContext WalletModel::requestUnlock(AskPassphraseDialog::Context context, bool relock)
-{
-    bool was_locked = getEncryptionStatus() == Locked;
-
-    if (!was_locked && isAnonymizeOnlyUnlocked()) {
-        setWalletLocked(true);
-        fWalletUnlockAnonymizeOnly = false;
-        was_locked = getEncryptionStatus() == Locked;
-    }
-
-    if (was_locked) {
-        // Request UI to unlock wallet
-        Q_EMIT requireUnlock(fWalletUnlockAnonymizeOnly);
-    }
-    // If wallet is still locked, unlock was failed or cancelled, mark context as invalid
-    bool valid = getEncryptionStatus() != Locked;
-
-    return UnlockContext(this, valid, relock, false);
-    //    return UnlockContext(this, valid, was_locked && !isAnonymizeOnlyUnlocked());
-}
+//WalletModel::UnlockContext WalletModel::requestUnlock(AskPassphraseDialog::Context context, bool relock)
+//{
+//    bool was_locked = getEncryptionStatus() == Locked;
+//
+//    if (!was_locked && isAnonymizeOnlyUnlocked()) {
+//        setWalletLocked(true);
+//        fWalletUnlockAnonymizeOnly = false;
+//        was_locked = getEncryptionStatus() == Locked;
+//    }
+//
+//    if (was_locked) {
+//        // Request UI to unlock wallet
+//        Q_EMIT requireUnlock(fWalletUnlockAnonymizeOnly);
+//    }
+//    // If wallet is still locked, unlock was failed or cancelled, mark context as invalid
+//    bool valid = getEncryptionStatus() != Locked;
+//
+//    return UnlockContext(this, valid, relock, false);
+//    //    return UnlockContext(this, valid, was_locked && !isAnonymizeOnlyUnlocked());
+//}
 
 WalletModel::UnlockContext::UnlockContext(WalletModel *_wallet, bool _valid, bool _relock, bool _was_unlocked_for_staking):
         wallet(_wallet),
