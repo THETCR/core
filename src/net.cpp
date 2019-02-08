@@ -1814,7 +1814,10 @@ void CConnman::ThreadMessageHandler()
                 pnode->AddRef();
             }
         }
-
+        // Poll the connected nodes for messages
+        CNode* pnodeTrickle = NULL;
+        if (!vNodesCopy.empty())
+            pnodeTrickle = vNodesCopy[GetRand(vNodesCopy.size())];
         bool fSleep = true;
 
         for(CNode* pnode: vNodesCopy)
@@ -1845,7 +1848,7 @@ void CConnman::ThreadMessageHandler()
             {
                 TRY_LOCK(pnode->cs_vSend, lockSend);
                 if (lockSend)
-                    GetNodeSignals().SendMessages(pnode);
+                    GetNodeSignals().SendMessages(pnode, pnode == pnodeTrickle || pnode->fWhitelisted);
             }
             boost::this_thread::interruption_point();
         }
@@ -1906,13 +1909,18 @@ bool BindListenPort(const CService& addrBind, string& strError, bool fWhiteliste
 
 
 #ifndef WIN32
-#ifdef SO_NOSIGPIPE
+    #ifdef SO_NOSIGPIPE
     // Different way of disabling SIGPIPE on BSD
     setsockopt(hListenSocket, SOL_SOCKET, SO_NOSIGPIPE, (void*)&nOne, sizeof(int));
 #endif
     // Allow binding if the port is still in TIME_WAIT state after
-    // the program was closed and restarted. Not an issue on windows!
+    // the program was closed and restarted.
     setsockopt(hListenSocket, SOL_SOCKET, SO_REUSEADDR, (void*)&nOne, sizeof(int));
+    // Disable Nagle's algorithm
+    setsockopt(hListenSocket, IPPROTO_TCP, TCP_NODELAY, (void*)&nOne, sizeof(int));
+#else
+    setsockopt(hListenSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)&nOne, sizeof(int));
+    setsockopt(hListenSocket, IPPROTO_TCP, TCP_NODELAY, (const char*)&nOne, sizeof(int));
 #endif
 
     // Set to non-blocking, incoming connections will also inherit this
