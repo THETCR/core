@@ -5,6 +5,9 @@
 
 #define BOOST_TEST_MODULE Wispr Test Suite
 
+#include "chainparams.h"
+#include "consensus/consensus.h"
+#include "consensus/validation.h"
 #include "main.h"
 #include "random.h"
 #include "txdb.h"
@@ -22,6 +25,8 @@
 CClientUIInterface uiInterface;
 CWallet* pwalletMain;
 
+std::unique_ptr<CConnman> g_connman;
+
 extern bool fPrintToConsole;
 extern void noui_connect();
 
@@ -30,6 +35,7 @@ struct TestingSetup {
     boost::filesystem::path pathTemp;
     boost::thread_group threadGroup;
     ECCVerifyHandle globalVerifyHandle;
+    CConnman* connman;
 
     TestingSetup() {
         ECC_Start();
@@ -57,6 +63,8 @@ struct TestingSetup {
         nScriptCheckThreads = 3;
         for (int i=0; i < nScriptCheckThreads-1; i++)
             threadGroup.create_thread(&ThreadScriptCheck);
+        g_connman = std::unique_ptr<CConnman>(new CConnman());
+        connman = g_connman.get();
         RegisterNodeSignals(GetNodeSignals());
     }
     ~TestingSetup()
