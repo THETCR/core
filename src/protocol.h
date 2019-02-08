@@ -323,33 +323,33 @@ enum ServiceFlags : uint64_t {
 };
 
 
-/** nServices flags */
-enum {
-    NODE_NETWORK = (1 << 0),
-
-    // NODE_BLOOM means the node is capable and willing to handle bloom-filtered connections.
-    // Bitcoin Core nodes used to support this by default, without advertising this bit,
-    // but no longer do as of protocol version 70011 (= NO_BLOOM_VERSION)
-    NODE_BLOOM = (1 << 2),
-
-	// NODE_BLOOM_WITHOUT_MN means the node has the same features as NODE_BLOOM with the only difference
-	// that the node doens't want to receive master nodes messages. (the 1<<3 was not picked as constant because on bitcoin 0.14 is witness and we want that update here )
-
-    NODE_BLOOM_WITHOUT_MN = (1 << 5),
-
-
-    // NODE_BLOOM_LIGHT_ZC means the node has the same feature as NODE_BLOOM_WITHOUT_MN with the addition of
-    // support for the light zerocoin protocol.
-    NODE_BLOOM_LIGHT_ZC = (1 << 6),
-
-    // Bits 24-31 are reserved for temporary experiments. Just pick a bit that
-    // isn't getting used, or one not being used much, and notify the
-    // bitcoin-development mailing list. Remember that service bits are just
-    // unauthenticated advertisements, so your code must be robust against
-    // collisions and other cases where nodes may be advertising a service they
-    // do not actually support. Other service bits should be allocated via the
-    // BIP process.
-};
+/** Old nServices flags */
+//enum {
+//    NODE_NETWORK = (1 << 0),
+//
+//    // NODE_BLOOM means the node is capable and willing to handle bloom-filtered connections.
+//    // Bitcoin Core nodes used to support this by default, without advertising this bit,
+//    // but no longer do as of protocol version 70011 (= NO_BLOOM_VERSION)
+//    NODE_BLOOM = (1 << 2),
+//
+//	// NODE_BLOOM_WITHOUT_MN means the node has the same features as NODE_BLOOM with the only difference
+//	// that the node doens't want to receive master nodes messages. (the 1<<3 was not picked as constant because on bitcoin 0.14 is witness and we want that update here )
+//
+//    NODE_BLOOM_WITHOUT_MN = (1 << 5),
+//
+//
+//    // NODE_BLOOM_LIGHT_ZC means the node has the same feature as NODE_BLOOM_WITHOUT_MN with the addition of
+//    // support for the light zerocoin protocol.
+//    NODE_BLOOM_LIGHT_ZC = (1 << 6),
+//
+//    // Bits 24-31 are reserved for temporary experiments. Just pick a bit that
+//    // isn't getting used, or one not being used much, and notify the
+//    // bitcoin-development mailing list. Remember that service bits are just
+//    // unauthenticated advertisements, so your code must be robust against
+//    // collisions and other cases where nodes may be advertising a service they
+//    // do not actually support. Other service bits should be allocated via the
+//    // BIP process.
+//};
 
 /** A CService with information about it as peer */
 class CAddress : public CService
