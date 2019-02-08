@@ -1006,12 +1006,12 @@ bool AppInit2()
     fAlerts = GetBoolArg("-alerts", DEFAULT_ALERTS);
 
     if (GetBoolArg("-peerbloomfilterszc", DEFAULT_PEERBLOOMFILTERS_ZC))
-        nLocalServices |= NODE_BLOOM_LIGHT_ZC;
+        nLocalServices = ServiceFlags(nLocalServices | NODE_BLOOM_LIGHT_ZC);
 
     if (nLocalServices != NODE_BLOOM_LIGHT_ZC) {
 
         if (GetBoolArg("-peerbloomfilters", DEFAULT_PEERBLOOMFILTERS))
-            nLocalServices |= ServiceFlags(nLocalServices | NODE_BLOOM);
+            nLocalServices = ServiceFlags(nLocalServices | NODE_BLOOM);
 
     }
 

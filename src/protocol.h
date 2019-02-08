@@ -381,8 +381,9 @@ public:
     // TODO: make private (improves encapsulation)
 public:
     ServiceFlags nServices;
+    ServiceFlags nServicesExpected;
 
-    // disk and network only
+  // disk and network only
     unsigned int nTime;
 };
 

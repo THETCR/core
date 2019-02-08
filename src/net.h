@@ -275,6 +275,7 @@ class CNode
 public:
     // socket
     ServiceFlags nServices;
+    ServiceFlags nServicesExpected;
     SOCKET hSocket;
     CDataStream ssSend;
     size_t nSendSize;   // total size of all vSendMsg entries
