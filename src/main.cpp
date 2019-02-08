@@ -4806,6 +4806,37 @@ string GetWarnings(string strFor)
     assert(!"GetWarnings() : invalid parameter");
     return "error";
 }
+//////////////////////////////////////////////////////////////////////////////
+//
+// blockchain -> download logic notification
+//
+
+void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {
+    const int nNewHeight = pindexNew->nHeight;
+
+    if (!fInitialDownload) {
+        // Find the hashes of all blocks that weren't previously in the best chain.
+        std::vector<uint256> vHashes;
+        const CBlockIndex *pindexToAnnounce = pindexNew;
+        while (pindexToAnnounce != pindexFork) {
+            vHashes.push_back(pindexToAnnounce->GetBlockHash());
+            pindexToAnnounce = pindexToAnnounce->pprev;
+            if (vHashes.size() == MAX_BLOCKS_TO_ANNOUNCE) {
+                // Limit announcements in case of a huge reorganization.
+                // Rely on the peer's synchronization mechanism in that case.
+                break;
+            }
+        }
+        // Relay inventory, but don't relay old inventory during initial block download.
+        connman->ForEachNode([nNewHeight, &vHashes](CNode* pnode) {
+          if (nNewHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : 0)) {
+              for(const uint256& hash: reverse_iterate(vHashes)) {
+                  pnode->PushBlockHash(hash);
+              }
+          }
+        });
+    }
+}
 
 
 //////////////////////////////////////////////////////////////////////////////

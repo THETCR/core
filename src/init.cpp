@@ -87,6 +87,7 @@ volatile bool fRestartRequested = false; // true: restart false: shutdown
 extern std::list<uint256> listAccCheckpointsNoDB;
 
 std::unique_ptr<CConnman> g_connman;
+std::unique_ptr<PeerLogicValidation> peerLogic;
 
 #if ENABLE_ZMQ
 static CZMQNotificationInterface* pzmqNotificationInterface = NULL;
@@ -216,6 +217,8 @@ void PrepareShutdown()
     GenerateBitcoins(false, nullptr, 0);
 #endif
     StopNode(*g_connman);
+    UnregisterValidationInterface(peerLogic.get());
+    peerLogic.reset();
     g_connman.reset();
     DumpMasternodes();
     DumpBudgets();
@@ -1244,7 +1247,8 @@ bool AppInit2()
     assert(!g_connman);
     g_connman = std::unique_ptr<CConnman>(new CConnman());
     CConnman& connman = *g_connman;
-
+    peerLogic.reset(new PeerLogicValidation(&connman));
+    RegisterValidationInterface(peerLogic.get());
     RegisterNodeSignals(GetNodeSignals());
 
     // sanitize comments per BIP-0014, format user agent and check total size

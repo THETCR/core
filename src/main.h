@@ -27,6 +27,7 @@
 #include "script/sigcache.h"
 #include "script/standard.h"
 #include "sync.h"
+#include "validationinterface.h"
 #include "tinyformat.h"
 #include "txmempool.h"
 #include "uint256.h"
@@ -231,6 +232,15 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
 int GetInputAge(CTxIn& vin);
 int GetInputAgeIX(uint256 nTXHash, CTxIn& vin);
 int GetIXConfirmations(uint256 nTXHash);
+class PeerLogicValidation : public CValidationInterface {
+private:
+  CConnman* connman;
+
+public:
+  PeerLogicValidation(CConnman* connmanIn) : connman(connmanIn) {}
+
+  virtual void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload);
+};
 
 struct CNodeStateStats {
     int nMisbehavior;
