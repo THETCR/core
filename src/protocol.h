@@ -306,13 +306,13 @@ enum ServiceFlags : uint64_t {
       NODE_WITNESS = (1 << 3),
   // NODE_XTHIN means the node supports Xtreme Thinblocks
   // If this is turned off then the node will not service nor make xthin requests
-      NODE_XTHIN = (1 << 4),
+      NODE_XTHIN = (1 << 6),
   // NODE_BLOOM_WITHOUT_MN means the node has the same features as NODE_BLOOM with the only difference
   // that the node doens't want to receive master nodes messages. (the 1<<3 was not picked as constant because on bitcoin 0.14 is witness and we want that update here )
-      NODE_BLOOM_WITHOUT_MN = (1 << 5),
+      NODE_BLOOM_WITHOUT_MN = (1 << 4),
   // NODE_BLOOM_LIGHT_ZC means the node has the same feature as NODE_BLOOM_WITHOUT_MN with the addition of
   // support for the light zerocoin protocol.
-      NODE_BLOOM_LIGHT_ZC = (1 << 6),
+      NODE_BLOOM_LIGHT_ZC = (1 << 5),
   // Bits 24-31 are reserved for temporary experiments. Just pick a bit that
   // isn't getting used, or one not being used much, and notify the
   // bitcoin-development mailing list. Remember that service bits are just
