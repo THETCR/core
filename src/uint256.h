@@ -277,7 +277,18 @@ public:
     {
         return pn[2 * n] | (uint64_t)pn[2 * n + 1] << 32;
     }
-
+    uint64_t GetUint64(int pos) const
+    {
+        const uint8_t* ptr = data + pos * 8;
+        return ((uint64_t)ptr[0]) | \
+        ((uint64_t)ptr[1]) << 8 | \
+        ((uint64_t)ptr[2]) << 16 | \
+        ((uint64_t)ptr[3]) << 24 | \
+        ((uint64_t)ptr[4]) << 32 | \
+        ((uint64_t)ptr[5]) << 40 | \
+        ((uint64_t)ptr[6]) << 48 | \
+        ((uint64_t)ptr[7]) << 56;
+    }
     uint32_t Get32(int n = 0) const
     {
         return pn[2 * n];

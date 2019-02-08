@@ -37,6 +37,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
+#include <math.h>
 
 // We add a random period time (0 to 1 seconds) to feeler connections to prevent synchronization.
 #define FEELER_SLEEP_WINDOW 1
@@ -69,6 +70,8 @@ const int MAX_FEELER_CONNECTIONS = 1;
 }
 /** Services this node implementation cares about */
 ServiceFlags nRelevantServices = NODE_NETWORK;
+static const uint64_t RANDOMIZER_ID_NETGROUP = 0x6c0edd8036ef4036ULL; // SHA256("netgroup")[0:8]
+static const uint64_t RANDOMIZER_ID_LOCALHOSTNONCE = 0xd93e69e2bbfa5735ULL; // SHA256("localhostnonce")[0:8]
 //
 // Global state variables
 //
@@ -2293,7 +2296,10 @@ void CNode::Fuzz(int nChance)
 unsigned int ReceiveFloodSize() { return 1000 * GetArg("-maxreceivebuffer", 5 * 1000); }
 unsigned int SendBufferSize() { return 1000 * GetArg("-maxsendbuffer", 1 * 1000); }
 
-CNode::CNode(SOCKET hSocketIn, CAddress addrIn, std::string addrNameIn, bool fInboundIn) : ssSend(SER_NETWORK, INIT_PROTO_VERSION), addrKnown(5000, 0.001)
+CNode::CNode(SOCKET hSocketIn, CAddress addrIn, std::string addrNameIn, bool fInboundIn) :
+ssSend(SER_NETWORK, INIT_PROTO_VERSION),
+nKeyedNetGroup(CalculateKeyedNetGroup(addrIn)),
+addrKnown(5000, 0.001)
 {
     nServices = 0;
     hSocket = hSocketIn;
@@ -2467,4 +2473,18 @@ void DumpBanlist()
 }
 int64_t PoissonNextSend(int64_t nNow, int average_interval_seconds) {
     return nNow + (int64_t)(log1p(GetRand(1ULL << 48) * -0.0000000000000035527136788 /* -1/2^48 */) * average_interval_seconds * -1000000.0 + 0.5);
+}
+CSipHasher GetDeterministicRandomizer(uint64_t id)
+{
+    static const uint64_t k0 = GetRand(std::numeric_limits<uint64_t>::max());
+    static const uint64_t k1 = GetRand(std::numeric_limits<uint64_t>::max());
+
+    return CSipHasher(k0, k1).Write(id);
+}
+
+uint64_t CalculateKeyedNetGroup(const CAddress& ad)
+{
+    std::vector<unsigned char> vchNetGroup(ad.GetGroup());
+
+    return GetDeterministicRandomizer(RANDOMIZER_ID_NETGROUP).Write(vchNetGroup.data(), vchNetGroup.size()).Finalize();
 }
