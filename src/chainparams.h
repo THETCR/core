@@ -23,7 +23,10 @@ struct CDNSSeedData {
   bool supportsServiceBitsFiltering;
   CDNSSeedData(const std::string& strName, const std::string& strHost) : name(strName), host(strHost) {}
 };
-
+struct SeedSpec6 {
+  uint8_t addr[16];
+  uint16_t port;
+};
 /**
  * CChainParams defines various tweakable parameters of a given instance of the
  * WISPR system. There are three: the main network on which people trade goods
