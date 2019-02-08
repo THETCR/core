@@ -20,7 +20,8 @@
 
 struct CDNSSeedData {
     std::string name, host;
-    CDNSSeedData(const std::string& strName, const std::string& strHost) : name(strName), host(strHost) {}
+  bool supportsServiceBitsFiltering;
+  CDNSSeedData(const std::string& strName, const std::string& strHost) : name(strName), host(strHost) {}
 };
 
 /**

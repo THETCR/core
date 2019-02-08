@@ -124,6 +124,9 @@ public:
     //constructor for single ip subnet (<ipv4>/32 or <ipv6>/128)
     explicit CSubNet(const CNetAddr &addr);
 
+    CSubNet(const CNetAddr &addr, int32_t mask);
+    CSubNet(const CNetAddr &addr, const CNetAddr &mask);
+
     bool Match(const CNetAddr& addr) const;
 
     std::string ToString() const;
@@ -208,10 +211,13 @@ bool IsProxy(const CNetAddr& addr);
 bool SetNameProxy(const proxyType &addrProxy);
 bool HaveNameProxy();
 bool LookupHost(const char* pszName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions = 0, bool fAllowLookup = true);
+bool LookupHost(const char *pszName, CNetAddr& addr, bool fAllowLookup);
+
 bool Lookup(const char* pszName, CService& addr, int portDefault = 0, bool fAllowLookup = true);
 bool Lookup(const char* pszName, std::vector<CService>& vAddr, int portDefault = 0, bool fAllowLookup = true, unsigned int nMaxSolutions = 0);
 CService LookupNumeric(const char *pszName, int portDefault = 0);
 bool LookupNumeric(const char* pszName, CService& addr, int portDefault = 0);
+bool LookupSubNet(const char *pszName, CSubNet& subnet);
 bool ConnectSocket(const CService& addr, SOCKET& hSocketRet, int nTimeout, bool* outProxyConnectionFailed = nullptr);
 bool ConnectSocketByName(CService& addr, SOCKET& hSocketRet, const char* pszDest, int portDefault, int nTimeout, bool* outProxyConnectionFailed = nullptr);
 /** Return readable error string for a network error code */
