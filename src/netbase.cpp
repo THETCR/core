@@ -226,6 +226,15 @@ bool Lookup(const char* pszName, CService& addr, int portDefault, bool fAllowLoo
     addr = vService[0];
     return true;
 }
+CService LookupNumeric(const char *pszName, int portDefault)
+{
+    CService addr;
+    // "1.2:345" will fail to resolve the ip, but will still set the port.
+    // If the ip fails to resolve, re-init the result.
+    if(!Lookup(pszName, addr, portDefault, false))
+        addr = CService();
+    return addr;
+}
 
 bool LookupNumeric(const char* pszName, CService& addr, int portDefault)
 {
