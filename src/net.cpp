@@ -1772,7 +1772,7 @@ void CConnman::ThreadMessageHandler()
 }
 
 // ppcoin: stake minter thread
-void static ThreadStakeMinter()
+void CConnman::ThreadStakeMinter()
 {
     boost::this_thread::interruption_point();
     LogPrintf("ThreadStakeMinter started\n");
@@ -2008,6 +2008,9 @@ bool CConnman::Start(boost::thread_group& threadGroup, std::string& strNodeError
     // Process messages
     threadGroup.create_thread(boost::bind(&TraceThread<boost::function<void()> >, "msghand", boost::function<void()>(boost::bind(&CConnman::ThreadMessageHandler, this))));
 
+    // ppcoin:mint proof-of-stake blocks in the background
+    if (GetBoolArg("-staking", true))
+        threadGroup.create_thread(boost::bind(&TraceThread<boost::function<void()> >, "stakemint", boost::function<void()>(boost::bind(&CConnman::ThreadStakeMinter, this))));
     return true;
 }
 

@@ -119,6 +119,7 @@ private:
   void AcceptConnection(const ListenSocket& hListenSocket);
   void ThreadSocketHandler();
   void ThreadDNSAddressSeed();
+  void ThreadStakeMinter();
 };
 extern std::unique_ptr<CConnman> g_connman;
 void MapPort(bool fUseUPnP);
