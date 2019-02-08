@@ -1011,7 +1011,7 @@ bool AppInit2()
     if (nLocalServices != NODE_BLOOM_LIGHT_ZC) {
 
         if (GetBoolArg("-peerbloomfilters", DEFAULT_PEERBLOOMFILTERS))
-            nLocalServices |= NODE_BLOOM;
+            nLocalServices |= ServiceFlags(nLocalServices | NODE_BLOOM);
 
     }
 
