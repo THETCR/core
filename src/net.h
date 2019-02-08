@@ -389,6 +389,7 @@ private:
 
     CNode(const CNode&);
     void operator=(const CNode&);
+    static uint64_t CalculateKeyedNetGroup(const CAddress& ad);
 
 public:
     NodeId GetId() const

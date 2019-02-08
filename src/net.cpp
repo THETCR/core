@@ -2482,7 +2482,7 @@ CSipHasher GetDeterministicRandomizer(uint64_t id)
     return CSipHasher(k0, k1).Write(id);
 }
 
-uint64_t CalculateKeyedNetGroup(const CAddress& ad)
+uint64_t CNode::CalculateKeyedNetGroup(const CAddress& ad)
 {
     std::vector<unsigned char> vchNetGroup(ad.GetGroup());
 
