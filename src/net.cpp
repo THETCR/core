@@ -38,6 +38,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 
+// We add a random period time (0 to 1 seconds) to feeler connections to prevent synchronization.
+#define FEELER_SLEEP_WINDOW 1
+
 // Dump addresses to peers.dat every 15 minutes (900s)
 #define DUMP_ADDRESSES_INTERVAL 900
 
@@ -64,7 +67,8 @@ namespace
 const int MAX_OUTBOUND_CONNECTIONS = 16;
 const int MAX_FEELER_CONNECTIONS = 1;
 }
-
+/** Services this node implementation cares about */
+ServiceFlags nRelevantServices = NODE_NETWORK;
 //
 // Global state variables
 //
