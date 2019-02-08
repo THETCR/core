@@ -279,7 +279,7 @@ public:
     }
     uint64_t GetUint64(int pos) const
     {
-        return pn[2 * n] | (uint64_t)pn[2 * n + 1] << 32;
+        return pn[2 * pos] | (uint64_t)pn[2 * pos + 1] << 32;
     }
     uint32_t Get32(int n = 0) const
     {
