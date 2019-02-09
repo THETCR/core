@@ -186,8 +186,8 @@ void Interrupt(boost::thread_group& threadGroup)
     InterruptRPC();
     InterruptREST();
     InterruptTorControl();
-    if (g_connman)
-        g_connman->Interrupt();
+//    if (g_connman)
+//        g_connman->Interrupt();
     threadGroup.interrupt_all();
 }
 
