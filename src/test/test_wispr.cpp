@@ -5,8 +5,6 @@
 
 #define BOOST_TEST_MODULE Wispr Test Suite
 
-#include "chainparams.h"
-#include "consensus/consensus.h"
 #include "consensus/validation.h"
 #include "main.h"
 #include "random.h"
