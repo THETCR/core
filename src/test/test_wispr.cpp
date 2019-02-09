@@ -8,13 +8,9 @@
 #include "chainparams.h"
 #include "consensus/consensus.h"
 #include "consensus/validation.h"
-#include "key.h"
 #include "main.h"
-#include "miner.h"
-#include "pubkey.h"
 #include "random.h"
 #include "txdb.h"
-#include "txmempool.h"
 #include "ui_interface.h"
 #include "util.h"
 #ifdef ENABLE_WALLET
@@ -41,7 +37,7 @@ struct TestingSetup {
     boost::filesystem::path pathTemp;
     boost::thread_group threadGroup;
     ECCVerifyHandle globalVerifyHandle;
-    CConnman* connman;
+//    CConnman* connman;
 
     TestingSetup() {
         ECC_Start();
@@ -75,7 +71,7 @@ struct TestingSetup {
         for (int i=0; i < nScriptCheckThreads-1; i++)
             threadGroup.create_thread(&ThreadScriptCheck);
 
-        g_connman = std::unique_ptr<CConnman>(new CConnman());
+//        g_connman = std::unique_ptr<CConnman>(new CConnman());
 //        connman = g_connman.get();
         RegisterNodeSignals(GetNodeSignals());
     }
@@ -84,7 +80,6 @@ struct TestingSetup {
         threadGroup.interrupt_all();
         threadGroup.join_all();
         UnregisterNodeSignals(GetNodeSignals());
-        UnloadBlockIndex();
 #ifdef ENABLE_WALLET
         delete pwalletMain;
         pwalletMain = nullptr;
@@ -97,7 +92,7 @@ struct TestingSetup {
 #endif
         boost::filesystem::remove_all(pathTemp);
         ECC_Stop();
-        g_connman.reset();
+//        g_connman.reset();
     }
 };
 
