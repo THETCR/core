@@ -84,6 +84,7 @@ struct TestingSetup {
 #endif
         boost::filesystem::remove_all(pathTemp);
         ECC_Stop();
+        g_connman.reset();
     }
 };
 
