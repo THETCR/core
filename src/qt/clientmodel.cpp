@@ -149,7 +149,7 @@ void ClientModel::updateTimer()
         prevAttempt = masternodeSync.RequestedMasternodeAttempt;
         prevAssets = masternodeSync.RequestedMasternodeAssets;
 
-        emit numBlocksChanged(newNumBlocks);
+        emit numBlocksChanged(newNumBlocks, getLastBlockDate(), getVerificationProgress(NULL));
     }
 
     emit bytesChanged(getTotalBytesRecv(), getTotalBytesSent());

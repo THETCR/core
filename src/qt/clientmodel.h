@@ -84,7 +84,7 @@ private:
     BanTableModel *banTableModel;
 
     int cachedNumBlocks;
-    QString cachedMasternfodeCountString;
+    QString cachedMasternodeCountString;
     bool cachedReindexing;
     bool cachedImporting;
 
