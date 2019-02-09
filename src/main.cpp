@@ -4892,13 +4892,21 @@ void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CB
             }
         }
         // Relay inventory, but don't relay old inventory during initial block download.
-        connman->ForEachNode([nNewHeight, &vHashes](CNode* pnode) {
-          if (nNewHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : 0)) {
-              for(const uint256& hash: reverse_iterate(vHashes)) {
-                  pnode->PushBlockHash(hash);
-              }
-          }
-        });
+        LOCK(cs_vNodes);
+        for (CNode* pnode: vNodes){
+            if (nNewHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : 0)) {
+                for(const uint256& hash: reverse_iterate(vHashes)) {
+                    pnode->PushBlockHash(hash);
+                }
+            }
+        }
+//        connman->ForEachNode([nNewHeight, &vHashes](CNode* pnode) {
+//          if (nNewHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : 0)) {
+//              for(const uint256& hash: reverse_iterate(vHashes)) {
+//                  pnode->PushBlockHash(hash);
+//              }
+//          }
+//        });
     }
 }
 

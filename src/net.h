@@ -114,13 +114,13 @@ public:
   bool Start(boost::thread_group& threadGroup, std::string& strNodeError);
   void Interrupt();
   void Stop();
-  template<typename Callable>
-  void ForEachNode(Callable&& func)
-  {
-      LOCK(cs_vNodes);
-      for (auto&& node : vNodes)
-          func(node);
-  };
+//  template<typename Callable>
+//  void ForEachNode(Callable&& func)
+//  {
+//      LOCK(cs_vNodes);
+//      for (auto&& node : vNodes)
+//          func(node);
+//  };
 private:
   void ThreadOpenAddedConnections();
   void ProcessOneShot();
