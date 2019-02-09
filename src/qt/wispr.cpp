@@ -349,6 +349,8 @@ BitcoinApplication::~BitcoinApplication()
     }
     delete optionsModel;
     optionsModel = nullptr;
+    delete platformStyle;
+    platformStyle = nullptr;
 }
 
 #ifdef ENABLE_WALLET
