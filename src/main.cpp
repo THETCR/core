@@ -4509,10 +4509,12 @@ bool CVerifyDB::VerifyDB(CCoinsView* coinsview, int nCheckLevel, int nCheckDepth
 
 void UnloadBlockIndex()
 {
+    LOCK(cs_main);
     mapBlockIndex.clear();
     setBlockIndexCandidates.clear();
     chainActive.SetTip(nullptr);
     pindexBestInvalid = nullptr;
+    pindexBestHeader = nullptr;
 }
 
 bool LoadBlockIndex(string& strError)

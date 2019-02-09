@@ -8,15 +8,21 @@
 #include "chainparams.h"
 #include "consensus/consensus.h"
 #include "consensus/validation.h"
+#include "key.h"
 #include "main.h"
+#include "miner.h"
+#include "pubkey.h"
 #include "random.h"
 #include "txdb.h"
+#include "txmempool.h"
 #include "ui_interface.h"
 #include "util.h"
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"
 #endif
+
+#include <memory>
 
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
@@ -54,6 +60,11 @@ struct TestingSetup {
         pcoinsdbview = new CCoinsViewDB(1 << 23, true);
         pcoinsTip = new CCoinsViewCache(pcoinsdbview);
         InitBlockIndex();
+        {
+            CValidationState state;
+            bool ok = ActivateBestChain(state);
+            BOOST_CHECK(ok);
+        }
 #ifdef ENABLE_WALLET
         bool fFirstRun;
         pwalletMain = new CWallet("wallet.dat");
@@ -69,9 +80,10 @@ struct TestingSetup {
     }
     ~TestingSetup()
     {
+        UnregisterNodeSignals(GetNodeSignals());
         threadGroup.interrupt_all();
         threadGroup.join_all();
-        UnregisterNodeSignals(GetNodeSignals());
+        UnloadBlockIndex();
 #ifdef ENABLE_WALLET
         delete pwalletMain;
         pwalletMain = nullptr;
