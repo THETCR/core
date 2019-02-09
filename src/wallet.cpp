@@ -398,6 +398,11 @@ set<uint256> CWallet::GetConflicts(const uint256& txid) const
     return result;
 }
 
+void CWallet::Flush(bool shutdown)
+{
+    bitdb.Flush(shutdown);
+}
+
 void CWallet::SyncMetaData(pair<TxSpends::iterator, TxSpends::iterator> range)
 {
     // We want all the wallet transactions in range to have the same metadata as

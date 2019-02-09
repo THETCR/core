@@ -660,6 +660,8 @@ public:
     //! Get wallet transactions that conflict with given transaction (spend same outputs)
     std::set<uint256> GetConflicts(const uint256& txid) const;
 
+    //! Flush wallet (bitdb flush)
+    void Flush(bool shutdown=false);
     /**
      * Address book entry changed.
      * @note called with lock cs_wallet held.
