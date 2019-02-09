@@ -3950,6 +3950,9 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
         }
     }
 
+    if (!AcceptBlockHeader(block.GetBlockHeader(), state, &pindex))
+        return false;
+
     if(Params().PivProtocolsStartHeightSmallerThen(pindexPrev->nHeight + 1)) {
         if (block.IsProofOfStake() && !CheckCoinStakeTimestamp(block.GetBlockTime(), (int64_t) block.vtx[1].nTime)) {
             return state.DoS(50, error("AcceptBlock() : coinstake timestamp violation nTimeBlock=%d nTimeTx=%u\n",
@@ -3988,8 +3991,6 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
     if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
         pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
-    if (!AcceptBlockHeader(block.GetBlockHeader(), state, &pindex))
-        return false;
 
     if (pindex->nStatus & BLOCK_HAVE_DATA) {
         // TODO: deal better with duplicate blocks.
