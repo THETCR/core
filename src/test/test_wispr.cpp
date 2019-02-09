@@ -76,7 +76,7 @@ struct TestingSetup {
             threadGroup.create_thread(&ThreadScriptCheck);
 
         g_connman = std::unique_ptr<CConnman>(new CConnman());
-        connman = g_connman.get();
+//        connman = g_connman.get();
         RegisterNodeSignals(GetNodeSignals());
     }
     ~TestingSetup()

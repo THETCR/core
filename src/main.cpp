@@ -3207,7 +3207,6 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
         // Notifications/callbacks that can run without cs_main
         // Always notify the UI if a new block tip was connected
         if (pindexFork != pindexNewTip) {
-            uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
 
             if (!fInitialDownload) {
                 uint256 hashNewTip = pindexNewTip->GetBlockHash();
