@@ -18,7 +18,7 @@
 #include "wallet.h"
 #endif
 
-#include <memory>
+//#include <memory>
 
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
@@ -27,7 +27,7 @@
 CClientUIInterface uiInterface;
 CWallet* pwalletMain;
 
-std::unique_ptr<CConnman> g_connman;
+//std::unique_ptr<CConnman> g_connman;
 
 extern bool fPrintToConsole;
 extern void noui_connect();
