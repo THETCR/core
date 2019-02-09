@@ -399,8 +399,8 @@ void RPCConsole::setClientModel(ClientModel* model)
         setNumConnections(model->getNumConnections());
         connect(model, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
 
-        setNumBlocks(model->getNumBlocks());
-        connect(model, SIGNAL(numBlocksChanged(int)), this, SLOT(setNumBlocks(int)));
+        setNumBlocks(model->getNumBlocks(), model->getLastBlockDate(), model->getVerificationProgress(NULL), false);
+        connect(model, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(setNumBlocks(int,QDateTime,double,bool)));
 
         setMasternodeCount(model->getMasternodeCountString());
         connect(model, SIGNAL(strMasternodesChanged(QString)), this, SLOT(setMasternodeCount(QString)));
@@ -683,13 +683,13 @@ void RPCConsole::setNumConnections(int count)
     ui->numberOfConnections->setText(connections);
 }
 
-void RPCConsole::setNumBlocks(int count)
+void RPCConsole::setNumBlocks(int count, const QDateTime& blockDate, double nVerificationProgress, bool headers)
 {
-    ui->numberOfBlocks->setText(QString::number(count));
-    if (clientModel)
-        ui->lastBlockTime->setText(clientModel->getLastBlockDate().toString());
+    if (!headers) {
+        ui->numberOfBlocks->setText(QString::number(count));
+        ui->lastBlockTime->setText(blockDate.toString());
+    }
 }
-
 void RPCConsole::setMasternodeCount(const QString& strMasternodes)
 {
     ui->masternodeCount->setText(strMasternodes);

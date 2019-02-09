@@ -83,7 +83,7 @@ private:
     BanTableModel *banTableModel;
 
     int cachedNumBlocks;
-    QString cachedMasternodeCountString;
+    QString cachedMasternfodeCountString;
     bool cachedReindexing;
     bool cachedImporting;
 
@@ -97,7 +97,7 @@ private:
 
 signals:
     void numConnectionsChanged(int count);
-    void numBlocksChanged(int count);
+    void numBlocksChanged(int count, const QDateTime& blockDate, double nVerificationProgress, bool header);
     void strMasternodesChanged(const QString& strMasternodes);
     void alertsChanged(const QString& warnings);
     void bytesChanged(quint64 totalBytesIn, quint64 totalBytesOut);

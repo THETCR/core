@@ -170,7 +170,7 @@ public slots:
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
     /** Set number of blocks shown in the UI */
-    void setNumBlocks(int count);
+    void setNumBlocks(int count, const QDateTime& blockDate, double nVerificationProgress, bool headers);
     /** Get restart command-line parameters and request restart */
     void handleRestart(QStringList args);
 
