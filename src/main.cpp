@@ -3217,7 +3217,7 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
             }
             // Notify external listeners about the new tip.
             // Note: uiInterface, should switch main signals.
-            uiInterface.NotifyBlockTip(hashNewTip);
+            uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
             GetMainSignals().UpdatedBlockTip(pindexNewTip);
 
             unsigned size = 0;
