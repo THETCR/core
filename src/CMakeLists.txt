@@ -1,6 +1,6 @@
 # Copyright (c) 2017 The Bitcoin developers
 
-cmake_minimum_required(VERSION 3.13.3)
+cmake_minimum_required(VERSION 3.13.2)
 project(WISPR)
 
 set(CMAKE_CXX_STANDARD 11)
