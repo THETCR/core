@@ -113,10 +113,15 @@ QDateTime ClientModel::getLastBlockDate() const
         return QDateTime::fromTime_t(Params().GenesisBlock().GetBlockTime()); // Genesis block's time of current network
 }
 
-double ClientModel::getVerificationProgress() const
+double ClientModel::getVerificationProgress(const CBlockIndex *tipIn) const
 {
-    LOCK(cs_main);
-    return Checkpoints::GuessVerificationProgress(chainActive.Tip());
+    CBlockIndex *tip = const_cast<CBlockIndex *>(tipIn);
+    if (!tip)
+    {
+        LOCK(cs_main);
+        tip = chainActive.Tip();
+    }
+    return Checkpoints::GuessVerificationProgress(tip);
 }
 
 void ClientModel::updateTimer()
