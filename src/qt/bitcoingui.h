@@ -24,6 +24,7 @@ class ClientModel;
 class NetworkStyle;
 class Notificator;
 class OptionsModel;
+class PlatformStyle;
 class BlockExplorer;
 class RPCConsole;
 class SendCoinsRecipient;
@@ -51,7 +52,7 @@ class BitcoinGUI : public QMainWindow
 public:
     static const QString DEFAULT_WALLET;
 
-    explicit BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent = 0);
+    explicit BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* networkStyle, QWidget* parent = 0);
     ~BitcoinGUI();
 
     /** Set the client model.
@@ -141,7 +142,9 @@ private:
     int prevBlocks;
     int spinnerFrame;
 
-    /** Create the main UI actions. */
+    const PlatformStyle *platformStyle;
+
+  /** Create the main UI actions. */
     void createActions(const NetworkStyle* networkStyle);
     /** Create the menu bar and sub-menus. */
     void createMenuBar();
