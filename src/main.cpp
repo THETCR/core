@@ -3986,7 +3986,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
     if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
         pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
-    if (!AcceptBlockHeader(block, state, &pindex))
+    if (!AcceptBlockHeader(block.GetBlockHeader(), state, &pindex))
         return false;
 
     if (pindex->nStatus & BLOCK_HAVE_DATA) {
