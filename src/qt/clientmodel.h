@@ -17,6 +17,7 @@ class PeerTableModel;
 class TransactionTableModel;
 
 class CWallet;
+class CBlockIndex;
 
 QT_BEGIN_NAMESPACE
 class QDateTime;
