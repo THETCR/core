@@ -5,10 +5,16 @@
 
 #define BOOST_TEST_MODULE Wispr Test Suite
 
+#include "chainparams.h"
+#include "consensus/consensus.h"
 #include "consensus/validation.h"
+#include "key.h"
 #include "main.h"
+#include "miner.h"
+#include "pubkey.h"
 #include "random.h"
 #include "txdb.h"
+#include "txmempool.h"
 #include "ui_interface.h"
 #include "util.h"
 #ifdef ENABLE_WALLET
@@ -16,7 +22,7 @@
 #include "wallet.h"
 #endif
 
-//#include <memory>
+#include <memory>
 
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
@@ -25,7 +31,7 @@
 CClientUIInterface uiInterface;
 CWallet* pwalletMain;
 
-//std::unique_ptr<CConnman> g_connman;
+std::unique_ptr<CConnman> g_connman;
 
 extern bool fPrintToConsole;
 extern void noui_connect();
@@ -35,7 +41,7 @@ struct TestingSetup {
     boost::filesystem::path pathTemp;
     boost::thread_group threadGroup;
     ECCVerifyHandle globalVerifyHandle;
-//    CConnman* connman;
+    CConnman* connman;
 
     TestingSetup() {
         ECC_Start();
@@ -54,6 +60,11 @@ struct TestingSetup {
         pcoinsdbview = new CCoinsViewDB(1 << 23, true);
         pcoinsTip = new CCoinsViewCache(pcoinsdbview);
         InitBlockIndex();
+        {
+            CValidationState state;
+            bool ok = ActivateBestChain(state);
+            BOOST_CHECK(ok);
+        }
 #ifdef ENABLE_WALLET
         bool fFirstRun;
         pwalletMain = new CWallet("wallet.dat");
@@ -64,8 +75,8 @@ struct TestingSetup {
         for (int i=0; i < nScriptCheckThreads-1; i++)
             threadGroup.create_thread(&ThreadScriptCheck);
 
-//        g_connman = std::unique_ptr<CConnman>(new CConnman());
-//        connman = g_connman.get();
+        g_connman = std::unique_ptr<CConnman>(new CConnman());
+        connman = g_connman.get();
         RegisterNodeSignals(GetNodeSignals());
     }
     ~TestingSetup()
@@ -73,6 +84,7 @@ struct TestingSetup {
         threadGroup.interrupt_all();
         threadGroup.join_all();
         UnregisterNodeSignals(GetNodeSignals());
+        UnloadBlockIndex();
 #ifdef ENABLE_WALLET
         delete pwalletMain;
         pwalletMain = nullptr;
@@ -85,7 +97,7 @@ struct TestingSetup {
 #endif
         boost::filesystem::remove_all(pathTemp);
         ECC_Stop();
-//        g_connman.reset();
+        g_connman.reset();
     }
 };
 
