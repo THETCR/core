@@ -3177,18 +3177,18 @@ static void NotifyHeaderTip() {
 bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlreadyChecked)
 {
     CBlockIndex* pindexMostWork = nullptr;
+    CBlockIndex* pindexNewTip = nullptr;
     do {
         boost::this_thread::interruption_point();
         if (ShutdownRequested())
             break;
 
-        CBlockIndex* pindexNewTip = nullptr;
         const CBlockIndex *pindexFork;
         bool fInitialDownload;
         {
             LOCK(cs_main);
             CBlockIndex *pindexOldTip = chainActive.Tip();
-            if (pindexMostWork == NULL) {
+            if (pindexMostWork == nullptr) {
                 pindexMostWork = FindMostWorkChain();
             }
             // Whether we have anything to do at all.
@@ -3236,9 +3236,11 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                         }
                     }
                 }
-                // Notify external listeners about the new tip.
+                // Always notify the UI if a new block tip was connected
                 if (!vHashes.empty()) {
-                    GetMainSignals().UpdatedBlockTip(pindexNewTip);
+                    uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
+                    // Notify external listeners about the new tip.
+                    GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
                 }
                 unsigned size = 0;
                 if (pblock)
