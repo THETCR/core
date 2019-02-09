@@ -55,13 +55,11 @@ void WaitForShutdown(boost::thread_group* threadGroup)
         MilliSleep(200);
         fShutdown = ShutdownRequested();
     }
-    Interrupt();
-
-//    if (threadGroup)
-//    {
-//        Interrupt(*threadGroup);
-//        threadGroup->join_all();
-//    }
+    if (threadGroup)
+    {
+        Interrupt(*threadGroup);
+        threadGroup->join_all();
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
