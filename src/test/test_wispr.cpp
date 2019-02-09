@@ -4,6 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #define BOOST_TEST_MODULE Wispr Test Suite
+#include "test_wispr.h"
 
 #include "chainparams.h"
 #include "consensus/consensus.h"
@@ -28,80 +29,82 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/thread.hpp>
 
-CClientUIInterface uiInterface;
+//CClientUIInterface uiInterface;
 CWallet* pwalletMain;
 
 std::unique_ptr<CConnman> g_connman;
 
 extern bool fPrintToConsole;
 extern void noui_connect();
-
-struct TestingSetup {
-    CCoinsViewDB *pcoinsdbview;
-    boost::filesystem::path pathTemp;
-    boost::thread_group threadGroup;
-    ECCVerifyHandle globalVerifyHandle;
-    CConnman* connman;
-
-    TestingSetup() {
-        ECC_Start();
-        SetupEnvironment();
-        fPrintToDebugLog = false; // don't want to write to debug.log file
-        fCheckBlockIndex = true;
-        SelectParams(CBaseChainParams::UNITTEST);
-        noui_connect();
+BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
+{
+    ECC_Start();
+    SetupEnvironment();
+    SetupNetworking();
+    fPrintToDebugLog = false; // don't want to write to debug.log file
+    fCheckBlockIndex = true;
+    SelectParams(CBaseChainParams::UNITTEST);
+    noui_connect();
 #ifdef ENABLE_WALLET
-        bitdb.MakeMock();
+    bitdb.MakeMock();
 #endif
-        pathTemp = GetTempPath() / strprintf("test_wispr_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
-        boost::filesystem::create_directories(pathTemp);
-        mapArgs["-datadir"] = pathTemp.string();
-        pblocktree = new CBlockTreeDB(1 << 20, true);
-        pcoinsdbview = new CCoinsViewDB(1 << 23, true);
-        pcoinsTip = new CCoinsViewCache(pcoinsdbview);
-        InitBlockIndex();
-        {
-            CValidationState state;
-            bool ok = ActivateBestChain(state);
-            BOOST_CHECK(ok);
-        }
-#ifdef ENABLE_WALLET
-        bool fFirstRun;
-        pwalletMain = new CWallet("wallet.dat");
-        pwalletMain->LoadWallet(fFirstRun);
-        RegisterValidationInterface(pwalletMain);
-#endif
-        nScriptCheckThreads = 3;
-        for (int i=0; i < nScriptCheckThreads-1; i++)
-            threadGroup.create_thread(&ThreadScriptCheck);
+}
 
-        g_connman = std::unique_ptr<CConnman>(new CConnman());
-        connman = g_connman.get();
-        RegisterNodeSignals(GetNodeSignals());
-    }
-    ~TestingSetup()
+BasicTestingSetup::~BasicTestingSetup()
+{
+    ECC_Stop();
+    g_connman.reset();
+}
+TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(chainName)
+{
+    const CChainParams& chainparams = Params();
+    // Ideally we'd move all the RPC tests to the functional testing framework
+    // instead of unit tests, but for now we need these here.
+
+//    RegisterAllCoreRPCCommands(tableRPC);
+//    ClearDatadirCache();
+    pathTemp = GetTempPath() / strprintf("test_bitcoin_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
+    boost::filesystem::create_directories(pathTemp);
+    mapArgs["-datadir"] = pathTemp.string();
+//    mempool.setSanityCheck(1.0);
+    pblocktree = new CBlockTreeDB(1 << 20, true);
+    pcoinsdbview = new CCoinsViewDB(1 << 23, true);
+    pcoinsTip = new CCoinsViewCache(pcoinsdbview);
+    InitBlockIndex();
     {
-        threadGroup.interrupt_all();
-        threadGroup.join_all();
-        UnregisterNodeSignals(GetNodeSignals());
-        UnloadBlockIndex();
-#ifdef ENABLE_WALLET
-        delete pwalletMain;
-        pwalletMain = nullptr;
-#endif
-        delete pcoinsTip;
-        delete pcoinsdbview;
-        delete pblocktree;
-#ifdef ENABLE_WALLET
-        bitdb.Flush(true);
-#endif
-        boost::filesystem::remove_all(pathTemp);
-        ECC_Stop();
-        g_connman.reset();
+        CValidationState state;
+        bool ok = ActivateBestChain(state);
+        BOOST_CHECK(ok);
     }
-};
+#ifdef ENABLE_WALLET
+    bool fFirstRun;
+    pwalletMain = new CWallet("wallet.dat");
+    pwalletMain->LoadWallet(fFirstRun);
+    RegisterValidationInterface(pwalletMain);
+#endif
+    nScriptCheckThreads = 3;
+    for (int i=0; i < nScriptCheckThreads-1; i++)
+        threadGroup.create_thread(&ThreadScriptCheck);
+    g_connman = std::unique_ptr<CConnman>(new CConnman()); // Deterministic randomness for tests.
+    connman = g_connman.get();
+    RegisterNodeSignals(GetNodeSignals());
+}
 
-BOOST_GLOBAL_FIXTURE(TestingSetup);
+TestingSetup::~TestingSetup()
+{
+    UnregisterNodeSignals(GetNodeSignals());
+    threadGroup.interrupt_all();
+    threadGroup.join_all();
+    UnloadBlockIndex();
+#ifdef ENABLE_WALLET
+    delete pwalletMain;
+    pwalletMain = nullptr;
+#endif
+    delete pcoinsTip;
+    delete pcoinsdbview;
+    delete pblocktree;
+    boost::filesystem::remove_all(pathTemp);
+}
 
 void Shutdown(void* parg)
 {
