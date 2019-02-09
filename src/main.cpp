@@ -3308,11 +3308,11 @@ bool ReconsiderBlock(CValidationState& state, CBlockIndex* pindex)
     return true;
 }
 
-CBlockIndex* AddToBlockIndex(const CBlock& block)
+CBlockIndex* AddToBlockIndex(const CBlockHeader& block)
 {
     // Check for duplicate
     uint256 hash = block.GetHash();
-    uint256 bn2Hash = block.IsProofOfWork() ? hash : block.vtx[1].vin[0].prevout.hash;
+//    uint256 bn2Hash = block.IsProofOfWork() ? hash : block.vtx[1].vin[0].prevout.hash;
     BlockMap::iterator it = mapBlockIndex.find(hash);
     if (it != mapBlockIndex.end())
         return it->second;
@@ -3349,18 +3349,18 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
             LogPrintf("AddToBlockIndex() : SetStakeEntropyBit() failed \n");
 
         // ppcoin: record proof-of-stake hash value
-        if (!mapProofOfStake.count(hash))
-            LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
-
-        pindexNew->hashProofOfStake = mapProofOfStake[hash];
+//        if (!mapProofOfStake.count(hash))
+//            LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
+//
+//        pindexNew->hashProofOfStake = mapProofOfStake[hash];
         uint64_t nStakeModifier = 0;
         bool fGeneratedStakeModifier = false;
         if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
             LogPrintf("AddToBlockIndex() : ComputeNextStakeModifier() failed \n");
         pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
-        if(pindexNew->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()){
-            pindexNew->bnStakeModifierV2 = ComputeStakeModifier(pindexNew->pprev, bn2Hash);
-        }
+//        if(pindexNew->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()){
+//            pindexNew->bnStakeModifierV2 = ComputeStakeModifier(pindexNew->pprev, bn2Hash);
+//        }
         pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
         if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
             LogPrintf("AddToBlockIndex() : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", pindexNew->nHeight, std::to_string(nStakeModifier));
@@ -3812,7 +3812,7 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
     return true;
 }
 
-bool AcceptBlockHeader(const CBlock& block, CValidationState& state, CBlockIndex** ppindex)
+bool AcceptBlockHeader(const CBlockHeader& block, CValidationState& state, CBlockIndex** ppindex)
 {
     AssertLockHeld(cs_main);
     // Check for duplicate
@@ -3872,7 +3872,26 @@ bool AcceptBlockHeader(const CBlock& block, CValidationState& state, CBlockIndex
 
     return true;
 }
-
+// Exposed wrapper for AcceptBlockHeader
+//bool ProcessNewBlockHeaders(const std::vector<CBlockHeader>& headers, CValidationState& state, const CChainParams& chainparams, const CBlockIndex** ppindex, CBlockHeader *first_invalid)
+//{
+//    if (first_invalid != nullptr) first_invalid->SetNull();
+//    {
+//        LOCK(cs_main);
+//        for (const CBlockHeader& header : headers) {
+//            CBlockIndex *pindex = nullptr; // Use a temp pindex instead of ppindex to avoid a const_cast
+//            if (!g_chainstate.AcceptBlockHeader(header, state, chainparams, &pindex)) {
+//                if (first_invalid) *first_invalid = header;
+//                return false;
+//            }
+//            if (ppindex) {
+//                *ppindex = pindex;
+//            }
+//        }
+//    }
+//    NotifyHeaderTip();
+//    return true;
+//}
 bool ContextualCheckZerocoinStake(int nHeight, CStakeInput* stake)
 {
     if (nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT())
@@ -3903,6 +3922,8 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
     AssertLockHeld(cs_main);
 
     CBlockIndex*& pindex = *ppindex;
+    uint256 hash = block.GetHash();
+    uint256 bn2Hash = block.IsProofOfWork() ? hash : block.vtx[1].vin[0].prevout.hash;
 
     // Get prev block index
     CBlockIndex* pindexPrev = nullptr;
@@ -3927,7 +3948,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
         }
     }
 
-    if(pindexPrev->nHeight + 1 < Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+    if(Params().PivProtocolsStartHeightSmallerThen(pindexPrev->nHeight + 1)) {
         if (block.IsProofOfStake() && !CheckCoinStakeTimestamp(block.GetBlockTime(), (int64_t) block.vtx[1].nTime)) {
             return state.DoS(50, error("AcceptBlock() : coinstake timestamp violation nTimeBlock=%d nTimeTx=%u\n",
                                        block.GetBlockTime(), block.vtx[1].nTime));
@@ -3937,6 +3958,9 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
         return false;
 
     if (block.IsProofOfStake()) {
+        pindex->SetProofOfStake();
+        pindex->prevoutStake = block.vtx[1].vin[0].prevout;
+        pindex->nStakeTime = block.nTime;
         uint256 hashProofOfStake = 0;
         unique_ptr<CStakeInput> stake;
 
@@ -3949,15 +3973,18 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
         if (stake->IsZWSP() && !ContextualCheckZerocoinStake(pindexPrev->nHeight, stake.get()))
             return state.DoS(100, error("%s: staked zWSP fails context checks", __func__));
 
-        uint256 hash = block.GetHash();
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
             mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
     }
     if(block.IsProofOfWork()){
         uint256 hashProofOfStake = block.GetPoWHash();
-        uint256 hash = block.GetHash();
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
             mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
+    }
+
+    pindex->hashProofOfStake = mapProofOfStake[hash];
+    if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
+        pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
     if (!AcceptBlockHeader(block, state, &pindex))
         return false;
@@ -4604,7 +4631,7 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                 // Activate the genesis block so normal node progress can continue
                 if (hash == chainparams.GetConsensus().hashGenesisBlock) {
                     CValidationState state;
-                    if (!ActivateBestChain(state, chainparams)) {
+                    if (!ActivateBestChain(state)) {
                         break;
                     }
                 }
@@ -5759,11 +5786,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                     Misbehaving(pfrom->GetId(), 20);
                     return error("non-continuous headers sequence");
                 }
-
-                /*TODO: this has a CBlock cast on it so that it will compile. There should be a solution for this
-             * before headers are reimplemented on mainnet
-             */
-                if (!AcceptBlockHeader((CBlock)header, state, &pindexLast)) {
+                if (!AcceptBlockHeader(header, state, &pindexLast)) {
                     int nDoS;
                     if (state.IsInvalid(nDoS)) {
                         if (nDoS > 0)

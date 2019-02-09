@@ -223,7 +223,20 @@ public:
     {
         SetNull();
     }
+    explicit CBlockIndex(const CBlockHeader& block)
+    {
+        SetNull();
 
+        nVersion                = block.nVersion;
+        hashMerkleRoot          = block.hashMerkleRoot;
+        nTime                   = block.nTime;
+        nBits                   = block.nBits;
+        nNonce                  = block.nNonce;
+        if(block.nVersion > 7) {
+            nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
+        }
+
+    }
     CBlockIndex(const CBlock& block)
     {
         SetNull();

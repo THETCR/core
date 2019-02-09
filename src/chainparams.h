@@ -134,7 +134,8 @@ public:
     int LAST_POW_BLOCK() const { return consensus.nLastPOWBlock; }
     int NEW_PROTOCOLS_STARTHEIGHT() const { return consensus.nNewProtocolStartHeight; }
     int NEW_PROTOCOLS_STARTTIME() const { return consensus.nNewProtocolStartTime; }
-
+    bool PivProtocolsStartHeightEqualOrGreaterThen(int nHeight) const { return nHeight >= consensus.nNewProtocolStartHeight; }
+    bool PivProtocolsStartHeightSmallerThen(int nHeight) const { return nHeight < consensus.nNewProtocolStartHeight; }
 protected:
     CChainParams() {}
 
