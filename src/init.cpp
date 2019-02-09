@@ -1962,6 +1962,11 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     if (GetBoolArg("-listenonion", DEFAULT_LISTEN_ONION))
         StartTorControl(threadGroup);
 
+    Discover(threadGroup);
+
+    // Map ports with UPnP
+    MapPort(GetBoolArg("-upnp", DEFAULT_UPNP));
+
     std::string strNodeError;
     if(!StartNode(connman, threadGroup, scheduler, strNodeError))
         return InitError(strNodeError);
