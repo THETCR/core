@@ -56,11 +56,6 @@ struct TestingSetup {
         pcoinsdbview = new CCoinsViewDB(1 << 23, true);
         pcoinsTip = new CCoinsViewCache(pcoinsdbview);
         InitBlockIndex();
-        {
-            CValidationState state;
-            bool ok = ActivateBestChain(state);
-            BOOST_CHECK(ok);
-        }
 #ifdef ENABLE_WALLET
         bool fFirstRun;
         pwalletMain = new CWallet("wallet.dat");
