@@ -178,7 +178,8 @@ public:
 static CCoinsViewDB* pcoinsdbview = nullptr;
 static CCoinsViewErrorCatcher* pcoinscatcher = nullptr;
 static std::unique_ptr<ECCVerifyHandle> globalVerifyHandle;
-
+static boost::thread_group threadGroup;
+static CScheduler scheduler;
 void Interrupt(boost::thread_group& threadGroup)
 {
     InterruptHTTPServer();
