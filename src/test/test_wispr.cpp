@@ -9,13 +9,9 @@
 #include "chainparams.h"
 #include "consensus/consensus.h"
 #include "consensus/validation.h"
-#include "key.h"
 #include "main.h"
 #include "miner.h"
-#include "pubkey.h"
 #include "random.h"
-#include "txdb.h"
-#include "txmempool.h"
 #include "ui_interface.h"
 #include "util.h"
 #ifdef ENABLE_WALLET
@@ -57,7 +53,7 @@ BasicTestingSetup::~BasicTestingSetup()
 }
 TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSetup(chainName)
 {
-    const CChainParams& chainparams = Params();
+//    const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
 
