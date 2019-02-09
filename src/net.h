@@ -112,7 +112,7 @@ public:
   CConnman();
   ~CConnman();
   bool Start(boost::thread_group& threadGroup, std::string& strNodeError);
-  void Interrupt();
+//  void Interrupt();
   void Stop();
 //  template<typename Callable>
 //  void ForEachNode(Callable&& func)

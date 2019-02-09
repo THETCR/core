@@ -2160,8 +2160,8 @@ void CExplicitNetCleanup::callCleanup()
     CNetCleanup* tmp = new CNetCleanup();
     delete tmp; // Stroustrup's gonna kill me for that
 }
-void CConnman::Interrupt()
-{
+//void CConnman::Interrupt()
+//{
 //    {
 //        std::lock_guard<std::mutex> lock(mutexMsgProc);
 //        flagInterruptMsgProc = true;
@@ -2175,7 +2175,7 @@ void CConnman::Interrupt()
 //        for (int i=0; i<(MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS); i++)
 //            semOutbound->post();
 
-}
+//}
 void CConnman::Stop()
 {
     LogPrintf("StopNode()\n");
