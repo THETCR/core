@@ -36,7 +36,7 @@ std::unique_ptr<CConnman> g_connman;
 
 extern bool fPrintToConsole;
 extern void noui_connect();
-BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
+BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
 {
     ECC_Start();
     SetupEnvironment();
@@ -55,7 +55,7 @@ BasicTestingSetup::~BasicTestingSetup()
     ECC_Stop();
     g_connman.reset();
 }
-TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(chainName)
+TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSetup(chainName)
 {
     const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
