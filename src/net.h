@@ -113,6 +113,13 @@ public:
   ~CConnman();
   bool Start(boost::thread_group& threadGroup, std::string& strNodeError);
   void Stop();
+  template<typename Callable>
+  void ForEachNode(Callable&& func)
+  {
+      LOCK(cs_vNodes);
+      for (auto&& node : vNodes)
+          func(node);
+  };
 private:
   void ThreadOpenAddedConnections();
   void ProcessOneShot();
@@ -472,7 +479,11 @@ public:
                 vInventoryToSend.push_back(inv);
         }
     }
-
+  void PushBlockHash(const uint256 &hash)
+  {
+      LOCK(cs_inventory);
+      vBlockHashesToAnnounce.push_back(hash);
+  }
     void AskFor(const CInv& inv);
 
     // TODO: Document the postcondition of this function.  Is cs_vSend locked?
