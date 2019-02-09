@@ -26,20 +26,21 @@ extern bool DecodeHexTx(CTransaction& tx, const std::string& strHexTx);
 BOOST_AUTO_TEST_SUITE(zerocoin_implementation_tests)
 
 BOOST_AUTO_TEST_CASE(zcparams_test)
-        {
-                cout << "Running zcparams_test...\n";
+{
+    cout << "Running zcparams_test...\n";
 
-                bool fPassed = true;
-                try{
-            SelectParams(CBaseChainParams::MAIN);
-            ZerocoinParams *ZCParams = Params().Zerocoin_Params(false);
-            (void)ZCParams;
-        } catch(std::exception& e) {
-            fPassed = false;
-            std::cout << e.what() << "\n";
-        }
-                BOOST_CHECK(fPassed);
-        }
+    bool fPassed = true;
+    try{
+        SelectParams(CBaseChainParams::MAIN);
+        ZerocoinParams *ZCParams = Params().Zerocoin_Params(false);
+        (void)ZCParams;
+    } catch(std::exception& e) {
+        fPassed = false;
+        std::cout << e.what() << "\n";
+    }
+    BOOST_CHECK(fPassed);
+}
+
 
 std::string zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
                               "4069182906412495150821892985591491761845028084891200728449926873928072877767359714183472702618963750149718246911"
