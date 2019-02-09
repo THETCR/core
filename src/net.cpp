@@ -2162,9 +2162,9 @@ void CConnman::Interrupt()
 //    interruptNet();
 //    InterruptSocks5(true);
 
-    if (semOutbound)
-        for (int i=0; i<(MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS); i++)
-            semOutbound->post();
+//    if (semOutbound)
+//        for (int i=0; i<(MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS); i++)
+//            semOutbound->post();
 
 }
 void CConnman::Stop()
@@ -2175,6 +2175,10 @@ void CConnman::Stop()
         DumpData();
         fAddressesInitialized = false;
     }
+    if (semOutbound)
+        for (int i=0; i<(MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS); i++)
+            semOutbound->post();
+
     // Close sockets
     for(CNode* pnode: vNodes)
     if (pnode->hSocket != INVALID_SOCKET)
@@ -2200,7 +2204,7 @@ void CConnman::Stop()
 
 CConnman::~CConnman()
 {
-    Interrupt();
+//    Interrupt();
     Stop();
 }
 

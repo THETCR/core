@@ -74,15 +74,16 @@ struct TestingSetup {
         nScriptCheckThreads = 3;
         for (int i=0; i < nScriptCheckThreads-1; i++)
             threadGroup.create_thread(&ThreadScriptCheck);
+
         g_connman = std::unique_ptr<CConnman>(new CConnman());
         connman = g_connman.get();
         RegisterNodeSignals(GetNodeSignals());
     }
     ~TestingSetup()
     {
-        UnregisterNodeSignals(GetNodeSignals());
         threadGroup.interrupt_all();
         threadGroup.join_all();
+        UnregisterNodeSignals(GetNodeSignals());
         UnloadBlockIndex();
 #ifdef ENABLE_WALLET
         delete pwalletMain;
