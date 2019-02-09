@@ -112,6 +112,7 @@ public:
   CConnman();
   ~CConnman();
   bool Start(boost::thread_group& threadGroup, std::string& strNodeError);
+  void Interrupt();
   void Stop();
   template<typename Callable>
   void ForEachNode(Callable&& func)
@@ -130,16 +131,21 @@ private:
   void ThreadDNSAddressSeed();
   void ThreadStakeMinter();
 
+  std::condition_variable condMsgProc;
+  std::mutex mutexMsgProc;
+  std::atomic<bool> flagInterruptMsgProc;
+
   std::vector<CNode*> vNodes;
   std::list<CNode*> vNodesDisconnected;
   mutable CCriticalSection cs_vNodes;
+
 };
 extern std::unique_ptr<CConnman> g_connman;
 void MapPort(bool fUseUPnP);
 unsigned short GetListenPort();
 bool BindListenPort(const CService& bindAddr, std::string& strError, bool fWhitelisted = false);
 bool StartNode(CConnman& connman, boost::thread_group& threadGroup, CScheduler& scheduler, std::string& strNodeError);
-bool StopNode(CConnman& connman);
+//bool StopNode(CConnman& connman);
 void SocketSendData(CNode* pnode);
 
 typedef int NodeId;

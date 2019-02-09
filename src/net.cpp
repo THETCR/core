@@ -2112,20 +2112,20 @@ bool CConnman::Start(boost::thread_group& threadGroup, std::string& strNodeError
     return true;
 }
 
-bool StopNode(CConnman& connman)
-{
-    LogPrintf("StopNode()\n");
-    MapPort(false);
-
-    if (fAddressesInitialized)
-    {
-        DumpData();
-        fAddressesInitialized = false;
-    }
-
-    connman.Stop();
-    return true;
-}
+//bool StopNode(CConnman& connman)
+//{
+//    LogPrintf("StopNode()\n");
+//    MapPort(false);
+//
+//    if (fAddressesInitialized)
+//    {
+//        DumpData();
+//        fAddressesInitialized = false;
+//    }
+//
+//    connman.Stop();
+//    return true;
+//}
 
 class CNetCleanup
 {
@@ -2149,12 +2149,30 @@ void CExplicitNetCleanup::callCleanup()
     CNetCleanup* tmp = new CNetCleanup();
     delete tmp; // Stroustrup's gonna kill me for that
 }
-void CConnman::Stop()
+void CConnman::Interrupt()
 {
+    {
+        std::lock_guard<std::mutex> lock(mutexMsgProc);
+        flagInterruptMsgProc = true;
+    }
+    condMsgProc.notify_all();
+
+//    interruptNet();
+//    InterruptSocks5(true);
+
     if (semOutbound)
         for (int i=0; i<(MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS); i++)
             semOutbound->post();
 
+}
+void CConnman::Stop()
+{
+    LogPrintf("StopNode()\n");
+    if (fAddressesInitialized)
+    {
+        DumpData();
+        fAddressesInitialized = false;
+    }
     // Close sockets
     for(CNode* pnode: vNodes)
     if (pnode->hSocket != INVALID_SOCKET)
@@ -2180,6 +2198,8 @@ void CConnman::Stop()
 
 CConnman::~CConnman()
 {
+    Interrupt();
+    Stop();
 }
 
 void RelayTransaction(const CTransaction& tx)
