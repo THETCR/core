@@ -129,6 +129,10 @@ private:
   void ThreadSocketHandler();
   void ThreadDNSAddressSeed();
   void ThreadStakeMinter();
+
+  std::vector<CNode*> vNodes;
+  std::list<CNode*> vNodesDisconnected;
+  mutable CCriticalSection cs_vNodes;
 };
 extern std::unique_ptr<CConnman> g_connman;
 void MapPort(bool fUseUPnP);
@@ -370,6 +374,9 @@ public:
     std::multimap<int64_t, CInv> mapAskFor;
     std::vector<uint256> vBlockRequested;
     // Block and TXN accept times
+    // Used for headers announcements - unfiltered blocks to relay
+    // Also protected by cs_inventory
+    std::vector<uint256> vBlockHashesToAnnounce;
     std::atomic<int64_t> nLastBlockTime{0};
     std::atomic<int64_t> nLastTXTime{0};
 
