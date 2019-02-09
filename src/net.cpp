@@ -2029,8 +2029,10 @@ CConnman::CConnman()
 {
 }
 
-bool StartNode(CConnman& connman, boost::thread_group& threadGroup, CScheduler& scheduler, std::string& strNodeError)
+
+bool CConnman::Start(boost::thread_group& threadGroup, CScheduler& scheduler, std::string& strNodeError)
 {
+
     uiInterface.InitMessage(_("Loading addresses..."));
     // Load addresses from peers.dat
     int64_t nStart = GetTimeMillis();
@@ -2067,17 +2069,8 @@ bool StartNode(CConnman& connman, boost::thread_group& threadGroup, CScheduler& 
 
     fAddressesInitialized = true;
 
-    Discover(threadGroup);
+//    Discover(threadGroup);
 
-    bool ret = connman.Start(threadGroup, strNodeError);
-
-    // Dump network addresses
-    scheduler.scheduleEvery(DumpData, DUMP_ADDRESSES_INTERVAL);
-    return ret;
-}
-
-bool CConnman::Start(boost::thread_group& threadGroup, std::string& strNodeError)
-{
     if (semOutbound == NULL) {
         // initialize semaphore
         int nMaxOutbound = std::min((MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS), nMaxConnections);
@@ -2094,17 +2087,15 @@ bool CConnman::Start(boost::thread_group& threadGroup, std::string& strNodeError
     //
     // Start threads
     //
+    // Map ports with UPnP
+    MapPort(GetBoolArg("-upnp", DEFAULT_UPNP));
+    // Send and receive from sockets, accept connections
+    threadGroup.create_thread(boost::bind(&TraceThread<boost::function<void()> >, "net", boost::function<void()>(boost::bind(&CConnman::ThreadSocketHandler, this))));
 
     if (!GetBoolArg("-dnsseed", true))
         LogPrintf("DNS seeding disabled\n");
     else
         threadGroup.create_thread(boost::bind(&TraceThread<boost::function<void()> >, "dnsseed", boost::function<void()>(boost::bind(&CConnman::ThreadDNSAddressSeed, this))));
-
-    // Map ports with UPnP
-    MapPort(GetBoolArg("-upnp", DEFAULT_UPNP));
-
-    // Send and receive from sockets, accept connections
-    threadGroup.create_thread(boost::bind(&TraceThread<boost::function<void()> >, "net", boost::function<void()>(boost::bind(&CConnman::ThreadSocketHandler, this))));
 
     // Initiate outbound connections from -addnode
     threadGroup.create_thread(boost::bind(&TraceThread<boost::function<void()> >, "addcon", boost::function<void()>(boost::bind(&CConnman::ThreadOpenAddedConnections, this))));
@@ -2119,6 +2110,7 @@ bool CConnman::Start(boost::thread_group& threadGroup, std::string& strNodeError
     if (GetBoolArg("-staking", true)){
         threadGroup.create_thread(boost::bind(&TraceThread<boost::function<void()> >, "stakemint", boost::function<void()>(boost::bind(&CConnman::ThreadStakeMinter, this))));
     }
+    scheduler.scheduleEvery(DumpData, DUMP_ADDRESSES_INTERVAL);
 
     return true;
 }
@@ -2160,22 +2152,22 @@ void CExplicitNetCleanup::callCleanup()
     CNetCleanup* tmp = new CNetCleanup();
     delete tmp; // Stroustrup's gonna kill me for that
 }
-//void CConnman::Interrupt()
-//{
+void CConnman::Interrupt()
+{
 //    {
 //        std::lock_guard<std::mutex> lock(mutexMsgProc);
 //        flagInterruptMsgProc = true;
 //    }
 //    condMsgProc.notify_all();
-
+//
 //    interruptNet();
 //    InterruptSocks5(true);
 
-//    if (semOutbound)
-//        for (int i=0; i<(MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS); i++)
-//            semOutbound->post();
+    if (semOutbound)
+        for (int i=0; i<(MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS); i++)
+            semOutbound->post();
 
-//}
+}
 void CConnman::Stop()
 {
     LogPrintf("StopNode()\n");
@@ -2213,7 +2205,7 @@ void CConnman::Stop()
 
 CConnman::~CConnman()
 {
-//    Interrupt();
+    Interrupt();
     Stop();
 }
 

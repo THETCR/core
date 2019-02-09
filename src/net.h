@@ -111,8 +111,8 @@ class CConnman
 public:
   CConnman();
   ~CConnman();
-  bool Start(boost::thread_group& threadGroup, std::string& strNodeError);
-//  void Interrupt();
+  bool Start(boost::thread_group& threadGroup, CScheduler& scheduler, std::string& strNodeError);
+  void Interrupt();
   void Stop();
 //  template<typename Callable>
 //  void ForEachNode(Callable&& func)

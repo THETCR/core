@@ -178,8 +178,6 @@ public:
 static CCoinsViewDB* pcoinsdbview = nullptr;
 static CCoinsViewErrorCatcher* pcoinscatcher = nullptr;
 static std::unique_ptr<ECCVerifyHandle> globalVerifyHandle;
-static boost::thread_group threadGroup;
-static CScheduler scheduler;
 void Interrupt(boost::thread_group& threadGroup)
 {
     InterruptHTTPServer();
@@ -187,8 +185,8 @@ void Interrupt(boost::thread_group& threadGroup)
     InterruptRPC();
     InterruptREST();
     InterruptTorControl();
-//    if (g_connman)
-//        g_connman->Interrupt();
+    if (g_connman)
+        g_connman->Interrupt();
     threadGroup.interrupt_all();
 }
 
@@ -220,8 +218,8 @@ void PrepareShutdown()
 #endif
     MapPort(false);
     UnregisterValidationInterface(peerLogic.get());
-    peerLogic.reset();
-    g_connman.reset();
+//    peerLogic.reset();
+//    g_connman.reset();
 
     DumpMasternodes();
     DumpBudgets();
@@ -1967,9 +1965,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     // Map ports with UPnP
     MapPort(GetBoolArg("-upnp", DEFAULT_UPNP));
-
     std::string strNodeError;
-    if(!StartNode(connman, threadGroup, scheduler, strNodeError))
+    if (!connman.Start(threadGroup, scheduler, strNodeError))
         return InitError(strNodeError);
 
     if (nLocalServices & NODE_BLOOM_LIGHT_ZC) {
