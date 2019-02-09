@@ -131,13 +131,13 @@ private:
   void ThreadDNSAddressSeed();
   void ThreadStakeMinter();
 
-  std::condition_variable condMsgProc;
-  std::mutex mutexMsgProc;
-  std::atomic<bool> flagInterruptMsgProc;
+//  std::condition_variable condMsgProc;
+//  std::mutex mutexMsgProc;
+//  std::atomic<bool> flagInterruptMsgProc;
 
-  std::vector<CNode*> vNodes;
-  std::list<CNode*> vNodesDisconnected;
-  mutable CCriticalSection cs_vNodes;
+//  std::vector<CNode*> vNodes;
+//  std::list<CNode*> vNodesDisconnected;
+//  mutable CCriticalSection cs_vNodes;
 
 };
 extern std::unique_ptr<CConnman> g_connman;

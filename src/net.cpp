@@ -854,7 +854,7 @@ void SocketSendData(CNode* pnode)
     pnode->vSendMsg.erase(pnode->vSendMsg.begin(), it);
 }
 
-static list<CNode*> vNodesDisconnected;
+static std::list<CNode*> vNodesDisconnected;
 struct NodeEvictionCandidate
 {
   NodeId id;
@@ -2107,8 +2107,10 @@ bool CConnman::Start(boost::thread_group& threadGroup, std::string& strNodeError
     threadGroup.create_thread(boost::bind(&TraceThread<boost::function<void()> >, "msghand", boost::function<void()>(boost::bind(&CConnman::ThreadMessageHandler, this))));
 
     // ppcoin:mint proof-of-stake blocks in the background
-    if (GetBoolArg("-staking", true))
+    if (GetBoolArg("-staking", true)){
         threadGroup.create_thread(boost::bind(&TraceThread<boost::function<void()> >, "stakemint", boost::function<void()>(boost::bind(&CConnman::ThreadStakeMinter, this))));
+    }
+
     return true;
 }
 
@@ -2151,11 +2153,11 @@ void CExplicitNetCleanup::callCleanup()
 }
 void CConnman::Interrupt()
 {
-    {
-        std::lock_guard<std::mutex> lock(mutexMsgProc);
-        flagInterruptMsgProc = true;
-    }
-    condMsgProc.notify_all();
+//    {
+//        std::lock_guard<std::mutex> lock(mutexMsgProc);
+//        flagInterruptMsgProc = true;
+//    }
+//    condMsgProc.notify_all();
 
 //    interruptNet();
 //    InterruptSocks5(true);
