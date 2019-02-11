@@ -23,6 +23,7 @@
 #include "script/sign.h"
 #include "spork.h"
 #include "stakeinput.h"
+#include "shutdown.h"
 #include "swifttx.h"
 #include "timedata.h"
 #include "txdb.h"
@@ -3004,8 +3005,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     for (std::unique_ptr<CStakeInput>& stakeInput : listInputs) {
         nCredit = 0;
         // Make sure the wallet is unlocked and shutdown hasn't been requested
-//        if (IsLocked() || ShutdownRequested())
-        if (IsLocked())
+        if (IsLocked() || ShutdownRequested())
             return false;
 
         //make sure that enough time has elapsed between
