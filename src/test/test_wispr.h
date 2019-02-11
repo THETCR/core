@@ -8,6 +8,8 @@
 #include "chainparamsbase.h"
 #include "key.h"
 #include "pubkey.h"
+#include "random.h"
+#include "scheduler.h"
 #include "txdb.h"
 #include "txmempool.h"
 
@@ -28,6 +30,9 @@ struct BasicTestingSetup {
  * Included are data directory, coins database, script check threads setup.
  */
 class CConnman;
+class CNode;
+class PeerLogicValidation;
+
 struct TestingSetup: public BasicTestingSetup {
     CCoinsViewDB *pcoinsdbview;
     boost::filesystem::path pathTemp;
