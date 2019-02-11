@@ -7,7 +7,7 @@
 #include "main.h"
 #include "txdb.h"
 #include "walletdb.h"
-#include "init.h"
+#include "shutdown.h"
 #include "wallet.h"
 #include "primitives/deterministicmint.h"
 #include "zwspchain.h"

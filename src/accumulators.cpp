@@ -7,7 +7,7 @@
 #include "chainparams.h"
 #include "main.h"
 #include "txdb.h"
-#include "init.h"
+#include "shutdown.h"
 #include "spork.h"
 #include "accumulatorcheckpoints.h"
 #include "zwspchain.h"
