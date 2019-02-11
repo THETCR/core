@@ -5,6 +5,11 @@
 #define BOOST_TEST_MODULE Wispr Test Suite
 
 #include "net.h"
+#include "ui_interface.h"
+#ifdef ENABLE_WALLET
+#include "db.h"
+#include "wallet.h"
+#endif
 
 #include <memory>
 
