@@ -4,6 +4,7 @@
 
 #ifndef WISPR_STAKEINPUT_H
 #define WISPR_STAKEINPUT_H
+#include "libzerocoin/CoinSpend.h"
 
 class CKeyStore;
 class CWallet;
