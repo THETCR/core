@@ -4,7 +4,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "obfuscation-relay.h"
-#include "main.h"
 
 CObfuScationRelay::CObfuScationRelay()
 {

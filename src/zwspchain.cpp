@@ -6,7 +6,6 @@
 #include "consensus/validation.h"
 #include "zwspchain.h"
 #include "invalid.h"
-#include "main.h"
 #include "txdb.h"
 #include "ui_interface.h"
 

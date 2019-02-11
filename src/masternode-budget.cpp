@@ -5,7 +5,6 @@
 
 #include "masternode-budget.h"
 #include "addrman.h"
-#include "main.h"
 #include "masternode-sync.h"
 #include "masternode.h"
 #include "masternodeman.h"

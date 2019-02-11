@@ -6,7 +6,6 @@
 #include "zwsptracker.h"
 #include "util.h"
 #include "sync.h"
-#include "main.h"
 #include "txdb.h"
 #include "txmempool.h"
 #include "walletdb.h"

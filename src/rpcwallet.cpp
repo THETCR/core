@@ -13,6 +13,7 @@
 #include "policy/policy.h"
 #include "netbase.h"
 #include "rpc/server.h"
+#include "main.h"
 #include "shutdown.h"
 #include "timedata.h"
 #include "util.h"

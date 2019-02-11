@@ -6,7 +6,6 @@
 #include "consensus/validation.h"
 #include "obfuscation.h"
 #include "coincontrol.h"
-#include "main.h"
 #include "masternodeman.h"
 #include "script/sign.h"
 #include "swifttx.h"

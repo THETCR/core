@@ -13,7 +13,6 @@
 #include "clientversion.h"
 #include "compat.h"
 #include "init.h"
-#include "main.h"
 #include "shutdown.h"
 #include "masternodeconfig.h"
 #include "noui.h"

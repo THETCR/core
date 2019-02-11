@@ -8,7 +8,6 @@
 #include "activemasternode.h"
 #include "base58.h"
 #include "key.h"
-#include "main.h"
 #include "masternodeman.h"
 #include "net.h"
 #include "obfuscation.h"
