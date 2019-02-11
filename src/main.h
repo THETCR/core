@@ -46,6 +46,7 @@ class CBloomFilter;
 class CInv;
 class CConnman;
 class CScriptCheck;
+class CTxMemPool;
 class CValidationInterface;
 class CValidationState;
 
