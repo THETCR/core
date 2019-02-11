@@ -21,11 +21,7 @@
 #include "accumulators.h"
 #endif
 
-#include <memory>
-
 #include <boost/filesystem.hpp>
-#include <boost/test/unit_test.hpp>
-#include <boost/thread.hpp>
 
 
 extern bool fPrintToConsole;
@@ -67,8 +63,9 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
     InitBlockIndex();
     {
         CValidationState state;
-        bool ok = ActivateBestChain(state);
-        BOOST_CHECK(ok);
+        if (!ActivateBestChain(state)) {
+            throw std::runtime_error("ActivateBestChain failed");
+        }
     }
 #ifdef ENABLE_WALLET
     bool fFirstRun;
