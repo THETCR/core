@@ -5,6 +5,7 @@
 
 #include "rpc/server.h"
 #include "rpc/client.h"
+#include "main.h"
 
 #include "base58.h"
 #include "wallet.h"
