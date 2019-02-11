@@ -9,6 +9,7 @@
 
 #include "coins.h"
 #include "leveldbwrapper.h"
+#include "libzerocoin/Coin.h"
 #include "primitives/zerocoin.h"
 #include "chain.h"
 
