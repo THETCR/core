@@ -7,6 +7,7 @@
 #include "chainparams.h"
 #include "consensus/validation.h"
 #include "main.h"
+#include <test/test_wispr.h>
 #include "txdb.h"
 #include "primitives/deterministicmint.h"
 #include "key.h"
@@ -23,7 +24,7 @@ using namespace libzerocoin;
 
 extern bool DecodeHexTx(CTransaction& tx, const std::string& strHexTx);
 
-BOOST_AUTO_TEST_SUITE(zerocoin_implementation_tests)
+BOOST_FIXTURE_TEST_SUITE(zerocoin_implementation_tests, TestingSetup)
 
 BOOST_AUTO_TEST_CASE(zcparams_test)
 {
