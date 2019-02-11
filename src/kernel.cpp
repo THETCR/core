@@ -7,6 +7,7 @@
 
 #include "consensus/validation.h"
 #include "db.h"
+#include "primitives/block.h"
 #include "kernel.h"
 #include "main.h"
 #include "spork.h"

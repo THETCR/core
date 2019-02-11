@@ -4,7 +4,6 @@
 
 #include "accumulators.h"
 #include "chain.h"
-#include "primitives/transaction.h"
 #include "primitives/deterministicmint.h"
 #include "main.h"
 #include "stakeinput.h"

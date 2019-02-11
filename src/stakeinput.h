@@ -5,16 +5,13 @@
 #ifndef WISPR_STAKEINPUT_H
 #define WISPR_STAKEINPUT_H
 #include "libzerocoin/CoinSpend.h"
+#include "primitives/transaction.h"
 
 class CKeyStore;
 class CWallet;
 class CWalletTx;
 class CDataStream;
 class CBlockIndex;
-class CTransaction;
-class CTxIn;
-class CTransaction;
-class CTxOut;
 
 class CStakeInput
 {
