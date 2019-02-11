@@ -26,6 +26,7 @@
 #include "shutdown.h"
 #include "timedata.h"
 #include "txdb.h"
+#include "txmempool.h"
 #include "util.h"
 #include "utilmoneystr.h"
 #include "zwspchain.h"
