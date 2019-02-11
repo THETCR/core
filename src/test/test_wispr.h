@@ -8,10 +8,9 @@
 #include "chainparamsbase.h"
 #include "key.h"
 #include "pubkey.h"
-#include "random.h"
-#include "scheduler.h"
 #include "txdb.h"
 #include "txmempool.h"
+#include "scheduler.h"
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"

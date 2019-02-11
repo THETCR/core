@@ -8,11 +8,18 @@
 #include "chainparams.h"
 #include "consensus/consensus.h"
 #include "consensus/validation.h"
+#include "key.h"
 #include "main.h"
 #include "miner.h"
+#include "pubkey.h"
 #include "random.h"
+#include "txdb.h"
+#include "txmempool.h"
 #include "ui_interface.h"
+#include "rpc/server.h"
+#include "script/sigcache.h"
 #include "util.h"
+
 #include <memory>
 
 #include <boost/filesystem.hpp>
