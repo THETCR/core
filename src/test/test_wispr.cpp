@@ -49,6 +49,9 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
 
 //    RegisterAllCoreRPCCommands(tableRPC);
 //    ClearDatadirCache();
+    // We have to run a scheduler thread to prevent ActivateBestChain
+    // from blocking due to queue overrun.
+    threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
     pathTemp = GetTempPath() / strprintf("test_bitcoin_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
     boost::filesystem::create_directories(pathTemp);
     mapArgs["-datadir"] = pathTemp.string();
