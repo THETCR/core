@@ -9,6 +9,7 @@
 #include "consensus/consensus.h"
 #include "consensus/params.h"
 #include "consensus/validation.h"
+#include "main.h"
 #include "miner.h"
 #include "random.h"
 #include "ui_interface.h"
