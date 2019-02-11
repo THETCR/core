@@ -14,6 +14,7 @@
 #include "utilstrencodings.h"
 #include "transaction.h"
 
+extern bool GetTransaction(const uint256 &hash, CTransaction &txOut, uint256 &hashBlock, bool fAllowSlow);
 
 
 std::string COutPoint::ToString() const

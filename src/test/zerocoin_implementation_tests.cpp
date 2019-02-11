@@ -115,20 +115,24 @@ BOOST_AUTO_TEST_CASE(checkzerocoinmint_test)
 
                 //generate a privkey
                 CKey key;
-                key.MakeNewKey(true);
-                CPrivKey privkey = key.GetPrivKey();
+            cout << "key\n";
 
+            key.MakeNewKey(true);
+            cout << "make new\n";
+            CPrivKey privkey = key.GetPrivKey();
+            cout << "private key\n";
                 //generate pubkey hash/serial
                 CPubKey pubkey = key.GetPubKey();
                 uint256 nSerial = Hash(pubkey.begin(), pubkey.end());
                 CBigNum bnSerial(nSerial);
-
+            cout << "serial\n";
                 //make sure privkey import to new keypair makes the same serial
                 CKey key2;
                 key2.SetPrivKey(privkey, true);
                 CPubKey pubkey2 = key2.GetPubKey();
                 uint256 nSerial2 = Hash(pubkey2.begin(), pubkey2.end());
                 CBigNum bnSerial2(nSerial2);
+
                 BOOST_CHECK_MESSAGE(bnSerial == bnSerial2, "Serials do not match!");
 
 
