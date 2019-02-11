@@ -10,6 +10,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+CClientUIInterface uiInterface;
+CWallet* pwalletMain;
 std::unique_ptr<CConnman> g_connman;
 
 [[noreturn]] void Shutdown(void* parg)
