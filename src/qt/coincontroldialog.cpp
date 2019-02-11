@@ -10,11 +10,11 @@
 #include "addresstablemodel.h"
 #include "bitcoinunits.h"
 #include "guiutil.h"
-#include "init.h"
 #include "optionsmodel.h"
 #include "walletmodel.h"
 
 #include "coincontrol.h"
+#include "txmempool.h"
 #include "policy/policy.h"
 #include "main.h"
 #include "obfuscation.h"

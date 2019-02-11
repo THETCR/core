@@ -21,7 +21,6 @@ class WalletModel;
 
 class MultisigDialog;
 class CCoinControl;
-class CTxMemPool;
 
 namespace Ui
 {
