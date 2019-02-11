@@ -10,6 +10,11 @@ class CKeyStore;
 class CWallet;
 class CWalletTx;
 class CDataStream;
+class CBlockIndex;
+class CTransaction;
+class CTxIn;
+class CTransaction;
+class CTxOut;
 
 class CStakeInput
 {
