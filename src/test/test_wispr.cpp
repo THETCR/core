@@ -20,6 +20,8 @@
 #endif
 
 #include <boost/filesystem.hpp>
+#include <boost/test/unit_test.hpp>
+
 
 extern bool fPrintToConsole;
 extern void noui_connect();
