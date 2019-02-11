@@ -10,6 +10,7 @@
 #include "consensus/consensus.h"
 #include "consensus/validation.h"
 #include "main.h"
+#include "init.h"
 #include "miner.h"
 #include "random.h"
 #include "ui_interface.h"
@@ -27,6 +28,7 @@
 
 //CClientUIInterface uiInterface;
 //CWallet* pwalletMain;
+//extern CWallet* pwalletMain;
 
 std::unique_ptr<CConnman> g_connman;
 
