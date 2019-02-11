@@ -13,10 +13,11 @@
 #include "random.h"
 #include "ui_interface.h"
 #include "util.h"
+#include <memory>
 
 #include <boost/filesystem.hpp>
 
-
+std::unique_ptr<CConnman> g_connman;
 extern bool fPrintToConsole;
 extern void noui_connect();
 BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
