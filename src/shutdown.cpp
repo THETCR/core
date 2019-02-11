@@ -8,7 +8,7 @@
 #include <atomic>
 
 static std::atomic<bool> fRequestShutdown(false);
-static std::atomic<bool> fRestartRequested(false);
+static std::atomic<bool> fRequestRestart(false);
 
 void StartShutdown()
 {
