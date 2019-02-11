@@ -95,6 +95,7 @@ TestingSetup::~TestingSetup()
     delete pblocktree;
     boost::filesystem::remove_all(pathTemp);
 }
+BOOST_GLOBAL_FIXTURE(TestingSetup);
 
 //void Shutdown(void* parg)
 //{

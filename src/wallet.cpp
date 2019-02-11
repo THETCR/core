@@ -24,7 +24,6 @@
 #include "spork.h"
 #include "stakeinput.h"
 #include "swifttx.h"
-#include "shutdown.h"
 #include "timedata.h"
 #include "txdb.h"
 #include "txmempool.h"
