@@ -10,6 +10,7 @@
 #include "shutdown.h"
 #include "spork.h"
 #include "accumulatorcheckpoints.h"
+#include "ui_interface.h"
 #include "zwspchain.h"
 
 using namespace libzerocoin;
