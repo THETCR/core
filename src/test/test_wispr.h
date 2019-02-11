@@ -12,6 +12,10 @@
 #include "scheduler.h"
 #include "txdb.h"
 #include "txmempool.h"
+#ifdef ENABLE_WALLET
+#include "db.h"
+#include "wallet.h"
+#endif
 
 #include <boost/thread.hpp>
 

@@ -7,17 +7,12 @@
 
 #include "chainparams.h"
 #include "consensus/consensus.h"
-#include "consensus/params.h"
 #include "consensus/validation.h"
 #include "main.h"
 #include "miner.h"
 #include "random.h"
 #include "ui_interface.h"
 #include "util.h"
-#ifdef ENABLE_WALLET
-#include "db.h"
-#include "wallet.h"
-#endif
 
 #include <boost/filesystem.hpp>
 
