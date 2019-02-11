@@ -5,6 +5,7 @@
 #include "libzerocoin/Denominations.h"
 #include "amount.h"
 #include "chainparams.h"
+#include "consensus/params.h"
 #include "consensus/validation.h"
 #include "main.h"
 #include <test/test_wispr.h>
@@ -32,7 +33,9 @@ BOOST_AUTO_TEST_CASE(zcparams_test)
 
     bool fPassed = true;
     try{
+        BOOST_TEST_PASSPOINT();
         SelectParams(CBaseChainParams::MAIN);
+        BOOST_TEST_PASSPOINT();
         ZerocoinParams *ZCParams = Params().Zerocoin_Params(false);
         BOOST_TEST_PASSPOINT();
             (void)ZCParams;
