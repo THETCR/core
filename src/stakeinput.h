@@ -8,6 +8,7 @@
 class CKeyStore;
 class CWallet;
 class CWalletTx;
+class CDataStream;
 
 class CStakeInput
 {

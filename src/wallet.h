@@ -21,6 +21,7 @@
 #include "primitives/zerocoin.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "utilstrencodings.h"
 #include "validationinterface.h"
 #include "wallet_ismine.h"
 #include "walletdb.h"
@@ -75,6 +76,7 @@ class COutput;
 class CReserveKey;
 class CScript;
 class CWalletTx;
+class CTxMemPool;
 
 /** (client) version numbers for particular wallet features */
 enum WalletFeature {

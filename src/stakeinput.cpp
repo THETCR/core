@@ -5,8 +5,8 @@
 #include "accumulators.h"
 #include "chain.h"
 #include "primitives/deterministicmint.h"
-#include "main.h"
 #include "stakeinput.h"
+#include "streams.h"
 #include "wallet.h"
 
 CZWspStake::CZWspStake(const libzerocoin::CoinSpend& spend)
