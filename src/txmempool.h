@@ -15,6 +15,7 @@
 #include "primitives/transaction.h"
 #include "sync.h"
 
+class CBlockIndex;
 class CAutoFile;
 
 inline double AllowFreeThreshold()
@@ -32,6 +33,20 @@ inline bool AllowFree(double dPriority)
 
 /** Fake height value used in CCoins to signify they are only in the memory pool (since 0.8) */
 static const unsigned int MEMPOOL_HEIGHT = 0x7FFFFFFF;
+struct LockPoints
+{
+  // Will be set to the blockchain height and median time past
+  // values that would be necessary to satisfy all relative locktime
+  // constraints (BIP68) of this tx given our view of block chain history
+  int height;
+  int64_t time;
+  // As long as the current chain descends from the highest height block
+  // containing one of the inputs used in the calculation, then the cached
+  // values are still valid even after a reorg.
+  CBlockIndex* maxInputBlock;
+
+  LockPoints() : height(0), time(0), maxInputBlock(nullptr) { }
+};
 
 /**
  * CTxMemPool stores these:
