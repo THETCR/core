@@ -23,6 +23,7 @@
 #include "guiutil.h"
 #include "qvalidatedlineedit.h"
 #include "bitcoinamountfield.h"
+#include "txmempool.h"
 
 #include <QVariant>
 #include <QHBoxLayout>
