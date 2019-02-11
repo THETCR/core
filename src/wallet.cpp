@@ -23,6 +23,7 @@
 #include "script/sign.h"
 #include "spork.h"
 #include "stakeinput.h"
+#include "shutdown.h"
 #include "swifttx.h"
 #include "timedata.h"
 #include "txdb.h"
