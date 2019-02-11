@@ -20,6 +20,7 @@
 #include "script/sign.h"
 #include "script/standard.h"
 #include "swifttx.h"
+#include "txmempool.h"
 #include "uint256.h"
 #include "utilmoneystr.h"
 #include "zwspchain.h"
