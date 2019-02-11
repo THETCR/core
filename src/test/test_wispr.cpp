@@ -20,7 +20,6 @@
 #endif
 
 #include <boost/filesystem.hpp>
-#include <boost/test/unit_test.hpp>
 
 
 extern bool fPrintToConsole;
@@ -97,7 +96,6 @@ TestingSetup::~TestingSetup()
     delete pblocktree;
     boost::filesystem::remove_all(pathTemp);
 }
-BOOST_GLOBAL_FIXTURE(TestingSetup);
 
 //TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
 //{
