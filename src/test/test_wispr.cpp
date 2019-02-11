@@ -27,7 +27,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 
-std::unique_ptr<CConnman> g_connman;
+//std::unique_ptr<CConnman> g_connman;
 
 extern bool fPrintToConsole;
 extern void noui_connect();
@@ -102,17 +102,17 @@ TestingSetup::~TestingSetup()
     boost::filesystem::remove_all(pathTemp);
 }
 
-void Shutdown(void* parg)
-{
-    exit(0);
-}
-
-void StartShutdown()
-{
-    exit(0);
-}
-
-bool ShutdownRequested()
-{
-    return false;
-}
+//void Shutdown(void* parg)
+//{
+//    exit(0);
+//}
+//
+//void StartShutdown()
+//{
+//    exit(0);
+//}
+//
+//bool ShutdownRequested()
+//{
+//    return false;
+//}
