@@ -4,13 +4,14 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "activemasternode.h"
-#include "init.h"
 #include "addrman.h"
 #include "masternode.h"
 #include "masternodeconfig.h"
 #include "masternodeman.h"
 #include "protocol.h"
 #include "spork.h"
+#include "wallet.h"
+
 
 //
 // Bootup the Masternode, look for a 125000 WISPR input and register on the network
