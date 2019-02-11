@@ -33,7 +33,8 @@ BOOST_AUTO_TEST_CASE(zcparams_test)
     try{
         SelectParams(CBaseChainParams::MAIN);
         ZerocoinParams *ZCParams = Params().Zerocoin_Params(false);
-        (void)ZCParams;
+        BOOST_TEST_PASSPOINT();
+            (void)ZCParams;
     } catch(std::exception& e) {
         fPassed = false;
         std::cout << e.what() << "\n";
@@ -115,24 +116,29 @@ BOOST_AUTO_TEST_CASE(checkzerocoinmint_test)
 
                 //generate a privkey
                 CKey key;
-            cout << "key\n";
+            BOOST_TEST_PASSPOINT();
 
             key.MakeNewKey(true);
-            cout << "make new\n";
+            BOOST_TEST_PASSPOINT();
             CPrivKey privkey = key.GetPrivKey();
-            cout << "private key\n";
+            BOOST_TEST_PASSPOINT();
                 //generate pubkey hash/serial
                 CPubKey pubkey = key.GetPubKey();
-                uint256 nSerial = Hash(pubkey.begin(), pubkey.end());
-                CBigNum bnSerial(nSerial);
-            cout << "serial\n";
+            BOOST_TEST_PASSPOINT();
+            uint256 nSerial = Hash(pubkey.begin(), pubkey.end());
+            BOOST_TEST_PASSPOINT();
+            CBigNum bnSerial(nSerial);
+            BOOST_TEST_PASSPOINT();
                 //make sure privkey import to new keypair makes the same serial
                 CKey key2;
-                key2.SetPrivKey(privkey, true);
-                CPubKey pubkey2 = key2.GetPubKey();
-                uint256 nSerial2 = Hash(pubkey2.begin(), pubkey2.end());
-                CBigNum bnSerial2(nSerial2);
-
+            BOOST_TEST_PASSPOINT();
+            key2.SetPrivKey(privkey, true);
+            BOOST_TEST_PASSPOINT();
+            CPubKey pubkey2 = key2.GetPubKey();
+            BOOST_TEST_PASSPOINT();
+            uint256 nSerial2 = Hash(pubkey2.begin(), pubkey2.end());
+            BOOST_TEST_PASSPOINT();
+            CBigNum bnSerial2(nSerial2);
                 BOOST_CHECK_MESSAGE(bnSerial == bnSerial2, "Serials do not match!");
 
 
