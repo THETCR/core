@@ -78,8 +78,6 @@ using namespace boost;
 using namespace std;
 
 #ifdef ENABLE_WALLET
-CWallet* pwalletMain = nullptr;
-CzWSPWallet* zwalletMain = nullptr;
 int nWalletBackups = 10;
 #endif
 volatile bool fFeeEstimatesInitialized = false;

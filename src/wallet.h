@@ -37,6 +37,9 @@
 #include <utility>
 #include <vector>
 
+extern CWallet* pwalletMain;
+extern CzWSPWallet* zwalletMain;
+
 /**
  * Settings
  */

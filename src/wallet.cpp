@@ -41,7 +41,8 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
-
+CWallet* pwalletMain = nullptr;
+CzWSPWallet* zwalletMain = nullptr;
 /**
  * Settings
  */
