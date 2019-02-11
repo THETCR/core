@@ -25,7 +25,7 @@ protected:
 
     // CValidationInterface
     void SyncTransaction(const CTransaction &tx, const CBlock *pblock);
-    void UpdatedBlockTip(const CBlockIndex *pindex);
+    void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) override;
     void NotifyTransactionLock(const CTransaction &tx);
 
 private:
