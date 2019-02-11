@@ -4,6 +4,7 @@
 
 #include "consensus/validation.h"
 #include "zwspwallet.h"
+#include "main.h"
 #include "txdb.h"
 #include "walletdb.h"
 #include "shutdown.h"
