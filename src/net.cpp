@@ -2169,6 +2169,19 @@ void CConnman::Interrupt()
 void CConnman::Stop()
 {
     LogPrintf("StopNode()\n");
+    if (threadMessageHandler.joinable())
+        threadMessageHandler.join();
+    if (threadOpenConnections.joinable())
+        threadOpenConnections.join();
+    if (threadOpenAddedConnections.joinable())
+        threadOpenAddedConnections.join();
+    if (threadDNSAddressSeed.joinable())
+        threadDNSAddressSeed.join();
+    if (threadSocketHandler.joinable())
+        threadSocketHandler.join();
+    if (threadStakeMinter.joinable())
+        threadStakeMinter.join();
+
     if (fAddressesInitialized)
     {
         DumpData();

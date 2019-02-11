@@ -57,7 +57,7 @@ public:
     }
 
     void StopLightZwspThread() {
-        threadIns.interrupt();
+        threadIns.join();
         LogPrintf("%s thread interrupted\n", "pivx-light-thread");
     }
 
