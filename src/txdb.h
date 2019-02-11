@@ -18,6 +18,8 @@
 #include <vector>
 
 class CBlockIndex;
+class CBlockFileInfo;
+class CDiskTxPos;
 class CCoins;
 class uint256;
 
