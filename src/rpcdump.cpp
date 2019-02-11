@@ -5,7 +5,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "bip38.h"
-#include "init.h"
 #include "main.h"
 #include "rpc/server.h"
 #include "script/script.h"

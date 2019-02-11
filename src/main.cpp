@@ -19,7 +19,6 @@
 #include "consensus/merkle.h"
 #include "consensus/tx_verify.h"
 #include "consensus/validation.h"
-#include "init.h"
 #include "kernel.h"
 #include "masternode-budget.h"
 #include "masternode-payments.h"
@@ -41,6 +40,7 @@
 #include "validationinterface.h"
 #include "zwspchain.h"
 #include "reverse_iterate.h"
+#include "wallet.h"
 
 #include "primitives/zerocoin.h"
 #include "libzerocoin/Denominations.h"

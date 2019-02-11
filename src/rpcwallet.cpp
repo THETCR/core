@@ -8,7 +8,6 @@
 #include "amount.h"
 #include "base58.h"
 #include "core_io.h"
-#include "init.h"
 #include "net.h"
 #include "policy/feerate.h"
 #include "policy/policy.h"

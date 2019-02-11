@@ -6,13 +6,13 @@
 #include "consensus/validation.h"
 #include "obfuscation.h"
 #include "coincontrol.h"
-#include "init.h"
 #include "main.h"
 #include "masternodeman.h"
 #include "script/sign.h"
 #include "swifttx.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "wallet.h"
 #include "reverse_iterate.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>

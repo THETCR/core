@@ -7,7 +7,6 @@
 
 #include "base58.h"
 #include "clientversion.h"
-#include "init.h"
 #include "main.h"
 #include "masternode-sync.h"
 #include "net.h"

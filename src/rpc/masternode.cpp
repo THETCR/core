@@ -5,7 +5,6 @@
 
 #include "activemasternode.h"
 #include "db.h"
-#include "init.h"
 #include "main.h"
 #include "masternode-budget.h"
 #include "masternode-payments.h"
@@ -13,6 +12,7 @@
 #include "masternodeman.h"
 #include "rpc/server.h"
 #include "utilmoneystr.h"
+#include "wallet.h"
 
 #include <univalue.h>
 

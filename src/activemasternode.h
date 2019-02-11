@@ -6,7 +6,6 @@
 #ifndef ACTIVEMASTERNODE_H
 #define ACTIVEMASTERNODE_H
 
-#include "init.h"
 #include "key.h"
 #include "masternode.h"
 #include "net.h"

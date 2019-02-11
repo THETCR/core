@@ -8,7 +8,6 @@
 #include "script/script.h"
 #include "script/standard.h"
 #include "util.h"
-#include "init.h"
 #include "uint256.h"
 
 
