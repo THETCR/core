@@ -19,12 +19,13 @@
 #include "rpc/server.h"
 #include "script/sigcache.h"
 #include "util.h"
-
-#include <memory>
+#ifdef ENABLE_WALLET
+#include "db.h"
+#include "wallet.h"
+#endif
 
 #include <boost/filesystem.hpp>
 
-std::unique_ptr<CConnman> g_connman;
 extern bool fPrintToConsole;
 extern void noui_connect();
 BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)

@@ -4,9 +4,13 @@
 
 #define BOOST_TEST_MODULE Wispr Test Suite
 
-//#include <memory>
+#include <net.h>
+
+#include <memory>
 
 #include <boost/test/unit_test.hpp>
+
+std::unique_ptr<CConnman> g_connman;
 
 [[noreturn]] void Shutdown(void* parg)
 {
