@@ -50,9 +50,10 @@ public:
         return true;
     }
 
-    void StartLightZwspThread(boost::thread_group& threadGroup) {
+    void StartLightZwspThread() {
         LogPrintf("%s thread start\n", "pivx-light-thread");
-        threadIns = boost::thread(boost::bind(&CLightWorker::ThreadLightZWSPSimplified, this));
+        threadIns = std::thread(std::bind(&CLightWorker::ThreadLightZWSPSimplified, this));
+//        threadIns = boost::thread(boost::bind(&CLightWorker::ThreadLightZWSPSimplified, this));
     }
 
     void StopLightZwspThread() {

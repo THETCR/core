@@ -111,7 +111,7 @@ class CConnman
 public:
   CConnman();
   ~CConnman();
-  bool Start(boost::thread_group& threadGroup, CScheduler& scheduler, std::string& strNodeError);
+  bool Start(CScheduler& scheduler, std::string& strNodeError);
   void Interrupt();
   void Stop();
 //  template<typename Callable>
@@ -131,13 +131,12 @@ private:
   void ThreadDNSAddressSeed();
   void ThreadStakeMinter();
 
-//  std::condition_variable condMsgProc;
-//  std::mutex mutexMsgProc;
-//  std::atomic<bool> flagInterruptMsgProc;
-
-//  std::vector<CNode*> vNodes;
-//  std::list<CNode*> vNodesDisconnected;
-//  mutable CCriticalSection cs_vNodes;
+  std::thread threadDNSAddressSeed;
+  std::thread threadSocketHandler;
+  std::thread threadOpenAddedConnections;
+  std::thread threadOpenConnections;
+  std::thread threadMessageHandler;
+  std::thread threadStakeMinter;
 
 };
 extern std::unique_ptr<CConnman> g_connman;
@@ -145,8 +144,6 @@ void Discover(boost::thread_group& threadGroup);
 void MapPort(bool fUseUPnP);
 unsigned short GetListenPort();
 bool BindListenPort(const CService& bindAddr, std::string& strError, bool fWhitelisted = false);
-bool StartNode(CConnman& connman, boost::thread_group& threadGroup, CScheduler& scheduler, std::string& strNodeError);
-//bool StopNode(CConnman& connman);
 void SocketSendData(CNode* pnode);
 
 typedef int NodeId;

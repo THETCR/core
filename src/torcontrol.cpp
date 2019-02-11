@@ -743,7 +743,7 @@ static void TorControlThread()
     event_base_dispatch(gBase);
 }
 
-void StartTorControl(boost::thread_group& threadGroup/*, CScheduler& scheduler*/)
+void StartTorControl()
 {
     assert(!gBase);
 #ifdef WIN32
@@ -757,7 +757,7 @@ void StartTorControl(boost::thread_group& threadGroup/*, CScheduler& scheduler*/
         return;
     }
 
-    torControlThread = boost::thread(boost::bind(&TraceThread<void (*)()>, "torcontrol", &TorControlThread));
+    torControlThread = std::thread(std::bind(&TraceThread<void (*)()>, "torcontrol", &TorControlThread));
 }
 
 void InterruptTorControl()
