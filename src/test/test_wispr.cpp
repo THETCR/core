@@ -26,7 +26,7 @@
 #include <boost/thread.hpp>
 
 //CClientUIInterface uiInterface;
-CWallet* pwalletMain;
+//CWallet* pwalletMain;
 
 std::unique_ptr<CConnman> g_connman;
 
@@ -102,17 +102,17 @@ TestingSetup::~TestingSetup()
     boost::filesystem::remove_all(pathTemp);
 }
 
-void Shutdown(void* parg)
-{
-  exit(0);
-}
-
-void StartShutdown()
-{
-  exit(0);
-}
-
-bool ShutdownRequested()
-{
-  return false;
-}
+//void Shutdown(void* parg)
+//{
+//  exit(0);
+//}
+//
+//void StartShutdown()
+//{
+//  exit(0);
+//}
+//
+//bool ShutdownRequested()
+//{
+//  return false;
+//}
