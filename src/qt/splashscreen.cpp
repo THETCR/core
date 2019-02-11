@@ -7,7 +7,6 @@
 #include "splashscreen.h"
 
 #include "clientversion.h"
-#include "init.h"
 #include "networkstyle.h"
 #include "ui_interface.h"
 #include "util.h"
