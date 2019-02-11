@@ -1080,7 +1080,7 @@ bool AppInit2()
      */
     if (fServer) {
         uiInterface.InitMessage.connect(SetRPCWarmupStatus);
-        if (!AppInitServers(threadGroup))
+        if (!AppInitServers())
             return InitError(_("Unable to start HTTP server. See debug log for details."));
     }
 
@@ -1954,7 +1954,7 @@ bool AppInit2()
     if (GetBoolArg("-listenonion", DEFAULT_LISTEN_ONION))
         StartTorControl();
 
-    Discover(threadGroup);
+    Discover();
 
     // Map ports with UPnP
     MapPort(GetBoolArg("-upnp", DEFAULT_UPNP));

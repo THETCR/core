@@ -31,7 +31,6 @@
 #include "init.h"
 #include "main.h"
 #include "rpc/server.h"
-#include "scheduler.h"
 #include "ui_interface.h"
 #include "util.h"
 
@@ -42,7 +41,6 @@
 #include <stdint.h>
 
 #include <boost/filesystem/operations.hpp>
-#include <boost/thread.hpp>
 
 #include <QApplication>
 #include <QDebug>
@@ -170,8 +168,6 @@ private:
     /// Flag indicating a restart
     bool execute_restart;
 
-    boost::thread_group threadGroup;
-    CScheduler scheduler;
     /// Pass fatal exception message to UI thread
     void handleRunawayException(std::exception* e);
 };
@@ -253,7 +249,7 @@ void BitcoinCore::initialize()
 
     try {
         qDebug() << __func__ << ": Running AppInit2 in thread";
-        int rv = AppInit2(threadGroup, scheduler);
+        int rv = AppInit2();
         emit initializeResult(rv);
     } catch (std::exception& e) {
         handleRunawayException(&e);
@@ -269,7 +265,6 @@ void BitcoinCore::restart(QStringList args)
         try {
             qDebug() << __func__ << ": Running Restart in thread";
             Interrupt();
-            threadGroup.join_all();
             PrepareShutdown();
             qDebug() << __func__ << ": Shutdown finished";
             emit shutdownResult(1);
@@ -290,7 +285,7 @@ void BitcoinCore::shutdown()
     try {
         qDebug() << __func__ << ": Running Shutdown in thread";
         Interrupt();
-        threadGroup.join_all();
+        Shutdown();
         qDebug() << __func__ << ": Shutdown finished";
         emit shutdownResult(1);
     } catch (std::exception& e) {

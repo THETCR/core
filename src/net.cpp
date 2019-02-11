@@ -2068,8 +2068,6 @@ bool CConnman::Start(CScheduler& scheduler, std::string& strNodeError)
 
     fAddressesInitialized = true;
 
-//    Discover(threadGroup);
-
     if (semOutbound == NULL) {
         // initialize semaphore
         int nMaxOutbound = std::min((MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS), nMaxConnections);
