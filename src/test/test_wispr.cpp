@@ -7,6 +7,7 @@
 
 #include "chainparams.h"
 #include "consensus/consensus.h"
+#include "consensus/params.h"
 #include "consensus/validation.h"
 #include "main.h"
 #include "miner.h"
@@ -16,6 +17,8 @@
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"
+#include "walletdb.h"
+#include "accumulators.h"
 #endif
 
 #include <memory>
