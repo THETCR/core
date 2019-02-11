@@ -21,7 +21,7 @@
 struct BasicTestingSetup {
     ECCVerifyHandle globalVerifyHandle;
 
-    BasicTestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::MAIN);
+    BasicTestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::UNITTEST);
     ~BasicTestingSetup();
 };
 
@@ -36,9 +36,9 @@ struct TestingSetup: public BasicTestingSetup {
     CCoinsViewDB *pcoinsdbview;
     boost::filesystem::path pathTemp;
     boost::thread_group threadGroup;
-    CConnman* connman;
+    CScheduler scheduler;
 
-    TestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::MAIN);
+    TestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::UNITTEST);
     ~TestingSetup();
 };
 

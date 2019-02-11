@@ -2,7 +2,6 @@
 // Copyright (c) 2017 The PIVX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#define BOOST_TEST_MODULE Wispr Test Suite
 
 #include "test_wispr.h"
 
@@ -20,12 +19,7 @@
 #include "wallet.h"
 #endif
 
-#include <memory>
-
-#include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
-
-std::unique_ptr<CConnman> g_connman;
 
 extern bool fPrintToConsole;
 extern void noui_connect();
@@ -46,7 +40,6 @@ BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
 BasicTestingSetup::~BasicTestingSetup()
 {
     ECC_Stop();
-    g_connman.reset();
 }
 TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSetup(chainName)
 {
@@ -80,7 +73,6 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
     for (int i=0; i < nScriptCheckThreads-1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
     g_connman = std::unique_ptr<CConnman>(new CConnman()); // Deterministic randomness for tests.
-    connman = g_connman.get();
     RegisterNodeSignals(GetNodeSignals());
 }
 
@@ -89,6 +81,7 @@ TestingSetup::~TestingSetup()
     UnregisterNodeSignals(GetNodeSignals());
     threadGroup.interrupt_all();
     threadGroup.join_all();
+    g_connman.reset();
     UnloadBlockIndex();
 #ifdef ENABLE_WALLET
     delete pwalletMain;
@@ -100,17 +93,17 @@ TestingSetup::~TestingSetup()
     boost::filesystem::remove_all(pathTemp);
 }
 
-void Shutdown(void* parg)
-{
-    exit(0);
-}
-
-void StartShutdown()
-{
-    exit(0);
-}
-
-bool ShutdownRequested()
-{
-    return false;
-}
+//void Shutdown(void* parg)
+//{
+//    exit(0);
+//}
+//
+//void StartShutdown()
+//{
+//    exit(0);
+//}
+//
+//bool ShutdownRequested()
+//{
+//    return false;
+//}

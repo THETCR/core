@@ -15,13 +15,21 @@ TEST_QT_H = \
   qt/test/paymentrequestdata.h \
   qt/test/paymentservertests.h
 
+TEST_BITCOIN_CPP = \
+  test/test_bitcoin.cpp
+
+TEST_BITCOIN_H = \
+  test/test_bitcoin.h
+
 qt_test_test_wispr_qt_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
   $(QT_INCLUDES) $(QT_TEST_INCLUDES) $(PROTOBUF_CFLAGS)
 
 qt_test_test_wispr_qt_SOURCES = \
   qt/test/test_main.cpp \
   qt/test/uritests.cpp \
-  $(TEST_QT_H)
+  $(TEST_QT_H) \
+  $(TEST_BITCOIN_CPP) \
+  $(TEST_BITCOIN_H)
 if ENABLE_WALLET
 qt_test_test_wispr_qt_SOURCES += \
   qt/test/paymentservertests.cpp
