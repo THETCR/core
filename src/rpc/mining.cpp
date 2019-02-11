@@ -18,6 +18,7 @@
 #include "pow.h"
 #include "rpc/server.h"
 #include "shutdown.h"
+#include "txmempool.h"
 #include "util.h"
 #ifdef ENABLE_WALLET
 #include "db.h"
