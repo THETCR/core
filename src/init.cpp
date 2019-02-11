@@ -163,7 +163,7 @@ public:
     // Writes do not need similar protection, as failure to write is handled by the caller.
 };
 
-static CCoinsViewDB* pcoinsdbview = nullptr;
+//static CCoinsViewDB* pcoinsdbview = nullptr;
 static CCoinsViewErrorCatcher* pcoinscatcher = nullptr;
 static std::unique_ptr<ECCVerifyHandle> globalVerifyHandle;
 static boost::thread_group threadGroup;
