@@ -39,6 +39,7 @@
 #include "spork.h"
 #include "sporkdb.h"
 #include "txdb.h"
+#include "txmempool.h"
 #include "torcontrol.h"
 #include "ui_interface.h"
 #include "util.h"
