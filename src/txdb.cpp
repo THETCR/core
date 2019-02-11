@@ -9,6 +9,7 @@
 #include "accumulators.h"
 #include "chainparams.h"
 #include "hash.h"
+#include "main.h"
 #include "pow.h"
 #include "shutdown.h"
 #include "uint256.h"
