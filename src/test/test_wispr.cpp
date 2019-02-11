@@ -25,7 +25,7 @@
 #include <boost/thread.hpp>
 
 //CClientUIInterface uiInterface;
-//CWallet* pwalletMain;
+CWallet* pwalletMain;
 //extern CWallet* pwalletMain;
 
 //std::unique_ptr<CConnman> g_connman;
