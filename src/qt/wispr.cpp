@@ -33,6 +33,7 @@
 #include "rpc/server.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "shutdown.h"
 
 #ifdef ENABLE_WALLET
 #include "wallet.h"
@@ -265,6 +266,7 @@ void BitcoinCore::restart(QStringList args)
         try {
             qDebug() << __func__ << ": Running Restart in thread";
             Interrupt();
+            StartRestart();
             PrepareShutdown();
             qDebug() << __func__ << ": Shutdown finished";
             emit shutdownResult(1);
