@@ -3,7 +3,6 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "init.h"
 #include "main.h"
 #include "consensus/merkle.h"
 #include "consensus/tx_verify.h"
