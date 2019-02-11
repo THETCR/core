@@ -5,7 +5,6 @@
 #ifndef BITCOIN_KERNEL_H
 #define BITCOIN_KERNEL_H
 
-#include "main.h"
 #include "stakeinput.h"
 
 

@@ -8,6 +8,7 @@
 #include "consensus/validation.h"
 #include "db.h"
 #include "kernel.h"
+#include "main.h"
 #include "spork.h"
 #include "script/interpreter.h"
 #include "timedata.h"

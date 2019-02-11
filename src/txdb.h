@@ -8,7 +8,6 @@
 #define BITCOIN_TXDB_H
 
 #include "leveldbwrapper.h"
-#include "main.h"
 #include "primitives/zerocoin.h"
 
 #include <map>

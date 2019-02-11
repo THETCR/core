@@ -16,7 +16,6 @@
 #include "kernel.h"
 #include "key.h"
 #include "keystore.h"
-#include "main.h"
 #include "primitives/block.h"
 #include "primitives/transaction.h"
 #include "primitives/zerocoin.h"

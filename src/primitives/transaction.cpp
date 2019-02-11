@@ -9,7 +9,6 @@
 
 #include "chain.h"
 #include "hash.h"
-#include "main.h"
 #include "tinyformat.h"
 #include "utilstrencodings.h"
 #include "transaction.h"
