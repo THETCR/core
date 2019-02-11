@@ -28,7 +28,7 @@ private:
 
     concurrentqueue<CGenWit> requestsQueue;
     std::atomic<bool> isWorkerRunning;
-    boost::thread threadIns;
+    std::thread threadIns;
 
 public:
 
