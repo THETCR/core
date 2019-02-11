@@ -14,24 +14,14 @@
 
 #include "amount.h"
 #include "chain.h"
-#include "chainparams.h"
 #include "coins.h"
-#include "consensus/consensus.h"
 #include "net.h"
 #include "policy/feerate.h"
 #include "pow.h"
-#include "primitives/block.h"
-#include "primitives/transaction.h"
-#include "primitives/zerocoin.h"
-#include "script/script.h"
-#include "script/sigcache.h"
-#include "script/standard.h"
+#include "script/script_error.h"
 #include "sync.h"
 #include "validationinterface.h"
-#include "tinyformat.h"
-#include "txmempool.h"
 #include "uint256.h"
-#include "undo.h"
 
 #include <algorithm>
 #include <exception>
@@ -49,10 +39,12 @@
 
 class CBlockIndex;
 class CBlockTreeDB;
+class CChainParams;
 class CZerocoinDB;
 class CSporkDB;
 class CBloomFilter;
 class CInv;
+class CConnman;
 class CScriptCheck;
 class CValidationInterface;
 class CValidationState;
