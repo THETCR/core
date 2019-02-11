@@ -17,6 +17,7 @@
 #include "util.h"
 #include "validationinterface.h"
 #include "reverse_iterate.h"
+#include "wallet.h"
 
 using namespace std;
 using namespace boost;

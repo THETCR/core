@@ -11,6 +11,7 @@
 #include "shutdown.h"
 #include "sync.h"
 #include "util.h"
+#include "wallet.h"
 
 // keep track of the scanning errors I've seen
 map<uint256, int> mapSeenMasternodeScanningErrors;
