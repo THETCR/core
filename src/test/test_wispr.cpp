@@ -30,7 +30,7 @@
 //CWallet* pwalletMain;
 //extern CWallet* pwalletMain;
 
-std::unique_ptr<CConnman> g_connman;
+//std::unique_ptr<CConnman> g_connman;
 
 extern bool fPrintToConsole;
 extern void noui_connect();
