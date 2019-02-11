@@ -7,14 +7,17 @@
 #ifndef BITCOIN_TXDB_H
 #define BITCOIN_TXDB_H
 
+#include "coins.h"
 #include "leveldbwrapper.h"
 #include "primitives/zerocoin.h"
+#include "chain.h"
 
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
+class CBlockIndex;
 class CCoins;
 class uint256;
 

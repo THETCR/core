@@ -6,11 +6,12 @@
 
 #include "txdb.h"
 
-#include "main.h"
+#include "accumulators.h"
+#include "chainparams.h"
+#include "hash.h"
 #include "pow.h"
 #include "shutdown.h"
 #include "uint256.h"
-#include "accumulators.h"
 
 #include <stdint.h>
 
