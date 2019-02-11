@@ -32,6 +32,7 @@
 #include "spork.h"
 #include "sporkdb.h"
 #include "swifttx.h"
+#include "shutdown.h"
 #include "txdb.h"
 #include "txmempool.h"
 #include "ui_interface.h"

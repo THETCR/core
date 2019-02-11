@@ -35,6 +35,7 @@
 #include "rpc/server.h"
 #include "script/standard.h"
 #include "scheduler.h"
+#include "shutdown.h"
 #include "spork.h"
 #include "sporkdb.h"
 #include "txdb.h"
@@ -81,7 +82,6 @@ using namespace std;
 int nWalletBackups = 10;
 #endif
 volatile bool fFeeEstimatesInitialized = false;
-volatile bool fRestartRequested = false; // true: restart false: shutdown
 extern std::list<uint256> listAccCheckpointsNoDB;
 
 std::unique_ptr<CConnman> g_connman;
@@ -141,17 +141,6 @@ CClientUIInterface uiInterface;
 // shutdown thing.
 //
 
-std::atomic<bool> fRequestShutdown(false);
-
-void StartShutdown()
-{
-    fRequestShutdown = true;
-}
-bool ShutdownRequested()
-{
-    return fRequestShutdown || fRestartRequested;
-}
-
 class CCoinsViewErrorCatcher : public CCoinsViewBacked
 {
 public:
@@ -191,8 +180,6 @@ void Interrupt(boost::thread_group& threadGroup)
 /** Preparing steps before shutting down or restarting the wallet */
 void PrepareShutdown()
 {
-    fRequestShutdown = true;  // Needed when we shutdown the wallet
-    fRestartRequested = true; // Needed when we restart the wallet
     LogPrintf("%s: In progress...\n", __func__);
     static CCriticalSection cs_Shutdown;
     TRY_LOCK(cs_Shutdown, lockShutdown);
@@ -216,8 +203,8 @@ void PrepareShutdown()
 #endif
     MapPort(false);
     UnregisterValidationInterface(peerLogic.get());
-//    peerLogic.reset();
-//    g_connman.reset();
+    peerLogic.reset();
+    g_connman.reset();
 
     DumpMasternodes();
     DumpBudgets();
@@ -290,7 +277,7 @@ void PrepareShutdown()
 void Shutdown()
 {
     // Shutdown part 1: prepare shutdown
-    if (!fRestartRequested) {
+    if (!RestartRequested()) {
         PrepareShutdown();
     }
     // Shutdown part 2: Stop TOR thread and delete wallet instance
@@ -315,7 +302,7 @@ void Shutdown()
  */
 void HandleSIGTERM(int)
 {
-    fRequestShutdown = true;
+    StartShutdown();
 }
 
 void HandleSIGHUP(int)
@@ -1567,7 +1554,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                     "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
                 if (fRet) {
                     fReindex = true;
-                    fRequestShutdown = false;
+                    AbortShutdown();
                 } else {
                     LogPrintf("Aborted block database rebuild. Exiting.\n");
                     return false;
@@ -1581,7 +1568,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     // As LoadBlockIndex can take several minutes, it's possible the user
     // requested to kill the GUI during the last operation. If so, exit.
     // As the program has not fully started yet, Shutdown() is possibly overkill.
-    if (fRequestShutdown) {
+    if (ShutdownRequested()) {
         LogPrintf("Shutdown requested. Exiting.\n");
         return false;
     }
@@ -1764,7 +1751,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     threadGroup.create_thread(boost::bind(&ThreadImport, vImportFiles));
     if (chainActive.Tip() == nullptr) {
         LogPrintf("Waiting for genesis block to be imported...\n");
-        while (!fRequestShutdown && chainActive.Tip() == nullptr)
+        while (!ShutdownRequested() && chainActive.Tip() == nullptr)
             MilliSleep(10);
     }
 
@@ -1994,5 +1981,5 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 #endif
 
 
-    return !fRequestShutdown;
+    return !ShutdownRequested();
 }

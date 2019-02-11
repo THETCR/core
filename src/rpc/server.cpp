@@ -14,6 +14,7 @@
 #include "sync.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "shutdown.h"
 #include "utilstrencodings.h"
 #ifdef ENABLE_WALLET
 #include "db.h"

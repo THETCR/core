@@ -8,6 +8,7 @@
 
 #include "main.h"
 #include "pow.h"
+#include "shutdown.h"
 #include "uint256.h"
 #include "accumulators.h"
 

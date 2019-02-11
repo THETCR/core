@@ -7,9 +7,10 @@
 
 #include "amount.h"
 #include "base58.h"
-#include "consensus/consensus.h"
-#include "consensus/validation.h"
 #include "chainparams.h"
+#include "consensus/consensus.h"
+#include "consensus/params.h"
+#include "consensus/validation.h"
 #include "core_io.h"
 #include "init.h"
 #include "main.h"
@@ -17,6 +18,7 @@
 #include "net.h"
 #include "pow.h"
 #include "rpc/server.h"
+#include "shutdown.h"
 #include "util.h"
 #ifdef ENABLE_WALLET
 #include "db.h"

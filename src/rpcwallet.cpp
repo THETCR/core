@@ -14,6 +14,7 @@
 #include "policy/policy.h"
 #include "netbase.h"
 #include "rpc/server.h"
+#include "shutdown.h"
 #include "timedata.h"
 #include "util.h"
 #include "utilmoneystr.h"
