@@ -40,6 +40,7 @@
 class CBlockIndex;
 class CBlockTreeDB;
 class CChainParams;
+class CCoinsViewDB;
 class CZerocoinDB;
 class CSporkDB;
 class CBloomFilter;
