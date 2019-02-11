@@ -35,7 +35,7 @@ BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
     SetupNetworking();
     fPrintToDebugLog = false; // don't want to write to debug.log file
     fCheckBlockIndex = true;
-    SelectParams(CBaseChainParams::UNITTEST);
+    SelectParams(CBaseChainParams::MAIN);
     noui_connect();
 #ifdef ENABLE_WALLET
     bitdb.MakeMock();
@@ -48,7 +48,7 @@ BasicTestingSetup::~BasicTestingSetup()
 }
 TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSetup(chainName)
 {
-//    const CChainParams& chainparams = Params();
+    const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
 

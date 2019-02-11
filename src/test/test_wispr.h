@@ -20,7 +20,7 @@
 struct BasicTestingSetup {
     ECCVerifyHandle globalVerifyHandle;
 
-    BasicTestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::UNITTEST);
+    BasicTestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::MAIN);
     ~BasicTestingSetup();
 };
 
@@ -36,7 +36,7 @@ struct TestingSetup: public BasicTestingSetup {
     boost::thread_group threadGroup;
     CScheduler scheduler;
 
-    TestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::UNITTEST);
+    TestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::MAIN);
     ~TestingSetup();
 };
 
