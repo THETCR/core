@@ -7,7 +7,9 @@
 #ifndef BITCOIN_INIT_H
 #define BITCOIN_INIT_H
 
+#include <memory>
 #include <string>
+#include <util.h>
 
 class CScheduler;
 class CWallet;

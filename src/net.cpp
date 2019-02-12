@@ -60,9 +60,6 @@
 #endif
 #endif
 
-using namespace boost;
-using namespace std;
-
 namespace
 {
 const int MAX_OUTBOUND_CONNECTIONS = 16;

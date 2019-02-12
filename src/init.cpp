@@ -201,7 +201,8 @@ void PrepareShutdown()
     GenerateBitcoins(false, nullptr, 0);
 #endif
     MapPort(false);
-    UnregisterValidationInterface(peerLogic.get());
+    UnregisterValidationInterface(peerLogic.get())
+    if (g_connman) g_connman->Stop();
     // After everything has been shut down, but before things get flushed, stop the
     // CScheduler/checkqueue threadGroup
     threadGroup.interrupt_all();
@@ -1236,8 +1237,7 @@ bool AppInit2()
 
     assert(!g_connman);
     g_connman = std::unique_ptr<CConnman>(new CConnman());
-    CConnman& connman = *g_connman;
-    peerLogic.reset(new PeerLogicValidation(&connman));
+    peerLogic.reset(new PeerLogicValidation(g_connman.get()));
     RegisterValidationInterface(peerLogic.get());
     RegisterNodeSignals(GetNodeSignals());
 
@@ -1955,8 +1955,9 @@ bool AppInit2()
     // Map ports with UPnP
     MapPort(GetBoolArg("-upnp", DEFAULT_UPNP));
     std::string strNodeError;
-    if (!connman.Start(scheduler, strNodeError))
+    if (!g_connman->Start(scheduler, strNodeError)) {
         return InitError(strNodeError);
+    }
 
     if (nLocalServices & NODE_BLOOM_LIGHT_ZC) {
         // Run a thread to compute witnesses
