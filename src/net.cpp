@@ -11,13 +11,13 @@
 
 #include "net.h"
 
-#include "addrman.h"
 #include "chainparams.h"
-#include "consensus/validation.h"
 #include "clientversion.h"
+#include "consensus/consensus.h"
 #include "miner.h"
 #include "obfuscation.h"
 #include "primitives/transaction.h"
+#include <netbase.h>
 #include "scheduler.h"
 #include "ui_interface.h"
 #include "wallet.h"
@@ -35,7 +35,7 @@
 #include <miniupnpc/upnperrors.h>
 #endif
 
-
+#include <unordered_map>
 #include <boost/thread.hpp>
 #include <math.h>
 
@@ -1866,9 +1866,9 @@ void CConnman::ThreadStakeMinter()
 {
     boost::this_thread::interruption_point();
     LogPrintf("ThreadStakeMinter started\n");
-    CWallet* pwallet = pwalletMain;
+//    CWallet* pwallet = pwalletMain;
     try {
-        BitcoinMiner(pwallet, true);
+        BitcoinMiner(pwalletMain, true);
         boost::this_thread::interruption_point();
     } catch (std::exception& e) {
         LogPrintf("ThreadStakeMinter() exception \n");
