@@ -87,3 +87,8 @@ bool CLevelDBWrapper::WriteBatch(CLevelDBBatch& batch, bool fSync)
     HandleError(status);
     return true;
 }
+
+CLevelDBIterator::~CLevelDBIterator() { delete piter; }
+bool CLevelDBIterator::Valid() const { return piter->Valid(); }
+void CLevelDBIterator::SeekToFirst() { piter->SeekToFirst(); }
+void CLevelDBIterator::Next() { piter->Next(); }

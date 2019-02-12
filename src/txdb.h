@@ -94,9 +94,9 @@ public:
   void Next();
 
 private:
-  CCoinsViewDBCursor(CDBIterator* pcursorIn, const uint256 &hashBlockIn):
+  CCoinsViewDBCursor(CLevelDBIterator* pcursorIn, const uint256 &hashBlockIn):
       CCoinsViewCursor(hashBlockIn), pcursor(pcursorIn) {}
-  boost::scoped_ptr<CDBIterator> pcursor;
+  boost::scoped_ptr<CLevelDBIterator> pcursor;
   std::pair<char, uint256> keyTmp;
 
   friend class CCoinsViewDB;

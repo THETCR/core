@@ -62,6 +62,65 @@ public:
     }
 };
 
+class CLevelDBIterator
+{
+private:
+  const CLevelDBWrapper &parent;
+  leveldb::Iterator *piter;
+
+public:
+
+  /**
+   * @param[in] _parent          Parent CDBWrapper instance.
+   * @param[in] _piter           The original leveldb iterator.
+   */
+  CLevelDBIterator(const CLevelDBWrapper &_parent, leveldb::Iterator *_piter) :
+      parent(_parent), piter(_piter) { };
+  ~CLevelDBIterator();
+
+  bool Valid() const;
+
+  void SeekToFirst();
+
+  template<typename K> void Seek(const K& key) {
+      CDataStream ssKey(SER_DISK, CLIENT_VERSION);
+      ssKey.reserve(DBWRAPPER_PREALLOC_KEY_SIZE);
+      ssKey << key;
+      leveldb::Slice slKey(ssKey.data(), ssKey.size());
+      piter->Seek(slKey);
+  }
+
+  void Next();
+
+  template<typename K> bool GetKey(K& key) {
+      leveldb::Slice slKey = piter->key();
+      try {
+          CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
+          ssKey >> key;
+      } catch (const std::exception&) {
+          return false;
+      }
+      return true;
+  }
+
+  template<typename V> bool GetValue(V& value) {
+      leveldb::Slice slValue = piter->value();
+      try {
+          CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
+          ssValue.Xor(dbwrapper_private::GetObfuscateKey(parent));
+          ssValue >> value;
+      } catch (const std::exception&) {
+          return false;
+      }
+      return true;
+  }
+
+  unsigned int GetValueSize() {
+      return piter->value().size();
+  }
+
+};
+
 class CLevelDBWrapper
 {
 private:
