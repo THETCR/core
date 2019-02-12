@@ -20,7 +20,6 @@
 #include <boost/test/unit_test.hpp>
 
 using namespace std;
-using namespace boost::assign;
 
 typedef vector<unsigned char> valtype;
 

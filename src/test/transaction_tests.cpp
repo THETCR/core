@@ -29,7 +29,6 @@
 #include <univalue.h>
 
 using namespace std;
-using namespace boost::algorithm;
 
 // In script_tests.cpp
 extern UniValue read_json(const std::string& jsondata);
