@@ -45,7 +45,7 @@ class CBlock;
 struct CMutableTransaction;
 class CScript;
 
-BOOST_GLOBAL_FIXTURE(BasicTestingSetup);
+//BOOST_GLOBAL_FIXTURE(BasicTestingSetup);
 
 // Testing fixture that pre-creates a
 // 100-block REGTEST-mode block chain
