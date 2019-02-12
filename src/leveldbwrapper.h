@@ -253,7 +253,7 @@ public:
         return WriteBatch(batch, true);
     }
 
-    CDBIterator *NewIterator()
+    CLevelDBIterator *NewIterator()
     {
         return new CDBIterator(*this, pdb->NewIterator(iteroptions));
     }
