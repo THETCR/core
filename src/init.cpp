@@ -264,7 +264,7 @@ void PrepareShutdown()
 #ifndef WIN32
     try {
         fs::remove(GetPidFile());
-    } catch (const fsfs_error& e) {
+    } catch (const fs_error& e) {
         LogPrintf("%s: Unable to remove pidfile: %s\n", __func__, e.what());
     }
 #endif
@@ -1111,7 +1111,7 @@ bool AppInit2()
                     try {
                         fs::copy_file(sourceFile, backupFile);
                         LogPrintf("Creating backup of %s -> %s\n", sourceFile, backupFile);
-                    } catch (fsfs_error& error) {
+                    } catch (fs_error& error) {
                         LogPrintf("Failed to create backup %s\n", error.what());
                     }
 #else
@@ -1147,7 +1147,7 @@ bool AppInit2()
                         try {
                             fs::remove(file.second);
                             LogPrintf("Old backup deleted: %s\n", file.second);
-                        } catch (fsfs_error& error) {
+                        } catch (fs_error& error) {
                             LogPrintf("Failed to delete backup %s\n", error.what());
                         }
                     }
@@ -1185,7 +1185,7 @@ bool AppInit2()
                     fs::remove_all(zerocoinDir);
                     LogPrintf("-resync: folder deleted: %s\n", zerocoinDir.string().c_str());
                 }
-            } catch (fsfs_error& error) {
+            } catch (fs_error& error) {
                 LogPrintf("Failed to delete blockchain folders %s\n", error.what());
             }
         }
@@ -1200,7 +1200,7 @@ bool AppInit2()
             try {
                 fs::rename(pathDatabase, pathDatabaseBak);
                 LogPrintf("Moved old %s to %s. Retrying.\n", pathDatabase.string(), pathDatabaseBak.string());
-            } catch (fsfs_error& error) {
+            } catch (fs_error& error) {
                 // failure is ok (well, not really, but it's not worse than what we started with)
             }
 
