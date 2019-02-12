@@ -218,7 +218,7 @@ void PrepareShutdown()
     UnregisterNodeSignals(GetNodeSignals());
 
     if (fFeeEstimatesInitialized) {
-        fs::filesystem::path est_path = GetDataDir() / FEE_ESTIMATES_FILENAME;
+        fs::path est_path = GetDataDir() / FEE_ESTIMATES_FILENAME;
         CAutoFile est_fileout(fopen(est_path.string().c_str(), "wb"), SER_DISK, CLIENT_VERSION);
         if (!est_fileout.IsNull())
             mempool.WriteFeeEstimates(est_fileout);
@@ -263,8 +263,8 @@ void PrepareShutdown()
 
 #ifndef WIN32
     try {
-        fs::filesystem::remove(GetPidFile());
-    } catch (const fs::filesystemfs::filesystem_error& e) {
+        fs::remove(GetPidFile());
+    } catch (const fsfs_error& e) {
         LogPrintf("%s: Unable to remove pidfile: %s\n", __func__, e.what());
     }
 #endif
@@ -645,7 +645,7 @@ struct CImportingNow {
     }
 };
 
-void ThreadImport(std::vector<fs::filesystem::path> vImportFiles)
+void ThreadImport(std::vector<fs::path> vImportFiles)
 {
     const CChainParams& chainparams = Params();
     RenameThread("wispr-loadblk");
@@ -656,7 +656,7 @@ void ThreadImport(std::vector<fs::filesystem::path> vImportFiles)
         int nFile = 0;
         while (true) {
             CDiskBlockPos pos(nFile, 0);
-            if (!fs::filesystem::exists(GetBlockPosFilename(pos, "blk")))
+            if (!fs::exists(GetBlockPosFilename(pos, "blk")))
                 break; // No block files left to reindex
             FILE* file = OpenBlockFile(pos, true);
             if (!file)
@@ -688,7 +688,7 @@ void ThreadImport(std::vector<fs::filesystem::path> vImportFiles)
     }
 
     // -loadblock=
-    for (fs::filesystem::path& path: vImportFiles) {
+    for (fs::path& path: vImportFiles) {
         FILE* file = fopen(path.string().c_str(), "rb");
         if (file) {
             CImportingNow imp;
@@ -1023,11 +1023,11 @@ bool AppInit2()
     std::string strDataDir = GetDataDir().string();
 #ifdef ENABLE_WALLET
     // Wallet file must be a plain filename without a directory
-    if (strWalletFile != fs::filesystem::basename(strWalletFile) + fs::filesystem::extension(strWalletFile))
+    if (strWalletFile != fs::basename(strWalletFile) + fs::extension(strWalletFile))
         return InitError(strprintf(_("Wallet %s resides outside data directory %s"), strWalletFile, strDataDir));
 #endif
     // Make sure only a single WISPR process is using the data directory.
-    fs::filesystem::path pathLockFile = GetDataDir() / ".lock";
+    fs::path pathLockFile = GetDataDir() / ".lock";
     FILE* file = fopen(pathLockFile.string().c_str(), "a"); // empty lock file; created if it doesn't exist.
     if (file) fclose(file);
     static boost::interprocess::file_lock lock(pathLockFile.string().c_str());
@@ -1102,16 +1102,16 @@ bool AppInit2()
                 backupPathStr += "/" + strWalletFile;
                 std::string sourcePathStr = GetDataDir().string();
                 sourcePathStr += "/" + strWalletFile;
-                fs::filesystem::path sourceFile = sourcePathStr;
-                fs::filesystem::path backupFile = backupPathStr + dateTimeStr;
+                fs::path sourceFile = sourcePathStr;
+                fs::path backupFile = backupPathStr + dateTimeStr;
                 sourceFile.make_preferred();
                 backupFile.make_preferred();
-                if (fs::filesystem::exists(sourceFile)) {
+                if (fs::exists(sourceFile)) {
 #if BOOST_VERSION >= 105800
                     try {
-                        fs::filesystem::copy_file(sourceFile, backupFile);
+                        fs::copy_file(sourceFile, backupFile);
                         LogPrintf("Creating backup of %s -> %s\n", sourceFile, backupFile);
-                    } catch (fs::filesystemfs::filesystem_error& error) {
+                    } catch (fsfs_error& error) {
                         LogPrintf("Failed to create backup %s\n", error.what());
                     }
 #else
@@ -1121,33 +1121,33 @@ bool AppInit2()
 #endif
                 }
                 // Keep only the last 10 backups, including the new one of course
-                typedef std::multimap<std::time_t, fs::filesystem::path> folder_set_t;
+                typedef std::multimap<std::time_t, fs::path> folder_set_t;
                 folder_set_t folder_set;
-                fs::filesystem::directory_iterator end_iter;
-                fs::filesystem::path backupFolder = backupDir.string();
+                fs::directory_iterator end_iter;
+                fs::path backupFolder = backupDir.string();
                 backupFolder.make_preferred();
                 // Build map of backup files for current(!) wallet sorted by last write time
-                fs::filesystem::path currentFile;
-                for (fs::filesystem::directory_iterator dir_iter(backupFolder); dir_iter != end_iter; ++dir_iter) {
+                fs::path currentFile;
+                for (fs::directory_iterator dir_iter(backupFolder); dir_iter != end_iter; ++dir_iter) {
                     // Only check regular files
-                    if (fs::filesystem::is_regular_file(dir_iter->status())) {
+                    if (fs::is_regular_file(dir_iter->status())) {
                         currentFile = dir_iter->path().filename();
                         // Only add the backups for the current wallet, e.g. wallet.dat.*
                         if (dir_iter->path().stem().string() == strWalletFile) {
-                            folder_set.insert(folder_set_t::value_type(fs::filesystem::last_write_time(dir_iter->path()), *dir_iter));
+                            folder_set.insert(folder_set_t::value_type(fs::last_write_time(dir_iter->path()), *dir_iter));
                         }
                     }
                 }
                 // Loop backward through backup files and keep the N newest ones (1 <= N <= 10)
                 int counter = 0;
-                for (std::pair<const std::time_t, fs::filesystem::path> file: reverse_iterate(folder_set)) {
+                for (std::pair<const std::time_t, fs::path> file: reverse_iterate(folder_set)) {
                     counter++;
                     if (counter > nWalletBackups) {
                         // More than nWalletBackups backups: delete oldest one(s)
                         try {
-                            fs::filesystem::remove(file.second);
+                            fs::remove(file.second);
                             LogPrintf("Old backup deleted: %s\n", file.second);
-                        } catch (fs::filesystemfs::filesystem_error& error) {
+                        } catch (fsfs_error& error) {
                             LogPrintf("Failed to delete backup %s\n", error.what());
                         }
                     }
@@ -1167,25 +1167,25 @@ bool AppInit2()
             // We delete in 4 individual steps in case one of the folder is missing already
             try {
                 if (filesystem::exists(blocksDir)){
-                    fs::filesystem::remove_all(blocksDir);
+                    fs::remove_all(blocksDir);
                     LogPrintf("-resync: folder deleted: %s\n", blocksDir.string().c_str());
                 }
 
                 if (filesystem::exists(chainstateDir)){
-                    fs::filesystem::remove_all(chainstateDir);
+                    fs::remove_all(chainstateDir);
                     LogPrintf("-resync: folder deleted: %s\n", chainstateDir.string().c_str());
                 }
 
                 if (filesystem::exists(sporksDir)){
-                    fs::filesystem::remove_all(sporksDir);
+                    fs::remove_all(sporksDir);
                     LogPrintf("-resync: folder deleted: %s\n", sporksDir.string().c_str());
                 }
 
                 if (filesystem::exists(zerocoinDir)){
-                    fs::filesystem::remove_all(zerocoinDir);
+                    fs::remove_all(zerocoinDir);
                     LogPrintf("-resync: folder deleted: %s\n", zerocoinDir.string().c_str());
                 }
-            } catch (fs::filesystemfs::filesystem_error& error) {
+            } catch (fsfs_error& error) {
                 LogPrintf("Failed to delete blockchain folders %s\n", error.what());
             }
         }
@@ -1195,12 +1195,12 @@ bool AppInit2()
 
         if (!bitdb.Open(GetDataDir())) {
             // try moving the database env out of the way
-            fs::filesystem::path pathDatabase = GetDataDir() / "database";
-            fs::filesystem::path pathDatabaseBak = GetDataDir() / strprintf("database.%d.bak", GetTime());
+            fs::path pathDatabase = GetDataDir() / "database";
+            fs::path pathDatabaseBak = GetDataDir() / strprintf("database.%d.bak", GetTime());
             try {
-                fs::filesystem::rename(pathDatabase, pathDatabaseBak);
+                fs::rename(pathDatabase, pathDatabaseBak);
                 LogPrintf("Moved old %s to %s. Retrying.\n", pathDatabase.string(), pathDatabaseBak.string());
-            } catch (fs::filesystemfs::filesystem_error& error) {
+            } catch (fsfs_error& error) {
                 // failure is ok (well, not really, but it's not worse than what we started with)
             }
 
@@ -1397,7 +1397,7 @@ bool AppInit2()
                 filesystem::create_hard_link(source, dest);
                 LogPrintf("Hardlinked %s -> %s\n", source.string(), dest.string());
                 linked = true;
-            } catch (filesystemfs::filesystem_error& e) {
+            } catch (filesystemfs_error& e) {
                 // Note: hardlink creation failing is not a disaster, it just means
                 // blocks will get re-downloaded from peers.
                 LogPrintf("Error hardlinking blk%04u.dat : %s\n", i, e.what());
@@ -1579,7 +1579,7 @@ bool AppInit2()
     }
     LogPrintf(" block index %15dms\n", GetTimeMillis() - nStart);
 
-    fs::filesystem::path est_path = GetDataDir() / FEE_ESTIMATES_FILENAME;
+    fs::path est_path = GetDataDir() / FEE_ESTIMATES_FILENAME;
     CAutoFile est_filein(fopen(est_path.string().c_str(), "rb"), SER_DISK, CLIENT_VERSION);
     // Allowed to fail as this file IS missing on first startup.
     if (!est_filein.IsNull())
@@ -1748,7 +1748,7 @@ bool AppInit2()
     if (!ActivateBestChain(state))
         strErrors << "Failed to connect best block";
 
-    std::vector<fs::filesystem::path> vImportFiles;
+    std::vector<fs::path> vImportFiles;
     if (mapArgs.count("-loadblock")) {
         for (string strFile: mapMultiArgs["-loadblock"])
             vImportFiles.push_back(strFile);
