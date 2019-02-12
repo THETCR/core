@@ -53,7 +53,7 @@ unsigned int ParseScriptFlags(string strFlags)
     }
     unsigned int flags = 0;
     vector<string> words;
-    split(words, strFlags, is_any_of(","));
+    boost::algorithm::split(words, strFlags, boost::algorithm::is_any_of(","));
 
     for(string word: words)
     {
