@@ -40,7 +40,7 @@ void HandleError(const leveldb::Status& status);
  * Database obfuscation should be considered an implementation detail of the
  * specific database.
  */
-const std::vector<unsigned char>& GetObfuscateKey(const CDBWrapper &w);
+const std::vector<unsigned char>& GetObfuscateKey(const CLevelDBWrapper &w);
 
 };
 
@@ -89,7 +89,7 @@ private:
 public:
 
   /**
-   * @param[in] _parent          Parent CDBWrapper instance.
+   * @param[in] _parent          Parent CLevelDBWrapper instance.
    * @param[in] _piter           The original leveldb iterator.
    */
   CLevelDBIterator(const CLevelDBWrapper &_parent, leveldb::Iterator *_piter) :
