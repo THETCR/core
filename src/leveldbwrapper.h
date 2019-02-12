@@ -61,7 +61,7 @@ public:
         batch.Delete(slKey);
     }
 };
-
+class CLevelDBWrapper;
 class CLevelDBIterator
 {
 private:
