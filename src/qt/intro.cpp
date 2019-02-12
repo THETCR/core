@@ -11,7 +11,7 @@
 
 #include "util.h"
 
-#include <boost/filesystem.hpp>
+
 
 #include <QFileDialog>
 #include <QMessageBox>

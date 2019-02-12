@@ -13,9 +13,9 @@
 #include "util.h"
 #include "wallet.h"
 #include "reverse_iterate.h"
+#include <fs.h>
+
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
 
 #include <algorithm>
 #include <boost/assign/list_of.hpp>

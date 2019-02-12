@@ -8,6 +8,7 @@
 
 #include "key.h"
 #include "masternode.h"
+#include <fs.h>
 
 using namespace std;
 
@@ -37,7 +38,7 @@ void DumpMasternodePayments();
 class CMasternodePaymentDB
 {
 private:
-    boost::filesystem::path pathDB;
+    fs::path pathDB;
     std::string strMagicMessage;
 
 public:

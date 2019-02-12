@@ -18,6 +18,7 @@
 #include "main.h" // for MAX_SCRIPTCHECK_THREADS
 #include "netbase.h"
 #include "txdb.h" // for -dbcache defaults
+#include <fs.h>
 
 #ifdef ENABLE_WALLET
 #include "wallet.h" // for CWallet::minTxFee
@@ -102,7 +103,7 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
     ui->preferredDenom->addItem(QString("5000"), QVariant("5000"));
 
     /* Theme selector external themes */
-    boost::filesystem::path pathAddr = GetDataDir() / "themes";
+    fs::path pathAddr = GetDataDir() / "themes";
     QDir dir(pathAddr.string().c_str());
     dir.setFilter(QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot);
     QFileInfoList list = dir.entryInfoList();

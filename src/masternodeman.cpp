@@ -12,7 +12,9 @@
 #include "obfuscation.h"
 #include "spork.h"
 #include "util.h"
-#include <boost/filesystem.hpp>
+#include <fs.h>
+
+
 
 #define MN_WINNER_MINIMUM_AGE 8000    // Age in seconds. This should be > MASTERNODE_REMOVAL_SECONDS to avoid misconfigured new nodes in the list.
 
@@ -98,7 +100,7 @@ CMasternodeDB::ReadResult CMasternodeDB::Read(CMasternodeMan& mnodemanToLoad, bo
     }
 
     // use file size to size memory buffer
-    int fileSize = boost::filesystem::file_size(pathMN);
+    int fileSize = fs::file_size(pathMN);
     int dataSize = fileSize - sizeof(uint256);
     // Don't try to resize to a negative number if file is small
     if (dataSize < 0)

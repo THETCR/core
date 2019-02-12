@@ -31,6 +31,7 @@
 #include "util.h"
 #include "utilmoneystr.h"
 #include "zwspchain.h"
+#include <fs.h>
 
 #include "denomination_functions.h"
 #include "libzerocoin/Denominations.h"
@@ -5156,22 +5157,22 @@ string CWallet::GetUniqueWalletBackupName(bool fzwspAuto) const
 
 void CWallet::ZWspBackupWallet()
 {
-    filesystem::path backupDir = GetDataDir() / "backups";
-    filesystem::path backupPath;
+    fs::path backupDir = GetDataDir() / "backups";
+    fs::path backupPath;
     string strNewBackupName;
 
     for (int i = 0; i < 10; i++) {
         strNewBackupName = strprintf("wallet-autozwspbackup-%d.dat", i);
         backupPath = backupDir / strNewBackupName;
 
-        if (filesystem::exists(backupPath)) {
+        if (fs::exists(backupPath)) {
             //Keep up to 10 backups
             if (i <= 8) {
                 //If the next file backup exists and is newer, then iterate
-                filesystem::path nextBackupPath = backupDir / strprintf("wallet-autozwspbackup-%d.dat", i + 1);
-                if (filesystem::exists(nextBackupPath)) {
-                    time_t timeThis = filesystem::last_write_time(backupPath);
-                    time_t timeNext = filesystem::last_write_time(nextBackupPath);
+                fs::path nextBackupPath = backupDir / strprintf("wallet-autozwspbackup-%d.dat", i + 1);
+                if (fs::exists(nextBackupPath)) {
+                    time_t timeThis = fs::last_write_time(backupPath);
+                    time_t timeNext = fs::last_write_time(nextBackupPath);
                     if (timeThis > timeNext) {
                         //The next backup is created before this backup was
                         //The next backup is the correct path to use
@@ -5194,8 +5195,8 @@ void CWallet::ZWspBackupWallet()
     BackupWallet(*this, backupPath.string());
 
     if(!GetArg("-zwspbackuppath", "").empty()) {
-        filesystem::path customPath(GetArg("-zwspbackuppath", ""));
-        filesystem::create_directories(customPath);
+        fs::path customPath(GetArg("-zwspbackuppath", ""));
+        fs::create_directories(customPath);
 
         if(!customPath.has_extension()) {
             customPath /= GetUniqueWalletBackupName(true);

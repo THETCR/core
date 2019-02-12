@@ -10,6 +10,7 @@
 #include "streams.h"
 #include "util.h"
 #include "version.h"
+#include <fs.h>
 
 #include <boost/filesystem/path.hpp>
 
@@ -86,7 +87,7 @@ private:
     leveldb::DB* pdb;
 
 public:
-    CLevelDBWrapper(const boost::filesystem::path& path, size_t nCacheSize, bool fMemory = false, bool fWipe = false);
+    CLevelDBWrapper(const fs::path& path, size_t nCacheSize, bool fMemory = false, bool fWipe = false);
     ~CLevelDBWrapper();
 
     template <typename K, typename V>

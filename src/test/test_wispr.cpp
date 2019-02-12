@@ -19,12 +19,14 @@
 #include "rpc/server.h"
 #include "script/sigcache.h"
 #include "util.h"
+#include <fs.h>
+
 //#ifdef ENABLE_WALLET
 //#include "db.h"
 //#include "wallet.h"
 //#endif
 
-#include <boost/filesystem.hpp>
+
 
 extern bool fPrintToConsole;
 extern void noui_connect();
@@ -58,7 +60,7 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
     // from blocking due to queue overrun.
     threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
     pathTemp = GetTempPath() / strprintf("test_bitcoin_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
-    boost::filesystem::create_directories(pathTemp);
+    fs::create_directories(pathTemp);
     mapArgs["-datadir"] = pathTemp.string();
 //    mempool.setSanityCheck(1.0);
     pblocktree = new CBlockTreeDB(1 << 20, true);
@@ -99,7 +101,7 @@ TestingSetup::~TestingSetup()
     delete pcoinsTip;
     delete pcoinsdbview;
     delete pblocktree;
-    boost::filesystem::remove_all(pathTemp);
+    fs::remove_all(pathTemp);
 }
 
 //TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)

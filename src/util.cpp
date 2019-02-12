@@ -17,6 +17,7 @@
 #include "sync.h"
 #include "utilstrencodings.h"
 #include "utiltime.h"
+#include <fs.h>
 
 #include <stdarg.h>
 
@@ -78,8 +79,6 @@
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower()
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/predicate.hpp> // for startswith() and endswith()
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
 
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -202,7 +201,7 @@ static void DebugPrintInit()
     assert(fileout == nullptr);
     assert(mutexDebugLog == NULL);
 
-    boost::filesystem::path pathDebug = GetDataDir() / "debug.log";
+    fs::path pathDebug = GetDataDir() / "debug.log";
     fileout = fopen(pathDebug.string().c_str(), "a");
     if (fileout) setbuf(fileout, nullptr); // unbuffered
 
@@ -263,7 +262,7 @@ int LogPrintStr(const std::string& str)
         // reopen the log file, if requested
         if (fReopenDebugLog) {
             fReopenDebugLog = false;
-            boost::filesystem::path pathDebug = GetDataDir() / "debug.log";
+            fs::path pathDebug = GetDataDir() / "debug.log";
             if (freopen(pathDebug.string().c_str(), "a", fileout) != NULL)
                 setbuf(fileout, nullptr); // unbuffered
         }
@@ -408,7 +407,7 @@ void PrintExceptionContinue(std::exception* pex, const char* pszThread)
     strMiscWarning = message;
 }
 
-boost::filesystem::path GetDefaultDataDir()
+fs::path GetDefaultDataDir()
 {
     namespace fs = boost::filesystem;
 // Windows < Vista: C:\Documents and Settings\Username\Application Data\WISPR
@@ -437,11 +436,11 @@ boost::filesystem::path GetDefaultDataDir()
 #endif
 }
 
-static boost::filesystem::path pathCached;
-static boost::filesystem::path pathCachedNetSpecific;
+static fs::path pathCached;
+static fs::path pathCachedNetSpecific;
 static CCriticalSection csPathCached;
 
-const boost::filesystem::path& GetDataDir(bool fNetSpecific)
+const fs::path& GetDataDir(bool fNetSpecific)
 {
     namespace fs = boost::filesystem;
 
@@ -473,22 +472,22 @@ const boost::filesystem::path& GetDataDir(bool fNetSpecific)
 
 void ClearDatadirCache()
 {
-    pathCached = boost::filesystem::path();
-    pathCachedNetSpecific = boost::filesystem::path();
+    pathCached = fs::path();
+    pathCachedNetSpecific = fs::path();
 }
 
-boost::filesystem::path GetConfigFile()
+fs::path GetConfigFile()
 {
-    boost::filesystem::path pathConfigFile(GetArg("-conf", "wispr.conf"));
+    fs::path pathConfigFile(GetArg("-conf", "wispr.conf"));
     if (!pathConfigFile.is_complete())
         pathConfigFile = GetDataDir(false) / pathConfigFile;
 
     return pathConfigFile;
 }
 
-boost::filesystem::path GetMasternodeConfigFile()
+fs::path GetMasternodeConfigFile()
 {
-    boost::filesystem::path pathConfigFile(GetArg("-mnconf", "masternode.conf"));
+    fs::path pathConfigFile(GetArg("-mnconf", "masternode.conf"));
     if (!pathConfigFile.is_complete()) pathConfigFile = GetDataDir() / pathConfigFile;
     return pathConfigFile;
 }
@@ -496,7 +495,7 @@ boost::filesystem::path GetMasternodeConfigFile()
 void ReadConfigFile(map<string, string>& mapSettingsRet,
     map<string, vector<string> >& mapMultiSettingsRet)
 {
-    boost::filesystem::ifstream streamConfig(GetConfigFile());
+    fs::ifstream streamConfig(GetConfigFile());
     if (!streamConfig.good()) {
         // Create empty wispr.conf if it does not exist
         FILE* configFile = fopen(GetConfigFile().string().c_str(), "a");
@@ -522,14 +521,14 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
 }
 
 #ifndef WIN32
-boost::filesystem::path GetPidFile()
+fs::path GetPidFile()
 {
-    boost::filesystem::path pathPidFile(GetArg("-pid", "wisprd.pid"));
+    fs::path pathPidFile(GetArg("-pid", "wisprd.pid"));
     if (!pathPidFile.is_complete()) pathPidFile = GetDataDir() / pathPidFile;
     return pathPidFile;
 }
 
-void CreatePidFile(const boost::filesystem::path& path, pid_t pid)
+void CreatePidFile(const fs::path& path, pid_t pid)
 {
     FILE* file = fopen(path.string().c_str(), "w");
     if (file) {
@@ -539,7 +538,7 @@ void CreatePidFile(const boost::filesystem::path& path, pid_t pid)
 }
 #endif
 
-bool RenameOver(boost::filesystem::path src, boost::filesystem::path dest)
+bool RenameOver(fs::path src, fs::path dest)
 {
 #ifdef WIN32
     return MoveFileExA(src.string().c_str(), dest.string().c_str(),
@@ -555,12 +554,12 @@ bool RenameOver(boost::filesystem::path src, boost::filesystem::path dest)
  * Specifically handles case where path p exists, but it wasn't possible for the user to
  * write to the parent directory.
  */
-bool TryCreateDirectory(const boost::filesystem::path& p)
+bool TryCreateDirectory(const fs::path& p)
 {
     try {
-        return boost::filesystem::create_directory(p);
-    } catch (boost::filesystem::filesystem_error) {
-        if (!boost::filesystem::exists(p) || !boost::filesystem::is_directory(p))
+        return fs::create_directory(p);
+    } catch (fs::filesystem_error) {
+        if (!fs::exists(p) || !fs::is_directory(p))
             throw;
     }
 
@@ -668,9 +667,9 @@ void AllocateFileRange(FILE* file, unsigned int offset, unsigned int length)
 void ShrinkDebugFile()
 {
     // Scroll debug.log if it's getting too big
-    boost::filesystem::path pathLog = GetDataDir() / "debug.log";
+    fs::path pathLog = GetDataDir() / "debug.log";
     FILE* file = fopen(pathLog.string().c_str(), "r");
-    if (file && boost::filesystem::file_size(pathLog) > 10 * 1000000) {
+    if (file && fs::file_size(pathLog) > 10 * 1000000) {
         // Restart the file with some of the end
         std::vector<char> vch(200000, 0);
         fseek(file, -((long)vch.size()), SEEK_END);
@@ -687,7 +686,7 @@ void ShrinkDebugFile()
 }
 
 #ifdef WIN32
-boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate)
+fs::path GetSpecialFolderPath(int nFolder, bool fCreate)
 {
     namespace fs = boost::filesystem;
 
@@ -702,24 +701,24 @@ boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate)
 }
 #endif
 
-boost::filesystem::path GetTempPath()
+fs::path GetTempPath()
 {
 #if BOOST_FILESYSTEM_VERSION == 3
-    return boost::filesystem::temp_directory_path();
+    return fs::temp_directory_path();
 #else
     // TODO: remove when we don't support filesystem v2 anymore
-    boost::filesystem::path path;
+    fs::path path;
 #ifdef WIN32
     char pszPath[MAX_PATH] = "";
 
     if (GetTempPathA(MAX_PATH, pszPath))
-        path = boost::filesystem::path(pszPath);
+        path = fs::path(pszPath);
 #else
-    path = boost::filesystem::path("/tmp");
+    path = fs::path("/tmp");
 #endif
-    if (path.empty() || !boost::filesystem::is_directory(path)) {
+    if (path.empty() || !fs::is_directory(path)) {
         LogPrintf("GetTempPath(): failed to find temp path\n");
-        return boost::filesystem::path("");
+        return fs::path("");
     }
     return path;
 #endif
@@ -795,11 +794,11 @@ void SetupEnvironment()
     // in multithreading environments, it is set explicitly by the main thread.
     // A dummy locale is used to extract the internal default locale, used by
     // fs::path, which is then used to explicitly imbue the path.
-    std::locale loc = boost::filesystem::path::imbue(std::locale::classic());
+    std::locale loc = fs::path::imbue(std::locale::classic());
 #ifndef WIN32
-    boost::filesystem::path::imbue(loc);
+    fs::path::imbue(loc);
 #else
-    boost::filesystem::path::imbue(std::locale(loc, new std::codecvt_utf8_utf16<wchar_t>()));
+    fs::path::imbue(std::locale(loc, new std::codecvt_utf8_utf16<wchar_t>()));
 #endif
 }
 

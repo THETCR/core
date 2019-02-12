@@ -12,6 +12,8 @@
 #include "net.h"
 #include "sync.h"
 #include "util.h"
+#include <fs.h>
+
 
 #define MASTERNODES_DUMP_SECONDS (15 * 60)
 #define MASTERNODES_DSEG_SECONDS (3 * 60 * 60)
@@ -28,7 +30,7 @@ void DumpMasternodes();
 class CMasternodeDB
 {
 private:
-    boost::filesystem::path pathMN;
+    fs::path pathMN;
     std::string strMagicMessage;
 
 public:

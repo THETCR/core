@@ -12,6 +12,7 @@
 #include "net.h"
 #include "sync.h"
 #include "util.h"
+#include <fs.h>
 
 using namespace std;
 
@@ -153,7 +154,7 @@ public:
 class CBudgetDB
 {
 private:
-    boost::filesystem::path pathDB;
+    fs::path pathDB;
     std::string strMagicMessage;
 
 public:

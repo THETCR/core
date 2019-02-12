@@ -11,6 +11,7 @@
 #include "txdb.h"
 #include "txmempool.h"
 #include "scheduler.h"
+#include <fs.h>
 
 #include <boost/thread.hpp>
 
@@ -32,7 +33,7 @@ class CNode;
 class PeerLogicValidation;
 
 struct TestingSetup: public BasicTestingSetup {
-    boost::filesystem::path pathTemp;
+    fs::path pathTemp;
     boost::thread_group threadGroup;
     CScheduler scheduler;
 

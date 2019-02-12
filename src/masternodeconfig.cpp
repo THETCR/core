@@ -8,6 +8,7 @@
 #include "util.h"
 #include "ui_interface.h"
 #include <base58.h>
+#include <fs.h>
 
 CMasternodeConfig masternodeConfig;
 
@@ -20,8 +21,8 @@ void CMasternodeConfig::add(std::string alias, std::string ip, std::string privK
 bool CMasternodeConfig::read(std::string& strErr)
 {
     int linenumber = 1;
-    boost::filesystem::path pathMasternodeConfigFile = GetMasternodeConfigFile();
-    boost::filesystem::ifstream streamConfig(pathMasternodeConfigFile);
+    fs::path pathMasternodeConfigFile = GetMasternodeConfigFile();
+    fs::ifstream streamConfig(pathMasternodeConfigFile);
 
     if (!streamConfig.good()) {
         FILE* configFile = fopen(pathMasternodeConfigFile.string().c_str(), "a");

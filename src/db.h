@@ -11,6 +11,7 @@
 #include "streams.h"
 #include "sync.h"
 #include "version.h"
+#include <fs.h>
 
 #include <map>
 #include <string>
@@ -35,7 +36,7 @@ class CDBEnv
 private:
     bool fDbEnvInit;
     bool fMockDb;
-    // Don't change into boost::filesystem::path, as that can result in
+    // Don't change into fs::path, as that can result in
     // shutdown problems/crashes caused by a static initialized internal pointer.
     std::string strPath;
 
@@ -72,7 +73,7 @@ public:
     typedef std::pair<std::vector<unsigned char>, std::vector<unsigned char> > KeyValPair;
     bool Salvage(std::string strFile, bool fAggressive, std::vector<KeyValPair>& vResult);
 
-    bool Open(const boost::filesystem::path& path);
+    bool Open(const fs::path& path);
     void Close();
     void Flush(bool fShutdown);
     void CheckpointLSN(const std::string& strFile);
