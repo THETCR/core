@@ -18,6 +18,8 @@
 #include "txdb.h"
 #include "util.h"
 #include "utilmoneystr.h"
+#include "utilstrencodings.h"
+#include "hash.h"
 #include "accumulatormap.h"
 #include "accumulators.h"
 #include "txmempool.h"
@@ -28,6 +30,8 @@
 #include <iostream>
 #include <univalue.h>
 #include "libzerocoin/bignum.h"
+
+#include <boost/thread/thread.hpp> // boost::thread::interrupt
 
 using namespace std;
 
@@ -384,6 +388,76 @@ UniValue getblock(const UniValue& params, bool fHelp)
     return blockToJSON(block, pblockindex);
 }
 
+struct CCoinsStats {
+  int nHeight;
+  uint256 hashBlock;
+  uint64_t nTransactions;
+  uint64_t nTransactionOutputs;
+  uint64_t nSerializedSize;
+  uint256 hashSerialized;
+  CAmount nTotalAmount;
+
+  CCoinsStats() : nHeight(0), hashBlock(0), nTransactions(0), nTransactionOutputs(0), nSerializedSize(0), hashSerialized(0), nTotalAmount(0) {}
+};
+
+//static void ApplyStats(CCoinsStats &stats, CHashWriter& ss, const uint256& hash, const std::map<uint32_t, CCoins>& outputs)
+//{
+//    assert(!outputs.empty());
+//    ss << hash;
+//    ss << VARINT(outputs.begin()->second.nHeight * 2 + outputs.begin()->second.fCoinBase ? 1u : 0u);
+//    stats.nTransactions++;
+//    for (const auto& output : outputs) {
+//        for(const auto& out: output.second.vout){
+//            ss << VARINT(output.first + 1);
+//            ss << out.scriptPubKey;
+//            ss << VARINT(out.nValue);
+//            stats.nTransactionOutputs++;
+//            stats.nTotalAmount += out.nValue;
+//        }
+//    }
+//    ss << VARINT(0u);
+//}
+
+//! Calculate statistics about the unspent transaction output set
+static bool GetUTXOStats(CCoinsView *view, CCoinsStats &stats)
+{
+    boost::scoped_ptr<CCoinsViewCursor> pcursor(view->Cursor());
+
+    CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
+    stats.hashBlock = pcursor->GetBestBlock();
+    {
+        LOCK(cs_main);
+        stats.nHeight = mapBlockIndex.find(stats.hashBlock)->second->nHeight;
+    }
+    ss << stats.hashBlock;
+    CAmount nTotalAmount = 0;
+    while (pcursor->Valid()) {
+        boost::this_thread::interruption_point();
+        uint256 key;
+        CCoins coins;
+        if (pcursor->GetKey(key) && pcursor->GetValue(coins)) {
+            stats.nTransactions++;
+            for (unsigned int i=0; i<coins.vout.size(); i++) {
+                const CTxOut &out = coins.vout[i];
+                if (!out.IsNull()) {
+                    stats.nTransactionOutputs++;
+                    ss << VARINT(i+1);
+                    ss << out;
+                    nTotalAmount += out.nValue;
+                }
+            }
+            stats.nSerializedSize += 32 + pcursor->GetValueSize();
+            ss << VARINT(0);
+        } else {
+            return error("%s: unable to read value", __func__);
+        }
+        pcursor->Next();
+    }
+    stats.hashSerialized = ss.GetHash();
+    stats.nTotalAmount = nTotalAmount;
+    return true;
+}
+
 UniValue getblockheader(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
@@ -464,7 +538,7 @@ UniValue gettxoutsetinfo(const UniValue& params, bool fHelp)
 
     CCoinsStats stats;
     FlushStateToDisk();
-    if (pcoinsTip->GetStats(stats)) {
+    if (GetUTXOStats(pcoinsTip, stats)) {
         ret.push_back(Pair("height", (int64_t)stats.nHeight));
         ret.push_back(Pair("bestblock", stats.hashBlock.GetHex()));
         ret.push_back(Pair("transactions", (int64_t)stats.nTransactions));

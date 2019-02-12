@@ -319,16 +319,24 @@ struct CCoinsCacheEntry {
 
 typedef boost::unordered_map<uint256, CCoinsCacheEntry, CCoinsKeyHasher> CCoinsMap;
 
-struct CCoinsStats {
-    int nHeight;
-    uint256 hashBlock;
-    uint64_t nTransactions;
-    uint64_t nTransactionOutputs;
-    uint64_t nSerializedSize;
-    uint256 hashSerialized;
-    CAmount nTotalAmount;
+/** Cursor for iterating over CoinsView state */
+class CCoinsViewCursor
+{
+public:
+  CCoinsViewCursor(const uint256 &hashBlockIn): hashBlock(hashBlockIn) {}
+  virtual ~CCoinsViewCursor() {}
 
-    CCoinsStats() : nHeight(0), hashBlock(0), nTransactions(0), nTransactionOutputs(0), nSerializedSize(0), hashSerialized(0), nTotalAmount(0) {}
+  virtual bool GetKey(COutPoint &key) const = 0;
+  virtual bool GetValue(Coin &coin) const = 0;
+  virtual unsigned int GetValueSize() const = 0;
+
+  virtual bool Valid() const = 0;
+  virtual void Next() = 0;
+
+  //! Get best block at the time this cursor was created
+  const uint256 &GetBestBlock() const { return hashBlock; }
+private:
+  uint256 hashBlock;
 };
 
 
@@ -350,8 +358,8 @@ public:
     //! The passed mapCoins can be modified.
     virtual bool BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock);
 
-    //! Calculate statistics about the unspent transaction output set
-    virtual bool GetStats(CCoinsStats& stats) const;
+    //! Get a cursor to iterate over the whole state
+    virtual CCoinsViewCursor *Cursor() const;
 
     //! As we use CCoinsViews polymorphically, have a virtual destructor
     virtual ~CCoinsView() {}
@@ -371,7 +379,7 @@ public:
     uint256 GetBestBlock() const;
     void SetBackend(CCoinsView& viewIn);
     bool BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock);
-    bool GetStats(CCoinsStats& stats) const;
+    CCoinsViewCursor *Cursor() const;
 };
 
 class CCoinsViewCache;
