@@ -19,10 +19,10 @@
 #include "rpc/server.h"
 #include "script/sigcache.h"
 #include "util.h"
-#ifdef ENABLE_WALLET
-#include "db.h"
-#include "wallet.h"
-#endif
+//#ifdef ENABLE_WALLET
+//#include "db.h"
+//#include "wallet.h"
+//#endif
 
 #include <boost/filesystem.hpp>
 
@@ -37,9 +37,9 @@ BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
     fCheckBlockIndex = true;
     SelectParams(CBaseChainParams::MAIN);
     noui_connect();
-#ifdef ENABLE_WALLET
-    bitdb.MakeMock();
-#endif
+//#ifdef ENABLE_WALLET
+//    bitdb.MakeMock();
+//#endif
 }
 
 BasicTestingSetup::~BasicTestingSetup()
@@ -71,12 +71,12 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
             throw std::runtime_error("ActivateBestChain failed");
         }
     }
-#ifdef ENABLE_WALLET
-    bool fFirstRun;
-    pwalletMain = new CWallet("wallet.dat");
-    pwalletMain->LoadWallet(fFirstRun);
-    RegisterValidationInterface(pwalletMain);
-#endif
+//#ifdef ENABLE_WALLET
+//    bool fFirstRun;
+//    pwalletMain = new CWallet("wallet.dat");
+//    pwalletMain->LoadWallet(fFirstRun);
+//    RegisterValidationInterface(pwalletMain);
+//#endif
     nScriptCheckThreads = 3;
     for (int i=0; i < nScriptCheckThreads-1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
@@ -91,10 +91,11 @@ TestingSetup::~TestingSetup()
     threadGroup.join_all();
     g_connman.reset();
     UnloadBlockIndex();
-#ifdef ENABLE_WALLET
-    delete pwalletMain;
-    pwalletMain = nullptr;
-#endif
+//#ifdef ENABLE_WALLET
+//    UnregisterValidationInterface(pwalletMain);
+//    delete pwalletMain;
+//    pwalletMain = nullptr;
+//#endif
     delete pcoinsTip;
     delete pcoinsdbview;
     delete pblocktree;
