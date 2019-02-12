@@ -255,7 +255,7 @@ public:
 
     CLevelDBIterator *NewIterator()
     {
-        return new CDBIterator(*this, pdb->NewIterator(iteroptions));
+        return new CLevelDBIterator(*this, pdb->NewIterator(iteroptions));
     }
 };
 
