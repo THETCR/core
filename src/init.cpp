@@ -173,6 +173,8 @@ void Interrupt()
     InterruptRPC();
     InterruptREST();
     InterruptTorControl();
+    InterruptMapPort();
+
     if (g_connman)
         g_connman->Interrupt();
 }
@@ -201,7 +203,7 @@ void PrepareShutdown()
         bitdb.Flush(false);
     GenerateBitcoins(false, nullptr, 0);
 #endif
-    MapPort(false);
+    StopMapPort();
     UnregisterValidationInterface(peerLogic.get());
     if (g_connman) g_connman->Stop();
     // After everything has been shut down, but before things get flushed, stop the
@@ -1954,7 +1956,10 @@ bool AppInit2()
     Discover();
 
     // Map ports with UPnP
-    MapPort(GetBoolArg("-upnp", DEFAULT_UPNP));
+    if (GetBoolArg("-upnp", DEFAULT_UPNP)) {
+        StartMapPort();
+    }
+
     std::string strNodeError;
     if (!g_connman->Start(scheduler, strNodeError)) {
         return InitError(strNodeError);
