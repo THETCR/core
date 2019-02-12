@@ -9,18 +9,20 @@
 
 #include "coins.h"
 #include "leveldbwrapper.h"
+#include "chain.h"
 #include "libzerocoin/Coin.h"
 #include "libzerocoin/CoinSpend.h"
 #include "primitives/zerocoin.h"
-#include "chain.h"
+#include <primitives/block.h>
 
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
+
 class CBlockIndex;
-class CBlockFileInfo;
 class CDiskTxPos;
 class CCoins;
 class uint256;
@@ -31,6 +33,34 @@ static const int64_t nDefaultDbCache = 100;
 static const int64_t nMaxDbCache = sizeof(void*) > 4 ? 4096 : 1024;
 //! min. -dbcache in (MiB)
 static const int64_t nMinDbCache = 4;
+
+struct CDiskTxPos : public CDiskBlockPos {
+  unsigned int nTxOffset; // after header
+
+  ADD_SERIALIZE_METHODS;
+
+  template <typename Stream, typename Operation>
+  inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+  {
+      READWRITE(*(CDiskBlockPos*)this);
+      READWRITE(VARINT(nTxOffset));
+  }
+
+  CDiskTxPos(const CDiskBlockPos& blockIn, unsigned int nTxOffsetIn) : CDiskBlockPos(blockIn.nFile, blockIn.nPos), nTxOffset(nTxOffsetIn)
+  {
+  }
+
+  CDiskTxPos()
+  {
+      SetNull();
+  }
+
+  void SetNull()
+  {
+      CDiskBlockPos::SetNull();
+      nTxOffset = 0;
+  }
+};
 
 /** CCoinsView backed by the LevelDB coin database (chainstate/) */
 class CCoinsViewDB : public CCoinsView
@@ -72,7 +102,7 @@ public:
     bool ReadFlag(const std::string& name, bool& fValue);
     bool WriteInt(const std::string& name, int nValue);
     bool ReadInt(const std::string& name, int& nValue);
-    bool LoadBlockIndexGuts();
+    bool LoadBlockIndexGuts(std::function<CBlockIndex*(const uint256&)> insertBlockIndex);
 };
 
 /** Zerocoin database (zerocoin/) */

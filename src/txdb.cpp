@@ -9,7 +9,6 @@
 #include "accumulators.h"
 #include "chainparams.h"
 #include "hash.h"
-#include "main.h"
 #include "pow.h"
 #include "shutdown.h"
 #include "uint256.h"
@@ -211,7 +210,7 @@ bool CBlockTreeDB::ReadInt(const std::string& name, int& nValue)
     return Read(std::make_pair('I', name), nValue);
 }
 
-bool CBlockTreeDB::LoadBlockIndexGuts()
+bool CBlockTreeDB::LoadBlockIndexGuts(std::function<CBlockIndex*(const uint256&)> insertBlockIndex)
 {
     boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
 
@@ -235,9 +234,9 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 ssValue >> diskindex;
 
                 // Construct block index object
-                CBlockIndex* pindexNew = InsertBlockIndex(diskindex.GetBlockHash());
-                pindexNew->pprev = InsertBlockIndex(diskindex.hashPrev);
-                pindexNew->pnext = InsertBlockIndex(diskindex.hashNext);
+                CBlockIndex* pindexNew = insertBlockIndex(diskindex.GetBlockHash());
+                pindexNew->pprev = insertBlockIndex(diskindex.hashPrev);
+                pindexNew->pnext = insertBlockIndex(diskindex.hashNext);
                 pindexNew->nHeight = diskindex.nHeight;
                 pindexNew->nFile = diskindex.nFile;
                 pindexNew->nDataPos = diskindex.nDataPos;
