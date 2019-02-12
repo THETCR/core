@@ -14,7 +14,7 @@
 #include "chainparams.h"
 #include "clientversion.h"
 #include "consensus/consensus.h"
-#include "consensus/protocol.h"
+#include "consensus/validation.h"
 #include "miner.h"
 #include "obfuscation.h"
 #include "primitives/transaction.h"
