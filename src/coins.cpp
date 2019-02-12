@@ -10,8 +10,6 @@
 #include <assert.h>
 
 
-CCoinsViewCursor *CCoinsView::Cursor() const { return nullptr; }
-
 /**
  * calculate number of bytes for the bitmask, and its number of non-zero bytes
  * each bit in the bitmask represents the availability of one output, but the
@@ -66,7 +64,7 @@ bool CCoinsView::GetCoins(const uint256& txid, CCoins& coins) const { return fal
 bool CCoinsView::HaveCoins(const uint256& txid) const { return false; }
 uint256 CCoinsView::GetBestBlock() const { return uint256(0); }
 bool CCoinsView::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock) { return false; }
-CCoinsViewCursor *CCoinsView::Cursor() const { return 0; }
+CCoinsViewCursor *CCoinsView::Cursor() const { return nullptr; }
 
 
 CCoinsViewBacked::CCoinsViewBacked(CCoinsView* viewIn) : base(viewIn) {}
