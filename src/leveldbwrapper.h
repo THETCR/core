@@ -125,7 +125,7 @@ public:
       leveldb::Slice slValue = piter->value();
       try {
           CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
-          ssValue.Xor(dbwrapper_private::GetObfuscateKey(parent));
+          ssValue.Xor(leveldbwrapper_private::GetObfuscateKey(parent));
           ssValue >> value;
       } catch (const std::exception&) {
           return false;
