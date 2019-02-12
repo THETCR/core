@@ -13,6 +13,7 @@
 #include "scheduler.h"
 
 #include <boost/thread.hpp>
+#include <boost/test/unit_test.hpp>
 
 /** Basic testing setup.
  * This just configures logging and chain parameters.
@@ -44,6 +45,7 @@ class CBlock;
 struct CMutableTransaction;
 class CScript;
 
+BOOST_GLOBAL_FIXTURE(TestingSetup);
 
 // Testing fixture that pre-creates a
 // 100-block REGTEST-mode block chain
