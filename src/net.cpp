@@ -2086,7 +2086,9 @@ bool CConnman::Start(CScheduler& scheduler, std::string& strNodeError)
     // Start threads
     //
     // Map ports with UPnP
-    MapPort(GetBoolArg("-upnp", DEFAULT_UPNP));
+    if (GetBoolArg("-upnp", DEFAULT_UPNP)) {
+        StartMapPort();
+    }
     // Send and receive from sockets, accept connections
     threadSocketHandler = std::thread(&TraceThread<std::function<void()> >, "net", std::function<void()>(std::bind(&CConnman::ThreadSocketHandler, this)));
 
