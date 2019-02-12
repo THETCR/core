@@ -253,10 +253,9 @@ public:
         return WriteBatch(batch, true);
     }
 
-    // not exactly clean encapsulation, but it's easiest for now
-    CLevelDBIterator *NewIterator()
+    CDBIterator *NewIterator()
     {
-        return pdb->NewIterator(iteroptions);
+        return new CDBIterator(*this, pdb->NewIterator(iteroptions));
     }
 };
 
