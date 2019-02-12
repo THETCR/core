@@ -254,7 +254,7 @@ public:
     }
 
     // not exactly clean encapsulation, but it's easiest for now
-    leveldb::Iterator* NewIterator()
+    CLevelDBIterator *NewIterator()
     {
         return pdb->NewIterator(iteroptions);
     }
