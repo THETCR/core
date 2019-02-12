@@ -23,10 +23,26 @@ static const size_t DBWRAPPER_PREALLOC_VALUE_SIZE = 1024;
 class leveldb_error : public std::runtime_error
 {
 public:
-    leveldb_error(const std::string& msg) : std::runtime_error(msg) {}
+    explicit leveldb_error(const std::string& msg) : std::runtime_error(msg) {}
 };
 
+class CLevelDBWrapper;
+
+/** These should be considered an implementation detail of the specific database.
+ */
+namespace leveldbwrapper_private {
+
+/** Handle database error by throwing dbwrapper_error exception.
+ */
 void HandleError(const leveldb::Status& status);
+
+/** Work around circular dependency, as well as for testing in dbwrapper_tests.
+ * Database obfuscation should be considered an implementation detail of the
+ * specific database.
+ */
+const std::vector<unsigned char>& GetObfuscateKey(const CDBWrapper &w);
+
+};
 
 /** Batch of changes queued to be written to a CLevelDBWrapper */
 class CLevelDBBatch
@@ -64,7 +80,6 @@ public:
         batch.Delete(slKey);
     }
 };
-class CLevelDBWrapper;
 class CLevelDBIterator
 {
 private:
@@ -126,6 +141,7 @@ public:
 
 class CLevelDBWrapper
 {
+  friend const std::vector<unsigned char>& leveldbwrapper_private::GetObfuscateKey(const CLevelDBWrapper &w);
 private:
     //! custom environment this database is using (may be NULL in case of default environment)
     leveldb::Env* penv;
@@ -148,6 +164,17 @@ private:
     //! the database itself
     leveldb::DB* pdb;
 
+  //! a key used for optional XOR-obfuscation of the database
+  std::vector<unsigned char> obfuscate_key;
+
+  //! the key under which the obfuscation key is stored
+  static const std::string OBFUSCATE_KEY_KEY;
+
+  //! the length of the obfuscate key in number of bytes
+  static const unsigned int OBFUSCATE_KEY_NUM_BYTES;
+
+  std::vector<unsigned char> CreateObfuscateKey() const;
+
 public:
     CLevelDBWrapper(const fs::path& path, size_t nCacheSize, bool fMemory = false, bool fWipe = false);
     ~CLevelDBWrapper();
@@ -166,7 +193,7 @@ public:
             if (status.IsNotFound())
                 return false;
             LogPrintf("LevelDB read failure: %s\n", status.ToString());
-            HandleError(status);
+            leveldbwrapper_private::HandleError(status);
         }
         try {
             CDataStream ssValue(strValue.data(), strValue.data() + strValue.size(), SER_DISK, CLIENT_VERSION);
@@ -199,7 +226,7 @@ public:
             if (status.IsNotFound())
                 return false;
             LogPrintf("LevelDB read failure: %s\n", status.ToString());
-            HandleError(status);
+            leveldbwrapper_private::HandleError(status);
         }
         return true;
     }
