@@ -8,6 +8,8 @@
 #define BITCOIN_NET_H
 
 #include "addrdb.h"
+#include <addrman.h>
+#include <amount.h>
 #include "bloom.h"
 #include "compat.h"
 #include "hash.h"
@@ -27,6 +29,7 @@
 #include <stdint.h>
 #include <thread>
 #include <memory>
+#include <condition_variable>
 
 #ifndef WIN32
 #include <arpa/inet.h>
@@ -41,6 +44,9 @@ class CBlockIndex;
 class CScheduler;
 class CNode;
 
+namespace boost {
+class thread_group;
+} // namespace boost
 
 /** Time between pings automatically sent out for latency probing and keepalive (in seconds). */
 static const int PING_INTERVAL = 2 * 60;
