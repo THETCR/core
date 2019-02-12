@@ -197,7 +197,6 @@ bool RecvLine(SOCKET hSocket, string& strLine)
             if (strLine.size() >= 9000)
                 return true;
         } else if (nBytes <= 0) {
-            boost::this_thread::interruption_point();
             if (nBytes < 0) {
                 int nErr = WSAGetLastError();
                 if (nErr == WSAEMSGSIZE)
@@ -1203,7 +1202,6 @@ void CConnman::ThreadSocketHandler()
 
         int nSelect = select(have_fds ? hSocketMax + 1 : 0,
                              &fdsetRecv, &fdsetSend, &fdsetError, &timeout);
-        boost::this_thread::interruption_point();
 
         if (nSelect == SOCKET_ERROR)
         {
@@ -1242,7 +1240,6 @@ void CConnman::ThreadSocketHandler()
         }
         for(CNode* pnode: vNodesCopy)
         {
-            boost::this_thread::interruption_point();
 
             //
             // Receive
@@ -1338,12 +1335,14 @@ void CConnman::ThreadSocketHandler()
 
 
 #ifdef USE_UPNP
-void ThreadMapPort()
+static CThreadInterrupt g_upnp_interrupt;
+static std::thread g_upnp_thread;
+static void ThreadMapPort()
 {
     std::string port = strprintf("%u", GetListenPort());
-    const char* multicastif = 0;
-    const char* minissdpdpath = 0;
-    struct UPNPDev* devlist = 0;
+    const char * multicastif = nullptr;
+    const char * minissdpdpath = nullptr;
+    struct UPNPDev * devlist = nullptr;
     char lanaddr[64];
 
 #ifndef UPNPDISCOVER_SUCCESS
@@ -1364,82 +1363,94 @@ void ThreadMapPort()
     int r;
 
     r = UPNP_GetValidIGD(devlist, &urls, &data, lanaddr, sizeof(lanaddr));
-    if (r == 1) {
+    if (r == 1)
+    {
         if (fDiscover) {
             char externalIPAddress[40];
             r = UPNP_GetExternalIPAddress(urls.controlURL, data.first.servicetype, externalIPAddress);
-            if (r != UPNPCOMMAND_SUCCESS)
+            if(r != UPNPCOMMAND_SUCCESS)
                 LogPrintf("UPnP: GetExternalIPAddress() returned %d\n", r);
-            else {
-                if (externalIPAddress[0]) {
-                    LogPrintf("UPnP: ExternalIPAddress = %s\n", externalIPAddress);
-                    AddLocal(CNetAddr(externalIPAddress), LOCAL_UPNP);
-                } else
+            else
+            {
+                if(externalIPAddress[0])
+                {
+                    CNetAddr resolved;
+                    if(LookupHost(externalIPAddress, resolved, false)) {
+                        LogPrintf("UPnP: ExternalIPAddress = %s\n", resolved.ToString().c_str());
+                        AddLocal(resolved, LOCAL_UPNP);
+                    }
+                }
+                else
                     LogPrintf("UPnP: GetExternalIPAddress failed.\n");
             }
         }
 
-        string strDesc = "WISPR " + FormatFullVersion();
+        std::string strDesc = "WISPR " + FormatFullVersion();
 
-        try {
-            while (true) {
+        do {
 #ifndef UPNPDISCOVER_SUCCESS
-                /* miniupnpc 1.5 */
-                r = UPNP_AddPortMapping(urls.controlURL, data.first.servicetype,
-                    port.c_str(), port.c_str(), lanaddr, strDesc.c_str(), "TCP", 0);
+            /* miniupnpc 1.5 */
+            r = UPNP_AddPortMapping(urls.controlURL, data.first.servicetype,
+                                port.c_str(), port.c_str(), lanaddr, strDesc.c_str(), "TCP", 0);
 #else
-                /* miniupnpc 1.6 */
-                r = UPNP_AddPortMapping(urls.controlURL, data.first.servicetype,
-                    port.c_str(), port.c_str(), lanaddr, strDesc.c_str(), "TCP", 0, "0");
+            /* miniupnpc 1.6 */
+            r = UPNP_AddPortMapping(urls.controlURL, data.first.servicetype,
+                                port.c_str(), port.c_str(), lanaddr, strDesc.c_str(), "TCP", 0, "0");
 #endif
 
-                if (r != UPNPCOMMAND_SUCCESS)
-                    LogPrintf("AddPortMapping(%s, %s, %s) failed with code %d (%s)\n",
-                        port, port, lanaddr, r, strupnperror(r));
-                else
-                    LogPrintf("UPnP Port Mapping successful.\n");
-                ;
-
-                MilliSleep(20 * 60 * 1000); // Refresh every 20 minutes
-            }
-        } catch (boost::thread_interrupted) {
-            r = UPNP_DeletePortMapping(urls.controlURL, data.first.servicetype, port.c_str(), "TCP", 0);
-            LogPrintf("UPNP_DeletePortMapping() returned : %d\n", r);
-            freeUPNPDevlist(devlist);
-            devlist = 0;
-            FreeUPNPUrls(&urls);
-            throw;
+            if(r!=UPNPCOMMAND_SUCCESS)
+                LogPrintf("AddPortMapping(%s, %s, %s) failed with code %d (%s)\n",
+                    port, port, lanaddr, r, strupnperror(r));
+            else
+                LogPrintf("UPnP Port Mapping successful.\n");
         }
+        while(g_upnp_interrupt.sleep_for(std::chrono::minutes(20)));
+
+        r = UPNP_DeletePortMapping(urls.controlURL, data.first.servicetype, port.c_str(), "TCP", 0);
+        LogPrintf("UPNP_DeletePortMapping() returned: %d\n", r);
+        freeUPNPDevlist(devlist); devlist = nullptr;
+        FreeUPNPUrls(&urls);
     } else {
         LogPrintf("No valid UPnP IGDs found\n");
-        freeUPNPDevlist(devlist);
-        devlist = 0;
+        freeUPNPDevlist(devlist); devlist = nullptr;
         if (r != 0)
             FreeUPNPUrls(&urls);
     }
 }
 
-void MapPort(bool fUseUPnP)
+void StartMapPort()
 {
-    static boost::thread* upnp_thread = NULL;
+    if (!g_upnp_thread.joinable()) {
+        assert(!g_upnp_interrupt);
+        g_upnp_thread = std::thread((std::bind(&TraceThread<void (*)()>, "upnp", &ThreadMapPort)));
+    }
+}
 
-    if (fUseUPnP) {
-        if (upnp_thread) {
-            upnp_thread->interrupt();
-            upnp_thread->join();
-            delete upnp_thread;
-        }
-        upnp_thread = new boost::thread(boost::bind(&TraceThread<void (*)()>, "upnp", &ThreadMapPort));
-    } else if (upnp_thread) {
-        upnp_thread->interrupt();
-        upnp_thread->join();
-        delete upnp_thread;
-        upnp_thread = NULL;
+void InterruptMapPort()
+{
+    if(g_upnp_thread.joinable()) {
+        g_upnp_interrupt();
+    }
+}
+
+void StopMapPort()
+{
+    if(g_upnp_thread.joinable()) {
+        g_upnp_thread.join();
+        g_upnp_interrupt.reset();
     }
 }
 
 #else
-void MapPort(bool)
+void StartMapPort()
+{
+    // Intentionally left blank.
+}
+void InterruptMapPort()
+{
+    // Intentionally left blank.
+}
+void StopMapPort()
 {
     // Intentionally left blank.
 }
@@ -1577,7 +1588,6 @@ void CConnman::ThreadOpenConnections()
         MilliSleep(500);
 
         CSemaphoreGrant grant(*semOutbound);
-        boost::this_thread::interruption_point();
 
         // Add seed nodes if DNS seeds are all down (an infrastructure attack?).
         if (addrman.size() == 0 && (GetTime() - nStart > 60)) {
@@ -1771,7 +1781,6 @@ bool OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSem
     //
     // Initiate outbound network connection
     //
-    boost::this_thread::interruption_point();
     if (!pszDest) {
         if (IsLocal(addrConnect) ||
             FindNode((CNetAddr)addrConnect) || CNode::IsBanned(addrConnect) ||
@@ -1781,7 +1790,6 @@ bool OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSem
         return false;
 
     CNode* pnode = ConnectNode(addrConnect, pszDest, fCountFailure);
-    boost::this_thread::interruption_point();
 
     if (!pnode)
         return false;
@@ -1840,7 +1848,6 @@ void CConnman::ThreadMessageHandler()
                     }
                 }
             }
-            boost::this_thread::interruption_point();
 
             // Send messages
             {
@@ -1848,7 +1855,6 @@ void CConnman::ThreadMessageHandler()
                 if (lockSend)
                     GetNodeSignals().SendMessages(pnode, pnode == pnodeTrickle || pnode->fWhitelisted);
             }
-            boost::this_thread::interruption_point();
         }
 
         {
@@ -1865,12 +1871,10 @@ void CConnman::ThreadMessageHandler()
 // ppcoin: stake minter thread
 void CConnman::ThreadStakeMinter()
 {
-    boost::this_thread::interruption_point();
     LogPrintf("ThreadStakeMinter started\n");
 //    CWallet* pwallet = pwalletMain;
     try {
         BitcoinMiner(pwalletMain, true);
-        boost::this_thread::interruption_point();
     } catch (std::exception& e) {
         LogPrintf("ThreadStakeMinter() exception \n");
     } catch (...) {

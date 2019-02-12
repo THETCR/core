@@ -23,6 +23,7 @@
 #include "sync.h"
 #include "uint256.h"
 #include "utilstrencodings.h"
+#include <threadinterrupt.h>
 
 #include <atomic>
 #include <deque>
