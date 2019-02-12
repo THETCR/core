@@ -365,33 +365,27 @@ bool CZerocoinDB::WipeCoins(std::string strType)
     if (strType != "spends" && strType != "mints")
         return error("%s: did not recognize type %s", __func__, strType);
 
-    boost::scoped_ptr<CLevelDBIterator> pcursor(NewIterator());
+    std::unique_ptr<CLevelDBIterator> pcursor(NewIterator());
 
     char type = (strType == "spends" ? 's' : 'm');
-    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
-    ssKeySet << make_pair(type, uint256(0));
-    pcursor->Seek(ssKeySet.str());
+    pcursor->Seek(std::make_pair(type, uint256()));
+
     // Load mapBlockIndex
     std::set<uint256> setDelete;
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
-        try {
-            leveldb::Slice slKey = pcursor->key();
-            CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
-            char chType;
-            ssKey >> chType;
-            if (chType == type) {
-                leveldb::Slice slValue = pcursor->value();
-                CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
-                uint256 hash;
-                ssValue >> hash;
+        std::pair<char, uint256> key;
+        if (pcursor->GetKey(key) && key.first == type) {
+            uint256 hash;
+            if (pcursor->GetValue(hash)) {
+                // Construct block index object
                 setDelete.insert(hash);
                 pcursor->Next();
             } else {
-                break; // if shutdown requested or finished loading block index
+                return error("%s: failed to read value", __func__);
             }
-        } catch (std::exception& e) {
-            return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+        } else {
+            break;
         }
     }
 
