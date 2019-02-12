@@ -201,7 +201,7 @@ void PrepareShutdown()
     GenerateBitcoins(false, nullptr, 0);
 #endif
     MapPort(false);
-    UnregisterValidationInterface(peerLogic.get())
+    UnregisterValidationInterface(peerLogic.get());
     if (g_connman) g_connman->Stop();
     // After everything has been shut down, but before things get flushed, stop the
     // CScheduler/checkqueue threadGroup
