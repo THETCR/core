@@ -53,7 +53,6 @@
 #include "wallet.h"
 #include "walletdb.h"
 #include "accumulators.h"
-
 #endif
 
 #include <fstream>
@@ -75,9 +74,6 @@
 #if ENABLE_ZMQ
 #include "zmq/zmqnotificationinterface.h"
 #endif
-
-using namespace boost;
-using namespace std;
 
 #ifdef ENABLE_WALLET
 int nWalletBackups = 10;
@@ -110,7 +106,6 @@ enum BindFlags {
 };
 
 static const char* FEE_ESTIMATES_FILENAME = "fee_estimates.dat";
-CClientUIInterface uiInterface;
 
 //////////////////////////////////////////////////////////////////////////////
 //
