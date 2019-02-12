@@ -106,6 +106,7 @@ enum BindFlags {
 };
 
 static const char* FEE_ESTIMATES_FILENAME = "fee_estimates.dat";
+CClientUIInterface uiInterface;
 
 //////////////////////////////////////////////////////////////////////////////
 //
