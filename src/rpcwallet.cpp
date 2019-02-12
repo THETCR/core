@@ -3317,7 +3317,7 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
 
     EnsureWalletIsUnlocked();
 
-    RPCTypeCheck(params, list_of(UniValue::VARR)(UniValue::VOBJ));
+    RPCTypeCheck(params, {UniValue::VARR, UniValue::VOBJ});
     UniValue arrMints = params[0].get_array();
     CWalletDB walletdb(pwalletMain->strWalletFile);
 
