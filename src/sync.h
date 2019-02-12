@@ -69,6 +69,7 @@ public:
     {
         return PARENT::try_lock();
     }
+    using UniqueLock = std::unique_lock<PARENT>;
 };
 
 #ifdef DEBUG_LOCKORDER
