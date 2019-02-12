@@ -214,30 +214,20 @@ bool CBlockTreeDB::ReadInt(const std::string& name, int& nValue)
 {
     return Read(std::make_pair('I', name), nValue);
 }
-
 bool CBlockTreeDB::LoadBlockIndexGuts(std::function<CBlockIndex*(const uint256&)> insertBlockIndex)
 {
-    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+    std::unique_ptr<CLevelDBIterator> pcursor(NewIterator());
 
-    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
-    ssKeySet << make_pair('b', uint256(0));
-    pcursor->Seek(ssKeySet.str());
+    pcursor->Seek(std::make_pair(DB_BLOCK_INDEX, uint256()));
 
     // Load mapBlockIndex
     uint256 nPreviousCheckpoint;
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
-        try {
-            leveldb::Slice slKey = pcursor->key();
-            CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
-            char chType;
-            ssKey >> chType;
-            if (chType == 'b') {
-                leveldb::Slice slValue = pcursor->value();
-                CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
-                CDiskBlockIndex diskindex;
-                ssValue >> diskindex;
-
+        std::pair<char, uint256> key;
+        if (pcursor->GetKey(key) && key.first == DB_BLOCK_INDEX) {
+            CDiskBlockIndex diskindex;
+            if (pcursor->GetValue(diskindex)) {
                 // Construct block index object
                 CBlockIndex* pindexNew = insertBlockIndex(diskindex.GetBlockHash());
                 pindexNew->pprev = insertBlockIndex(diskindex.hashPrev);
@@ -285,10 +275,10 @@ bool CBlockTreeDB::LoadBlockIndexGuts(std::function<CBlockIndex*(const uint256&)
 
                 pcursor->Next();
             } else {
-                break; // if shutdown requested or finished loading block index
+                return error("%s: failed to read value", __func__);
             }
-        } catch (std::exception& e) {
-            return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+        } else {
+            break;
         }
     }
 
@@ -375,7 +365,7 @@ bool CZerocoinDB::WipeCoins(std::string strType)
     if (strType != "spends" && strType != "mints")
         return error("%s: did not recognize type %s", __func__, strType);
 
-    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+    boost::scoped_ptr<CLevelDBIterator> pcursor(NewIterator());
 
     char type = (strType == "spends" ? 's' : 'm');
     CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
