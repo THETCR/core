@@ -22,7 +22,6 @@
 #include <openssl/rand.h>
 
 using namespace std;
-using namespace boost;
 
 // The main object for accessing Obfuscation
 CObfuscationPool obfuScationPool;

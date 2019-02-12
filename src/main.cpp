@@ -66,7 +66,6 @@
 #include <atomic>
 #include <queue>
 
-using namespace boost;
 using namespace std;
 using namespace libzerocoin;
 

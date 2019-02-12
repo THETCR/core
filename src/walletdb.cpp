@@ -26,7 +26,6 @@
 #include <boost/thread.hpp>
 #include <fstream>
 
-using namespace boost;
 using namespace std;
 
 static uint64_t nAccountingEntryNumber = 0;

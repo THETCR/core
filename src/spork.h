@@ -16,8 +16,6 @@
 #include "protocol.h"
 
 using namespace std;
-using namespace boost;
-
 /*
     Don't ever reuse these IDs for other sporks
     - This would result in old clients getting confused about which spork is for what
