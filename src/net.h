@@ -45,10 +45,6 @@ class CBlockIndex;
 class CScheduler;
 class CNode;
 
-namespace boost {
-class thread_group;
-} // namespace boost
-
 /** Time between pings automatically sent out for latency probing and keepalive (in seconds). */
 static const int PING_INTERVAL = 2 * 60;
 /** Time after which to disconnect, after waiting for a ping response (or inactivity). */

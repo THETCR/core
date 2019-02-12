@@ -37,7 +37,6 @@
 #endif
 
 #include <unordered_map>
-#include <boost/thread.hpp>
 #include <math.h>
 
 // We add a random period time (0 to 1 seconds) to feeler connections to prevent synchronization.
