@@ -12,8 +12,6 @@
 #include "accumulators.h"
 #include "concurrentqueue.h"
 #include "chainparams.h"
-#include <boost/function.hpp>
-#include <boost/thread.hpp>
 
 extern CChain chainActive;
 // Max amount of computation for a single request

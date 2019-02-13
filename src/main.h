@@ -12,17 +12,19 @@
 #include "config/wispr-config.h"
 #endif
 
-#include "amount.h"
+#include <amount.h>
+#include <coins.h>
+#include <crypto/common.h> // for ReadLE64
+#include <fs.h>
+#include <protocol.h> // For CMessageHeader::MessageStartChars
+#include <policy/feerate.h>
+#include <script/script_error.h>
+#include <sync.h>
+
 #include "chain.h"
-#include "coins.h"
-#include "net.h"
-#include "policy/feerate.h"
 #include "pow.h"
-#include "script/script_error.h"
-#include "sync.h"
 #include "validationinterface.h"
 #include "uint256.h"
-#include <fs.h>
 
 #include <algorithm>
 #include <exception>
@@ -32,6 +34,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <atomic>
 
 #include "libzerocoin/CoinSpend.h"
 #include "lightzwspthread.h"
