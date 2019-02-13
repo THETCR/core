@@ -20,7 +20,6 @@
 #include "consensus/tx_verify.h"
 #include "consensus/validation.h"
 #include "hash.h"
-#include "init.h"
 #include "kernel.h"
 #include "masternode-budget.h"
 #include "masternode-payments.h"
