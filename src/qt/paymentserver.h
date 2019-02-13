@@ -91,7 +91,7 @@ public:
     // This is now public, because we use it in paymentservertests.cpp
     static bool readPaymentRequestFromFile(const QString& filename, PaymentRequestPlus& request);
 
-signals:
+Q_SIGNALS:
     // Fired when a valid payment request is received
     void receivedPaymentRequest(SendCoinsRecipient);
 

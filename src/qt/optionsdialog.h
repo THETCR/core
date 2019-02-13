@@ -54,7 +54,7 @@ private Q_SLOTS:
     void clearStatusLabel();
     void doProxyIpChecks(QValidatedLineEdit* pUiProxyIp, QLineEdit* pUiProxyPort);
 
-signals:
+Q_SIGNALS:
     void proxyIpChecks(QValidatedLineEdit* pUiProxyIp, QLineEdit* pUiProxyPort);
 
 private:

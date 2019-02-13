@@ -43,7 +43,7 @@ public Q_SLOTS:
                     const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
     void hideOrphans(bool fHide);
 
-signals:
+Q_SIGNALS:
     void transactionClicked(const QModelIndex& index);
 
 private:

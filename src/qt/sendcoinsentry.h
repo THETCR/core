@@ -50,7 +50,7 @@ public:
 public Q_SLOTS:
     void clear();
 
-signals:
+Q_SIGNALS:
     void removeEntry(SendCoinsEntry* entry);
     void payAmountChanged();
 

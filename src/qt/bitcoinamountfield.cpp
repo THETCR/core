@@ -175,7 +175,7 @@ protected:
         return rv;
     }
 
-signals:
+Q_SIGNALS:
     void valueChanged();
 };
 

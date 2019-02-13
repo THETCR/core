@@ -50,7 +50,7 @@ public:
      */
     static QString getDefaultDataDirectory();
 
-signals:
+Q_SIGNALS:
     void requestCheck();
     void stopThread();
 

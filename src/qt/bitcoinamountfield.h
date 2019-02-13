@@ -56,7 +56,7 @@ public:
     */
     QWidget* setupTabChain(QWidget* prev);
 
-signals:
+Q_SIGNALS:
     void valueChanged();
 
 protected:

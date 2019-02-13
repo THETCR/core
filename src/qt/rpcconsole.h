@@ -121,7 +121,7 @@ public Q_SLOTS:
     /** Show folder with wallet backups in default browser */
     void showBackups();
 
-signals:
+Q_SIGNALS:
     // For RPC command executor
     void stopExecutor();
     void cmdRequest(const QString& command);

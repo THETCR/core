@@ -135,7 +135,7 @@ public Q_SLOTS:
     /** Update selected WSP amount from transactionview */
     void trxAmount(QString amount);
 
-signals:
+Q_SIGNALS:
     /** Signal that we want to show the main window */
     void showNormalIfMinimized();
     /**  Fired when a message should be reported to the user */
