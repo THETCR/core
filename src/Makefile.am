@@ -146,6 +146,7 @@ BITCOIN_CORE_H = \
   mruset.h \
   netbase.h \
   net.h \
+  netaddress.h \
   noui.h \
   policy/fees.h \
   policy/feerate.h \
@@ -167,6 +168,7 @@ BITCOIN_CORE_H = \
   script/standard.h \
   script/script_error.h \
   serialize.h \
+  span.h \
   spork.h \
   sporkdb.h \
   stakeinput.h \
@@ -372,6 +374,7 @@ libbitcoin_common_a_SOURCES = \
   invalid.cpp \
   key.cpp \
   keystore.cpp \
+  netaddress.cpp \
   policy/feerate.cpp \
   netbase.cpp \
   protocol.cpp \
