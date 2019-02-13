@@ -8,7 +8,7 @@
 #endif
 
 #include "optionsdialog.h"
-#include "ui_optionsdialog.h"
+#include <qt/forms/ui_optionsdialog.h>
 
 #include "bitcoinunits.h"
 #include "guiutil.h"

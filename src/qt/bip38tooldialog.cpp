@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "bip38tooldialog.h"
-#include "ui_bip38tooldialog.h"
+#include <qt/forms/ui_bip38tooldialog.h>
 
 #include "addressbookpage.h"
 #include "guiutil.h"

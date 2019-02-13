@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "multisenddialog.h"
-#include "ui_multisenddialog.h"
+#include <qt/forms/ui_multisenddialog.h>
 
 #include "addressbookpage.h"
 #include "addresstablemodel.h"

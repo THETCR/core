@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "masternodelist.h"
-#include "ui_masternodelist.h"
+#include <qt/forms/ui_masternodelist.h>
 
 #include "activemasternode.h"
 #include "clientmodel.h"

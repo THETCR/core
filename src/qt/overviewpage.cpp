@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "overviewpage.h"
-#include "ui_overviewpage.h"
+#include <qt/forms/ui_overviewpage.h>
 
 #include "bitcoinunits.h"
 #include "clientmodel.h"

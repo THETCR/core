@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "coincontroldialog.h"
-#include "ui_coincontroldialog.h"
+#include <qt/forms/ui_coincontroldialog.h>
 
 #include "addresstablemodel.h"
 #include "bitcoinunits.h"

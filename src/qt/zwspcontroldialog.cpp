@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "zwspcontroldialog.h"
-#include "ui_zwspcontroldialog.h"
+#include <qt/forms/ui_zwspcontroldialog.h>
 
 #include "accumulators.h"
 #include "main.h"

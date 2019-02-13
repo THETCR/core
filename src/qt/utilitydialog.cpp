@@ -6,7 +6,7 @@
 
 #include "utilitydialog.h"
 
-#include "ui_helpmessagedialog.h"
+#include <qt/forms/ui_helpmessagedialog.h>
 
 #include "bitcoingui.h"
 #include "clientmodel.h"

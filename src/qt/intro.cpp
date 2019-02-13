@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "intro.h"
-#include "ui_intro.h"
+#include <qt/forms/ui_intro.h>
 
 #include "guiutil.h"
 

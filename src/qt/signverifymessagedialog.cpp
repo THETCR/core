@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "signverifymessagedialog.h"
-#include "ui_signverifymessagedialog.h"
+#include <qt/forms/ui_signverifymessagedialog.h">
 
 #include "addressbookpage.h"
 #include "guiutil.h"

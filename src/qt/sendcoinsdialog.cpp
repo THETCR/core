@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "sendcoinsdialog.h"
-#include "ui_sendcoinsdialog.h"
+#include <qt/forms/ui_sendcoinsdialog.h>
 
 #include "addresstablemodel.h"
 #include "askpassphrasedialog.h"

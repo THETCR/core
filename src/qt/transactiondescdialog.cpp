@@ -6,7 +6,7 @@
 
 #include "transactiondescdialog.h"
 #include "guiutil.h"
-#include "ui_transactiondescdialog.h"
+#include <qt/forms/ui_transactiondescdialog.h>
 
 #include "transactiontablemodel.h"
 

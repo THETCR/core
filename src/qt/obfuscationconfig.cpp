@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "obfuscationconfig.h"
-#include "ui_obfuscationconfig.h"
+#include <qt/forms/ui_obfuscationconfig.h>
 
 #include "bitcoinunits.h"
 #include "guiconstants.h"
