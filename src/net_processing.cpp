@@ -530,7 +530,7 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
 }
 
 // Requires cs_main.
-void Misbehaving(NodeId pnode, int howmuch) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+void Misbehaving(NodeId pnode, int howmuch)
 {
     if (howmuch == 0)
         return;
