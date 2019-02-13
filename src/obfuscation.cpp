@@ -4,6 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "consensus/validation.h"
+#include <net_processing.h>
 #include "obfuscation.h"
 #include "coincontrol.h"
 #include "masternodeman.h"
