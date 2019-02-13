@@ -8,7 +8,7 @@
 #include "bitcoinunits.h"
 #include "guiconstants.h"
 #include "guiutil.h"
-#include "qvaluecombobox.h"
+#include <qt/qvaluecombobox.h>
 
 #include <QAbstractSpinBox>
 #include <QApplication>

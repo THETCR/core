@@ -825,7 +825,7 @@ https://www.transifex.com/WisprProject/WisprProject-translations</string>
   <customwidget>
    <class>QValueComboBox</class>
    <extends>QComboBox</extends>
-   <header>qvaluecombobox.h</header>
+   <header>qt/qvaluecombobox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
