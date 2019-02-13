@@ -31,7 +31,7 @@ public:
     void setModel(WalletModel* model);
     void updateCoinControl(CAmount nAmount, unsigned int nQuantity);
 
-public slots:
+public Q_SLOTS:
     void showTab(int index);
 
 private:
@@ -52,7 +52,7 @@ private:
     bool addMultisig(int m, std::vector<std::string> keys);
     bool isFullyVerified(CMutableTransaction& txToVerify);
 
-private slots:
+private Q_SLOTS:
    void deleteFrame();
    void pasteText();
    void commitMultisigTx();

@@ -287,7 +287,7 @@ signals:
     // Receive tab address may have changed
     void notifyReceiveAddressChanged();
 
-public slots:
+public Q_SLOTS:
     /* Wallet status might have changed */
     void updateStatus();
     /* New transaction, or transaction changed status */

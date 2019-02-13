@@ -73,7 +73,7 @@ class RPCExecutor : public QObject
 {
     Q_OBJECT
 
-public slots:
+public Q_SLOTS:
     void request(const QString& command);
 
 signals:
@@ -95,7 +95,7 @@ public:
         timer.start(millis);
     }
     ~QtRPCTimerBase() {}
-private slots:
+private Q_SLOTS:
     void timeout() { func(); }
 private:
     QTimer timer;
@@ -217,7 +217,7 @@ void RPCExecutor::request(const QString& command)
 {
     std::vector<std::string> args;
     if (!parseCommandLine(args, command.toStdString())) {
-        emit reply(RPCConsole::CMD_ERROR, QString("Parse error: unbalanced ' or \""));
+        Q_EMIT reply(RPCConsole::CMD_ERROR, QString("Parse error: unbalanced ' or \""));
         return;
     }
     if (args.empty())
@@ -238,19 +238,19 @@ void RPCExecutor::request(const QString& command)
         else
             strPrint = result.write(2);
 
-        emit reply(RPCConsole::CMD_REPLY, QString::fromStdString(strPrint));
+        Q_EMIT reply(RPCConsole::CMD_REPLY, QString::fromStdString(strPrint));
     } catch (UniValue& objError) {
         try // Nice formatting for standard-format error
         {
             int code = find_value(objError, "code").get_int();
             std::string message = find_value(objError, "message").get_str();
-            emit reply(RPCConsole::CMD_ERROR, QString::fromStdString(message) + " (code " + QString::number(code) + ")");
+            Q_EMIT reply(RPCConsole::CMD_ERROR, QString::fromStdString(message) + " (code " + QString::number(code) + ")");
         } catch (std::runtime_error&) // raised when converting to invalid type, i.e. missing code or message
         {                             // Show raw JSON object
-            emit reply(RPCConsole::CMD_ERROR, QString::fromStdString(objError.write()));
+            Q_EMIT reply(RPCConsole::CMD_ERROR, QString::fromStdString(objError.write()));
         }
     } catch (std::exception& e) {
-        emit reply(RPCConsole::CMD_ERROR, QString("Error: ") + QString::fromStdString(e.what()));
+        Q_EMIT reply(RPCConsole::CMD_ERROR, QString("Error: ") + QString::fromStdString(e.what()));
     }
 }
 
@@ -334,7 +334,7 @@ RPCConsole::RPCConsole(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHi
 RPCConsole::~RPCConsole()
 {
     GUIUtil::saveWindowGeometry("nRPCConsoleWindow", this);
-    emit stopExecutor();
+    Q_EMIT stopExecutor();
     RPCUnsetTimerInterface(rpcTimerInterface);
     delete rpcTimerInterface;
     delete ui;
@@ -603,7 +603,7 @@ void RPCConsole::buildParameterlist(QString arg)
     args.append(arg);
 
     // Send command-line arguments to BitcoinGUI::handleRestart()
-    emit handleRestart(args);
+    Q_EMIT handleRestart(args);
 }
 
 void RPCConsole::clear()
@@ -702,7 +702,7 @@ void RPCConsole::on_lineEdit_returnPressed()
 
     if (!cmd.isEmpty()) {
         message(CMD_REQUEST, cmd);
-        emit cmdRequest(cmd);
+        Q_EMIT cmdRequest(cmd);
         // Remove command, if already in history
         history.removeOne(cmd);
         // Append command to history

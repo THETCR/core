@@ -85,7 +85,7 @@ private:
 
     bool eventFilter(QObject* obj, QEvent* event);
 
-private slots:
+private Q_SLOTS:
     void contextualMenu(const QPoint&);
     void dateRangeChanged();
     void showDetails();
@@ -106,7 +106,7 @@ signals:
     /** Send computed sum back to wallet-view */
     void trxAmount(QString amount);
 
-public slots:
+public Q_SLOTS:
     void chooseDate(int idx);
     void chooseType(int idx);
     void hideOrphans(bool fHide);

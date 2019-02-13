@@ -788,7 +788,7 @@ void BitcoinGUI::openClicked()
 {
     OpenURIDialog dlg(this);
     if (dlg.exec()) {
-        emit receivedURI(dlg.getURI());
+        Q_EMIT receivedURI(dlg.getURI());
     }
 }
 
@@ -1156,7 +1156,7 @@ void BitcoinGUI::dropEvent(QDropEvent* event)
 {
     if (event->mimeData()->hasUrls()) {
         for (const QUrl& uri: event->mimeData()->urls()) {
-            emit receivedURI(uri.toString());
+            Q_EMIT receivedURI(uri.toString());
         }
     }
     event->acceptProposedAction();
@@ -1370,7 +1370,7 @@ void BitcoinGUI::unsubscribeFromCoreSignals()
 void BitcoinGUI::handleRestart(QStringList args)
 {
     if (!ShutdownRequested())
-        emit requestedRestart(args);
+        Q_EMIT requestedRestart(args);
 }
 
 UnitDisplayStatusBarControl::UnitDisplayStatusBarControl() : optionsModel(0),

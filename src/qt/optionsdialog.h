@@ -37,7 +37,7 @@ public:
 protected:
     bool eventFilter(QObject* object, QEvent* event);
 
-private slots:
+private Q_SLOTS:
     /* enable OK button */
     void enableOkButton();
     /* disable OK button */

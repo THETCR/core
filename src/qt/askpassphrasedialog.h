@@ -58,7 +58,7 @@ private:
     Context context;
     bool fCapsLock;
 
-private slots:
+private Q_SLOTS:
     void textChanged();
 
 protected:

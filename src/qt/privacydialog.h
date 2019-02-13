@@ -48,7 +48,7 @@ public:
     void showOutOfSyncWarning(bool fShow);
     void setZWspControlLabels(int64_t nAmount, int nQuantity);
 
-public slots:
+public Q_SLOTS:
     void setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, 
                     const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance,
                     const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
@@ -79,7 +79,7 @@ private:
     bool updateLabel(const QString& address);
     void sendzWSP();
 
-private slots:
+private Q_SLOTS:
     void on_payTo_textChanged(const QString& address);
     void on_addressBookButton_clicked();
 //    void coinControlFeatureChanged(bool);

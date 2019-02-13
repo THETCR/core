@@ -337,7 +337,7 @@ void TransactionView::updateHideOrphans(bool fHide)
     if (settings.value("fHideOrphans", false).toBool() != fHide) {
         settings.setValue("fHideOrphans", fHide);
         if (model && model->getOptionsModel())
-            emit model->getOptionsModel()->hideOrphansChanged(fHide);
+            Q_EMIT model->getOptionsModel()->hideOrphansChanged(fHide);
     }
     hideOrphans(fHide);
     // retain consistency with other checkboxes
@@ -411,11 +411,11 @@ void TransactionView::exportClicked()
     }
 
     if (fExport) {
-        emit message(tr("Exporting Successful"), tr("The transaction history was successfully saved to %1.").arg(filename),
+        Q_EMIT message(tr("Exporting Successful"), tr("The transaction history was successfully saved to %1.").arg(filename),
                      CClientUIInterface::MSG_INFORMATION);
     }
     else {
-        emit message(tr("Exporting Failed"), tr("There was an error trying to save the transaction history to %1.").arg(filename),
+        Q_EMIT message(tr("Exporting Failed"), tr("There was an error trying to save the transaction history to %1.").arg(filename),
                      CClientUIInterface::MSG_ERROR);
     }
 }
@@ -512,7 +512,7 @@ void TransactionView::computeSum()
     }
     QString strAmount(BitcoinUnits::formatWithUnit(nDisplayUnit, amount, true, BitcoinUnits::separatorAlways));
     if (amount < 0) strAmount = "<span style='color:red;'>" + strAmount + "</span>";
-    emit trxAmount(strAmount);
+    Q_EMIT trxAmount(strAmount);
 }
 
 void TransactionView::openThirdPartyTxUrl(QString url)

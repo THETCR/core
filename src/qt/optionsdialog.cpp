@@ -347,7 +347,7 @@ bool OptionsDialog::eventFilter(QObject* object, QEvent* event)
 {
     if (event->type() == QEvent::FocusOut) {
         if (object == ui->proxyIp || object == ui->proxyPort) {
-            emit proxyIpChecks(ui->proxyIp, ui->proxyPort);
+            Q_EMIT proxyIpChecks(ui->proxyIp, ui->proxyPort);
         }
     }
     return QDialog::eventFilter(object, event);

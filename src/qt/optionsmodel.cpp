@@ -394,41 +394,41 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         case ZeromintEnable:
             fEnableZeromint = value.toBool();
             settings.setValue("fZeromintEnable", fEnableZeromint);
-            emit zeromintEnableChanged(fEnableZeromint);
+            Q_EMIT zeromintEnableChanged(fEnableZeromint);
             break;
         case ZeromintAddresses:
             fEnableAutoConvert = value.toBool();
             settings.setValue("fEnableAutoConvert", fEnableAutoConvert);
-            emit zeromintAddressesChanged(fEnableAutoConvert);
+            Q_EMIT zeromintAddressesChanged(fEnableAutoConvert);
         case ZeromintPercentage:
             nZeromintPercentage = value.toInt();
             settings.setValue("nZeromintPercentage", nZeromintPercentage);
-            emit zeromintPercentageChanged(nZeromintPercentage);
+            Q_EMIT zeromintPercentageChanged(nZeromintPercentage);
             break;
         case ZeromintPrefDenom:
             nPreferredDenom = value.toInt();
             settings.setValue("nPreferredDenom", nPreferredDenom);
-            emit preferredDenomChanged(nPreferredDenom);
+            Q_EMIT preferredDenomChanged(nPreferredDenom);
             break;
         case HideZeroBalances:
             fHideZeroBalances = value.toBool();
             settings.setValue("fHideZeroBalances", fHideZeroBalances);
-            emit hideZeroBalancesChanged(fHideZeroBalances);
+            Q_EMIT hideZeroBalancesChanged(fHideZeroBalances);
             break;
         case HideOrphans:
             fHideOrphans = value.toBool();
             settings.setValue("fHideOrphans", fHideOrphans);
-            emit hideOrphansChanged(fHideOrphans);
+            Q_EMIT hideOrphansChanged(fHideOrphans);
             break;
         case AnonymizeWisprAmount:
             nAnonymizeWisprAmount = value.toInt();
             settings.setValue("nAnonymizeWisprAmount", nAnonymizeWisprAmount);
-            emit anonymizeWisprAmountChanged(nAnonymizeWisprAmount);
+            Q_EMIT anonymizeWisprAmountChanged(nAnonymizeWisprAmount);
             break;
         case CoinControlFeatures:
             fCoinControlFeatures = value.toBool();
             settings.setValue("fCoinControlFeatures", fCoinControlFeatures);
-            emit coinControlFeaturesChanged(fCoinControlFeatures);
+            Q_EMIT coinControlFeaturesChanged(fCoinControlFeatures);
             break;
         case DatabaseCache:
             if (settings.value("nDatabaseCache") != value) {
@@ -453,7 +453,7 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         }
     }
 
-    emit dataChanged(index, index);
+    Q_EMIT dataChanged(index, index);
 
     return successful;
 }
@@ -465,7 +465,7 @@ void OptionsModel::setDisplayUnit(const QVariant& value)
         QSettings settings;
         nDisplayUnit = value.toInt();
         settings.setValue("nDisplayUnit", nDisplayUnit);
-        emit displayUnitChanged(nDisplayUnit);
+        Q_EMIT displayUnitChanged(nDisplayUnit);
     }
 }
 
