@@ -16,6 +16,7 @@
 #include "kernel.h"
 #include "masternode-budget.h"
 #include "net.h"
+#include <net_processing.h>
 #include "main.h"
 #include "policy/policy.h"
 #include "primitives/transaction.h"
