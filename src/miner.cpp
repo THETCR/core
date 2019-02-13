@@ -13,7 +13,6 @@
 #include "consensus/tx_verify.h"
 #include "consensus/validation.h"
 #include "hash.h"
-#include "main.h"
 #include "masternode-sync.h"
 #include "net.h"
 #include "policy/feerate.h"

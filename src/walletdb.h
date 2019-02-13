@@ -7,9 +7,12 @@
 #ifndef BITCOIN_WALLETDB_H
 #define BITCOIN_WALLETDB_H
 
+#include <amount.h>
+#include <primitives/transaction.h>
+#include <key.h>
+
 #include "amount.h"
 #include "db.h"
-#include "key.h"
 #include "keystore.h"
 #include "primitives/zerocoin.h"
 #include "libzerocoin/Accumulator.h"

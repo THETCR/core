@@ -10,18 +10,18 @@
 #include "consensus/tx_verify.h"
 #include "consensus/validation.h"
 #include "base58.h"
-#include "main.h"
+#include <fs.h>
 #include "protocol.h"
 #include "serialize.h"
 #include "sync.h"
-#include "txdb.h"
 #include "util.h"
 #include "utiltime.h"
 #include "wallet.h"
 #include <primitives/deterministicmint.h>
-#include <fs.h>
 
 
+#include <atomic>
+#include <string>
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
