@@ -419,10 +419,9 @@ libbitcoin_common_a_SOURCES = \
   key.cpp \
   keystore.cpp \
   netaddress.cpp \
-  policy/feerate.cpp \
   netbase.cpp \
+  policy/feerate.cpp \
   protocol.cpp \
-  pubkey.cpp \
   scheduler.cpp \
   script/interpreter.cpp \
   script/script.cpp \
@@ -431,7 +430,6 @@ libbitcoin_common_a_SOURCES = \
   script/script_error.cpp \
   spork.cpp \
   sporkdb.cpp \
-  timedata.cpp \
   $(BITCOIN_CORE_H)
 
 # util: shared between all executables.
