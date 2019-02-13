@@ -93,7 +93,6 @@ map<COutPoint, int> mapStakeSpent;
 map<unsigned int, unsigned int> mapHashedBlocks;
 CChain chainActive;
 CBlockIndex* pindexBestHeader = nullptr;
-int64_t nTimeBestReceived = 0;
 CWaitableCriticalSection csBestBlock;
 CConditionVariable cvBlockChange;
 int nScriptCheckThreads = 0;
@@ -2322,7 +2321,7 @@ void static UpdateTip(CBlockIndex* pindexNew)
         pwalletMain->AutoZeromint ();
 
     // New best block
-    nTimeBestReceived = GetTime();
+//    nTimeBestReceived = GetTime();
     mempool.AddTransactionsUpdated(1);
 
     LogPrintf("UpdateTip: new best=%s  height=%d  log2_work=%.8g  tx=%lu  date=%s progress=%f  cache=%u\n",

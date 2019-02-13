@@ -51,4 +51,10 @@ bool ProcessMessages(CNode* pfrom);
  */
 bool SendMessages(CNode* pto, bool fSendTrickle);
 
+class CTransaction;
+void RelayTransaction(const CTransaction& tx);
+void RelayTransaction(const CTransaction& tx, const CDataStream& ss);
+void RelayTransactionLockReq(const CTransaction& tx, bool relayToAll = false);
+void RelayInv(CInv& inv);
+
 #endif // BITCOIN_NET_PROCESSING_H

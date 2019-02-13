@@ -44,17 +44,6 @@ using namespace std;
 # error "Bitcoin cannot be compiled without assertions."
 #endif
 
-int64_t nTimeBestReceived = 0; // Used only to inform the wallet of when we last received a block
-
-struct IteratorComparator
-{
-  template<typename I>
-  bool operator()(const I& a, const I& b)
-  {
-      return &(*a) < &(*b);
-  }
-};
-
 struct COrphanTx {
   CTransaction tx;
   NodeId fromPeer;
@@ -99,6 +88,18 @@ int nQueuedValidatedHeaders GUARDED_BY(cs_main) = 0;
 
 /** Number of preferable block download peers. */
 int nPreferredDownload GUARDED_BY(cs_main) = 0;
+
+std::atomic<int64_t> nTimeBestReceived(0); // Used only to inform the wallet of when we last received a block
+
+struct IteratorComparator
+{
+  template<typename I>
+  bool operator()(const I& a, const I& b)
+  {
+      return &(*a) < &(*b);
+  }
+};
+
 } // anon namespace
 
 namespace
@@ -601,6 +602,7 @@ void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CB
 //          }
 //        });
     }
+    nTimeBestReceived = GetTime();
 }
 
 
@@ -758,6 +760,16 @@ void RelayTransactionLockReq(const CTransaction& tx, bool relayToAll)
             continue;
 
         pnode->PushMessage(NetMsgType::TXLOCKREQUEST, tx);
+    }
+}
+
+void RelayInv(CInv& inv)
+{
+    LOCK(cs_vNodes);
+    for (CNode* pnode: vNodes){
+        if((pnode->nServices == NODE_BLOOM_WITHOUT_MN || pnode->nServices == NODE_BLOOM_LIGHT_ZC) && inv.IsMasterNodeType())continue;
+        if (pnode->nVersion >= ActiveProtocol())
+            pnode->PushInventory(inv);
     }
 }
 
@@ -2225,8 +2237,9 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
         // Resend wallet transactions that haven't gotten in a block yet
         // Except during reindex, importing and IBD, when old wallet
         // transactions become unconfirmed and spams other nodes.
-        if (!fReindex /*&& !fImporting && !IsInitialBlockDownload()*/) {
-            GetMainSignals().Broadcast();
+        if (!fReindex && !fImporting && !IsInitialBlockDownload())
+        {
+            GetMainSignals().Broadcast(nTimeBestReceived);
         }
 
         //

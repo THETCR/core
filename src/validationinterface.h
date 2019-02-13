@@ -40,7 +40,7 @@ protected:
     virtual bool UpdatedTransaction(const uint256 &hash) { return false;}
     virtual void Inventory(const uint256 &hash) {}
 // XX42    virtual void ResendWalletTransactions(int64_t nBestBlockTime) {}
-    virtual void ResendWalletTransactions() {}
+    virtual void ResendWalletTransactions(int64_t nBestBlockTime) {}
     virtual void BlockChecked(const CBlock&, const CValidationState&) {}
 // XX42    virtual void GetScriptForMining(boost::shared_ptr<CReserveScript>&) {};
     virtual void ResetRequestCount(const uint256 &hash) {};
@@ -65,7 +65,7 @@ struct CMainSignals {
     boost::signals2::signal<void (const uint256 &)> Inventory;
     /** Tells listeners to broadcast their data. */
 // XX42    boost::signals2::signal<void (int64_t nBestBlockTime)> Broadcast;
-    boost::signals2::signal<void ()> Broadcast;
+    boost::signals2::signal<void (int64_t nBestBlockTime)> Broadcast;
     /** Notifies listeners of a block validation result */
     boost::signals2::signal<void (const CBlock&, const CValidationState&)> BlockChecked;
     /** Notifies listeners that a key for mining is required (coinbase) */

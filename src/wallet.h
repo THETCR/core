@@ -481,7 +481,7 @@ public:
     void EraseFromWallet(const uint256& hash);
     int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false);
     void ReacceptWalletTransactions();
-    void ResendWalletTransactions();
+    void ResendWalletTransactions(int64_t nBestBlockTime) override EXCLUSIVE_LOCKS_REQUIRED(cs_main);
     CAmount GetBalance() const;
     CAmount GetZerocoinBalance(bool fMatureOnly) const;
     CAmount GetUnconfirmedZerocoinBalance() const;

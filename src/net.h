@@ -775,12 +775,6 @@ public:
     static void callCleanup();
 };
 
-class CTransaction;
-void RelayTransaction(const CTransaction& tx);
-void RelayTransaction(const CTransaction& tx, const CDataStream& ss);
-void RelayTransactionLockReq(const CTransaction& tx, bool relayToAll = false);
-void RelayInv(CInv& inv);
-
 
 void DumpBanlist();
 
