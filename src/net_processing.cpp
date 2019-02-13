@@ -638,16 +638,15 @@ void PeerLogicValidation::BlockChecked(const CBlock& block, const CValidationSta
     LOCK(cs_main);
 
     const uint256 hash(block.GetHash());
-    std::map<uint256, std::pair<NodeId, bool>>::iterator it = mapBlockSource.find(hash);
+    std::map<uint256, NodeId>::iterator it = mapBlockSource.find(hash);
 
     int nDoS = 0;
     if (state.IsInvalid(nDoS)) {
-        if (it != mapBlockSource.end() && State(it->second.first)) {
-            assert (state.GetRejectCode() < REJECT_INTERNAL); // Blocks are never rejected with internal reject codes
+        if (it != mapBlockSource.end() && State(it->second)) {
             CBlockReject reject = {(unsigned char)state.GetRejectCode(), state.GetRejectReason().substr(0, MAX_REJECT_MESSAGE_LENGTH), hash};
-            State(it->second.first)->rejects.push_back(reject);
-            if (nDoS > 0 && it->second.second)
-                Misbehaving(it->second.first, nDoS);
+            State(it->second)->rejects.push_back(reject);
+            if (nDoS > 0)
+                Misbehaving(it->second, nDoS);
         }
     }
     if (it != mapBlockSource.end())
