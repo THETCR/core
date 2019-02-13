@@ -30,6 +30,9 @@
 #include <boost/algorithm/string/case_conv.hpp> // for to_upper()
 
 #include <univalue.h>
+#include <algorithm>
+#include <memory> // for unique_ptr
+#include <unordered_map>
 
 using namespace RPCServer;
 using namespace std;
