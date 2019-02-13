@@ -71,8 +71,11 @@ if BUILD_BITCOIND
   bin_PROGRAMS += wisprd
 endif
 
-if BUILD_BITCOIN_UTILS
-  bin_PROGRAMS += wispr-cli wispr-tx
+if BUILD_BITCOIN_CLI
+  bin_PROGRAMS += wispr-cli
+endif
+if BUILD_BITCOIN_TX
+  bin_PROGRAMS += wispr-tx
 endif
 
 .PHONY: FORCE check-symbols check-security
