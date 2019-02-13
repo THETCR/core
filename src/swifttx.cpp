@@ -10,6 +10,7 @@
 #include "key.h"
 #include "masternodeman.h"
 #include "net.h"
+#include <net_processing.h>
 #include "obfuscation.h"
 #include "protocol.h"
 #include "spork.h"

@@ -8,6 +8,7 @@
 #include "addrman.h"
 #include "masternodeman.h"
 #include "obfuscation.h"
+#include <net_processing.h>
 #include "shutdown.h"
 #include "sync.h"
 #include "util.h"
