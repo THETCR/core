@@ -5,7 +5,7 @@
 
 #include "paymentservertests.h"
 
-#include "optionsmodel.h"
+#include <qt/optionsmodel.h>
 #include "paymentrequestdata.h"
 
 #include "random.h"
