@@ -9,8 +9,8 @@
 #include "guiconstants.h"
 #include "guiutil.h"
 
-#include "net.h"
-#include "sync.h"
+#include <main.h> // for cs_main
+#include <sync.h>
 
 #include <QDebug>
 #include <QList>

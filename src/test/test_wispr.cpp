@@ -29,7 +29,6 @@
 
 
 extern bool fPrintToConsole;
-extern void noui_connect();
 BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
 {
     ECC_Start();
