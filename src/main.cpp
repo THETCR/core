@@ -3452,6 +3452,7 @@ bool AcceptBlockHeader(const CBlockHeader& block, CValidationState& state, CBloc
     if (ppindex)
         *ppindex = pindex;
 
+    CheckBlockIndex();
     return true;
 }
 
@@ -3634,6 +3635,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
         return AbortNode(state, std::string("System error: ") + e.what());
     }
 
+    CheckBlockIndex();
     return true;
 }
 
@@ -3740,7 +3742,6 @@ bool ProcessNewBlock(const CChainParams& chainparams, const CBlock* pblock, bool
         CValidationState state;
         bool ret = AcceptBlock(*pblock, state, &pindex, dbp, fNewBlock);
 //        bool ret = AcceptBlock(*pblock, state, &pindex, fForceProcessing, dbp, fNewBlock);
-        CheckBlockIndex();
         if (!ret) {
             GetMainSignals().BlockChecked(*pblock, state);
             return error("%s: AcceptBlock FAILED", __func__);
@@ -4430,45 +4431,6 @@ string GetWarnings(string strFor)
         return strRPC;
     assert(!"GetWarnings() : invalid parameter");
     return "error";
-}
-//////////////////////////////////////////////////////////////////////////////
-//
-// blockchain -> download logic notification
-//
-
-void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {
-    const int nNewHeight = pindexNew->nHeight;
-
-    if (!fInitialDownload) {
-        // Find the hashes of all blocks that weren't previously in the best chain.
-        std::vector<uint256> vHashes;
-        const CBlockIndex *pindexToAnnounce = pindexNew;
-        while (pindexToAnnounce != pindexFork) {
-            vHashes.push_back(pindexToAnnounce->GetBlockHash());
-            pindexToAnnounce = pindexToAnnounce->pprev;
-            if (vHashes.size() == MAX_BLOCKS_TO_ANNOUNCE) {
-                // Limit announcements in case of a huge reorganization.
-                // Rely on the peer's synchronization mechanism in that case.
-                break;
-            }
-        }
-        // Relay inventory, but don't relay old inventory during initial block download.
-        LOCK(cs_vNodes);
-        for (CNode* pnode: vNodes){
-            if (nNewHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : 0)) {
-                for(const uint256& hash: reverse_iterate(vHashes)) {
-                    pnode->PushBlockHash(hash);
-                }
-            }
-        }
-//        connman->ForEachNode([nNewHeight, &vHashes](CNode* pnode) {
-//          if (nNewHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : 0)) {
-//              for(const uint256& hash: reverse_iterate(vHashes)) {
-//                  pnode->PushBlockHash(hash);
-//              }
-//          }
-//        });
-    }
 }
 
 

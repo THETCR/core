@@ -34,6 +34,7 @@
 #include "masternodeman.h"
 #include "masternode-sync.h"
 #include "masternode-budget.h"
+#include <alert.h>
 
 #include <boost/thread.hpp>
 
@@ -567,24 +568,31 @@ void Misbehaving(NodeId pnode, int howmuch) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 //    }
 //}
 //
-//void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {
-//    const int nNewHeight = pindexNew->nHeight;
-//    connman->SetBestHeight(nNewHeight);
-//
-//    if (!fInitialDownload) {
-//        // Find the hashes of all blocks that weren't previously in the best chain.
-//        std::vector<uint256> vHashes;
-//        const CBlockIndex *pindexToAnnounce = pindexNew;
-//        while (pindexToAnnounce != pindexFork) {
-//            vHashes.push_back(pindexToAnnounce->GetBlockHash());
-//            pindexToAnnounce = pindexToAnnounce->pprev;
-//            if (vHashes.size() == MAX_BLOCKS_TO_ANNOUNCE) {
-//                // Limit announcements in case of a huge reorganization.
-//                // Rely on the peer's synchronization mechanism in that case.
-//                break;
-//            }
-//        }
-//        // Relay inventory, but don't relay old inventory during initial block download.
+void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {
+    const int nNewHeight = pindexNew->nHeight;
+
+    if (!fInitialDownload) {
+        // Find the hashes of all blocks that weren't previously in the best chain.
+        std::vector<uint256> vHashes;
+        const CBlockIndex *pindexToAnnounce = pindexNew;
+        while (pindexToAnnounce != pindexFork) {
+            vHashes.push_back(pindexToAnnounce->GetBlockHash());
+            pindexToAnnounce = pindexToAnnounce->pprev;
+            if (vHashes.size() == MAX_BLOCKS_TO_ANNOUNCE) {
+                // Limit announcements in case of a huge reorganization.
+                // Rely on the peer's synchronization mechanism in that case.
+                break;
+            }
+        }
+        // Relay inventory, but don't relay old inventory during initial block download.
+        LOCK(cs_vNodes);
+        for (CNode* pnode: vNodes){
+            if (nNewHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : 0)) {
+                for(const uint256& hash: reverse_iterate(vHashes)) {
+                    pnode->PushBlockHash(hash);
+                }
+            }
+        }
 //        connman->ForEachNode([nNewHeight, &vHashes](CNode* pnode) {
 //          if (nNewHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : 0)) {
 //              for(const uint256& hash: reverse_iterate(vHashes)) {
@@ -592,10 +600,10 @@ void Misbehaving(NodeId pnode, int howmuch) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 //              }
 //          }
 //        });
-//    }
-//
-//    nTimeBestReceived = GetTime();
-//}
+    }
+}
+
+
 //
 //void PeerLogicValidation::BlockChecked(const CBlock& block, const CValidationState& state) {
 //    LOCK(cs_main);
@@ -1634,10 +1642,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 LogPrintf("more getheaders (%d) to end to peer=%d (startheight:%d)\n", pindexLast->nHeight, pfrom->id, pfrom->nStartingHeight);
                 pfrom->PushMessage(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexLast), uint256(0));
             }
-
-            CheckBlockIndex();
         }
-        NotifyHeaderTip();
     }
 
     else if (strCommand == NetMsgType::BLOCK && !fImporting && !fReindex) // Ignore blocks received while importing

@@ -21,7 +21,8 @@ private:
   CConnman* connman;
 
 public:
-  PeerLogicValidation(CConnman* connmanIn);
+//  PeerLogicValidation(CConnman* connmanIn);
+  PeerLogicValidation(CConnman* connmanIn) : connman(connmanIn) {}
 
   virtual void SyncTransaction(const CTransaction& tx, const CBlockIndex* pindex, int nPosInBlock);
   virtual void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload);

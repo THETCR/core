@@ -214,15 +214,6 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
 int GetInputAge(CTxIn& vin);
 int GetInputAgeIX(uint256 nTXHash, CTxIn& vin);
 int GetIXConfirmations(uint256 nTXHash);
-class PeerLogicValidation : public CValidationInterface {
-private:
-  CConnman* connman;
-
-public:
-  PeerLogicValidation(CConnman* connmanIn) : connman(connmanIn) {}
-
-  virtual void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload);
-};
 
 CAmount GetMinRelayFee(const CTransaction& tx, unsigned int nBytes, bool fAllowFree);
 
