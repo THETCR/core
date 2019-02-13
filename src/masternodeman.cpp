@@ -5,6 +5,7 @@
 
 #include "masternodeman.h"
 #include "consensus/validation.h"
+#include <net_processing.h>
 #include "clientversion.h"
 #include "activemasternode.h"
 #include "addrman.h"
