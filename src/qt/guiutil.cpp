@@ -8,7 +8,7 @@
 
 #include "bitcoinaddressvalidator.h"
 #include "bitcoinunits.h"
-#include "qvalidatedlineedit.h"
+#include <qt/qvalidatedlineedit.h>
 #include "walletmodel.h"
 
 #include "main.h"

@@ -20,7 +20,7 @@
 #include "script/interpreter.h"
 #include "utilmoneystr.h"
 #include "guiutil.h"
-#include "qvalidatedlineedit.h"
+#include <qt/qvalidatedlineedit.h>
 #include "bitcoinamountfield.h"
 #include "txmempool.h"
 
