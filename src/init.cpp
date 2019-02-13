@@ -30,7 +30,9 @@
 #include "masternodeconfig.h"
 #include "masternodeman.h"
 #include "miner.h"
-#include "net.h"
+#include <netbase.h>
+#include <net.h>
+#include <net_processing.h>
 #include "policy/feerate.h"
 #include "policy/policy.h"
 #include "rpc/server.h"

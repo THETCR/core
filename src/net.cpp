@@ -10,6 +10,7 @@
 #endif
 
 #include "net.h"
+#include <net_processing.h>
 
 #include "chainparams.h"
 #include "clientversion.h"

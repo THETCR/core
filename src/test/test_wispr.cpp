@@ -5,21 +5,21 @@
 
 #include "test_wispr.h"
 
-#include "chainparams.h"
-#include "consensus/consensus.h"
-#include "consensus/validation.h"
-#include "key.h"
-#include "main.h"
-#include "miner.h"
-#include "pubkey.h"
-#include "random.h"
-#include "txdb.h"
-#include "txmempool.h"
-#include "ui_interface.h"
-#include "rpc/server.h"
-#include "script/sigcache.h"
+#include <chainparams.h>
+#include <consensus/consensus.h>
+#include <consensus/params.h>
+#include <consensus/validation.h>
+#include <crypto/sha256.h>
+#include <main.h>
+#include <miner.h>
+#include <net_processing.h>
+#include <noui.h>
+#include <pow.h>
+#include <rpc/server.h>
+#include <script/sigcache.h>
+#include <streams.h>
+#include <ui_interface.h>
 #include "util.h"
-#include <fs.h>
 
 //#ifdef ENABLE_WALLET
 //#include "db.h"

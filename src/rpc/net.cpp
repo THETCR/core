@@ -8,8 +8,11 @@
 
 #include "clientversion.h"
 #include "main.h"
-#include "net.h"
+#include <net.h>
+#include <net_processing.h>
+#include <netbase.h>
 #include "netbase.h"
+#include <policy/policy.h>
 #include "protocol.h"
 #include "sync.h"
 #include "timedata.h"
