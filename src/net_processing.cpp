@@ -73,6 +73,27 @@ int nSyncStarted GUARDED_BY(cs_main) = 0;
      */
 map<uint256, NodeId> mapBlockSource GUARDED_BY(cs_main);
 
+/**
+ * Filter for transactions that were recently rejected by
+ * AcceptToMemoryPool. These are not rerequested until the chain tip
+ * changes, at which point the entire filter is reset.
+ *
+ * Without this filter we'd be re-requesting txs from each of our peers,
+ * increasing bandwidth consumption considerably. For instance, with 100
+ * peers, half of which relay a tx we don't accept, that might be a 50x
+ * bandwidth increase. A flooding attacker attempting to roll-over the
+ * filter using minimum-sized, 60byte, transactions might manage to send
+ * 1000/sec if we have fast peers, so we pick 120,000 to give our peers a
+ * two minute window to send invs to us.
+ *
+ * Decreasing the false positive rate is fairly cheap, so we pick one in a
+ * million to make it highly unlikely for users to have issues with this
+ * filter.
+ *
+ * Memory used: 1.3 MB
+ */
+std::unique_ptr<CRollingBloomFilter> recentRejects GUARDED_BY(cs_main);
+uint256 hashRecentRejectsChainTip GUARDED_BY(cs_main);
 /** Blocks that are in flight, and that are in the queue to be downloaded. Protected by cs_main. */
 struct QueuedBlock {
   uint256 hash;
@@ -536,11 +557,11 @@ void Misbehaving(NodeId pnode, int howmuch) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 
 // TODO: Implement this with the rest of PeerLogicValidation
 
-//PeerLogicValidation::PeerLogicValidation(CConnman* connmanIn) : connman(connmanIn) {
-//    // Initialize global variables that cannot be constructed at startup.
-//    recentRejects.reset(new CRollingBloomFilter(120000, 0.000001));
-//}
-//
+PeerLogicValidation::PeerLogicValidation(CConnman* connmanIn) : connman(connmanIn) {
+    // Initialize global variables that cannot be constructed at startup.
+    recentRejects.reset(new CRollingBloomFilter(120000, 0.000001));
+}
+
 //void PeerLogicValidation::SyncTransaction(const CTransaction& tx, const CBlockIndex* pindex, int nPosInBlock) {
 //    if (nPosInBlock == CMainSignals::SYNC_TRANSACTION_NOT_IN_BLOCK)
 //        return;
@@ -550,10 +571,10 @@ void Misbehaving(NodeId pnode, int howmuch) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 //    std::vector<uint256> vOrphanErase;
 //    // Which orphan pool entries must we evict?
 //    for (size_t j = 0; j < tx.vin.size(); j++) {
-//        auto itByPrev = mapOrphanTransactionsByPrev.find(tx.vin[j].prevout);
+//        auto itByPrev = mapOrphanTransactionsByPrev.find(tx.vin[j].prevout.hash);
 //        if (itByPrev == mapOrphanTransactionsByPrev.end()) continue;
 //        for (auto mi = itByPrev->second.begin(); mi != itByPrev->second.end(); ++mi) {
-//            const CTransaction& orphanTx = (*mi)->second.tx;
+//            const CTransaction& orphanTx = *mi;
 //            const uint256& orphanHash = orphanTx.GetHash();
 //            vOrphanErase.push_back(orphanHash);
 //        }
@@ -562,13 +583,17 @@ void Misbehaving(NodeId pnode, int howmuch) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 //    // Erase orphan transactions include or precluded by this block
 //    if (vOrphanErase.size()) {
 //        int nErased = 0;
-//        BOOST_FOREACH(uint256 &orphanHash, vOrphanErase) {
+//        for(uint256 &orphanHash: vOrphanErase) {
 //            nErased += EraseOrphanTx(orphanHash);
 //        }
 //        LogPrint("mempool", "Erased %d orphan tx included or conflicted by block\n", nErased);
 //    }
 //}
-//
+
+/**
+ * Update our best height and announce any block hashes which weren't previously
+ * in chainActive to our peers.
+ */
 void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {
     const int nNewHeight = pindexNew->nHeight;
 
@@ -605,27 +630,29 @@ void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CB
     nTimeBestReceived = GetTime();
 }
 
+/**
+ * Handle invalid block rejection and consequent peer banning, maintain which
+ * peers announce compact blocks.
+ */
+void PeerLogicValidation::BlockChecked(const CBlock& block, const CValidationState& state) {
+    LOCK(cs_main);
 
-//
-//void PeerLogicValidation::BlockChecked(const CBlock& block, const CValidationState& state) {
-//    LOCK(cs_main);
-//
-//    const uint256 hash(block.GetHash());
-//    std::map<uint256, std::pair<NodeId, bool>>::iterator it = mapBlockSource.find(hash);
-//
-//    int nDoS = 0;
-//    if (state.IsInvalid(nDoS)) {
-//        if (it != mapBlockSource.end() && State(it->second.first)) {
-//            assert (state.GetRejectCode() < REJECT_INTERNAL); // Blocks are never rejected with internal reject codes
-//            CBlockReject reject = {(unsigned char)state.GetRejectCode(), state.GetRejectReason().substr(0, MAX_REJECT_MESSAGE_LENGTH), hash};
-//            State(it->second.first)->rejects.push_back(reject);
-//            if (nDoS > 0 && it->second.second)
-//                Misbehaving(it->second.first, nDoS);
-//        }
-//    }
-//    if (it != mapBlockSource.end())
-//        mapBlockSource.erase(it);
-//}
+    const uint256 hash(block.GetHash());
+    std::map<uint256, std::pair<NodeId, bool>>::iterator it = mapBlockSource.find(hash);
+
+    int nDoS = 0;
+    if (state.IsInvalid(nDoS)) {
+        if (it != mapBlockSource.end() && State(it->second.first)) {
+            assert (state.GetRejectCode() < REJECT_INTERNAL); // Blocks are never rejected with internal reject codes
+            CBlockReject reject = {(unsigned char)state.GetRejectCode(), state.GetRejectReason().substr(0, MAX_REJECT_MESSAGE_LENGTH), hash};
+            State(it->second.first)->rejects.push_back(reject);
+            if (nDoS > 0 && it->second.second)
+                Misbehaving(it->second.first, nDoS);
+        }
+    }
+    if (it != mapBlockSource.end())
+        mapBlockSource.erase(it);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //

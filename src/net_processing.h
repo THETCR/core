@@ -21,12 +21,12 @@ private:
   CConnman* connman;
 
 public:
-//  PeerLogicValidation(CConnman* connmanIn);
-  PeerLogicValidation(CConnman* connmanIn) : connman(connmanIn) {}
+  PeerLogicValidation(CConnman* connmanIn);
+//  PeerLogicValidation(CConnman* connmanIn) : connman(connmanIn) {}
 
-  virtual void SyncTransaction(const CTransaction& tx, const CBlockIndex* pindex, int nPosInBlock);
-  virtual void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload);
-  virtual void BlockChecked(const CBlock& block, const CValidationState& state);
+//  virtual void SyncTransaction(const CTransaction& tx, const CBlockIndex* pindex, int nPosInBlock);
+  void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) override;
+  void BlockChecked(const CBlock& block, const CValidationState& state) override;
 };
 
 struct CNodeStateStats {
