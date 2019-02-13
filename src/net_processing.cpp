@@ -68,8 +68,8 @@ map<uint256, int64_t> mapZerocoinspends GUARDED_BY(cs_main); //txid, time receiv
 //map<uint256, COrphanTx> mapOrphanTransactions GUARDED_BY(cs_main);
 //map<COutPoint, set<map<uint256, COrphanTx>::iterator, IteratorComparator>> mapOrphanTransactionsByPrev GUARDED_BY(cs_main);
 void EraseOrphansFor(NodeId peer) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
-/** Increase a node's misbehavior score. */
-void Misbehaving(NodeId nodeid, int howmuch) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+///** Increase a node's misbehavior score. */
+//void Misbehaving(NodeId nodeid, int howmuch) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 static const uint64_t RANDOMIZER_ID_ADDRESS_RELAY = 0x3cac0035b5866b90ULL; // SHA256("main address relay")[0:8]
 
 // Internal stuff

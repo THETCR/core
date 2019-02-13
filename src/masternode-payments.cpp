@@ -9,6 +9,7 @@
 #include "masternode-budget.h"
 #include "masternode-sync.h"
 #include "masternodeman.h"
+#include <net_processing.h>
 #include "obfuscation.h"
 #include "spork.h"
 #include "sync.h"

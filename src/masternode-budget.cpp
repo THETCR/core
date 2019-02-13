@@ -8,6 +8,7 @@
 #include "masternode-sync.h"
 #include "masternode.h"
 #include "masternodeman.h"
+#include <net_processing.h>
 #include "obfuscation.h"
 #include "util.h"
 #include "wallet.h"
