@@ -40,8 +40,6 @@ void CNetAddr::SetRaw(Network network, const uint8_t* ip_in)
     }
 }
 
-static const unsigned char pchOnionCat[] = {0xFD, 0x87, 0xD8, 0x7E, 0xEB, 0x43};
-
 bool CNetAddr::SetSpecial(const std::string& strName)
 {
     if (strName.size() > 6 && strName.substr(strName.size() - 6, 6) == ".onion") {
