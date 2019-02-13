@@ -12,7 +12,6 @@
 #include "walletmodel.h"
 
 #include "base58.h"
-#include "init.h"
 #include "wallet.h"
 #include "askpassphrasedialog.h"
 

@@ -15,7 +15,6 @@
 #include "coins.h"
 #include "keystore.h"
 #include "policy/policy.h"
-#include "init.h"
 #include "wallet.h"
 #include "script/sign.h"
 #include "script/interpreter.h"

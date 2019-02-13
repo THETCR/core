@@ -14,7 +14,6 @@
 #include "guiutil.h"
 
 #include "amount.h"
-#include "init.h"
 #include "main.h"
 #include "net.h"
 #include "txdb.h" // for -dbcache defaults

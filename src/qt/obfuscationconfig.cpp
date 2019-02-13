@@ -8,7 +8,6 @@
 
 #include "bitcoinunits.h"
 #include "guiconstants.h"
-#include "init.h"
 #include "optionsmodel.h"
 #include "walletmodel.h"
 

@@ -8,7 +8,6 @@
 #include "addressbookpage.h"
 #include "addresstablemodel.h"
 #include "base58.h"
-#include "init.h"
 #include "walletmodel.h"
 
 #include <QStyle>
