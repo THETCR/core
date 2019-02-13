@@ -11,7 +11,7 @@
 #include "main.h"
 #include "net.h"
 #include "txdb.h"
-#include "ui_blockexplorer.h"
+#include <qt/forms/ui_blockexplorer.h>
 #include "ui_interface.h"
 #include "util.h"
 #include "utilstrencodings.h"
