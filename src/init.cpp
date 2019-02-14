@@ -78,7 +78,7 @@
 #if ENABLE_ZMQ
 #include <zmq/zmqabstractnotifier.h>
 #include <zmq/zmqnotificationinterface.h>
-#include <zmq/zmqpublishnotifier.h>
+#include <zmq/zmqrpc.h>
 #endif
 
 #ifdef ENABLE_WALLET
@@ -1074,6 +1074,9 @@ bool AppInit2()
     CScheduler::Function serviceLoop = boost::bind(&CScheduler::serviceQueue, &scheduler);
     threadGroup.create_thread(boost::bind(&TraceThread<CScheduler::Function>, "scheduler", serviceLoop));
 
+//#if ENABLE_ZMQ
+//    RegisterZMQRPCCommands(tableRPC);
+//#endif
     /* Start the RPC server already.  It will be started in "warmup" mode
      * and not really process calls already (but it will signify connections
      * that the server is there and will be ready later).  Warmup mode will
