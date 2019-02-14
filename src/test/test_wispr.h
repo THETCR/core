@@ -9,15 +9,22 @@
 #include <fs.h>
 #include <key.h>
 #include <pubkey.h>
-//#include <random.h>
+#include <random.h>
 #include <scheduler.h>
-//#include <txdb.h>
-//#include <txmempool.h>
+#include <txdb.h>
+#include <txmempool.h>
 
 #include <memory>
 #include <type_traits>
 
 #include <boost/thread.hpp>
+
+// Enable BOOST_CHECK_EQUAL for enum class types
+template <typename T>
+std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::ostream>::type& stream, const T& e)
+{
+    return stream << static_cast<typename std::underlying_type<T>::type>(e);
+}
 
 /** Basic testing setup.
  * This just configures logging and chain parameters.
@@ -25,7 +32,7 @@
 struct BasicTestingSetup {
     ECCVerifyHandle globalVerifyHandle;
 
-    BasicTestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::MAIN);
+    explicit BasicTestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::MAIN);
     ~BasicTestingSetup();
 };
 
@@ -41,7 +48,7 @@ struct TestingSetup: public BasicTestingSetup {
     boost::thread_group threadGroup;
     CScheduler scheduler;
 
-    TestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::MAIN);
+    explicit TestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::MAIN);
     ~TestingSetup();
 };
 
@@ -99,4 +106,8 @@ class CScript;
 //    TestMemPoolEntryHelper &SpendsCoinbase(bool _flag) { spendsCoinbase = _flag; return *this; }
 //    TestMemPoolEntryHelper &SigOpsCost(unsigned int _sigopsCost) { sigOpCost = _sigopsCost; return *this; }
 //};
+
+// define an implicit conversion here so that uint256 may be used directly in BOOST_CHECK_*
+std::ostream& operator<<(std::ostream& os, const uint256& num);
+
 #endif
