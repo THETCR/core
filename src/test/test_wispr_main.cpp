@@ -4,11 +4,11 @@
 
 #define BOOST_TEST_MODULE Wispr Test Suite
 
-#include <net.h>
+//#include <net.h>
 #include <net_processing.h>
-#include <memory>
+//#include <memory>
 
-std::unique_ptr<CConnman> g_connman;
+//std::unique_ptr<CConnman> g_connman;
 
 #include "main.h"
 #include "random.h"
