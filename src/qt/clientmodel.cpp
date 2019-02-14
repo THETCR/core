@@ -315,23 +315,23 @@ static void BlockTipChanged(ClientModel *clientmodel, bool initialSync, const CB
 void ClientModel::subscribeToCoreSignals()
 {
     // Connect signals to client
-    uiInterface.ShowProgress.connect(boost::bind(ShowProgress, this, _1, _2));
-    uiInterface.NotifyNumConnectionsChanged.connect(boost::bind(NotifyNumConnectionsChanged, this, _1));
-    uiInterface.NotifyAlertChanged.connect(boost::bind(NotifyAlertChanged, this, _1, _2));
-    uiInterface.BannedListChanged.connect(boost::bind(BannedListChanged, this));
-    uiInterface.NotifyBlockTip.connect(boost::bind(BlockTipChanged, this, _1, _2, false));
-    uiInterface.NotifyHeaderTip.connect(boost::bind(BlockTipChanged, this, _1, _2, true));
+    uiInterface.ShowProgress_connect(boost::bind(ShowProgress, this, _1, _2));
+    uiInterface.NotifyNumConnectionsChanged_connect(boost::bind(NotifyNumConnectionsChanged, this, _1));
+    uiInterface.NotifyAlertChanged_connect(boost::bind(NotifyAlertChanged, this, _1, _2));
+    uiInterface.BannedListChanged_connect(boost::bind(BannedListChanged, this));
+    uiInterface.NotifyBlockTip_connect(boost::bind(BlockTipChanged, this, _1, _2, false));
+    uiInterface.NotifyHeaderTip_connect(boost::bind(BlockTipChanged, this, _1, _2, true));
 }
 
 void ClientModel::unsubscribeFromCoreSignals()
 {
     // Disconnect signals from client
-    uiInterface.ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2));
-    uiInterface.NotifyNumConnectionsChanged.disconnect(boost::bind(NotifyNumConnectionsChanged, this, _1));
-    uiInterface.NotifyAlertChanged.disconnect(boost::bind(NotifyAlertChanged, this, _1, _2));
-    uiInterface.BannedListChanged.disconnect(boost::bind(BannedListChanged, this));
-    uiInterface.NotifyBlockTip.disconnect(boost::bind(BlockTipChanged, this, _1, _2, false));
-    uiInterface.NotifyHeaderTip.disconnect(boost::bind(BlockTipChanged, this, _1, _2, true));
+    uiInterface.ShowProgress_disconnect(boost::bind(ShowProgress, this, _1, _2));
+    uiInterface.NotifyNumConnectionsChanged_disconnect(boost::bind(NotifyNumConnectionsChanged, this, _1));
+    uiInterface.NotifyAlertChanged_disconnect(boost::bind(NotifyAlertChanged, this, _1, _2));
+    uiInterface.BannedListChanged_disconnect(boost::bind(BannedListChanged, this));
+    uiInterface.NotifyBlockTip_disconnect(boost::bind(BlockTipChanged, this, _1, _2, false));
+    uiInterface.NotifyHeaderTip_disconnect(boost::bind(BlockTipChanged, this, _1, _2, true));
 }
 
 bool ClientModel::getTorInfo(std::string& ip_port) const

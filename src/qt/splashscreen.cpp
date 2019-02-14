@@ -132,18 +132,18 @@ static void ConnectWallet(SplashScreen* splash, CWallet* wallet)
 void SplashScreen::subscribeToCoreSignals()
 {
     // Connect signals to client
-    uiInterface.InitMessage.connect(boost::bind(InitMessage, this, _1));
-    uiInterface.ShowProgress.connect(boost::bind(ShowProgress, this, _1, _2));
+    uiInterface.InitMessage_connect(boost::bind(InitMessage, this, _1));
+    uiInterface.ShowProgress_connect(boost::bind(ShowProgress, this, _1, _2));
 #ifdef ENABLE_WALLET
-    uiInterface.LoadWallet.connect(boost::bind(ConnectWallet, this, _1));
+    uiInterface.LoadWallet_connect(boost::bind(ConnectWallet, this, _1));
 #endif
 }
 
 void SplashScreen::unsubscribeFromCoreSignals()
 {
     // Disconnect signals from client
-    uiInterface.InitMessage.disconnect(boost::bind(InitMessage, this, _1));
-    uiInterface.ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2));
+    uiInterface.InitMessage_disconnect(boost::bind(InitMessage, this, _1));
+    uiInterface.ShowProgress_disconnect(boost::bind(ShowProgress, this, _1, _2));
 #ifdef ENABLE_WALLET
     if (pwalletMain)
         pwalletMain->ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2));

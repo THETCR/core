@@ -319,18 +319,6 @@ void HandleSIGHUP(int)
     fReopenDebugLog = true;
 }
 
-bool static InitError(const std::string& str)
-{
-    uiInterface.ThreadSafeMessageBox(str, "", CClientUIInterface::MSG_ERROR);
-    return false;
-}
-
-bool static InitWarning(const std::string& str)
-{
-    uiInterface.ThreadSafeMessageBox(str, "", CClientUIInterface::MSG_WARNING);
-    return true;
-}
-
 bool static Bind(const CService& addr, unsigned int flags)
 {
     if (!(flags & BF_EXPLICIT) && IsLimited(addr))
@@ -1083,7 +1071,7 @@ bool AppInit2()
      * be disabled when initialisation is finished.
      */
     if (fServer) {
-        uiInterface.InitMessage.connect(SetRPCWarmupStatus);
+        uiInterface.InitMessage_connect(SetRPCWarmupStatus);
         if (!AppInitServers())
             return InitError(_("Unable to start HTTP server. See debug log for details."));
     }
@@ -1744,10 +1732,10 @@ bool AppInit2()
     // ********************************************************* Step 9: import blocks
 
     if (mapArgs.count("-blocknotify"))
-        uiInterface.NotifyBlockTip.connect(BlockNotifyCallback);
+        uiInterface.NotifyBlockTip_connect(BlockNotifyCallback);
 
     if (mapArgs.count("-blocksizenotify"))
-        uiInterface.NotifyBlockSize.connect(BlockSizeNotifyCallback);
+        uiInterface.NotifyBlockSize_connect(BlockSizeNotifyCallback);
 
     // scan for better chains in the block chain database, that are not yet connected in the active best chain
     CValidationState state;

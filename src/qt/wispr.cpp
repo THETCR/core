@@ -559,7 +559,7 @@ int main(int argc, char* argv[])
     // Now that QSettings are accessible, initialize translations
     QTranslator qtTranslatorBase, qtTranslator, translatorBase, translator;
     initTranslations(qtTranslatorBase, qtTranslator, translatorBase, translator);
-    uiInterface.Translate.connect(Translate);
+    uiInterface.Translate_connect(Translate);
 
     // Show help message immediately after parsing command-line options (for "-lang") and setting locale,
     // but before showing splash screen.
@@ -648,7 +648,7 @@ int main(int argc, char* argv[])
     app.createOptionsModel();
 
     // Subscribe to global signals from core
-    uiInterface.InitMessage.connect(InitMessage);
+    uiInterface.InitMessage_connect(InitMessage);
 
     if (GetBoolArg("-splash", true) && !GetBoolArg("-min", false))
         app.createSplashScreen(networkStyle.data());

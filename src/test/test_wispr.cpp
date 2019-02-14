@@ -28,7 +28,7 @@
 #endif
 
 
-CClientUIInterface uiInterface;
+//CClientUIInterface uiInterface;
 //CWallet* pwalletMain;
 
 extern bool fPrintToConsole;
