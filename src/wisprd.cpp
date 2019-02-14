@@ -29,6 +29,8 @@
 
 #include <stdio.h>
 
+const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
+
 /* Introduction text for doxygen: */
 
 /*! \mainpage Developer documentation

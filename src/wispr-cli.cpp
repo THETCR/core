@@ -25,8 +25,9 @@
 
 #define _(x) std::string(x) /* Keep the _() around in case gettext or such will be used later to translate non-UI */
 
-using namespace std;
+const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
+using namespace std;
 static const int DEFAULT_HTTP_CLIENT_TIMEOUT=900;
 
 std::string HelpMessageCli()
