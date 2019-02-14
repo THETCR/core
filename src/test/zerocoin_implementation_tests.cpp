@@ -114,7 +114,7 @@ std::string rawTxSerial3 = "3abf349844720512325d129c95402edbc85d86fff89632a05dc1
 std::vector<std::pair<std::string, std::string> > vecRawMints = {std::make_pair(rawTx1, rawTxSerial1), std::make_pair(rawTx2, rawTxSerial2), std::make_pair(rawTx3, rawTxSerial3)};
 
 //create a zerocoin mint from vecsend
-BOOST_AUTO_TEST_CASE(checkzerocoinmint_test)
+BOOST_FIXTURE_TEST_CASE(checkzerocoinmint_test, TestingSetup)
         {
                 cout << "generating privkeys\n";
 
