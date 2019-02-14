@@ -32,7 +32,7 @@ std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::os
 struct BasicTestingSetup {
     ECCVerifyHandle globalVerifyHandle;
 
-    explicit BasicTestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::MAIN);
+    explicit BasicTestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::UNITTEST);
     ~BasicTestingSetup();
 };
 
@@ -48,7 +48,7 @@ struct TestingSetup: public BasicTestingSetup {
     boost::thread_group threadGroup;
     CScheduler scheduler;
 
-    explicit TestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::MAIN);
+    explicit TestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::UNITTEST);
     ~TestingSetup();
 };
 
