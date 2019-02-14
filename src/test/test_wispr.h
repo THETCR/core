@@ -5,58 +5,58 @@
 #ifndef BITCOIN_TEST_TEST_BITCOIN_H
 #define BITCOIN_TEST_TEST_BITCOIN_H
 
-//#include <chainparamsbase.h>
-//#include <fs.h>
-//#include <key.h>
-//#include <pubkey.h>
-//#include <random.h>
-//#include <scheduler.h>
-//#include <txdb.h>
-//#include <txmempool.h>
-//
-//#include <memory>
-//#include <type_traits>
-//
-//#include <boost/thread.hpp>
+#include <chainparamsbase.h>
+#include <fs.h>
+#include <key.h>
+#include <pubkey.h>
+#include <random.h>
+#include <scheduler.h>
+#include <txdb.h>
+#include <txmempool.h>
+
+#include <memory>
+#include <type_traits>
+
+#include <boost/thread.hpp>
 
 // Enable BOOST_CHECK_EQUAL for enum class types
-//template <typename T>
-//std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::ostream>::type& stream, const T& e)
-//{
-//    return stream << static_cast<typename std::underlying_type<T>::type>(e);
-//}
+template <typename T>
+std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::ostream>::type& stream, const T& e)
+{
+    return stream << static_cast<typename std::underlying_type<T>::type>(e);
+}
 
 /** Basic testing setup.
  * This just configures logging and chain parameters.
  */
-//struct BasicTestingSetup {
-//    ECCVerifyHandle globalVerifyHandle;
-//
-//    explicit BasicTestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::UNITTEST);
-//    ~BasicTestingSetup();
-//};
+struct BasicTestingSetup {
+    ECCVerifyHandle globalVerifyHandle;
+
+    explicit BasicTestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::UNITTEST);
+    ~BasicTestingSetup();
+};
 
 /** Testing setup that configures a complete environment.
  * Included are data directory, coins database, script check threads setup.
  */
-//class CConnman;
-//class CNode;
-//class PeerLogicValidation;
-//
-//struct TestingSetup: public BasicTestingSetup {
-//    CCoinsViewDB *pcoinsdbview;
-//    fs::path pathTemp;
-//    boost::thread_group threadGroup;
-//    CScheduler scheduler;
-//    CConnman* connman;
-//
-//    explicit TestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::UNITTEST);
-//    ~TestingSetup();
-//};
-//
-//class CBlock;
-//struct CMutableTransaction;
-//class CScript;
+class CConnman;
+class CNode;
+class PeerLogicValidation;
+
+struct TestingSetup: public BasicTestingSetup {
+    CCoinsViewDB *pcoinsdbview;
+    fs::path pathTemp;
+    boost::thread_group threadGroup;
+    CScheduler scheduler;
+    CConnman* connman;
+
+    explicit TestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::UNITTEST);
+    ~TestingSetup();
+};
+
+class CBlock;
+struct CMutableTransaction;
+class CScript;
 
 //BOOST_GLOBAL_FIXTURE(BasicTestingSetup);
 
@@ -110,6 +110,6 @@
 //};
 
 // define an implicit conversion here so that uint256 may be used directly in BOOST_CHECK_*
-//std::ostream& operator<<(std::ostream& os, const uint256& num);
+std::ostream& operator<<(std::ostream& os, const uint256& num);
 
 #endif
