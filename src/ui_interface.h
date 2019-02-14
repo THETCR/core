@@ -7,16 +7,20 @@
 #ifndef BITCOIN_UI_INTERFACE_H
 #define BITCOIN_UI_INTERFACE_H
 
+#include <functional>
+#include <memory>
 #include <stdint.h>
 #include <string>
-
-#include <boost/signals2/last_value.hpp>
-#include <boost/signals2/signal.hpp>
 
 class CBasicKeyStore;
 class CWallet;
 class uint256;
 class CBlockIndex;
+namespace boost {
+namespace signals2 {
+class connection;
+}
+} // namespace boost
 
 /** General change type (added, updated, removed). */
 enum ChangeType {
@@ -76,57 +80,69 @@ public:
         MSG_WARNING = (ICON_WARNING | BTN_OK | MODAL),
         MSG_ERROR = (ICON_ERROR | BTN_OK | MODAL)
     };
+#define ADD_SIGNALS_DECL_WRAPPER(signal_name, rtype, ...)                                  \
+    rtype signal_name(__VA_ARGS__);                                                        \
+    using signal_name##Sig = rtype(__VA_ARGS__);                                           \
+    boost::signals2::connection signal_name##_connect(std::function<signal_name##Sig> fn); \
+    void signal_name##_disconnect(std::function<signal_name##Sig> fn);
 
-    /** Show message box. */
-    boost::signals2::signal<bool (const std::string& message, const std::string& caption, unsigned int style), boost::signals2::last_value<bool> > ThreadSafeMessageBox;
+  /** Show message box. */
+  ADD_SIGNALS_DECL_WRAPPER(ThreadSafeMessageBox, bool, const std::string& message, const std::string& caption, unsigned int style);
 
-    /** If possible, ask the user a question. If not, falls back to ThreadSafeMessageBox(noninteractive_message, caption, style) and returns false. */
-    boost::signals2::signal<bool (const std::string& message, const std::string& noninteractive_message, const std::string& caption, unsigned int style), boost::signals2::last_value<bool> > ThreadSafeQuestion;
+  /** If possible, ask the user a question. If not, falls back to ThreadSafeMessageBox(noninteractive_message, caption, style) and returns false. */
+  ADD_SIGNALS_DECL_WRAPPER(ThreadSafeQuestion, bool, const std::string& message, const std::string& noninteractive_message, const std::string& caption, unsigned int style);
 
   /** Progress message during initialization. */
-    boost::signals2::signal<void(const std::string& message)> InitMessage;
+  ADD_SIGNALS_DECL_WRAPPER(InitMessage, void, const std::string& message);
 
-    /** Translate a message to the native language of the user. */
-    boost::signals2::signal<std::string(const char* psz)> Translate;
+  /** Number of network connections changed. */
+  ADD_SIGNALS_DECL_WRAPPER(NotifyNumConnectionsChanged, void, int newNumConnections);
 
-    /** Number of network connections changed. */
-    boost::signals2::signal<void(int newNumConnections)> NotifyNumConnectionsChanged;
+  /** Network activity state changed. */
+  ADD_SIGNALS_DECL_WRAPPER(NotifyNetworkActiveChanged, void, bool networkActive);
 
-    /**
+  /** Translate a message to the native language of the user. */
+  ADD_SIGNALS_DECL_WRAPPER(Translate, std::string, const char* psz);
+
+  /**
      * New, updated or cancelled alert.
      * @note called with lock cs_mapAlerts held.
-     */
-    boost::signals2::signal<void(const uint256& hash, ChangeType status)> NotifyAlertChanged;
+   */
+  ADD_SIGNALS_DECL_WRAPPER(NotifyAlertChanged, void, const uint256& hash, ChangeType status);
 
-    /** A wallet has been loaded. */
-    boost::signals2::signal<void(CWallet* wallet)> LoadWallet;
+  /** A wallet has been loaded. */
+  ADD_SIGNALS_DECL_WRAPPER(LoadWallet, void, CWallet* wallet);
 
-    /** Show progress e.g. for verifychain */
-    boost::signals2::signal<void(const std::string& title, int nProgress)> ShowProgress;
+  /**
+   * Show progress e.g. for verifychain.
+   * resume_possible indicates shutting down now will result in the current progress action resuming upon restart.
+   */
+  ADD_SIGNALS_DECL_WRAPPER(ShowProgress, void, const std::string& title, int nProgress);
 
-    /** New block has been accepted */
-    boost::signals2::signal<void (bool, const CBlockIndex *)> NotifyBlockTip;
+  /** New block has been accepted */
+  ADD_SIGNALS_DECL_WRAPPER(NotifyBlockTip, void, bool, const CBlockIndex*);
 
-    /** Best header has changed */
-    boost::signals2::signal<void (bool, const CBlockIndex *)> NotifyHeaderTip;
+  /** Best header has changed */
+  ADD_SIGNALS_DECL_WRAPPER(NotifyHeaderTip, void, bool, const CBlockIndex*);
 
-    /** New block has been accepted and is over a certain size */
-    boost::signals2::signal<void(int size, const uint256& hash)> NotifyBlockSize;
+  /** New block has been accepted and is over a certain size */
+  ADD_SIGNALS_DECL_WRAPPER(NotifyBlockSize, void, int size, const uint256& hash);
 
-    /** Banlist did change. */
-    boost::signals2::signal<void (void)> BannedListChanged;
+  /** Banlist did change. */
+  ADD_SIGNALS_DECL_WRAPPER(BannedListChanged, void, void);
+
 };
 
-extern CClientUIInterface uiInterface;
+/** Show warning message **/
+void InitWarning(const std::string& str);
 
-/**
- * Translation function: Call Translate signal on UI interface, which returns a boost::optional result.
- * If no translation slot is registered, nothing is returned, and simply return the input.
- */
-inline std::string _(const char* psz)
-{
-    boost::optional<std::string> rv = uiInterface.Translate(psz);
-    return rv ? (*rv) : psz;
-}
+/** Show error message **/
+bool InitError(const std::string& str);
+
+std::string AmountHighWarn(const std::string& optname);
+
+std::string AmountErrMsg(const char* const optname, const std::string& strValue);
+
+extern CClientUIInterface uiInterface;
 
 #endif // BITCOIN_UI_INTERFACE_H
