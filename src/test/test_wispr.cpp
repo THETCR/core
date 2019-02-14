@@ -29,7 +29,7 @@
 
 
 CClientUIInterface uiInterface;
-CWallet* pwalletMain;
+//CWallet* pwalletMain;
 
 extern bool fPrintToConsole;
 BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)

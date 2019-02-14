@@ -9,10 +9,10 @@
 #include <fs.h>
 #include <key.h>
 #include <pubkey.h>
-#include <random.h>
+//#include <random.h>
 #include <scheduler.h>
-#include <txdb.h>
-#include <txmempool.h>
+//#include <txdb.h>
+//#include <txmempool.h>
 
 #include <memory>
 #include <type_traits>
