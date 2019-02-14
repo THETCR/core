@@ -21,6 +21,7 @@
 #include <ui_interface.h>
 #include <txdb.h>
 #include <util.h>
+#include <boost/test/unit_test_suite.hpp>
 
 #ifdef ENABLE_WALLET
 #include "db.h"
@@ -105,6 +106,7 @@ TestingSetup::~TestingSetup()
     delete pblocktree;
     fs::remove_all(pathTemp);
 }
+BOOST_GLOBAL_FIXTURE(TestingSetup);
 
 //TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
 //{
