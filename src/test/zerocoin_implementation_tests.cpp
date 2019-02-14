@@ -25,7 +25,7 @@ using namespace libzerocoin;
 
 extern bool DecodeHexTx(CTransaction& tx, const std::string& strHexTx);
 
-BOOST_FIXTURE_TEST_SUITE(zerocoin_implementation_tests, TestingSetup)
+BOOST_AUTO_TEST_SUITE(zerocoin_implementation_tests)
 
 BOOST_AUTO_TEST_CASE(zcparams_test)
 {
