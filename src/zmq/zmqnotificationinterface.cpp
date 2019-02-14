@@ -179,3 +179,4 @@ void CZMQNotificationInterface::NotifyTransactionLock(const CTransaction &tx)
         }
     }
 }
+CZMQNotificationInterface* g_zmq_notification_interface = nullptr;
