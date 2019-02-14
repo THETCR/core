@@ -16,7 +16,7 @@ struct UISignals {
     boost::signals2::signal<CClientUIInterface::InitMessageSig> InitMessage;
     boost::signals2::signal<CClientUIInterface::NotifyNumConnectionsChangedSig> NotifyNumConnectionsChanged;
     boost::signals2::signal<CClientUIInterface::NotifyNetworkActiveChangedSig> NotifyNetworkActiveChanged;
-    boost::signals2::signal<CClientUIInterface::TranslateSig, std::string> Translate;
+    boost::signals2::signal<CClientUIInterface::TranslateSig, boost::signals2::last_value<std::string>> Translate;
     boost::signals2::signal<CClientUIInterface::NotifyAlertChangedSig> NotifyAlertChanged;
     boost::signals2::signal<CClientUIInterface::LoadWalletSig> LoadWallet;
     boost::signals2::signal<CClientUIInterface::ShowProgressSig> ShowProgress;
