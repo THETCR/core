@@ -15,7 +15,8 @@ typedef CZMQAbstractNotifier* (*CZMQNotifierFactory)();
 class CZMQAbstractNotifier
 {
 public:
-    CZMQAbstractNotifier() : psocket(nullptr) { }
+  static const int DEFAULT_ZMQ_SNDHWM {1000};
+  CZMQAbstractNotifier() : psocket(nullptr) { }
     virtual ~CZMQAbstractNotifier();
 
     template <typename T>
