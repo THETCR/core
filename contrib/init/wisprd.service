@@ -1,24 +1,48 @@
 # It is not recommended to modify this file in-place, because it will
 # be overwritten during package upgrades. If you want to add further
 # options or overwrite existing ones then use
-# $ systemctl edit bitcoind.service
+# $ systemctl edit wisprd.service
 # See "man systemd.service" for details.
 
 # Note that almost all daemon options could be specified in
-# /etc/wispr/wispr.conf
+# /etc/wispr/wispr.conf, except for those explicitly specified as arguments
+# in ExecStart=
 
 [Unit]
 Description=WISPR daemon
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/wisprd -daemon -conf=/etc/wispr/wispr.conf -pid=/run/wisprd/wisprd.pid
-# Creates /run/wisprd owned by wispr
-RuntimeDirectory=wisprd
-User=wispr
+ExecStart=/usr/bin/wisprd -daemon \
+                            -pid=/run/wisprd/wisprd.pid \
+                            -conf=/etc/wispr/wispr.conf \
+                            -datadir=/var/lib/wisprd
+
+# Process management
+####################
+
 Type=forking
 PIDFile=/run/wisprd/wisprd.pid
 Restart=on-failure
+
+# Directory creation and permissions
+####################################
+
+# Run as wispr:wispr
+User=wispr
+Group=wispr
+
+# /run/wisprd
+RuntimeDirectory=wisprd
+RuntimeDirectoryMode=0710
+
+# /etc/wispr
+ConfigurationDirectory=wispr
+ConfigurationDirectoryMode=0710
+
+# /var/lib/wisprd
+StateDirectory=wisprd
+StateDirectoryMode=0710
 
 # Hardening measures
 ####################

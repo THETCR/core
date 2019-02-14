@@ -9,25 +9,23 @@
 #include <config/wispr-config.h>
 #endif
 
-#include "chainparams.h"
-#include "clientversion.h"
-#include "compat.h"
-#include "init.h"
-#include "shutdown.h"
-#include "masternodeconfig.h"
-#include "noui.h"
-#include "scheduler.h"
-#include "rpc/server.h"
-#include "ui_interface.h"
-#include "util.h"
-#include "httpserver.h"
-#include "httprpc.h"
-#include "utilstrencodings.h"
+
+#include <chainparams.h>
+#include <clientversion.h>
+#include <compat.h>
 #include <fs.h>
+#include <masternodeconfig.h>
+#include <rpc/server.h>
+#include <init.h>
+#include <noui.h>
+#include <shutdown.h>
+#include <util.h>
+#include <httpserver.h>
+#include <httprpc.h>
+#include <utilstrencodings.h>
+
 
 #include <boost/algorithm/string/predicate.hpp>
-
-#include <boost/thread.hpp>
 
 #include <stdio.h>
 

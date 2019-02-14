@@ -26,7 +26,7 @@ lockfile=${BITCOIND_LOCKFILE-/var/lock/subsys/wisprd}
 bitcoind=${BITCOIND_BIN-/usr/bin/wisprd}
 
 # wisprd opts default to -disablewallet, override with BITCOIND_OPTS
-bitcoind_opts=${BITCOIND_OPTS}
+bitcoind_opts=${BITCOIND_OPTS--disablewallet}
 
 start() {
     echo -n $"Starting $prog: "
