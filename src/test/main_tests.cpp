@@ -4,8 +4,11 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "primitives/transaction.h"
-#include "main.h"
+#include <chainparams.h>
+#include <main.h>
+#include <net.h>
+
+#include <test/test_wispr.h>
 
 #include <boost/test/unit_test.hpp>
 
