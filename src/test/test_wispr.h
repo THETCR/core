@@ -48,6 +48,7 @@ struct TestingSetup: public BasicTestingSetup {
     fs::path pathTemp;
     boost::thread_group threadGroup;
     CScheduler scheduler;
+    CConnman* connman;
 
     explicit TestingSetup(CBaseChainParams::Network chainName = CBaseChainParams::UNITTEST);
     ~TestingSetup();

@@ -28,7 +28,6 @@
 #endif
 
 
-CWallet* pwalletMain;
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
 extern bool fPrintToConsole;
@@ -88,6 +87,7 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
     for (int i=0; i < nScriptCheckThreads-1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
     g_connman = std::unique_ptr<CConnman>(new CConnman()); // Deterministic randomness for tests.
+    connman = g_connman.get();
     RegisterNodeSignals(GetNodeSignals());
 }
 
