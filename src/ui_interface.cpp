@@ -5,8 +5,8 @@
 #include <ui_interface.h>
 #include <util.h>
 
-#include <boost/signals2/last_value.hpp>
-#include <boost/signals2/signal.hpp>
+//#include <boost/signals2/last_value.hpp>
+//#include <boost/signals2/signal.hpp>
 
 CClientUIInterface uiInterface;
 
