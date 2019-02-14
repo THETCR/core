@@ -3,7 +3,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-//#include <test/test_wispr.h>
+#include <test/test_wispr.h>
 //
 //#include <chainparams.h>
 //#include <consensus/consensus.h>
@@ -20,7 +20,7 @@
 //#include <streams.h>
 //#include <ui_interface.h>
 //#include <txdb.h>
-//#include <util.h>
+#include <util.h>
 //
 //#ifdef ENABLE_WALLET
 //#include "db.h"
@@ -28,7 +28,7 @@
 //#endif
 
 
-//const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
+const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
 //extern bool fPrintToConsole;
 //BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
