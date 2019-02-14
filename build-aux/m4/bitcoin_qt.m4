@@ -276,7 +276,7 @@ AC_DEFUN([_BITCOIN_QT_CHECK_QT5],[
       #endif
     ]],
     [[
-      #if QT_VERSION < 0x050000 || QT_VERSION_MAJOR < 5
+      #if QT_VERSION < 0x050200 || QT_VERSION_MAJOR < 5
       choke
       #endif
     ]])],
@@ -457,7 +457,6 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS_WITHOUT_PKGCONFIG],[
   TEMP_CPPFLAGS="$CPPFLAGS"
   TEMP_CXXFLAGS="$CXXFLAGS"
   CXXFLAGS="$PIC_FLAGS $CXXFLAGS"
-  CFLAGS="$PIC_FLAGS $CFLAGS"
   TEMP_LIBS="$LIBS"
   BITCOIN_QT_CHECK([
     if test "x$qt_include_path" != x; then
