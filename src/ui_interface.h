@@ -152,8 +152,8 @@ extern CClientUIInterface uiInterface;
  */
 inline std::string _(const char* psz)
 {
-    boost::optional<std::string> rv = uiInterface.Translate(psz);
-    return rv ? (*rv) : psz;
+    std::string rv = uiInterface.Translate(psz);
+    return rv;
 }
 
 
