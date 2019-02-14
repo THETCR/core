@@ -34,6 +34,24 @@ const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 extern bool fPrintToConsole;
 BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
 {
+//    ECC_Start();
+//    SetupEnvironment();
+//    SetupNetworking();
+//    fPrintToDebugLog = false; // don't want to write to debug.log file
+//    fCheckBlockIndex = true;
+//    SelectParams(chainName);
+//    noui_connect();
+//#ifdef ENABLE_WALLET
+//    bitdb.MakeMock();
+//#endif
+}
+
+BasicTestingSetup::~BasicTestingSetup()
+{
+//    ECC_Stop();
+}
+TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSetup(chainName)
+{
     ECC_Start();
     SetupEnvironment();
     SetupNetworking();
@@ -44,15 +62,6 @@ BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
 #ifdef ENABLE_WALLET
     bitdb.MakeMock();
 #endif
-}
-
-BasicTestingSetup::~BasicTestingSetup()
-{
-    ECC_Stop();
-}
-TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSetup(chainName)
-{
-    const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
 
@@ -60,7 +69,7 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
 //    ClearDatadirCache();
     // We have to run a scheduler thread to prevent ActivateBestChain
     // from blocking due to queue overrun.
-    threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
+//    threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
     pathTemp = GetTempPath() / strprintf("test_wispr_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
     fs::create_directories(pathTemp);
     mapArgs["-datadir"] = pathTemp.string();
@@ -84,20 +93,25 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
 
 TestingSetup::~TestingSetup()
 {
-    UnregisterNodeSignals(GetNodeSignals());
     threadGroup.interrupt_all();
     threadGroup.join_all();
+    UnregisterNodeSignals(GetNodeSignals());
     g_connman.reset();
-    UnloadBlockIndex();
+//    UnloadBlockIndex();
 #ifdef ENABLE_WALLET
-    UnregisterValidationInterface(pwalletMain);
+//    UnregisterValidationInterface(pwalletMain);
     delete pwalletMain;
     pwalletMain = nullptr;
 #endif
     delete pcoinsTip;
     delete pcoinsdbview;
     delete pblocktree;
+#ifdef ENABLE_WALLET
+    bitdb.Flush(true);
+#endif
     fs::remove_all(pathTemp);
+    ECC_Stop();
+
 }
 
 //TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
