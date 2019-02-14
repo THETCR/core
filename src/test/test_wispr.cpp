@@ -28,7 +28,7 @@
 #endif
 
 
-//CWallet* pwalletMain;
+CWallet* pwalletMain;
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
 extern bool fPrintToConsole;
