@@ -1872,9 +1872,9 @@ void CConnman::ThreadMessageHandler()
 void CConnman::ThreadStakeMinter()
 {
     LogPrintf("ThreadStakeMinter started\n");
-//    CWallet* pwallet = pwalletMain;
+    CWallet* pwallet = pwalletMain;
     try {
-        BitcoinMiner(pwalletMain, true);
+        BitcoinMiner(pwallet, true);
     } catch (std::exception& e) {
         LogPrintf("ThreadStakeMinter() exception \n");
     } catch (...) {
