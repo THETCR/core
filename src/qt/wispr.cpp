@@ -5,7 +5,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "config/wispr-config.h"
+#include <config/wispr-config.h>
 #endif
 
 #include "bitcoingui.h"

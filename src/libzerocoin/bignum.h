@@ -7,7 +7,7 @@
 #define BITCOIN_BIGNUM_H
 
 #if defined HAVE_CONFIG_H
-#include "config/wispr-config.h"
+#include <config/wispr-config.h>
 #endif
 
 #include <stdexcept>
