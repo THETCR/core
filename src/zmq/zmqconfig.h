@@ -21,7 +21,4 @@
 
 void zmqError(const char *str);
 
-
-void zmqError(const char *str);
-
 #endif // BITCOIN_ZMQ_ZMQCONFIG_H
