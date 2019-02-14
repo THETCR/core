@@ -5,21 +5,22 @@
 
 #include <test/test_wispr.h>
 
-#include <chainparams.h>
-#include <consensus/consensus.h>
-#include <consensus/params.h>
+//#include <chainparams.h>
+//#include <consensus/consensus.h>
+//#include <consensus/params.h>
 #include <consensus/validation.h>
-#include <crypto/sha256.h>
+//#include <crypto/sha256.h>
 #include <main.h>
-#include <miner.h>
+//#include <miner.h>
 #include <net_processing.h>
 #include <noui.h>
-#include <pow.h>
-#include <rpc/server.h>
-#include <script/sigcache.h>
-#include <streams.h>
+//#include <pow.h>
+//#include <rpc/server.h>
+//#include <script/sigcache.h>
+//#include <streams.h>
 #include <ui_interface.h>
-#include "util.h"
+#include <txdb.h>
+#include <util.h>
 
 #ifdef ENABLE_WALLET
 #include "db.h"
@@ -51,7 +52,7 @@ BasicTestingSetup::~BasicTestingSetup()
 }
 TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSetup(chainName)
 {
-    const CChainParams& chainparams = Params();
+//    const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
 
