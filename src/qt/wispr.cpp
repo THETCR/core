@@ -28,6 +28,7 @@
 #include <qt/paymentserver.h>
 #include <qt/walletmodel.h>
 #endif
+#include <init.h>
 #include <masternodeconfig.h>
 
 #include <noui.h>
