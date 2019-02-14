@@ -28,7 +28,6 @@ using namespace std;
 
 static bool fCreateBlank;
 static map<string, UniValue> registers;
-CClientUIInterface uiInterface;
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
 static bool AppInitRawTx(int argc, char* argv[])

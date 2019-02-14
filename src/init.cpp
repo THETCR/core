@@ -41,6 +41,7 @@
 #include "shutdown.h"
 #include "spork.h"
 #include "sporkdb.h"
+#include <timedata.h>
 #include "txdb.h"
 #include "txmempool.h"
 #include "torcontrol.h"
@@ -108,7 +109,6 @@ enum BindFlags {
 };
 
 static const char* FEE_ESTIMATES_FILENAME = "fee_estimates.dat";
-CClientUIInterface uiInterface;
 
 //////////////////////////////////////////////////////////////////////////////
 //
