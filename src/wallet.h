@@ -8,28 +8,28 @@
 #ifndef BITCOIN_WALLET_H
 #define BITCOIN_WALLET_H
 
-#include "amount.h"
-#include "policy/feerate.h"
-#include "base58.h"
-#include "consensus/tx_verify.h"
-#include "crypter.h"
-#include "kernel.h"
-#include "key.h"
-#include "keystore.h"
-#include "primitives/block.h"
-#include "primitives/transaction.h"
-#include "primitives/zerocoin.h"
-#include "ui_interface.h"
-#include "util.h"
-#include "utilstrencodings.h"
-#include "validationinterface.h"
-#include "wallet_ismine.h"
-#include "walletdb.h"
-#include "zwspwallet.h"
-#include "zwsptracker.h"
+#include <amount.h>
+#include <policy/feerate.h>
+#include <streams.h>
+#include <tinyformat.h>
+#include <ui_interface.h>
+#include <utilstrencodings.h>
+#include <validationinterface.h>
+#include <script/sign.h>
+#include <util.h>
+#include <crypter.h>
+#include <walletdb.h>
+
+#include <base58.h>
+#include <kernel.h>
+#include <wallet_ismine.h>
+#include <zwspwallet.h>
+#include <zwsptracker.h>
 
 #include <algorithm>
+#include <atomic>
 #include <map>
+#include <memory>
 #include <set>
 #include <stdexcept>
 #include <stdint.h>
@@ -481,7 +481,7 @@ public:
     void EraseFromWallet(const uint256& hash);
     int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false);
     void ReacceptWalletTransactions();
-    void ResendWalletTransactions(int64_t nBestBlockTime) override EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+    void ResendWalletTransactions(int64_t nBestBlockTime) override EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
     CAmount GetBalance() const;
     CAmount GetZerocoinBalance(bool fMatureOnly) const;
     CAmount GetUnconfirmedZerocoinBalance() const;
@@ -1023,32 +1023,7 @@ public:
     }
 
     bool InMempool() const;
-
-    bool IsTrusted() const
-    {
-        // Quick answer in most cases
-        if (!IsFinalTx(*this))
-            return false;
-        int nDepth = GetDepthInMainChain();
-        if (nDepth >= 1)
-            return true;
-        if (nDepth < 0)
-            return false;
-        if (!bSpendZeroConfChange || !IsFromMe(ISMINE_ALL)) // using wtx's cached debit
-            return false;
-
-        // Trusted if all inputs are from us and are in the mempool:
-        for (const CTxIn& txin: vin) {
-            // Transactions not sent by us: not trusted
-            const CWalletTx* parent = pwallet->GetWalletTx(txin.prevout.hash);
-            if (parent == NULL)
-                return false;
-            const CTxOut& parentOut = parent->vout[txin.prevout.n];
-            if (pwallet->IsMine(parentOut) != ISMINE_SPENDABLE)
-                return false;
-        }
-        return true;
-    }
+    bool IsTrusted() const;
 
     bool WriteToDisk();
 

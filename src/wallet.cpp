@@ -5,44 +5,46 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "wallet.h"
+#include <wallet.h>
 
-#include "accumulators.h"
-#include "base58.h"
-#include "consensus/consensus.h"
-#include "consensus/validation.h"
-#include "checkpoints.h"
-#include "coincontrol.h"
-#include "kernel.h"
-#include "masternode-budget.h"
-#include "net.h"
-#include <net_processing.h>
-#include "main.h"
-#include "policy/policy.h"
-#include "primitives/transaction.h"
-#include "script/script.h"
-#include "script/sign.h"
-#include "spork.h"
-#include "stakeinput.h"
-#include "shutdown.h"
-#include "swifttx.h"
-#include "timedata.h"
-#include "txdb.h"
-#include "txmempool.h"
-#include "util.h"
-#include "utilmoneystr.h"
-#include "zwspchain.h"
+#include <accumulators.h>
+#include <checkpoints.h>
+#include <chain.h>
+#include <coincontrol.h>
+#include <consensus/consensus.h>
+#include <consensus/validation.h>
 #include <fs.h>
+#include <kernel.h>
+#include <key.h>
+#include <keystore.h>
+#include <main.h>
+#include <masternode-budget.h>
+#include <net.h>
+#include <net_processing.h>
+#include <policy/fees.h>
+#include <policy/policy.h>
+#include <primitives/block.h>
+#include <primitives/transaction.h>
+#include <script/script.h>
+#include <script/sign.h>
+#include <shutdown.h>
+#include <spork.h>
+#include <stakeinput.h>
+#include <swifttx.h>
+#include <timedata.h>
+#include <txmempool.h>
+#include <utilmoneystr.h>
+#include <zwspchain.h>
 
-#include "denomination_functions.h"
-#include "libzerocoin/Denominations.h"
-#include "zwspwallet.h"
-#include "primitives/deterministicmint.h"
+#include <denomination_functions.h>
+#include <libzerocoin/Denominations.h>
+#include <zwspwallet.h>
+#include <primitives/deterministicmint.h>
+#include <algorithm>
 #include <assert.h>
+#include <future>
 
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/thread.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
@@ -714,9 +716,11 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet)
         // notify an external script when a wallet transaction comes in or is updated
         std::string strCmd = GetArg("-walletnotify", "");
 
-        if (!strCmd.empty()) {
+        if (!strCmd.empty())
+        {
             boost::replace_all(strCmd, "%s", wtxIn.GetHash().GetHex());
-            boost::thread t(runCommand, strCmd); // thread runs free
+            std::thread t(runCommand, strCmd);
+            t.detach(); // thread runs free
         }
     }
     return true;
@@ -1260,7 +1264,7 @@ CAmount CWalletTx::GetDenominatedCredit(bool unconfirmed, bool fUseCache) const
     int nDepth = GetDepthInMainChain(false);
     if (nDepth < 0) return 0;
 
-    bool isUnconfirmed = !IsFinalTx(*this) || (!IsTrusted() && nDepth == 0);
+    bool isUnconfirmed = !CheckFinalTx(*this) || (!IsTrusted() && nDepth == 0);
     if (unconfirmed != isUnconfirmed) return 0;
 
     if (fUseCache) {
@@ -1578,7 +1582,31 @@ bool CWalletTx::InMempool() const
     }
     return false;
 }
+bool CWalletTx::IsTrusted() const
+{
+    // Quick answer in most cases
+    if (!CheckFinalTx(*this))
+        return false;
+    int nDepth = GetDepthInMainChain();
+    if (nDepth >= 1)
+        return true;
+    if (nDepth < 0)
+        return false;
+    if (!bSpendZeroConfChange || !IsFromMe(ISMINE_ALL)) // using wtx's cached debit
+        return false;
 
+    // Trusted if all inputs are from us and are in the mempool:
+    for (const CTxIn& txin: vin) {
+        // Transactions not sent by us: not trusted
+        const CWalletTx* parent = pwallet->GetWalletTx(txin.prevout.hash);
+        if (parent == NULL)
+            return false;
+        const CTxOut& parentOut = parent->vout[txin.prevout.n];
+        if (pwallet->IsMine(parentOut) != ISMINE_SPENDABLE)
+            return false;
+    }
+    return true;
+}
 void CWalletTx::RelayWalletTransaction(std::string strCommand)
 {
     LOCK(cs_main);
@@ -3608,7 +3636,7 @@ std::map<CTxDestination, CAmount> CWallet::GetAddressBalances()
         for (std::pair<uint256, CWalletTx> walletEntry: mapWallet) {
             CWalletTx* pcoin = &walletEntry.second;
 
-            if (!IsFinalTx(*pcoin) || !pcoin->IsTrusted())
+            if (!CheckFinalTx(*pcoin) || !pcoin->IsTrusted())
                 continue;
 
             if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0)
