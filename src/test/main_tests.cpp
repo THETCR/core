@@ -11,7 +11,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(main_tests, TestingSetup)
+BOOST_AUTO_TEST_SUITE(main_tests)
 
 CAmount nMoneySupplyPoWEnd = 56250000 * COIN;
 
