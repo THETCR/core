@@ -25,7 +25,7 @@ std::unique_ptr<CConnman> g_connman;
 #include <boost/thread.hpp>
 
 //CClientUIInterface uiInterface;
-//CWallet* pwalletMain;
+extern CWallet* pwalletMain;
 
 extern bool fPrintToConsole;
 extern void noui_connect();
