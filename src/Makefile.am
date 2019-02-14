@@ -90,7 +90,6 @@ BITCOIN_CORE_H = \
   addrman.h \
   alert.h \
   allocators.h \
-  amount.h \
   base58.h \
   bip38.h \
   bloom.h \
@@ -110,21 +109,13 @@ BITCOIN_CORE_H = \
   compat/sanity.h \
   compressor.h \
   consensus/consensus.h \
-  consensus/merkle.h \
-  consensus/params.h \
-  consensus/validation.h \
   consensus/tx_verify.h \
-  primitives/block.h \
-  primitives/deterministicmint.h \
-  primitives/transaction.h \
-  primitives/zerocoin.h \
   core_io.h \
   crypter.h \
   denomination_functions.h \
   obfuscation.h \
   obfuscation-relay.h \
   db.h \
-  hash.h \
   fs.h \
   httprpc.h \
   httpserver.h \
@@ -155,15 +146,14 @@ BITCOIN_CORE_H = \
   netbase.h \
   netmessagemaker.h \
   noui.h \
-  policy/fees.h \
   policy/feerate.h \
+  policy/fees.h \
   policy/policy.h \
   pow.h \
   protocol.h \
-  pubkey.h \
   random.h \
-  reverselock.h \
   reverse_iterate.h \
+  reverselock.h \
   rpc/client.h \
   rpc/protocol.h \
   rpc/server.h \
@@ -174,8 +164,6 @@ BITCOIN_CORE_H = \
   script/sign.h \
   script/standard.h \
   script/script_error.h \
-  serialize.h \
-  span.h \
   spork.h \
   sporkdb.h \
   stakeinput.h \
@@ -186,19 +174,16 @@ BITCOIN_CORE_H = \
   threadsafety.h \
   threadinterrupt.h \
   timedata.h \
-  tinyformat.h \
   torcontrol.h \
   txdb.h \
   txmempool.h \
   ui_interface.h \
-  uint256.h \
   undo.h \
   util.h \
   utilstrencodings.h \
   utilmoneystr.h \
   utiltime.h \
   validationinterface.h \
-  version.h \
   wallet.h \
   wallet_ismine.h \
   walletdb.h \
@@ -376,6 +361,10 @@ libbitcoin_consensus_a_SOURCES = \
   primitives/block.h \
   primitives/transaction.cpp \
   primitives/transaction.h \
+  primitives/deterministicmint.cpp \
+  primitives/deterministicmint.h \
+  primitives/zerocoin.cpp \
+  primitives/zerocoin.h \
   pubkey.cpp \
   pubkey.h \
   script/bitcoinconsensus.cpp \
