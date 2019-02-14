@@ -38,32 +38,54 @@ struct TestingSetup {
   ECCVerifyHandle globalVerifyHandle;
 
   TestingSetup() {
+      BOOST_TEST_PASSPOINT();
       ECC_Start();
+      BOOST_TEST_PASSPOINT();
       SetupEnvironment();
+      BOOST_TEST_PASSPOINT();
       fPrintToDebugLog = false; // don't want to write to debug.log file
+      BOOST_TEST_PASSPOINT();
       fCheckBlockIndex = true;
+      BOOST_TEST_PASSPOINT();
       SelectParams(CBaseChainParams::UNITTEST);
+      BOOST_TEST_PASSPOINT();
       noui_connect();
+      BOOST_TEST_PASSPOINT();
 #ifdef ENABLE_WALLET
+      BOOST_TEST_PASSPOINT();
       bitdb.MakeMock();
 #endif
+      BOOST_TEST_PASSPOINT();
       pathTemp = GetTempPath() / strprintf("test_pivx_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
+      BOOST_TEST_PASSPOINT();
       boost::filesystem::create_directories(pathTemp);
+      BOOST_TEST_PASSPOINT();
       mapArgs["-datadir"] = pathTemp.string();
+      BOOST_TEST_PASSPOINT();
       pblocktree = new CBlockTreeDB(1 << 20, true);
+      BOOST_TEST_PASSPOINT();
       pcoinsdbview = new CCoinsViewDB(1 << 23, true);
+      BOOST_TEST_PASSPOINT();
       pcoinsTip = new CCoinsViewCache(pcoinsdbview);
+      BOOST_TEST_PASSPOINT();
       InitBlockIndex();
+      BOOST_TEST_PASSPOINT();
 #ifdef ENABLE_WALLET
       bool fFirstRun;
+      BOOST_TEST_PASSPOINT();
       pwalletMain = new CWallet("wallet.dat");
+      BOOST_TEST_PASSPOINT();
       pwalletMain->LoadWallet(fFirstRun);
+      BOOST_TEST_PASSPOINT();
       RegisterValidationInterface(pwalletMain);
+      BOOST_TEST_PASSPOINT();
 #endif
       nScriptCheckThreads = 3;
       for (int i=0; i < nScriptCheckThreads-1; i++)
           threadGroup.create_thread(&ThreadScriptCheck);
+      BOOST_TEST_PASSPOINT();
       RegisterNodeSignals(GetNodeSignals());
+      BOOST_TEST_PASSPOINT();
   }
   ~TestingSetup()
   {
