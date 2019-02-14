@@ -69,12 +69,6 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
     pcoinsdbview = new CCoinsViewDB(1 << 23, true);
     pcoinsTip = new CCoinsViewCache(pcoinsdbview);
     InitBlockIndex();
-    {
-        CValidationState state;
-        if (!ActivateBestChain(state)) {
-            throw std::runtime_error("ActivateBestChain failed");
-        }
-    }
 #ifdef ENABLE_WALLET
     bool fFirstRun;
     pwalletMain = new CWallet("wallet.dat");
