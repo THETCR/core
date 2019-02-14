@@ -8,7 +8,6 @@
 #include "consensus/params.h"
 #include "consensus/validation.h"
 #include "main.h"
-#include <test/test_wispr.h>
 #include "txdb.h"
 #include "primitives/deterministicmint.h"
 #include "key.h"

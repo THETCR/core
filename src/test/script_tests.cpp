@@ -12,7 +12,6 @@
 #include "script/script.h"
 #include "script/script_error.h"
 #include "script/sign.h"
-#include <test/test_wispr.h>
 #include "util.h"
 #include "utilstrencodings.h"
 

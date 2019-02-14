@@ -3,116 +3,116 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <test/test_wispr.h>
+//#include <test/test_wispr.h>
+//
+//#include <chainparams.h>
+//#include <consensus/consensus.h>
+//#include <consensus/params.h>
+//#include <consensus/validation.h>
+//#include <crypto/sha256.h>
+//#include <main.h>
+//#include <miner.h>
+//#include <net_processing.h>
+//#include <noui.h>
+//#include <pow.h>
+//#include <rpc/server.h>
+//#include <script/sigcache.h>
+//#include <streams.h>
+//#include <ui_interface.h>
+//#include <txdb.h>
+//#include <util.h>
+//
+//#ifdef ENABLE_WALLET
+//#include "db.h"
+//#include "wallet.h"
+//#endif
 
-#include <chainparams.h>
-#include <consensus/consensus.h>
-#include <consensus/params.h>
-#include <consensus/validation.h>
-#include <crypto/sha256.h>
-#include <main.h>
-#include <miner.h>
-#include <net_processing.h>
-#include <noui.h>
-#include <pow.h>
-#include <rpc/server.h>
-#include <script/sigcache.h>
-#include <streams.h>
-#include <ui_interface.h>
-#include <txdb.h>
-#include <util.h>
 
-#ifdef ENABLE_WALLET
-#include "db.h"
-#include "wallet.h"
-#endif
+//const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
+//extern bool fPrintToConsole;
+//BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
+//{
+////    ECC_Start();
+////    SetupEnvironment();
+////    SetupNetworking();
+////    fPrintToDebugLog = false; // don't want to write to debug.log file
+////    fCheckBlockIndex = true;
+////    SelectParams(chainName);
+////    noui_connect();
+////#ifdef ENABLE_WALLET
+////    bitdb.MakeMock();
+////#endif
+//}
 
-const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
-
-extern bool fPrintToConsole;
-BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
-{
+//BasicTestingSetup::~BasicTestingSetup()
+//{
+////    ECC_Stop();
+//}
+//TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSetup(chainName)
+//{
 //    ECC_Start();
 //    SetupEnvironment();
 //    SetupNetworking();
 //    fPrintToDebugLog = false; // don't want to write to debug.log file
 //    fCheckBlockIndex = true;
-//    SelectParams(chainName);
+//    SelectParams(CBaseChainParams::UNITTEST);
 //    noui_connect();
 //#ifdef ENABLE_WALLET
 //    bitdb.MakeMock();
 //#endif
-}
+//    // Ideally we'd move all the RPC tests to the functional testing framework
+//    // instead of unit tests, but for now we need these here.
+//
+////    RegisterAllCoreRPCCommands(tableRPC);
+////    ClearDatadirCache();
+//    // We have to run a scheduler thread to prevent ActivateBestChain
+//    // from blocking due to queue overrun.
+////    threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
+//    pathTemp = GetTempPath() / strprintf("test_wispr_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
+//    fs::create_directories(pathTemp);
+//    mapArgs["-datadir"] = pathTemp.string();
+////    mempool.setSanityCheck(1.0);
+//    pblocktree = new CBlockTreeDB(1 << 20, true);
+//    pcoinsdbview = new CCoinsViewDB(1 << 23, true);
+//    pcoinsTip = new CCoinsViewCache(pcoinsdbview);
+//    InitBlockIndex();
+//#ifdef ENABLE_WALLET
+//    bool fFirstRun;
+//    pwalletMain = new CWallet("wallet.dat");
+//    pwalletMain->LoadWallet(fFirstRun);
+//    RegisterValidationInterface(pwalletMain);
+//#endif
+//    nScriptCheckThreads = 3;
+//    for (int i=0; i < nScriptCheckThreads-1; i++)
+//        threadGroup.create_thread(&ThreadScriptCheck);
+//    g_connman = std::unique_ptr<CConnman>(new CConnman()); // Deterministic randomness for tests.
+//    connman = g_connman.get();
+//    RegisterNodeSignals(GetNodeSignals());
+//}
 
-BasicTestingSetup::~BasicTestingSetup()
-{
-//    ECC_Stop();
-}
-TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSetup(chainName)
-{
-    ECC_Start();
-    SetupEnvironment();
-    SetupNetworking();
-    fPrintToDebugLog = false; // don't want to write to debug.log file
-    fCheckBlockIndex = true;
-    SelectParams(CBaseChainParams::UNITTEST);
-    noui_connect();
-#ifdef ENABLE_WALLET
-    bitdb.MakeMock();
-#endif
-    // Ideally we'd move all the RPC tests to the functional testing framework
-    // instead of unit tests, but for now we need these here.
-
-//    RegisterAllCoreRPCCommands(tableRPC);
-//    ClearDatadirCache();
-    // We have to run a scheduler thread to prevent ActivateBestChain
-    // from blocking due to queue overrun.
-//    threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
-    pathTemp = GetTempPath() / strprintf("test_wispr_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
-    fs::create_directories(pathTemp);
-    mapArgs["-datadir"] = pathTemp.string();
-//    mempool.setSanityCheck(1.0);
-    pblocktree = new CBlockTreeDB(1 << 20, true);
-    pcoinsdbview = new CCoinsViewDB(1 << 23, true);
-    pcoinsTip = new CCoinsViewCache(pcoinsdbview);
-    InitBlockIndex();
-#ifdef ENABLE_WALLET
-    bool fFirstRun;
-    pwalletMain = new CWallet("wallet.dat");
-    pwalletMain->LoadWallet(fFirstRun);
-    RegisterValidationInterface(pwalletMain);
-#endif
-    nScriptCheckThreads = 3;
-    for (int i=0; i < nScriptCheckThreads-1; i++)
-        threadGroup.create_thread(&ThreadScriptCheck);
-    g_connman = std::unique_ptr<CConnman>(new CConnman()); // Deterministic randomness for tests.
-    connman = g_connman.get();
-    RegisterNodeSignals(GetNodeSignals());
-}
-
-TestingSetup::~TestingSetup()
-{
-    threadGroup.interrupt_all();
-    threadGroup.join_all();
-    UnregisterNodeSignals(GetNodeSignals());
-    g_connman.reset();
+//TestingSetup::~TestingSetup()
+//{
+//    threadGroup.interrupt_all();
+//    threadGroup.join_all();
+//    UnregisterNodeSignals(GetNodeSignals());
+//    g_connman.reset();
 //    UnloadBlockIndex();
-#ifdef ENABLE_WALLET
+//#ifdef ENABLE_WALLET
 //    UnregisterValidationInterface(pwalletMain);
-    delete pwalletMain;
-    pwalletMain = nullptr;
-#endif
-    delete pcoinsTip;
-    delete pcoinsdbview;
-    delete pblocktree;
-#ifdef ENABLE_WALLET
-    bitdb.Flush(true);
-#endif
-    fs::remove_all(pathTemp);
-    ECC_Stop();
-
-}
+//    delete pwalletMain;
+//    pwalletMain = nullptr;
+//#endif
+//    delete pcoinsTip;
+//    delete pcoinsdbview;
+//    delete pblocktree;
+//#ifdef ENABLE_WALLET
+//    bitdb.Flush(true);
+//#endif
+//    fs::remove_all(pathTemp);
+//    ECC_Stop();
+//
+//}
 
 //TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
 //{
