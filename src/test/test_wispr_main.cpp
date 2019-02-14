@@ -24,7 +24,7 @@ std::unique_ptr<CConnman> g_connman;
 #include <boost/test/unit_test.hpp>
 #include <boost/thread.hpp>
 
-//CClientUIInterface uiInterface;
+extern CClientUIInterface uiInterface;
 extern CWallet* pwalletMain;
 
 extern bool fPrintToConsole;
