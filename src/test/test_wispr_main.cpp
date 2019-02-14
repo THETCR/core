@@ -5,6 +5,7 @@
 #define BOOST_TEST_MODULE Wispr Test Suite
 
 #include <net.h>
+#include <test/test_wispr.h>
 
 #include <memory>
 
@@ -23,3 +24,4 @@ std::unique_ptr<CConnman> g_connman;
 bool ShutdownRequested() {
   return false;
 }
+BOOST_GLOBAL_FIXTURE(TestingSetup);
