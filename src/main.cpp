@@ -2904,18 +2904,16 @@ CBlockIndex* AddToBlockIndex(const CBlockHeader& block)
     // to avoid miners withholding blocks but broadcasting headers, to get a
     // competitive advantage.
     pindexNew->nSequenceId = 0;
-    BlockMap::iterator mi = mapBlockIndex.insert(make_pair(hash, pindexNew)).first;
-
-    //mark as PoS seen
-    if (pindexNew->IsProofOfStake())
-        setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
-
+    BlockMap::iterator mi = mapBlockIndex.insert(std::make_pair(hash, pindexNew)).first;
     pindexNew->phashBlock = &((*mi).first);
     BlockMap::iterator miPrev = mapBlockIndex.find(block.hashPrevBlock);
     if (miPrev != mapBlockIndex.end()) {
         pindexNew->pprev = (*miPrev).second;
         pindexNew->nHeight = pindexNew->pprev->nHeight + 1;
         pindexNew->BuildSkip();
+        //mark as PoS seen
+        if (pindexNew->IsProofOfStake())
+            setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
         //update previous block pointer
         pindexNew->pprev->pnext = pindexNew;
 
