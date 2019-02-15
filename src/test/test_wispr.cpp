@@ -74,6 +74,7 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
         CValidationState state;
         cout << "Activate best chain...\n";
         ActivateBestChain(state);
+        cout << "Activate best chain succeeded\n";
     }
 #ifdef ENABLE_WALLET
     bool fFirstRun;
