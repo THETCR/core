@@ -110,6 +110,8 @@ BITCOIN_CORE_H = \
   compressor.h \
   consensus/consensus.h \
   consensus/tx_verify.h \
+  primitives/deterministicmint.h \
+  primitives/zerocoin.h \
   core_io.h \
   crypter.h \
   denomination_functions.h \
@@ -286,6 +288,8 @@ libbitcoin_wallet_a_SOURCES = \
   masternodeman.cpp \
   mintpool.cpp \
   rpcdump.cpp \
+  primitives/deterministicmint.cpp \
+  primitives/zerocoin.cpp \
   rpcwallet.cpp \
   kernel.cpp \
   wallet.cpp \
@@ -364,10 +368,6 @@ libbitcoin_consensus_a_SOURCES = \
   primitives/block.h \
   primitives/transaction.cpp \
   primitives/transaction.h \
-  primitives/deterministicmint.cpp \
-  primitives/deterministicmint.h \
-  primitives/zerocoin.cpp \
-  primitives/zerocoin.h \
   pubkey.cpp \
   pubkey.h \
   script/bitcoinconsensus.cpp \
@@ -400,6 +400,8 @@ libbitcoin_common_a_SOURCES = \
   chainparams.cpp \
   coins.cpp \
   compressor.cpp \
+  primitives/deterministicmint.cpp \
+  primitives/zerocoin.cpp \
   core_read.cpp \
   core_write.cpp \
   invalid.cpp \
