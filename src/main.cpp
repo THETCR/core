@@ -2743,81 +2743,83 @@ static void NotifyHeaderTip() {
  */
 bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlreadyChecked)
 {
+    // Note that while we're often called here from ProcessNewBlock, this is
+    // far from a guarantee. Things in the P2P/RPC will often end up calling
+    // us in the middle of ProcessNewBlock - do not assume pblock is set
+    // sanely for performance or correctness!
+    AssertLockNotHeld(cs_main);
+
+    // ABC maintains a fair degree of expensive-to-calculate internal state
+    // because this function periodically releases cs_main so that it does not lock up other threads for too long
+    // during large connects - and to allow for e.g. the callback queue to drain
+    // we use m_cs_chainstate to enforce mutual exclusion so that only one caller may execute this function at a time
+//    LOCK(m_cs_chainstate);
+
     CBlockIndex* pindexMostWork = nullptr;
     CBlockIndex* pindexNewTip = nullptr;
     do {
         boost::this_thread::interruption_point();
-        if (ShutdownRequested())
-            break;
-
-        const CBlockIndex *pindexFork;
-        bool fInitialDownload;
         {
             LOCK(cs_main);
-            CBlockIndex *pindexOldTip = chainActive.Tip();
-            if (pindexMostWork == nullptr) {
-                pindexMostWork = FindMostWorkChain();
-            }
-            // Whether we have anything to do at all.
-            if (pindexMostWork == nullptr || pindexMostWork == chainActive.Tip())
-                return true;
+            CBlockIndex* starting_tip = chainActive.Tip();
+            bool blocks_connected = false;
+            do {
+                // We absolutely may not unlock cs_main until we've made forward progress
+                // (with the exception of shutdown due to hardware issues, low disk space, etc).
+//                ConnectTrace connectTrace(mempool); // Destructed before cs_main is unlocked
 
-            if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked))
-                return false;
+                if (pindexMostWork == nullptr) {
+                    pindexMostWork = FindMostWorkChain();
+                }
 
-            pindexNewTip = chainActive.Tip();
-            pindexFork = chainActive.FindFork(pindexOldTip);
-            fInitialDownload = IsInitialBlockDownload();
+                // Whether we have anything to do at all.
+                if (pindexMostWork == nullptr || pindexMostWork == chainActive.Tip()) {
+                    break;
+                }
+                bool fInvalidFound = false;
+                std::shared_ptr<const CBlock> nullBlockPtr;
+                if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked)){
+                    return false;
+                }
+
+                blocks_connected = true;
+
+                if (fInvalidFound) {
+                    // Wipe cache, we may need another branch now.
+                    pindexMostWork = nullptr;
+                }
+                pindexNewTip = chainActive.Tip();
+
+            } while (!chainActive.Tip() || (starting_tip && CBlockIndexWorkComparator()(chainActive.Tip(), starting_tip)));
+            if (!blocks_connected) return true;
+
+            const CBlockIndex* pindexFork = chainActive.FindFork(starting_tip);
+            bool fInitialDownload = IsInitialBlockDownload();
+            // Notify external listeners about the new tip.
+                // Enqueue while holding cs_main to ensure that UpdatedBlockTip is called in the order in which blocks are connected
+                if (pindexFork != pindexNewTip) {
+                    // Notify ValidationInterface subscribers
+                    GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
+
+                    // Always notify the UI if a new block tip was connected
+                    uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
+                }
         }
         // When we reach this point, we switched to a new tip (stored in pindexNewTip).
-
-        // Notifications/callbacks that can run without cs_main
-        // Always notify the UI if a new block tip was connected
-        if (pindexFork != pindexNewTip) {
-
-            if (!fInitialDownload) {
-                uint256 hashNewTip = pindexNewTip->GetBlockHash();
-
-                // Find the hashes of all blocks that weren't previously in the best chain.
-                std::vector<uint256> vHashes;
-                CBlockIndex *pindexToAnnounce = pindexNewTip;
-                while (pindexToAnnounce != pindexFork) {
-                    vHashes.push_back(pindexToAnnounce->GetBlockHash());
-                    pindexToAnnounce = pindexToAnnounce->pprev;
-                    if (vHashes.size() == MAX_BLOCKS_TO_ANNOUNCE) {
-                        // Limit announcements in case of a huge reorganization.
-                        // Rely on the peer's synchronization mechanism in that case.
-                        break;
-                    }
-                }
-                // Relay inventory, but don't relay old inventory during initial block download.
-                int nBlockEstimate = Checkpoints::GetTotalBlocksEstimate();
-                {
-                    LOCK(cs_vNodes);
-                    for(CNode* pnode: vNodes) {
-                        if (chainActive.Height() > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : nBlockEstimate)) {
-                            for(const uint256& hash: reverse_iterate(vHashes)) {
-                                pnode->PushBlockHash(hash);
-                            }
-                        }
-                    }
-                }
-                // Always notify the UI if a new block tip was connected
-                if (!vHashes.empty()) {
-                    uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
-                    // Notify external listeners about the new tip.
-                    GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
-                }
-                unsigned size = 0;
-                if (pblock)
-                    size = GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION);
-                // If the size is over 1 MB notify external listeners, and it is within the last 5 minutes
-                if (size > MAX_BLOCK_SIZE_LEGACY && pblock->GetBlockTime() > GetAdjustedTime() - 300) {
-                    uiInterface.NotifyBlockSize(static_cast<int>(size), hashNewTip);
-                }
-            }
-        }
-    } while (pindexMostWork != chainActive.Tip());
+//                unsigned size = 0;
+//                if (pblock)
+//                    size = GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION);
+//                // If the size is over 1 MB notify external listeners, and it is within the last 5 minutes
+//                if (size > MAX_BLOCK_SIZE_LEGACY && pblock->GetBlockTime() > GetAdjustedTime() - 300) {
+//                    uiInterface.NotifyBlockSize(static_cast<int>(size), hashNewTip);
+//                }
+        // We check shutdown only after giving ActivateBestChainStep a chance to run once so that we
+        // never shutdown before connecting the genesis block during LoadChainTip(). Previously this
+        // caused an assert() failure during shutdown in such cases as the UTXO DB flushing checks
+        // that the best block hash is non-null.
+        if (ShutdownRequested())
+            break;
+    } while (pindexNewTip != pindexMostWork);
     CheckBlockIndex();
 
     // Write changes periodically to disk, after relay.
