@@ -7,17 +7,23 @@
 #ifndef WISPR_SERIALIZE_H
 #define WISPR_SERIALIZE_H
 
+#include <compat/endian.h>
+
 #include <algorithm>
 #include <assert.h>
 #include <ios>
 #include <limits>
 #include <map>
+#include <memory>
 #include <set>
 #include <stdint.h>
-#include <string.h>
 #include <string>
+#include <string.h>
 #include <utility>
 #include <vector>
+
+#include <prevector.h>
+#include <span.h>
 #include "libzerocoin/Denominations.h"
 #include "libzerocoin/SpendType.h"
 
