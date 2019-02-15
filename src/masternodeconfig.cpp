@@ -6,6 +6,7 @@
 #include "netbase.h"
 #include "masternodeconfig.h"
 #include "util.h"
+#include "utilstrencodings.h"
 #include "ui_interface.h"
 #include <base58.h>
 #include <fs.h>
