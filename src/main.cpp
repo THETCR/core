@@ -1908,7 +1908,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // Special case for the genesis block, skipping connection of its transactions
     // (its coinbase is unspendable)
-    if (block.GetHash() == Params().HashGenesisBlock()) {
+    if (block.GetHash() == Params().GetConsensus().hashGenesisBlock) {
         view.SetBestBlock(pindex->GetBlockHash());
         return true;
     }
@@ -3291,7 +3291,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 {
     uint256 hash = block.GetHash();
 
-    if (hash == Params().HashGenesisBlock())
+    if (hash == Params().GetConsensus().hashGenesisBlock)
         return true;
 
     assert(pindexPrev);
@@ -3418,7 +3418,7 @@ bool AcceptBlockHeader(const CBlockHeader& block, CValidationState& state, CBloc
 
     // Get prev block index
     CBlockIndex* pindexPrev = nullptr;
-    if (hash != Params().HashGenesisBlock()) {
+    if (hash != Params().GetConsensus().hashGenesisBlock) {
         BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
         if (mi == mapBlockIndex.end())
             return state.DoS(0, error("%s : prev block %s not found", __func__, block.hashPrevBlock.ToString().c_str()), 0, "bad-prevblk");
@@ -3489,7 +3489,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
 
     // Get prev block index
     CBlockIndex* pindexPrev = nullptr;
-    if (block.GetHash() != Params().HashGenesisBlock()) {
+    if (block.GetHash() != Params().GetConsensus().hashGenesisBlock) {
         BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
         if (mi == mapBlockIndex.end())
             return state.DoS(0, error("%s : prev block %s not found", __func__, block.hashPrevBlock.ToString().c_str()), 0, "bad-prevblk");
@@ -3519,7 +3519,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
                                        block.GetBlockTime(), block.vtx[1].nTime));
         }
     }
-    if (block.GetHash() != Params().HashGenesisBlock() && !CheckWork(block, pindexPrev))
+    if (block.GetHash() != Params().GetConsensus().hashGenesisBlock && !CheckWork(block, pindexPrev))
         return false;
 
     if (block.IsProofOfStake()) {
@@ -4094,7 +4094,7 @@ static bool AddGenesisBlock(const CChainParams& chainparams, const CBlock& block
         return error("%s: FindBlockPos failed", __func__);
     if (!WriteBlockToDisk(block, blockPos))
         return error("%s: writing genesis block to disk failed", __func__);
-    CBlockIndex *pindex = AddToBlockIndex(block);
+    CBlockIndex *pindex = AddToBlockIndex(block.GetBlockHeader());
     if (!ReceivedBlockTransactions(block, state, pindex, blockPos))
         return error("%s: genesis block not accepted", __func__);
     return true;
@@ -4178,7 +4178,7 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
 
                 // detect out of order blocks, and store them for later
                 uint256 hash = block.GetHash();
-                if (hash != Params().HashGenesisBlock() && mapBlockIndex.find(block.hashPrevBlock) == mapBlockIndex.end()) {
+                if (hash != Params().GetConsensus().hashGenesisBlock && mapBlockIndex.find(block.hashPrevBlock) == mapBlockIndex.end()) {
                     LogPrint("reindex", "%s: Out of order block %s, parent %s not known\n", __func__, hash.ToString(),
                              block.hashPrevBlock.ToString());
                     if (dbp)
@@ -4292,7 +4292,7 @@ void static CheckBlockIndex()
         // Begin: actual consistency checks.
         if (pindex->pprev == nullptr) {
             // Genesis block checks.
-            assert(pindex->GetBlockHash() == Params().HashGenesisBlock()); // Genesis block's hash must match.
+            assert(pindex->GetBlockHash() == Params().GetConsensus().hashGenesisBlock); // Genesis block's hash must match.
             assert(pindex == chainActive.Genesis());                       // The current active chain's genesis block must be this block.
         }
         // HAVE_DATA is equivalent to VALID_TRANSACTIONS and equivalent to nTx > 0 (we stored the number of transactions in the block)
