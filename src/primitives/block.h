@@ -7,11 +7,10 @@
 #ifndef BITCOIN_PRIMITIVES_BLOCK_H
 #define BITCOIN_PRIMITIVES_BLOCK_H
 
-#include "primitives/transaction.h"
+#include <primitives/transaction.h>
 #include "keystore.h"
-#include "serialize.h"
-#include "uint256.h"
-
+#include <serialize.h>
+#include <uint256.h>
 
 
 
@@ -182,7 +181,6 @@ public:
     }
 
     std::string ToString() const;
-    void print() const;
 };
 
 

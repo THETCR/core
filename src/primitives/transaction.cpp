@@ -4,14 +4,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "primitives/block.h"
-#include "primitives/transaction.h"
+#include <primitives/transaction.h>
 
-#include "chain.h"
 #include "hash.h"
 #include "tinyformat.h"
 #include "utilstrencodings.h"
-#include "transaction.h"
 
 extern bool GetTransaction(const uint256 &hash, CTransaction &txOut, uint256 &hashBlock, bool fAllowSlow);
 

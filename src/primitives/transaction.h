@@ -7,11 +7,11 @@
 #ifndef BITCOIN_PRIMITIVES_TRANSACTION_H
 #define BITCOIN_PRIMITIVES_TRANSACTION_H
 
-#include "amount.h"
-#include "util.h"
-#include "script/script.h"
-#include "serialize.h"
-#include "uint256.h"
+#include <stdint.h>
+#include <amount.h>
+#include <script/script.h>
+#include <serialize.h>
+#include <uint256.h>
 
 #include <list>
 

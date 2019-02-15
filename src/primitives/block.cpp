@@ -4,16 +4,14 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "primitives/block.h"
+#include <primitives/block.h>
 
-#include "hash.h"
-#include "script/standard.h"
-#include "script/sign.h"
-#include "tinyformat.h"
-#include "utilstrencodings.h"
-#include "util.h"
-#include "crypto/scrypt.h"
+#include <hash.h>
+#include <tinyformat.h>
+#include <utilstrencodings.h>
+#include <crypto/scrypt.h>
 
+#define CVOIDBEGIN(a)        ((const void*)&(a))
 
 uint256 CBlockHeader::GetHash() const
 {
@@ -46,11 +44,6 @@ std::string CBlock::ToString() const
         s << "  " << vtx[i].ToString() << "\n";
     }
     return s.str();
-}
-
-void CBlock::print() const
-{
-    LogPrintf("%s", ToString());
 }
 
 bool CBlock::IsZerocoinStake() const
