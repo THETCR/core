@@ -282,8 +282,6 @@ libbitcoin_wallet_a_SOURCES = \
   masternodeman.cpp \
   mintpool.cpp \
   rpcdump.cpp \
-  primitives/deterministicmint.cpp \
-  primitives/zerocoin.cpp \
   rpcwallet.cpp \
   kernel.cpp \
   wallet.cpp \
@@ -378,6 +376,7 @@ libbitcoin_consensus_a_SOURCES = \
   script/script_error.cpp \
   script/script_error.h \
   serialize.h \
+  streams.h \
   span.h \
   tinyformat.h \
   uint256.cpp \
@@ -400,10 +399,6 @@ libbitcoin_common_a_SOURCES = \
   coins.cpp \
   compressor.cpp \
   consensus/merkle.cpp \
-  primitives/block.cpp \
-  primitives/deterministicmint.cpp \
-  primitives/transaction.cpp \
-  primitives/zerocoin.cpp \
   core_read.cpp \
   core_write.cpp \
   hash.cpp \
@@ -442,7 +437,6 @@ libbitcoin_util_a_SOURCES = \
   support/cleanse.cpp \
   sync.cpp \
   threadinterrupt.cpp \
-  uint256.cpp \
   util.cpp \
   utilmoneystr.cpp \
   utilstrencodings.cpp \
