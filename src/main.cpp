@@ -2778,11 +2778,9 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                 }
                 bool fInvalidFound = false;
                 std::shared_ptr<const CBlock> nullBlockPtr;
-                cout << "Activate best chain step...\n";
                 if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked)){
                     return false;
                 }
-                cout << "Activate best chain step succeeded...\n";
                 blocks_connected = true;
 
                 if (fInvalidFound) {
@@ -2795,18 +2793,14 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
             } while (!chainActive.Tip() || (starting_tip && CBlockIndexWorkComparator()(chainActive.Tip(), starting_tip)));
             if (!blocks_connected) return true;
 
-            cout << "Find fork...\n";
             const CBlockIndex* pindexFork = chainActive.FindFork(starting_tip);
-            cout << "Is initial block download...\n";
             bool fInitialDownload = IsInitialBlockDownload();
             // Notify external listeners about the new tip.
                 // Enqueue while holding cs_main to ensure that UpdatedBlockTip is called in the order in which blocks are connected
                 if (pindexFork != pindexNewTip) {
                     // Notify ValidationInterface subscribers
-                    cout << "Updated block tip call...\n";
                     GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
 
-                    cout << "Notify block tip...\n";
                     // Always notify the UI if a new block tip was connected
                     uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
                 }
@@ -2823,11 +2817,9 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
         // never shutdown before connecting the genesis block during LoadChainTip(). Previously this
         // caused an assert() failure during shutdown in such cases as the UTXO DB flushing checks
         // that the best block hash is non-null.
-        cout << "ShutdownRequested?...\n";
         if (ShutdownRequested())
             break;
     } while (pindexNewTip != pindexMostWork);
-    cout << "Check block index...\n";
     CheckBlockIndex();
 
     // Write changes periodically to disk, after relay.

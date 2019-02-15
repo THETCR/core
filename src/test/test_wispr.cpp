@@ -72,11 +72,9 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
     InitBlockIndex(chainparams);
     {
         CValidationState state;
-        cout << "Activate best chain...\n";
         if (!ActivateBestChain(state)) {
             throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
         }
-        cout << "Activate best chain succeeded\n";
     }
 #ifdef ENABLE_WALLET
     bool fFirstRun;
