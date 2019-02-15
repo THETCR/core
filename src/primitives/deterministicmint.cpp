@@ -4,7 +4,7 @@
 
 #include <libzerocoin/Coin.h>
 #include <tinyformat.h>
-#include "deterministicmint.h"
+#include <primitives/deterministicmint.h>
 
 using namespace libzerocoin;
 
