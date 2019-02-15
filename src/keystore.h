@@ -7,9 +7,12 @@
 #ifndef BITCOIN_KEYSTORE_H
 #define BITCOIN_KEYSTORE_H
 
-#include "key.h"
-#include "pubkey.h"
-#include "sync.h"
+#include <key.h>
+#include <pubkey.h>
+#include <script/script.h>
+#include <script/sign.h>
+#include <script/standard.h>
+#include <sync.h>
 
 #include <boost/signals2/signal.hpp>
 
@@ -32,6 +35,7 @@ public:
     //! Check whether a key corresponding to a given address is present in the store.
     virtual bool HaveKey(const CKeyID& address) const = 0;
     virtual bool GetKey(const CKeyID& address, CKey& keyOut) const = 0;
+    virtual std::set<CKeyID> GetKeys() const =0;
     virtual void GetKeys(std::set<CKeyID>& setAddress) const = 0;
     virtual bool GetPubKey(const CKeyID& address, CPubKey& vchPubKeyOut) const;
 
@@ -67,9 +71,11 @@ protected:
     WatchOnlySet setWatchOnly;
     MultiSigScriptSet setMultiSig;
 
+//    void ImplicitlyLearnRelatedKeyScripts(const CPubKey& pubkey) EXCLUSIVE_LOCKS_REQUIRED(cs_KeyStore);
 public:
     bool AddKeyPubKey(const CKey& key, const CPubKey& pubkey);
     bool HaveKey(const CKeyID& address) const;
+    std::set<CKeyID> GetKeys() const override;
     void GetKeys(std::set<CKeyID>& setAddress) const;
     bool GetKey(const CKeyID& address, CKey& keyOut) const;
 

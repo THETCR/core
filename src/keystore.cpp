@@ -4,15 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "keystore.h"
-
-#include "crypter.h"
-#include "key.h"
-#include "script/script.h"
-#include "script/standard.h"
+#include <keystore.h>
 #include "util.h"
-
-
 
 bool CKeyStore::GetPubKey(const CKeyID& address, CPubKey& vchPubKeyOut) const
 {
@@ -136,7 +129,15 @@ void CBasicKeyStore::GetKeys(std::set<CKeyID>& setAddress) const
         }
     }
 }
-
+std::set<CKeyID> CBasicKeyStore::GetKeys() const
+{
+    LOCK(cs_KeyStore);
+    std::set<CKeyID> set_address;
+    for (const auto& mi : mapKeys) {
+        set_address.insert(mi.first);
+    }
+    return set_address;
+}
 bool CBasicKeyStore::GetKey(const CKeyID& address, CKey& keyOut) const
 {
     {
