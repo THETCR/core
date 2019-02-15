@@ -89,6 +89,7 @@ BITCOIN_CORE_H = \
   addrdb.h \
   addrman.h \
   alert.h \
+  attributes.h \
   base58.h \
   bip38.h \
   bloom.h \
@@ -369,6 +370,8 @@ libbitcoin_consensus_a_SOURCES = \
   primitives/zerocoin.h \
   pubkey.cpp \
   pubkey.h \
+  key.cpp \
+  key.h \
   script/bitcoinconsensus.cpp \
   script/interpreter.cpp \
   script/interpreter.h \
