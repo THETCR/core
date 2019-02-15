@@ -3,17 +3,19 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "httpserver.h"
+#include <httpserver.h>
 
-#include "chainparamsbase.h"
-#include "compat.h"
+#include <chainparamsbase.h>
+#include <compat.h>
 #include "util.h"
-#include "netbase.h"
-#include "rpc/protocol.h" // For HTTP status codes
-#include "shutdown.h"
-#include "sync.h"
-#include "ui_interface.h"
+#include <utilstrencodings.h>
+#include <netbase.h>
+#include <rpc/protocol.h> // For HTTP status codes
+#include <shutdown.h>
+#include <sync.h>
+#include <ui_interface.h>
 
+#include <memory>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,9 +23,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <signal.h>
-#include <future>
 
-#include <event2/event.h>
 #include <event2/http.h>
 #include <event2/thread.h>
 #include <event2/buffer.h>
