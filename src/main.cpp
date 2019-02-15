@@ -2778,6 +2778,7 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                 }
                 bool fInvalidFound = false;
                 std::shared_ptr<const CBlock> nullBlockPtr;
+                cout << "Activate best chain step...\n";
                 if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked)){
                     return false;
                 }
