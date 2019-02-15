@@ -5,7 +5,6 @@
 #include <streams.h>
 #include "primitives/zerocoin.h"
 #include "hash.h"
-#include "util.h"
 #include "utilstrencodings.h"
 
 bool CMintMeta::operator <(const CMintMeta& a) const
@@ -29,11 +28,15 @@ uint256 GetPubCoinHash(const CBigNum& bnValue)
 
 bool CZerocoinMint::GetKeyPair(CKey &key) const
 {
-    if (version < STAKABLE_VERSION)
-        return error("%s: version is %d", __func__, version);
+    if (version < STAKABLE_VERSION){
+        return false;
+//        return error("%s: version is %d", __func__, version);
+    }
 
-    if (privkey.empty())
-        return error("%s: empty privkey %s", __func__, privkey.data());
+    if (privkey.empty()){
+        return false;
+//        return error("%s: empty privkey %s", __func__, privkey.data());
+    }
 
     return key.SetPrivKey(privkey, true);
 }
