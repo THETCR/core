@@ -543,6 +543,12 @@ libbitcoinconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 endif
 #
 
+CTAES_DIST =  crypto/ctaes/bench.c
+CTAES_DIST += crypto/ctaes/ctaes.c
+CTAES_DIST += crypto/ctaes/ctaes.h
+CTAES_DIST += crypto/ctaes/README.md
+CTAES_DIST += crypto/ctaes/test.c
+
 CLEANFILES = $(EXTRA_LIBRARIES)
 
 CLEANFILES += *.gcda *.gcno
@@ -557,7 +563,7 @@ CLEANFILES += univalue/*.gcda univalue/*.gcno
 CLEANFILES += zmq/*.gcda zmq/*.gcno
 CLEANFILES += obj/build.h
 
-EXTRA_DIST =
+EXTRA_DIST = $(CTAES_DIST)
 
 
 config/wispr-config.h: config/stamp-h1
