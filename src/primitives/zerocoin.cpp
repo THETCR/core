@@ -5,6 +5,7 @@
 #include <streams.h>
 #include "primitives/zerocoin.h"
 #include "hash.h"
+#include <tinyformat.h>
 #include "utilstrencodings.h"
 
 bool CMintMeta::operator <(const CMintMeta& a) const
