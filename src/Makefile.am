@@ -303,25 +303,23 @@ crypto_libbitcoin_crypto_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/aes.cpp \
   crypto/aes.h \
-  crypto/sha1.cpp \
-  crypto/sha256.cpp \
-  crypto/sha512.cpp \
-  crypto/hmac_sha256.cpp \
-  crypto/rfc6979_hmac_sha256.cpp \
-  crypto/hmac_sha512.cpp \
-  crypto/scrypt.cpp \
-  crypto/ripemd160.cpp \
-  crypto/aes_helper.c \
   crypto/common.h \
-  crypto/sha256.h \
-  crypto/sha512.h \
+  crypto/hmac_sha256.cpp \
   crypto/hmac_sha256.h \
-  crypto/rfc6979_hmac_sha256.h \
+  crypto/hmac_sha512.cpp \
   crypto/hmac_sha512.h \
-  crypto/scrypt.h \
-  crypto/sha1.h \
+  crypto/ripemd160.cpp \
   crypto/ripemd160.h \
-  crypto/sph_types.h
+  crypto/sha1.cpp \
+  crypto/sha1.h \
+  crypto/sha256.cpp \
+  crypto/sha256.h \
+  crypto/sha512.cpp \
+  crypto/sha512.h \
+  crypto/rfc6979_hmac_sha256.cpp \
+  crypto/rfc6979_hmac_sha256.h \
+  crypto/scrypt.cpp \
+  crypto/scrypt.h
 
 # libzerocoin library
 libzerocoin_libbitcoin_zerocoin_a_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS)
