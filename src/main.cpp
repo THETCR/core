@@ -2782,7 +2782,7 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                 if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked)){
                     return false;
                 }
-
+                cout << "Activate best chain step succeeded...\n";
                 blocks_connected = true;
 
                 if (fInvalidFound) {
