@@ -163,7 +163,6 @@ BITCOIN_CORE_H = \
   script/sigcache.h \
   script/sign.h \
   script/standard.h \
-  script/script_error.h \
   spork.h \
   sporkdb.h \
   stakeinput.h \
@@ -376,7 +375,6 @@ libbitcoin_consensus_a_SOURCES = \
   script/script_error.cpp \
   script/script_error.h \
   serialize.h \
-  streams.h \
   span.h \
   tinyformat.h \
   uint256.cpp \
@@ -398,10 +396,8 @@ libbitcoin_common_a_SOURCES = \
   chainparams.cpp \
   coins.cpp \
   compressor.cpp \
-  consensus/merkle.cpp \
   core_read.cpp \
   core_write.cpp \
-  hash.cpp \
   invalid.cpp \
   key.cpp \
   keystore.cpp \
@@ -414,7 +410,6 @@ libbitcoin_common_a_SOURCES = \
   script/script.cpp \
   script/sign.cpp \
   script/standard.cpp \
-  script/script_error.cpp \
   spork.cpp \
   sporkdb.cpp \
   $(BITCOIN_CORE_H)
