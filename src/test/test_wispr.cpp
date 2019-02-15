@@ -21,7 +21,6 @@
 #include <ui_interface.h>
 #include <txdb.h>
 #include <util.h>
-#include <boost/test/test_tools.hpp>
 
 #ifdef ENABLE_WALLET
 #include "db.h"
