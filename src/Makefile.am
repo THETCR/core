@@ -183,6 +183,7 @@ BITCOIN_CORE_H = \
   undo.h \
   util.h \
   utilstrencodings.h \
+  util/memory.h \
   utilmoneystr.h \
   utiltime.h \
   validationinterface.h \
