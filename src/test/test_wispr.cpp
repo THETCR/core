@@ -21,6 +21,7 @@
 #include <ui_interface.h>
 #include <txdb.h>
 #include <util.h>
+#include <boost/test/test_tools.hpp>
 
 #ifdef ENABLE_WALLET
 #include "db.h"
@@ -68,7 +69,10 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
     pblocktree = new CBlockTreeDB(1 << 20, true);
     pcoinsdbview = new CCoinsViewDB(1 << 23, true);
     pcoinsTip = new CCoinsViewCache(pcoinsdbview);
+    BOOST_TEST_PASSPOINT();
     InitBlockIndex(chainparams);
+    BOOST_TEST_PASSPOINT();
+
     {
         CValidationState state;
         bool ok = ActivateBestChain(state);
