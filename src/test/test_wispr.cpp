@@ -69,13 +69,10 @@ TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSe
     pblocktree = new CBlockTreeDB(1 << 20, true);
     pcoinsdbview = new CCoinsViewDB(1 << 23, true);
     pcoinsTip = new CCoinsViewCache(pcoinsdbview);
-    BOOST_TEST_PASSPOINT();
     InitBlockIndex(chainparams);
-    BOOST_TEST_PASSPOINT();
-
     {
         CValidationState state;
-        bool ok = ActivateBestChain(state);
+        ActivateBestChain(state);
     }
 #ifdef ENABLE_WALLET
     bool fFirstRun;
