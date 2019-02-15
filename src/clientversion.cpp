@@ -1,11 +1,10 @@
-// Copyright (c) 2012-2017 The Bitcoin Core developers
-// Copyright (c) 2016-2017 The PIVX developers
+// Copyright (c) 2012-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "clientversion.h"
+#include <clientversion.h>
 
-#include "tinyformat.h"
+#include <tinyformat.h>
 
 
 /**
@@ -39,7 +38,7 @@ const std::string CLIENT_NAME("WISPR Core");
 
 //! First, include build.h if requested
 #ifdef HAVE_BUILD_INFO
-#include "obj/build.h"
+#include <obj/build.h>
 #endif
 
 //! git will put "#define GIT_ARCHIVE 1" on the next line inside archives. $Format:%n#define GIT_ARCHIVE 1$
@@ -91,18 +90,19 @@ std::string FormatFullVersion()
     return CLIENT_BUILD;
 }
 
-/** 
- * Format the subversion field according to BIP 14 spec (https://github.com/bitcoin/bips/blob/master/bip-0014.mediawiki) 
+/**
+ * Format the subversion field according to BIP 14 spec (https://github.com/bitcoin/bips/blob/master/bip-0014.mediawiki)
  */
 std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments)
 {
     std::ostringstream ss;
     ss << "/";
     ss << name << ":" << FormatVersion(nClientVersion);
-    if (!comments.empty()) {
+    if (!comments.empty())
+    {
         std::vector<std::string>::const_iterator it(comments.begin());
         ss << "(" << *it;
-        for (++it; it != comments.end(); ++it)
+        for(++it; it != comments.end(); ++it)
             ss << "; " << *it;
         ss << ")";
     }
