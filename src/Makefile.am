@@ -370,8 +370,6 @@ libbitcoin_consensus_a_SOURCES = \
   primitives/zerocoin.h \
   pubkey.cpp \
   pubkey.h \
-  key.cpp \
-  key.h \
   script/bitcoinconsensus.cpp \
   script/interpreter.cpp \
   script/interpreter.h \
