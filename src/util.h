@@ -21,13 +21,16 @@
 #include "utiltime.h"
 #include <fs.h>
 
+#include <atomic>
 #include <exception>
 #include <map>
+#include <set>
 #include <stdint.h>
 #include <string>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
-#include <boost/filesystem/path.hpp>
 #include <boost/thread/exceptions.hpp>
 #include <boost/thread/condition_variable.hpp> // for boost::thread_interrupted
 #define CVOIDBEGIN(a)        ((const void*)&(a))
