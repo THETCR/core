@@ -291,9 +291,18 @@ public:
         if(block.nVersion > 7) {
             nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
         }
-
+        //Proof of Stake
+        bnChainTrust = uint256();
+        nMint = 0;
+        nMoneySupply = 0;
+        nFlags = 0;
+        nStakeModifier = 0;
+        nStakeModifierChecksum = 0;
+        hashProofOfStake = uint256();
+        prevoutStake.SetNull();
+        nStakeTime = 0;
     }
-    CBlockIndex(const CBlock& block)
+    explicit CBlockIndex(const CBlock& block)
     {
         SetNull();
 
