@@ -2,14 +2,15 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "key.h"
-#include "keystore.h"
-#include "policy/policy.h"
-#include "script/script.h"
-#include "script/script_error.h"
-#include "script/interpreter.h"
-#include "script/sign.h"
-#include "uint256.h"
+#include <key.h>
+#include <keystore.h>
+#include <policy/policy.h>
+#include <script/script.h>
+#include <script/script_error.h>
+#include <script/interpreter.h>
+#include <script/sign.h>
+#include <uint256.h>
+#include <test/test_wispr.h>
 
 #ifdef ENABLE_WALLET
 #include "wallet_ismine.h"
