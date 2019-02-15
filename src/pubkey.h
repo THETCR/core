@@ -7,9 +7,9 @@
 #ifndef WISPR_PUBKEY_H
 #define WISPR_PUBKEY_H
 
-#include "hash.h"
-#include "serialize.h"
-#include "uint256.h"
+#include <hash.h>
+#include <serialize.h>
+#include <uint256.h>
 
 #include <stdexcept>
 #include <vector>

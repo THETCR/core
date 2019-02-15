@@ -10,8 +10,8 @@
 #ifndef BITCOIN_UTILSTRENCODINGS_H
 #define BITCOIN_UTILSTRENCODINGS_H
 
-#include "allocators.h"
-#include <stdint.h>
+#include <allocators.h>
+#include <cstdint>
 #include <string>
 #include <vector>
 

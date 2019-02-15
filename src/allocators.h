@@ -6,7 +6,7 @@
 #ifndef BITCOIN_ALLOCATORS_H
 #define BITCOIN_ALLOCATORS_H
 
-#include "support/cleanse.h"
+#include <support/cleanse.h>
 
 #include <map>
 #include <string.h>
