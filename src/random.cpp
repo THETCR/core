@@ -3,23 +3,32 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "random.h"
+#include <random.h>
 
-#include "support/cleanse.h"
+#include <support/cleanse.h>
 #ifdef WIN32
-#include "compat.h" // for Windows API
+#include <compat.h> // for Windows API
+#include <wincrypt.h>
 #endif
 #include "util.h"             // for LogPrint()
+#include <sync.h>     // for WAIT_LOCK
 #include "utilstrencodings.h" // for GetTime()
 
 #include <limits>
 
+#include <stdlib.h>
+#include <chrono>
+#include <thread>
+
+#include <support/allocators/secure.h>
 #ifndef WIN32
+#include <fcntl.h>
 #include <sys/time.h>
 #endif
 
 #include <openssl/err.h>
 #include <openssl/rand.h>
+#include <openssl/conf.h>
 
 static inline int64_t GetPerformanceCounter()
 {

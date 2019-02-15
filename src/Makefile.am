@@ -89,7 +89,6 @@ BITCOIN_CORE_H = \
   addrdb.h \
   addrman.h \
   alert.h \
-  allocators.h \
   base58.h \
   bip38.h \
   bloom.h \
@@ -168,7 +167,11 @@ BITCOIN_CORE_H = \
   stakeinput.h \
   shutdown.h \
   streams.h \
+  support/allocators/secure.h \
+  support/allocators/zeroafterfree.h \
   support/cleanse.h \
+  support/events.h \
+  support/lockedpool.h \
   sync.h \
   threadsafety.h \
   threadinterrupt.h \
@@ -348,8 +351,6 @@ libbitcoin_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_consensus_a_SOURCES = \
   amount.h \
-  allocators.cpp \
-  allocators.h \
   consensus/merkle.cpp \
   consensus/merkle.h \
   consensus/params.h \
@@ -394,7 +395,6 @@ libbitcoin_common_a_SOURCES = \
   accumulators.cpp \
   accumulatorcheckpoints.cpp \
   accumulatormap.cpp \
-  allocators.cpp \
   base58.cpp \
   bip38.cpp \
   chainparams.cpp \
@@ -424,7 +424,7 @@ libbitcoin_common_a_SOURCES = \
 libbitcoin_util_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_util_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_util_a_SOURCES = \
-  allocators.cpp \
+  support/lockedpool.cpp \
   chainparamsbase.cpp \
   clientversion.cpp \
   compat/glibc_sanity.cpp \

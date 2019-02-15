@@ -11,7 +11,6 @@
 
 #include "util.h"
 
-#include "allocators.h"
 #include "chainparamsbase.h"
 #include "random.h"
 #include "sync.h"

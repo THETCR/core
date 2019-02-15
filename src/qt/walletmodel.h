@@ -7,11 +7,20 @@
 #ifndef BITCOIN_QT_WALLETMODEL_H
 #define BITCOIN_QT_WALLETMODEL_H
 
-#include "askpassphrasedialog.h"
-#include "paymentrequestplus.h"
-#include "walletmodeltransaction.h"
+#include <amount.h>
+#include <key.h>
+#include <serialize.h>
+#include <script/standard.h>
 
-#include "allocators.h" /* for SecureString */
+#if defined(HAVE_CONFIG_H)
+#include <config/wispr-config.h>
+#endif
+
+#include "askpassphrasedialog.h"
+#include <qt/paymentrequestplus.h>
+#include <qt/walletmodeltransaction.h>
+
+#include <support/allocators/secure.h>
 #include "swifttx.h"
 #include "wallet.h"
 

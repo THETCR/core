@@ -4,8 +4,10 @@
 
 #include "util.h"
 
-#include "allocators.h"
+#include <support/allocators/secure.h>
+#include <test/test_wispr.h>
 
+#include <memory>
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(allocator_tests)

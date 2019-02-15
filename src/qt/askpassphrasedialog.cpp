@@ -4,14 +4,17 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "askpassphrasedialog.h"
+#if defined(HAVE_CONFIG_H)
+#include <config/wispr-config.h>
+#endif
+#include <qt/askpassphrasedialog.h>
 #include <qt/forms/ui_askpassphrasedialog.h>
 
-#include "guiconstants.h"
-#include "guiutil.h"
-#include "walletmodel.h"
+#include <qt/guiconstants.h>
+#include <qt/guiutil.h>
+#include <qt/walletmodel.h>
 
-#include "allocators.h"
+#include <support/allocators/secure.h>
 
 #include <QKeyEvent>
 #include <QMessageBox>
