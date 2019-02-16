@@ -966,7 +966,7 @@ void ThreadFlushWalletDB(const string& strFile)
 
 void NotifyBacked(const CWallet& wallet, bool fSuccess, string strMessage)
 {
-    LogPrint(nullptr, strMessage.data());
+    LogPrint(BCLog::NONE, strMessage.data());
     wallet.NotifyWalletBacked(fSuccess, strMessage);
 }
 
@@ -1059,7 +1059,7 @@ bool BackupWallet(const CWallet& wallet, const fs::path& strDest, bool fEnableCu
                                 }
                             } catch (fs::filesystem_error& error) {
                                 string strMessage = strprintf("Failed to delete backup %s\n", error.what());
-                                LogPrint(nullptr, strMessage.data());
+                                LogPrint(BCLog::NONE, strMessage.data());
                                 NotifyBacked(wallet, false, strMessage);
                             }
                         }
@@ -1095,12 +1095,12 @@ bool AttemptBackupWallet(const CWallet& wallet, const fs::path& pathSrc, const f
         dst.close();
 #endif
         strMessage = strprintf("copied wallet.dat to %s\n", pathDest.string());
-        LogPrint(nullptr, strMessage.data());
+        LogPrint(BCLog::NONE, strMessage.data());
         retStatus = true;
     } catch (const fs::filesystem_error& e) {
         retStatus = false;
         strMessage = strprintf("%s\n", e.what());
-        LogPrint(nullptr, strMessage.data());
+        LogPrint(BCLog::NONE, strMessage.data());
     }
     NotifyBacked(wallet, retStatus, strMessage);
     return retStatus;
