@@ -7,7 +7,7 @@
 
 /**
  * Server/client environment: argument handling, config file parsing,
- * logging, thread wrappers
+ * thread wrappers
  */
 #ifndef BITCOIN_UTIL_H
 #define BITCOIN_UTIL_H
@@ -16,10 +16,12 @@
 #include <config/wispr-config.h>
 #endif
 
-#include "compat.h"
-#include "tinyformat.h"
-#include "utiltime.h"
+#include <compat.h>
 #include <fs.h>
+#include <logging.h>
+#include <sync.h>
+#include <tinyformat.h>
+#include <utiltime.h>
 
 #include <exception>
 #include <map>
@@ -27,7 +29,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/filesystem/path.hpp>
 #include <boost/thread/exceptions.hpp>
 #include <boost/thread/condition_variable.hpp> // for boost::thread_interrupted
 
@@ -54,13 +55,8 @@ extern std::string strBudgetMode;
 extern std::map<std::string, std::string> mapArgs;
 extern std::map<std::string, std::vector<std::string> > mapMultiArgs;
 extern bool fDebug;
-extern bool fPrintToConsole;
-extern bool fPrintToDebugLog;
 extern bool fServer;
 extern std::string strMiscWarning;
-extern bool fLogTimestamps;
-extern bool fLogIPs;
-extern volatile bool fReopenDebugLog;
 
 /** Translate a message to the native language of the user. */
 const extern std::function<std::string(const char*)> G_TRANSLATION_FUN;
@@ -77,47 +73,10 @@ inline std::string _(const char* psz)
 void SetupEnvironment();
 bool SetupNetworking();
 
-/** Return true if log accepts specified category */
-bool LogAcceptCategory(const char* category);
-/** Send a string to the log output */
-int LogPrintStr(const std::string& str);
-
-#define LogPrintf(...) LogPrint(NULL, __VA_ARGS__)
-
-/**
- * When we switch to C++11, this can be switched to variadic templates instead
- * of this macro-based construction (see tinyformat.h).
- */
-#define MAKE_ERROR_AND_LOG_FUNC(n)                                                              \
-    /**   Print to debug.log if -debug=category switch is given OR category is NULL. */         \
-    template <TINYFORMAT_ARGTYPES(n)>                                                           \
-    static inline int LogPrint(const char* category, const char* format, TINYFORMAT_VARARGS(n)) \
-    {                                                                                           \
-        if (!LogAcceptCategory(category)) return 0;                                             \
-        return LogPrintStr(tfm::format(format, TINYFORMAT_PASSARGS(n)));                        \
-    }                                                                                           \
-    /**   Log error and return false */                                                         \
-    template <TINYFORMAT_ARGTYPES(n)>                                                           \
-    static inline bool error(const char* format, TINYFORMAT_VARARGS(n))                         \
-    {                                                                                           \
-        LogPrintStr(std::string("ERROR: ") + tfm::format(format, TINYFORMAT_PASSARGS(n)) + "\n");            \
-        return false;                                                                           \
-    }
-
-TINYFORMAT_FOREACH_ARGNUM(MAKE_ERROR_AND_LOG_FUNC)
-
-/**
- * Zero-arg versions of logging and error, these are not covered by
- * TINYFORMAT_FOREACH_ARGNUM
- */
-static inline int LogPrint(const char* category, const char* format)
+template<typename... Args>
+bool error(const char* fmt, const Args&... args)
 {
-    if (!LogAcceptCategory(category)) return 0;
-    return LogPrintStr(format);
-}
-static inline bool error(const char* format)
-{
-    LogPrintStr(std::string("ERROR: ") + format + "\n");
+    LogPrintStr("ERROR: " + tfm::format(fmt, args...) + "\n");
     return false;
 }
 
@@ -144,7 +103,6 @@ void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map
 fs::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 #endif
 fs::path GetTempPath();
-void ShrinkDebugFile();
 void runCommand(std::string strCommand);
 
 inline bool IsSwitchChar(char c)
