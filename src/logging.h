@@ -21,6 +21,10 @@ static const bool DEFAULT_LOGIPS        = false;
 static const bool DEFAULT_LOGTIMESTAMPS = true;
 extern const char * const DEFAULT_DEBUGLOGFILE;
 
+extern bool fPrintToConsole;
+extern bool fPrintToDebugLog;
+extern bool fLogTimestamps;
+extern volatile bool fReopenDebugLog;
 extern bool fLogIPs;
 
 struct CLogCategoryActive
