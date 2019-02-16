@@ -13,8 +13,8 @@
 #include "policy/policy.h"
 #include "policy/fees.h"
 #include "streams.h"
-#include "util.h"
-#include "utilmoneystr.h"
+#include <util/system.h>
+#include "util/moneystr.h"
 #include "version.h"
 
 using namespace std;

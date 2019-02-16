@@ -8,7 +8,7 @@
 #include <config/wispr-config.h>
 #endif
 
-#include "util.h"
+#include <util/system.h>
 #include "uritests.h"
 
 #ifdef ENABLE_WALLET

@@ -15,7 +15,7 @@
 #define COINSPEND_H_
 
 #include <streams.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 #include "Accumulator.h"
 #include "AccumulatorProofOfKnowledge.h"
 #include "Coin.h"

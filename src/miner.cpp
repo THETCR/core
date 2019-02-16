@@ -22,8 +22,8 @@
 #include "primitives/transaction.h"
 #include "timedata.h"
 #include "txmempool.h"
-#include "util.h"
-#include "utilmoneystr.h"
+#include <util/system.h>
+#include <util/moneystr.h>
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif

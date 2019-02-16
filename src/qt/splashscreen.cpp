@@ -9,7 +9,7 @@
 #include "clientversion.h"
 #include "networkstyle.h"
 #include "ui_interface.h"
-#include "util.h"
+#include <util/system.h>
 #include "shutdown.h"
 #include "version.h"
 

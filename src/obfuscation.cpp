@@ -11,7 +11,7 @@
 #include "script/sign.h"
 #include "swifttx.h"
 #include "ui_interface.h"
-#include "util.h"
+#include <util/system.h>
 #include "wallet.h"
 #include "reverse_iterate.h"
 #include <fs.h>

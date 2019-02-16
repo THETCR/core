@@ -11,7 +11,7 @@
 #include "net.h"
 #include "spork.h"
 #include "sync.h"
-#include "util.h"
+#include <util/system.h>
 
 /*
     At 15 signatures, 1/2 of the masternode network can be owned by

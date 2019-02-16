@@ -9,7 +9,7 @@
 
 #include "guiutil.h"
 
-#include "util.h"
+#include <util/system.h>
 
 
 

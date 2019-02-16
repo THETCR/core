@@ -123,9 +123,9 @@ HEADERS += src/activemasternode.h \
            src/uint256.h \
            src/undo.h \
            src/util.h \
-           src/utilmoneystr.h \
-           src/utilstrencodings.h \
-           src/utiltime.h \
+           src/util/moneystr.h \
+           src/util/strencodings.h \
+           src/util/time.h \
            src/version.h \
            src/wallet.h \
            src/wallet_ismine.h \
@@ -412,9 +412,9 @@ SOURCES += src/activemasternode.cpp \
            src/txmempool.cpp \
            src/uint256.cpp \
            src/util.cpp \
-           src/utilmoneystr.cpp \
-           src/utilstrencodings.cpp \
-           src/utiltime.cpp \
+           src/util/moneystr.cpp \
+           src/util/strencodings.cpp \
+           src/util/time.cpp \
            src/wallet.cpp \
            src/wallet_ismine.cpp \
            src/walletdb.cpp \

@@ -6,7 +6,7 @@
 
 #include <netbase.h>
 #include <test/test_wispr.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 
 #include <string>
 

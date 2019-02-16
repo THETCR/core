@@ -8,8 +8,8 @@
 #include "base58.h"
 #include "script/script.h"
 #include "uint256.h"
-#include "util.h"
-#include "utilstrencodings.h"
+#include <util/system.h>
+#include "util/strencodings.h"
 
 #include <string>
 #include <vector>

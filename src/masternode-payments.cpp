@@ -13,8 +13,8 @@
 #include "obfuscation.h"
 #include "spork.h"
 #include "sync.h"
-#include "util.h"
-#include "utilmoneystr.h"
+#include <util/system.h>
+#include "util/moneystr.h"
 #include <fs.h>
 
 

@@ -20,7 +20,7 @@
 #include <streams.h>
 #include <ui_interface.h>
 #include <txdb.h>
-#include <util.h>
+#include <util/system.h>
 
 #ifdef ENABLE_WALLET
 #include "db.h"

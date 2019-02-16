@@ -19,7 +19,7 @@
 #include "rpc/server.h"
 #include "shutdown.h"
 #include "txmempool.h"
-#include "util.h"
+#include <util/system.h>
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"

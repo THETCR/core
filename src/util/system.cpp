@@ -9,13 +9,13 @@
 #include <config/wispr-config.h>
 #endif
 
-#include "util.h"
+#include <util/system.h>
 
 #include "chainparamsbase.h"
 #include "random.h"
 #include "sync.h"
-#include "utilstrencodings.h"
-#include "utiltime.h"
+#include "util/strencodings.h"
+#include "util/time.h"
 #include <fs.h>
 
 #include <stdarg.h>

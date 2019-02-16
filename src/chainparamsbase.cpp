@@ -6,7 +6,7 @@
 
 #include "chainparamsbase.h"
 
-#include "util.h"
+#include <util/system.h>
 
 #include <assert.h>
 

@@ -14,7 +14,7 @@
 #include "policy/policy.h"
 #include "chainparams.h"
 #include "ui_interface.h"
-#include "util.h"
+#include <util/system.h>
 #include "wallet.h"
 
 #include <cstdlib>

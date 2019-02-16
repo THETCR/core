@@ -10,7 +10,7 @@
 #include "masternodeman.h"
 #include <net_processing.h>
 #include "obfuscation.h"
-#include "util.h"
+#include <util/system.h>
 #include "wallet.h"
 #include <fs.h>
 

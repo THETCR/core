@@ -13,7 +13,7 @@
 #include "protocol.h"
 #include "sync.h"
 #include "sporkdb.h"
-#include "util.h"
+#include <util/system.h>
 
 using namespace std;
 

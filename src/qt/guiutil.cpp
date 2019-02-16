@@ -17,7 +17,7 @@
 #include "protocol.h"
 #include "script/script.h"
 #include "script/standard.h"
-#include "util.h"
+#include <util/system.h>
 #include <fs.h>
 
 

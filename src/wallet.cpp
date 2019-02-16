@@ -33,7 +33,7 @@
 #include <swifttx.h>
 #include <timedata.h>
 #include <txmempool.h>
-#include <utilmoneystr.h>
+#include <util/moneystr.h>
 #include <zwspchain.h>
 
 #include <denomination_functions.h>

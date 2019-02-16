@@ -10,9 +10,9 @@
 #include <compat.h> // for Windows API
 #include <wincrypt.h>
 #endif
-#include "util.h"             // for LogPrint()
+#include <util/system.h>             // for LogPrint()
 #include <sync.h>     // for WAIT_LOCK
-#include "utilstrencodings.h" // for GetTime()
+#include <util/strencodings.h> // for GetTime()
 
 #include <limits>
 

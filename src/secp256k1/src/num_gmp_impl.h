@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 
-#include "util.h"
+#include <util/system.h>
 #include "num.h"
 
 #ifdef VERIFY

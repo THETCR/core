@@ -15,7 +15,7 @@
 #include "protocol.h"
 #include "spork.h"
 #include "sync.h"
-#include "util.h"
+#include <util/system.h>
 #include "validationinterface.h"
 #include "reverse_iterate.h"
 #include "wallet.h"

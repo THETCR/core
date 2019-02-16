@@ -4,7 +4,7 @@
 
 #include <primitives/deterministicmint.h>
 #include "zwsptracker.h"
-#include "util.h"
+#include <util/system.h>
 #include "sync.h"
 #include "main.h"
 #include "txdb.h"

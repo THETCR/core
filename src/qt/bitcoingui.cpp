@@ -32,7 +32,7 @@
 
 #include "masternodelist.h"
 #include "ui_interface.h"
-#include "util.h"
+#include <util/system.h>
 #include "shutdown.h"
 
 #include <iostream>

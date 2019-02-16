@@ -8,7 +8,7 @@
 #include "askpassphrasedialog.h"
 #include "primitives/transaction.h"
 #include "addressbookpage.h"
-#include "utilstrencodings.h"
+#include "util/strencodings.h"
 #include "core_io.h"
 #include "script/script.h"
 #include "base58.h"
@@ -18,7 +18,7 @@
 #include "wallet.h"
 #include "script/sign.h"
 #include "script/interpreter.h"
-#include "utilmoneystr.h"
+#include "util/moneystr.h"
 #include "guiutil.h"
 #include <qt/qvalidatedlineedit.h>
 #include "bitcoinamountfield.h"

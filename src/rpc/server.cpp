@@ -11,9 +11,9 @@
 #include "random.h"
 #include "sync.h"
 #include "ui_interface.h"
-#include "util.h"
+#include <util/system.h>
 #include "shutdown.h"
-#include "utilstrencodings.h"
+#include <util/strencodings.h>
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"

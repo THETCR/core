@@ -20,7 +20,7 @@
 #include "base58.h"
 #include "coincontrol.h"
 #include "ui_interface.h"
-#include "utilmoneystr.h"
+#include <util/moneystr.h>
 #include "txmempool.h"
 #include "policy/fees.h"
 #include "wallet.h"

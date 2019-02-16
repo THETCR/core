@@ -6,7 +6,7 @@
 #include <iostream>
 #include "genwit.h"
 #include "chainparams.h"
-#include "util.h"
+#include <util/system.h>
 
 CGenWit::CGenWit() : accWitValue(0) {}
 

@@ -16,8 +16,8 @@
 #include "main.h"
 #include "shutdown.h"
 #include "timedata.h"
-#include "util.h"
-#include "utilmoneystr.h"
+#include <util/system.h>
+#include <util/moneystr.h>
 #include "wallet.h"
 #include "walletdb.h"
 #include "zwspchain.h"

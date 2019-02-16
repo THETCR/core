@@ -10,9 +10,9 @@
 #include "script/script.h"
 #include "script/standard.h"
 #include "sync.h"
-#include "util.h"
-#include "utilstrencodings.h"
-#include "utiltime.h"
+#include <util/system.h>
+#include <util/strencodings.h>
+#include <util/time.h>
 #include "wallet.h"
 
 #include <fstream>

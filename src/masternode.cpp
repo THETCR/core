@@ -11,7 +11,7 @@
 #include <net_processing.h>
 #include "shutdown.h"
 #include "sync.h"
-#include "util.h"
+#include <util/system.h>
 #include "txmempool.h"
 #include "wallet.h"
 

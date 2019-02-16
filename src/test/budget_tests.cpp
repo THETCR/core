@@ -4,7 +4,7 @@
 
 #include "masternode-budget.h"
 #include "tinyformat.h"
-#include "utilmoneystr.h"
+#include "util/moneystr.h"
 
 #include <boost/test/unit_test.hpp>
 

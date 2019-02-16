@@ -12,7 +12,7 @@
 #include "masternodeman.h"
 #include "spork.h"
 #include "ui_interface.h"
-#include "util.h"
+#include <util/system.h>
 #include "addrman.h"
 // clang-format on
 

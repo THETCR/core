@@ -13,8 +13,8 @@
 #include "txdb.h"
 #include <qt/forms/ui_blockexplorer.h>
 #include "ui_interface.h"
-#include "util.h"
-#include "utilstrencodings.h"
+#include <util/system.h>
+#include <util/strencodings.h>
 #include <QDateTime>
 #include <QKeyEvent>
 #include <QMessageBox>

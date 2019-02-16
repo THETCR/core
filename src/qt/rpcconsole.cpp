@@ -16,7 +16,7 @@
 #include "main.h"
 #include "rpc/client.h"
 #include "rpc/server.h"
-#include "util.h"
+#include <util/system.h>
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif // ENABLE_WALLET

@@ -11,7 +11,7 @@
 #include "masternode.h"
 #include "net.h"
 #include "sync.h"
-#include "util.h"
+#include <util/system.h>
 #include <fs.h>
 
 

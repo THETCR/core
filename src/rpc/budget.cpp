@@ -11,7 +11,7 @@
 #include "masternodeconfig.h"
 #include "masternodeman.h"
 #include "rpc/server.h"
-#include "utilmoneystr.h"
+#include <util/moneystr.h>
 #include "wallet.h"
 
 #include <univalue.h>

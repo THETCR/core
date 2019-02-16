@@ -5,7 +5,7 @@
 
 #include "main.h"
 #include "random.h"
-#include "util.h"
+#include <util/system.h>
 
 #include <vector>
 
