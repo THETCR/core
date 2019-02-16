@@ -6,6 +6,7 @@
 
 
 #include "lightzwspthread.h"
+#include <logging.h>
 #include "main.h"
 
 /****** Thread ********/
@@ -62,7 +63,7 @@ void CLightWorker::ThreadLightZWSPSimplified() {
                         );
 
                     } catch (NotEnoughMintsException e) {
-                        LogPrintStr(std::string("ThreadLightZWSPSimplified: ") + e.message + "\n");
+                        LogPrintf("ThreadLightZWSPSimplified: %s\n", e.message);
                         rejectWork(genWit, blockHeight, NOT_ENOUGH_MINTS);
                         continue;
                     }
