@@ -127,6 +127,14 @@ const CLogCategoryDesc LogCategories[] =
         {BCLog::LEVELDB, "leveldb"},
         {BCLog::ALL, "1"},
         {BCLog::ALL, "all"},
+        {BCLog::OBFUSCATION, "obfuscation"},
+        {BCLog::SWIFTX, "swiftx"},
+        {BCLog::MASTERNODE, "masternode"},
+        {BCLog::MNPAYMENTS, "mnpayments"},
+        {BCLog::ZERO, "zero"},
+        {BCLog::MNBUDGET, "mnbudget"},
+        {BCLog::ZWSP, "zwsp"},
+        {BCLog::ALERT, "alert"},
     };
 
 bool GetLogCategory(BCLog::LogFlags& flag, const std::string& str)

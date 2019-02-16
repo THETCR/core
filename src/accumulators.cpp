@@ -137,7 +137,7 @@ bool LoadAccumulatorValuesFromDB(const uint256 nCheckpoint)
         if (!zerocoinDB->ReadAccumulatorValue(nChecksum, bnValue)) {
             if (!count(listAccCheckpointsNoDB.begin(), listAccCheckpointsNoDB.end(), nCheckpoint))
                 listAccCheckpointsNoDB.push_back(nCheckpoint);
-            LogPrint("zero", "%s : Missing databased value for checksum %d", __func__, nChecksum);
+            LogPrint(BCLog::ZERO, "%s : Missing databased value for checksum %d", __func__, nChecksum);
             return false;
         }
         mapAccumulatorValues.insert(make_pair(nChecksum, bnValue));
@@ -281,7 +281,7 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
             return error("%s: failed to get zerocoin mintlist from block %d", __func__, pindex->nHeight);
 
         nTotalMintsFound += listPubcoins.size();
-        LogPrint("zero", "%s found %d mints\n", __func__, listPubcoins.size());
+        LogPrint(BCLog::ZERO, "%s found %d mints\n", __func__, listPubcoins.size());
 
         //add the pubcoins to accumulator
         for (const PublicCoin& pubcoin : listPubcoins) {
@@ -297,7 +297,7 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
     else
         nCheckpoint = mapAccumulators.GetCheckpoint();
 
-    LogPrint("zero", "%s checkpoint=%s\n", __func__, nCheckpoint.GetHex());
+    LogPrint(BCLog::ZERO, "%s checkpoint=%s\n", __func__, nCheckpoint.GetHex());
     return true;
 }
 
@@ -609,7 +609,7 @@ bool CalculateAccumulatorWitnessFor(
 
         // calculate how many mints of this denomination existed in the accumulator we initialized
         nMintsAdded += ComputeAccumulatedCoins(startHeight, den);
-        LogPrint("zero", "%s : %d mints added to witness\n", __func__, nMintsAdded);
+        LogPrint(BCLog::ZERO, "%s : %d mints added to witness\n", __func__, nMintsAdded);
 
         return true;
 
@@ -650,9 +650,9 @@ bool GenerateAccumulatorWitness(
 {
     try {
         // Lock
-        LogPrint("zero", "%s: generating\n", __func__);
+        LogPrint(BCLog::ZERO, "%s: generating\n", __func__);
         if (!LockMethod()) return false;
-        LogPrint("zero", "%s: after lock\n", __func__);
+        LogPrint(BCLog::ZERO, "%s: after lock\n", __func__);
 
         int nHeightMintAdded = SearchMintHeightOf(coin.getValue());
         //get the checkpoint added at the next multiple of 10
@@ -712,7 +712,7 @@ bool GenerateAccumulatorWitness(
 
         // calculate how many mints of this denomination existed in the accumulator we initialized
         nMintsAdded += ComputeAccumulatedCoins(nAccStartHeight, coin.getDenomination());
-        LogPrint("zero", "%s : %d mints added to witness\n", __func__, nMintsAdded);
+        LogPrint(BCLog::ZERO, "%s : %d mints added to witness\n", __func__, nMintsAdded);
 
         return true;
 

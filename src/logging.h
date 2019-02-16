@@ -54,6 +54,14 @@ enum LogFlags : uint32_t {
   QT          = (1 << 19),
   LEVELDB     = (1 << 20),
   ALL         = ~(uint32_t)0,
+  OBFUSCATION = (1 << 21),
+  SWIFTX      = (1 << 22),
+  MASTERNODE  = (1 << 23),
+  MNPAYMENTS  = (1 << 24),
+  ZERO        = (1 << 25),
+  MNBUDGET    = (1 << 26),
+  ZWSP        = (1 << 27),
+  ALERT       = (1 << 28),
 };
 
 class Logger

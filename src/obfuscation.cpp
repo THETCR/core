@@ -128,7 +128,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
             }
 
             if (state == POOL_STATUS_QUEUE) {
-                LogPrint("obfuscation", "Obfuscation queue is ready - %s\n", addr.ToString());
+                LogPrint(BCLog::OBFUSCATION, "Obfuscation queue is ready - %s\n", addr.ToString());
                 PrepareObfuscationDenominate();
             }
         } else {
@@ -136,18 +136,18 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
                 if (q.vin == dsq.vin) return;
             }
 
-            LogPrint("obfuscation", "dsq last %d last2 %d count %d\n", pmn->nLastDsq, pmn->nLastDsq + mnodeman.size() / 5, mnodeman.nDsqCount);
+            LogPrint(BCLog::OBFUSCATION, "dsq last %d last2 %d count %d\n", pmn->nLastDsq, pmn->nLastDsq + mnodeman.size() / 5, mnodeman.nDsqCount);
             //don't allow a few nodes to dominate the queuing process
             if (pmn->nLastDsq != 0 &&
                 pmn->nLastDsq + mnodeman.CountEnabled(ActiveProtocol()) / 5 > mnodeman.nDsqCount) {
-                LogPrint("obfuscation", "dsq -- Masternode sending too many dsq messages. %s \n", pmn->addr.ToString());
+                LogPrint(BCLog::OBFUSCATION, "dsq -- Masternode sending too many dsq messages. %s \n", pmn->addr.ToString());
                 return;
             }
             mnodeman.nDsqCount++;
             pmn->nLastDsq = mnodeman.nDsqCount;
             pmn->allowFreeTx = true;
 
-            LogPrint("obfuscation", "dsq - new Obfuscation queue object - %s\n", addr.ToString());
+            LogPrint(BCLog::OBFUSCATION, "dsq - new Obfuscation queue object - %s\n", addr.ToString());
             vecObfuscationQueue.push_back(dsq);
             dsq.Relay();
             dsq.time = GetTime();
@@ -224,7 +224,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
             for (const CTxIn i: in) {
                 tx.vin.push_back(i);
 
-                LogPrint("obfuscation", "dsi -- tx in %s\n", i.ToString());
+                LogPrint(BCLog::OBFUSCATION, "dsi -- tx in %s\n", i.ToString());
 
                 CTransaction tx2;
                 uint256 hash;
@@ -296,7 +296,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
         int errorID;
         vRecv >> sessionIDMessage >> state >> entriesCount >> accepted >> errorID;
 
-        LogPrint("obfuscation", "dssu - state: %i entriesCount: %i accepted: %i error: %s \n", state, entriesCount, accepted, GetMessageByID(errorID));
+        LogPrint(BCLog::OBFUSCATION, "dssu - state: %i entriesCount: %i accepted: %i error: %s \n", state, entriesCount, accepted, GetMessageByID(errorID));
 
         if ((accepted != 1 && accepted != 0) && sessionID != sessionIDMessage) {
             LogPrintf("dssu - message doesn't match current Obfuscation session %d %d\n", sessionID, sessionIDMessage);
@@ -319,7 +319,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
 
         for (const CTxIn item: sigs) {
             if (AddScriptSig(item)) success = true;
-            LogPrint("obfuscation", " -- sigs count %d %d\n", (int)sigs.size(), count);
+            LogPrint(BCLog::OBFUSCATION, " -- sigs count %d %d\n", (int)sigs.size(), count);
             count++;
         }
 
@@ -343,7 +343,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
         vRecv >> sessionIDMessage >> txNew;
 
         if (sessionID != sessionIDMessage) {
-            LogPrint("obfuscation", "dsf - message doesn't match current Obfuscation session %d %d\n", sessionID, sessionIDMessage);
+            LogPrint(BCLog::OBFUSCATION, "dsf - message doesn't match current Obfuscation session %d %d\n", sessionID, sessionIDMessage);
             return;
         }
 
@@ -368,7 +368,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
         vRecv >> sessionIDMessage >> error >> errorID;
 
         if (sessionID != sessionIDMessage) {
-            LogPrint("obfuscation", "dsc - message doesn't match current Obfuscation session %d %d\n", obfuScationPool.sessionID, sessionIDMessage);
+            LogPrint(BCLog::OBFUSCATION, "dsc - message doesn't match current Obfuscation session %d %d\n", obfuScationPool.sessionID, sessionIDMessage);
             return;
         }
 
@@ -516,22 +516,22 @@ std::string CObfuscationPool::GetStatus()
 //
 void CObfuscationPool::Check()
 {
-    if (fMasterNode) LogPrint("obfuscation", "CObfuscationPool::Check() - entries count %lu\n", entries.size());
+    if (fMasterNode) LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() - entries count %lu\n", entries.size());
     //printf("CObfuscationPool::Check() %d - %d - %d\n", state, anonTx.CountEntries(), GetTimeMillis()-lastTimeChanged);
 
     if (fMasterNode) {
-        LogPrint("obfuscation", "CObfuscationPool::Check() - entries count %lu\n", entries.size());
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() - entries count %lu\n", entries.size());
 
         // If entries is full, then move on to the next phase
         if (state == POOL_STATUS_ACCEPTING_ENTRIES && (int)entries.size() >= GetMaxPoolTransactions()) {
-            LogPrint("obfuscation", "CObfuscationPool::Check() -- TRYING TRANSACTION \n");
+            LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() -- TRYING TRANSACTION \n");
             UpdateState(POOL_STATUS_FINALIZE_TRANSACTION);
         }
     }
 
     // create the finalized transaction for distribution to the clients
     if (state == POOL_STATUS_FINALIZE_TRANSACTION) {
-        LogPrint("obfuscation", "CObfuscationPool::Check() -- FINALIZE TRANSACTIONS\n");
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() -- FINALIZE TRANSACTIONS\n");
         UpdateState(POOL_STATUS_SIGNING);
 
         if (fMasterNode) {
@@ -551,7 +551,7 @@ void CObfuscationPool::Check()
             std::random_shuffle(txNew.vout.begin(), txNew.vout.end(), randomizeList);
 
 
-            LogPrint("obfuscation", "Transaction 1: %s\n", txNew.ToString());
+            LogPrint(BCLog::OBFUSCATION, "Transaction 1: %s\n", txNew.ToString());
             finalTransaction = txNew;
 
             // request signatures from clients
@@ -561,7 +561,7 @@ void CObfuscationPool::Check()
 
     // If we have all of the signatures, try to compile the transaction
     if (fMasterNode && state == POOL_STATUS_SIGNING && SignaturesComplete()) {
-        LogPrint("obfuscation", "CObfuscationPool::Check() -- SIGNING\n");
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() -- SIGNING\n");
         UpdateState(POOL_STATUS_TRANSMISSION);
 
         CheckFinalTransaction();
@@ -569,7 +569,7 @@ void CObfuscationPool::Check()
 
     // reset if we're here for 10 seconds
     if ((state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) && GetTimeMillis() - lastTimeChanged >= 10000) {
-        LogPrint("obfuscation", "CObfuscationPool::Check() -- timeout, RESETTING\n");
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() -- timeout, RESETTING\n");
         UnlockCoins();
         SetNull();
         if (fMasterNode) RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET);
@@ -584,7 +584,7 @@ void CObfuscationPool::CheckFinalTransaction()
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
     {
-        LogPrint("obfuscation", "Transaction 2: %s\n", txNew.ToString());
+        LogPrint(BCLog::OBFUSCATION, "Transaction 2: %s\n", txNew.ToString());
 
         // See if the transaction is valid
         if (!txNew.AcceptToMemoryPool(false, true, true)) {
@@ -643,7 +643,7 @@ void CObfuscationPool::CheckFinalTransaction()
         ChargeRandomFees();
 
         // Reset
-        LogPrint("obfuscation", "CObfuscationPool::Check() -- COMPLETED -- RESETTING\n");
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() -- COMPLETED -- RESETTING\n");
         SetNull();
         RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET);
     }
@@ -808,15 +808,15 @@ void CObfuscationPool::CheckTimeout()
     if (!fMasterNode) {
         switch (state) {
         case POOL_STATUS_TRANSMISSION:
-            LogPrint("obfuscation", "CObfuscationPool::CheckTimeout() -- Session complete -- Running Check()\n");
+            LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() -- Session complete -- Running Check()\n");
             Check();
             break;
         case POOL_STATUS_ERROR:
-            LogPrint("obfuscation", "CObfuscationPool::CheckTimeout() -- Pool error -- Running Check()\n");
+            LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() -- Pool error -- Running Check()\n");
             Check();
             break;
         case POOL_STATUS_SUCCESS:
-            LogPrint("obfuscation", "CObfuscationPool::CheckTimeout() -- Pool success -- Running Check()\n");
+            LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() -- Pool success -- Running Check()\n");
             Check();
             break;
         }
@@ -827,7 +827,7 @@ void CObfuscationPool::CheckTimeout()
     vector<CObfuscationQueue>::iterator it = vecObfuscationQueue.begin();
     while (it != vecObfuscationQueue.end()) {
         if ((*it).IsExpired()) {
-            LogPrint("obfuscation", "CObfuscationPool::CheckTimeout() : Removing expired queue entry - %d\n", c);
+            LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() : Removing expired queue entry - %d\n", c);
             it = vecObfuscationQueue.erase(it);
         } else
             ++it;
@@ -844,7 +844,7 @@ void CObfuscationPool::CheckTimeout()
         vector<CObfuScationEntry>::iterator it2 = entries.begin();
         while (it2 != entries.end()) {
             if ((*it2).IsExpired()) {
-                LogPrint("obfuscation", "CObfuscationPool::CheckTimeout() : Removing expired entry - %d\n", c);
+                LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() : Removing expired entry - %d\n", c);
                 it2 = entries.erase(it2);
                 if (entries.size() == 0) {
                     UnlockCoins();
@@ -863,7 +863,7 @@ void CObfuscationPool::CheckTimeout()
             SetNull();
         }
     } else if (GetTimeMillis() - lastTimeChanged >= (OBFUSCATION_QUEUE_TIMEOUT * 1000) + addLagTime) {
-        LogPrint("obfuscation", "CObfuscationPool::CheckTimeout() -- Session timed out (%ds) -- resetting\n", OBFUSCATION_QUEUE_TIMEOUT);
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() -- Session timed out (%ds) -- resetting\n", OBFUSCATION_QUEUE_TIMEOUT);
         UnlockCoins();
         SetNull();
 
@@ -872,7 +872,7 @@ void CObfuscationPool::CheckTimeout()
     }
 
     if (state == POOL_STATUS_SIGNING && GetTimeMillis() - lastTimeChanged >= (OBFUSCATION_SIGNING_TIMEOUT * 1000) + addLagTime) {
-        LogPrint("obfuscation", "CObfuscationPool::CheckTimeout() -- Session timed out (%ds) -- restting\n", OBFUSCATION_SIGNING_TIMEOUT);
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() -- Session timed out (%ds) -- restting\n", OBFUSCATION_SIGNING_TIMEOUT);
         ChargeFees();
         UnlockCoins();
         SetNull();
@@ -936,14 +936,14 @@ bool CObfuscationPool::SignatureValid(const CScript& newSig, const CTxIn& newVin
     if (found >= 0) { //might have to do this one input at a time?
         int n = found;
         txNew.vin[n].scriptSig = newSig;
-        LogPrint("obfuscation", "CObfuscationPool::SignatureValid() - Sign with sig %s\n", newSig.ToString().substr(0, 24));
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::SignatureValid() - Sign with sig %s\n", newSig.ToString().substr(0, 24));
         if (!VerifyScript(txNew.vin[n].scriptSig, sigPubKey, SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_STRICTENC, MutableTransactionSignatureChecker(&txNew, n))) {
-            LogPrint("obfuscation", "CObfuscationPool::SignatureValid() - Signing - Error signing input %u\n", n);
+            LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::SignatureValid() - Signing - Error signing input %u\n", n);
             return false;
         }
     }
 
-    LogPrint("obfuscation", "CObfuscationPool::SignatureValid() - Signing - Successfully validated input\n");
+    LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::SignatureValid() - Signing - Successfully validated input\n");
     return true;
 }
 
@@ -979,17 +979,17 @@ bool CObfuscationPool::IsCollateralValid(const CTransaction& txCollateral)
     }
 
     if (missingTx) {
-        LogPrint("obfuscation", "CObfuscationPool::IsCollateralValid - Unknown inputs in collateral transaction - %s\n", txCollateral.ToString());
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::IsCollateralValid - Unknown inputs in collateral transaction - %s\n", txCollateral.ToString());
         return false;
     }
 
     //collateral transactions are required to pay out OBFUSCATION_COLLATERAL as a fee to the miners
     if (nValueIn - nValueOut < OBFUSCATION_COLLATERAL) {
-        LogPrint("obfuscation", "CObfuscationPool::IsCollateralValid - did not include enough fees in transaction %d\n%s\n", nValueOut - nValueIn, txCollateral.ToString());
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::IsCollateralValid - did not include enough fees in transaction %d\n%s\n", nValueOut - nValueIn, txCollateral.ToString());
         return false;
     }
 
-    LogPrint("obfuscation", "CObfuscationPool::IsCollateralValid %s\n", txCollateral.ToString());
+    LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::IsCollateralValid %s\n", txCollateral.ToString());
 
     {
         LOCK(cs_main);
@@ -1013,7 +1013,7 @@ bool CObfuscationPool::AddEntry(const std::vector<CTxIn>& newInput, const CAmoun
 
     for (CTxIn in: newInput) {
         if (in.prevout.IsNull() || nAmount < 0) {
-            LogPrint("obfuscation", "CObfuscationPool::AddEntry - input not valid!\n");
+            LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::AddEntry - input not valid!\n");
             errorID = ERR_INVALID_INPUT;
             sessionUsers--;
             return false;
@@ -1021,25 +1021,25 @@ bool CObfuscationPool::AddEntry(const std::vector<CTxIn>& newInput, const CAmoun
     }
 
     if (!IsCollateralValid(txCollateral)) {
-        LogPrint("obfuscation", "CObfuscationPool::AddEntry - collateral not valid!\n");
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::AddEntry - collateral not valid!\n");
         errorID = ERR_INVALID_COLLATERAL;
         sessionUsers--;
         return false;
     }
 
     if ((int)entries.size() >= GetMaxPoolTransactions()) {
-        LogPrint("obfuscation", "CObfuscationPool::AddEntry - entries is full!\n");
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::AddEntry - entries is full!\n");
         errorID = ERR_ENTRIES_FULL;
         sessionUsers--;
         return false;
     }
 
     for (CTxIn in: newInput) {
-        LogPrint("obfuscation", "looking for vin -- %s\n", in.ToString());
+        LogPrint(BCLog::OBFUSCATION, "looking for vin -- %s\n", in.ToString());
         for (const CObfuScationEntry& v: entries) {
             for (const CTxDSIn& s: v.sev) {
                 if ((CTxIn)s == in) {
-                    LogPrint("obfuscation", "CObfuscationPool::AddEntry - found in vin\n");
+                    LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::AddEntry - found in vin\n");
                     errorID = ERR_ALREADY_HAVE;
                     sessionUsers--;
                     return false;
@@ -1052,7 +1052,7 @@ bool CObfuscationPool::AddEntry(const std::vector<CTxIn>& newInput, const CAmoun
     v.Add(newInput, nAmount, txCollateral, newOutput);
     entries.push_back(v);
 
-    LogPrint("obfuscation", "CObfuscationPool::AddEntry -- adding %s\n", newInput[0].ToString());
+    LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::AddEntry -- adding %s\n", newInput[0].ToString());
     errorID = MSG_ENTRIES_ADDED;
 
     return true;
@@ -1060,35 +1060,35 @@ bool CObfuscationPool::AddEntry(const std::vector<CTxIn>& newInput, const CAmoun
 
 bool CObfuscationPool::AddScriptSig(const CTxIn& newVin)
 {
-    LogPrint("obfuscation", "CObfuscationPool::AddScriptSig -- new sig  %s\n", newVin.scriptSig.ToString().substr(0, 24));
+    LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::AddScriptSig -- new sig  %s\n", newVin.scriptSig.ToString().substr(0, 24));
 
 
     for (const CObfuScationEntry& v: entries) {
         for (const CTxDSIn& s: v.sev) {
             if (s.scriptSig == newVin.scriptSig) {
-                LogPrint("obfuscation", "CObfuscationPool::AddScriptSig - already exists\n");
+                LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::AddScriptSig - already exists\n");
                 return false;
             }
         }
     }
 
     if (!SignatureValid(newVin.scriptSig, newVin)) {
-        LogPrint("obfuscation", "CObfuscationPool::AddScriptSig - Invalid Sig\n");
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::AddScriptSig - Invalid Sig\n");
         return false;
     }
 
-    LogPrint("obfuscation", "CObfuscationPool::AddScriptSig -- sig %s\n", newVin.ToString());
+    LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::AddScriptSig -- sig %s\n", newVin.ToString());
 
     for (CTxIn& vin: finalTransaction.vin) {
         if (newVin.prevout == vin.prevout && vin.nSequence == newVin.nSequence) {
             vin.scriptSig = newVin.scriptSig;
             vin.prevPubKey = newVin.prevPubKey;
-            LogPrint("obfuscation", "CObfuScationPool::AddScriptSig -- adding to finalTransaction  %s\n", newVin.scriptSig.ToString().substr(0, 24));
+            LogPrint(BCLog::OBFUSCATION, "CObfuScationPool::AddScriptSig -- adding to finalTransaction  %s\n", newVin.scriptSig.ToString().substr(0, 24));
         }
     }
     for (unsigned int i = 0; i < entries.size(); i++) {
         if (entries[i].AddSig(newVin)) {
-            LogPrint("obfuscation", "CObfuScationPool::AddScriptSig -- adding  %s\n", newVin.scriptSig.ToString().substr(0, 24));
+            LogPrint(BCLog::OBFUSCATION, "CObfuScationPool::AddScriptSig -- adding  %s\n", newVin.scriptSig.ToString().substr(0, 24));
             return true;
         }
     }
@@ -1172,7 +1172,7 @@ void CObfuscationPool::SendObfuscationDenominate(std::vector<CTxIn>& vin, std::v
         for (const CTxIn& i: vin) {
             tx.vin.push_back(i);
 
-            LogPrint("obfuscation", "dsi -- tx in %s\n", i.ToString());
+            LogPrint(BCLog::OBFUSCATION, "dsi -- tx in %s\n", i.ToString());
         }
 
         LogPrintf("Submitting tx %s\n", tx.ToString());
@@ -1310,18 +1310,18 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
 
                 const CKeyStore& keystore = *pwalletMain;
 
-                LogPrint("obfuscation", "CObfuscationPool::Sign - Signing my input %i\n", mine);
+                LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Sign - Signing my input %i\n", mine);
                 if (!SignSignature(keystore, prevPubKey, finalTransaction, mine, int(SIGHASH_ALL | SIGHASH_ANYONECANPAY))) { // changes scriptSig
-                    LogPrint("obfuscation", "CObfuscationPool::Sign - Unable to sign my own transaction! \n");
+                    LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Sign - Unable to sign my own transaction! \n");
                     // not sure what to do here, it will timeout...?
                 }
 
                 sigs.push_back(finalTransaction.vin[mine]);
-                LogPrint("obfuscation", " -- dss %d %d %s\n", mine, (int)sigs.size(), finalTransaction.vin[mine].scriptSig.ToString());
+                LogPrint(BCLog::OBFUSCATION, " -- dss %d %d %s\n", mine, (int)sigs.size(), finalTransaction.vin[mine].scriptSig.ToString());
             }
         }
 
-        LogPrint("obfuscation", "CObfuscationPool::Sign - txNew:\n%s", finalTransaction.ToString());
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Sign - txNew:\n%s", finalTransaction.ToString());
     }
 
     // push all of our signatures to the Masternode
@@ -1334,7 +1334,7 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
 
 void CObfuscationPool::NewBlock()
 {
-    LogPrint("obfuscation", "CObfuscationPool::NewBlock \n");
+    LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::NewBlock \n");
 
     //we we're processing lots of blocks, we'll just leave
     if (GetTime() - lastNewBlock < 10) return;
@@ -1413,7 +1413,7 @@ bool CObfuscationPool::DoAutomaticDenominating(bool fDryRun)
     }
 
     if (mnodeman.size() == 0) {
-        LogPrint("obfuscation", "CObfuscationPool::DoAutomaticDenominating - No Masternodes detected\n");
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::DoAutomaticDenominating - No Masternodes detected\n");
         strAutoDenomResult = _("No Masternodes detected.");
         return false;
     }
@@ -1449,7 +1449,7 @@ bool CObfuscationPool::DoAutomaticDenominating(bool fDryRun)
         return false;
     }
 
-    LogPrint("obfuscation", "DoAutomaticDenominating : nLowestDenom=%d, nBalanceNeedsAnonymized=%d\n", nLowestDenom, nBalanceNeedsAnonymized);
+    LogPrint(BCLog::OBFUSCATION, "DoAutomaticDenominating : nLowestDenom=%d, nBalanceNeedsAnonymized=%d\n", nLowestDenom, nBalanceNeedsAnonymized);
 
     // select coins that should be given to the pool
     if (!pwalletMain->SelectCoinsDark(nValueMin, nBalanceNeedsAnonymized, vCoins, nValueIn, 0, nZeromintPercentage)) {
@@ -1521,10 +1521,10 @@ bool CObfuscationPool::DoAutomaticDenominating(bool fDryRun)
 
         //if we've used 90% of the Masternode list then drop all the oldest first
         int nThreshold = (int)(mnodeman.CountEnabled(ActiveProtocol()) * 0.9);
-        LogPrint("obfuscation", "Checking vecMasternodesUsed size %d threshold %d\n", (int)vecMasternodesUsed.size(), nThreshold);
+        LogPrint(BCLog::OBFUSCATION, "Checking vecMasternodesUsed size %d threshold %d\n", (int)vecMasternodesUsed.size(), nThreshold);
         while ((int)vecMasternodesUsed.size() > nThreshold) {
             vecMasternodesUsed.erase(vecMasternodesUsed.begin());
-            LogPrint("obfuscation", "  vecMasternodesUsed size %d threshold %d\n", (int)vecMasternodesUsed.size(), nThreshold);
+            LogPrint(BCLog::OBFUSCATION, "  vecMasternodesUsed size %d threshold %d\n", (int)vecMasternodesUsed.size(), nThreshold);
         }
 
         //don't use the queues all of the time for mixing
@@ -1863,7 +1863,7 @@ bool CObfuscationPool::IsCompatibleWithSession(int64_t nDenom, CTransaction txCo
     LogPrintf("CObfuscationPool::IsCompatibleWithSession - sessionDenom %d sessionUsers %d\n", sessionDenom, sessionUsers);
 
     if (!unitTest && !IsCollateralValid(txCollateral)) {
-        LogPrint("obfuscation", "CObfuscationPool::IsCompatibleWithSession - collateral not valid!\n");
+        LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::IsCompatibleWithSession - collateral not valid!\n");
         errorID = ERR_INVALID_COLLATERAL;
         return false;
     }
