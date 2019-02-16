@@ -8,7 +8,7 @@
 cmake_minimum_required(VERSION 3.13.2)
 project(WISPR)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 # Add path for custom modules
 set(CMAKE_MODULE_PATH
@@ -65,11 +65,27 @@ find_package(Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test CONFIG REQUIR
 
 include_directories(
         src
+        src/qt/forms
         src/leveldb/include
         src/secp256k1/include
         src/univalue/include
         ${Boost_INCLUDE_DIR}
 )
+
+if(UNIX AND NOT APPLE)
+    set(DEPENDS_PREFIX depends/x86_64-pc-linux-gnu)
+elseif(APPLE)
+    set(DEPENDS_PREFIX depends/x86_64-apple-darwin11)
+elseif(WIN32)
+    set(DEPENDS_PREFIX depends/x86_64-w64-mingw32)
+endif()
+
+message(STATUS "DEPENDS_PREFIX: ${DEPENDS_PREFIX}")
+
+if(DEFINED DEPENDS_PREFIX)
+    include_directories(${DEPENDS_PREFIX}/include)
+    include_directories(${DEPENDS_PREFIX}/include/QtWidgets)
+endif()
 
 add_definitions(
         -DENABLE_WALLET=1
@@ -100,6 +116,9 @@ qt5_wrap_ui(UI_GENERATED_HEADERS
         qt/forms/zwspcontroldialog.ui
         )
 file(GLOB SOURCE_FILES
+        src/bench/*.c
+        src/bench/*.h
+        src/bench/*.cpp
         src/compat/*.cpp
         src/compat/*.h
         src/consensus/*.cpp
@@ -107,11 +126,18 @@ file(GLOB SOURCE_FILES
         src/crypto/*.c
         src/crypto/*.h
         src/crypto/*.cpp
-        src/key/*.cpp
-        src/key/*.h
+        src/crypto/ctaes/*.c
+        src/crypto/ctaes/*.h
+        src/crypto/ctaes/*.cpp
+        src/index/*.cpp
+        src/index/*.h
+        src/interfaces/*.cpp
+        src/interfaces/*.h
         src/leveldb/db/*.cc
         src/leveldb/db/*.h
         src/leveldb/include/*.h
+        src/node/*.cpp
+        src/node/*.h
         src/libzerocoin/*.h
         src/libzerocoin/*.cpp
         src/policy/*.cpp
@@ -131,17 +157,23 @@ file(GLOB SOURCE_FILES
         src/secp256k1/src/*.h
         src/support/*.cpp
         src/support/*.h
+        src/support/allocators/*.cpp
+        src/support/allocators/*.h
         src/test/*.cpp
         src/test/*.h
         src/univalue/include/*.h
         src/univalue/lib/*.cpp
         src/univalue/lib/*.h
+        src/util/*.cpp
+        src/util/*.h
+        src/wallet/*.cpp
+        src/wallet/*.h
+        src/wallet/test/*.cpp
+        src/wallet/test/*.h
         src/zmq/*.cpp
         src/zmq/*.h
         src/*.cpp
         src/*.h
-        src/evo/*.h
-        src/evo/*.cpp
         # Handle ui files
         ${UI_GENERATED_HEADERS}
         )
