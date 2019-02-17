@@ -20,18 +20,18 @@
 class CThreadInterrupt
 {
 public:
-    CThreadInterrupt();
-    explicit operator bool() const;
-    void operator()();
-    void reset();
-    bool sleep_for(std::chrono::milliseconds rel_time);
-    bool sleep_for(std::chrono::seconds rel_time);
-    bool sleep_for(std::chrono::minutes rel_time);
+  CThreadInterrupt();
+  explicit operator bool() const;
+  void operator()();
+  void reset();
+  bool sleep_for(std::chrono::milliseconds rel_time);
+  bool sleep_for(std::chrono::seconds rel_time);
+  bool sleep_for(std::chrono::minutes rel_time);
 
 private:
-    std::condition_variable cond;
-    Mutex mut;
-    std::atomic<bool> flag;
+  std::condition_variable cond;
+  Mutex mut;
+  std::atomic<bool> flag;
 };
 
 #endif //BITCOIN_THREADINTERRUPT_H
