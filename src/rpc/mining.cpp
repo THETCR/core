@@ -468,7 +468,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         {
             checktxtime = std::chrono::steady_clock::now() + std::chrono::minutes(1);
 
-            WaitableLock lock(csBestBlock);
+            std::unique_lock<std::mutex> lock(csBestBlock);
             while (chainActive.Tip()->GetBlockHash() == hashWatchedChain && IsRPCRunning()) {
                 if (cvBlockChange.wait_until(lock, checktxtime) == std::cv_status::timeout)
                 {
