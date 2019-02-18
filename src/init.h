@@ -24,6 +24,8 @@ class thread_group;
 void Interrupt();
 void Shutdown();
 void PrepareShutdown();
+//!Initialize the logging infrastructure
+void InitLogging();
 bool AppInit2();
 
 /** The help message mode determines what help message to show */

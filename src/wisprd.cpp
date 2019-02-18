@@ -107,7 +107,8 @@ bool AppInit(int argc, char* argv[])
             fprintf(stderr, "Error: %s\n", e.what());
             return EXIT_FAILURE;
         }
-
+        // Set this early so that parameter interactions go to console
+        InitLogging();
         // parse masternode.conf
         std::string strErr;
         if (!masternodeConfig.read(strErr)) {
