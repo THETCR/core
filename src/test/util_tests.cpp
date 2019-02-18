@@ -95,29 +95,74 @@ BOOST_AUTO_TEST_CASE(util_DateTimeStrFormat)
     BOOST_CHECK_EQUAL(DateTimeStrFormat("%Y-%m-%d %H:%M", 1317425777), "2011-09-30 23:36");
     BOOST_CHECK_EQUAL(DateTimeStrFormat("%a, %d %b %Y %H:%M:%S +0000", 1317425777), "Fri, 30 Sep 2011 23:36:17 +0000");
 }
+BOOST_AUTO_TEST_CASE(util_FormatISO8601DateTime)
+{
+    BOOST_CHECK_EQUAL(FormatISO8601DateTime(1317425777), "2011-09-30T23:36:17Z");
+}
+
+BOOST_AUTO_TEST_CASE(util_FormatISO8601Date)
+{
+    BOOST_CHECK_EQUAL(FormatISO8601Date(1317425777), "2011-09-30");
+}
+
+struct TestArgsManager : public ArgsManager
+{
+  TestArgsManager() { m_network_only_args.clear(); }
+  std::map<std::string, std::vector<std::string> >& GetOverrideArgs() { return m_override_args; }
+  std::map<std::string, std::vector<std::string> >& GetConfigArgs() { return m_config_args; }
+  void ReadConfigString(const std::string str_config)
+  {
+      std::istringstream streamConfig(str_config);
+      {
+          LOCK(cs_args);
+          m_config_args.clear();
+      }
+      std::string error;
+      BOOST_REQUIRE(ReadConfigStream(streamConfig, error));
+  }
+  void SetNetworkOnlyArg(const std::string arg)
+  {
+      LOCK(cs_args);
+      m_network_only_args.insert(arg);
+  }
+  void SetupArgs(int argv, const char* args[])
+  {
+      for (int i = 0; i < argv; ++i) {
+          AddArg(args[i], "", false, OptionsCategory::OPTIONS);
+      }
+  }
+};
 
 BOOST_AUTO_TEST_CASE(util_ParseParameters)
 {
+    TestArgsManager testArgs;
+    const char* avail_args[] = {"-a", "-b", "-ccc", "-d"};
     const char *argv_test[] = {"-ignored", "-a", "-b", "-ccc=argument", "-ccc=multiple", "f", "-d=e"};
+
     std::string error;
-    gArgs.ParseParameters(0, (char**)argv_test, error);
-    BOOST_CHECK(mapArgs.empty() && mapMultiArgs.empty());
+    testArgs.SetupArgs(4, avail_args);
+    BOOST_CHECK(testArgs.ParseParameters(0, (char**)argv_test, error));
+    BOOST_CHECK(testArgs.GetOverrideArgs().empty() && testArgs.GetConfigArgs().empty());
 
-    gArgs.ParseParameters(1, (char**)argv_test, error);
-    BOOST_CHECK(mapArgs.empty() && mapMultiArgs.empty());
+    BOOST_CHECK(testArgs.ParseParameters(1, (char**)argv_test, error));
+    BOOST_CHECK(testArgs.GetOverrideArgs().empty() && testArgs.GetConfigArgs().empty());
 
-    gArgs.ParseParameters(5, (char**)argv_test, error);
+    BOOST_CHECK(testArgs.ParseParameters(7, (char**)argv_test, error));
     // expectation: -ignored is ignored (program name argument),
     // -a, -b and -ccc end up in map, -d ignored because it is after
     // a non-option argument (non-GNU option parsing)
-    BOOST_CHECK(mapArgs.size() == 3 && mapMultiArgs.size() == 3);
-    BOOST_CHECK(mapArgs.count("-a") && mapArgs.count("-b") && mapArgs.count("-ccc")
-                && !mapArgs.count("f") && !mapArgs.count("-d"));
-    BOOST_CHECK(mapMultiArgs.count("-a") && mapMultiArgs.count("-b") && mapMultiArgs.count("-ccc")
-                && !mapMultiArgs.count("f") && !mapMultiArgs.count("-d"));
+    BOOST_CHECK(testArgs.GetOverrideArgs().size() == 3 && testArgs.GetConfigArgs().empty());
+    BOOST_CHECK(testArgs.IsArgSet("-a") && testArgs.IsArgSet("-b") && testArgs.IsArgSet("-ccc")
+                    && !testArgs.IsArgSet("f") && !testArgs.IsArgSet("-d"));
+    BOOST_CHECK(testArgs.GetOverrideArgs().count("-a") && testArgs.GetOverrideArgs().count("-b") && testArgs.GetOverrideArgs().count("-ccc")
+                    && !testArgs.GetOverrideArgs().count("f") && !testArgs.GetOverrideArgs().count("-d"));
 
-    BOOST_CHECK(mapArgs["-a"] == "" && mapArgs["-ccc"] == "multiple");
-    BOOST_CHECK(mapMultiArgs["-ccc"].size() == 2);
+    BOOST_CHECK(testArgs.GetOverrideArgs()["-a"].size() == 1);
+    BOOST_CHECK(testArgs.GetOverrideArgs()["-a"].front() == "");
+    BOOST_CHECK(testArgs.GetOverrideArgs()["-ccc"].size() == 2);
+    BOOST_CHECK(testArgs.GetOverrideArgs()["-ccc"].front() == "argument");
+    BOOST_CHECK(testArgs.GetOverrideArgs()["-ccc"].back() == "multiple");
+    BOOST_CHECK(testArgs.GetArgs("-ccc").size() == 2);
 }
 
 BOOST_AUTO_TEST_CASE(util_GetArg)
