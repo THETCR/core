@@ -1,17 +1,20 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Copyright (c) 2016-2018 The PIVX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "txdb.h"
+#include <txdb.h>
 
-#include "accumulators.h"
-#include "chainparams.h"
-#include "hash.h"
-#include "pow.h"
-#include "shutdown.h"
-#include "uint256.h"
+#include <accumulators.h>
+#include <chainparams.h>
+#include <hash.h>
+#include <random.h>
+#include <pow.h>
+#include <shutdown.h>
+#include <uint256.h>
+#include <util/system.h>
+#include <ui_interface.h>
 
 #include <stdint.h>
 
@@ -20,6 +23,7 @@
 using namespace std;
 using namespace libzerocoin;
 
+static const char DB_COIN = 'C';
 static const char DB_COINS = 'c';
 static const char DB_BLOCK_FILES = 'f';
 static const char DB_TXINDEX = 't';
@@ -68,7 +72,7 @@ uint256 CCoinsViewDB::GetBestBlock() const
 
 bool CCoinsViewDB::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock)
 {
-    CLevelDBBatch batch;
+    CLevelDBBatch batch(db);
     size_t count = 0;
     size_t changed = 0;
     for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end();) {
@@ -86,7 +90,10 @@ bool CCoinsViewDB::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock)
     LogPrint(BCLog::COINDB, "Committing %u changed transactions (out of %u) to coin database...\n", (unsigned int)changed, (unsigned int)count);
     return db.WriteBatch(batch);
 }
-
+size_t CCoinsViewDB::EstimateSize() const
+{
+    return db.EstimateSize(DB_COIN, (char)(DB_COIN+1));
+}
 CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevelDBWrapper(GetDataDir() / "blocks" / "index", nCacheSize, fMemory, fWipe)
 {
 }
@@ -185,7 +192,7 @@ bool CBlockTreeDB::ReadTxIndex(const uint256& txid, CDiskTxPos& pos)
 
 bool CBlockTreeDB::WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& vect)
 {
-    CLevelDBBatch batch;
+    CLevelDBBatch batch(*this);
     for (std::vector<std::pair<uint256, CDiskTxPos> >::const_iterator it = vect.begin(); it != vect.end(); it++)
     batch.Write(make_pair('t', it->first), it->second);
     return WriteBatch(batch);
@@ -322,7 +329,7 @@ bool CZerocoinDB::EraseCoinMint(const CBigNum& bnPubcoin)
 
 bool CZerocoinDB::WriteCoinSpendBatch(const std::vector<std::pair<libzerocoin::CoinSpend, uint256> >& spendInfo)
 {
-    CLevelDBBatch batch;
+    CLevelDBBatch batch(*this);
     size_t count = 0;
     for (std::vector<std::pair<libzerocoin::CoinSpend, uint256> >::const_iterator it=spendInfo.begin(); it != spendInfo.end(); it++) {
         CBigNum bnSerial = it->first.getCoinSerialNumber();
@@ -413,3 +420,71 @@ bool CZerocoinDB::EraseAccumulatorValue(const uint32_t& nChecksum)
     LogPrint(BCLog::ZERO, "%s : checksum:%d\n", __func__, nChecksum);
     return Erase(make_pair('2', nChecksum));
 }
+/** Upgrade the database from older formats.
+ *
+ * Currently implemented: from the per-tx utxo model (0.8..0.14.x) to per-txout.
+ */
+//bool CCoinsViewDB::Upgrade() {
+//    std::unique_ptr<CLevelDBIterator> pcursor(db.NewIterator());
+//    pcursor->Seek(std::make_pair(DB_COINS, uint256()));
+//    if (!pcursor->Valid()) {
+//        return true;
+//    }
+//
+//    int64_t count = 0;
+//    LogPrintf("Upgrading utxo-set database...\n");
+//    LogPrintf("[0%%]..."); /* Continued */
+//    uiInterface.ShowProgress(_("Upgrading UTXO database"), 0, true);
+//    size_t batch_size = 1 << 24;
+//    CLevelDBBatch batch(db);
+//    int reportDone = 0;
+//    std::pair<unsigned char, uint256> key;
+//    std::pair<unsigned char, uint256> prev_key = {DB_COINS, uint256()};
+//    while (pcursor->Valid()) {
+//        boost::this_thread::interruption_point();
+//        if (ShutdownRequested()) {
+//            break;
+//        }
+//        if (pcursor->GetKey(key) && key.first == DB_COINS) {
+//            if (count++ % 256 == 0) {
+//                uint32_t high = 0x100 * *key.second.begin() + *(key.second.begin() + 1);
+//                int percentageDone = (int)(high * 100.0 / 65536.0 + 0.5);
+//                uiInterface.ShowProgress(_("Upgrading UTXO database"), percentageDone, true);
+//                if (reportDone < percentageDone/10) {
+//                    // report max. every 10% step
+//                    LogPrintf("[%d%%]...", percentageDone); /* Continued */
+//                    reportDone = percentageDone/10;
+//                }
+//            }
+//            CCoins old_coins;
+//            if (!pcursor->GetValue(old_coins)) {
+//                return error("%s: cannot parse CCoins record", __func__);
+//            }
+//            COutPoint outpoint(key.second, 0);
+//            for (size_t i = 0; i < old_coins.vout.size(); ++i) {
+//                if (!old_coins.vout[i].IsNull() && !old_coins.vout[i].scriptPubKey.IsUnspendable()) {
+//                    Coin newcoin(std::move(old_coins.vout[i]), old_coins.nHeight, old_coins.fCoinBase);
+//                    outpoint.n = i;
+//                    CoinEntry entry(&outpoint);
+//                    batch.Write(entry, newcoin);
+//                }
+//            }
+//            batch.Erase(key);
+//            if (batch.SizeEstimate() > batch_size) {
+//                db.WriteBatch(batch);
+//                batch.Clear();
+//                db.CompactRange(prev_key, key);
+//                prev_key = key;
+//            }
+//            pcursor->Next();
+//        } else {
+//            break;
+//        }
+//    }
+//    db.WriteBatch(batch);
+//    db.CompactRange({DB_COINS, uint256()}, key);
+//    uiInterface.ShowProgress("", 100);
+//    uiInterface.ShowProgress("", 100, false);
+//    LogPrintf("[%s].\n", ShutdownRequested() ? "CANCELLED" : "DONE");
+//    return !ShutdownRequested();
+//}
