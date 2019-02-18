@@ -99,14 +99,14 @@ BOOST_AUTO_TEST_CASE(util_DateTimeStrFormat)
 BOOST_AUTO_TEST_CASE(util_ParseParameters)
 {
     const char *argv_test[] = {"-ignored", "-a", "-b", "-ccc=argument", "-ccc=multiple", "f", "-d=e"};
-
-    gArgs.ParseParameters(0, (char**)argv_test);
+    std::string error;
+    gArgs.ParseParameters(0, (char**)argv_test, error);
     BOOST_CHECK(mapArgs.empty() && mapMultiArgs.empty());
 
-    gArgs.ParseParameters(1, (char**)argv_test);
+    gArgs.ParseParameters(1, (char**)argv_test, error);
     BOOST_CHECK(mapArgs.empty() && mapMultiArgs.empty());
 
-    gArgs.ParseParameters(5, (char**)argv_test);
+    gArgs.ParseParameters(5, (char**)argv_test, error);
     // expectation: -ignored is ignored (program name argument),
     // -a, -b and -ccc end up in map, -d ignored because it is after
     // a non-option argument (non-GNU option parsing)

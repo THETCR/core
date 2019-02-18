@@ -35,7 +35,8 @@ static bool AppInitRawTx(int argc, char* argv[])
     //
     // Parameters
     //
-    gArgs.ParseParameters(argc, argv);
+    std::string error;
+    gArgs.ParseParameters(argc, argv, error);
 
     // Check for -testnet or -regtest parameter (Params() calls are only valid after this clause)
     try {

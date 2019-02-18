@@ -70,7 +70,8 @@ bool AppInit(int argc, char* argv[])
     // Parameters
     //
     // If Qt is used, parameters/wispr.conf are parsed in qt/wispr.cpp's main()
-    gArgs.ParseParameters(argc, argv);
+    std::string error;
+    gArgs.ParseParameters(argc, argv, error);
 
     // Process help and version before taking care about datadir
     if (mapArgs.count("-?") || mapArgs.count("-help") || mapArgs.count("-version")) {
