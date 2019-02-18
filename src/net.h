@@ -78,6 +78,8 @@ static const unsigned int DEFAULT_MAX_PEER_CONNECTIONS = 125;
 static const uint64_t DEFAULT_MAX_UPLOAD_TARGET = 0;
 /** Default for blocks only*/
 static const bool DEFAULT_BLOCKSONLY = false;
+/** -peertimeout default */
+static const int64_t DEFAULT_PEER_CONNECT_TIMEOUT = 60;
 
 static const bool DEFAULT_FORCEDNSSEED = false;
 static const size_t DEFAULT_MAXRECEIVEBUFFER = 5 * 1000;

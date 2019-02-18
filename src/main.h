@@ -97,6 +97,65 @@ static const unsigned int MAX_BLOCKS_TO_ANNOUNCE = 8;
  static const bool DEFAULT_PEERBLOOMFILTERS = true;
 static const bool DEFAULT_PEERBLOOMFILTERS_ZC = false;
 
+
+/** Default for -whitelistrelay. */
+static const bool DEFAULT_WHITELISTRELAY = true;
+/** Default for -whitelistforcerelay. */
+static const bool DEFAULT_WHITELISTFORCERELAY = false;
+/** Default for -minrelaytxfee, minimum relay fee for transactions */
+static const unsigned int DEFAULT_MIN_RELAY_TX_FEE = 1000;
+//! -maxtxfee default
+static const CAmount DEFAULT_TRANSACTION_MAXFEE = COIN / 10;
+//! Discourage users to set fees higher than this amount (in satoshis) per kB
+static const CAmount HIGH_TX_FEE_PER_KB = COIN / 100;
+//! -maxtxfee will warn if called with a higher fee than this amount (in satoshis)
+static const CAmount HIGH_MAX_TX_FEE = 100 * HIGH_TX_FEE_PER_KB;
+/** Default for -limitancestorcount, max number of in-mempool ancestors */
+static const unsigned int DEFAULT_ANCESTOR_LIMIT = 25;
+/** Default for -limitancestorsize, maximum kilobytes of tx + all in-mempool ancestors */
+static const unsigned int DEFAULT_ANCESTOR_SIZE_LIMIT = 101;
+/** Default for -limitdescendantcount, max number of in-mempool descendants */
+static const unsigned int DEFAULT_DESCENDANT_LIMIT = 25;
+/** Default for -limitdescendantsize, maximum kilobytes of in-mempool descendants */
+static const unsigned int DEFAULT_DESCENDANT_SIZE_LIMIT = 101;
+/** Default for -mempoolexpiry, expiration time for mempool transactions in hours */
+static const unsigned int DEFAULT_MEMPOOL_EXPIRY = 336;
+/** Maximum kilobytes for transactions to store for processing during reorg */
+static const unsigned int MAX_DISCONNECTED_TX_POOL_SIZE = 20000;
+
+/** Maximum depth of blocks we're willing to serve as compact blocks to peers
+ *  when requested. For older blocks, a regular BLOCK response will be sent. */
+static const int MAX_CMPCTBLOCK_DEPTH = 5;
+/** Maximum depth of blocks we're willing to respond to GETBLOCKTXN requests for. */
+static const int MAX_BLOCKTXN_DEPTH = 10;
+/** Time to wait (in seconds) between flushing chainstate to disk. */
+static const unsigned int DATABASE_FLUSH_INTERVAL = 24 * 60 * 60;
+/** Block download timeout base, expressed in millionths of the block interval (i.e. 10 min) */
+static const int64_t BLOCK_DOWNLOAD_TIMEOUT_BASE = 1000000;
+/** Additional block download timeout per parallel downloading peer (i.e. 5 min) */
+static const int64_t BLOCK_DOWNLOAD_TIMEOUT_PER_PEER = 500000;
+
+static const int64_t DEFAULT_MAX_TIP_AGE = 24 * 60 * 60;
+/** Maximum age of our tip in seconds for us to be considered current for fee estimation */
+static const int64_t MAX_FEE_ESTIMATION_TIP_AGE = 3 * 60 * 60;
+
+/** Default for -permitbaremultisig */
+static const bool DEFAULT_PERMIT_BAREMULTISIG = true;
+static const bool DEFAULT_CHECKPOINTS_ENABLED = true;
+static const bool DEFAULT_TXINDEX = false;
+/** Default for -persistmempool */
+static const bool DEFAULT_PERSIST_MEMPOOL = true;
+/** Default for -mempoolreplacement */
+static const bool DEFAULT_ENABLE_REPLACEMENT = true;
+/** Default for using fee filter */
+static const bool DEFAULT_FEEFILTER = true;
+
+/** Maximum number of unconnecting headers announcements before DoS score */
+static const int MAX_UNCONNECTING_HEADERS = 10;
+
+/** Default for -stopatheight */
+static const int DEFAULT_STOPATHEIGHT = 0;
+
 struct BlockHasher {
     size_t operator()(const uint256& hash) const { return hash.GetLow64(); }
 };
@@ -145,6 +204,31 @@ extern CLightWorker lightWorker;
 
 /** Minimum disk space required - used in CheckDiskSpace() */
 static const uint64_t nMinDiskSpace = 52428800;
+
+/** Pruning-related variables and constants */
+/** True if any block files have ever been pruned. */
+extern bool fHavePruned;
+/** True if we're running in -prune mode. */
+extern bool fPruneMode;
+/** Number of MiB of block files that we're trying to stay below. */
+extern uint64_t nPruneTarget;
+/** Block files containing a block-height within MIN_BLOCKS_TO_KEEP of chainActive.Tip() will not be pruned. */
+static const unsigned int MIN_BLOCKS_TO_KEEP = 288;
+/** Minimum blocks required to signal NODE_NETWORK_LIMITED */
+static const unsigned int NODE_NETWORK_LIMITED_MIN_BLOCKS = 288;
+
+static const signed int DEFAULT_CHECKBLOCKS = 6;
+static const unsigned int DEFAULT_CHECKLEVEL = 3;
+
+// Require that user allocate at least 550 MiB for block & undo files (blk???.dat and rev???.dat)
+// At 1MB per block, 288 blocks = 288MB.
+// Add 15% for Undo data = 331MB
+// Add 20% for Orphan block rate = 397MB
+// We want the low water mark after pruning to be at least 397 MB and since we prune in
+// full block file chunks, we need the high water mark which triggers the prune to be
+// one 128MB block file + added 15% undo data = 147MB greater for a total of 545MB
+// Setting the target to >= 550 MiB will make it likely we can respect the target.
+static const uint64_t MIN_DISK_SPACE_FOR_BLOCK_FILES = 550 * 1024 * 1024;
 
 /**
  * Process an incoming block. This only returns after the best known valid

@@ -48,7 +48,7 @@ static bool AppInitRawTx(int argc, char* argv[])
 
     fCreateBlank = gArgs.GetBoolArg("-create", false);
 
-    if (argc < 2 || mapArgs.count("-?") || mapArgs.count("-help")) {
+    if (argc < 2 || gArgs.IsArgSet("-?") || gArgs.IsArgSet("-help")) {
         // First part of help message is specific to this utility
         std::string strUsage = _("Wispr Core wispr-tx utility version") + " " + FormatFullVersion() + "\n\n" +
                                _("Usage:") + "\n" +

@@ -1558,7 +1558,7 @@ void CConnman::ProcessOneShot()
 void CConnman::ThreadOpenConnections()
 {
     // Connect to specific addresses
-    if (mapArgs.count("-connect") && mapMultiArgs["-connect"].size() > 0)
+    if (gArgs.IsArgSet("-connect") && mapMultiArgs["-connect"].size() > 0)
     {
         for (int64_t nLoop = 0;; nLoop++)
         {
@@ -2406,12 +2406,12 @@ void CNode::EndMessage() UNLOCK_FUNCTION(cs_vSend)
     // The -*messagestest options are intentionally not documented in the help message,
     // since they are only used during development to debug the networking code and are
     // not intended for end-users.
-    if (mapArgs.count("-dropmessagestest") && GetRand(gArgs.GetArg("-dropmessagestest", 2)) == 0) {
+    if (gArgs.IsArgSet("-dropmessagestest") && GetRand(gArgs.GetArg("-dropmessagestest", 2)) == 0) {
         LogPrint(BCLog::NET, "dropmessages DROPPING SEND MESSAGE\n");
         AbortMessage();
         return;
     }
-    if (mapArgs.count("-fuzzmessagestest"))
+    if (gArgs.IsArgSet("-fuzzmessagestest"))
         Fuzz(gArgs.GetArg("-fuzzmessagestest", 10));
 
     if (ssSend.size() == 0) {

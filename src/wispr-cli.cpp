@@ -76,9 +76,9 @@ static bool AppInitRPC(int argc, char* argv[])
     //
     std::string error;
     gArgs.ParseParameters(argc, argv, error);
-    if (argc < 2 || mapArgs.count("-?") || mapArgs.count("-help") || mapArgs.count("-version")) {
+    if (argc < 2 || gArgs.IsArgSet("-?") || gArgs.IsArgSet("-help") || gArgs.IsArgSet("-version")) {
         std::string strUsage = _("WISPR Core RPC client version") + " " + FormatFullVersion() + "\n";
-        if (!mapArgs.count("-version")) {
+        if (!gArgs.IsArgSet("-version")) {
             strUsage += "\n" + _("Usage:") + "\n" +
                         "  wispr-cli [options] <command> [params]  " + _("Send command to WISPR Core") + "\n" +
                         "  wispr-cli [options] help                " + _("List commands") + "\n" +

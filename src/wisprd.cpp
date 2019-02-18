@@ -70,14 +70,17 @@ bool AppInit(int argc, char* argv[])
     // Parameters
     //
     // If Qt is used, parameters/wispr.conf are parsed in qt/wispr.cpp's main()
+    SetupServerArgs();
     std::string error;
-    gArgs.ParseParameters(argc, argv, error);
-
+    if (!gArgs.ParseParameters(argc, argv, error)) {
+        fprintf(stderr, "Error parsing command line arguments: %s\n", error.c_str());
+        return false;
+    }
     // Process help and version before taking care about datadir
-    if (mapArgs.count("-?") || mapArgs.count("-help") || mapArgs.count("-version")) {
+    if (gArgs.IsArgSet("-?") || gArgs.IsArgSet("-help") || gArgs.IsArgSet("-version")) {
         std::string strUsage = PACKAGE_NAME " Daemon version " + FormatFullVersion() + "\n";
 
-        if (mapArgs.count("-version")) {
+        if (gArgs.IsArgSet("-version")) {
             strUsage += FormatParagraph(LicenseInfo()) + "\n";
         } else {
             strUsage += "\nUsage:  wisprd [options]                     Start " PACKAGE_NAME " Daemon\n";

@@ -54,7 +54,8 @@ struct Params {
   int nNewProtocolStartTime;
   int nZerocoinRequiredStakeDepth;
   uint256 stakeLimit;
-
+  uint256 nMinimumChainWork;
+  uint256 defaultAssumeValid;
 };
 } // namespace Consensus
 

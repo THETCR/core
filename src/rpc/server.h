@@ -21,6 +21,8 @@
 
 #include <univalue.h>
 
+static const unsigned int DEFAULT_RPC_SERIALIZE_VERSION = 1;
+
 class CRPCCommand;
 
 namespace RPCServer
