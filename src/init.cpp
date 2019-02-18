@@ -313,6 +313,41 @@ void Shutdown()
     ECC_Stop();
     LogPrintf("%s: done\n", __func__);
 }
+/**
+ * Signal handlers are very limited in what they are allowed to do.
+ * The execution context the handler is invoked in is not guaranteed,
+ * so we restrict handler operations to just touching variables:
+ */
+#ifndef WIN32
+static void HandleSIGTERM(int)
+{
+    StartShutdown();
+}
+
+static void HandleSIGHUP(int)
+{
+    fReopenDebugLog = true;
+    LogInstance().m_reopen_file = true;
+}
+#else
+static BOOL WINAPI consoleCtrlHandler(DWORD dwCtrlType)
+{
+    StartShutdown();
+    Sleep(INFINITE);
+    return true;
+}
+#endif
+
+#ifndef WIN32
+static void registerSignalHandler(int signal, void(*handler)(int))
+{
+    struct sigaction sa;
+    sa.sa_handler = handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(signal, &sa, nullptr);
+}
+#endif
 
 /**
  * Signal handlers are very limited in what they are allowed to do, so:
@@ -936,7 +971,18 @@ bool AppInitServers()
         return false;
     return true;
 }
+[[noreturn]] static void new_handler_terminate()
+{
+    // Rather than throwing std::bad-alloc if allocation fails, terminate
+    // immediately to (try to) avoid chain corruption.
+    // Since LogPrintf may itself allocate memory, set the handler directly
+    // to terminate first.
+    std::set_new_handler(std::terminate);
+    LogPrintf("Error: Out of memory. Terminating.\n");
 
+    // The log was successful, terminate now.
+    std::terminate();
+};
 /** Initialize wispr.
  *  @pre Parameters should be parsed and config file should be read.
  */
@@ -947,57 +993,34 @@ bool AppInit2()
 #ifdef _MSC_VER
     // Turn off Microsoft heap dump noise
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
-    _CrtSetReportFile(_CRT_WARN, CreateFileA("NUL", GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, 0));
-#endif
-#if _MSC_VER >= 1400
+    _CrtSetReportFile(_CRT_WARN, CreateFileA("NUL", GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, 0));
     // Disable confusing "helpful" text message on abort, Ctrl-C
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
 #endif
 #ifdef WIN32
-// Enable Data Execution Prevention (DEP)
-// Minimum supported OS versions: WinXP SP3, WinVista >= SP1, Win Server 2008
-// A failure is non-critical and needs no further attention!
-#ifndef PROCESS_DEP_ENABLE
-// We define this here, because GCCs winbase.h limits this to _WIN32_WINNT >= 0x0601 (Windows 7),
-// which is not correct. Can be removed, when GCCs winbase.h is fixed!
-#define PROCESS_DEP_ENABLE 0x00000001
-#endif
-    typedef BOOL(WINAPI * PSETPROCDEPPOL)(DWORD);
-    PSETPROCDEPPOL setProcDEPPol = (PSETPROCDEPPOL)GetProcAddress(GetModuleHandleA("Kernel32.dll"), "SetProcessDEPPolicy");
-    if (setProcDEPPol != nullptr) setProcDEPPol(PROCESS_DEP_ENABLE);
+    // Enable Data Execution Prevention (DEP)
+    SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 #endif
 
     if (!SetupNetworking())
         return InitError("Error: Initializing networking failed");
 
 #ifndef WIN32
-    if (gArgs.GetBoolArg("-sysperms", false)) {
-#ifdef ENABLE_WALLET
-        if (!gArgs.GetBoolArg("-disablewallet", false))
-            return InitError("Error: -sysperms is not allowed in combination with enabled wallet functionality");
-#endif
-    } else {
+    if (!gArgs.GetBoolArg("-sysperms", false)) {
         umask(077);
     }
 
-
     // Clean shutdown on SIGTERM
-    struct sigaction sa;
-    sa.sa_handler = HandleSIGTERM;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    sigaction(SIGTERM, &sa, NULL);
-    sigaction(SIGINT, &sa, NULL);
+    registerSignalHandler(SIGTERM, HandleSIGTERM);
+    registerSignalHandler(SIGINT, HandleSIGTERM);
 
     // Reopen debug.log on SIGHUP
-    struct sigaction sa_hup;
-    sa_hup.sa_handler = HandleSIGHUP;
-    sigemptyset(&sa_hup.sa_mask);
-    sa_hup.sa_flags = 0;
-    sigaction(SIGHUP, &sa_hup, NULL);
+    registerSignalHandler(SIGHUP, HandleSIGHUP);
 
     // Ignore SIGPIPE, otherwise it will bring the daemon down if the client closes unexpectedly
     signal(SIGPIPE, SIG_IGN);
+#else
+    SetConsoleCtrlHandler(consoleCtrlHandler, true);
 #endif
 
     // ********************************************************* Step 2: parameter interactions
