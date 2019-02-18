@@ -66,7 +66,6 @@
 #include <stdio.h>
 
 #ifndef WIN32
-#include <winbase.h>
 #include <signal.h>
 #include <sys/stat.h>
 #endif
@@ -76,6 +75,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/thread.hpp>
 #include <openssl/crypto.h>
 
@@ -101,6 +101,7 @@ std::unique_ptr<CConnman> g_connman;
 std::unique_ptr<PeerLogicValidation> peerLogic;
 
 #ifdef WIN32
+#include <winbase.h>
 // Win32 LevelDB doesn't use filedescriptors, and the ones used for
 // accessing block files don't count towards the fd_set size limit
 // anyway.
