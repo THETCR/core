@@ -2,7 +2,9 @@
 // Copyright (c) 2015-2017 The PIVX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
+#if defined(HAVE_CONFIG_H)
+#include <config/wispr-config.h>
+#endif
 #include "base58.h"
 #include "consensus/consensus.h"
 #include "clientversion.h"
@@ -16,8 +18,8 @@
 #include "ui_interface.h" // for _(...)
 #include <univalue.h>
 #include <util/system.h>
-#include "util/moneystr.h"
-#include "util/strencodings.h"
+#include <util/moneystr.h>
+#include <util/strencodings.h>
 
 #include <stdio.h>
 
@@ -30,14 +32,53 @@ static bool fCreateBlank;
 static map<string, UniValue> registers;
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
+static void SetupBitcoinTxArgs()
+{
+    SetupHelpOptions(gArgs);
+
+    gArgs.AddArg("-create", "Create new, empty TX.", false, OptionsCategory::OPTIONS);
+    gArgs.AddArg("-json", "Select JSON output", false, OptionsCategory::OPTIONS);
+    gArgs.AddArg("-txid", "Output only the hex-encoded transaction id of the resultant transaction.", false, OptionsCategory::OPTIONS);
+    SetupChainParamsBaseOptions();
+
+    gArgs.AddArg("delin=N", "Delete input N from TX", false, OptionsCategory::COMMANDS);
+    gArgs.AddArg("delout=N", "Delete output N from TX", false, OptionsCategory::COMMANDS);
+    gArgs.AddArg("in=TXID:VOUT(:SEQUENCE_NUMBER)", "Add input to TX", false, OptionsCategory::COMMANDS);
+    gArgs.AddArg("locktime=N", "Set TX lock time to N", false, OptionsCategory::COMMANDS);
+    gArgs.AddArg("nversion=N", "Set TX version to N", false, OptionsCategory::COMMANDS);
+    gArgs.AddArg("outaddr=VALUE:ADDRESS", "Add address-based output to TX", false, OptionsCategory::COMMANDS);
+    gArgs.AddArg("outdata=[VALUE:]DATA", "Add data-based output to TX", false, OptionsCategory::COMMANDS);
+    gArgs.AddArg("outmultisig=VALUE:REQUIRED:PUBKEYS:PUBKEY1:PUBKEY2:....[:FLAGS]", "Add Pay To n-of-m Multi-sig output to TX. n = REQUIRED, m = PUBKEYS. "
+                                                                                    "Optionally add the \"W\" flag to produce a pay-to-witness-script-hash output. "
+                                                                                    "Optionally add the \"S\" flag to wrap the output in a pay-to-script-hash.", false, OptionsCategory::COMMANDS);
+    gArgs.AddArg("outpubkey=VALUE:PUBKEY[:FLAGS]", "Add pay-to-pubkey output to TX. "
+                                                   "Optionally add the \"W\" flag to produce a pay-to-witness-pubkey-hash output. "
+                                                   "Optionally add the \"S\" flag to wrap the output in a pay-to-script-hash.", false, OptionsCategory::COMMANDS);
+    gArgs.AddArg("outscript=VALUE:SCRIPT[:FLAGS]", "Add raw script output to TX. "
+                                                   "Optionally add the \"W\" flag to produce a pay-to-witness-script-hash output. "
+                                                   "Optionally add the \"S\" flag to wrap the output in a pay-to-script-hash.", false, OptionsCategory::COMMANDS);
+    gArgs.AddArg("replaceable(=N)", "Set RBF opt-in sequence number for input N (if not provided, opt-in all available inputs)", false, OptionsCategory::COMMANDS);
+    gArgs.AddArg("sign=SIGHASH-FLAGS", "Add zero or more signatures to transaction. "
+                                       "This command requires JSON registers:"
+                                       "prevtxs=JSON object, "
+                                       "privatekeys=JSON object. "
+                                       "See signrawtransactionwithkey docs for format of sighash flags, JSON objects.", false, OptionsCategory::COMMANDS);
+
+    gArgs.AddArg("load=NAME:FILENAME", "Load JSON file FILENAME into register NAME", false, OptionsCategory::REGISTER_COMMANDS);
+    gArgs.AddArg("set=NAME:JSON-STRING", "Set register NAME to given JSON-STRING", false, OptionsCategory::REGISTER_COMMANDS);
+}
+
 static bool AppInitRawTx(int argc, char* argv[])
 {
     //
     // Parameters
     //
+    SetupBitcoinTxArgs();
     std::string error;
-    gArgs.ParseParameters(argc, argv, error);
-
+    if (!gArgs.ParseParameters(argc, argv, error)) {
+        fprintf(stderr, "Error parsing command line arguments: %s\n", error.c_str());
+        return EXIT_FAILURE;
+    }
     // Check for -testnet or -regtest parameter (Params() calls are only valid after this clause)
     try {
         SelectParams(gArgs.GetChainName());
