@@ -69,7 +69,9 @@
 #include <signal.h>
 #include <sys/stat.h>
 #endif
-
+#ifndef PROCESS_DEP_ENABLE
+#define PROCESS_DEP_ENABLE                          0x00000001
+#endif
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -937,6 +939,19 @@ void ThreadImport(std::vector<fs::path> vImportFiles)
     }
 }
 
+static bool LockDataDirectory(bool probeOnly)
+{
+    // Make sure only a single Bitcoin process is using the data directory.
+    fs::path datadir = GetDataDir();
+    if (!DirIsWritable(datadir)) {
+        return InitError(strprintf(_("Cannot write to data directory '%s'; check permissions."), datadir.string()));
+    }
+    if (!LockDirectory(datadir, ".lock", probeOnly)) {
+        return InitError(strprintf(_("Cannot obtain a lock on data directory %s. %s is probably already running."), datadir.string(), _(PACKAGE_NAME)));
+    }
+    return true;
+}
+
 /** Sanity checks
  *  Ensure that WISPR is running in a usable environment with all
  *  necessary library support.
@@ -981,6 +996,19 @@ bool AppInitServers()
     // The log was successful, terminate now.
     std::terminate();
 };
+
+bool AppInitLockDataDirectory()
+{
+    // After daemonization get the data directory lock again and hold on to it until exit
+    // This creates a slight window for a race condition to happen, however this condition is harmless: it
+    // will at most make us exit without printing a message to console.
+    if (!LockDataDirectory(false)) {
+        // Detailed error printed inside LockDataDirectory
+        return false;
+    }
+    return true;
+}
+
 /** Initialize wispr.
  *  @pre Parameters should be parsed and config file should be read.
  */
@@ -1021,6 +1049,7 @@ bool AppInit2()
     SetConsoleCtrlHandler(consoleCtrlHandler, true);
 #endif
 
+    std::set_new_handler(new_handler_terminate);
     // ********************************************************* Step 2: parameter interactions
     // Set this early so that parameter interactions go to console
     fPrintToConsole = gArgs.GetBoolArg("-printtoconsole", false);
@@ -1248,14 +1277,7 @@ bool AppInit2()
         return InitError(strprintf(_("Wallet %s resides outside data directory %s"), strWalletFile, strDataDir));
 #endif
     // Make sure only a single WISPR process is using the data directory.
-    fs::path pathLockFile = GetDataDir() / ".lock";
-    FILE* file = fopen(pathLockFile.string().c_str(), "a"); // empty lock file; created if it doesn't exist.
-    if (file) fclose(file);
-    static boost::interprocess::file_lock lock(pathLockFile.string().c_str());
-
-    // Wait maximum 10 seconds if an old wallet is still running. Avoids lockup during restart
-    if (!lock.timed_lock(boost::get_system_time() + boost::posix_time::seconds(10)))
-        return InitError(strprintf(_("Cannot obtain a lock on data directory %s. WISPR Core is probably already running."), strDataDir));
+    LockDataDirectory(true);
 
 #ifndef WIN32
     CreatePidFile(GetPidFile(), getpid());
