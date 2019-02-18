@@ -234,6 +234,8 @@ public:
 
     //! (memory only) Sequential id assigned to distinguish order in which blocks are received.
     uint32_t nSequenceId;
+    //! (memory only) Maximum nTime in the chain up to and including this block.
+    unsigned int nTimeMax;
 
     //! zerocoin specific fields
     std::map<libzerocoin::CoinDenomination, int64_t> mapZerocoinSupply;
@@ -253,6 +255,7 @@ public:
         nChainTx = 0;
         nStatus = 0;
         nSequenceId = 0;
+        nTimeMax = 0;
 
         nMint = 0;
         nMoneySupply = 0;
@@ -392,7 +395,12 @@ public:
     {
         return (int64_t)nTime;
     }
-    int64_t GetPastTimeLimit() const
+    int64_t GetBlockTimeMax() const
+    {
+        return (int64_t)nTimeMax;
+    }
+
+  int64_t GetPastTimeLimit() const
     {
         return GetBlockTime();
     }
