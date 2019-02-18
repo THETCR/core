@@ -17,7 +17,6 @@ TEST_QT_H = \
   qt/test/paymentservertests.h
 
 TEST_BITCOIN_CPP = \
-  test/test_wispr_main.cpp \
   test/test_wispr.cpp
 
 TEST_BITCOIN_H = \
