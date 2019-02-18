@@ -17,6 +17,7 @@ TEST_QT_H = \
   qt/test/paymentservertests.h
 
 TEST_BITCOIN_CPP = \
+  test/test_wispr_main.cpp \
   test/test_wispr.cpp
 
 TEST_BITCOIN_H = \
@@ -26,6 +27,8 @@ qt_test_test_wispr_qt_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT
   $(QT_INCLUDES) $(QT_TEST_INCLUDES) $(PROTOBUF_CFLAGS)
 
 qt_test_test_wispr_qt_SOURCES = \
+  test/testutil.cpp \
+  test/testutil.h \
   qt/test/test_main.cpp \
   qt/test/uritests.cpp \
   $(TEST_QT_H) \
