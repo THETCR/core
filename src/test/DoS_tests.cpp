@@ -95,8 +95,12 @@ BOOST_AUTO_TEST_CASE(DoS_bantime)
     CNode dummyNode(INVALID_SOCKET, addr, "", true);
     dummyNode.nVersion = 1;
 
-    Misbehaving(dummyNode.GetId(), 100);
-    SendMessages(&dummyNode, false);
+    {
+        LOCK(cs_main);
+        Misbehaving(dummyNode.GetId(), 100);
+    }
+
+    BOOST_CHECK(SendMessages(&dummyNode, false));
     BOOST_CHECK(CNode::IsBanned(addr));
 
     SetMockTime(nStartTime+64);
