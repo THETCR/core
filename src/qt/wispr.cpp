@@ -589,12 +589,10 @@ int main(int argc, char* argv[])
             QObject::tr("Error: Specified data directory \"%1\" does not exist.").arg(QString::fromStdString(mapArgs["-datadir"])));
         return 1;
     }
-    try {
-        ReadConfigFile(mapArgs, mapMultiArgs);
-    } catch (std::exception& e) {
-        QMessageBox::critical(0, QObject::tr("WISPR Core"),
-            QObject::tr("Error: Cannot parse configuration file: %1. Only use key=value syntax.").arg(e.what()));
-        return 0;
+    if (!gArgs.ReadConfigFiles(error)) {
+        QMessageBox::critical(nullptr, QObject::tr(PACKAGE_NAME),
+                              QObject::tr("Error: Cannot parse configuration file: %1.").arg(QString::fromStdString(error)));
+        return EXIT_FAILURE;
     }
 
     /// 7. Determine network (and switch to network specific options)

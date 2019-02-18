@@ -93,11 +93,9 @@ bool AppInit(int argc, char* argv[])
             fprintf(stderr, "Error: Specified data directory \"%s\" does not exist.\n", mapArgs["-datadir"].c_str());
             return false;
         }
-        try {
-            ReadConfigFile(mapArgs, mapMultiArgs);
-        } catch (std::exception& e) {
-            fprintf(stderr, "Error reading configuration file: %s\n", e.what());
-            return false;
+        if (!gArgs.ReadConfigFiles(error, true)) {
+            fprintf(stderr, "Error reading configuration file: %s\n", error.c_str());
+            return EXIT_FAILURE;
         }
         // Check for -testnet or -regtest parameter (Params() calls are only valid after this clause)
         try {
