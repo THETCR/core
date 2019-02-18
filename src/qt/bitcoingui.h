@@ -50,6 +50,7 @@ class BitcoinGUI : public QMainWindow
     Q_OBJECT
 
 public:
+    static const std::string DEFAULT_UIPLATFORM;
     static const QString DEFAULT_WALLET;
 
     explicit BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* networkStyle, QWidget* parent = 0);

@@ -521,6 +521,20 @@ WId BitcoinApplication::getMainWinId() const
     return window->winId();
 }
 
+static void SetupUIArgs()
+{
+#if defined(ENABLE_WALLET) && defined(ENABLE_BIP70)
+    gArgs.AddArg("-allowselfsignedrootcertificates", strprintf("Allow self signed root certificates (default: %u)", DEFAULT_SELFSIGNED_ROOTCERTS), true, OptionsCategory::GUI);
+#endif
+    gArgs.AddArg("-choosedatadir", strprintf("Choose data directory on startup (default: %u)", DEFAULT_CHOOSE_DATADIR), false, OptionsCategory::GUI);
+    gArgs.AddArg("-lang=<lang>", "Set language, for example \"de_DE\" (default: system locale)", false, OptionsCategory::GUI);
+    gArgs.AddArg("-min", "Start minimized", false, OptionsCategory::GUI);
+    gArgs.AddArg("-resetguisettings", "Reset all settings changed in the GUI", false, OptionsCategory::GUI);
+    gArgs.AddArg("-rootcertificates=<file>", "Set SSL root certificates for payment request (default: -system-)", false, OptionsCategory::GUI);
+    gArgs.AddArg("-splash", strprintf("Show splash screen on startup (default: %u)", DEFAULT_SPLASHSCREEN), false, OptionsCategory::GUI);
+    gArgs.AddArg("-uiplatform", strprintf("Select platform to customize UI for (one of windows, macosx, other; default: %s)", BitcoinGUI::DEFAULT_UIPLATFORM), true, OptionsCategory::GUI);
+}
+
 #ifndef BITCOIN_QT_TEST
 int main(int argc, char* argv[])
 {
@@ -528,9 +542,6 @@ int main(int argc, char* argv[])
 
     /// 1. Parse command-line options. These take precedence over anything else.
     // Command-line options take precedence:
-    std::string error;
-    gArgs.ParseParameters(argc, argv, error);
-
 // Do not refer to data directory yet, this can be overridden by Intro::pickDataDirectory
 
 /// 2. Basic Qt initialization (not dependent on parameters or configuration)
@@ -555,6 +566,14 @@ int main(int argc, char* argv[])
     //   IMPORTANT if it is no longer a typedef use the normal variant above
     qRegisterMetaType<CAmount>("CAmount");
 
+    SetupServerArgs();
+    SetupUIArgs();
+    std::string error;
+    if (!ParseParameters(argc, argv, error)) {
+        QMessageBox::critical(nullptr, QObject::tr(PACKAGE_NAME),
+                              QObject::tr("Error parsing command line arguments: %1.").arg(QString::fromStdString(error)));
+        return EXIT_FAILURE;
+    }
     /// 3. Application identification
     // must be set before OptionsModel is initialized or translations are loaded,
     // as it is used to locate QSettings
