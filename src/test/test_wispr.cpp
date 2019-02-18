@@ -70,7 +70,6 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     pblocktree = new CBlockTreeDB(1 << 20, true);
     pcoinsdbview = new CCoinsViewDB(1 << 23, true);
     pcoinsTip = new CCoinsViewCache(pcoinsdbview);
-    cout << "Init block index...\n";
     InitBlockIndex(chainparams);
     {
         CValidationState state;

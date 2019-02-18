@@ -2787,7 +2787,6 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                     // Wipe cache, we may need another branch now.
                     pindexMostWork = nullptr;
                 }
-                cout << "New Tip...\n";
                 pindexNewTip = chainActive.Tip();
 
             } while (!chainActive.Tip() || (starting_tip && CBlockIndexWorkComparator()(chainActive.Tip(), starting_tip)));
