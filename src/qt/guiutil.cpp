@@ -351,7 +351,7 @@ void openDebugLogfile()
 
 void openConfigfile()
 {
-    fs::path pathConfig = GetConfigFile();
+    fs::path pathConfig = GetConfigFile(gArgs.GetArg("-conf", BITCOIN_CONF_FILENAME));
 
     /* Open wispr.conf with the associated application */
     if (fs::exists(pathConfig))
