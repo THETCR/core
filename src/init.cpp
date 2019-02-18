@@ -66,6 +66,7 @@
 #include <stdio.h>
 
 #ifndef WIN32
+#include <winbase.h>
 #include <signal.h>
 #include <sys/stat.h>
 #endif
