@@ -351,19 +351,6 @@ static void registerSignalHandler(int signal, void(*handler)(int))
 }
 #endif
 
-/**
- * Signal handlers are very limited in what they are allowed to do, so:
- */
-void HandleSIGTERM(int)
-{
-    StartShutdown();
-}
-
-void HandleSIGHUP(int)
-{
-    fReopenDebugLog = true;
-}
-
 bool static Bind(const CService& addr, unsigned int flags)
 {
     if (!(flags & BF_EXPLICIT) && IsLimited(addr))
