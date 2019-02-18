@@ -32,7 +32,7 @@
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
 extern bool fPrintToConsole;
-BasicTestingSetup::BasicTestingSetup(CBaseChainParams::Network chainName)
+BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
 {
     ECC_Start();
     SetupEnvironment();
@@ -50,7 +50,7 @@ BasicTestingSetup::~BasicTestingSetup()
 {
     ECC_Stop();
 }
-TestingSetup::TestingSetup(CBaseChainParams::Network chainName) : BasicTestingSetup(chainName)
+TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(chainName)
 {
     const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
