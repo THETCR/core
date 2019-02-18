@@ -147,7 +147,6 @@ protected:
     int nMinerThreads;
     std::vector<CDNSSeedData> vSeeds;
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
-    CBaseChainParams::Network networkID;
     std::string strNetworkID;
     CBlock genesis;
     std::vector<SeedSpec6> vFixedSeeds;
@@ -181,24 +180,30 @@ public:
 
 
 /**
- * Return the currently selected parameters. This won't change after app startup
- * outside of the unit tests.
+ * Return the currently selected parameters. This won't change after app
+ * startup, except for unit tests.
  */
-const CChainParams& Params();
+const CChainParams &Params();
 
 /** Return parameters for the given network. */
-CChainParams& Params(CBaseChainParams::Network network);
+CChainParams& Params(const std::string& chain);
 
 /** Get modifiable network parameters (UNITTEST only) */
 CModifiableParams* ModifiableParams();
 
-/** Sets the params returned by Params() to those for the given network. */
-void SelectParams(CBaseChainParams::Network network);
+/**
+ * Sets the params returned by Params() to those for the given BIP70 chain name.
+ * @throws std::runtime_error when the chain is not supported.
+ */
+void SelectParams(const std::string& chain);
+
 
 /**
- * Looks for -regtest or -testnet and then calls SelectParams as appropriate.
- * Returns false if an invalid combination is given.
+ * Creates and returns a std::unique_ptr<CChainParams> of the chosen chain.
+ * @returns a CChainParams* of the chosen chain.
+ * @throws a std::runtime_error if the chain is not supported.
  */
-bool SelectParamsFromCommandLine();
+std::unique_ptr<const CChainParams> CreateChainParams(const std::string& chain);
+
 
 #endif // BITCOIN_CHAINPARAMS_H

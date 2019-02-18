@@ -91,7 +91,6 @@ class CMainParams : public CChainParams
 public:
     CMainParams()
     {
-        networkID = CBaseChainParams::MAIN;
         strNetworkID = "main";
         consensus.nSubsidyHalvingInterval = 0;
         consensus.nEnforceBlockUpgradeMajority = 750;
@@ -212,7 +211,6 @@ public:
         return data;
     }
 };
-static CMainParams mainParams;
 
 /**
  * Testnet (v3)
@@ -222,7 +220,6 @@ class CTestNetParams : public CMainParams
 public:
     CTestNetParams()
     {
-        networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
         consensus.nSubsidyHalvingInterval = 0;
         consensus.nEnforceBlockUpgradeMajority = 51;
@@ -313,7 +310,6 @@ public:
         return dataTestnet;
     }
 };
-static CTestNetParams testNetParams;
 
 /**
  * Regression test
@@ -321,9 +317,8 @@ static CTestNetParams testNetParams;
 class CRegTestParams : public CTestNetParams
 {
 public:
-    CRegTestParams()
+    explicit CRegTestParams(const ArgsManager& args)
     {
-        networkID = CBaseChainParams::REGTEST;
         strNetworkID = "regtest";
         consensus.nSubsidyHalvingInterval = 0;
         consensus.nEnforceBlockUpgradeMajority = 750;
@@ -369,7 +364,6 @@ public:
         return dataRegtest;
     }
 };
-static CRegTestParams regTestParams;
 
 /**
  * Unit test
@@ -379,7 +373,6 @@ class CUnitTestParams : public CMainParams, public CModifiableParams
 public:
     CUnitTestParams()
     {
-        networkID = CBaseChainParams::UNITTEST;
         strNetworkID = "unittest";
         nDefaultPort = 17005;
         vFixedSeeds.clear(); //! Unit test mode doesn't have any fixed seeds.
@@ -410,6 +403,7 @@ static CUnitTestParams unitTestParams;
 
 
 static CChainParams* pCurrentParams = nullptr;
+static std::unique_ptr<const CChainParams> globalChainParams;
 
 CModifiableParams* ModifiableParams()
 {
@@ -418,41 +412,26 @@ CModifiableParams* ModifiableParams()
     return (CModifiableParams*)&unitTestParams;
 }
 
-const CChainParams& Params()
-{
-    assert(pCurrentParams);
-    return *pCurrentParams;
+const CChainParams &Params() {
+    assert(globalChainParams);
+    return *globalChainParams;
 }
 
-CChainParams& Params(CBaseChainParams::Network network)
+std::unique_ptr<const CChainParams> CreateChainParams(const std::string& chain)
 {
-    switch (network) {
-        case CBaseChainParams::MAIN:
-            return mainParams;
-        case CBaseChainParams::TESTNET:
-            return testNetParams;
-        case CBaseChainParams::REGTEST:
-            return regTestParams;
-        case CBaseChainParams::UNITTEST:
-            return unitTestParams;
-        default:
-            assert(false && "Unimplemented network");
-            return mainParams;
-    }
+    if (chain == CBaseChainParams::MAIN)
+        return std::unique_ptr<CChainParams>(new CMainParams());
+    else if (chain == CBaseChainParams::TESTNET)
+        return std::unique_ptr<CChainParams>(new CTestNetParams());
+    else if (chain == CBaseChainParams::REGTEST)
+        return std::unique_ptr<CChainParams>(new CRegTestParams(gArgs));
+    else if (chain == CBaseChainParams::UNITTEST)
+        return std::unique_ptr<CChainParams>(new CUnitTestParams());
+    throw std::runtime_error(strprintf("%s: Unknown chain %s.", __func__, chain));
 }
 
-void SelectParams(CBaseChainParams::Network network)
+void SelectParams(const std::string& network)
 {
     SelectBaseParams(network);
-    pCurrentParams = &Params(network);
-}
-
-bool SelectParamsFromCommandLine()
-{
-    CBaseChainParams::Network network = NetworkIdFromCommandLine();
-    if (network == CBaseChainParams::MAX_NETWORK_TYPES)
-        return false;
-
-    SelectParams(network);
-    return true;
+    globalChainParams = CreateChainParams(network);
 }
