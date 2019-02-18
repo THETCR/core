@@ -144,7 +144,7 @@ bool AppInit(int argc, char* argv[])
                 fprintf(stderr, "Error: setsid() returned %d errno %d\n", sid, errno);
         }
 #endif
-        SoftSetBoolArg("-server", true);
+        gArgs.SoftSetBoolArg("-server", true);
 
         fRet = AppInit2();
     } catch (std::exception& e) {

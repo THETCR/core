@@ -801,61 +801,61 @@ bool AppInit2()
     if (mapArgs.count("-bind") || mapArgs.count("-whitebind")) {
         // when specifying an explicit binding address, you want to listen on it
         // even when -connect or -proxy is specified
-        if (SoftSetBoolArg("-listen", true))
+        if (gArgs.SoftSetBoolArg("-listen", true))
             LogPrintf("AppInit2 : parameter interaction: -bind or -whitebind set -> setting -listen=1\n");
     }
 
     if (mapArgs.count("-connect") && mapMultiArgs["-connect"].size() > 0) {
         // when only connecting to trusted nodes, do not seed via DNS, or listen by default
-        if (SoftSetBoolArg("-dnsseed", false))
+        if (gArgs.SoftSetBoolArg("-dnsseed", false))
             LogPrintf("AppInit2 : parameter interaction: -connect set -> setting -dnsseed=0\n");
-        if (SoftSetBoolArg("-listen", false))
+        if (gArgs.SoftSetBoolArg("-listen", false))
             LogPrintf("AppInit2 : parameter interaction: -connect set -> setting -listen=0\n");
     }
 
     if (mapArgs.count("-proxy")) {
         // to protect privacy, do not listen by default if a default proxy server is specified
-        if (SoftSetBoolArg("-listen", false))
+        if (gArgs.SoftSetBoolArg("-listen", false))
             LogPrintf("%s: parameter interaction: -proxy set -> setting -listen=0\n", __func__);
         // to protect privacy, do not use UPNP when a proxy is set. The user may still specify -listen=1
         // to listen locally, so don't rely on this happening through -listen below.
-        if (SoftSetBoolArg("-upnp", false))
+        if (gArgs.SoftSetBoolArg("-upnp", false))
             LogPrintf("%s: parameter interaction: -proxy set -> setting -upnp=0\n", __func__);
         // to protect privacy, do not discover addresses by default
-        if (SoftSetBoolArg("-discover", false))
+        if (gArgs.SoftSetBoolArg("-discover", false))
             LogPrintf("AppInit2 : parameter interaction: -proxy set -> setting -discover=0\n");
     }
 
     if (!gArgs.GetBoolArg("-listen", true)) {
         // do not map ports or try to retrieve public IP when not listening (pointless)
-        if (SoftSetBoolArg("-upnp", false))
+        if (gArgs.SoftSetBoolArg("-upnp", false))
             LogPrintf("AppInit2 : parameter interaction: -listen=0 -> setting -upnp=0\n");
-        if (SoftSetBoolArg("-discover", false))
+        if (gArgs.SoftSetBoolArg("-discover", false))
             LogPrintf("AppInit2 : parameter interaction: -listen=0 -> setting -discover=0\n");
-        if (SoftSetBoolArg("-listenonion", false))
+        if (gArgs.SoftSetBoolArg("-listenonion", false))
             LogPrintf("AppInit2 : parameter interaction: -listen=0 -> setting -listenonion=0\n");
     }
 
     if (mapArgs.count("-externalip")) {
         // if an explicit public IP is specified, do not try to find others
-        if (SoftSetBoolArg("-discover", false))
+        if (gArgs.SoftSetBoolArg("-discover", false))
             LogPrintf("AppInit2 : parameter interaction: -externalip set -> setting -discover=0\n");
     }
 
     if (gArgs.GetBoolArg("-salvagewallet", false)) {
         // Rewrite just private keys: rescan to find transactions
-        if (SoftSetBoolArg("-rescan", true))
+        if (gArgs.SoftSetBoolArg("-rescan", true))
             LogPrintf("AppInit2 : parameter interaction: -salvagewallet=1 -> setting -rescan=1\n");
     }
 
     // -zapwallettx implies a rescan
     if (gArgs.GetBoolArg("-zapwallettxes", false)) {
-        if (SoftSetBoolArg("-rescan", true))
+        if (gArgs.SoftSetBoolArg("-rescan", true))
             LogPrintf("AppInit2 : parameter interaction: -zapwallettxes=<mode> -> setting -rescan=1\n");
     }
 
     if (!gArgs.GetBoolArg("-enableswifttx", fEnableSwiftTX)) {
-        if (SoftSetArg("-swifttxdepth", "0"))
+        if (gArgs.SoftSetArg("-swifttxdepth", "0"))
             LogPrintf("AppInit2 : parameter interaction: -enableswifttx=false -> setting -nSwiftTXDepth=0\n");
     }
 
@@ -922,7 +922,7 @@ bool AppInit2()
     bool fDisableWallet = gArgs.GetBoolArg("-disablewallet", false);
     if (fDisableWallet) {
 #endif
-        if (SoftSetBoolArg("-staking", false))
+        if (gArgs.SoftSetBoolArg("-staking", false))
             LogPrintf("AppInit2 : parameter interaction: wallet functionality not enabled -> setting -staking=0\n");
 #ifdef ENABLE_WALLET
     }
