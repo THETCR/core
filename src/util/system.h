@@ -111,6 +111,7 @@ const fs::path &GetBlocksDir();
 const fs::path &GetDataDir(bool fNetSpecific = true);
 void ClearDatadirCache();
 fs::path GetConfigFile(const std::string& confPath);
+fs::path GetMasternodeConfigFile();
 #ifndef WIN32
 fs::path GetPidFile();
 void CreatePidFile(const fs::path &path, pid_t pid);
@@ -416,5 +417,8 @@ private:
 #endif
 
 } // namespace util
+double double_safe_addition(double fValue, double fIncrement);
+double double_safe_multiplication(double fValue, double fmultiplicator);
+void SetThreadPriority(int nPriority);
 
 #endif // BITCOIN_UTIL_SYSTEM_H

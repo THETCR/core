@@ -63,7 +63,7 @@ CLevelDBWrapper::CLevelDBWrapper(const fs::path& path, size_t nCacheSize, bool f
             LogPrintf("Wiping LevelDB in %s\n", path.string());
             leveldb::DestroyDB(path.string(), options);
         }
-        TryCreateDirectory(path);
+        TryCreateDirectories(path);
         LogPrintf("Opening LevelDB in %s\n", path.string());
     }
     leveldb::Status status = leveldb::DB::Open(options, path.string(), &pdb);
