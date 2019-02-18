@@ -69,13 +69,9 @@
 #include <signal.h>
 #include <sys/stat.h>
 #endif
-#ifndef PROCESS_DEP_ENABLE
-#define PROCESS_DEP_ENABLE                          0x00000001
-#endif
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/thread.hpp>
 #include <openssl/crypto.h>
 
