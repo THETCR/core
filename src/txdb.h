@@ -21,11 +21,11 @@
 #include <utility>
 #include <vector>
 
-
 class CBlockIndex;
 class CDiskTxPos;
 class CCoins;
 class uint256;
+class CBigNum;
 
 //! No need to periodic flush if at least this much space still available.
 static constexpr int MAX_BLOCK_COINSDB_USAGE = 10;
@@ -102,12 +102,12 @@ class CCoinsViewDBCursor: public CCoinsViewCursor
 public:
   ~CCoinsViewDBCursor() {}
 
-  bool GetKey(uint256 &key) const;
-  bool GetValue(CCoins &coins) const;
-  unsigned int GetValueSize() const;
+  bool GetKey(uint256 &key) const override;
+  bool GetValue(CCoins &coins) const override;
+  unsigned int GetValueSize() const override;
 
-  bool Valid() const;
-  void Next();
+  bool Valid() const override;
+  void Next() override;
 
 private:
   CCoinsViewDBCursor(CLevelDBIterator* pcursorIn, const uint256 &hashBlockIn):
@@ -122,7 +122,7 @@ private:
 class CBlockTreeDB : public CLevelDBWrapper
 {
 public:
-    CBlockTreeDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
+    explicit CBlockTreeDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
 
 private:
     CBlockTreeDB(const CBlockTreeDB&);
@@ -149,7 +149,7 @@ public:
 class CZerocoinDB : public CLevelDBWrapper
 {
 public:
-    CZerocoinDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
+    explicit CZerocoinDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
 
 private:
     CZerocoinDB(const CZerocoinDB&);
