@@ -918,7 +918,7 @@ void ThreadFlushWalletDB(const string& strFile)
     if (fOneThread)
         return;
     fOneThread = true;
-    if (!GetBoolArg("-flushwallet", true))
+    if (!gArgs.GetBoolArg("-flushwallet", true))
         return;
 
     unsigned int nLastSeen = nWalletDBUpdated;
@@ -977,7 +977,7 @@ bool BackupWallet(const CWallet& wallet, const fs::path& strDest, bool fEnableCu
     if (!wallet.fFileBacked) {
         return false;
     } else if(fEnableCustom) {
-        pathWithFile = GetArg("-backuppath", "");
+        pathWithFile = gArgs.GetArg("-backuppath", "");
         if(!pathWithFile.empty()) {
             if(!pathWithFile.has_extension()) {
                 pathCustom = pathWithFile;
@@ -1013,7 +1013,7 @@ bool BackupWallet(const CWallet& wallet, const fs::path& strDest, bool fEnableCu
                 bool defaultPath = AttemptBackupWallet(wallet, pathSrc.string(), pathDest.string());
 
                 if(defaultPath && !pathCustom.empty()) {
-                    int nThreshold = GetArg("-custombackupthreshold", DEFAULT_CUSTOMBACKUPTHRESHOLD);
+                    int nThreshold = gArgs.GetArg("-custombackupthreshold", DEFAULT_CUSTOMBACKUPTHRESHOLD);
                     if (nThreshold > 0) {
 
                         typedef std::multimap<std::time_t, fs::path> folder_set_t;

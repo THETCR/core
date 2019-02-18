@@ -115,7 +115,7 @@ UniValue getgenerate(const UniValue& params, bool fHelp)
             HelpExampleCli("getgenerate", "") + HelpExampleRpc("getgenerate", ""));
 
     LOCK(cs_main);
-    return GetBoolArg("-gen", false);
+    return gArgs.GetBoolArg("-gen", false);
 }
 
 
@@ -257,7 +257,7 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("currentblocktx", (uint64_t)nLastBlockTx));
     obj.push_back(Pair("difficulty", (double)GetDifficulty()));
     obj.push_back(Pair("errors", GetWarnings("statusbar")));
-    obj.push_back(Pair("genproclimit", (int)GetArg("-genproclimit", -1)));
+    obj.push_back(Pair("genproclimit", (int)gArgs.GetArg("-genproclimit", -1)));
     obj.push_back(Pair("networkhashps", getnetworkhashps(params, false)));
     obj.push_back(Pair("pooledtx", (uint64_t)mempool.size()));
     obj.push_back(Pair("testnet", Params().TestnetToBeDeprecatedFieldRPC()));

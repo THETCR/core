@@ -70,7 +70,7 @@ bool AppInit(int argc, char* argv[])
     // Parameters
     //
     // If Qt is used, parameters/wispr.conf are parsed in qt/wispr.cpp's main()
-    ParseParameters(argc, argv);
+    gArgs.ParseParameters(argc, argv);
 
     // Process help and version before taking care about datadir
     if (mapArgs.count("-?") || mapArgs.count("-help") || mapArgs.count("-version")) {
@@ -124,7 +124,7 @@ bool AppInit(int argc, char* argv[])
             exit(1);
         }
 #ifndef WIN32
-        fDaemon = GetBoolArg("-daemon", false);
+        fDaemon = gArgs.GetBoolArg("-daemon", false);
         if (fDaemon) {
             fprintf(stdout, "WISPR server starting\n");
 

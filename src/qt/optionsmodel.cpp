@@ -158,7 +158,7 @@ void OptionsModel::Init()
     // Only try to set -proxy, if user has enabled fUseProxy
     if (settings.value("fUseProxy").toBool() && !SoftSetArg("-proxy", settings.value("addrProxy").toString().toStdString()))
         addOverriddenOption("-proxy");
-    else if (!settings.value("fUseProxy").toBool() && !GetArg("-proxy", "").empty())
+    else if (!settings.value("fUseProxy").toBool() && !gArgs.GetArg("-proxy", "").empty())
         addOverriddenOption("-proxy");
 
     // Display

@@ -74,7 +74,7 @@ static bool AppInitRPC(int argc, char* argv[])
     //
     // Parameters
     //
-    ParseParameters(argc, argv);
+    gArgs.ParseParameters(argc, argv);
     if (argc < 2 || mapArgs.count("-?") || mapArgs.count("-help") || mapArgs.count("-version")) {
         std::string strUsage = _("WISPR Core RPC client version") + " " + FormatFullVersion() + "\n";
         if (!mapArgs.count("-version")) {
@@ -106,7 +106,7 @@ static bool AppInitRPC(int argc, char* argv[])
         fprintf(stderr, "Error: %s\n", e.what());
         return EXIT_FAILURE;
     }
-    if (GetBoolArg("-rpcssl", false))
+    if (gArgs.GetBoolArg("-rpcssl", false))
     {
         fprintf(stderr, "Error: SSL mode for RPC (-rpcssl) is no longer supported.\n");
         return false;
@@ -149,8 +149,8 @@ static void http_request_done(struct evhttp_request *req, void *ctx)
 
 UniValue CallRPC(const string& strMethod, const UniValue& params)
 {
-    std::string host = GetArg("-rpcconnect", "127.0.0.1");
-    int port = GetArg("-rpcport", BaseParams().RPCPort());
+    std::string host = gArgs.GetArg("-rpcconnect", "127.0.0.1");
+    int port = gArgs.GetArg("-rpcport", BaseParams().RPCPort());
 
     // Create event base
     struct event_base *base = event_base_new(); // TODO RAII
@@ -161,7 +161,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
     struct evhttp_connection *evcon = evhttp_connection_base_new(base, NULL, host.c_str(), port); // TODO RAII
     if (evcon == nullptr)
         throw runtime_error("create connection failed");
-    evhttp_connection_set_timeout(evcon, GetArg("-rpcclienttimeout", DEFAULT_HTTP_CLIENT_TIMEOUT));
+    evhttp_connection_set_timeout(evcon, gArgs.GetArg("-rpcclienttimeout", DEFAULT_HTTP_CLIENT_TIMEOUT));
 
     HTTPReply response;
     struct evhttp_request *req = evhttp_request_new(http_request_done, (void*)&response); // TODO RAII
@@ -246,7 +246,7 @@ int CommandLineRPC(int argc, char* argv[])
         UniValue params = RPCConvertValues(strMethod, strParams);
 
         // Execute and handle connection failures with -rpcwait
-        const bool fWait = GetBoolArg("-rpcwait", false);
+        const bool fWait = gArgs.GetBoolArg("-rpcwait", false);
         do {
             try {
                 const UniValue reply = CallRPC(strMethod, params);

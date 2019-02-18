@@ -650,7 +650,7 @@ UniValue verifychain(const UniValue& params, bool fHelp)
     LOCK(cs_main);
 
     int nCheckLevel = 4;
-    int nCheckDepth = GetArg("-checkblocks", 288);
+    int nCheckDepth = gArgs.GetArg("-checkblocks", 288);
     if (params.size() > 0)
         nCheckDepth = params[0].get_int();
 

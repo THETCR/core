@@ -106,7 +106,7 @@ static QString GetLangTerritory()
     if (!lang_territory_qsettings.isEmpty())
         lang_territory = lang_territory_qsettings;
     // 3) -lang command line argument
-    lang_territory = QString::fromStdString(GetArg("-lang", lang_territory.toStdString()));
+    lang_territory = QString::fromStdString(gArgs.GetArg("-lang", lang_territory.toStdString()));
     return lang_territory;
 }
 
@@ -333,7 +333,7 @@ BitcoinApplication::BitcoinApplication(int& argc, char** argv) : QApplication(ar
 #else
     std::string platformName = "other";
 #endif
-    platformName = GetArg("-uiplatform", platformName);
+    platformName = gArgs.GetArg("-uiplatform", platformName);
     platformStyle = PlatformStyle::instantiate(QString::fromStdString(platformName));
     if (!platformStyle) // Fall back to "other" if specified name not found
         platformStyle = PlatformStyle::instantiate("other");
@@ -478,7 +478,7 @@ void BitcoinApplication::initializeResult(int retval)
 #endif
 
         // If -min option passed, start window minimized.
-        if (GetBoolArg("-min", false)) {
+        if (gArgs.GetBoolArg("-min", false)) {
             window->showMinimized();
         } else {
             window->show();
@@ -528,7 +528,7 @@ int main(int argc, char* argv[])
 
     /// 1. Parse command-line options. These take precedence over anything else.
     // Command-line options take precedence:
-    ParseParameters(argc, argv);
+    gArgs.ParseParameters(argc, argv);
 
 // Do not refer to data directory yet, this can be overridden by Intro::pickDataDirectory
 
@@ -659,7 +659,7 @@ int main(int argc, char* argv[])
     // Subscribe to global signals from core
     uiInterface.InitMessage_connect(InitMessage);
 
-    if (GetBoolArg("-splash", true) && !GetBoolArg("-min", false))
+    if (gArgs.GetBoolArg("-splash", true) && !gArgs.GetBoolArg("-min", false))
         app.createSplashScreen(networkStyle.data());
 
     try {

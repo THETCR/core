@@ -116,7 +116,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     QString windowTitle = tr("WISPR Core") + " - ";
 #ifdef ENABLE_WALLET
     /* if compiled with wallet support, -disablewallet can still disable the wallet */
-    enableWallet = !GetBoolArg("-disablewallet", false);
+    enableWallet = !gArgs.GetBoolArg("-disablewallet", false);
 #else
     enableWallet = false;
 #endif // ENABLE_WALLET
@@ -125,7 +125,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     } else {
         windowTitle += tr("Node");
     }
-    QString userWindowTitle = QString::fromStdString(GetArg("-windowtitle", ""));
+    QString userWindowTitle = QString::fromStdString(gArgs.GetArg("-windowtitle", ""));
     if (!userWindowTitle.isEmpty()) windowTitle += " - " + userWindowTitle;
     windowTitle += " " + networkStyle->getTitleAddText();
 #ifndef Q_OS_MAC

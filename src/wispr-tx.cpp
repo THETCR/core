@@ -35,7 +35,7 @@ static bool AppInitRawTx(int argc, char* argv[])
     //
     // Parameters
     //
-    ParseParameters(argc, argv);
+    gArgs.ParseParameters(argc, argv);
 
     // Check for -testnet or -regtest parameter (Params() calls are only valid after this clause)
     try {
@@ -45,7 +45,7 @@ static bool AppInitRawTx(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    fCreateBlank = GetBoolArg("-create", false);
+    fCreateBlank = gArgs.GetBoolArg("-create", false);
 
     if (argc < 2 || mapArgs.count("-?") || mapArgs.count("-help")) {
         // First part of help message is specific to this utility
@@ -526,9 +526,9 @@ static void OutputTxHex(const CTransaction& tx)
 
 static void OutputTx(const CTransaction& tx)
 {
-    if (GetBoolArg("-json", false))
+    if (gArgs.GetBoolArg("-json", false))
         OutputTxJSON(tx);
-    else if (GetBoolArg("-txid", false))
+    else if (gArgs.GetBoolArg("-txid", false))
         OutputTxHash(tx);
     else
         OutputTxHex(tx);

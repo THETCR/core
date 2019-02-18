@@ -100,13 +100,13 @@ BOOST_AUTO_TEST_CASE(util_ParseParameters)
 {
     const char *argv_test[] = {"-ignored", "-a", "-b", "-ccc=argument", "-ccc=multiple", "f", "-d=e"};
 
-    ParseParameters(0, (char**)argv_test);
+    gArgs.ParseParameters(0, (char**)argv_test);
     BOOST_CHECK(mapArgs.empty() && mapMultiArgs.empty());
 
-    ParseParameters(1, (char**)argv_test);
+    gArgs.ParseParameters(1, (char**)argv_test);
     BOOST_CHECK(mapArgs.empty() && mapMultiArgs.empty());
 
-    ParseParameters(5, (char**)argv_test);
+    gArgs.ParseParameters(5, (char**)argv_test);
     // expectation: -ignored is ignored (program name argument),
     // -a, -b and -ccc end up in map, -d ignored because it is after
     // a non-option argument (non-GNU option parsing)
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(util_ParseParameters)
     BOOST_CHECK(mapMultiArgs["-ccc"].size() == 2);
 }
 
-BOOST_AUTO_TEST_CASE(util_GetArg)
+BOOST_AUTO_TEST_CASE(util_gArgs.GetArg)
 {
     mapArgs.clear();
     mapArgs["strtest1"] = "string...";
@@ -133,15 +133,15 @@ BOOST_AUTO_TEST_CASE(util_GetArg)
     mapArgs["booltest3"] = "0";
     mapArgs["booltest4"] = "1";
 
-    BOOST_CHECK_EQUAL(GetArg("strtest1", "default"), "string...");
-    BOOST_CHECK_EQUAL(GetArg("strtest2", "default"), "default");
-    BOOST_CHECK_EQUAL(GetArg("inttest1", -1), 12345);
-    BOOST_CHECK_EQUAL(GetArg("inttest2", -1), 81985529216486895LL);
-    BOOST_CHECK_EQUAL(GetArg("inttest3", -1), -1);
-    BOOST_CHECK_EQUAL(GetBoolArg("booltest1", false), true);
-    BOOST_CHECK_EQUAL(GetBoolArg("booltest2", false), false);
-    BOOST_CHECK_EQUAL(GetBoolArg("booltest3", false), false);
-    BOOST_CHECK_EQUAL(GetBoolArg("booltest4", false), true);
+    BOOST_CHECK_EQUAL(gArgs.GetArg("strtest1", "default"), "string...");
+    BOOST_CHECK_EQUAL(gArgs.GetArg("strtest2", "default"), "default");
+    BOOST_CHECK_EQUAL(gArgs.GetArg("inttest1", -1), 12345);
+    BOOST_CHECK_EQUAL(gArgs.GetArg("inttest2", -1), 81985529216486895LL);
+    BOOST_CHECK_EQUAL(gArgs.GetArg("inttest3", -1), -1);
+    BOOST_CHECK_EQUAL(gArgs.GetBoolArg("booltest1", false), true);
+    BOOST_CHECK_EQUAL(gArgs.GetBoolArg("booltest2", false), false);
+    BOOST_CHECK_EQUAL(gArgs.GetBoolArg("booltest3", false), false);
+    BOOST_CHECK_EQUAL(gArgs.GetBoolArg("booltest4", false), true);
 }
 
 BOOST_AUTO_TEST_CASE(util_FormatMoney)

@@ -714,7 +714,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet)
         NotifyTransactionChanged(this, hash, fInsertedNew ? CT_NEW : CT_UPDATED);
 
         // notify an external script when a wallet transaction comes in or is updated
-        std::string strCmd = GetArg("-walletnotify", "");
+        std::string strCmd = gArgs.GetArg("-walletnotify", "");
 
         if (!strCmd.empty())
         {
@@ -1471,7 +1471,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
 {
     int ret = 0;
     int64_t nNow = GetTime();
-    bool fCheckZWSP = GetBoolArg("-zapwallettxes", false);
+    bool fCheckZWSP = gArgs.GetBoolArg("-zapwallettxes", false);
     if (fCheckZWSP)
         zwspTracker->Init();
 
@@ -2149,7 +2149,7 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
     vector<COutput> vCoins;
     AvailableCoins(vCoins, true, NULL, false, STAKABLE_COINS);
     CAmount nAmountSelected = 0;
-    if (GetBoolArg("-wspstake", true)) {
+    if (gArgs.GetBoolArg("-wspstake", true)) {
         for (const COutput &out : vCoins) {
             //make sure not to outrun target amount
             if (nAmountSelected + out.tx->vout[out.i].nValue > nTargetAmount)
@@ -2181,7 +2181,7 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
     }
 
     //zWSP
-    if (GetBoolArg("-zwspstake", true) && chainActive.Height() > Params().NEW_PROTOCOLS_STARTHEIGHT() && !IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
+    if (gArgs.GetBoolArg("-zwspstake", true) && chainActive.Height() > Params().NEW_PROTOCOLS_STARTHEIGHT() && !IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
         //Only update zWSP set once per update interval
         bool fUpdate = false;
         static int64_t nTimeLastUpdate = 0;
@@ -3507,7 +3507,7 @@ bool CWallet::NewKeyPool()
         if (IsLocked())
             return false;
 
-        int64_t nKeys = max(GetArg("-keypool", 1000), (int64_t)0);
+        int64_t nKeys = max(gArgs.GetArg("-keypool", 1000), (int64_t)0);
         for (int i = 0; i < nKeys; i++) {
             int64_t nIndex = i + 1;
             walletdb.WritePool(nIndex, CKeyPool(GenerateNewKey()));
@@ -3533,7 +3533,7 @@ bool CWallet::TopUpKeyPool(unsigned int kpSize)
         if (kpSize > 0)
             nTargetSize = kpSize;
         else
-            nTargetSize = max(GetArg("-keypool", 1000), (int64_t)0);
+            nTargetSize = max(gArgs.GetArg("-keypool", 1000), (int64_t)0);
 
         while (setKeyPool.size() < (nTargetSize + 1)) {
             int64_t nEnd = 1;
@@ -5222,8 +5222,8 @@ void CWallet::ZWspBackupWallet()
 
     BackupWallet(*this, backupPath.string());
 
-    if(!GetArg("-zwspbackuppath", "").empty()) {
-        fs::path customPath(GetArg("-zwspbackuppath", ""));
+    if(!gArgs.GetArg("-zwspbackuppath", "").empty()) {
+        fs::path customPath(gArgs.GetArg("-zwspbackuppath", ""));
         fs::create_directories(customPath);
 
         if(!customPath.has_extension()) {
