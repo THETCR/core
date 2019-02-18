@@ -28,7 +28,8 @@ static void ResetArgs(const std::string& strArg)
     for(std::string& s: vecArg)
         vecChar.push_back(s.c_str());
 
-    gArgs.ParseParameters(vecChar.size(), &vecChar[0]);
+    std::string error;
+    gArgs.ParseParameters(vecChar.size(), &vecChar[0], error);
 }
 
 BOOST_AUTO_TEST_CASE(boolarg)
