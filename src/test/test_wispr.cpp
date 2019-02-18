@@ -65,7 +65,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
     pathTemp = GetTempPath() / strprintf("test_wispr_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
     fs::create_directories(pathTemp);
-    mapArgs["-datadir"] = pathTemp.string();
+    gArgs.ForceSetArg("-datadir", pathTemp.string());
 //    mempool.setSanityCheck(1.0);
     pblocktree = new CBlockTreeDB(1 << 20, true);
     pcoinsdbview = new CCoinsViewDB(1 << 23, true);

@@ -2221,7 +2221,7 @@ bool CWallet::MintableCoins()
 
     // Regular WSP
     if (nBalance > 0) {
-        if (gArgs.IsArgSet("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
+        if (gArgs.IsArgSet("-reservebalance") && !ParseMoney(gArgs.GetArg("-reservebalance", ""), nReserveBalance))
             return error("%s : invalid reserve balance amount", __func__);
         if (nBalance <= nReserveBalance)
             return false;
@@ -3012,7 +3012,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     // Choose coins to use
     CAmount nBalance = GetBalance();
 
-    if (gArgs.IsArgSet("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
+    if (gArgs.IsArgSet("-reservebalance") && !ParseMoney(gArgs.GetArg("-reservebalance", ""), nReserveBalance))
         return error("CreateCoinStake : invalid reserve balance amount");
 
     if (nBalance > 0 && nBalance <= nReserveBalance)

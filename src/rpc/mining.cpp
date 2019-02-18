@@ -195,8 +195,8 @@ UniValue setgenerate(const UniValue& params, bool fHelp)
         return blockHashes;
     } else // Not -regtest: start generate thread, return immediately
     {
-        mapArgs["-gen"] = (fGenerate ? "1" : "0");
-        mapArgs["-genproclimit"] = itostr(nGenProcLimit);
+        gArgs.SoftSetArg("-gen", (fGenerate ? "1" : "0"));
+        gArgs.SoftSetArg("-genproclimit", itostr(nGenProcLimit));
         GenerateBitcoins(fGenerate, pwalletMain, nGenProcLimit);
     }
 

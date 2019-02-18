@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(AlertNotify)
     fs::path temp = GetTempPath() / "alertnotify.txt";
     fs::remove(temp);
 
-    mapArgs["-alertnotify"] = std::string("echo %s >> ") + temp.string();
+    gArgs.ForceSetArg("-alertnotify", std::string("echo %s >> ") + temp.string());
 
     for(CAlert alert: alerts)
         alert.ProcessAlert(false);
