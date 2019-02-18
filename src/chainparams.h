@@ -95,6 +95,20 @@ public:
     int64_t IntervalV2() const {
         return consensus.nTargetTimespanV2 / consensus.nTargetSpacingV2;
     }
+  int64_t TargetTimespan(int nHeight) const {
+        if(PivProtocolsStartHeightEqualOrGreaterThen(nHeight)){
+            return consensus.nTargetTimespanV2;
+        }else{
+            return consensus.nTargetTimespanV1;
+        }
+  }
+  int64_t TargetSpacing(int nHeight) const {
+      if(PivProtocolsStartHeightEqualOrGreaterThen(nHeight)){
+          return consensus.nTargetSpacingV2;
+      }else{
+          return consensus.nTargetSpacingV1;
+      }
+  }
     int COINBASE_MATURITY() const { return consensus.nMaturity; }
     CAmount MaxMoneyOut() const { return consensus.nMaxMoneyOut; }
     /** The masternode count that we will allow the see-saw reward payments to be off by */
