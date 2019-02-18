@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(DoS_banscore)
     Misbehaving(dummyNode1.GetId(), 1);
     SendMessages(&dummyNode1, false);
     BOOST_CHECK(CNode::IsBanned(addr1));
-    mapArgs.erase("-banscore");
+    gArgs.ForceSetArg("-banscore", std::to_string(DEFAULT_BANSCORE_THRESHOLD));
 }
 
 BOOST_AUTO_TEST_CASE(DoS_bantime)
