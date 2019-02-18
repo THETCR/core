@@ -569,7 +569,7 @@ int main(int argc, char* argv[])
     SetupServerArgs();
     SetupUIArgs();
     std::string error;
-    if (!ParseParameters(argc, argv, error)) {
+    if (!gArgs.ParseParameters(argc, argv, error)) {
         QMessageBox::critical(nullptr, QObject::tr(PACKAGE_NAME),
                               QObject::tr("Error parsing command line arguments: %1.").arg(QString::fromStdString(error)));
         return EXIT_FAILURE;
