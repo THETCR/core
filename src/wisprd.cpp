@@ -99,9 +99,11 @@ bool AppInit(int argc, char* argv[])
             return false;
         }
         // Check for -testnet or -regtest parameter (Params() calls are only valid after this clause)
-        if (!SelectParamsFromCommandLine()) {
-            fprintf(stderr, "Error: Invalid combination of -regtest and -testnet.\n");
-            return false;
+        try {
+            SelectParams(gArgs.GetChainName());
+        } catch (const std::exception& e) {
+            fprintf(stderr, "Error: %s\n", e.what());
+            return EXIT_FAILURE;
         }
 
         // parse masternode.conf

@@ -117,7 +117,7 @@ public:
     int64_t StartMasternodePayments() const { return consensus.nStartMasternodePayments; }
     int64_t Budget_Fee_Confirmations() const { return consensus.nBudget_Fee_Confirmations; }
 
-    CBaseChainParams::Network NetworkID() const { return networkID; }
+    std::string NetworkID() const { return strNetworkID; }
 
     /** Zerocoin **/
     std::string Zerocoin_Modulus() const { return consensus.zerocoinModulus; }

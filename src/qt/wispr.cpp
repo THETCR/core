@@ -603,9 +603,11 @@ int main(int argc, char* argv[])
     // - Needs to be done before createOptionsModel
 
     // Check for -testnet or -regtest parameter (Params() calls are only valid after this clause)
-    if (!SelectParamsFromCommandLine()) {
-        QMessageBox::critical(0, QObject::tr("WISPR Core"), QObject::tr("Error: Invalid combination of -regtest and -testnet."));
-        return 1;
+    try {
+        SelectParams(gArgs.GetChainName());
+    } catch(std::exception &e) {
+        QMessageBox::critical(nullptr, QObject::tr(PACKAGE_NAME), QObject::tr("Error: %1").arg(e.what()));
+        return EXIT_FAILURE;
     }
 #ifdef ENABLE_WALLET
     // Parse URIs on command line -- this can affect Params()
