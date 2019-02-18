@@ -191,18 +191,22 @@ void PaymentServer::ipcParseCommandLine(int argc, char* argv[])
         // network as that would require fetching and parsing the payment request.
         // That means clicking such an URI which contains a testnet payment request
         // will start a mainnet instance and throw a "wrong network" error.
-        if (arg.startsWith(BITCOIN_IPC_PREFIX, Qt::CaseInsensitive)) // wispr: URI
+        if (arg.startsWith(BITCOIN_IPC_PREFIX, Qt::CaseInsensitive)) // bitcoin: URI
         {
             savedPaymentRequests.append(arg);
 
             SendCoinsRecipient r;
-            if (GUIUtil::parseBitcoinURI(arg, &r) && !r.address.isEmpty()) {
+            if (GUIUtil::parseBitcoinURI(arg, &r) && !r.address.isEmpty())
+            {
+                auto tempChainParams = CreateChainParams(CBaseChainParams::MAIN);
                 CBitcoinAddress address(r.address.toStdString());
-
-                if (address.IsValid(Params(CBaseChainParams::MAIN))) {
+                if (address.IsValid(*tempChainParams)) {
                     SelectParams(CBaseChainParams::MAIN);
-                } else if (address.IsValid(Params(CBaseChainParams::TESTNET))) {
-                    SelectParams(CBaseChainParams::TESTNET);
+                } else {
+                    tempChainParams = CreateChainParams(CBaseChainParams::TESTNET);
+                    if (address.IsValid(*tempChainParams)) {
+                        SelectParams(CBaseChainParams::TESTNET);
+                    }
                 }
             }
         } else if (QFile::exists(arg)) // Filename
@@ -210,10 +214,14 @@ void PaymentServer::ipcParseCommandLine(int argc, char* argv[])
             savedPaymentRequests.append(arg);
 
             PaymentRequestPlus request;
-            if (readPaymentRequestFromFile(arg, request)) {
-                if (request.getDetails().network() == "main") {
+            if (readPaymentRequestFromFile(arg, request))
+            {
+                if (request.getDetails().network() == "main")
+                {
                     SelectParams(CBaseChainParams::MAIN);
-                } else if (request.getDetails().network() == "test") {
+                }
+                else if (request.getDetails().network() == "test")
+                {
                     SelectParams(CBaseChainParams::TESTNET);
                 }
             }
