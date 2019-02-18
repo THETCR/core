@@ -49,6 +49,10 @@
 #if !defined(HAVE_MSG_NOSIGNAL) && !defined(MSG_NOSIGNAL)
 #define MSG_NOSIGNAL 0
 #endif
+// MSG_DONTWAIT is not available on some platforms, if it doesn't exist define it as 0
+#if !defined(MSG_DONTWAIT)
+#define MSG_DONTWAIT 0
+#endif
 
 // Fix for ancient MinGW versions, that don't have defined these in ws2tcpip.h.
 // Todo: Can be removed when our pull-tester is upgraded to a modern MinGW version.
