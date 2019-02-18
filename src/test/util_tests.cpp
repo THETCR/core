@@ -120,28 +120,118 @@ BOOST_AUTO_TEST_CASE(util_ParseParameters)
     BOOST_CHECK(mapMultiArgs["-ccc"].size() == 2);
 }
 
-BOOST_AUTO_TEST_CASE(util_gArgs.GetArg)
+BOOST_AUTO_TEST_CASE(util_GetArg)
 {
-    mapArgs.clear();
-    mapArgs["strtest1"] = "string...";
+    TestArgsManager testArgs;
+    testArgs.GetOverrideArgs().clear();
+    testArgs.GetOverrideArgs()["strtest1"] = {"string..."};
     // strtest2 undefined on purpose
-    mapArgs["inttest1"] = "12345";
-    mapArgs["inttest2"] = "81985529216486895";
+    testArgs.GetOverrideArgs()["inttest1"] = {"12345"};
+    testArgs.GetOverrideArgs()["inttest2"] = {"81985529216486895"};
     // inttest3 undefined on purpose
-    mapArgs["booltest1"] = "";
+    testArgs.GetOverrideArgs()["booltest1"] = {""};
     // booltest2 undefined on purpose
-    mapArgs["booltest3"] = "0";
-    mapArgs["booltest4"] = "1";
+    testArgs.GetOverrideArgs()["booltest3"] = {"0"};
+    testArgs.GetOverrideArgs()["booltest4"] = {"1"};
 
-    BOOST_CHECK_EQUAL(gArgs.GetArg("strtest1", "default"), "string...");
-    BOOST_CHECK_EQUAL(gArgs.GetArg("strtest2", "default"), "default");
-    BOOST_CHECK_EQUAL(gArgs.GetArg("inttest1", -1), 12345);
-    BOOST_CHECK_EQUAL(gArgs.GetArg("inttest2", -1), 81985529216486895LL);
-    BOOST_CHECK_EQUAL(gArgs.GetArg("inttest3", -1), -1);
-    BOOST_CHECK_EQUAL(gArgs.GetBoolArg("booltest1", false), true);
-    BOOST_CHECK_EQUAL(gArgs.GetBoolArg("booltest2", false), false);
-    BOOST_CHECK_EQUAL(gArgs.GetBoolArg("booltest3", false), false);
-    BOOST_CHECK_EQUAL(gArgs.GetBoolArg("booltest4", false), true);
+    // priorities
+    testArgs.GetOverrideArgs()["pritest1"] = {"a", "b"};
+    testArgs.GetConfigArgs()["pritest2"] = {"a", "b"};
+    testArgs.GetOverrideArgs()["pritest3"] = {"a"};
+    testArgs.GetConfigArgs()["pritest3"] = {"b"};
+    testArgs.GetOverrideArgs()["pritest4"] = {"a","b"};
+    testArgs.GetConfigArgs()["pritest4"] = {"c","d"};
+
+    BOOST_CHECK_EQUAL(testArgs.GetArg("strtest1", "default"), "string...");
+    BOOST_CHECK_EQUAL(testArgs.GetArg("strtest2", "default"), "default");
+    BOOST_CHECK_EQUAL(testArgs.GetArg("inttest1", -1), 12345);
+    BOOST_CHECK_EQUAL(testArgs.GetArg("inttest2", -1), 81985529216486895LL);
+    BOOST_CHECK_EQUAL(testArgs.GetArg("inttest3", -1), -1);
+    BOOST_CHECK_EQUAL(testArgs.GetBoolArg("booltest1", false), true);
+    BOOST_CHECK_EQUAL(testArgs.GetBoolArg("booltest2", false), false);
+    BOOST_CHECK_EQUAL(testArgs.GetBoolArg("booltest3", false), false);
+    BOOST_CHECK_EQUAL(testArgs.GetBoolArg("booltest4", false), true);
+
+    BOOST_CHECK_EQUAL(testArgs.GetArg("pritest1", "default"), "b");
+    BOOST_CHECK_EQUAL(testArgs.GetArg("pritest2", "default"), "a");
+    BOOST_CHECK_EQUAL(testArgs.GetArg("pritest3", "default"), "a");
+    BOOST_CHECK_EQUAL(testArgs.GetArg("pritest4", "default"), "b");
+}
+
+BOOST_AUTO_TEST_CASE(util_GetChainName)
+{
+    TestArgsManager test_args;
+    const char* avail_args[] = {"-testnet", "-regtest"};
+    test_args.SetupArgs(2, avail_args);
+
+    const char* argv_testnet[] = {"cmd", "-testnet"};
+    const char* argv_regtest[] = {"cmd", "-regtest"};
+    const char* argv_test_no_reg[] = {"cmd", "-testnet", "-noregtest"};
+    const char* argv_both[] = {"cmd", "-testnet", "-regtest"};
+
+    // equivalent to "-testnet"
+    // regtest in testnet section is ignored
+    const char* testnetconf = "testnet=1\nregtest=0\n[test]\nregtest=1";
+    std::string error;
+
+    BOOST_CHECK(test_args.ParseParameters(0, (char**)argv_testnet, error));
+    BOOST_CHECK_EQUAL(test_args.GetChainName(), "main");
+
+    BOOST_CHECK(test_args.ParseParameters(2, (char**)argv_testnet, error));
+    BOOST_CHECK_EQUAL(test_args.GetChainName(), "test");
+
+    BOOST_CHECK(test_args.ParseParameters(2, (char**)argv_regtest, error));
+    BOOST_CHECK_EQUAL(test_args.GetChainName(), "regtest");
+
+    BOOST_CHECK(test_args.ParseParameters(3, (char**)argv_test_no_reg, error));
+    BOOST_CHECK_EQUAL(test_args.GetChainName(), "test");
+
+    BOOST_CHECK(test_args.ParseParameters(3, (char**)argv_both, error));
+    BOOST_CHECK_THROW(test_args.GetChainName(), std::runtime_error);
+
+    BOOST_CHECK(test_args.ParseParameters(0, (char**)argv_testnet, error));
+    test_args.ReadConfigString(testnetconf);
+    BOOST_CHECK_EQUAL(test_args.GetChainName(), "test");
+
+    BOOST_CHECK(test_args.ParseParameters(2, (char**)argv_testnet, error));
+    test_args.ReadConfigString(testnetconf);
+    BOOST_CHECK_EQUAL(test_args.GetChainName(), "test");
+
+    BOOST_CHECK(test_args.ParseParameters(2, (char**)argv_regtest, error));
+    test_args.ReadConfigString(testnetconf);
+    BOOST_CHECK_THROW(test_args.GetChainName(), std::runtime_error);
+
+    BOOST_CHECK(test_args.ParseParameters(3, (char**)argv_test_no_reg, error));
+    test_args.ReadConfigString(testnetconf);
+    BOOST_CHECK_EQUAL(test_args.GetChainName(), "test");
+
+    BOOST_CHECK(test_args.ParseParameters(3, (char**)argv_both, error));
+    test_args.ReadConfigString(testnetconf);
+    BOOST_CHECK_THROW(test_args.GetChainName(), std::runtime_error);
+
+    // check setting the network to test (and thus making
+    // [test] regtest=1 potentially relevant) doesn't break things
+    test_args.SelectConfigNetwork("test");
+
+    BOOST_CHECK(test_args.ParseParameters(0, (char**)argv_testnet, error));
+    test_args.ReadConfigString(testnetconf);
+    BOOST_CHECK_EQUAL(test_args.GetChainName(), "test");
+
+    BOOST_CHECK(test_args.ParseParameters(2, (char**)argv_testnet, error));
+    test_args.ReadConfigString(testnetconf);
+    BOOST_CHECK_EQUAL(test_args.GetChainName(), "test");
+
+    BOOST_CHECK(test_args.ParseParameters(2, (char**)argv_regtest, error));
+    test_args.ReadConfigString(testnetconf);
+    BOOST_CHECK_THROW(test_args.GetChainName(), std::runtime_error);
+
+    BOOST_CHECK(test_args.ParseParameters(2, (char**)argv_test_no_reg, error));
+    test_args.ReadConfigString(testnetconf);
+    BOOST_CHECK_EQUAL(test_args.GetChainName(), "test");
+
+    BOOST_CHECK(test_args.ParseParameters(3, (char**)argv_both, error));
+    test_args.ReadConfigString(testnetconf);
+    BOOST_CHECK_THROW(test_args.GetChainName(), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(util_FormatMoney)
