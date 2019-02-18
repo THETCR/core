@@ -3,12 +3,12 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "consensus/validation.h"
-#include "zwspwallet.h"
+#include <wallet/zwspwallet.h>
 #include "main.h"
 #include "txdb.h"
-#include "walletdb.h"
+#include <wallet/walletdb.h>
 #include "shutdown.h"
-#include "wallet.h"
+#include <wallet/wallet.h>
 #include "primitives/deterministicmint.h"
 #include "zwspchain.h"
 

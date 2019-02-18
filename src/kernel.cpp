@@ -6,7 +6,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include "consensus/validation.h"
-#include "db.h"
+#include <wallet/db.h>
 #include "primitives/block.h"
 #include "kernel.h"
 #include "main.h"

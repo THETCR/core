@@ -10,7 +10,7 @@
 #include "masternodeman.h"
 #include "protocol.h"
 #include "spork.h"
-#include "wallet.h"
+#include <wallet/wallet.h>
 
 
 //

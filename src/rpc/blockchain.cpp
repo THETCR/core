@@ -23,7 +23,7 @@
 #include "accumulatormap.h"
 #include "accumulators.h"
 #include "txmempool.h"
-#include "wallet.h"
+#include <wallet/wallet.h>
 #include "libzerocoin/Coin.h"
 #include <stdint.h>
 #include <fstream>

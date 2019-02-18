@@ -13,7 +13,7 @@
 #include "sync.h"
 #include <util/system.h>
 #include "txmempool.h"
-#include "wallet.h"
+#include <wallet/wallet.h>
 
 // keep track of the scanning errors I've seen
 map<uint256, int> mapSeenMasternodeScanningErrors;

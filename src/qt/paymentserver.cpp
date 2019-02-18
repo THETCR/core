@@ -15,7 +15,7 @@
 #include "chainparams.h"
 #include "ui_interface.h"
 #include <util/system.h>
-#include "wallet.h"
+#include <wallet/wallet.h>
 
 #include <cstdlib>
 

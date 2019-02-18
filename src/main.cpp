@@ -53,7 +53,7 @@
 #include <util/strencodings.h>
 #include "validationinterface.h"
 #include "zwspchain.h"
-#include "wallet.h"
+#include <wallet/wallet.h>
 #include <fs.h>
 
 #include "libzerocoin/Denominations.h"

@@ -55,9 +55,9 @@
 #include "reverse_iterate.h"
 
 #ifdef ENABLE_WALLET
-#include "db.h"
-#include "wallet.h"
-#include "walletdb.h"
+#include <wallet/db.h>
+#include <wallet/wallet.h>
+#include <wallet/walletdb.h>
 #include "accumulators.h"
 #endif
 

@@ -5,12 +5,12 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <wallet.h>
+#include <wallet/wallet.h>
 
 #include <accumulators.h>
 #include <checkpoints.h>
 #include <chain.h>
-#include <coincontrol.h>
+#include <wallet/coincontrol.h>
 #include <consensus/consensus.h>
 #include <consensus/validation.h>
 #include <fs.h>
@@ -38,7 +38,7 @@
 
 #include <denomination_functions.h>
 #include <libzerocoin/Denominations.h>
-#include <zwspwallet.h>
+#include <wallet/zwspwallet.h>
 #include <primitives/deterministicmint.h>
 #include <algorithm>
 #include <assert.h>

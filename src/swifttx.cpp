@@ -18,7 +18,7 @@
 #include <util/system.h>
 #include "validationinterface.h"
 #include "reverse_iterate.h"
-#include "wallet.h"
+#include <wallet/wallet.h>
 
 #ifdef ENABLE_WALLET
 extern CWallet* pwalletMain;

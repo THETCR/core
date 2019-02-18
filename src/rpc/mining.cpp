@@ -21,8 +21,8 @@
 #include "txmempool.h"
 #include <util/system.h>
 #ifdef ENABLE_WALLET
-#include "db.h"
-#include "wallet.h"
+#include <wallet/db.h>
+#include <wallet/wallet.h>
 #endif
 
 #include <stdint.h>

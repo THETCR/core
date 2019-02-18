@@ -101,7 +101,7 @@ BITCOIN_CORE_H = \
   checkpoints.h \
   checkqueue.h \
   clientversion.h \
-  coincontrol.h \
+  wallet/coincontrol.h \
   coins.h \
   compat.h \
   compat/assumptions.h \
@@ -114,11 +114,11 @@ BITCOIN_CORE_H = \
   primitives/deterministicmint.h \
   primitives/zerocoin.h \
   core_io.h \
-  crypter.h \
+  wallet/crypter.h \
   denomination_functions.h \
   obfuscation.h \
   obfuscation-relay.h \
-  db.h \
+  wallet/db.h \
   fs.h \
   httprpc.h \
   httpserver.h \
@@ -192,12 +192,12 @@ BITCOIN_CORE_H = \
   util/moneystr.h \
   util/time.h \
   validationinterface.h \
-  wallet.h \
+  wallet/wallet.h \
   wallet_ismine.h \
-  walletdb.h \
+  wallet/walletdb.h \
   zwspchain.h \
-  zwsptracker.h \
-  zwspwallet.h \
+  wallet/zwsptracker.h \
+  wallet/zwspwallet.h \
   genwit.h \
   concurrentqueue.h \
   lightzwspthread.h \
@@ -279,8 +279,8 @@ libbitcoin_wallet_a_SOURCES = \
   denomination_functions.cpp \
   obfuscation.cpp \
   obfuscation-relay.cpp \
-  db.cpp \
-  crypter.cpp \
+  wallet/db.cpp \
+  wallet/crypter.cpp \
   swifttx.cpp \
   masternode.cpp \
   masternode-budget.cpp \
@@ -289,16 +289,16 @@ libbitcoin_wallet_a_SOURCES = \
   masternodeconfig.cpp \
   masternodeman.cpp \
   mintpool.cpp \
-  rpcdump.cpp \
+  wallet/rpcdump.cpp \
   primitives/deterministicmint.cpp \
   primitives/zerocoin.cpp \
-  rpcwallet.cpp \
+  wallet/rpcwallet.cpp \
   kernel.cpp \
-  wallet.cpp \
+  wallet/wallet.cpp \
   wallet_ismine.cpp \
-  walletdb.cpp \
-  zwspwallet.cpp \
-  zwsptracker.cpp \
+  wallet/walletdb.cpp \
+  wallet/zwspwallet.cpp \
+  wallet/zwsptracker.cpp \
   stakeinput.cpp \
   genwit.cpp \
   lightzwspthread.cpp \

@@ -17,14 +17,14 @@
 #include <validationinterface.h>
 #include <script/sign.h>
 #include <util/system.h>
-#include <crypter.h>
-#include <walletdb.h>
+#include <wallet/crypter.h>
+#include <wallet/walletdb.h>
 
 #include <base58.h>
 #include <kernel.h>
 #include <wallet_ismine.h>
-#include <zwspwallet.h>
-#include <zwsptracker.h>
+#include <wallet/zwspwallet.h>
+#include <wallet/zwsptracker.h>
 
 #include <algorithm>
 #include <atomic>

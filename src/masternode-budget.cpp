@@ -11,7 +11,7 @@
 #include <net_processing.h>
 #include "obfuscation.h"
 #include <util/system.h>
-#include "wallet.h"
+#include <wallet/wallet.h>
 #include <fs.h>
 
 

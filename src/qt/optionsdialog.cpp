@@ -21,7 +21,7 @@
 #include <fs.h>
 
 #ifdef ENABLE_WALLET
-#include "wallet.h" // for CWallet::minTxFee
+#include <wallet/wallet.h> // for CWallet::minTxFee
 #endif
 
 #include <boost/thread.hpp>

@@ -14,12 +14,12 @@
 #include "base58.h"
 #include "consensus/consensus.h"
 #include "consensus/tx_verify.h"
-#include "db.h"
+#include <wallet/db.h>
 #include "main.h"
 #include "script/script.h"
 #include "timedata.h"
 #include <util/system.h>
-#include "wallet.h"
+#include <wallet/wallet.h>
 #include "policy/policy.h"
 
 #include <stdint.h>

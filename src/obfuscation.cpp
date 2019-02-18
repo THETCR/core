@@ -6,13 +6,13 @@
 #include "consensus/validation.h"
 #include <net_processing.h>
 #include "obfuscation.h"
-#include "coincontrol.h"
+#include <wallet/coincontrol.h>
 #include "masternodeman.h"
 #include "script/sign.h"
 #include "swifttx.h"
 #include "ui_interface.h"
 #include <util/system.h>
-#include "wallet.h"
+#include <wallet/wallet.h>
 #include "reverse_iterate.h"
 #include <fs.h>
 

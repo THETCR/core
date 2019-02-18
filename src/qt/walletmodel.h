@@ -22,7 +22,7 @@
 
 #include <support/allocators/secure.h>
 #include "swifttx.h"
-#include "wallet.h"
+#include <wallet/wallet.h>
 
 #include <map>
 #include <vector>

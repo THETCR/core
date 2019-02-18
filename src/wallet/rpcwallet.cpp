@@ -18,8 +18,8 @@
 #include "timedata.h"
 #include <util/system.h>
 #include <util/moneystr.h>
-#include "wallet.h"
-#include "walletdb.h"
+#include <wallet/wallet.h>
+#include <wallet/walletdb.h>
 #include "zwspchain.h"
 
 #include <stdint.h>

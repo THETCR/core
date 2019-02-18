@@ -13,7 +13,7 @@
 #include <util/system.h>
 #include <util/strencodings.h>
 #include <util/time.h>
-#include "wallet.h"
+#include <wallet/wallet.h>
 
 #include <fstream>
 #include <secp256k1.h>

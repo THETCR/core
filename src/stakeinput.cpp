@@ -8,7 +8,7 @@
 #include "main.h"
 #include "stakeinput.h"
 #include "streams.h"
-#include "wallet.h"
+#include <wallet/wallet.h>
 
 CZWspStake::CZWspStake(const libzerocoin::CoinSpend& spend)
 {

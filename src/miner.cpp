@@ -25,7 +25,7 @@
 #include <util/system.h>
 #include <util/moneystr.h>
 #ifdef ENABLE_WALLET
-#include "wallet.h"
+#include <wallet/wallet.h>
 #endif
 #include "validationinterface.h"
 #include "masternode-payments.h"

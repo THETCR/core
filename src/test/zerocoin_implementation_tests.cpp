@@ -18,8 +18,8 @@
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 #include <accumulators.h>
-#include "wallet.h"
-#include "zwspwallet.h"
+#include <wallet/wallet.h>
+#include <wallet/zwspwallet.h>
 #include "zwspchain.h"
 
 using namespace libzerocoin;

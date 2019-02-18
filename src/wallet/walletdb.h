@@ -12,12 +12,12 @@
 #include <key.h>
 
 #include "amount.h"
-#include "db.h"
+#include <wallet/db.h>
 #include "keystore.h"
 #include "primitives/zerocoin.h"
 #include "libzerocoin/Accumulator.h"
 #include "libzerocoin/Denominations.h"
-#include "zwsptracker.h"
+#include <wallet/zwsptracker.h>
 #include <fs.h>
 
 #include <list>

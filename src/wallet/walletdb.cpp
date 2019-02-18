@@ -5,7 +5,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "walletdb.h"
+#include <wallet/walletdb.h>
 
 #include "consensus/tx_verify.h"
 #include "consensus/validation.h"
@@ -16,7 +16,7 @@
 #include "sync.h"
 #include <util/system.h>
 #include <util/time.h>
-#include "wallet.h"
+#include <wallet/wallet.h>
 #include <primitives/deterministicmint.h>
 
 
