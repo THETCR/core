@@ -106,6 +106,9 @@ TestingSetup::~TestingSetup()
     delete pcoinsTip;
     delete pcoinsdbview;
     delete pblocktree;
+#ifdef ENABLE_WALLET
+    bitdb.Flush(true);
+#endif
     fs::remove_all(pathTemp);
 }
 
