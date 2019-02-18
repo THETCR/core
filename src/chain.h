@@ -8,9 +8,10 @@
 #define BITCOIN_CHAIN_H
 
 #include "pow.h"
-#include "primitives/block.h"
-#include "tinyformat.h"
-#include "uint256.h"
+#include <consensus/params.h>
+#include <primitives/block.h>
+#include <tinyformat.h>
+#include <uint256.h>
 #include <util/system.h>
 #include "libzerocoin/Denominations.h"
 
@@ -607,77 +608,73 @@ public:
 };
 
 /** An in-memory indexed chain of blocks. */
-class CChain
-{
+class CChain {
 private:
-    std::vector<CBlockIndex*> vChain;
+  std::vector<CBlockIndex*> vChain;
 
 public:
-    /** Returns the index entry for the genesis block of this chain, or NULL if none. */
-    CBlockIndex* Genesis() const
-    {
-        return vChain.size() > 0 ? vChain[0] : NULL;
-    }
+  /** Returns the index entry for the genesis block of this chain, or nullptr if none. */
+  CBlockIndex *Genesis() const {
+      return vChain.size() > 0 ? vChain[0] : nullptr;
+  }
 
-    /** Returns the index entry for the tip of this chain, or NULL if none. */
-    CBlockIndex* Tip(bool fProofOfStake = false) const
-    {
-        if (vChain.size() < 1)
-            return nullptr;
+  /** Returns the index entry for the tip of this chain, or nullptr if none. */
+  CBlockIndex* Tip(bool fProofOfStake = false) const
+  {
+      if (vChain.size() < 1)
+          return nullptr;
 
-        CBlockIndex* pindex = vChain[vChain.size() - 1];
+      CBlockIndex* pindex = vChain[vChain.size() - 1];
 
-        if (fProofOfStake) {
-            while (pindex && pindex->pprev && !pindex->IsProofOfStake())
-                pindex = pindex->pprev;
-        }
-        return pindex;
-    }
+      if (fProofOfStake) {
+          while (pindex && pindex->pprev && !pindex->IsProofOfStake())
+              pindex = pindex->pprev;
+      }
+      return pindex;
+  }
 
-    /** Returns the index entry at a particular height in this chain, or NULL if no such height exists. */
-    CBlockIndex* operator[](int nHeight) const
-    {
-        if (nHeight < 0 || nHeight >= (int)vChain.size())
-            return nullptr;
-        return vChain[nHeight];
-    }
+  /** Returns the index entry at a particular height in this chain, or nullptr if no such height exists. */
+  CBlockIndex *operator[](int nHeight) const {
+      if (nHeight < 0 || nHeight >= (int)vChain.size())
+          return nullptr;
+      return vChain[nHeight];
+  }
 
-    /** Compare two chains efficiently. */
-    friend bool operator==(const CChain& a, const CChain& b)
-    {
-        return a.vChain.size() == b.vChain.size() &&
-               a.vChain[a.vChain.size() - 1] == b.vChain[b.vChain.size() - 1];
-    }
+  /** Compare two chains efficiently. */
+  friend bool operator==(const CChain &a, const CChain &b) {
+      return a.vChain.size() == b.vChain.size() &&
+          a.vChain[a.vChain.size() - 1] == b.vChain[b.vChain.size() - 1];
+  }
 
-    /** Efficiently check whether a block is present in this chain. */
-    bool Contains(const CBlockIndex* pindex) const
-    {
-        return (*this)[pindex->nHeight] == pindex;
-    }
+  /** Efficiently check whether a block is present in this chain. */
+  bool Contains(const CBlockIndex *pindex) const {
+      return (*this)[pindex->nHeight] == pindex;
+  }
 
-    /** Find the successor of a block in this chain, or NULL if the given index is not found or is the tip. */
-    CBlockIndex* Next(const CBlockIndex* pindex) const
-    {
-        if (Contains(pindex))
-            return (*this)[pindex->nHeight + 1];
-        else
-            return nullptr;
-    }
+  /** Find the successor of a block in this chain, or nullptr if the given index is not found or is the tip. */
+  CBlockIndex *Next(const CBlockIndex *pindex) const {
+      if (Contains(pindex))
+          return (*this)[pindex->nHeight + 1];
+      else
+          return nullptr;
+  }
 
-    /** Return the maximal height in the chain. Is equal to chain.Tip() ? chain.Tip()->nHeight : -1. */
-    int Height() const
-    {
-        return vChain.size() - 1;
-    }
+  /** Return the maximal height in the chain. Is equal to chain.Tip() ? chain.Tip()->nHeight : -1. */
+  int Height() const {
+      return vChain.size() - 1;
+  }
 
-    /** Set/initialize a chain with a given tip. */
-    void SetTip(CBlockIndex* pindex);
+  /** Set/initialize a chain with a given tip. */
+  void SetTip(CBlockIndex *pindex);
 
-    /** Return a CBlockLocator that refers to a block in this chain (by default the tip). */
-    CBlockLocator GetLocator(const CBlockIndex* pindex = nullptr) const;
+  /** Return a CBlockLocator that refers to a block in this chain (by default the tip). */
+  CBlockLocator GetLocator(const CBlockIndex *pindex = nullptr) const;
 
-    /** Find the last common block between this chain and a block index entry. */
-    const CBlockIndex *FindFork(const CBlockIndex *pindex) const;
+  /** Find the last common block between this chain and a block index entry. */
+  const CBlockIndex *FindFork(const CBlockIndex *pindex) const;
+
+  /** Find the earliest block with timestamp equal or greater than the given. */
+  CBlockIndex* FindEarliestAtLeast(int64_t nTime) const;
 };
 
 #endif // BITCOIN_CHAIN_H
