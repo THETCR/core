@@ -138,7 +138,7 @@ protected:
    */
   virtual void ChainStateFlushed(const CBlockLocator &locator) {}
   /** Tells listeners to broadcast their data. */
-  virtual void ResendWalletTransactions(int64_t nBestBlockTime, CConnman* connman) {}
+  virtual void ResendWalletTransactions(int64_t nBestBlockTime) {}
   /**
    * Notifies listeners of a block validation result.
    * If the provided CValidationState IsValid, the provided block
