@@ -47,7 +47,18 @@ struct LockPoints
 
   LockPoints() : height(0), time(0), maxInputBlock(nullptr) { }
 };
-
+/** Reason why a transaction was removed from the mempool,
+ * this is passed to the notification signal.
+ */
+enum class MemPoolRemovalReason {
+  UNKNOWN = 0, //!< Manually removed or unknown reason
+  EXPIRY,      //!< Expired from mempool
+  SIZELIMIT,   //!< Removed in size limiting
+  REORG,       //!< Removed for reorganization
+  BLOCK,       //!< Removed for block
+  CONFLICT,    //!< Removed for conflict with in-block transaction
+  REPLACED,    //!< Removed for replacement
+};
 /**
  * CTxMemPool stores these:
  */
@@ -188,6 +199,9 @@ public:
     /** Write/Read estimates to disk */
     bool WriteFeeEstimates(CAutoFile& fileout) const;
     bool ReadFeeEstimates(CAutoFile& filein);
+
+    boost::signals2::signal<void (CTransactionRef)> NotifyEntryAdded;
+    boost::signals2::signal<void (CTransactionRef, MemPoolRemovalReason)> NotifyEntryRemoved;
 };
 
 /** 
