@@ -75,7 +75,7 @@ public:
 
   // TODO uncomment after implementing transaction witnesses and GetTransactionSigOpCost in consensus/tx_verify.cpp
 
-//    CScriptWitness scriptWitness; //!< Only serialized through CTransaction
+    CScriptWitness scriptWitness; //!< Only serialized through CTransaction
 
   /* Setting nSequence to this value for every input in a transaction
 * disables nLockTime. */

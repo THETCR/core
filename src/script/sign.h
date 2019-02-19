@@ -200,20 +200,20 @@ void DeserializeHDKeypaths(Stream& s, const std::vector<unsigned char>& key, std
 
 // Serialize HD keypaths to a stream from a map
 template<typename Stream>
-void SerializeHDKeypaths(Stream& s, const std::map<CPubKey, KeyOriginInfo>& hd_keypaths, uint8_t type)
-{
-    for (auto keypath_pair : hd_keypaths) {
-        if (!keypath_pair.first.IsValid()) {
-            throw std::ios_base::failure("Invalid CPubKey being serialized");
-        }
-        SerializeToVector(s, type, MakeSpan(keypath_pair.first));
-        WriteCompactSize(s, (keypath_pair.second.path.size() + 1) * sizeof(uint32_t));
-        s << keypath_pair.second.fingerprint;
-        for (const auto& path : keypath_pair.second.path) {
-            s << path;
-        }
-    }
-}
+//void SerializeHDKeypaths(Stream& s, const std::map<CPubKey, KeyOriginInfo>& hd_keypaths, uint8_t type)
+//{
+//    for (auto keypath_pair : hd_keypaths) {
+//        if (!keypath_pair.first.IsValid()) {
+//            throw std::ios_base::failure("Invalid CPubKey being serialized");
+//        }
+//        SerializeToVector(s, type, MakeSpan(keypath_pair.first));
+//        WriteCompactSize(s, (keypath_pair.second.path.size() + 1) * sizeof(uint32_t));
+//        s << keypath_pair.second.fingerprint;
+//        for (const auto& path : keypath_pair.second.path) {
+//            s << path;
+//        }
+//    }
+//}
 
 /** Produce a script signature using a generic signature creator. */
 bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreator& creator, const CScript& scriptPubKey, SignatureData& sigdata);

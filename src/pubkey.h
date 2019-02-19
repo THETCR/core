@@ -69,7 +69,11 @@ private:
     }
 
 public:
-    //! Construct an invalid public key.
+     bool static ValidSize(const std::vector<unsigned char> &vch) {
+         return vch.size() > 0 && GetLen(vch[0]) == vch.size();
+     }
+
+     //! Construct an invalid public key.
     CPubKey()
     {
         Invalidate();
