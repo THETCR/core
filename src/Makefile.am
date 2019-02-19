@@ -111,6 +111,7 @@ BITCOIN_CORE_H = \
   compressor.h \
   consensus/consensus.h \
   consensus/tx_verify.h \
+  cuckoocache.h \
   primitives/deterministicmint.h \
   primitives/zerocoin.h \
   core_io.h \
