@@ -193,7 +193,7 @@ public:
             if (!vout[i].IsNull())
                 nSize += ::GetSerializeSize(CTxOutCompressor(REF(vout[i])));
         // height
-        nSize += ::GetSerializeSize(VARINT(nHeight));
+        nSize += ::GetSerializeSize(VARINT(nHeight, VarIntMode::NONNEGATIVE_SIGNED));
         return nSize;
     }
 
