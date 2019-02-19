@@ -26,6 +26,31 @@ std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::os
     return stream << static_cast<typename std::underlying_type<T>::type>(e);
 }
 
+/**
+ * This global and the helpers that use it are not thread-safe.
+ *
+ * If thread-safety is needed, the global could be made thread_local (given
+ * that thread_local is supported on all architectures we support) or a
+ * per-thread instance could be used in the multi-threaded test.
+ */
+extern FastRandomContext g_insecure_rand_ctx;
+
+/**
+ * Flag to make GetRand in random.h return the same number
+ */
+extern bool g_mock_deterministic_tests;
+
+static inline void SeedInsecureRand(bool deterministic = false)
+{
+    g_insecure_rand_ctx = FastRandomContext(deterministic);
+}
+
+static inline uint32_t InsecureRand32() { return g_insecure_rand_ctx.rand32(); }
+static inline uint256 InsecureRand256() { return g_insecure_rand_ctx.rand256(); }
+static inline uint64_t InsecureRandBits(int bits) { return g_insecure_rand_ctx.randbits(bits); }
+static inline uint64_t InsecureRandRange(uint64_t range) { return g_insecure_rand_ctx.randrange(range); }
+static inline bool InsecureRandBool() { return g_insecure_rand_ctx.randbool(); }
+
 /** Basic testing setup.
  * This just configures logging and chain parameters.
  */

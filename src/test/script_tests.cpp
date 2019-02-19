@@ -371,7 +371,7 @@ public:
       std::vector<unsigned char> vchSig, r, s;
       uint32_t iter = 0;
       do {
-          key.Sign(hash, vchSig, false, iter++);
+          key.Sign(hash, vchSig, iter++);
           if ((lenS == 33) != (vchSig[5 + vchSig[3]] == 33)) {
               NegateSignatureS(vchSig);
           }
@@ -973,8 +973,8 @@ BOOST_AUTO_TEST_CASE(script_json_test)
     // If a witness is given, then the last value in the array should be the
     // amount (nValue) to use in the crediting tx
 //    UniValue tests = read_json(std::string(json_tests::script_tests, json_tests::script_tests + sizeof(json_tests::script_tests)));
-    UniValue json_tests = read_json(std::string(json_tests::script_valid, json_tests::script_valid + sizeof(json_tests::script_valid)));
-    json_tests += read_json(std::string(json_tests::script_invalid, json_tests::script_invalid + sizeof(json_tests::script_invalid)));
+    UniValue tests = read_json(std::string(json_tests::script_valid, json_tests::script_valid + sizeof(json_tests::script_valid)));
+    tests += read_json(std::string(json_tests::script_invalid, json_tests::script_invalid + sizeof(json_tests::script_invalid)));
     for (unsigned int idx = 0; idx < tests.size(); idx++) {
         UniValue test = tests[idx];
         std::string strTest = test.write();
