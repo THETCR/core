@@ -11,6 +11,7 @@
 #include <pubkey.h>
 #include <script/interpreter.h>
 #include <streams.h>
+#include <keystore.h>
 
 class CKey;
 class CKeyID;
@@ -231,5 +232,6 @@ void UpdateInput(CTxIn& input, const SignatureData& data);
  * provider is used to look up public keys and redeemscripts by hash.
  * Solvability is unrelated to whether we consider this output to be ours. */
 bool IsSolvable(const SigningProvider& provider, const CScript& script);
+bool SignSignature(const CKeyStore& keystore, const CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn, int nHashType=SIGHASH_ALL);
 
 #endif // BITCOIN_SCRIPT_SIGN_H

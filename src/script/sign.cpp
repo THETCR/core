@@ -501,3 +501,18 @@ FlatSigningProvider Merge(const FlatSigningProvider& a, const FlatSigningProvide
     ret.origins.insert(b.origins.begin(), b.origins.end());
     return ret;
 }
+
+//!WISPR
+bool SignSignature(const SigningProvider &provider, const CScript& fromPubKey, CMutableTransaction& txTo, unsigned int nIn, int nHashType)
+{
+    assert(nIn < txTo.vin.size());
+    CTxIn& txin = txTo.vin[nIn];
+
+    CTransaction txToConst(txTo);
+//    MutableTransactionSignatureCreator creator(&txToConst, nIn, txTo.vout[nIn].nValue, nHashType);
+    MutableTransactionSignatureCreator creator(&txTo, nIn, CAmount(txTo.vout[nIn].nValue), nHashType);
+    SignatureData sigdata;
+    bool ret = ProduceSignature(provider, creator, fromPubKey, sigdata);
+    UpdateInput(txTo.vin.at(nIn), sigdata);
+    return ret;
+}
