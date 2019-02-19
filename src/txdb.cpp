@@ -20,7 +20,6 @@
 
 #include <boost/thread.hpp>
 
-using namespace std;
 using namespace libzerocoin;
 
 static const char DB_COIN = 'C';
@@ -38,9 +37,9 @@ static const char DB_LAST_BLOCK = 'l';
 void static BatchWriteCoins(CLevelDBBatch& batch, const uint256& hash, const CCoins& coins)
 {
     if (coins.IsPruned())
-        batch.Erase(make_pair('c', hash));
+        batch.Erase(std::make_pair('c', hash));
     else
-        batch.Write(make_pair('c', hash), coins);
+        batch.Write(std::make_pair('c', hash), coins);
 }
 
 void static BatchWriteHashBestChain(CLevelDBBatch& batch, const uint256& hash)
@@ -48,18 +47,18 @@ void static BatchWriteHashBestChain(CLevelDBBatch& batch, const uint256& hash)
     batch.Write('B', hash);
 }
 
-CCoinsViewDB::CCoinsViewDB(size_t nCacheSize, bool fMemory, bool fWipe) : db(GetDataDir() / "chainstate", nCacheSize, fMemory, fWipe)
+CCoinsViewDB::CCoinsViewDB(size_t nCacheSize, bool fMemory, bool fWipe) : db(GetDataDir() / "chainstate", nCacheSize, fMemory, fWipe, true)
 {
 }
 
 bool CCoinsViewDB::GetCoins(const uint256& txid, CCoins& coins) const
 {
-    return db.Read(make_pair('c', txid), coins);
+    return db.Read(std::make_pair('c', txid), coins);
 }
 
 bool CCoinsViewDB::HaveCoins(const uint256& txid) const
 {
-    return db.Exists(make_pair('c', txid));
+    return db.Exists(std::make_pair('c', txid));
 }
 
 uint256 CCoinsViewDB::GetBestBlock() const
@@ -94,23 +93,23 @@ size_t CCoinsViewDB::EstimateSize() const
 {
     return db.EstimateSize(DB_COIN, (char)(DB_COIN+1));
 }
-CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevelDBWrapper(GetDataDir() / "blocks" / "index", nCacheSize, fMemory, fWipe)
+CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevelDBWrapper(gArgs.IsArgSet("-blocksdir") ? GetDataDir() / "blocks" / "index" : GetBlocksDir() / "index", nCacheSize, fMemory, fWipe)
 {
 }
 
 bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
 {
-    return Write(make_pair('b', blockindex.GetBlockHash()), blockindex);
+    return Write(std::make_pair('b', blockindex.GetBlockHash()), blockindex);
 }
 
 bool CBlockTreeDB::WriteBlockFileInfo(int nFile, const CBlockFileInfo& info)
 {
-    return Write(make_pair('f', nFile), info);
+    return Write(std::make_pair('f', nFile), info);
 }
 
 bool CBlockTreeDB::ReadBlockFileInfo(int nFile, CBlockFileInfo& info)
 {
-    return Read(make_pair('f', nFile), info);
+    return Read(std::make_pair('f', nFile), info);
 }
 
 bool CBlockTreeDB::WriteLastBlockFile(int nFile)
@@ -187,14 +186,15 @@ void CCoinsViewDBCursor::Next()
 
 bool CBlockTreeDB::ReadTxIndex(const uint256& txid, CDiskTxPos& pos)
 {
-    return Read(make_pair('t', txid), pos);
+    return Read(std::make_pair('t', txid), pos);
 }
 
 bool CBlockTreeDB::WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& vect)
 {
     CLevelDBBatch batch(*this);
-    for (std::vector<std::pair<uint256, CDiskTxPos> >::const_iterator it = vect.begin(); it != vect.end(); it++)
-    batch.Write(make_pair('t', it->first), it->second);
+    for (auto it = vect.begin(); it != vect.end(); it++){
+        batch.Write(std::make_pair('t', it->first), it->second);
+    }
     return WriteBatch(batch);
 }
 
@@ -300,10 +300,10 @@ bool CZerocoinDB::WriteCoinMintBatch(const std::vector<std::pair<libzerocoin::Pu
 {
     CLevelDBBatch batch(*this);
     size_t count = 0;
-    for (std::vector<std::pair<libzerocoin::PublicCoin, uint256> >::const_iterator it=mintInfo.begin(); it != mintInfo.end(); it++) {
+    for (auto it=mintInfo.begin(); it != mintInfo.end(); it++) {
         PublicCoin pubCoin = it->first;
         uint256 hash = GetPubCoinHash(pubCoin.getValue());
-        batch.Write(make_pair('m', hash), it->second);
+        batch.Write(std::make_pair('m', hash), it->second);
         ++count;
     }
 
@@ -318,25 +318,25 @@ bool CZerocoinDB::ReadCoinMint(const CBigNum& bnPubcoin, uint256& hashTx)
 
 bool CZerocoinDB::ReadCoinMint(const uint256& hashPubcoin, uint256& hashTx)
 {
-    return Read(make_pair('m', hashPubcoin), hashTx);
+    return Read(std::make_pair('m', hashPubcoin), hashTx);
 }
 
 bool CZerocoinDB::EraseCoinMint(const CBigNum& bnPubcoin)
 {
     uint256 hash = GetPubCoinHash(bnPubcoin);
-    return Erase(make_pair('m', hash));
+    return Erase(std::make_pair('m', hash));
 }
 
 bool CZerocoinDB::WriteCoinSpendBatch(const std::vector<std::pair<libzerocoin::CoinSpend, uint256> >& spendInfo)
 {
     CLevelDBBatch batch(*this);
     size_t count = 0;
-    for (std::vector<std::pair<libzerocoin::CoinSpend, uint256> >::const_iterator it=spendInfo.begin(); it != spendInfo.end(); it++) {
+    for (auto it=spendInfo.begin(); it != spendInfo.end(); it++) {
         CBigNum bnSerial = it->first.getCoinSerialNumber();
         CDataStream ss(SER_GETHASH, 0);
         ss << bnSerial;
         uint256 hash = Hash(ss.begin(), ss.end());
-        batch.Write(make_pair('s', hash), it->second);
+        batch.Write(std::make_pair('s', hash), it->second);
         ++count;
     }
 
@@ -350,12 +350,12 @@ bool CZerocoinDB::ReadCoinSpend(const CBigNum& bnSerial, uint256& txHash)
     ss << bnSerial;
     uint256 hash = Hash(ss.begin(), ss.end());
 
-    return Read(make_pair('s', hash), txHash);
+    return Read(std::make_pair('s', hash), txHash);
 }
 
 bool CZerocoinDB::ReadCoinSpend(const uint256& hashSerial, uint256 &txHash)
 {
-    return Read(make_pair('s', hashSerial), txHash);
+    return Read(std::make_pair('s', hashSerial), txHash);
 }
 
 bool CZerocoinDB::EraseCoinSpend(const CBigNum& bnSerial)
@@ -364,10 +364,10 @@ bool CZerocoinDB::EraseCoinSpend(const CBigNum& bnSerial)
     ss << bnSerial;
     uint256 hash = Hash(ss.begin(), ss.end());
 
-    return Erase(make_pair('s', hash));
+    return Erase(std::make_pair('s', hash));
 }
 
-bool CZerocoinDB::WipeCoins(std::string strType)
+bool CZerocoinDB::WipeCoins(const std::string& strType)
 {
     if (strType != "spends" && strType != "mints")
         return error("%s: did not recognize type %s", __func__, strType);
@@ -397,7 +397,7 @@ bool CZerocoinDB::WipeCoins(std::string strType)
     }
 
     for (auto& hash : setDelete) {
-        if (!Erase(make_pair(type, hash)))
+        if (!Erase(std::make_pair(type, hash)))
             LogPrintf("%s: error failed to delete %s\n", __func__, hash.GetHex());
     }
 
@@ -407,18 +407,18 @@ bool CZerocoinDB::WipeCoins(std::string strType)
 bool CZerocoinDB::WriteAccumulatorValue(const uint32_t& nChecksum, const CBigNum& bnValue)
 {
     LogPrint(BCLog::ZERO,"%s : checksum:%d val:%s\n", __func__, nChecksum, bnValue.GetHex());
-    return Write(make_pair('2', nChecksum), bnValue);
+    return Write(std::make_pair('2', nChecksum), bnValue);
 }
 
 bool CZerocoinDB::ReadAccumulatorValue(const uint32_t& nChecksum, CBigNum& bnValue)
 {
-    return Read(make_pair('2', nChecksum), bnValue);
+    return Read(std::make_pair('2', nChecksum), bnValue);
 }
 
 bool CZerocoinDB::EraseAccumulatorValue(const uint32_t& nChecksum)
 {
     LogPrint(BCLog::ZERO, "%s : checksum:%d\n", __func__, nChecksum);
-    return Erase(make_pair('2', nChecksum));
+    return Erase(std::make_pair('2', nChecksum));
 }
 /** Upgrade the database from older formats.
  *
