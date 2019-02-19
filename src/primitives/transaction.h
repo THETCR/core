@@ -330,6 +330,15 @@ public:
     }
 
     std::string ToString() const;
+//    bool HasWitness() const
+//    {
+//        for (size_t i = 0; i < vin.size(); i++) {
+//            if (!vin[i].scriptWitness.IsNull()) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 };
 
 /** A mutable version of CTransaction. */
@@ -380,7 +389,15 @@ struct CMutableTransaction
     {
         return !(a == b);
     }
-
+//  bool HasWitness() const
+//  {
+//      for (size_t i = 0; i < vin.size(); i++) {
+//          if (!vin[i].scriptWitness.IsNull()) {
+//              return true;
+//          }
+//      }
+//      return false;
+//  }
 };
 
 typedef std::shared_ptr<const CTransaction> CTransactionRef;
