@@ -985,7 +985,8 @@ namespace {
  * Wrapper that serializes like CTransaction, but with the modifications
  *  required for the signature hash done in-place
  */
-    class CTransactionSignatureSerializer {
+template <class T>
+class CTransactionSignatureSerializer {
     private:
         const CTransaction &txTo;  //! reference to the spending transaction (the one being serialized)
         const CScript &scriptCode; //! output script being consumed
@@ -1082,6 +1083,7 @@ namespace {
 
 } // anon namespace
 
+template <class T>
 uint256 SignatureHash(const CScript& scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType)
 {
     if (nIn >= txTo.vin.size()) {
@@ -1098,7 +1100,7 @@ uint256 SignatureHash(const CScript& scriptCode, const CTransaction& txTo, unsig
     }
 
     // Wrapper to serialize only the necessary parts of the transaction being signed
-    CTransactionSignatureSerializer txTmp(txTo, scriptCode, nIn, nHashType);
+    CTransactionSignatureSerializer<T> txTmp(txTo, scriptCode, nIn, nHashType);
 
     // Serialize and hash
     CHashWriter ss(SER_GETHASH, 0);
