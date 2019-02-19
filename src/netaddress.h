@@ -86,10 +86,10 @@ public:
   ADD_SERIALIZE_METHODS;
 
   template <typename Stream, typename Operation>
-  inline void SerializationOp(Stream& s, Operation ser_action)
-  {
+  inline void SerializationOp(Stream& s, Operation ser_action) {
       READWRITE(ip);
   }
+
 
   friend class CSubNet;
 };
@@ -167,13 +167,9 @@ public:
   ADD_SERIALIZE_METHODS;
 
   template <typename Stream, typename Operation>
-  inline void SerializationOp(Stream& s, Operation ser_action)
-  {
+  inline void SerializationOp(Stream& s, Operation ser_action) {
       READWRITE(ip);
-      unsigned short portN = htons(port);
-      READWRITE(portN);
-      if (ser_action.ForRead())
-          port = ntohs(portN);
+      READWRITE(WrapBigEndian(port));
   }
 };
 
