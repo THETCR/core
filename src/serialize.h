@@ -1025,13 +1025,21 @@ inline void Serialize(Stream& s, libzerocoin::SpendType a)
     WRITEDATA(s, f);
 }
 
-template <typename Stream>
-inline void Unserialize(Stream& s, libzerocoin::SpendType & a)
+template<typename Stream, typename T>
+inline void Unserialize(Stream& is, libzerocoin::SpendType & a)
 {
     uint8_t f=0;
-    READDATA(s, f);
+    READDATA(is, f);
     a = static_cast<libzerocoin::SpendType>(f);
 }
+
+//template <typename Stream>
+//inline void Unserialize(Stream& s, libzerocoin::SpendType & a)
+//{
+//    uint8_t f=0;
+//    READDATA(s, f);
+//    a = static_cast<libzerocoin::SpendType>(f);
+//}
 
 
 class CScript;

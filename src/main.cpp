@@ -3763,7 +3763,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const CBlock* pblock, bool
     }
 
     LogPrintf("%s : ACCEPTED Block %ld in %ld milliseconds with size=%d\n", __func__, chainActive.Height(), GetTimeMillis() - nStartTime,
-              ::GetSerializeSize(&pblock, CLIENT_VERSION));
+              ::GetSerializeSize(*pblock, CLIENT_VERSION));
 
     return true;
 }
