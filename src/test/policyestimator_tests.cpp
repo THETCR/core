@@ -2,10 +2,12 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <policy/policy.h>
 #include "policy/fees.h"
 #include "txmempool.h"
 #include "uint256.h"
 #include <util/system.h>
+#include <test/test_wispr.h>
 
 #include <boost/test/unit_test.hpp>
 
