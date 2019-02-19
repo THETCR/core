@@ -6,6 +6,8 @@
 #include "main.h"
 #include "zwspchain.h"
 
+typedef std::vector<unsigned char> valtype;
+
 bool SignBlockWithKey(CBlock& block, const CKey& key)
 {
     if (!key.Sign(block.GetHash(), block.vchBlockSig))

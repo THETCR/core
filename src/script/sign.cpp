@@ -14,9 +14,6 @@
 #include "uint256.h"
 #include <util/system.h>
 
-typedef std::vector<unsigned char> valtype;
-
-
 using namespace std;
 
 typedef vector<unsigned char> valtype;
