@@ -5,30 +5,39 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "base58.h"
-#include "core_io.h"
-#include "consensus/validation.h"
-#include "init.h"
-#include "keystore.h"
-#include "main.h"
+#include <chain.h>
+#include <coins.h>
+#include <compat/byteswap.h>
+#include <consensus/validation.h>
+#include <consensus/tx_verify.h>
+#include <core_io.h>
+#include <init.h>
+#include <keystore.h>
+#include <merkleblock.h>
+#include <policy/policy.h>
+#include <primitives/transaction.h>
+#include <rpc/server.h>
+#include <script/script.h>
+#include <script/script_error.h>
+#include <script/sign.h>
+#include <script/standard.h>
+#include <uint256.h>
+#include <util/strencodings.h>
+#include <main.h>
+#include <validationinterface.h>
+
+#include <base58.h>
 #include <net.h>
 #include <net_processing.h>
-#include "policy/policy.h"
-#include "primitives/transaction.h"
-#include "rpc/server.h"
-#include "script/script.h"
-#include "script/script_error.h"
-#include "script/sign.h"
-#include "script/standard.h"
-#include "swifttx.h"
-#include "txmempool.h"
-#include "uint256.h"
+#include <swifttx.h>
+#include <txmempool.h>
 #include <util/moneystr.h>
-#include "zwspchain.h"
+#include <zwspchain.h>
 #ifdef ENABLE_WALLET
 #include <wallet/wallet.h>
 #endif
 
+#include <numeric>
 #include <stdint.h>
 
 #include <boost/assign/list_of.hpp>
@@ -718,20 +727,24 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
         }
         const CScript& prevPubKey = coins->vout[txin.prevout.n].scriptPubKey;
         const CAmount& amount = coins->vout[txin.prevout.n].nValue;
-
+        const CTxOut& out = coins->vout[txin.prevout.n];
         txin.scriptSig.clear();
+        SignatureData sigdata;
         // Only sign SIGHASH_SINGLE if there's a corresponding output:
         if (!fHashSingle || (i < mergedTx.vout.size()))
             SignSignature(keystore, prevPubKey, mergedTx, i, nHashType);
 
         // ... and merge in other signatures:
         for (const CMutableTransaction& txv: txVariants) {
-            txin.scriptSig = CombineSignatures(prevPubKey, mergedTx, i, txin.scriptSig, txv.vin[i].scriptSig);
+            sigdata.MergeSignatureData(DataFromTransaction(txv, i, out));
         }
         ScriptError serror = SCRIPT_ERR_OK;
         if (!VerifyScript(txin.scriptSig, prevPubKey, nullptr, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i, amount), &serror)) {
             TxInErrorToJSON(txin, vErrors, ScriptErrorString(serror));
         }
+        ProduceSignature(DUMMY_SIGNING_PROVIDER, MutableTransactionSignatureCreator(&mergedTx, i, out.nValue, 1), out.scriptPubKey, sigdata);
+
+        UpdateInput(txin, sigdata);
     }
     bool fComplete = vErrors.empty();
 
