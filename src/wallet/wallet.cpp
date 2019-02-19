@@ -2934,12 +2934,13 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
 
                 // Sign
                 int nIn = 0;
-                for (const std::pair<const CWalletTx*, unsigned int> & coin: setCoins)
+                for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
                     if (!SignSignature(*this, coin.first->vout[nIn].scriptPubKey, txNew, nIn)) {
                         strFailReason = _("Signing transaction failed");
                         return false;
                     }
-                nIn++;
+                    nIn++;
+                }
                 // Embed the constructed transaction data in wtxNew.
                 *static_cast<CTransaction*>(&wtxNew) = CTransaction(txNew);
 
@@ -4663,15 +4664,9 @@ bool CWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransa
     if (!isZCSpendChange) {
         int nIn = 0;
         for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-            const CScript& scriptPubKey = coin.first->vout[nIn].scriptPubKey;
-            SignatureData sigdata;
-
-            if (!ProduceSignature(*this, MutableTransactionSignatureCreator(&txNew, nIn, coin.first->vout[nIn].nValue, SIGHASH_ALL), scriptPubKey, sigdata))
-            {
+            if (!SignSignature(*this, *coin.first->vout[nIn].scriptPubKey, txNew, nIn)) {
                 strFailReason = _("Signing transaction failed");
                 return false;
-            } else {
-                UpdateInput(txNew.vin.at(nIn), sigdata);
             }
             nIn++;
         }
