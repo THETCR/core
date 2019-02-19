@@ -126,6 +126,7 @@ BITCOIN_CORE_H = \
   invalid.h \
   invalid_outpoints.json.h \
   invalid_serials.json.h \
+  indirectmap.h \
   kernel.h \
   swifttx.h \
   key.h \
@@ -144,6 +145,7 @@ BITCOIN_CORE_H = \
   miner.h \
   mintpool.h \
   mruset.h \
+  memusage.h \
   net.h \
   net_processing.h \
   netaddress.h \
