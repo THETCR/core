@@ -4664,7 +4664,7 @@ bool CWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransa
     if (!isZCSpendChange) {
         int nIn = 0;
         for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-            if (!SignSignature(*this, *coin.first->vout[nIn].scriptPubKey, txNew, nIn)) {
+            if (!SignSignature(*this, coin.first->vout[nIn].scriptPubKey, txNew, nIn)) {
                 strFailReason = _("Signing transaction failed");
                 return false;
             }
