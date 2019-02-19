@@ -48,7 +48,7 @@ public:
       SetNull();
   }
 
-    void SetNull(){};
+    void SetNull();
 
     bool HasSelected() const
     {
