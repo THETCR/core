@@ -49,7 +49,7 @@ public:
   explicit CScriptCompressor(CScript &scriptIn) : script(scriptIn) { }
 
   template<typename Stream>
-  void Serialize(Stream &s) const {
+  void Serialize(Stream &s, int nType, int nVersion) const {
       std::vector<unsigned char> compr;
       if (CompressScript(script, compr)) {
           s << MakeSpan(compr);
@@ -61,7 +61,7 @@ public:
   }
 
   template<typename Stream>
-  void Unserialize(Stream &s) {
+  void Unserialize(Stream &s, int nType, int nVersion) {
       unsigned int nSize = 0;
       s >> VARINT(nSize);
       if (nSize < nSpecialScripts) {

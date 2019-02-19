@@ -42,14 +42,14 @@ struct CoinEntry {
   explicit CoinEntry(const COutPoint* ptr) : outpoint(const_cast<COutPoint*>(ptr)), key(DB_COIN)  {}
 
   template<typename Stream>
-  void Serialize(Stream &s) const {
+  void Serialize(Stream &s, int nType, int nVersion) const {
       s << key;
       s << outpoint->hash;
       s << VARINT(outpoint->n);
   }
 
   template<typename Stream>
-  void Unserialize(Stream& s) {
+  void Unserialize(Stream& s, int nType, int nVersion) {
       s >> key;
       s >> outpoint->hash;
       s >> VARINT(outpoint->n);
