@@ -19,8 +19,8 @@ bool SignBlockWithKey(CBlock& block, const CKey& key)
 bool GetKeyIDFromUTXO(const CTxOut& txout, CKeyID& keyID)
 {
     std::vector<valtype> vSolutions;
-    txnouttype whichType;
-    if (!Solver(txout.scriptPubKey, whichType, vSolutions))
+    txnouttype whichType = Solver(txout.scriptPubKey, vSolutions);
+    if (whichType == TX_NONSTANDARD)
         return false;
     if (whichType == TX_PUBKEY) {
         keyID = CPubKey(vSolutions[0]).GetID();
@@ -74,10 +74,10 @@ bool CheckBlockSignature(const CBlock& block)
         libzerocoin::CoinSpend spend = TxInToZerocoinSpend(block.vtx[1].vin[0]);
         pubkey = spend.getPubKey();
     } else {
-        txnouttype whichType;
         std::vector<valtype> vSolutions;
         const CTxOut& txout = block.vtx[1].vout[1];
-        if (!Solver(txout.scriptPubKey, whichType, vSolutions))
+        txnouttype whichType = Solver(txout.scriptPubKey, vSolutions);
+        if (whichType == TX_NONSTANDARD)
             return false;
         if (whichType == TX_PUBKEY || whichType == TX_PUBKEYHASH) {
             valtype& vchPubKey = vSolutions[0];

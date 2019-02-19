@@ -43,8 +43,8 @@ isminetype IsMine(const CKeyStore& keystore, const CScript& scriptPubKey)
         return ISMINE_MULTISIG;
 
     vector<valtype> vSolutions;
-    txnouttype whichType;
-    if(!Solver(scriptPubKey, whichType, vSolutions)) {
+    txnouttype whichType = Solver(scriptPubKey, vSolutions);
+    if(whichType == TX_NONSTANDARD) {
         if(keystore.HaveWatchOnly(scriptPubKey))
             return ISMINE_WATCH_ONLY;
         if(keystore.HaveMultiSig(scriptPubKey))

@@ -32,7 +32,8 @@ bool IsDust(const CTxOut& txout, const CFeeRate& dustRelayFeeIn)
 bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType)
 {
     vector<valtype> vSolutions;
-    if (!Solver(scriptPubKey, whichType, vSolutions))
+    whichType = Solver(scriptPubKey, vSolutions);
+    if (whichType == TX_NONSTANDARD)
         return false;
 
     if (whichType == TX_MULTISIG)
@@ -162,7 +163,8 @@ bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs)
         txnouttype whichType;
         // get the scriptPubKey corresponding to this input:
         const CScript& prevScript = prev.scriptPubKey;
-        if (!Solver(prevScript, whichType, vSolutions))
+        whichType = Solver(prevScript, vSolutions);
+        if (whichType == TX_NONSTANDARD)
             return false;
         int nArgsExpected = ScriptSigArgsExpected(whichType, vSolutions);
         if (nArgsExpected < 0)
@@ -184,7 +186,8 @@ bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs)
             CScript subscript(stack.back().begin(), stack.back().end());
             vector<vector<unsigned char> > vSolutions2;
             txnouttype whichType2;
-            if (Solver(subscript, whichType2, vSolutions2)) {
+            whichType2 = Solver(subscript, vSolutions2);
+            if (whichType2 != TX_NONSTANDARD) {
                 int tmpExpected = ScriptSigArgsExpected(whichType2, vSolutions2);
                 if (tmpExpected < 0)
                     return false;
