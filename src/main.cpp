@@ -2272,7 +2272,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
  * The caches and indexes are flushed if either they're too large, forceWrite is set, or
  * fast is not set and it's been a while since the last write.
  */
-bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
+bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& state, FlushStateMode mode)
 {
     LOCK(cs_main);
     static int64_t nLastWrite = 0;
@@ -2328,8 +2328,9 @@ bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
 
 void FlushStateToDisk()
 {
+    const CChainParams& chainParams = Params();
     CValidationState state;
-    FlushStateToDisk(state, FlushStateMode::ALWAYS);
+    FlushStateToDisk(chainParams, state, FlushStateMode::ALWAYS);
 }
 
 /** Update chainActive and related internal data structures. */
@@ -3762,7 +3763,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const CBlock* pblock, bool
     }
 
     LogPrintf("%s : ACCEPTED Block %ld in %ld milliseconds with size=%d\n", __func__, chainActive.Height(), GetTimeMillis() - nStartTime,
-              ::GetSerializeSize(pblock, CLIENT_VERSION));
+              ::GetSerializeSize(&pblock, CLIENT_VERSION));
 
     return true;
 }
