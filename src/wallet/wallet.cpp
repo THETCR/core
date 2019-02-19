@@ -2935,11 +2935,11 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                 // Sign
                 int nIn = 0;
                 for (const std::pair<const CWalletTx*, unsigned int> & coin: setCoins)
-                    if (!SignSignature(*this, *coin.first, txNew, nIn++)) {
+                    if (!SignSignature(*this, coin.first->vout[nIn].scriptPubKey, txNew, nIn)) {
                         strFailReason = _("Signing transaction failed");
                         return false;
                     }
-
+                nIn++;
                 // Embed the constructed transaction data in wtxNew.
                 *static_cast<CTransaction*>(&wtxNew) = CTransaction(txNew);
 
@@ -3122,8 +3122,9 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
         for (CTxIn txIn : txNew.vin) {
             const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
-            if (!SignSignature(*this, *wtx, txNew, nIn++))
+            if (!SignSignature(*this, wtx->vout[nIn].scriptPubKey, txNew, nIn))
                 return error("CreateCoinStake : failed to sign coinstake");
+            nIn++;
         }
     } else {
         //Update the mint database with tx hash and height
@@ -4662,10 +4663,17 @@ bool CWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransa
     if (!isZCSpendChange) {
         int nIn = 0;
         for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-            if (!SignSignature(*this, *coin.first, txNew, nIn++)) {
+            const CScript& scriptPubKey = coin.first->vout[nIn].scriptPubKey;
+            SignatureData sigdata;
+
+            if (!ProduceSignature(*this, MutableTransactionSignatureCreator(&txNew, nIn, coin.first->vout[nIn].nValue, SIGHASH_ALL), scriptPubKey, sigdata))
+            {
                 strFailReason = _("Signing transaction failed");
                 return false;
+            } else {
+                UpdateInput(txNew.vin.at(nIn), sigdata);
             }
+            nIn++;
         }
     }
 
