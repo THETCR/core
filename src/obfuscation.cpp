@@ -936,8 +936,9 @@ bool CObfuscationPool::SignatureValid(const CScript& newSig, const CTxIn& newVin
     if (found >= 0) { //might have to do this one input at a time?
         int n = found;
         txNew.vin[n].scriptSig = newSig;
+        CAmount amount = txNew.vout[n].nValue;
         LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::SignatureValid() - Sign with sig %s\n", newSig.ToString().substr(0, 24));
-        if (!VerifyScript(txNew.vin[n].scriptSig, sigPubKey, SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_STRICTENC, MutableTransactionSignatureChecker(&txNew, n))) {
+        if (!VerifyScript(txNew.vin[n].scriptSig, sigPubKey, nullptr, SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_STRICTENC, MutableTransactionSignatureChecker(&txNew, n, amount))) {
             LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::SignatureValid() - Signing - Error signing input %u\n", n);
             return false;
         }
@@ -960,7 +961,7 @@ bool CObfuscationPool::IsCollateralValid(const CTransaction& txCollateral)
     for (const CTxOut o: txCollateral.vout) {
         nValueOut += o.nValue;
 
-        if (!o.scriptPubKey.IsNormalPaymentScript()) {
+        if (!o.scriptPubKey.IsPayToPublicKeyHash() && !o.scriptPubKey.IsUnspendable()) {
             LogPrintf("CObfuscationPool::IsCollateralValid - Invalid Script %s\n", txCollateral.ToString());
             return false;
         }

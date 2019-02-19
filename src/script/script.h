@@ -574,6 +574,7 @@ public:
       CScriptBase::clear();
       shrink_to_fit();
   }
+  bool IsPayToPublicKeyHash() const;
 };
 
 struct CScriptWitness
