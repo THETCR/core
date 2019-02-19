@@ -9,6 +9,7 @@
 
 #include <util/system.h>
 #include <util/strencodings.h>
+#include <chainparams.h>
 
 #ifndef WIN32
 # include <arpa/inet.h>
