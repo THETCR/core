@@ -441,13 +441,13 @@ static bool GetUTXOStats(CCoinsView *view, CCoinsStats &stats)
                 const CTxOut &out = coins.vout[i];
                 if (!out.IsNull()) {
                     stats.nTransactionOutputs++;
-                    ss << VARINT(i+1, VarIntMode::NONNEGATIVE_SIGNED);
+                    ss << VARINT(i+1, VarIntMode::DEFAULT);
                     ss << out;
                     nTotalAmount += out.nValue;
                 }
             }
             stats.nSerializedSize += 32 + pcursor->GetValueSize();
-            ss << VARINT(0);
+            ss << VARINT(0, VarIntMode::NONNEGATIVE_SIGNED);
         } else {
             return error("%s: unable to read value", __func__);
         }
