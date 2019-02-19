@@ -3893,6 +3893,8 @@ public:
         if (keystore.GetCScript(scriptId, script))
             Process(script);
     }
+    void operator()(const WitnessV0ScriptHash &none) {}
+    void operator()(const WitnessUnknown &none) {}
 
     void operator()(const CNoDestination& none) {}
 };
