@@ -1197,7 +1197,7 @@ public:
         if (ser_action.ForRead()) {
             mapValue.clear();
             if (std::string::npos != nSepPos) {
-                CDataStream ss(std::vector<char>(strComment.begin() + nSepPos + 1, strComment.end()));
+                CDataStream ss(std::vector<char>(strComment.begin() + nSepPos + 1, strComment.end()), s.GetType(), nVersion);
                 ss >> mapValue;
                 _ssExtra = std::vector<char>(ss.begin(), ss.end());
             }
