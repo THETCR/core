@@ -1024,10 +1024,10 @@ inline void Unserialize(Stream& os, libzerocoin::CoinDenomination& p)
 // Serialization for libzerocoin::SpendType
 inline unsigned int GetSerializedSize(libzerocoin::SpendType a) { return sizeof(libzerocoin::SpendType); }
 template <typename Stream>
-inline void Serialize(Stream& s, libzerocoin::SpendType a)
+inline void Serialize(Stream& os, const libzerocoin::SpendType& p)
 {
-    uint8_t f = static_cast<uint8_t>(a);
-    WRITEDATA(s, f);
+    uint8_t f = static_cast<uint8_t>(p);
+    WRITEDATA(os, f);
 }
 
 //template<typename Stream, typename T>
