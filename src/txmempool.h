@@ -14,6 +14,7 @@
 #include "policy/feerate.h"
 #include "primitives/transaction.h"
 #include "sync.h"
+#include <boost/signals2/signal.hpp>
 
 class CBlockIndex;
 class CAutoFile;
