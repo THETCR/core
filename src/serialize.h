@@ -994,6 +994,11 @@ size_t GetSerializeSizeMany(int nVersion, const T&... t)
 }
 
 //!WISPR
+/*
+ * Basic Types
+ */
+#define WRITEDATA(s, obj) s.write((char*)&(obj), sizeof(obj))
+#define READDATA(s, obj) s.read((char*)&(obj), sizeof(obj))
 // Serializatin for libzerocoin::CoinDenomination
 inline unsigned int GetSerializeSize(libzerocoin::CoinDenomination a) { return sizeof(libzerocoin::CoinDenomination); }
 template <typename Stream>

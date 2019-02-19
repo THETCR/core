@@ -11,7 +11,7 @@
 
 namespace libzerocoin {
 
-enum  CoinDenomination {
+enum CoinDenomination {
     ZQ_ERROR = 0,
     ZQ_ONE = 1,
     ZQ_FIVE = 5,
