@@ -32,7 +32,31 @@ static const char DB_BEST_BLOCK = 'B';
 static const char DB_FLAG = 'F';
 static const char DB_REINDEX_FLAG = 'R';
 static const char DB_LAST_BLOCK = 'l';
+static const char DB_HEAD_BLOCKS = 'H';
 
+namespace {
+
+struct CoinEntry {
+  COutPoint* outpoint;
+  char key;
+  explicit CoinEntry(const COutPoint* ptr) : outpoint(const_cast<COutPoint*>(ptr)), key(DB_COIN)  {}
+
+  template<typename Stream>
+  void Serialize(Stream &s) const {
+      s << key;
+      s << outpoint->hash;
+      s << VARINT(outpoint->n);
+  }
+
+  template<typename Stream>
+  void Unserialize(Stream& s) {
+      s >> key;
+      s >> outpoint->hash;
+      s >> VARINT(outpoint->n);
+  }
+};
+
+}
 
 void static BatchWriteCoins(CLevelDBBatch& batch, const uint256& hash, const CCoins& coins)
 {
@@ -69,6 +93,14 @@ uint256 CCoinsViewDB::GetBestBlock() const
     return hashBestChain;
 }
 
+std::vector<uint256> CCoinsViewDB::GetHeadBlocks() const {
+    std::vector<uint256> vhashHeadBlocks;
+    if (!db.Read(DB_HEAD_BLOCKS, vhashHeadBlocks)) {
+        return std::vector<uint256>();
+    }
+    return vhashHeadBlocks;
+}
+
 bool CCoinsViewDB::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock)
 {
     CLevelDBBatch batch(db);
@@ -89,6 +121,7 @@ bool CCoinsViewDB::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock)
     LogPrint(BCLog::COINDB, "Committing %u changed transactions (out of %u) to coin database...\n", (unsigned int)changed, (unsigned int)count);
     return db.WriteBatch(batch);
 }
+
 size_t CCoinsViewDB::EstimateSize() const
 {
     return db.EstimateSize(DB_COIN, (char)(DB_COIN+1));
