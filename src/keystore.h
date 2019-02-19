@@ -15,7 +15,7 @@
 #include <sync.h>
 
 #include <boost/signals2/signal.hpp>
-
+class SigningProvider;
 /** A virtual base class for key stores */
 class CKeyStore : public SigningProvider
 {
