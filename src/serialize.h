@@ -1008,11 +1008,11 @@ inline void Serialize(Stream& s, libzerocoin::CoinDenomination a)
     WRITEDATA(s, f);
 }
 
-template <typename Stream>
-inline void Unserialize(Stream& s, libzerocoin::CoinDenomination& a)
+template<typename Stream, typename T>
+inline void Unserialize(Stream& is, libzerocoin::CoinDenomination& a)
 {
     int f=0;
-    READDATA(s, f);
+    READDATA(is, f);
     a = libzerocoin::IntToZerocoinDenomination(f);
 }
 
