@@ -18,7 +18,7 @@ class CKeyID;
 class CScript;
 class CScriptID;
 class CTransaction;
-class CKeyStore
+class CKeyStore;
 
 struct CMutableTransaction;
 
