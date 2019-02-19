@@ -87,7 +87,8 @@ int bitcoinconsensus_verify_script(const unsigned char *scriptPubKey, unsigned i
          set_error(err, bitcoinconsensus_ERR_OK);
         CAmount am(amount);
         PrecomputedTransactionData txdata(tx);
-        return VerifyScript(tx.vin[nIn].scriptSig, CScript(scriptPubKey, scriptPubKey + scriptPubKeyLen), flags, TransactionSignatureChecker(&tx, nIn, am, txdata), nullptr);
+        return VerifyScript(tx.vin[nIn].scriptSig, CScript(scriptPubKey, scriptPubKey + scriptPubKeyLen), nullptr, flags, TransactionSignatureChecker(&tx, nIn, am, txdata), nullptr);
+//        return VerifyScript(tx.vin[nIn].scriptSig, CScript(scriptPubKey, scriptPubKey + scriptPubKeyLen), flags, TransactionSignatureChecker(&tx, nIn, am, txdata), nullptr);
     } catch (const std::exception&) {
         return set_error(err, bitcoinconsensus_ERR_TX_DESERIALIZE); // Error deserializing
     }
