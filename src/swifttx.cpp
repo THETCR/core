@@ -68,7 +68,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
         for (const CTxOut o: tx.vout) {
             // IX supports normal scripts and unspendable scripts (used in DS collateral and Budget collateral).
             // TODO: Look into other script types that are normal and can be included
-            if (!o.scriptPubKey.IsNormalPaymentScript() && !o.scriptPubKey.IsUnspendable()) {
+            if (!o.scriptPubKey.IsPayToPublicKeyHash() && !o.scriptPubKey.IsUnspendable()) {
                 LogPrintf("ProcessMessageSwiftTX::ix - Invalid Script %s\n", tx.ToString().c_str());
                 return;
             }

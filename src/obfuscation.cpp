@@ -213,7 +213,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
                     pfrom->PushMessage(NetMsgType::DSSTATUSUPDATE, sessionID, GetState(), GetEntriesCount(), MASTERNODE_REJECTED, errorID);
                     return;
                 }
-                if (!o.scriptPubKey.IsNormalPaymentScript()) {
+                if (!o.scriptPubKey.IsPayToPublicKeyHash()) {
                     LogPrintf("dsi - invalid script! %s\n", o.scriptPubKey.ToString());
                     errorID = ERR_INVALID_SCRIPT;
                     pfrom->PushMessage(NetMsgType::DSSTATUSUPDATE, sessionID, GetState(), GetEntriesCount(), MASTERNODE_REJECTED, errorID);
