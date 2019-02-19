@@ -410,6 +410,7 @@ I ReadVarInt(Stream& is)
     }
 }
 
+#define FLATDATA(obj) REF(CFlatData((char*)&(obj), (char*)&(obj) + sizeof(obj)))
 #define VARINT(obj, ...) WrapVarInt<__VA_ARGS__>(REF(obj))
 #define COMPACTSIZE(obj) CCompactSize(REF(obj))
 #define LIMITED_STRING(obj,n) LimitedString< n >(REF(obj))
