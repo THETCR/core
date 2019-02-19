@@ -2272,7 +2272,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
  * The caches and indexes are flushed if either they're too large, forceWrite is set, or
  * fast is not set and it's been a while since the last write.
  */
-bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& state, FlushStateMode mode)
+bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& state, FlushStateMode mode, int nManualPruneHeight)
 {
     LOCK(cs_main);
     static int64_t nLastWrite = 0;
