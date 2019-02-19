@@ -32,7 +32,7 @@ public:
     unsigned int GetSerializeSize(int nType, int nVersion) const
     {
         return ::GetSerializeSize(VARINT(nHeight * 4 + (fCoinBase ? 2 : 0) + (fCoinStake ? 1 : 0))) +
-               (nHeight > 0 ? ::GetSerializeSize(VARINT(this->nVersion)) : 0) +
+               (nHeight > 0 ? ::GetSerializeSize(VARINT(this->nVersion, VarIntMode::NONNEGATIVE_SIGNED)) : 0) +
                ::GetSerializeSize(CTxOutCompressor(REF(txout)));
     }
 
