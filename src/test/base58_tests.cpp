@@ -92,6 +92,9 @@ public:
     {
         return (exp_addrType == "none");
     }
+  bool operator()(const WitnessV0KeyHash& no) const {  return (exp_addrType == "none"); }
+  bool operator()(const WitnessV0ScriptHash& no) const {  return (exp_addrType == "none"); }
+  bool operator()(const WitnessUnknown& no) const {  return (exp_addrType == "none"); }
 };
 
 // Visitor to check address payload
