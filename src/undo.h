@@ -41,7 +41,7 @@ public:
     {
         ::Serialize(s, VARINT(nHeight * 4 + (fCoinBase ? 2 : 0) + (fCoinStake ? 1 : 0)));
         if (nHeight > 0)
-            ::Serialize(s, VARINT(this->nVersion));
+            ::Serialize(s, VARINT(this->nVersion, VarIntMode::NONNEGATIVE_SIGNED));
         ::Serialize(s, CTxOutCompressor(REF(txout)));
     }
 
@@ -54,7 +54,7 @@ public:
         fCoinBase = nCode & 2;
         fCoinStake = nCode & 1;
         if (nHeight > 0)
-            ::Unserialize(s, VARINT(this->nVersion));
+            ::Unserialize(s, VARINT(this->nVersion, VarIntMode::NONNEGATIVE_SIGNED));
         ::Unserialize(s, REF(CTxOutCompressor(REF(txout))));
     }
 };

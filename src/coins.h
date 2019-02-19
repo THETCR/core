@@ -207,7 +207,7 @@ public:
         assert(fFirst || fSecond || nMaskCode);
         unsigned int nCode = 16 * (nMaskCode - (fFirst || fSecond ? 0 : 1)) + (fCoinBase ? 1 : 0) + (fCoinStake ? 2 : 0) + (fFirst ? 4 : 0) + (fSecond ? 8 : 0);
         // version
-        ::Serialize(s, VARINT(this->nVersion));
+        ::Serialize(s, VARINT(this->nVersion, VarIntMode::NONNEGATIVE_SIGNED));
         // header code
         ::Serialize(s, VARINT(nCode));
         // spentness bitmask
@@ -232,7 +232,7 @@ public:
     {
         unsigned int nCode = 0;
         // version
-        ::Unserialize(s, VARINT(this->nVersion));
+        ::Unserialize(s, VARINT(this->nVersion, VarIntMode::NONNEGATIVE_SIGNED));
         // header code
         ::Unserialize(s, VARINT(nCode));
         fCoinBase = nCode & 1;         //0001 - means coinbase
