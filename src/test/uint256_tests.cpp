@@ -1,6 +1,10 @@
-// Copyright (c) 2011-2013 The Bitcoin Core developers
+// Copyright (c) 2011-2018 The Bitcoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#include <uint256.h>
+#include <version.h>
+#include <test/test_wispr.h>
 
 #include <boost/test/unit_test.hpp>
 #include <stdint.h>
@@ -8,9 +12,8 @@
 #include <iomanip>
 #include <limits>
 #include <cmath>
-#include "uint256.h"
 #include <string>
-#include "version.h"
+#include <stdio.h>
 
 BOOST_AUTO_TEST_SUITE(uint256_tests)
  
@@ -591,22 +594,22 @@ BOOST_AUTO_TEST_CASE( methods ) // GetHex SetHex begin() end() size() GetLow64 G
     BOOST_CHECK(R1L.GetSerializeSize(0,PROTOCOL_VERSION) == 32);
     BOOST_CHECK(ZeroL.GetSerializeSize(0,PROTOCOL_VERSION) == 32);
 
-    std::stringstream ss;
-    R1L.Serialize(ss,0,PROTOCOL_VERSION);
+    CDataStream ss(0, PROTOCOL_VERSION);
+    ss << R1L;
     BOOST_CHECK(ss.str() == std::string(R1Array,R1Array+32));
-    TmpL.Unserialize(ss,0,PROTOCOL_VERSION);
+    ss >> TmpL;
     BOOST_CHECK(R1L == TmpL);
-    ss.str("");
-    ZeroL.Serialize(ss,0,PROTOCOL_VERSION);
+    ss.clear();
+    ss << ZeroL;
     BOOST_CHECK(ss.str() == std::string(ZeroArray,ZeroArray+32));
-    TmpL.Unserialize(ss,0,PROTOCOL_VERSION);
+    ss >> TmpL;
     BOOST_CHECK(ZeroL == TmpL);
-    ss.str("");
-    MaxL.Serialize(ss,0,PROTOCOL_VERSION);
+    ss.clear();
+    ss << MaxL;
     BOOST_CHECK(ss.str() == std::string(MaxArray,MaxArray+32));
-    TmpL.Unserialize(ss,0,PROTOCOL_VERSION);
+    ss >> TmpL;
     BOOST_CHECK(MaxL == TmpL);
-    ss.str("");
+    ss.clear();
 
     BOOST_CHECK(R1S.GetHex() == R1S.ToString());
     BOOST_CHECK(R2S.GetHex() == R2S.ToString());
