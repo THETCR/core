@@ -583,6 +583,11 @@ template<typename Stream, typename T> void Serialize(Stream& os, const std::uniq
 template<typename Stream, typename T> void Unserialize(Stream& os, std::unique_ptr<const T>& p);
 
 
+//!WISPR
+template<typename Stream> void Serialize(Stream& os, const libzerocoin::CoinDenomination& p);
+template<typename Stream> void Unserialize(Stream& os, libzerocoin::CoinDenomination& p);
+template<typename Stream> void Serialize(Stream& os, const libzerocoin::SpendType& p);
+template<typename Stream> void Unserialize(Stream& os, libzerocoin::SpendType& p);
 
 /**
  * If none of the specialized versions above matched, default to calling member function.
@@ -1008,7 +1013,7 @@ inline void Serialize(Stream& s, libzerocoin::CoinDenomination a)
     WRITEDATA(s, f);
 }
 
-template<typename Stream, typename T>
+template <typename Stream>
 inline void Unserialize(Stream& is, libzerocoin::CoinDenomination& a)
 {
     int f=0;
@@ -1025,21 +1030,21 @@ inline void Serialize(Stream& s, libzerocoin::SpendType a)
     WRITEDATA(s, f);
 }
 
-template<typename Stream, typename T>
-inline void Unserialize(Stream& is, libzerocoin::SpendType & a)
-{
-    uint8_t f=0;
-    READDATA(is, f);
-    a = static_cast<libzerocoin::SpendType>(f);
-}
-
-//template <typename Stream>
-//inline void Unserialize(Stream& s, libzerocoin::SpendType & a)
+//template<typename Stream, typename T>
+//inline void Unserialize(Stream& is, libzerocoin::SpendType & a)
 //{
 //    uint8_t f=0;
-//    READDATA(s, f);
+//    READDATA(is, f);
 //    a = static_cast<libzerocoin::SpendType>(f);
 //}
+
+template <typename Stream>
+inline void Unserialize(Stream& s, libzerocoin::SpendType & a)
+{
+    uint8_t f=0;
+    READDATA(s, f);
+    a = static_cast<libzerocoin::SpendType>(f);
+}
 
 
 class CScript;
