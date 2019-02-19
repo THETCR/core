@@ -1007,18 +1007,18 @@ size_t GetSerializeSizeMany(int nVersion, const T&... t)
 // Serializatin for libzerocoin::CoinDenomination
 inline unsigned int GetSerializeSize(libzerocoin::CoinDenomination a) { return sizeof(libzerocoin::CoinDenomination); }
 template <typename Stream>
-inline void Serialize(Stream& s, libzerocoin::CoinDenomination a)
+inline void Serialize(Stream& os, const libzerocoin::CoinDenomination& p)
 {
-    int f = libzerocoin::ZerocoinDenominationToInt(a);
-    WRITEDATA(s, f);
+    int f = libzerocoin::ZerocoinDenominationToInt(p);
+    WRITEDATA(os, f);
 }
 
 template <typename Stream>
-inline void Unserialize(Stream& is, libzerocoin::CoinDenomination& a)
+inline void Unserialize(Stream& os, libzerocoin::CoinDenomination& p)
 {
     int f=0;
-    READDATA(is, f);
-    a = libzerocoin::IntToZerocoinDenomination(f);
+    READDATA(os, f);
+    p = libzerocoin::IntToZerocoinDenomination(f);
 }
 
 // Serialization for libzerocoin::SpendType
