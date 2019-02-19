@@ -474,18 +474,14 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
         }
         const CScript& prevPubKey = coins->vout[txin.prevout.n].scriptPubKey;
         const CAmount& amount = coins->vout[txin.prevout.n].nValue;
-
+        const CTxOut& out = coins->vout[txin.prevout.n];
         txin.scriptSig.clear();
+        SignatureData sigdata = DataFromTransaction(mergedTx, i, out);
         // Only sign SIGHASH_SINGLE if there's a corresponding output:
         if (!fHashSingle || (i < mergedTx.vout.size()))
-            SignSignature(keystore, prevPubKey, mergedTx, i, nHashType);
+            ProduceSignature(keystore, MutableTransactionSignatureCreator(&mergedTx, i, amount, nHashType), prevPubKey, sigdata);
 
-        // ... and merge in other signatures:
-        for (const CTransaction& txv: txVariants) {
-            txin.scriptSig = CombineSignatures(prevPubKey, mergedTx, i, txin.scriptSig, txv.vin[i].scriptSig);
-        }
-        if (!VerifyScript(txin.scriptSig, prevPubKey, nullptr, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i, amount)))
-            fComplete = false;
+        UpdateInput(txin, sigdata);
     }
 
     if (fComplete) {
