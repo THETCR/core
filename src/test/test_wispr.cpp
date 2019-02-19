@@ -32,6 +32,7 @@
 
 //CWallet* pwalletMain;
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
+FastRandomContext g_insecure_rand_ctx;
 
 extern bool fPrintToConsole;
 BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
