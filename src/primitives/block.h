@@ -44,7 +44,7 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(this->nVersion);
-        int nVersion = this->nVersion;
+        int _nVersion = this->nVersion;
         READWRITE(hashPrevBlock);
         READWRITE(hashMerkleRoot);
         READWRITE(nTime);
@@ -52,7 +52,7 @@ public:
         READWRITE(nNonce);
 
         //zerocoin active, header changes to include accumulator checksum
-        if(nVersion > 7)
+        if(_nVersion > 7)
             READWRITE(nAccumulatorCheckpoint);
     }
 

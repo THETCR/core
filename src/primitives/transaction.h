@@ -252,8 +252,8 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
-        int nVersion = this->nVersion;
-        if(nVersion < 2){
+        int _nVersion = this->nVersion;
+        if(_nVersion < 2){
             READWRITE(*const_cast<unsigned int *>(&nTime));
         }
         READWRITE(*const_cast<std::vector<CTxIn>*>(&vin));
@@ -360,8 +360,8 @@ struct CMutableTransaction
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(this->nVersion);
-        int nVersion = this->nVersion;
-        if(nVersion < 2){
+        int _nVersion = this->nVersion;
+        if(_nVersion < 2){
             READWRITE(nTime);
         }
         READWRITE(vin);

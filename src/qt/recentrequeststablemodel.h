@@ -33,7 +33,6 @@ public:
         unsigned int nDate = date.toTime_t();
 
         READWRITE(this->nVersion);
-        int nVersion = this->nVersion;
         READWRITE(id);
         READWRITE(nDate);
         READWRITE(recipient);
