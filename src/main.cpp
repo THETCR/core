@@ -1290,15 +1290,10 @@ void UpdateCoins(const CTransaction& tx, CValidationState& state, CCoinsViewCach
     inputs.ModifyCoins(tx.GetHash())->FromTx(tx, nHeight);
 }
 
-bool CScriptCheck::operator()()
-{
-    const CScript& scriptSig = ptxTo->vin[nIn].scriptSig;
-    PrecomputedTransactionData txdata(ptxTo);
-    const CAmount& amount = ptxTo->vout[nIn].nValue;
-    if (!VerifyScript(scriptSig, scriptPubKey, nullptr, nFlags, CachingTransactionSignatureChecker(ptxTo, nIn, amount, cacheStore, txdata), &error)) {
-        return ::error("CScriptCheck(): %s:%d VerifySignature failed: %s", ptxTo->GetHash().ToString(), nIn, ScriptErrorString(error));
-    }
-    return true;
+bool CScriptCheck::operator()() {
+    const CScript &scriptSig = ptxTo->vin[nIn].scriptSig;
+//    const CScriptWitness *witness = &ptxTo->vin[nIn].scriptWitness;
+    return VerifyScript(scriptSig, m_tx_out.scriptPubKey, nullptr, nFlags, CachingTransactionSignatureChecker(ptxTo, nIn, m_tx_out.nValue, cacheStore, *txdata), &error);
 }
 
 CBitcoinAddress addressExp1("WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmDW");
