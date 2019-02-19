@@ -14,6 +14,8 @@
 #include <util/system.h>
 #include <util/strencodings.h>
 
+typedef std::vector<unsigned char> valtype;
+
 bool IsDust(const CTxOut& txout, const CFeeRate& dustRelayFeeIn)
 {
     // "Dust" is defined in terms of CTransaction::minRelayTxFee, which has units uwsp-per-kilobyte.
