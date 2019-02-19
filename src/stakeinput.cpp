@@ -214,7 +214,7 @@ bool CWspStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout, CAmount nTo
         if (!pwallet->GetKey(keyID, key))
             return false;
 
-        scriptPubKey << key.GetPubKey() << OP_CHECKSIG;
+        scriptPubKey << ToByteVector(key.GetPubKey()) << OP_CHECKSIG;
     } else
         scriptPubKey = scriptPubKeyKernel;
 
