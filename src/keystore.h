@@ -17,7 +17,8 @@
 #include <boost/signals2/signal.hpp>
 
 /** A virtual base class for key stores */
-class CKeyStore : public SigningProvider {
+class CKeyStore : public SigningProvider
+{
 protected:
     mutable CCriticalSection cs_KeyStore;
 
