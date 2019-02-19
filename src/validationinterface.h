@@ -154,7 +154,7 @@ protected:
 
   virtual void SyncTransaction(const CTransaction &tx, const CBlock *pblock){};
   virtual void NotifyTransactionLock(const CTransaction &tx){};
-  virtual bool UpdatedTransaction(const uint256 &hash){ return false;}
+  virtual bool UpdatedTransaction(const uint256 &hash){ return false;};
   virtual void SetBestChain(const CBlockLocator &chain){};
   virtual void Inventory(const uint256 &hash){};
   virtual void BlockFound(const uint256 &hash){};
