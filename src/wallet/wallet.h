@@ -65,7 +65,8 @@ static const unsigned int MAX_FREE_TRANSACTION_CREATE_SIZE = 1000;
 static const int DEFAULT_CUSTOMBACKUPTHRESHOLD = 1;
 //! -enableautoconvertaddress default
 static const bool DEFAULT_AUTOCONVERTADDRESS = true;
-
+//! Default for -avoidpartialspends
+static const bool DEFAULT_AVOIDPARTIALSPENDS = true;
 // Zerocoin denomination which creates exactly one of each denominations:
 // 6666 = 1*5000 + 1*1000 + 1*500 + 1*100 + 1*50 + 1*10 + 1*5 + 1
 static const int ZQ_6666 = 6666;
