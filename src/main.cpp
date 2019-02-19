@@ -1294,8 +1294,8 @@ bool CScriptCheck::operator()()
 {
     const CScript& scriptSig = ptxTo->vin[nIn].scriptSig;
     PrecomputedTransactionData txdata(ptxTo);
-    CAmount am(0);
-    if (!VerifyScript(scriptSig, scriptPubKey, nullptr, nFlags, CachingTransactionSignatureChecker(ptxTo, nIn, am, cacheStore, txdata), &error)) {
+    const CAmount& amount = ptxTo->vout[nIn].nValue;
+    if (!VerifyScript(scriptSig, scriptPubKey, nullptr, nFlags, CachingTransactionSignatureChecker(ptxTo, nIn, amount, cacheStore, txdata), &error)) {
         return ::error("CScriptCheck(): %s:%d VerifySignature failed: %s", ptxTo->GetHash().ToString(), nIn, ScriptErrorString(error));
     }
     return true;
