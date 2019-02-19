@@ -441,7 +441,7 @@ static bool GetUTXOStats(CCoinsView *view, CCoinsStats &stats)
                 const CTxOut &out = coins.vout[i];
                 if (!out.IsNull()) {
                     stats.nTransactionOutputs++;
-                    ss << VARINT(i+1);
+                    ss << VARINT(i+1, VarIntMode::NONNEGATIVE_SIGNED);
                     ss << out;
                     nTotalAmount += out.nValue;
                 }
