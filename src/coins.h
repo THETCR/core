@@ -224,7 +224,7 @@ public:
                 ::Serialize(s, CTxOutCompressor(REF(vout[i])));
         }
         // coinbase height
-        ::Serialize(s, VARINT(nHeight));
+        ::Serialize(s, VARINT(nHeight, VarIntMode::NONNEGATIVE_SIGNED));
     }
 
     template <typename Stream>
