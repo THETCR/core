@@ -427,7 +427,7 @@ public:
 
     unsigned int GetSerializeSize(int nType, int nVersion) const
     {
-        return (CSizeComputer(nType, nVersion) << *this).size();
+        return (CSizeComputer(nVersion) << *this).size();
     }
 
     void Clear()

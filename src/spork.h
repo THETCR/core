@@ -90,7 +90,7 @@ public:
         READWRITE(nSporkID);
         READWRITE(nValue);
         READWRITE(nTimeSigned);
-        if (!(nType & SER_GETHASH)) {
+        if (!(s.GetType() & SER_GETHASH)) {
             READWRITE(vchSig);
         }
     }
