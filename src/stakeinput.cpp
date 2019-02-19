@@ -10,6 +10,8 @@
 #include "streams.h"
 #include <wallet/wallet.h>
 
+typedef std::vector<unsigned char> valtype;
+
 CZWspStake::CZWspStake(const libzerocoin::CoinSpend& spend)
 {
     this->nChecksum = spend.getAccumulatorChecksum();
