@@ -88,7 +88,7 @@ public:
   template <typename Stream, typename Operation>
   inline void SerializationOp(Stream& s, Operation ser_action)
   {
-      READWRITE(FLATDATA(ip));
+      READWRITE(ip);
   }
 
   friend class CSubNet;
@@ -128,8 +128,8 @@ public:
   template <typename Stream, typename Operation>
   inline void SerializationOp(Stream& s, Operation ser_action) {
       READWRITE(network);
-      READWRITE(FLATDATA(netmask));
-      READWRITE(FLATDATA(valid));
+      READWRITE(netmask);
+      READWRITE(valid);
   }
 };
 
@@ -169,7 +169,7 @@ public:
   template <typename Stream, typename Operation>
   inline void SerializationOp(Stream& s, Operation ser_action)
   {
-      READWRITE(FLATDATA(ip));
+      READWRITE(ip);
       unsigned short portN = htons(port);
       READWRITE(portN);
       if (ser_action.ForRead())
