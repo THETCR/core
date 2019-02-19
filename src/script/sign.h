@@ -11,7 +11,6 @@
 #include <pubkey.h>
 #include <script/interpreter.h>
 #include <streams.h>
-#include <keystore.h>
 
 class CKey;
 class CKeyID;
