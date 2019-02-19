@@ -503,5 +503,12 @@ private:
     CCoinsMap::iterator FetchCoins(const uint256& txid);
     CCoinsMap::const_iterator FetchCoins(const uint256& txid) const;
 };
+//! Utility function to add all of a transaction's outputs to a cache.
+//! When check is false, this assumes that overwrites are only possible for coinbase transactions.
+//! When check is true, the underlying view may be queried to determine whether an addition is
+//! an overwrite.
+// TODO: pass in a boolean to limit these possible overwrites to known
+// (pre-BIP34) cases.
+void AddCoins(CCoinsViewCache& cache, const CTransaction& tx, int nHeight, bool check = false);
 
 #endif // BITCOIN_COINS_H
