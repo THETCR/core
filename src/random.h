@@ -244,7 +244,7 @@ void RandomInit();
  * @param Deterministic Use a deterministic seed
  */
 void seed_insecure_rand(bool fDeterministic = false);
-void RandAddSeed();
+//void RandAddSeed();
 
 extern uint32_t insecure_rand_Rz;
 extern uint32_t insecure_rand_Rw;

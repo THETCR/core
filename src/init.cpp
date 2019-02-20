@@ -1954,7 +1954,6 @@ bool AppInit2()
 
         if (fFirstRun) {
             // Create new keyUser and set as default key
-//            RandAddSeedPerfmon();
 
             CPubKey newDefaultKey;
             if (pwalletMain->GetKeyFromPool(newDefaultKey)) {

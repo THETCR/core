@@ -759,10 +759,10 @@ void seed_insecure_rand(bool fDeterministic)
         insecure_rand_Rw = tmp;
     }
 }
-void RandAddSeed()
-{
-    // Seed with CPU performance counter
-    int64_t nCounter = GetPerformanceCounter();
-    RAND_add(&nCounter, sizeof(nCounter), 1.5);
-    memory_cleanse((void*)&nCounter, sizeof(nCounter));
-}
+//void RandAddSeed()
+//{
+//    // Seed with CPU performance counter
+//    int64_t nCounter = GetPerformanceCounter();
+//    RAND_add(&nCounter, sizeof(nCounter), 1.5);
+//    memory_cleanse((void*)&nCounter, sizeof(nCounter));
+//}
