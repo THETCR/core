@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(sign)
     for (int i = 0; i < 4; i++)
     {
         key[i].MakeNewKey(true);
-        keystore.AddKey(key[i]);
+        BOOST_CHECK(keystore.AddKey(key[i]));
     }
 
     // 8 Scripts: checking all combinations of
@@ -78,12 +78,12 @@ BOOST_AUTO_TEST_CASE(sign)
     CScript evalScripts[4];
     for (int i = 0; i < 4; i++)
     {
-        keystore.AddCScript(standardScripts[i]);
+        BOOST_CHECK(keystore.AddCScript(standardScripts[i]));
         evalScripts[i] = GetScriptForDestination(CScriptID(standardScripts[i]));
     }
 
     CMutableTransaction txFrom;  // Funding transaction:
-    string reason;
+    std::string reason;
     txFrom.vout.resize(8);
     for (int i = 0; i < 4; i++)
     {
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(sign)
         txFrom.vout[i+4].scriptPubKey = standardScripts[i];
         txFrom.vout[i+4].nValue = COIN;
     }
-    BOOST_CHECK(IsStandardTx(txFrom, reason));
+    BOOST_CHECK(IsStandardTx(CTransaction(txFrom), reason));
 
     CMutableTransaction txTo[8]; // Spending transactions
     for (int i = 0; i < 8; i++)
@@ -102,9 +102,7 @@ BOOST_AUTO_TEST_CASE(sign)
         txTo[i].vin[0].prevout.n = i;
         txTo[i].vin[0].prevout.hash = txFrom.GetHash();
         txTo[i].vout[0].nValue = 1;
-#ifdef ENABLE_WALLET
         BOOST_CHECK_MESSAGE(IsMine(keystore, txFrom.vout[i].scriptPubKey), strprintf("IsMine %d", i));
-#endif
     }
     for (int i = 0; i < 8; i++)
     {
