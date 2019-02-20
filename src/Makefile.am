@@ -167,6 +167,7 @@ BITCOIN_CORE_H = \
   scheduler.h \
   script/interpreter.h \
   script/script.h \
+  script/ismine.h \
   script/sigcache.h \
   script/sign.h \
   script/standard.h \
@@ -196,7 +197,6 @@ BITCOIN_CORE_H = \
   util/time.h \
   validationinterface.h \
   wallet/wallet.h \
-  wallet_ismine.h \
   wallet/walletdb.h \
   zwspchain.h \
   wallet/zwsptracker.h \
@@ -299,7 +299,6 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/rpcwallet.cpp \
   kernel.cpp \
   wallet/wallet.cpp \
-  wallet_ismine.cpp \
   wallet/walletdb.cpp \
   wallet/zwspwallet.cpp \
   wallet/zwsptracker.cpp \
@@ -422,6 +421,7 @@ libbitcoin_common_a_SOURCES = \
   scheduler.cpp \
   script/interpreter.cpp \
   script/script.cpp \
+  script/ismine.cpp \
   script/sign.cpp \
   script/standard.cpp \
   spork.cpp \

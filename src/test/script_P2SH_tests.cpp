@@ -8,12 +8,9 @@
 #include "main.h"
 #include "policy/policy.h"
 #include "script/script.h"
+#include <script/ismine.h>
 #include "script/script_error.h"
 #include "script/sign.h"
-
-#ifdef ENABLE_WALLET
-#include "wallet_ismine.h"
-#endif
 
 #include <vector>
 

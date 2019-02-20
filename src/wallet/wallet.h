@@ -15,6 +15,7 @@
 #include <ui_interface.h>
 #include <util/strencodings.h>
 #include <validationinterface.h>
+#include <script/ismine.h>
 #include <script/sign.h>
 #include <util/system.h>
 #include <wallet/crypter.h>
@@ -22,7 +23,6 @@
 
 #include <base58.h>
 #include <kernel.h>
-#include <wallet_ismine.h>
 #include <wallet/zwspwallet.h>
 #include <wallet/zwsptracker.h>
 
