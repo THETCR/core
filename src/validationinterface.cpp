@@ -232,6 +232,7 @@ void CMainSignals::NotifyTransactionLock(const CTransaction &tx)
 bool CMainSignals::UpdatedTransaction(const uint256 &hash)
 {
     m_internals->UpdatedTransaction(hash);
+    return false;
 }
 
 void CMainSignals::SetBestChain(const CBlockLocator &chain)
