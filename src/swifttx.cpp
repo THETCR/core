@@ -367,9 +367,9 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx)
             if (!CheckForConflictingLocks(tx)) {
 #ifdef ENABLE_WALLET
                 if (pwalletMain) {
-                    if (pwalletMain->UpdatedTransaction((*i).second.txHash)) {
-                        nCompleteTXLocks++;
-                    }
+//                    if (pwalletMain->UpdatedTransaction((*i).second.txHash)) {
+//                        nCompleteTXLocks++;
+//                    }
                 }
 #endif
 
