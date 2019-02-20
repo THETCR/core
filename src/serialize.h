@@ -489,9 +489,9 @@ template<size_t Limit>
 class LimitedString
 {
 protected:
-  std::string& std::string;
+  std::string& string;
 public:
-  explicit LimitedString(std::string& _string) : std::string(_string) {}
+  explicit LimitedString(std::string& _string) : string(_string) {}
 
   template<typename Stream>
   void Unserialize(Stream& s)
@@ -500,7 +500,7 @@ public:
       if (size > Limit) {
           throw std::ios_base::failure("String length limit exceeded");
       }
-      std::string.resize(size);
+      string.resize(size);
       if (size != 0)
           s.read((char*)string.data(), size);
   }
