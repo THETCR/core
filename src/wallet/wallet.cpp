@@ -2676,7 +2676,8 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
 
     int vinNumber = 0;
     for (CTxIn v: txCollateral.vin) {
-        if (!SignSignature(*this, v.prevPubKey, txCollateral, vinNumber, int(SIGHASH_ALL | SIGHASH_ANYONECANPAY))) {
+        const CTxOut& txout = txCollateral.vout[v.prevout.n];
+        if (!SignSignature(*this, v.prevPubKey, txCollateral, vinNumber, txout.nValue, int(SIGHASH_ALL | SIGHASH_ANYONECANPAY))) {
             for (CTxIn v: vCoinsCollateral)
                 UnlockCoin(v.prevout);
 
@@ -2935,7 +2936,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                 // Sign
                 int nIn = 0;
                 for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-                    if (!SignSignature(*this, coin.first->vout[nIn].scriptPubKey, txNew, nIn)) {
+                    if (!SignSignature(*this, coin.first->vout[nIn].scriptPubKey, txNew, nIn, coin.first->vout[nIn].nValue, SIGHASH_ALL)) {
                         strFailReason = _("Signing transaction failed");
                         return false;
                     }
@@ -3123,7 +3124,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
         for (CTxIn txIn : txNew.vin) {
             const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
-            if (!SignSignature(*this, wtx->vout[nIn].scriptPubKey, txNew, nIn))
+            if (!SignSignature(*this, wtx->vout[nIn].scriptPubKey, txNew, nIn, wtx->vout[nIn].nValue, SIGHASH_ALL))
                 return error("CreateCoinStake : failed to sign coinstake");
             nIn++;
         }
@@ -4664,7 +4665,7 @@ bool CWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransa
     if (!isZCSpendChange) {
         int nIn = 0;
         for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
-            if (!SignSignature(*this, coin.first->vout[nIn].scriptPubKey, txNew, nIn)) {
+            if (!SignSignature(*this, coin.first->vout[nIn].scriptPubKey, txNew, nIn, coin.first->vout[nIn].nValue, SIGHASH_ALL)) {
                 strFailReason = _("Signing transaction failed");
                 return false;
             }
