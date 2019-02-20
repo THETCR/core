@@ -110,7 +110,7 @@ size_t CMainSignals::CallbacksPending() {
 //
 //void CMainSignals::UnregisterWithMempoolSignals(CTxMemPool& pool) {
 //    g_connNotifyEntryRemoved.erase(&pool);
-}
+//}
 
 CMainSignals& GetMainSignals()
 {
