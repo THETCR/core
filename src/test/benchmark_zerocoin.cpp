@@ -12,6 +12,7 @@
 // Copyright (c) 2017-2018 The PIVX developers
 
 #include <boost/test/unit_test.hpp>
+#include <test/test_wispr.h>
 #include <string>
 #include <iostream>
 #include <fstream>
