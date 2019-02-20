@@ -738,29 +738,3 @@ void RandomInit()
 
     ReportHardwareRand();
 }
-void RandAddSeed()
-{
-    // Seed with CPU performance counter
-    int64_t nCounter = GetPerformanceCounter();
-    RAND_add(&nCounter, sizeof(nCounter), 1.5);
-    memory_cleanse((void*)&nCounter, sizeof(nCounter));
-}
-uint32_t insecure_rand_Rz = 11;
-uint32_t insecure_rand_Rw = 11;
-void seed_insecure_rand(bool fDeterministic)
-{
-    // The seed values have some unlikely fixed points which we avoid.
-    if (fDeterministic) {
-        insecure_rand_Rz = insecure_rand_Rw = 11;
-    } else {
-        uint32_t tmp;
-        do {
-            GetRandBytes((unsigned char*)&tmp, 4);
-        } while (tmp == 0 || tmp == 0x9068ffffU);
-        insecure_rand_Rz = tmp;
-        do {
-            GetRandBytes((unsigned char*)&tmp, 4);
-        } while (tmp == 0 || tmp == 0x464fffffU);
-        insecure_rand_Rw = tmp;
-    }
-}
