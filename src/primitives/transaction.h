@@ -223,6 +223,7 @@ class CTransaction
 private:
     /** Memory only. */
     const uint256 hash;
+    const uint256 m_witness_hash;
     void UpdateHash() const;
 
 public:
@@ -243,7 +244,8 @@ public:
     CTransaction();
 
     /** Convert a CMutableTransaction into a CTransaction. */
-    CTransaction(const CMutableTransaction &tx);
+    explicit CTransaction(const CMutableTransaction &tx);
+    CTransaction(CMutableTransaction &&tx);
 
     CTransaction& operator=(const CTransaction& tx);
 
