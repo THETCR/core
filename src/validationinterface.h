@@ -149,14 +149,14 @@ protected:
   /**
    * Notifies listeners that a block which builds directly on our current tip
    * has been received and connected to the headers tree, though not validated yet */
-  virtual void NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& block) {};
+  virtual void NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& block) {}
 
 
-  virtual void SyncTransaction(const CTransaction &tx, const CBlock *pblock){};
-  virtual void NotifyTransactionLock(const CTransaction &tx){};
-  virtual bool UpdatedTransaction(const uint256 &hash){ return false;};
-  virtual void SetBestChain(const CBlockLocator &chain){};
-  virtual void Inventory(const uint256 &hash){};
+  virtual void SyncTransaction(const CTransaction &tx, const CBlock *pblock){}
+  virtual void NotifyTransactionLock(const CTransaction &tx){}
+//  virtual bool UpdatedTransaction(const uint256 &hash){ return false;};
+  virtual void SetBestChain(const CBlockLocator &chain){}
+  virtual void Inventory(const uint256 &hash){}
   virtual void BlockFound(const uint256 &hash){};
   friend void ::RegisterValidationInterface(CValidationInterface*);
   friend void ::UnregisterValidationInterface(CValidationInterface*);
@@ -205,7 +205,7 @@ public:
   /** Notifies listeners of an updated transaction lock without new data. */
   void NotifyTransactionLock(const CTransaction &);
   /** Notifies listeners of an updated transaction without new data (for now: a coinbase potentially becoming visible). */
-  bool UpdatedTransaction(const uint256 &);
+//  bool UpdatedTransaction(const uint256 &);
   /** Notifies listeners of a new active block chain. */
   void SetBestChain(const CBlockLocator &);
   /** Notifies listeners about an inventory item being seen on the network. */
