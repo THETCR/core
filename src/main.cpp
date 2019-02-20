@@ -2842,7 +2842,7 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                 if (pindexFork != pindexNewTip) {
                     // Notify ValidationInterface subscribers
                     cout << "UpdatedBlockTip...\n";
-                    GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
+//                    GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
 
                     cout << "NotifyBlockTip...\n";
                     // Always notify the UI if a new block tip was connected
