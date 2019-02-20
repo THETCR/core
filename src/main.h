@@ -341,7 +341,7 @@ bool ValidOutPoint(const COutPoint out, int nHeight);
 void RecalculateZWSPSpent();
 void RecalculateZWSPMinted();
 bool RecalculateWSPSupply(int nHeightStart);
-bool ReindexAccumulators(list<uint256>& listMissingCheckpoints, std::string& strError);
+bool ReindexAccumulators(std::list<uint256>& listMissingCheckpoints, std::string& strError);
 
 
 /**

@@ -102,7 +102,7 @@ struct QueuedBlock {
   int nValidatedQueuedBefore; //! Number of blocks queued with validated headers (globally) at the time this one is requested.
   bool fValidatedHeaders;     //! Whether this block has validated headers at the time of request.
 };
-map<uint256, pair<NodeId, std::list<QueuedBlock>::iterator> > mapBlocksInFlight GUARDED_BY(cs_main);
+std::map<uint256, pair<NodeId, std::list<QueuedBlock>::iterator> > mapBlocksInFlight GUARDED_BY(cs_main);
 
 /** Number of blocks in flight with validated headers. */
 int nQueuedValidatedHeaders GUARDED_BY(cs_main) = 0;
@@ -245,7 +245,7 @@ void FinalizeNode(NodeId nodeid)
 // Requires cs_main.
 bool MarkBlockAsReceived(const uint256& hash)
 {
-    map<uint256, pair<NodeId, std::list<QueuedBlock>::iterator> >::iterator itInFlight = mapBlocksInFlight.find(hash);
+    std::map<uint256, pair<NodeId, std::list<QueuedBlock>::iterator> >::iterator itInFlight = mapBlocksInFlight.find(hash);
     if (itInFlight != mapBlocksInFlight.end()) {
         CNodeState* state = State(itInFlight->second.first);
         nQueuedValidatedHeaders -= itInFlight->second.second->fValidatedHeaders;

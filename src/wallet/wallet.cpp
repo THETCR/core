@@ -1368,7 +1368,7 @@ CAmount CWalletTx::GetLockedWatchOnlyCredit() const
     return nCredit;
 }
 
-void CWalletTx::GetAmounts(list<COutputEntry>& listReceived,
+void CWalletTx::GetAmounts(std::list<COutputEntry>& listReceived,
     std::list<COutputEntry>& listSent,
     CAmount& nFee,
     std::string& strSentAccount,
