@@ -2272,7 +2272,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& state, FlushStateMode mode, int nManualPruneHeight)
 {
     LOCK(cs_main);
+    cout << "FlushStateToDisk start\n";
     static int64_t nLastWrite = 0;
+    static int64_t nLastFlush = 0;
     bool full_flush_completed = false;
     try {
         if ((mode == FlushStateMode::ALWAYS) ||
@@ -2283,12 +2285,15 @@ bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& 
             // twice (once in the log, and once in the tables). This is already
             // an overestimation, as most will delete an existing entry or
             // overwrite one. Still, use a conservative safety factor of 2.
+            cout << "FlushStateToDisk CheckDiskSpace\n";
             if (!CheckDiskSpace(100 * 2 * 2 * pcoinsTip->GetCacheSize()))
                 return state.Error("out of disk space");
             // First make sure all block and undo data is flushed to disk.
+            cout << "FlushStateToDisk FlushBlockfile\n";
             FlushBlockFile();
             // Then update all block file information (which may refer to block and undo files).
             bool fileschanged = false;
+            cout << "FlushStateToDisk WriteBlockFile\n";
             for (set<int>::iterator it = setDirtyFileInfo.begin(); it != setDirtyFileInfo.end();) {
                 if (!pblocktree->WriteBlockFileInfo(*it, vinfoBlockFile[*it])) {
                     return AbortNode(state, "Failed to write to block index");
@@ -2296,22 +2301,25 @@ bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& 
                 fileschanged = true;
                 setDirtyFileInfo.erase(it++);
             }
+            cout << "FlushStateToDisk Write last block file\n";
             if (fileschanged && !pblocktree->WriteLastBlockFile(nLastBlockFile)) {
                 return AbortNode(state, "Failed to write to block index");
             }
+            cout << "FlushStateToDisk Write block index\n";
             for (set<CBlockIndex*>::iterator it = setDirtyBlockIndex.begin(); it != setDirtyBlockIndex.end();) {
                 if (!pblocktree->WriteBlockIndex(CDiskBlockIndex(*it))) {
                     return AbortNode(state, "Failed to write to block index");
                 }
                 setDirtyBlockIndex.erase(it++);
             }
-
+            cout << "FlushStateToDisk Sync tree\n";
             pblocktree->Sync();
             // Finally flush the chainstate (which may refer to block index entries).
             if (!pcoinsTip->Flush())
                 return AbortNode(state, "Failed to write to coin database");
             // Update best block in wallet (so we can detect restored wallets).
             if (mode != FlushStateMode::IF_NEEDED) {
+                cout << "FlushStateToDisk Set best chain\n";
                 GetMainSignals().SetBestChain(chainActive.GetLocator());
             }
             nLastWrite = GetTimeMicros();
