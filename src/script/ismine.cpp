@@ -38,7 +38,8 @@ enum class IsMineResult
     NO = 0,         //!< Not ours
     WATCH_ONLY = 1, //!< Included in watch-only balance
     SPENDABLE = 2,  //!< Included in all balances
-    INVALID = 3,    //!< Not spendable by anyone (uncompressed pubkey in segwit, P2SH inside P2SH or witness, witness inside witness)
+    MULTISIG = 3,    //!< Not spendable by anyone (uncompressed pubkey in segwit, P2SH inside P2SH or witness, witness inside witness)
+    INVALID = 4,    //!< Not spendable by anyone (uncompressed pubkey in segwit, P2SH inside P2SH or witness, witness inside witness)
 };
 
 bool PermitsUncompressed(IsMineSigVersion sigversion)
@@ -168,6 +169,9 @@ IsMineResult IsMineInner(const CKeyStore& keystore, const CScript& scriptPubKey,
     if (ret == IsMineResult::NO && keystore.HaveWatchOnly(scriptPubKey)) {
         ret = std::max(ret, IsMineResult::WATCH_ONLY);
     }
+    if(keystore.HaveMultiSig(scriptPubKey)){
+        ret = std::max(ret, IsMineResult::MULTISIG);
+    }
     return ret;
 }
 
@@ -183,6 +187,8 @@ isminetype IsMine(const CKeyStore& keystore, const CScript& scriptPubKey)
         return ISMINE_WATCH_ONLY;
     case IsMineResult::SPENDABLE:
         return ISMINE_SPENDABLE;
+    case IsMineResult::MULTISIG:
+        return ISMINE_MULTISIG;
     }
     assert(false);
 }
