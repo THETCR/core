@@ -2678,12 +2678,13 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
     bool fInvalidFound = false;
     const CBlockIndex* pindexOldTip = chainActive.Tip();
     const CBlockIndex* pindexFork = chainActive.FindFork(pindexMostWork);
-
+    cout << "FindFork...\n";
     // Disconnect active blocks which are no longer in the best chain.
     while (chainActive.Tip() && chainActive.Tip() != pindexFork) {
         if (!DisconnectTip(state))
             return false;
     }
+    cout << "DisconnectTip...\n";
 
     // Build list of new blocks to connect.
     std::vector<CBlockIndex*> vpindexToConnect;
@@ -2696,6 +2697,7 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
         vpindexToConnect.clear();
         vpindexToConnect.reserve(nTargetHeight - nHeight);
         CBlockIndex* pindexIter = pindexMostWork->GetAncestor(nTargetHeight);
+        cout << "GetAncestor...\n";
         while (pindexIter && pindexIter->nHeight != nHeight) {
             vpindexToConnect.push_back(pindexIter);
             pindexIter = pindexIter->pprev;
@@ -2703,6 +2705,7 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
         nHeight = nTargetHeight;
 
         // Connect new blocks.
+        cout << "Connect new blocks...\n";
         for (CBlockIndex* pindexConnect: reverse_iterate(vpindexToConnect)) {
             if (!ConnectTip(state, pindexConnect, pindexConnect == pindexMostWork ? pblock : NULL, fAlreadyChecked)) {
                 if (state.IsInvalid()) {
@@ -2719,6 +2722,7 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
                 }
             } else {
                 PruneBlockIndexCandidates();
+                cout << "PruneBlockIndexCandidates...\n";
                 if (!pindexOldTip || chainActive.Tip()->nChainWork > pindexOldTip->nChainWork) {
                     // We're in a better position than we were. Return temporarily to release the lock.
                     fContinue = false;
@@ -2729,6 +2733,7 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
     }
 
     // Callbacks/notifications for a new best chain.
+    cout << "CheckForkWarningConditionsOnNewFork...\n";
     if (fInvalidFound)
         CheckForkWarningConditionsOnNewFork(vpindexToConnect.back());
     else
