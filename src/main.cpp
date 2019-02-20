@@ -2802,17 +2802,18 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                 }
                 bool fInvalidFound = false;
                 std::shared_ptr<const CBlock> nullBlockPtr;
+                cout << "Activate best chain step...\n";
                 if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked)){
                     return false;
                 }
+                cout << "Activate best chain step done...\n";
                 blocks_connected = true;
-
                 if (fInvalidFound) {
                     // Wipe cache, we may need another branch now.
                     pindexMostWork = nullptr;
                 }
                 pindexNewTip = chainActive.Tip();
-
+                cout << "New tip...\n";
             } while (!chainActive.Tip() || (starting_tip && CBlockIndexWorkComparator()(chainActive.Tip(), starting_tip)));
             if (!blocks_connected) return true;
 
@@ -2822,8 +2823,10 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                 // Enqueue while holding cs_main to ensure that UpdatedBlockTip is called in the order in which blocks are connected
                 if (pindexFork != pindexNewTip) {
                     // Notify ValidationInterface subscribers
+                    cout << "UpdatedBlockTip...\n";
                     GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
 
+                    cout << "NotifyBlockTip...\n";
                     // Always notify the UI if a new block tip was connected
                     uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
                 }
@@ -2840,15 +2843,18 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
         // never shutdown before connecting the genesis block during LoadChainTip(). Previously this
         // caused an assert() failure during shutdown in such cases as the UTXO DB flushing checks
         // that the best block hash is non-null.
+        cout << "ShutdownRequested...\n";
         if (ShutdownRequested())
             break;
     } while (pindexNewTip != pindexMostWork);
     CheckBlockIndex();
+    cout << "CheckBlockIndex done...\n";
 
     // Write changes periodically to disk, after relay.
     if (!FlushStateToDisk(chainparams, state, FlushStateMode::PERIODIC)) {
         return false;
     }
+    cout << "Activatebestchain done...\n";
 
     return true;
 }
