@@ -226,6 +226,8 @@ private:
     const uint256 m_witness_hash;
     void UpdateHash() const;
 
+    uint256 ComputeHash() const;
+    uint256 ComputeWitnessHash() const;
 public:
     static const int32_t CURRENT_VERSION = 2;
 
@@ -247,7 +249,7 @@ public:
     explicit CTransaction(const CMutableTransaction &tx);
     CTransaction(CMutableTransaction &tx);
 
-//    CTransaction& operator=(const CTransaction& tx);
+    CTransaction& operator=(const CTransaction& tx);
 
     ADD_SERIALIZE_METHODS;
 
@@ -273,10 +275,8 @@ public:
     bool IsNull() const {
         return vin.empty() && vout.empty();
     }
-
-    const uint256& GetHash() const {
-        return hash;
-    }
+    const uint256& GetHash() const { return hash; }
+    const uint256& GetWitnessHash() const { return m_witness_hash; };
 
     // Return sum of txouts.
     CAmount GetValueOut() const;

@@ -98,11 +98,6 @@ std::string CTxOut::ToString() const
 CMutableTransaction::CMutableTransaction() : nVersion(CTransaction::CURRENT_VERSION), nTime(0), nLockTime(0) {}
 CMutableTransaction::CMutableTransaction(const CTransaction& tx) : nVersion(tx.nVersion), nTime(tx.nTime), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime) {}
 
-uint256 CMutableTransaction::GetHash() const
-{
-    return SerializeHash(*this);
-}
-
 std::string CMutableTransaction::ToString() const
 {
     std::string str;
@@ -123,6 +118,23 @@ void CTransaction::UpdateHash() const
     *const_cast<uint256*>(&hash) = SerializeHash(*this);
 }
 
+uint256 CMutableTransaction::GetHash() const
+{
+    return SerializeHash(*this, SER_GETHASH, SERIALIZE_TRANSACTION_NO_WITNESS);
+}
+
+uint256 CTransaction::ComputeHash() const
+{
+    return SerializeHash(*this, SER_GETHASH, SERIALIZE_TRANSACTION_NO_WITNESS);
+}
+
+uint256 CTransaction::ComputeWitnessHash() const
+{
+//    if (!HasWitness()) {
+        return hash;
+//    }
+//    return SerializeHash(*this, SER_GETHASH, 0);
+}
 CTransaction::CTransaction() : hash(), nVersion(CTransaction::CURRENT_VERSION), nTime(0), vin(), vout(), nLockTime(0) { }
 
 CTransaction::CTransaction(const CMutableTransaction &tx) : nVersion(tx.nVersion), nTime(tx.nTime), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime) {
@@ -132,15 +144,16 @@ CTransaction::CTransaction(CMutableTransaction& tx) : nVersion(tx.nVersion), nTi
     UpdateHash();
 }
 
-//CTransaction &CTransaction::operator=(const CTransaction &tx) {
-//    *const_cast<int32_t *>(&nVersion) = tx.nVersion;
-//    *const_cast<unsigned int *>(&nTime) = tx.nTime;
-//    *const_cast<std::vector <CTxIn> *>(&vin) = tx.vin;
-//    *const_cast<std::vector <CTxOut> *>(&vout) = tx.vout;
-//    *const_cast<uint32_t *>(&nLockTime) = tx.nLockTime;
-//    *const_cast<uint256 *>(&hash) = tx.hash;
-//    return *this;
-//}
+CTransaction &CTransaction::operator=(const CTransaction &tx) {
+    *const_cast<int32_t *>(&nVersion) = tx.nVersion;
+    *const_cast<unsigned int *>(&nTime) = tx.nTime;
+    *const_cast<std::vector <CTxIn> *>(&vin) = tx.vin;
+    *const_cast<std::vector <CTxOut> *>(&vout) = tx.vout;
+    *const_cast<uint32_t *>(&nLockTime) = tx.nLockTime;
+    *const_cast<uint256 *>(&hash) = tx.hash;
+    *const_cast<uint256 *>(&m_witness_hash) = tx.m_witness_hash;
+    return *this;
+}
 
 bool CTransaction::IsCoinStake() const
 {
