@@ -64,6 +64,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     // We have to run a scheduler thread to prevent ActivateBestChain
     // from blocking due to queue overrun.
     threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
+    GetMainSignals().RegisterBackgroundSignalScheduler(scheduler);
     pathTemp = GetTempPath() / strprintf("test_wispr_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
     fs::create_directories(pathTemp);
     gArgs.ForceSetArg("-datadir", pathTemp.string());

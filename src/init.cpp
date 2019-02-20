@@ -1361,6 +1361,7 @@ bool AppInit2()
     // Start the lightweight task scheduler thread
     CScheduler::Function serviceLoop = boost::bind(&CScheduler::serviceQueue, &scheduler);
     threadGroup.create_thread(boost::bind(&TraceThread<CScheduler::Function>, "scheduler", serviceLoop));
+    GetMainSignals().RegisterBackgroundSignalScheduler(scheduler);
 
 //#if ENABLE_ZMQ
 //    RegisterZMQRPCCommands(tableRPC);
