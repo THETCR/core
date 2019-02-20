@@ -140,9 +140,9 @@ CTransaction::CTransaction() : hash(), nVersion(CTransaction::CURRENT_VERSION), 
 CTransaction::CTransaction(const CMutableTransaction &tx) : nVersion(tx.nVersion), nTime(tx.nTime), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime) {
     UpdateHash();
 }
-CTransaction::CTransaction(CMutableTransaction& tx) : nVersion(tx.nVersion), nTime(tx.nTime), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime){
-    UpdateHash();
-}
+//CTransaction::CTransaction(CMutableTransaction& tx) : nVersion(tx.nVersion), nTime(tx.nTime), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime){
+//    UpdateHash();
+//}
 
 CTransaction &CTransaction::operator=(const CTransaction &tx) {
     *const_cast<int32_t *>(&nVersion) = tx.nVersion;
