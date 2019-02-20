@@ -30,8 +30,6 @@ BOOST_AUTO_TEST_SUITE(zerocoin_implementation_tests)
 
 BOOST_AUTO_TEST_CASE(zcparams_test)
 {
-    cout << "Running zcparams_test...\n";
-
     bool fPassed = true;
     try{
         BOOST_TEST_PASSPOINT();
@@ -428,8 +426,6 @@ BOOST_AUTO_TEST_CASE(setup_exceptions_test)
                 bnTrustedModulus.SetDec(zerocoinModulus);
                 libzerocoin::ZerocoinParams zerocoinParams = libzerocoin::ZerocoinParams(bnTrustedModulus);
 
-                cout << "Running check_unitialized parameters,etc for setup exceptions...\n";
-
                 CBigNum bnpubcoin;
                 BOOST_CHECK(bnpubcoin.SetHexBool(rawTxpub1));
 
@@ -485,7 +481,6 @@ BOOST_AUTO_TEST_CASE(setup_exceptions_test)
 
 BOOST_AUTO_TEST_CASE(checksum_tests)
         {
-                cout << "Running checksum_tests\n";
 
                 uint256 checksum;
                 uint32_t c1 = 0xa3219ef1;
@@ -521,7 +516,6 @@ BOOST_AUTO_TEST_CASE(test_checkpoints)
 BOOST_AUTO_TEST_CASE(deterministic_tests)
         {
                 SelectParams(CBaseChainParams::UNITTEST);
-                cout << "Testing deterministic minting\n";
                 uint256 seedMaster("3a1947364362e2e7c073b386869c89c905c0cf462448ffd6c2021bd03ce689f6");
 
                 string strWalletFile = "unittestwallet.dat";

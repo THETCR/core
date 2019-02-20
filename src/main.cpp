@@ -2238,7 +2238,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // Watch for changes to the previous coinbase transaction.
     static uint256 hashPrevBestCoinBase;
-//    GetMainSignals().UpdatedTransaction(hashPrevBestCoinBase);
+    GetMainSignals().UpdatedTransaction(hashPrevBestCoinBase);
     hashPrevBestCoinBase = block.vtx[0].GetHash();
 
     int64_t nTime4 = GetTimeMicros();
@@ -2272,7 +2272,6 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& state, FlushStateMode mode, int nManualPruneHeight)
 {
     LOCK(cs_main);
-    cout << "FlushStateToDisk start\n";
     static int64_t nLastWrite = 0;
 //    static int64_t nLastFlush = 0;
 //    bool full_flush_completed = false;
@@ -2285,15 +2284,12 @@ bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& 
             // twice (once in the log, and once in the tables). This is already
             // an overestimation, as most will delete an existing entry or
             // overwrite one. Still, use a conservative safety factor of 2.
-            cout << "FlushStateToDisk CheckDiskSpace\n";
             if (!CheckDiskSpace(100 * 2 * 2 * pcoinsTip->GetCacheSize()))
                 return state.Error("out of disk space");
             // First make sure all block and undo data is flushed to disk.
-            cout << "FlushStateToDisk FlushBlockfile\n";
             FlushBlockFile();
             // Then update all block file information (which may refer to block and undo files).
             bool fileschanged = false;
-            cout << "FlushStateToDisk WriteBlockFile\n";
             for (set<int>::iterator it = setDirtyFileInfo.begin(); it != setDirtyFileInfo.end();) {
                 if (!pblocktree->WriteBlockFileInfo(*it, vinfoBlockFile[*it])) {
                     return AbortNode(state, "Failed to write to block index");
@@ -2301,34 +2297,29 @@ bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& 
                 fileschanged = true;
                 setDirtyFileInfo.erase(it++);
             }
-            cout << "FlushStateToDisk Write last block file\n";
             if (fileschanged && !pblocktree->WriteLastBlockFile(nLastBlockFile)) {
                 return AbortNode(state, "Failed to write to block index");
             }
-            cout << "FlushStateToDisk Write block index\n";
             for (set<CBlockIndex*>::iterator it = setDirtyBlockIndex.begin(); it != setDirtyBlockIndex.end();) {
                 if (!pblocktree->WriteBlockIndex(CDiskBlockIndex(*it))) {
                     return AbortNode(state, "Failed to write to block index");
                 }
                 setDirtyBlockIndex.erase(it++);
             }
-            cout << "FlushStateToDisk Sync tree\n";
             pblocktree->Sync();
             // Finally flush the chainstate (which may refer to block index entries).
             if (!pcoinsTip->Flush())
                 return AbortNode(state, "Failed to write to coin database");
             // Update best block in wallet (so we can detect restored wallets).
-//            if (mode != FlushStateMode::IF_NEEDED) {
-//                cout << "FlushStateToDisk Set best chain\n";
-//                GetMainSignals().SetBestChain(chainActive.GetLocator());
-//            }
+            if (mode != FlushStateMode::IF_NEEDED) {
+                GetMainSignals().SetBestChain(chainActive.GetLocator());
+            }
             nLastWrite = GetTimeMicros();
 //            full_flush_completed = true;
         }
     } catch (const std::runtime_error& e) {
         return AbortNode(state, std::string("System error while flushing: ") + e.what());
     }
-                    cout << "FlushStateToDisk DONE\n";
     return true;
 }
 
@@ -2436,12 +2427,9 @@ static int64_t nTimePostConnect = 0;
 bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CBlock* pblock, bool fAlreadyChecked)
 {
     const CChainParams& chainparams = Params();
-    cout << "ConnectTip...\n";
     assert(pindexNew->pprev == chainActive.Tip());
     mempool.check(pcoinsTip);
-    cout << "mempool check...\n";
     CCoinsViewCache view(pcoinsTip);
-    cout << "CCoinsViewCache...\n";
 
     if (pblock == nullptr)
         fAlreadyChecked = false;
@@ -2450,12 +2438,10 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     int64_t nTime1 = GetTimeMicros();
     CBlock block;
     if (!pblock) {
-        cout << "ReadBlockFromDisk...\n";
         if (!ReadBlockFromDisk(block, pindexNew))
             return AbortNode(state, "Failed to read block");
         pblock = &block;
     }
-    cout << "Apply the block atomically to the chain state...\n";
     // Apply the block atomically to the chain state.
     int64_t nTime2 = GetTimeMicros();
     nTimeReadFromDisk += nTime2 - nTime1;
@@ -2463,11 +2449,8 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     LogPrint(BCLog::BENCH, "  - Load block from disk: %.2fms [%.2fs]\n", (nTime2 - nTime1) * 0.001, nTimeReadFromDisk * 0.000001);
     {
         CInv inv(MSG_BLOCK, pindexNew->GetBlockHash());
-        cout << "ConnectBlock...\n";
         bool rv = ConnectBlock(*pblock, state, pindexNew, view, false, fAlreadyChecked);
-        cout << "Block connected...\n";
-//        GetMainSignals().BlockChecked(*pblock, state);
-        cout << "BlockChecked...\n";
+        GetMainSignals().BlockChecked(*pblock, state);
         if (!rv) {
             if (state.IsInvalid())
                 InvalidBlockFound(pindexNew, state);
@@ -2483,13 +2466,11 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     LogPrint(BCLog::BENCH, "  - Flush: %.2fms [%.2fs]\n", (nTime4 - nTime3) * 0.001, nTimeFlush * 0.000001);
 
     // Write the chain state to disk, if necessary. Always write to disk if this is the first of a new file.
-    cout << "flushMode...\n";
     FlushStateMode flushMode = FlushStateMode::IF_NEEDED;
     if (pindexNew->pprev && (pindexNew->GetBlockPos().nFile != pindexNew->pprev->GetBlockPos().nFile))
         flushMode = FlushStateMode::ALWAYS;
 
     // Write the chain state to disk, if necessary.
-    cout << "FlushStateToDisk...\n";
     if (!FlushStateToDisk(chainparams, state, FlushStateMode::IF_NEEDED))
         return false;
     int64_t nTime5 = GetTimeMicros();
@@ -2502,17 +2483,14 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     mempool.check(pcoinsTip);
     // Update chainActive & related variables.
     UpdateTip(pindexNew);
-    cout << "UpdateTip...\n";
     // Tell wallet about transactions that went from mempool
     // to conflicted:
     for (const CTransaction& tx: txConflicted) {
-        cout << "SyncWithWallets...\n";
-//        SyncWithWallets(tx, NULL);
+        SyncWithWallets(tx, NULL);
     }
     // ... and about transactions that got confirmed:
     for (const CTransaction& tx: pblock->vtx) {
-//        cout << "SyncWithWallets 2...\n";
-//        SyncWithWallets(tx, pblock);
+        SyncWithWallets(tx, pblock);
     }
 
     int64_t nTime6 = GetTimeMicros();
@@ -2691,13 +2669,11 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
     bool fInvalidFound = false;
     const CBlockIndex* pindexOldTip = chainActive.Tip();
     const CBlockIndex* pindexFork = chainActive.FindFork(pindexMostWork);
-    cout << "FindFork...\n";
     // Disconnect active blocks which are no longer in the best chain.
     while (chainActive.Tip() && chainActive.Tip() != pindexFork) {
         if (!DisconnectTip(state))
             return false;
     }
-    cout << "DisconnectTip...\n";
 
     // Build list of new blocks to connect.
     std::vector<CBlockIndex*> vpindexToConnect;
@@ -2710,7 +2686,6 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
         vpindexToConnect.clear();
         vpindexToConnect.reserve(nTargetHeight - nHeight);
         CBlockIndex* pindexIter = pindexMostWork->GetAncestor(nTargetHeight);
-        cout << "GetAncestor...\n";
         while (pindexIter && pindexIter->nHeight != nHeight) {
             vpindexToConnect.push_back(pindexIter);
             pindexIter = pindexIter->pprev;
@@ -2718,7 +2693,6 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
         nHeight = nTargetHeight;
 
         // Connect new blocks.
-        cout << "Connect new blocks...\n";
         for (CBlockIndex* pindexConnect: reverse_iterate(vpindexToConnect)) {
             if (!ConnectTip(state, pindexConnect, pindexConnect == pindexMostWork ? pblock : NULL, fAlreadyChecked)) {
                 if (state.IsInvalid()) {
@@ -2735,7 +2709,6 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
                 }
             } else {
                 PruneBlockIndexCandidates();
-                cout << "PruneBlockIndexCandidates...\n";
                 if (!pindexOldTip || chainActive.Tip()->nChainWork > pindexOldTip->nChainWork) {
                     // We're in a better position than we were. Return temporarily to release the lock.
                     fContinue = false;
@@ -2746,7 +2719,6 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
     }
 
     // Callbacks/notifications for a new best chain.
-    cout << "CheckForkWarningConditionsOnNewFork...\n";
     if (fInvalidFound)
         CheckForkWarningConditionsOnNewFork(vpindexToConnect.back());
     else
@@ -2820,18 +2792,15 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                 }
                 bool fInvalidFound = false;
                 std::shared_ptr<const CBlock> nullBlockPtr;
-                cout << "Activate best chain step...\n";
                 if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked)){
                     return false;
                 }
-                cout << "Activate best chain step done...\n";
                 blocks_connected = true;
                 if (fInvalidFound) {
                     // Wipe cache, we may need another branch now.
                     pindexMostWork = nullptr;
                 }
                 pindexNewTip = chainActive.Tip();
-                cout << "New tip...\n";
             } while (!chainActive.Tip() || (starting_tip && CBlockIndexWorkComparator()(chainActive.Tip(), starting_tip)));
             if (!blocks_connected) return true;
 
@@ -2841,10 +2810,8 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                 // Enqueue while holding cs_main to ensure that UpdatedBlockTip is called in the order in which blocks are connected
                 if (pindexFork != pindexNewTip) {
                     // Notify ValidationInterface subscribers
-                    cout << "UpdatedBlockTip...\n";
-//                    GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
+                    GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
 
-                    cout << "NotifyBlockTip...\n";
                     // Always notify the UI if a new block tip was connected
                     uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
                 }
@@ -2861,18 +2828,15 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
         // never shutdown before connecting the genesis block during LoadChainTip(). Previously this
         // caused an assert() failure during shutdown in such cases as the UTXO DB flushing checks
         // that the best block hash is non-null.
-        cout << "ShutdownRequested...\n";
         if (ShutdownRequested())
             break;
     } while (pindexNewTip != pindexMostWork);
     CheckBlockIndex();
-    cout << "CheckBlockIndex done...\n";
 
     // Write changes periodically to disk, after relay.
     if (!FlushStateToDisk(chainparams, state, FlushStateMode::PERIODIC)) {
         return false;
     }
-    cout << "Activatebestchain done...\n";
 
     return true;
 }
@@ -3763,7 +3727,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const CBlock* pblock, bool
         bool ret = AcceptBlock(*pblock, state, &pindex, dbp, fNewBlock);
 //        bool ret = AcceptBlock(*pblock, state, &pindex, fForceProcessing, dbp, fNewBlock);
         if (!ret) {
-//            GetMainSignals().BlockChecked(*pblock, state);
+            GetMainSignals().BlockChecked(*pblock, state);
             return error("%s: AcceptBlock FAILED", __func__);
         }
     }
@@ -4142,14 +4106,12 @@ bool InitBlockIndex(const CChainParams& chainparams)
             if (!AddGenesisBlock(chainparams, chainparams.GenesisBlock(), state))
                 return false;
 
-            cout << "Flush state to disk\n";
             // Force a chainstate write so that when we VerifyDB in a moment, it doesnt check stale data
             return FlushStateToDisk(chainparams, state, FlushStateMode::ALWAYS);
         } catch (std::runtime_error& e) {
             return error("LoadBlockIndex() : failed to initialize block database: %s", e.what());
         }
     }
-    cout << "Init block index finished.\n";
 
     return true;
 }

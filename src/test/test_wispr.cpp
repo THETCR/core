@@ -73,31 +73,24 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     pcoinsdbview = new CCoinsViewDB(1 << 23, true);
     pcoinsTip = new CCoinsViewCache(pcoinsdbview);
     InitBlockIndex(chainparams);
-    cout << "InitBLockIndex DONE\n";
     {
         CValidationState state;
-        cout << "Activate best chain...\n";
         if (!ActivateBestChain(state)) {
             throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
         }
-        cout << "Activate best chain success\n";
     }
 #ifdef ENABLE_WALLET
     bool fFirstRun;
     pwalletMain = new CWallet("wallet.dat");
     pwalletMain->LoadWallet(fFirstRun);
-    cout << "RegisterValidationInterface\n";
     RegisterValidationInterface(pwalletMain);
-    cout << "RegisterValidationInterface Done\n";
 #endif
     nScriptCheckThreads = 3;
     for (int i=0; i < nScriptCheckThreads-1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
     g_connman = std::unique_ptr<CConnman>(new CConnman()); // Deterministic randomness for tests.
     connman = g_connman.get();
-    cout << "RegisterNodeSignals\n";
     RegisterNodeSignals(GetNodeSignals());
-    cout << "RegisterNodeSignals Done\n";
 }
 
 TestingSetup::~TestingSetup()
