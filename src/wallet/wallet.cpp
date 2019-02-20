@@ -2082,7 +2082,7 @@ map<CBitcoinAddress, std::vector<COutput> > CWallet::AvailableCoinsByAddress(boo
     return mapCoins;
 }
 
-static void ApproximateBestSubset(std::vector<pair<CAmount, pair<const CWalletTx*, unsigned int> > > vValue, const CAmount& nTotalLower, const CAmount& nTargetValue, std::vector<char>& vfBest, CAmount& nBest, int iterations = 1000)
+static void ApproximateBestSubset(std::vector<std::pair<CAmount, pair<const CWalletTx*, unsigned int> > > vValue, const CAmount& nTotalLower, const CAmount& nTargetValue, std::vector<char>& vfBest, CAmount& nBest, int iterations = 1000)
 {
     std::vector<char> vfIncluded;
 
@@ -2263,7 +2263,7 @@ bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, int nConfMine, int
     pair<CAmount, pair<const CWalletTx*, unsigned int> > coinLowestLarger;
     coinLowestLarger.first = std::numeric_limits<CAmount>::max();
     coinLowestLarger.second.first = NULL;
-    std::vector<pair<CAmount, pair<const CWalletTx*, unsigned int> > > vValue;
+    std::vector<std::pair<CAmount, pair<const CWalletTx*, unsigned int> > > vValue;
     CAmount nTotalLower = 0;
 
     random_shuffle(vCoins.begin(), vCoins.end(), GetRandInt);
@@ -2700,7 +2700,7 @@ bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, bool useI
 
     CAmount nFeeRet = 0;
     std::string strFail = "";
-    std::vector<pair<CScript, CAmount> > vecSend;
+    std::vector<std::pair<CScript, CAmount> > vecSend;
     vecSend.push_back(std::make_pair(scriptChange, BUDGET_FEE_TX_OLD)); // Old 50 WSP collateral
 
     CCoinControl* coinControl = nullptr;
@@ -2723,7 +2723,7 @@ bool CWallet::GetBudgetFinalizationCollateralTX(CWalletTx& tx, uint256 hash, boo
 
     CAmount nFeeRet = 0;
     std::string strFail = "";
-    std::vector<pair<CScript, CAmount> > vecSend;
+    std::vector<std::pair<CScript, CAmount> > vecSend;
     vecSend.push_back(std::make_pair(scriptChange, BUDGET_FEE_TX)); // New 5 WSP collateral
 
     CCoinControl* coinControl = nullptr;
@@ -2751,7 +2751,7 @@ bool CWallet::ConvertList(std::vector<CTxIn> vCoins, std::vector<CAmount>& vecAm
     return true;
 }
 
-bool CWallet::CreateTransaction(const std::vector<pair<CScript, CAmount> >& vecSend,
+bool CWallet::CreateTransaction(const std::vector<std::pair<CScript, CAmount> >& vecSend,
     CWalletTx& wtxNew,
     CReserveKey& reservekey,
     CAmount& nFeeRet,
@@ -2989,7 +2989,7 @@ bool CWallet::CreateTransaction(const std::vector<pair<CScript, CAmount> >& vecS
 
 bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay)
 {
-    std::vector<pair<CScript, CAmount> > vecSend;
+    std::vector<std::pair<CScript, CAmount> > vecSend;
     vecSend.push_back(std::make_pair(scriptPubKey, nValue));
     return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, strFailReason, coinControl, coin_type, useIX, nFeePay);
 }
@@ -4247,7 +4247,7 @@ void CWallet::AutoCombineDust()
         if (vRewardCoins.size() <= 1)
             continue;
 
-        std::vector<pair<CScript, CAmount> > vecSend;
+        std::vector<std::pair<CScript, CAmount> > vecSend;
         CScript scriptPubKey = GetScriptForDestination(it->first.Get());
         vecSend.push_back(std::make_pair(scriptPubKey, nTotalRewardsValue));
 
@@ -4343,7 +4343,7 @@ bool CWallet::MultiSend()
         CWalletTx wtx;
         CReserveKey keyChange(this); // this change address does not end up being used, because change is returned with coin control switch
         CAmount nFeeRet = 0;
-        std::vector<pair<CScript, CAmount> > vecSend;
+        std::vector<std::pair<CScript, CAmount> > vecSend;
 
         // loop through multisend vector and add amounts and addresses to the sending vector
         const isminefilter filter = ISMINE_SPENDABLE;

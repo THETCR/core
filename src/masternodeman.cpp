@@ -483,7 +483,7 @@ CMasternode* CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight
     LOCK(cs);
 
     CMasternode* pBestMasternode = nullptr;
-    std::vector<pair<int64_t, CTxIn> > vecMasternodeLastPaid;
+    std::vector<std::pair<int64_t, CTxIn> > vecMasternodeLastPaid;
 
     /*
         Make a vector with all of the last paid times
@@ -597,7 +597,7 @@ CMasternode* CMasternodeMan::GetCurrentMasterNode(int mod, int64_t nBlockHeight,
 
 int CMasternodeMan::GetMasternodeRank(const CTxIn& vin, int64_t nBlockHeight, int minProtocol, bool fOnlyActive)
 {
-    std::vector<pair<int64_t, CTxIn> > vecMasternodeScores;
+    std::vector<std::pair<int64_t, CTxIn> > vecMasternodeScores;
     int64_t nMasternode_Min_Age = MN_WINNER_MINIMUM_AGE;
     int64_t nMasternode_Age = 0;
 
@@ -642,10 +642,10 @@ int CMasternodeMan::GetMasternodeRank(const CTxIn& vin, int64_t nBlockHeight, in
     return -1;
 }
 
-std::vector<pair<int, CMasternode> > CMasternodeMan::GetMasternodeRanks(int64_t nBlockHeight, int minProtocol)
+std::vector<std::pair<int, CMasternode> > CMasternodeMan::GetMasternodeRanks(int64_t nBlockHeight, int minProtocol)
 {
-    std::vector<pair<int64_t, CMasternode> > vecMasternodeScores;
-    std::vector<pair<int, CMasternode> > vecMasternodeRanks;
+    std::vector<std::pair<int64_t, CMasternode> > vecMasternodeScores;
+    std::vector<std::pair<int, CMasternode> > vecMasternodeRanks;
 
     //make sure we know about this block
     uint256 hash = 0;
@@ -681,7 +681,7 @@ std::vector<pair<int, CMasternode> > CMasternodeMan::GetMasternodeRanks(int64_t 
 
 CMasternode* CMasternodeMan::GetMasternodeByRank(int nRank, int64_t nBlockHeight, int minProtocol, bool fOnlyActive)
 {
-    std::vector<pair<int64_t, CTxIn> > vecMasternodeScores;
+    std::vector<std::pair<int64_t, CTxIn> > vecMasternodeScores;
 
     // scan for winner
     for (CMasternode& mn: vMasternodes) {

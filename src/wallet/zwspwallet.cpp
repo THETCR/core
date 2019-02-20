@@ -158,7 +158,7 @@ void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
 // pubcoin hashes are stored to db so that a full accounting of mints belonging to the seed can be tracked without regenerating
 bool CzWSPWallet::LoadMintPoolFromDB()
 {
-    map<uint256, std::vector<pair<uint256, uint32_t> > > mapMintPool = CWalletDB(strWalletFile).MapMintPool();
+    map<uint256, std::vector<std::pair<uint256, uint32_t> > > mapMintPool = CWalletDB(strWalletFile).MapMintPool();
 
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
     for (auto& pair : mapMintPool[hashSeed])

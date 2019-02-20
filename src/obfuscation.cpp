@@ -1686,7 +1686,7 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
     CWalletTx wtx;
     CAmount nFeeRet = 0;
     std::string strFail = "";
-    std::vector<pair<CScript, CAmount> > vecSend;
+    std::vector<std::pair<CScript, CAmount> > vecSend;
 
     // ****** Add fees ************ /
     vecSend.push_back(std::make_pair(scriptChange, nPayment));
@@ -1711,7 +1711,7 @@ bool CObfuscationPool::MakeCollateralAmounts()
     CWalletTx wtx;
     CAmount nFeeRet = 0;
     std::string strFail = "";
-    std::vector<pair<CScript, CAmount> > vecSend;
+    std::vector<std::pair<CScript, CAmount> > vecSend;
     CCoinControl coinControl;
     coinControl.fAllowOtherInputs = false;
     coinControl.fAllowWatchOnly = false;
@@ -1765,7 +1765,7 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
     CWalletTx wtx;
     CAmount nFeeRet = 0;
     std::string strFail = "";
-    std::vector<pair<CScript, CAmount> > vecSend;
+    std::vector<std::pair<CScript, CAmount> > vecSend;
     CAmount nValueLeft = nTotalValue;
 
     // make our collateral address
@@ -1961,7 +1961,7 @@ int CObfuscationPool::GetDenominations(const std::vector<CTxDSOut>& vout)
 // return a bitshifted integer representing the denominations in this list
 int CObfuscationPool::GetDenominations(const std::vector<CTxOut>& vout, bool fSingleRandomDenom)
 {
-    std::vector<pair<int64_t, int> > denomUsed;
+    std::vector<std::pair<int64_t, int> > denomUsed;
 
     // make a list of denominations, with zero uses
     for (int64_t d: obfuScationDenominations)

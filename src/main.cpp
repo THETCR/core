@@ -3868,7 +3868,7 @@ bool static LoadBlockIndexDB(string& strError)
     boost::this_thread::interruption_point();
 
     // Calculate nChainWork
-    std::vector<pair<int, CBlockIndex*> > vSortedByHeight;
+    std::vector<std::pair<int, CBlockIndex*> > vSortedByHeight;
     vSortedByHeight.reserve(mapBlockIndex.size());
     for (const std::pair<const uint256, CBlockIndex*>& item : mapBlockIndex) {
         CBlockIndex* pindex = item.second;

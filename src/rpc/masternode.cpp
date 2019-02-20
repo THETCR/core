@@ -228,7 +228,7 @@ UniValue listmasternodes(const UniValue& params, bool fHelp)
         if(!pindex) return 0;
         nHeight = pindex->nHeight;
     }
-    std::vector<pair<int, CMasternode> > vMasternodeRanks = mnodeman.GetMasternodeRanks(nHeight);
+    std::vector<std::pair<int, CMasternode> > vMasternodeRanks = mnodeman.GetMasternodeRanks(nHeight);
     for (std::pair<int, CMasternode> & s: vMasternodeRanks) {
         UniValue obj(UniValue::VOBJ);
         std::string strVin = s.second.vin.prevout.ToStringShort();

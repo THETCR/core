@@ -957,7 +957,7 @@ UniValue sendmany(const UniValue& params, bool fHelp)
         wtx.mapValue["comment"] = params[3].get_str();
 
     set<CBitcoinAddress> setAddress;
-    std::vector<pair<CScript, CAmount> > vecSend;
+    std::vector<std::pair<CScript, CAmount> > vecSend;
 
     CAmount totalAmount = 0;
     std::vector<string> keys = sendTo.getKeys();
