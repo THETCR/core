@@ -732,7 +732,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
         SignatureData sigdata;
         // Only sign SIGHASH_SINGLE if there's a corresponding output:
         if (!fHashSingle || (i < mergedTx.vout.size()))
-            SignSignature(keystore, prevPubKey, mergedTx, i, nHashType);
+            SignSignature(keystore, prevPubKey, mergedTx, i, amount, nHashType);
 
         // ... and merge in other signatures:
         for (const CMutableTransaction& txv: txVariants) {
