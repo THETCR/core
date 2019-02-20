@@ -144,7 +144,7 @@ const CBigNum CommitmentProofOfKnowledge::calculateChallenge(const CBigNum& a, c
 	CHashWriter hasher(0,0);
 
 	// Hash together the following elements:
-	// * A string identifying the proof
+	// * A std::string identifying the proof
 	// * Commitment A
 	// * Commitment B
 	// * Ephemeral commitment T1

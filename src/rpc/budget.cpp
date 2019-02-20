@@ -52,7 +52,7 @@ void budgetToJSON(CBudgetProposal* pbudgetProposal, UniValue& bObj)
 // Future removal of this command is planned to keep things clean.
 UniValue mnbudget(const UniValue& params, bool fHelp)
 {
-    string strCommand;
+    std::string strCommand;
     if (params.size() >= 1)
         strCommand = params[0].get_str();
 
@@ -861,7 +861,7 @@ UniValue mnbudgetrawvote(const UniValue& params, bool fHelp)
 
 UniValue mnfinalbudget(const UniValue& params, bool fHelp)
 {
-    string strCommand;
+    std::string strCommand;
     if (params.size() >= 1)
         strCommand = params[0].get_str();
 

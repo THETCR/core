@@ -81,7 +81,7 @@ public:
     RequestMethod GetRequestMethod();
 
     /**
-     * Get the request header specified by hdr, or an empty string.
+     * Get the request header specified by hdr, or an empty std::string.
      * Return an pair (isPresent,string).
      */
     std::pair<bool, std::string> GetHeader(const std::string& hdr);
@@ -90,7 +90,7 @@ public:
      * Read request body.
      *
      * @note As this consumes the underlying buffer, call this only once.
-     * Repeated calls will return an empty string.
+     * Repeated calls will return an empty std::string.
      */
     std::string ReadBody();
 

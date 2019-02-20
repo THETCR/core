@@ -80,7 +80,7 @@
  *
  * @subsection io Input/output conventions
  *
- * In all generality, hash functions operate over strings of bits.
+ * In all generality, hash functions operate over std::strings of bits.
  * Individual bits are rarely encountered in C programming or actual
  * communication protocols; most protocols converge on the ubiquitous
  * "octet" which is a group of eight bits. Data is thus expressed as a

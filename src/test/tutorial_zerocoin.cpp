@@ -68,7 +68,7 @@ ZerocoinTutorial()
 		//                  the included 'paramgen' utility.
 		/********************************************************************/
 
-		// Load a test modulus from our hardcoded string (above)
+		// Load a test modulus from our hardcoded std::string (above)
 		CBigNum testModulus;
 		testModulus.SetHex(std::string(TUTORIAL_TEST_MODULUS));
 

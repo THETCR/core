@@ -968,7 +968,7 @@ BOOST_AUTO_TEST_CASE(script_json_test)
     // Read tests from test/data/script_tests.json
     // Format is an array of arrays
     // Inner arrays are [ ["wit"..., nValue]?, "scriptSig", "scriptPubKey", "flags", "expected_scripterror" ]
-    // ... where scriptSig and scriptPubKey are stringified
+    // ... where scriptSig and scriptPubKey are std::stringified
     // scripts.
     // If a witness is given, then the last value in the array should be the
     // amount (nValue) to use in the crediting tx

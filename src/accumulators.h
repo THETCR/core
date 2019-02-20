@@ -41,7 +41,7 @@ bool CalculateAccumulatorWitnessFor(
         libzerocoin::AccumulatorWitness& witness,
         int nSecurityLevel,
         int& nMintsAdded,
-        string& strError,
+        std::string& strError,
         std::list<CBigNum>& ret,
         int &heightStop
 );

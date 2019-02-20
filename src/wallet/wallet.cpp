@@ -1371,7 +1371,7 @@ CAmount CWalletTx::GetLockedWatchOnlyCredit() const
 void CWalletTx::GetAmounts(list<COutputEntry>& listReceived,
     std::list<COutputEntry>& listSent,
     CAmount& nFee,
-    string& strSentAccount,
+    std::string& strSentAccount,
     const isminefilter& filter) const
 {
     nFee = 0;
@@ -1429,7 +1429,7 @@ void CWalletTx::GetAccountAmounts(const std::string& strAccount, CAmount& nRecei
     nReceived = nSent = nFee = 0;
 
     CAmount allFee;
-    string strSentAccount;
+    std::string strSentAccount;
     std::list<COutputEntry> listReceived;
     std::list<COutputEntry> listSent;
     GetAmounts(listReceived, listSent, allFee, strSentAccount, filter);
@@ -2347,7 +2347,7 @@ bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, int nConfMine, int
         setCoinsRet.insert(coinLowestLarger.second);
         nValueRet += coinLowestLarger.first;
     } else {
-        string s = "CWallet::SelectCoinsMinConf best subset: ";
+        std::string s = "CWallet::SelectCoinsMinConf best subset: ";
         for (unsigned int i = 0; i < vValue.size(); i++) {
             if (vfBest[i]) {
                 setCoinsRet.insert(vValue[i].second);
@@ -3466,7 +3466,7 @@ bool CWallet::DelAddressBook(const CTxDestination& address)
         if (fFileBacked) {
             // Delete destdata tuples associated with address
             std::string strAddress = CBitcoinAddress(address).ToString();
-            for (const std::pair<string, string> & item: mapAddressBook[address].destdata) {
+            for (const std::pair<string, std::string> & item: mapAddressBook[address].destdata) {
                 CWalletDB(strWalletFile).EraseDestData(strAddress, item.first);
             }
         }
@@ -4081,7 +4081,7 @@ void CWallet::CreateAutoMintTransaction(const CAmount& nMintAmount, CCoinControl
         CWalletTx wtx;
         std::vector<CDeterministicMint> vDMints;
         LogPrintf("%s: autominting request amount %s\n", __func__, FormatMoney(nMintAmount));
-        string strError = pwalletMain->MintZerocoin(nMintAmount, wtx, vDMints, coinControl);
+        std::string strError = pwalletMain->MintZerocoin(nMintAmount, wtx, vDMints, coinControl);
 
         // Return if something went wrong during minting
         if (strError != ""){
@@ -4262,7 +4262,7 @@ void CWallet::AutoCombineDust()
         // Create the transaction and commit it to the network
         CWalletTx wtx;
         CReserveKey keyChange(this); // this change address does not end up being used, because change is returned with coin control switch
-        string strErr;
+        std::string strErr;
         CAmount nFeeRet = 0;
 
         // 10% safety margin to avoid "Insufficient funds" errors
@@ -4359,7 +4359,7 @@ bool CWallet::MultiSend()
 
         //get the fee amount
         CWalletTx wtxdummy;
-        string strErr;
+        std::string strErr;
         CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, strErr, &cControl, ALL_COINS, false, CAmount(0));
         CAmount nLastSendAmount = vecSend[vecSend.size() - 1].second;
         if (nLastSendAmount < nFeeRet + 500) {
@@ -4699,7 +4699,7 @@ bool CWallet::MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, con
     // 3. Compute Accumulator and Witness
     libzerocoin::Accumulator accumulator(paramsAccumulator, pubCoinSelected.getDenomination());
     libzerocoin::AccumulatorWitness witness(paramsAccumulator, accumulator, pubCoinSelected);
-    string strFailReason = "";
+    std::string strFailReason = "";
     int nMintsAdded = 0;
     if (!GenerateAccumulatorWitness(pubCoinSelected, accumulator, witness, nSecurityLevel, nMintsAdded, strFailReason, pindexCheckpoint)) {
         receipt.SetStatus(_("Try to spend with a higher security level to include more coins"), ZWSP_FAILED_ACCUMULATOR_INITIALIZATION);
@@ -4982,7 +4982,7 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLevel,
                 //mint change as zerocoins
                 if (fMintChange) {
                     CAmount nFeeRet = 0;
-                    string strFailReason = "";
+                    std::string strFailReason = "";
                     if (!CreateZerocoinMintTransaction(nChange, txNew, vNewMints, &reserveKey, nFeeRet, strFailReason, NULL, true)) {
                         receipt.SetStatus(_("Failed to create mint"), nStatus);
                         return false;
@@ -5068,7 +5068,7 @@ string CWallet::ResetMintZerocoin()
 
     NotifyzWSPReset();
 
-    string strResult = _("ResetMintZerocoin finished: ") + to_string(updates) + _(" mints updated, ") + to_string(deletions) + _(" mints deleted\n");
+    std::string strResult = _("ResetMintZerocoin finished: ") + to_string(updates) + _(" mints updated, ") + to_string(deletions) + _(" mints deleted\n");
     return strResult;
 }
 
@@ -5108,7 +5108,7 @@ string CWallet::ResetSpentZerocoin()
 
     NotifyzWSPReset();
 
-    string strResult = _("ResetSpentZerocoin finished: ") + to_string(removed) + _(" unconfirmed transactions removed\n");
+    std::string strResult = _("ResetSpentZerocoin finished: ") + to_string(removed) + _(" unconfirmed transactions removed\n");
     return strResult;
 }
 
@@ -5179,7 +5179,7 @@ void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, s
 
 string CWallet::GetUniqueWalletBackupName(bool fzwspAuto) const
 {
-    stringstream ssDateTime;
+    std::stringstream ssDateTime;
     std::string strWalletBackupName = strprintf("%s", DateTimeStrFormat(".%Y-%m-%d-%H-%M", GetTime()));
     ssDateTime << strWalletBackupName;
 
@@ -5190,7 +5190,7 @@ void CWallet::ZWspBackupWallet()
 {
     fs::path backupDir = GetDataDir() / "backups";
     fs::path backupPath;
-    string strNewBackupName;
+    std::string strNewBackupName;
 
     for (int i = 0; i < 10; i++) {
         strNewBackupName = strprintf("wallet-autozwspbackup-%d.dat", i);
@@ -5245,11 +5245,11 @@ string CWallet::MintZerocoinFromOutPoint(CAmount nValue, CWalletTx& wtxNew, std:
         coinControl->Select(outpt);
     }
     if (!coinControl->HasSelected()){
-        string strError = _("Error: No valid utxo!");
+        std::string strError = _("Error: No valid utxo!");
         LogPrintf("MintZerocoin() : %s", strError.c_str());
         return strError;
     }
-    string strError = MintZerocoin(nValue, wtxNew, vDMints, coinControl);
+    std::string strError = MintZerocoin(nValue, wtxNew, vDMints, coinControl);
     delete coinControl;
     return strError;
 }
@@ -5270,12 +5270,12 @@ string CWallet::MintZerocoin(CAmount nValue, CWalletTx& wtxNew, std::vector<CDet
     int64_t nFeeRequired;
 
     if (IsLocked()) {
-        string strError = _("Error: Wallet locked, unable to create transaction!");
+        std::string strError = _("Error: Wallet locked, unable to create transaction!");
         LogPrintf("MintZerocoin() : %s", strError.c_str());
         return strError;
     }
 
-    string strError;
+    std::string strError;
     CMutableTransaction txNew;
     if (!CreateZerocoinMintTransaction(nValue, txNew, vDMints, &reservekey, nFeeRequired, strError, coinControl)) {
         if (nValue + nFeeRequired > GetBalance())

@@ -231,7 +231,7 @@ public:
     bool DatabaseMint(CDeterministicMint& dMint);
     bool SetMintUnspent(const CBigNum& bnSerial);
     bool UpdateMint(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom);
-    string GetUniqueWalletBackupName(bool fzwspAuto) const;
+    std::string GetUniqueWalletBackupName(bool fzwspAuto) const;
     void InitAutoConvertAddresses();
 
 
@@ -1082,7 +1082,7 @@ public:
     int64_t nTimeExpires;
     std::string strComment;
     //! todo: add something to note what created it (user, getnewaddress, change)
-    //!   maybe should have a map<string, string> property map
+    //!   maybe should have a map<string, std::string> property map
 
     CWalletKey(int64_t nExpires = 0);
 

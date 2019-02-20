@@ -70,7 +70,7 @@ string FormatScriptFlags(unsigned int flags)
     if (flags == 0) {
         return "";
     }
-    string ret;
+    std::string ret;
     std::map<string, unsigned int>::const_iterator it = mapFlagNames.begin();
     while (it != mapFlagNames.end()) {
         if (flags & it->second) {
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_SUITE(transaction_tests)
 //                // Format is an array of arrays
 //                // Inner arrays are either [ "comment" ]
 //                // or [[[prevout hash, prevout index, prevout scriptPubKey], [input 2], ...],"], serializedTransaction, verifyFlags
-//                // ... where all scripts are stringified scripts.
+//                // ... where all scripts are std::stringified scripts.
 //                //
 //                // verifyFlags is a comma separated list of script verification flags to apply, or "NONE"
 //                UniValue tests = read_json(std::string(json_tests::tx_valid, json_tests::tx_valid + sizeof(json_tests::tx_valid)));
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_SUITE(transaction_tests)
 //                ScriptError err;
 //                for (unsigned int idx = 0; idx < tests.size(); idx++) {
 //            UniValue test = tests[idx];
-//            string strTest = test.write();
+//            std::string strTest = test.write();
 //            if (test[0].isArray())
 //            {
 //                if (test.size() != 3 || !test[1].isStr() || !test[2].isStr())
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_SUITE(transaction_tests)
 //                    continue;
 //                }
 //
-//                string transaction = test[1].get_str();
+//                std::string transaction = test[1].get_str();
 //                CDataStream stream(ParseHex(transaction), SER_NETWORK, PROTOCOL_VERSION);
 //                CTransaction tx;
 //                stream >> tx;
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_SUITE(transaction_tests)
 //                // Format is an array of arrays
 //                // Inner arrays are either [ "comment" ]
 //                // or [[[prevout hash, prevout index, prevout scriptPubKey], [input 2], ...],"], serializedTransaction, verifyFlags
-//                // ... where all scripts are stringified scripts.
+//                // ... where all scripts are std::stringified scripts.
 //                //
 //                // verifyFlags is a comma separated list of script verification flags to apply, or "NONE"
 //                UniValue tests = read_json(std::string(json_tests::tx_invalid, json_tests::tx_invalid + sizeof(json_tests::tx_invalid)));
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_SUITE(transaction_tests)
 //                ScriptError err;
 //                for (unsigned int idx = 0; idx < tests.size(); idx++) {
 //            UniValue test = tests[idx];
-//            string strTest = test.write();
+//            std::string strTest = test.write();
 //            if (test[0].isArray())
 //            {
 //                if (test.size() != 3 || !test[1].isStr() || !test[2].isStr())
@@ -206,7 +206,7 @@ BOOST_AUTO_TEST_SUITE(transaction_tests)
 //                    continue;
 //                }
 //
-//                string transaction = test[1].get_str();
+//                std::string transaction = test[1].get_str();
 //                CDataStream stream(ParseHex(transaction), SER_NETWORK, PROTOCOL_VERSION);
 //                CTransaction tx;
 //                unsigned int nTime = 0;
@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_CASE(test_IsStandard)
                 key.MakeNewKey(true);
                 t.vout[0].scriptPubKey = GetScriptForDestination(key.GetPubKey().GetID());
 
-                string reason;
+                std::string reason;
                 BOOST_CHECK(IsStandardTx(CTransaction(t), reason));
 
                 t.vout[0].nValue = 5011; // dust

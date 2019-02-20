@@ -62,7 +62,7 @@ static int ec_privkey_import_der(const secp256k1_context* ctx, unsigned char *ou
         return 0;
     }
     privkey += 3;
-    /* sequence element 1: octet string, up to 32 bytes */
+    /* sequence element 1: octet std::string, up to 32 bytes */
     if (end - privkey < 2 || privkey[0] != 0x04u) {
         return 0;
     }

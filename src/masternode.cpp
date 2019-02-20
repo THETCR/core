@@ -702,7 +702,7 @@ std::string CMasternodeBroadcast::GetOldStrMessage()
     return strMessage;
 }
 
-std:: string CMasternodeBroadcast::GetNewStrMessage()
+std:: std::string CMasternodeBroadcast::GetNewStrMessage()
 {
     std::string strMessage;
 

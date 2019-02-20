@@ -425,7 +425,7 @@ bool AddressTableModel::removeRows(int row, int count, const QModelIndex& parent
     return true;
 }
 
-/* Look up label for address in address book, if not found return empty string.
+/* Look up label for address in address book, if not found return empty std::string.
  */
 QString AddressTableModel::labelForAddress(const QString& address) const
 {

@@ -56,10 +56,10 @@ BOOST_AUTO_TEST_CASE(rpc_addmultisig)
     BOOST_CHECK_THROW(addmultisig(createArgs(1, ""), false), runtime_error);
     BOOST_CHECK_THROW(addmultisig(createArgs(1, "NotAValidPubkey"), false), runtime_error);
 
-    string short1(address1Hex, address1Hex + sizeof(address1Hex) - 2); // last byte missing
+    std::string short1(address1Hex, address1Hex + sizeof(address1Hex) - 2); // last byte missing
     BOOST_CHECK_THROW(addmultisig(createArgs(2, short1.c_str()), false), runtime_error);
 
-    string short2(address1Hex + 1, address1Hex + sizeof(address1Hex)); // first byte missing
+    std::string short2(address1Hex + 1, address1Hex + sizeof(address1Hex)); // first byte missing
     BOOST_CHECK_THROW(addmultisig(createArgs(2, short2.c_str()), false), runtime_error);
 }
 
@@ -73,8 +73,8 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     CPubKey demoPubkey = pwalletMain->GenerateNewKey();
     CBitcoinAddress demoAddress = CBitcoinAddress(CTxDestination(demoPubkey.GetID()));
     UniValue retValue;
-    string strAccount = "walletDemoAccount";
-    string strPurpose = "receive";
+    std::string strAccount = "walletDemoAccount";
+    std::string strPurpose = "receive";
     BOOST_CHECK_NO_THROW({ /*Initialize Wallet with an account */
         CWalletDB walletdb(pwalletMain->strWalletFile);
         CAccount account;
@@ -100,8 +100,8 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
      * 			listunspent
      *********************************/
     BOOST_CHECK_NO_THROW(CallRPC("listunspent"));
-    BOOST_CHECK_THROW(CallRPC("listunspent string"), runtime_error);
-    BOOST_CHECK_THROW(CallRPC("listunspent 0 string"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listunspent std::string"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listunspent 0 std::string"), runtime_error);
     BOOST_CHECK_THROW(CallRPC("listunspent 0 1 not_array"), runtime_error);
     BOOST_CHECK_THROW(CallRPC("listunspent 0 1 [] extra"), runtime_error);
     BOOST_CHECK_NO_THROW(r = CallRPC("listunspent 0 1 []"));

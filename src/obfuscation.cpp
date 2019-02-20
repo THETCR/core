@@ -1913,7 +1913,7 @@ bool CObfuscationPool::IsCompatibleWithSession(int64_t nDenom, CTransaction txCo
     return true;
 }
 
-//create a nice string to show the denominations
+//create a nice std::string to show the denominations
 void CObfuscationPool::GetDenominationsToString(int nDenom, std::string& strDenom)
 {
     // Function returns as follows:

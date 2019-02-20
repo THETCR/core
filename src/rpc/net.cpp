@@ -102,7 +102,7 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp)
             "    \"pingtime\": n,             (numeric) ping time\n"
             "    \"pingwait\": n,             (numeric) ping wait\n"
             "    \"version\": v,              (numeric) The peer version, such as 7001\n"
-            "    \"subver\": \"/Wispr Core:x.x.x.x/\",  (string) The string version\n"
+            "    \"subver\": \"/Wispr Core:x.x.x.x/\",  (string) The std::string version\n"
             "    \"inbound\": true|false,     (boolean) Inbound (true) or Outbound (false)\n"
             "    \"startingheight\": n,       (numeric) The starting height (block) of the peer\n"
             "    \"banscore\": n,             (numeric) The ban score\n"
@@ -171,7 +171,7 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp)
 
 UniValue addnode(const UniValue& params, bool fHelp)
 {
-    string strCommand;
+    std::string strCommand;
     if (params.size() == 2)
         strCommand = params[1].get_str();
     if (fHelp || params.size() != 2 ||
@@ -188,7 +188,7 @@ UniValue addnode(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("addnode", "\"192.168.0.6:17000\" \"onetry\"") + HelpExampleRpc("addnode", "\"192.168.0.6:17000\", \"onetry\""));
 
-    string strNode = params[0].get_str();
+    std::string strNode = params[0].get_str();
 
     if (strCommand == "onetry") {
         CAddress addr;
@@ -280,7 +280,7 @@ UniValue getaddednodeinfo(const UniValue& params, bool fHelp)
         for (string& strAddNode: vAddedNodes)
             laddedNodes.push_back(strAddNode);
     } else {
-        string strNode = params[1].get_str();
+        std::string strNode = params[1].get_str();
         LOCK(cs_vAddedNodes);
         for (string& strAddNode: vAddedNodes)
             if (strAddNode == strNode) {
@@ -383,7 +383,7 @@ static UniValue GetNetworksInfo()
         obj.push_back(Pair("name", GetNetworkName(network)));
         obj.push_back(Pair("limited", IsLimited(network)));
         obj.push_back(Pair("reachable", IsReachable(network)));
-        obj.push_back(Pair("proxy", proxy.IsValid() ? proxy.proxy.ToStringIPPort() : string()));
+        obj.push_back(Pair("proxy", proxy.IsValid() ? proxy.proxy.ToStringIPPort() : std::string()));
         obj.push_back(Pair("proxy_randomize_credentials", proxy.randomize_credentials));
         networks.push_back(obj);
     }
@@ -400,7 +400,7 @@ UniValue getnetworkinfo(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "{\n"
             "  \"version\": xxxxx,                      (numeric) the server version\n"
-            "  \"subversion\": \"/Wispr Core:x.x.x.x/\",     (string) the server subversion string\n"
+            "  \"subversion\": \"/Wispr Core:x.x.x.x/\",     (string) the server subversion std::string\n"
             "  \"protocolversion\": xxxxx,              (numeric) the protocol version\n"
             "  \"localservices\": \"xxxxxxxxxxxxxxxx\", (string) the services we offer to the network\n"
             "  \"timeoffset\": xxxxx,                   (numeric) the time offset\n"
@@ -456,7 +456,7 @@ UniValue getnetworkinfo(const UniValue& params, bool fHelp)
 
 UniValue setban(const UniValue& params, bool fHelp)
 {
-    string strCommand;
+    std::string strCommand;
     if (params.size() >= 2)
         strCommand = params[1].get_str();
     if (fHelp || params.size() < 2 ||
@@ -480,7 +480,7 @@ UniValue setban(const UniValue& params, bool fHelp)
     CNetAddr netAddr;
     bool isSubnet = false;
 
-    if (params[0].get_str().find("/") != string::npos)
+    if (params[0].get_str().find("/") != std::string::npos)
         isSubnet = true;
 
     if (!isSubnet)

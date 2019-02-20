@@ -37,7 +37,7 @@ static const int CONTINUE_EXECUTION=-1;
 
 std::string HelpMessageCli()
 {
-    string strUsage;
+    std::string strUsage;
     strUsage += HelpMessageGroup(_("Options:"));
     strUsage += HelpMessageOpt("-?", _("This help message"));
     strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), "wispr.conf"));
@@ -268,7 +268,7 @@ UniValue CallRPC(const std::string& strMethod, const UniValue& params)
 
 int CommandLineRPC(int argc, char* argv[])
 {
-    string strPrint;
+    std::string strPrint;
     int nRet = 0;
     try {
         // Skip switches
@@ -280,9 +280,9 @@ int CommandLineRPC(int argc, char* argv[])
         // Method
         if (argc < 2)
             throw runtime_error("too few parameters");
-        string strMethod = argv[1];
+        std::string strMethod = argv[1];
 
-        // Parameters default to strings
+        // Parameters default to std::strings
         std::vector<std::string> strParams(&argv[2], &argv[argc]);
         UniValue params = RPCConvertValues(strMethod, strParams);
 
@@ -324,7 +324,7 @@ int CommandLineRPC(int argc, char* argv[])
     } catch (boost::thread_interrupted) {
         throw;
     } catch (std::exception& e) {
-        strPrint = string("error: ") + e.what();
+        strPrint = std::string("error: ") + e.what();
         nRet = EXIT_FAILURE;
     } catch (...) {
         PrintExceptionContinue(nullptr, "CommandLineRPC()");

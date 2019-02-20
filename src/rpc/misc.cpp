@@ -130,7 +130,7 @@ UniValue getinfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("blocks", (int)chainActive.Height()));
     obj.push_back(Pair("timeoffset", GetTimeOffset()));
     obj.push_back(Pair("connections", (int)vNodes.size()));
-    obj.push_back(Pair("proxy", (proxy.IsValid() ? proxy.proxy.ToStringIPPort() : string())));
+    obj.push_back(Pair("proxy", (proxy.IsValid() ? proxy.proxy.ToStringIPPort() : std::string())));
     obj.push_back(Pair("difficulty", (double)GetDifficulty()));
     obj.push_back(Pair("testnet", Params().TestnetToBeDeprecatedFieldRPC()));
 
@@ -416,7 +416,7 @@ UniValue validateaddress(const UniValue& params, bool fHelp)
     ret.push_back(Pair("isvalid", isValid));
     if (isValid) {
         CTxDestination dest = address.Get();
-        string currentAddress = address.ToString();
+        std::string currentAddress = address.ToString();
         ret.push_back(Pair("address", currentAddress));
         CScript scriptPubKey = GetScriptForDestination(dest);
         ret.push_back(Pair("scriptPubKey", HexStr(scriptPubKey.begin(), scriptPubKey.end())));
@@ -513,7 +513,7 @@ UniValue createmultisig(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "{\n"
             "  \"address\":\"multisigaddress\",  (string) The value of the new multisig address.\n"
-            "  \"redeemScript\":\"script\"       (string) The string value of the hex-encoded redemption script.\n"
+            "  \"redeemScript\":\"script\"       (string) The std::string value of the hex-encoded redemption script.\n"
             "}\n"
 
             "\nExamples:\n"
@@ -561,9 +561,9 @@ UniValue verifymessage(const UniValue& params, bool fHelp)
 
     LOCK(cs_main);
 
-    string strAddress = params[0].get_str();
-    string strSign = params[1].get_str();
-    string strMessage = params[2].get_str();
+    std::string strAddress = params[0].get_str();
+    std::string strSign = params[1].get_str();
+    std::string strMessage = params[2].get_str();
 
     CBitcoinAddress addr(strAddress);
     if (!addr.IsValid())

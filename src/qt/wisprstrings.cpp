@@ -192,7 +192,7 @@ static const char UNUSED *wispr_strings[] = {
                                        "the OpenSSL Toolkit <https://www.openssl.org/> and cryptographic software "
                                        "written by Eric Young and UPnP software written by Thomas Bernard."),
         QT_TRANSLATE_NOOP("wispr-core", ""
-                                       "Total length of network version string (%i) exceeds maximum length (%i). "
+                                       "Total length of network version std::string (%i) exceeds maximum length (%i). "
                                        "Reduce the number or size of uacomments."),
         QT_TRANSLATE_NOOP("wispr-core", ""
                                        "Unable to bind to %s on this computer. WISPR Core is probably already running."),
@@ -250,7 +250,7 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", "Allow DNS lookups for -addnode, -seednode and -connect"),
         QT_TRANSLATE_NOOP("wispr-core", "Already have that input."),
         QT_TRANSLATE_NOOP("wispr-core", "Always query for peer addresses via DNS lookup (default: %u)"),
-        QT_TRANSLATE_NOOP("wispr-core", "Append comment to the user agent string"),
+        QT_TRANSLATE_NOOP("wispr-core", "Append comment to the user agent std::string"),
         QT_TRANSLATE_NOOP("wispr-core", "Attempt to force blockchain corruption recovery"),
         QT_TRANSLATE_NOOP("wispr-core", "Attempt to recover private keys from a corrupt wallet.dat"),
         QT_TRANSLATE_NOOP("wispr-core", "Automatically create Tor hidden service (default: %d)"),
@@ -320,7 +320,7 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", "Failed to deserialize"),
         QT_TRANSLATE_NOOP("wispr-core", "Failed to find Zerocoins in wallet.dat"),
         QT_TRANSLATE_NOOP("wispr-core", "Failed to listen on any port. Use -listen=0 if you want this."),
-        QT_TRANSLATE_NOOP("wispr-core", "Failed to parse host:port string"),
+        QT_TRANSLATE_NOOP("wispr-core", "Failed to parse host:port std::string"),
         QT_TRANSLATE_NOOP("wispr-core", "Failed to read block"),
         QT_TRANSLATE_NOOP("wispr-core", "Failed to select a zerocoin"),
         QT_TRANSLATE_NOOP("wispr-core", "Failed to wipe zerocoinDB"),

@@ -286,10 +286,10 @@ static std::map<std::string,std::string> ParseTorReplyMapping(const std::string 
         }
         if (ptr == s.size()) // unexpected end of line
             return std::map<std::string,std::string>();
-        if (s[ptr] == ' ') // The remaining string is an OptArguments
+        if (s[ptr] == ' ') // The remaining std::string is an OptArguments
             break;
         ++ptr; // skip '='
-        if (ptr < s.size() && s[ptr] == '"') { // Quoted string
+        if (ptr < s.size() && s[ptr] == '"') { // Quoted std::string
             ++ptr; // skip opening '"'
             bool escape_next = false;
             while (ptr < s.size() && (escape_next || s[ptr] != '"')) {
@@ -362,8 +362,8 @@ static std::map<std::string,std::string> ParseTorReplyMapping(const std::string 
 }
 
 /** Read full contents of a file and return them in a std::string.
- * Returns a pair <status, string>.
- * If an error occurred, status will be false, otherwise status will be true and the data will be returned in string.
+ * Returns a pair <status, std::string>.
+ * If an error occurred, status will be false, otherwise status will be true and the data will be returned in std::string.
  *
  * @param maxsize Puts a maximum size limit on the file that is read. If the file is larger than this, truncated data
  *         (with len > maxsize) will be returned.
@@ -557,7 +557,7 @@ void TorController::auth_cb(TorControlConnection& _conn, const TorControlReply& 
  *
  *    After a controller sends a successful AUTHCHALLENGE command, the
  *    next command sent on the connection must be an AUTHENTICATE command,
- *    and the only authentication string which that AUTHENTICATE command
+ *    and the only authentication std::string which that AUTHENTICATE command
  *    will accept is:
  *
  *      HMAC-SHA256("Tor safe cookie authentication controller-to-server hash",

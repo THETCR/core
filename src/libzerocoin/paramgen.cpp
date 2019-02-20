@@ -111,7 +111,7 @@ int main(int argc, char **argv)
 	delete p;
 	delete q;
 
-	// Convert to a hexidecimal string
+	// Convert to a hexidecimal std::string
 	std::string resultHex = resultModulus.ToString(16);
 
 	cout << endl << "N = " << endl << resultHex << endl;

@@ -36,7 +36,7 @@ QT_END_NAMESPACE
  */
 namespace GUIUtil
 {
-// Create human-readable string from date
+// Create human-readable std::string from date
 QString dateTimeStr(const QDateTime& datetime);
 QString dateTimeStr(qint64 nTime);
 
@@ -184,7 +184,7 @@ private Q_SLOTS:
 
 /**
      * Extension to QTableWidgetItem that facilitates proper ordering for "DHMS"
-     * strings (primarily used in the masternode's "active" listing).
+     * std::strings (primarily used in the masternode's "active" listing).
      */
 class DHMSTableWidgetItem : public QTableWidgetItem
 {
@@ -193,7 +193,7 @@ public:
     virtual bool operator<(QTableWidgetItem const& item) const;
 
 private:
-    // Private backing value for DHMS string, used for sorting.
+    // Private backing value for DHMS std::string, used for sorting.
     int64_t value;
 };
 
@@ -220,13 +220,13 @@ QString boostPathToQString(const fs::path& path);
 /* Convert seconds into a QString with days, hours, mins, secs */
 QString formatDurationStr(int secs);
 
-/* Format CNodeStats.nServices bitmask into a user-readable string */
+/* Format CNodeStats.nServices bitmask into a user-readable std::string */
 QString formatServicesStr(quint64 mask);
 
-/* Format a CNodeCombinedStats.dPingTime into a user-readable string or display N/A, if 0*/
+/* Format a CNodeCombinedStats.dPingTime into a user-readable std::string or display N/A, if 0*/
 QString formatPingTime(double dPingTime);
 
-/* Format a CNodeCombinedStats.nTimeOffset into a user-readable string. */
+/* Format a CNodeCombinedStats.nTimeOffset into a user-readable std::string. */
 QString formatTimeOffset(int64_t nTimeOffset);
 
 #if defined(Q_OS_MAC)

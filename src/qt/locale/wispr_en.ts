@@ -6637,7 +6637,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <location line="+4"/>
-        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <source>Total length of network version std::string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6772,7 +6772,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <location line="+1"/>
-        <source>Append comment to the user agent string</source>
+        <source>Append comment to the user agent std::string</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7057,7 +7057,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <location line="+1"/>
-        <source>Failed to parse host:port string</source>
+        <source>Failed to parse host:port std::string</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

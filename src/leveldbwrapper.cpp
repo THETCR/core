@@ -208,14 +208,14 @@ size_t CLevelDBWrapper::DynamicMemoryUsage() const {
 
 // Prefixed with null character to avoid collisions with other keys
 //
-// We must use a string constructor which specifies length so that we copy
+// We must use a std::string constructor which specifies length so that we copy
 // past the null-terminator.
 const std::string CLevelDBWrapper::OBFUSCATE_KEY_KEY("\000obfuscate_key", 14);
 
 const unsigned int CLevelDBWrapper::OBFUSCATE_KEY_NUM_BYTES = 8;
 
 /**
- * Returns a string (consisting of 8 random bytes) suitable for use as an
+ * Returns a std::string (consisting of 8 random bytes) suitable for use as an
  * obfuscating XOR key.
  */
 std::vector<unsigned char> CLevelDBWrapper::CreateObfuscateKey() const

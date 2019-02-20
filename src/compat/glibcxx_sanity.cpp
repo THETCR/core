@@ -40,7 +40,7 @@ bool sanity_test_list(unsigned int size)
 
 } // namespace
 
-// trigger: string::at(x) on an empty string to trigger __throw_out_of_range_fmt.
+// trigger: std::string::at(x) on an empty std::string to trigger __throw_out_of_range_fmt.
 // test: force std::string to throw an out_of_range exception. Verify that
 //   it's caught correctly.
 bool sanity_test_range_fmt()

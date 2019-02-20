@@ -173,7 +173,7 @@ void base_uint<BITS>::SetHex(const char* psz)
     if (psz[0] == '0' && tolower(psz[1]) == 'x')
         psz += 2;
 
-    // hex string to uint
+    // hex std::string to uint
     const char* pbegin = psz;
     while (::HexDigit(*psz) != -1)
         psz++;

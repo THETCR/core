@@ -84,13 +84,13 @@ static void InitMessage(const std::string& message)
 }
 
 /*
-   Translate string to current locale using Qt.
+   Translate std::string to current locale using Qt.
  */
 //static std::string Translate(const char* psz)
 //{
 //    return QCoreApplication::translate("wispr-core", psz).toStdString();
 //}
-/** Translate string to current locale using Qt. */
+/** Translate std::string to current locale using Qt. */
 extern const std::function<std::string(const char*)> G_TRANSLATION_FUN = [](const char* psz) {
   return QCoreApplication::translate("wispr-core", psz).toStdString();
 };
@@ -641,7 +641,7 @@ int main(int argc, char* argv[])
 
 #ifdef ENABLE_WALLET
     /// 7a. parse masternode.conf
-    string strErr;
+    std::string strErr;
     if (!masternodeConfig.read(strErr)) {
         QMessageBox::critical(0, QObject::tr("WISPR Core"),
             QObject::tr("Error reading masternode configuration file: %1").arg(strErr.c_str()));

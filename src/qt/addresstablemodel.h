@@ -61,11 +61,11 @@ public:
     /*@}*/
 
     /* Add an address to the model.
-       Returns the added address on success, and an empty string otherwise.
+       Returns the added address on success, and an empty std::string otherwise.
      */
     QString addRow(const QString& type, const QString& label, const QString& address);
 
-    /* Look up label for address in address book, if not found return empty string.
+    /* Look up label for address in address book, if not found return empty std::string.
      */
     QString labelForAddress(const QString& address) const;
 

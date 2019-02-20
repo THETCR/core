@@ -216,7 +216,7 @@ QString BitcoinUnits::floorHtmlWithUnit(int unit, const CAmount& amount, bool pl
 bool BitcoinUnits::parse(int unit, const QString& value, CAmount* val_out)
 {
     if (!valid(unit) || value.isEmpty())
-        return false; // Refuse to parse invalid unit or empty string
+        return false; // Refuse to parse invalid unit or empty std::string
     int num_decimals = decimals(unit);
 
     // Ignore spaces and thin spaces when parsing

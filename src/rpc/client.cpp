@@ -190,7 +190,7 @@ UniValue ParseNonRFCJSONValue(const std::string& strVal)
     return jVal[0];
 }
 
-/** Convert strings to command-specific RPC representation */
+/** Convert std::strings to command-specific RPC representation */
 UniValue RPCConvertValues(const std::string &strMethod, const std::vector<std::string> &strParams)
 {
     UniValue params(UniValue::VARR);
@@ -199,10 +199,10 @@ UniValue RPCConvertValues(const std::string &strMethod, const std::vector<std::s
         const std::string& strVal = strParams[idx];
 
         if (!rpcCvtTable.convert(strMethod, idx)) {
-            // insert string value directly
+            // insert std::string value directly
             params.push_back(strVal);
         } else {
-            // parse string as JSON, insert bool/number/object/etc. value
+            // parse std::string as JSON, insert bool/number/object/etc. value
             params.push_back(ParseNonRFCJSONValue(strVal));
         }
     }

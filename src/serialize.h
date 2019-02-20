@@ -489,9 +489,9 @@ template<size_t Limit>
 class LimitedString
 {
 protected:
-  std::string& string;
+  std::string& std::string;
 public:
-  explicit LimitedString(std::string& _string) : string(_string) {}
+  explicit LimitedString(std::string& _string) : std::string(_string) {}
 
   template<typename Stream>
   void Unserialize(Stream& s)
@@ -500,7 +500,7 @@ public:
       if (size > Limit) {
           throw std::ios_base::failure("String length limit exceeded");
       }
-      string.resize(size);
+      std::string.resize(size);
       if (size != 0)
           s.read((char*)string.data(), size);
   }
@@ -508,9 +508,9 @@ public:
   template<typename Stream>
   void Serialize(Stream& s) const
   {
-      WriteCompactSize(s, string.size());
+      WriteCompactSize(s, std::string.size());
       if (!string.empty())
-          s.write((char*)string.data(), string.size());
+          s.write((char*)string.data(), std::string.size());
   }
 };
 
@@ -525,7 +525,7 @@ BigEndian<I> WrapBigEndian(I& n) { return BigEndian<I>(n); }
  */
 
 /**
- *  string
+ *  std::string
  */
 template<typename Stream, typename C> void Serialize(Stream& os, const std::basic_string<C>& str);
 template<typename Stream, typename C> void Unserialize(Stream& is, std::basic_string<C>& str);
@@ -609,7 +609,7 @@ inline void Unserialize(Stream& is, T&& a)
 
 
 /**
- * string
+ * std::string
  */
 template<typename Stream, typename C>
 void Serialize(Stream& os, const std::basic_string<C>& str)

@@ -283,11 +283,11 @@ void SendCoinsDialog::on_sendButton_clicked()
     // Format confirmation message
     QStringList formatted;
     for (const SendCoinsRecipient& rcp: recipients) {
-        // generate bold amount string
+        // generate bold amount std::string
         QString amount = "<b>" + BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), rcp.amount);
         amount.append("</b> ").append(strFunds);
 
-        // generate monospace address string
+        // generate monospace address std::string
         QString address = "<span style='font-family: monospace;'>" + rcp.address;
         address.append("</span>");
 
@@ -363,7 +363,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee,
     questionString.append("<br /><br />%1");
 
     if (txFee > 0) {
-        // append fee string if a fee is required
+        // append fee std::string if a fee is required
         questionString.append("<hr /><span style='color:#aa0000;'>");
         questionString.append(BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), txFee));
         questionString.append("</span> ");

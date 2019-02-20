@@ -38,7 +38,7 @@ CScript ParseScript(std::string s)
             const char* name = GetOpName((opcodetype)op);
             if (strcmp(name, "OP_UNKNOWN") == 0)
                 continue;
-            string strName(name);
+            std::string strName(name);
             mapOpNames[strName] = (opcodetype)op;
             // Convenience: OP_ADD and just ADD are both recognized:
             boost::algorithm::replace_first(strName, "OP_", "");
@@ -53,7 +53,7 @@ CScript ParseScript(std::string s)
     {
         if (w->empty())
         {
-            // Empty string, ignore. (boost::split given '' will return one word)
+            // Empty std::string, ignore. (boost::split given '' will return one word)
         }
         else if (std::all_of(w->begin(), w->end(), ::IsDigit) ||
             (w->front() == '-' && w->size() > 1 && std::all_of(w->begin()+1, w->end(), ::IsDigit)))
@@ -70,8 +70,8 @@ CScript ParseScript(std::string s)
         }
         else if (w->size() >= 2 && w->front() == '\'' && w->back() == '\'')
         {
-            // Single-quoted string, pushed as data. NOTE: this is poor-man's
-            // parsing, spaces/tabs/newlines in single-quoted strings won't work.
+            // Single-quoted std::string, pushed as data. NOTE: this is poor-man's
+            // parsing, spaces/tabs/newlines in single-quoted std::strings won't work.
             std::vector<unsigned char> value(w->begin()+1, w->end()-1);
             result << value;
         }
@@ -123,7 +123,7 @@ bool DecodeHexBlk(CBlock& block, const std::string& strHexBlk)
 
 uint256 ParseHashUV(const UniValue& v, const std::string& strName)
 {
-    string strHex;
+    std::string strHex;
     if (v.isStr())
         strHex = v.getValStr();
     return ParseHashStr(strHex, strName); // Note: ParseHashStr("") throws a runtime_error
@@ -132,7 +132,7 @@ uint256 ParseHashUV(const UniValue& v, const std::string& strName)
 uint256 ParseHashStr(const std::string& strHex, const std::string& strName)
 {
     if (!IsHex(strHex)) // Note: IsHex("") is false
-        throw runtime_error(strName + " must be hexadecimal string (not '" + strHex + "')");
+        throw runtime_error(strName + " must be hexadecimal std::string (not '" + strHex + "')");
 
     uint256 result;
     result.SetHex(strHex);
@@ -141,10 +141,10 @@ uint256 ParseHashStr(const std::string& strHex, const std::string& strName)
 
 std::vector<unsigned char> ParseHexUV(const UniValue& v, const std::string& strName)
 {
-    string strHex;
+    std::string strHex;
     if (v.isStr())
         strHex = v.getValStr();
     if (!IsHex(strHex))
-        throw runtime_error(strName + " must be hexadecimal string (not '" + strHex + "')");
+        throw runtime_error(strName + " must be hexadecimal std::string (not '" + strHex + "')");
     return ParseHex(strHex);
 }

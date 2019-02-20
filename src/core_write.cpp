@@ -69,8 +69,8 @@ string EncodeHexTx(const CTransaction& tx)
     return HexStr(ssTx.begin(), ssTx.end());
 }
 /**
- * Create the assembly string representation of a CScript object.
- * @param[in] script    CScript object to convert into the asm string representation.
+ * Create the assembly std::string representation of a CScript object.
+ * @param[in] script    CScript object to convert into the asm std::string representation.
  * @param[in] fAttemptSighashDecode    Whether to attempt to decode sighash types on data within the script that matches the format
  *                                     of a signature. Only pass true for scripts you believe could contain signatures. For example,
  *                                     pass false, or omit the this argument (defaults to false), for scriptPubKeys.

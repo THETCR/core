@@ -198,7 +198,7 @@ public:
 /** Double ended buffer combining vector and stream-like interfaces.
  *
  * >> and << read and write unformatted data using the above serialization templates.
- * Fills with data in linear time; some stringstream implementations take N^2 time.
+ * Fills with data in linear time; some std::stringstream implementations take N^2 time.
  */
 class CDataStream
 {

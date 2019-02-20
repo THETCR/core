@@ -243,13 +243,13 @@ UniValue getrawmempool(const UniValue& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "getrawmempool ( verbose )\n"
-            "\nReturns all transaction ids in memory pool as a json array of string transaction ids.\n"
+            "\nReturns all transaction ids in memory pool as a json array of std::string transaction ids.\n"
 
             "\nArguments:\n"
             "1. verbose           (boolean, optional, default=false) true for a json object, false for array of transaction ids\n"
 
             "\nResult: (for verbose = false):\n"
-            "[                     (json array of string)\n"
+            "[                     (json array of std::string)\n"
             "  \"transactionid\"     (string) The transaction id\n"
             "  ,...\n"
             "]\n"
@@ -312,7 +312,7 @@ UniValue getblock(const UniValue& params, bool fHelp)
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
             "getblock \"hash\" ( verbose )\n"
-            "\nIf verbose is false, returns a string that is serialized, hex-encoded data for block 'hash'.\n"
+            "\nIf verbose is false, returns a std::string that is serialized, hex-encoded data for block 'hash'.\n"
             "If verbose is true, returns an Object with information about block <hash>.\n"
 
             "\nArguments:\n"
@@ -327,7 +327,7 @@ UniValue getblock(const UniValue& params, bool fHelp)
             "  \"height\" : n,          (numeric) The block height or index\n"
             "  \"version\" : n,         (numeric) The block version\n"
             "  \"merkleroot\" : \"xxxx\", (string) The merkle root\n"
-            "  \"tx\" : [               (array of string) The transaction ids\n"
+            "  \"tx\" : [               (array of std::string) The transaction ids\n"
             "     \"transactionid\"     (string) The transaction id\n"
             "     ,...\n"
             "  ],\n"
@@ -354,7 +354,7 @@ UniValue getblock(const UniValue& params, bool fHelp)
             "}\n"
 
             "\nResult (for verbose=false):\n"
-            "\"data\"             (string) A string that is serialized, hex-encoded data for block 'hash'.\n"
+            "\"data\"             (string) A std::string that is serialized, hex-encoded data for block 'hash'.\n"
 
             "\nExamples:\n" +
             HelpExampleCli("getblock", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\"") +
@@ -463,7 +463,7 @@ UniValue getblockheader(const UniValue& params, bool fHelp)
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
             "getblockheader \"hash\" ( verbose )\n"
-            "\nIf verbose is false, returns a string that is serialized, hex-encoded data for block 'hash' header.\n"
+            "\nIf verbose is false, returns a std::string that is serialized, hex-encoded data for block 'hash' header.\n"
             "If verbose is true, returns an Object with information about block <hash> header.\n"
 
             "\nArguments:\n"
@@ -482,7 +482,7 @@ UniValue getblockheader(const UniValue& params, bool fHelp)
             "}\n"
 
             "\nResult (for verbose=false):\n"
-            "\"data\"             (string) A string that is serialized, hex-encoded data for block 'hash' header.\n"
+            "\"data\"             (string) A std::string that is serialized, hex-encoded data for block 'hash' header.\n"
 
             "\nExamples:\n" +
             HelpExampleCli("getblockheader", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\"") +
@@ -572,7 +572,7 @@ UniValue gettxout(const UniValue& params, bool fHelp)
             "     \"hex\" : \"hex\",        (string) \n"
             "     \"reqSigs\" : n,          (numeric) Number of required signatures\n"
             "     \"type\" : \"pubkeyhash\", (string) The type, eg pubkeyhash\n"
-            "     \"addresses\" : [          (array of string) array of wispr addresses\n"
+            "     \"addresses\" : [          (array of std::string) array of wispr addresses\n"
             "     \"wispraddress\"   	 	(string) wispr address\n"
             "        ,...\n"
             "     ]\n"
@@ -815,7 +815,7 @@ UniValue getchaintips(const UniValue& params, bool fHelp)
         const int branchLen = block->nHeight - chainActive.FindFork(block)->nHeight;
         obj.push_back(Pair("branchlen", branchLen));
 
-        string status;
+        std::string status;
         if (chainActive.Contains(block)) {
             // This block is part of the currently active chain.
             status = "active";
@@ -1135,7 +1135,7 @@ UniValue getaccumulatorwitness(const UniValue& params, bool fHelp)
     //Compute Accumulator and Witness
     libzerocoin::Accumulator accumulator(zcparams, pubCoin.getDenomination());
     libzerocoin::AccumulatorWitness witness(zcparams, accumulator, pubCoin);
-    string strFailReason = "";
+    std::string strFailReason = "";
     int nMintsAdded = 0;
     CZerocoinSpendReceipt receipt;
     if (!GenerateAccumulatorWitness(pubCoin, accumulator, witness, 100, nMintsAdded, strFailReason)) {

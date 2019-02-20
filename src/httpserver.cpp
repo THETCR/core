@@ -228,7 +228,7 @@ static bool InitHTTPAllowList()
     return true;
 }
 
-/** HTTP request method as string - use for logging only */
+/** HTTP request method as std::string - use for logging only */
 static std::string RequestMethodString(HTTPRequest::RequestMethod m)
 {
     switch (m) {
@@ -574,7 +574,7 @@ std::string HTTPRequest::ReadBody()
     /** Trivial implementation: if this is ever a performance bottleneck,
      * internal copying can be avoided in multi-segment buffers by using
      * evbuffer_peek and an awkward loop. Though in that case, it'd be even
-     * better to not copy into an intermediate string but use a stream
+     * better to not copy into an intermediate std::string but use a stream
      * abstraction to consume the evbuffer on the fly in the parsing algorithm.
      */
     const char* data = (const char*)evbuffer_pullup(buf, size);
@@ -616,7 +616,7 @@ CService HTTPRequest::GetPeer()
     evhttp_connection* con = evhttp_request_get_connection(req);
     CService peer;
     if (con) {
-        // evhttp retains ownership over returned address string
+        // evhttp retains ownership over returned address std::string
         const char* address = "";
         uint16_t port = 0;
         evhttp_connection_get_peer(con, (char**)&address, &port);

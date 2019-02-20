@@ -543,7 +543,7 @@ TableViewLastColumnResizingFixer::TableViewLastColumnResizingFixer(QTableView* t
 
 /**
  * Class constructor.
- * @param[in] seconds   Number of seconds to convert to a DHMS string
+ * @param[in] seconds   Number of seconds to convert to a DHMS std::string
  */
 DHMSTableWidgetItem::DHMSTableWidgetItem(const int64_t seconds) : QTableWidgetItem(),
                                                                   value(seconds)
@@ -554,7 +554,7 @@ DHMSTableWidgetItem::DHMSTableWidgetItem(const int64_t seconds) : QTableWidgetIt
 /**
  * Comparator overload to ensure that the "DHMS"-type durations as used in
  * the "active-since" list in the masternode tab are sorted by the elapsed
- * duration (versus the string value being sorted).
+ * duration (versus the std::string value being sorted).
  * @param[in] item      Right hand side of the less than operator
  */
 bool DHMSTableWidgetItem::operator<(QTableWidgetItem const& item) const
@@ -615,7 +615,7 @@ bool SetStartOnSystemStartup(bool fAutoStart)
                 reinterpret_cast<void**>(&ppf));
             if (SUCCEEDED(hres)) {
                 WCHAR pwsz[MAX_PATH];
-                // Ensure that the string is ANSI.
+                // Ensure that the std::string is ANSI.
                 MultiByteToWideChar(CP_ACP, 0, StartupShortcutPath().string().c_str(), -1, pwsz, MAX_PATH);
                 // Save the link by calling IPersistFile::Save.
                 hres = ppf->Save(pwsz, TRUE);

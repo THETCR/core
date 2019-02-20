@@ -346,7 +346,7 @@ public:
 
     /** Process a Obfuscation message using the Obfuscation protocol
      * \param pfrom
-     * \param strCommand lower case command string; valid values are:
+     * \param strCommand lower case command std::string; valid values are:
      *        Command  | Description
      *        -------- | -----------------
      *        dsa      | Obfuscation Acceptable

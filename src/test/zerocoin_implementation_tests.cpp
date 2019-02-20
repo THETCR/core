@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinmint_test)
 //                BOOST_CHECK(fFoundMint);
         }
 
-bool CheckZerocoinSpendNoDB(const CTransaction tx, string& strError)
+bool CheckZerocoinSpendNoDB(const CTransaction tx, std::string& strError)
 {
     //max needed non-mint outputs should be 2 - one for redemption address and a possible 2nd for change
     if (tx.vout.size() > 2){
@@ -269,9 +269,9 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, string& strError)
 //
 //                //load our serialized pubcoin
 //                CBigNum bnpubcoin;
-//                BOOST_CHECK_MESSAGE(bnpubcoin.SetHexBool(rawTxpub1), "Failed to set CBigNum from hex string");
+//                BOOST_CHECK_MESSAGE(bnpubcoin.SetHexBool(rawTxpub1), "Failed to set CBigNum from hex std::string");
 //                PublicCoin pubCoin(Params().Zerocoin_Params(true), bnpubcoin, CoinDenomination::ZQ_ONE);
-//                BOOST_CHECK_MESSAGE(pubCoin.validate(), "Failed to validate pubCoin created from hex string");
+//                BOOST_CHECK_MESSAGE(pubCoin.validate(), "Failed to validate pubCoin created from hex std::string");
 //
 //                //initialize and Accumulator and AccumulatorWitness
 //                Accumulator accumulator(Params().Zerocoin_Params(false), CoinDenomination::ZQ_ONE);
@@ -279,7 +279,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, string& strError)
 //
 //                //populate the witness and accumulators
 //                CValidationState state;
-//                for(pair<string, string> raw : vecRawMints) {
+//                for(pair<string, std::string> raw : vecRawMints) {
 //            CTransaction tx;
 //            BOOST_CHECK_MESSAGE(DecodeHexTx(tx, raw.first), "Failed to deserialize hex transaction");
 //
@@ -357,7 +357,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, string& strError)
 //                CTransaction txMintFrom;
 //                BOOST_CHECK_MESSAGE(DecodeHexTx(txMintFrom, rawTx1), "Failed to deserialize hex transaction");
 //
-//                string strError = "";
+//                std::string strError = "";
 //                if (!CheckZerocoinSpendNoDB(txNew, strError)) {
 //            cout << state.GetRejectCode() << endl;
 //            BOOST_CHECK_MESSAGE(false, strError);
@@ -370,7 +370,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, string& strError)
 //                txOverSpend.vout.push_back(txOutOverSpend);
 //                strError = "";
 //                CheckZerocoinSpendNoDB(txOverSpend, strError);
-//                string str = "Failed to detect overspend. Error Message: " + strError;
+//                std::string str = "Failed to detect overspend. Error Message: " + strError;
 //                BOOST_CHECK_MESSAGE(strError == "Transaction spend more than was redeemed in zerocoins", str);
 //
 //
@@ -518,7 +518,7 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
                 SelectParams(CBaseChainParams::UNITTEST);
                 uint256 seedMaster("3a1947364362e2e7c073b386869c89c905c0cf462448ffd6c2021bd03ce689f6");
 
-                string strWalletFile = "unittestwallet.dat";
+                std::string strWalletFile = "unittestwallet.dat";
                 CWalletDB walletdb(strWalletFile, "cr+");
 
                 CWallet wallet(strWalletFile);

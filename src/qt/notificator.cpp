@@ -162,7 +162,7 @@ void Notificator::notifyDBus(Class cls, const QString& title, const QString& tex
     // Unique ID of this notification type:
     args.append(0U);
 
-    // Application Icon, empty string
+    // Application Icon, empty std::string
     args.append(QString());
 
     // Summary

@@ -537,7 +537,7 @@ bool CalculateAccumulatorWitnessFor(
         AccumulatorWitness& witness,
         int nSecurityLevel,
         int& nMintsAdded,
-        string& strError,
+        std::string& strError,
         std::list<CBigNum>& ret,
         int &heightStop
 ){
@@ -645,7 +645,7 @@ bool GenerateAccumulatorWitness(
         AccumulatorWitness& witness,
         int nSecurityLevel,
         int& nMintsAdded,
-        string& strError,
+        std::string& strError,
         CBlockIndex* pindexCheckpoint)
 {
     try {

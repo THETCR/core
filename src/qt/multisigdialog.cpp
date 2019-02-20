@@ -212,7 +212,7 @@ void MultisigDialog::on_importAddressButton_clicked(){
     if(!model)
         return;
 
-    string sRedeem = ui->importRedeem->text().toStdString();
+    std::string sRedeem = ui->importRedeem->text().toStdString();
 
     if(sRedeem.empty()){
         ui->addMultisigStatus->setStyleSheet("QLabel { color: red; }");
@@ -240,7 +240,7 @@ void MultisigDialog::on_importAddressButton_clicked(){
 
 bool MultisigDialog::addMultisig(int m, std::vector<string> keys){
     try{
-        string error;
+        std::string error;
         CScript redeem;
 
         if(!createRedeemScript(m, keys, redeem, error)){
@@ -256,7 +256,7 @@ bool MultisigDialog::addMultisig(int m, std::vector<string> keys){
         }
 
         CScriptID innerID(redeem);
-        string label = ui->multisigAddressLabel->text().toStdString();
+        std::string label = ui->multisigAddressLabel->text().toStdString();
         pwalletMain->SetAddressBook(innerID, label, "receive");
         if (!pwalletMain->AddMultiSig(redeem)){
             throw runtime_error("Failure: unable to add address as watch only");
@@ -353,13 +353,13 @@ void MultisigDialog::on_createButton_clicked()
             //clear member variable
             multisigTx = CMutableTransaction();
 
-            string error;
-            string fee;
+            std::string error;
+            std::string fee;
             if(!createMultisigTransaction(vUserIn, vUserOut, fee, error)){
                 throw runtime_error(error);
             }
 
-            //display status string
+            //display status std::string
             ui->createButtonStatus->setStyleSheet("QTextEdit{ color: black }");
 
             QString status(strprintf("Transaction has successfully created with a fee of %s.\n"
@@ -376,7 +376,7 @@ void MultisigDialog::on_createButton_clicked()
     }
 }
 
-bool MultisigDialog::createMultisigTransaction(std::vector<CTxIn> vUserIn, std::vector<CTxOut> vUserOut, string& feeStringRet, string& errorRet)
+bool MultisigDialog::createMultisigTransaction(std::vector<CTxIn> vUserIn, std::vector<CTxOut> vUserOut, std::string& feeStringRet, std::string& errorRet)
 {
     try{
         //attempt to access the given inputs
@@ -519,7 +519,7 @@ void MultisigDialog::on_signButton_clicked()
             return;
         }
 
-        string errorOut = string();
+        std::string errorOut = std::string();
         bool fComplete = signMultisigTx(tx, errorOut, ui->keyList);
 
         if(!errorOut.empty()){
@@ -542,19 +542,19 @@ void MultisigDialog::on_signButton_clicked()
  */
 QString MultisigDialog::buildMultisigTxStatusString(bool fComplete, const CMutableTransaction& tx)
 {
-    string sTxHex = EncodeHexTx(tx);
+    std::string sTxHex = EncodeHexTx(tx);
 
     if(fComplete){
         ui->commitButton->setEnabled(true);
-        string sTxId = tx.GetHash().GetHex();
-        string sTxComplete   =  "Complete: true!\n"
+        std::string sTxId = tx.GetHash().GetHex();
+        std::string sTxComplete   =  "Complete: true!\n"
                 "The commit button has now been enabled for you to finalize the transaction.\n"
                 "Once the commit button is clicked, the transaction will be published and coins transferred "
                 "to their destinations.\nWARNING: THE ACTIONS OF THE COMMIT BUTTON ARE FINAL AND CANNOT BE REVERSED.";
 
         return QString(strprintf("%s\nTx Id:\n%s\nTx Hex:\n%s",sTxComplete, sTxId, sTxHex).c_str());
     } else {
-        string sTxIncomplete = "Complete: false.\n"
+        std::string sTxIncomplete = "Complete: false.\n"
                 "You may now send the hex below to another owner to sign.\n"
                 "Keep in mind the transaction must be passed from one owner to the next for signing.\n"
                 "Ensure all owners have imported the redeem before trying to sign. (besides creator)";
@@ -586,7 +586,7 @@ CCoinsViewCache MultisigDialog::getInputsCoinsViewCache(const std::vector<CTxIn>
 }
 
 
-bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, string& errorOut, QVBoxLayout* keyList)
+bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, std::string& errorOut, QVBoxLayout* keyList)
 {
     //will be set false if all inputs are not fully signed(valid)
     bool fComplete = true;
@@ -685,7 +685,7 @@ bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, string& errorOut, Q
         ui->signButtonStatus->setText(buildMultisigTxStatusString(fComplete, tx));
 
     }catch(const runtime_error& e){
-        errorOut = string(e.what());
+        errorOut = std::string(e.what());
         fComplete = false;
     }
     return fComplete;
@@ -761,7 +761,7 @@ void MultisigDialog::commitMultisigTx()
     }
 }
 
-bool MultisigDialog::createRedeemScript(int m, std::vector<string> vKeys, CScript& redeemRet, string& errorRet)
+bool MultisigDialog::createRedeemScript(int m, std::vector<string> vKeys, CScript& redeemRet, std::string& errorRet)
 {
     try{
         int n = vKeys.size();
@@ -781,7 +781,7 @@ bool MultisigDialog::createRedeemScript(int m, std::vector<string> vKeys, CScrip
 
         int i = 0;
         for(std::vector<string>::iterator it = vKeys.begin(); it != vKeys.end(); ++it) {
-            string keyString = *it;
+            std::string keyString = *it;
 #ifdef ENABLE_WALLET
             // Case 1: WISPR address and we have full public key:
             CBitcoinAddress address(keyString);
@@ -796,7 +796,7 @@ bool MultisigDialog::createRedeemScript(int m, std::vector<string> vKeys, CScrip
                     throw runtime_error(
                         strprintf("no full public key for address %s", keyString));
                 if (!vchPubKey.IsFullyValid()){
-                    string sKey = keyString.empty()?"(empty)":keyString;
+                    std::string sKey = keyString.empty()?"(empty)":keyString;
                     throw runtime_error(" Invalid public key: " + sKey );
                 }
                 pubkeys[i++] = vchPubKey;
@@ -828,7 +828,7 @@ bool MultisigDialog::createRedeemScript(int m, std::vector<string> vKeys, CScrip
         redeemRet << OP_CHECKMULTISIG;
         return true;
     }catch(const runtime_error& e){
-        errorRet = string(e.what());
+        errorRet = std::string(e.what());
         return false;
     }
 }

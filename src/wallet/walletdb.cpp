@@ -365,7 +365,7 @@ void CWalletDB::ListAccountCreditDebit(const std::string& strAccount, std::list<
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << std::make_pair(std::string("acentry"), std::make_pair((fAllAccounts ? string("") : strAccount), uint64_t(0)));
+            ssKey << std::make_pair(std::string("acentry"), std::make_pair((fAllAccounts ? std::string("") : strAccount), uint64_t(0)));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
         fFlags = DB_NEXT;
@@ -377,7 +377,7 @@ void CWalletDB::ListAccountCreditDebit(const std::string& strAccount, std::list<
         }
 
         // Unserialize
-        string strType;
+        std::string strType;
         ssKey >> strType;
         if (strType != "acentry")
             break;
@@ -477,7 +477,7 @@ public:
     }
 };
 
-bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CWalletScanState& wss, string& strType, string& strErr)
+bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CWalletScanState& wss, std::string& strType, std::string& strErr)
 {
     try {
         // Unserialize
@@ -485,11 +485,11 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
         // is just the two items serialized one after the other
         ssKey >> strType;
         if (strType == "name") {
-            string strAddress;
+            std::string strAddress;
             ssKey >> strAddress;
             ssValue >> pwallet->mapAddressBook[CBitcoinAddress(strAddress).Get()].name;
         } else if (strType == "purpose") {
-            string strAddress;
+            std::string strAddress;
             ssKey >> strAddress;
             ssValue >> pwallet->mapAddressBook[CBitcoinAddress(strAddress).Get()].purpose;
         } else if (strType == "tx") {
@@ -523,7 +523,7 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
 
             pwallet->AddToWallet(wtx, true);
         } else if (strType == "acentry") {
-            string strAccount;
+            std::string strAccount;
             ssKey >> strAccount;
             uint64_t nNumber;
             ssKey >> nNumber;
@@ -768,7 +768,7 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
             }
 
             // Try to be tolerant of single corrupt records:
-            string strType, strErr;
+            std::string strType, strErr;
             if (!ReadKeyValue(pwallet, ssKey, ssValue, wss, strType, strErr)) {
                 // losing keys is considered a catastrophic error, anything else
                 // we assume the user can live with:
@@ -866,7 +866,7 @@ DBErrors CWalletDB::FindWalletTx(CWallet* pwallet, std::vector<uint256>& vTxHash
                 return DB_CORRUPT;
             }
 
-            string strType;
+            std::string strType;
             ssKey >> strType;
             if (strType == "tx") {
                 uint256 hash;
@@ -964,7 +964,7 @@ void ThreadFlushWalletDB(const std::string& strFile)
     }
 }
 
-void NotifyBacked(const CWallet& wallet, bool fSuccess, string strMessage)
+void NotifyBacked(const CWallet& wallet, bool fSuccess, std::string strMessage)
 {
     LogPrint(BCLog::NONE, strMessage.data());
     wallet.NotifyWalletBacked(fSuccess, strMessage);
@@ -1058,7 +1058,7 @@ bool BackupWallet(const CWallet& wallet, const fs::path& strDest, bool fEnableCu
                                     LogPrintf("Old backup deleted: %s\n", (*entry).second);
                                 }
                             } catch (fs::filesystem_error& error) {
-                                string strMessage = strprintf("Failed to delete backup %s\n", error.what());
+                                std::string strMessage = strprintf("Failed to delete backup %s\n", error.what());
                                 LogPrint(BCLog::NONE, strMessage.data());
                                 NotifyBacked(wallet, false, strMessage);
                             }
@@ -1078,7 +1078,7 @@ bool BackupWallet(const CWallet& wallet, const fs::path& strDest, bool fEnableCu
 bool AttemptBackupWallet(const CWallet& wallet, const fs::path& pathSrc, const fs::path& pathDest)
 {
     bool retStatus;
-    string strMessage;
+    std::string strMessage;
     try {
         if (fs::equivalent(pathSrc, pathDest)) {
             LogPrintf("cannot backup to wallet source file %s\n", pathDest.string());
@@ -1158,7 +1158,7 @@ bool CWalletDB::Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys)
         if (fOnlyKeys) {
             CDataStream ssKey(row.first, SER_DISK, CLIENT_VERSION);
             CDataStream ssValue(row.second, SER_DISK, CLIENT_VERSION);
-            string strType, strErr;
+            std::string strType, strErr;
             bool fReadOK = ReadKeyValue(&dummyWallet, ssKey, ssValue,
                 wss, strType, strErr);
             if (!IsKeyType(strType))
@@ -1410,7 +1410,7 @@ std::map<uint256, std::vector<pair<uint256, uint32_t> > > CWalletDB::MapMintPool
         }
 
         // Unserialize
-        string strType;
+        std::string strType;
         ssKey >> strType;
         if (strType != "mintpool")
             break;
@@ -1466,7 +1466,7 @@ std::list<CDeterministicMint> CWalletDB::ListDeterministicMints()
         }
 
         // Unserialize
-        string strType;
+        std::string strType;
         ssKey >> strType;
         if (strType != "dzwsp")
             break;
@@ -1511,7 +1511,7 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins()
         }
 
         // Unserialize
-        string strType;
+        std::string strType;
         ssKey >> strType;
         if (strType != "zerocoin")
             break;
@@ -1554,7 +1554,7 @@ std::list<CZerocoinSpend> CWalletDB::ListSpentCoins()
         }
 
         // Unserialize
-        string strType;
+        std::string strType;
         ssKey >> strType;
         if (strType != "zcserial")
             break;
@@ -1609,7 +1609,7 @@ std::list<CZerocoinMint> CWalletDB::ListArchivedZerocoins()
         }
 
         // Unserialize
-        string strType;
+        std::string strType;
         ssKey >> strType;
         if (strType != "zco")
             break;
@@ -1652,7 +1652,7 @@ std::list<CDeterministicMint> CWalletDB::ListArchivedDeterministicMints()
         }
 
         // Unserialize
-        string strType;
+        std::string strType;
         ssKey >> strType;
         if (strType != "dzco")
             break;

@@ -22,7 +22,7 @@ namespace libzerocoin {
 
 /// \brief Fill in a set of Zerocoin parameters from a modulus "N".
 /// \param N                A trusted RSA modulus
-/// \param aux              An optional auxiliary string used in derivation
+/// \param aux              An optional auxiliary std::string used in derivation
 /// \param securityLevel    A security level
 ///
 /// \throws         std::runtime_error if the process fails
@@ -39,7 +39,7 @@ namespace libzerocoin {
 ///
 
 void
-CalculateParams(ZerocoinParams &params, CBigNum N, string aux, uint32_t securityLevel)
+CalculateParams(ZerocoinParams &params, CBigNum N, std::string aux, uint32_t securityLevel)
 {
 	params.initialized = false;
 	params.accumulatorParams.initialized = false;
@@ -67,8 +67,8 @@ CalculateParams(ZerocoinParams &params, CBigNum N, string aux, uint32_t security
 	calculateGroupParamLengths(NLen - 2, securityLevel, &pLen, &qLen);
 
 	// Calculate candidate parameters ("p", "q") for the coin commitment group
-	// using a deterministic process based on "N", the "aux" string, and
-	// the dedicated string "COMMITMENTGROUP".
+	// using a deterministic process based on "N", the "aux" std::string, and
+	// the dedicated std::string "COMMITMENTGROUP".
 	params.coinCommitmentGroup = deriveIntegerGroupParams(calculateSeed(N, aux, securityLevel, STRING_COMMIT_GROUP),
 	                             pLen, qLen);
 
@@ -115,17 +115,17 @@ CalculateParams(ZerocoinParams &params, CBigNum N, string aux, uint32_t security
 	params.initialized = true;
 }
 
-/// \brief Format a seed string by hashing several values.
+/// \brief Format a seed std::string by hashing several values.
 /// \param N                A CBigNum
-/// \param aux              An auxiliary string
+/// \param aux              An auxiliary std::string
 /// \param securityLevel    The security level in bits
-/// \param groupName        A group description string
+/// \param groupName        A group description std::string
 /// \throws         std::runtime_error if the process fails
 ///
 /// Returns the hash of the value.
 
 uint256
-calculateGeneratorSeed(uint256 seed, uint256 pSeed, uint256 qSeed, string label, uint32_t index, uint32_t count)
+calculateGeneratorSeed(uint256 seed, uint256 pSeed, uint256 qSeed, std::string label, uint32_t index, uint32_t count)
 {
 	CHashWriter hasher(0,0);
 	uint256     hash;
@@ -133,31 +133,31 @@ calculateGeneratorSeed(uint256 seed, uint256 pSeed, uint256 qSeed, string label,
 	// Compute the hash of:
 	// <modulus>||<securitylevel>||<auxString>||groupName
 	hasher << seed;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << pSeed;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << qSeed;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << label;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << index;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << count;
 
 	return hasher.GetHash();
 }
 
-/// \brief Format a seed string by hashing several values.
+/// \brief Format a seed std::string by hashing several values.
 /// \param N                A CBigNum
-/// \param aux              An auxiliary string
+/// \param aux              An auxiliary std::string
 /// \param securityLevel    The security level in bits
-/// \param groupName        A group description string
+/// \param groupName        A group description std::string
 /// \throws         std::runtime_error if the process fails
 ///
 /// Returns the hash of the value.
 
 uint256
-calculateSeed(CBigNum modulus, string auxString, uint32_t securityLevel, string groupName)
+calculateSeed(CBigNum modulus, std::string auxString, uint32_t securityLevel, std::string groupName)
 {
 	CHashWriter hasher(0,0);
 	uint256     hash;
@@ -165,11 +165,11 @@ calculateSeed(CBigNum modulus, string auxString, uint32_t securityLevel, string 
 	// Compute the hash of:
 	// <modulus>||<securitylevel>||<auxString>||groupName
 	hasher << modulus;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << securityLevel;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << auxString;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << groupName;
 
 	return hasher.GetHash();
@@ -232,7 +232,7 @@ calculateGroupParamLengths(uint32_t maxPLen, uint32_t securityLevel,
 }
 
 /// \brief Deterministically compute a set of group parameters using NIST procedures.
-/// \param seedStr  A byte string seeding the process.
+/// \param seedStr  A byte std::string seeding the process.
 /// \param pLen     The desired length of the modulus "p" in bits
 /// \param qLen     The desired length of the order "q" in bits
 /// \return         An IntegerGroupParams object
@@ -341,7 +341,7 @@ deriveIntegerGroupFromOrder(CBigNum &groupOrder)
 }
 
 /// \brief Deterministically compute a group description using NIST procedures.
-/// \param seed                         A byte string seeding the process.
+/// \param seed                         A byte std::string seeding the process.
 /// \param pLen                         The desired length of the modulus "p" in bits
 /// \param qLen                         The desired length of the order "q" in bits
 /// \param resultModulus                A value "p" describing a finite field "F_p"

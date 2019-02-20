@@ -107,7 +107,7 @@ std::string EncodeBase58(const unsigned char* pbegin, const unsigned char* pend)
     std::vector<unsigned char>::iterator it = b58.begin();
     while (it != b58.end() && *it == 0)
         it++;
-    // Translate the result into a string.
+    // Translate the result into a std::string.
     std::string str;
     str.reserve(zeroes + (b58.end() - it));
     str.assign(zeroes, '1');

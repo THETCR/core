@@ -169,7 +169,7 @@ bool parseCommandLine(std::vector<std::string>& args, const std::string& strComm
                 state = STATE_ARGUMENT;
             }
             break;
-        case STATE_SINGLEQUOTED: // Single-quoted string
+        case STATE_SINGLEQUOTED: // Single-quoted std::string
             switch (ch) {
             case '\'':
                 state = STATE_ARGUMENT;
@@ -178,7 +178,7 @@ bool parseCommandLine(std::vector<std::string>& args, const std::string& strComm
                 curarg += ch;
             }
             break;
-        case STATE_DOUBLEQUOTED: // Double-quoted string
+        case STATE_DOUBLEQUOTED: // Double-quoted std::string
             switch (ch) {
             case '"':
                 state = STATE_ARGUMENT;

@@ -49,7 +49,7 @@ UniValue getpoolinfo(const UniValue& params, bool fHelp)
 // Future removal of this command is planned to keep things clean.
 UniValue masternode(const UniValue& params, bool fHelp)
 {
-    string strCommand;
+    std::string strCommand;
     if (params.size() >= 1)
         strCommand = params[0].get_str();
 
@@ -64,7 +64,7 @@ UniValue masternode(const UniValue& params, bool fHelp)
             "This command is depreciated, please see individual command documentation for future reference\n\n"
 
             "\nArguments:\n"
-            "1. \"command\"        (string or set of strings, required) The command to execute\n"
+            "1. \"command\"        (string or set of std::strings, required) The command to execute\n"
 
             "\nAvailable commands:\n"
             "  count        - Print count information of all known masternodes\n"
@@ -238,9 +238,9 @@ UniValue listmasternodes(const UniValue& params, bool fHelp)
         CMasternode* mn = mnodeman.Find(s.second.vin);
 
         if (mn != nullptr) {
-            if (strFilter != "" && strTxHash.find(strFilter) == string::npos &&
-                mn->Status().find(strFilter) == string::npos &&
-                CBitcoinAddress(mn->pubKeyCollateralAddress.GetID()).ToString().find(strFilter) == string::npos) continue;
+            if (strFilter != "" && strTxHash.find(strFilter) == std::string::npos &&
+                mn->Status().find(strFilter) == std::string::npos &&
+                CBitcoinAddress(mn->pubKeyCollateralAddress.GetID()).ToString().find(strFilter) == std::string::npos) continue;
 
             std::string strStatus = mn->Status();
             std::string strHost;
@@ -660,10 +660,10 @@ UniValue listmasternodeconf (const UniValue& params, bool fHelp)
 
         std::string strStatus = pmn ? pmn->Status() : "MISSING";
 
-        if (strFilter != "" && mne.getAlias().find(strFilter) == string::npos &&
-            mne.getIp().find(strFilter) == string::npos &&
-            mne.getTxHash().find(strFilter) == string::npos &&
-            strStatus.find(strFilter) == string::npos) continue;
+        if (strFilter != "" && mne.getAlias().find(strFilter) == std::string::npos &&
+            mne.getIp().find(strFilter) == std::string::npos &&
+            mne.getTxHash().find(strFilter) == std::string::npos &&
+            strStatus.find(strFilter) == std::string::npos) continue;
 
         UniValue mnObj(UniValue::VOBJ);
         mnObj.push_back(Pair("alias", mne.getAlias()));
@@ -830,7 +830,7 @@ UniValue getmasternodescores (const UniValue& params, bool fHelp)
 
             "\nResult:\n"
             "{\n"
-            "  xxxx: \"xxxx\"   (numeric : string) Block height : Masternode hash\n"
+            "  xxxx: \"xxxx\"   (numeric : std::string) Block height : Masternode hash\n"
             "  ,...\n"
             "}\n"
 
@@ -884,7 +884,7 @@ bool DecodeHexMnb(CMasternodeBroadcast& mnb, std::string strHexMnb) {
 }
 UniValue createmasternodebroadcast(const UniValue& params, bool fHelp)
 {
-    string strCommand;
+    std::string strCommand;
     if (params.size() >= 1)
         strCommand = params[0].get_str();
     if (fHelp || (strCommand != "alias" && strCommand != "all") || (strCommand == "alias" && params.size() < 2))

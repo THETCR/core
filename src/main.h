@@ -273,7 +273,7 @@ void ThreadScriptCheck();
 
 /** Check whether we are doing an initial block download (synchronizing from disk or network) */
 bool IsInitialBlockDownload();
-/** Format a string that describes several potential problems detected by the core */
+/** Format a std::string that describes several potential problems detected by the core */
 std::string GetWarnings(std::string strFor);
 /** Retrieve a transaction (from memory pool, or from disk, if possible) */
 bool GetTransaction(const uint256& hash, CTransaction& tx, uint256& hashBlock, bool fAllowSlow = false);
@@ -341,7 +341,7 @@ bool ValidOutPoint(const COutPoint out, int nHeight);
 void RecalculateZWSPSpent();
 void RecalculateZWSPMinted();
 bool RecalculateWSPSupply(int nHeightStart);
-bool ReindexAccumulators(list<uint256>& listMissingCheckpoints, string& strError);
+bool ReindexAccumulators(list<uint256>& listMissingCheckpoints, std::string& strError);
 
 
 /**

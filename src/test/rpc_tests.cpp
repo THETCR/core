@@ -33,7 +33,7 @@ UniValue CallRPC(string args)
 {
     std::vector<string> vArgs;
     boost::split(vArgs, args, boost::is_any_of(" \t"));
-    string strMethod = vArgs[0];
+    std::string strMethod = vArgs[0];
     vArgs.erase(vArgs.begin());
     UniValue params = RPCConvertValues(strMethod, vArgs);
 
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(rpc_rawparams)
     BOOST_CHECK_THROW(CallRPC("decoderawtransaction"), runtime_error);
     BOOST_CHECK_THROW(CallRPC("decoderawtransaction null"), runtime_error);
     BOOST_CHECK_THROW(CallRPC("decoderawtransaction DEADBEEF"), runtime_error);
-    string rawtx = "0100000020fa905b01c300debee79c8061f8fa5e6b252435a26e3fe006dd13e19cf0a00757136c5c01010000004847304402200da2e47992271f1256d68f10df7113f3179b3eab11e8e38fa2d2b8bfb1a10bc0022052bce179d580f0150d67b686c891b2e6d863f1314404f27caba599dc14a92d0c01ffffffff020000000000000000000011c9d20c0000004341044815561eba60fd39e32b76f349ff8fcd9119f71d07e567eace3b125b0e6dd1e0e6508d29917b3329ae4aee4e0484984979a76692a33faa5644c1e4331e838115ac00000000";
+    std::string rawtx = "0100000020fa905b01c300debee79c8061f8fa5e6b252435a26e3fe006dd13e19cf0a00757136c5c01010000004847304402200da2e47992271f1256d68f10df7113f3179b3eab11e8e38fa2d2b8bfb1a10bc0022052bce179d580f0150d67b686c891b2e6d863f1314404f27caba599dc14a92d0c01ffffffff020000000000000000000011c9d20c0000004341044815561eba60fd39e32b76f349ff8fcd9119f71d07e567eace3b125b0e6dd1e0e6508d29917b3329ae4aee4e0484984979a76692a33faa5644c1e4331e838115ac00000000";
     BOOST_CHECK_NO_THROW(r = CallRPC(string("decoderawtransaction ")+rawtx));
     BOOST_CHECK_EQUAL(find_value(r.get_obj(), "version").get_int(), 1);
     BOOST_CHECK_EQUAL(find_value(r.get_obj(), "locktime").get_int(), 0);
@@ -95,15 +95,15 @@ BOOST_AUTO_TEST_CASE(rpc_rawsign)
 {
     UniValue r;
     // input is a 1-of-2 multisig (so is output):
-    string prevout =
+    std::string prevout =
       "[{\"txid\":\"204542c7d2f37b6dab7c71eead3ba017afd21fd2dc6ee57b5a32db1e672474ec\","
       "\"vout\":1,\"scriptPubKey\":\"a914f5404a39a4799d8710e15db4c4512c5e06f97fed87\","
       "\"redeemScript\":\"5121021431a18c7039660cd9e3612a2a47dc53b69cb38ea4ad743b7df8245fd0438f8e21029bbeff390ce736bd396af43b52a1c14ed52c086b1e5585c15931f68725772bac52ae\"}]";
     r = CallRPC(string("createrawtransaction ")+prevout+" "+
       "{\"Wa4qRD6Eg9zZAUGA9NYgRDVeW3VEXC1x3N\":1}");
-    string notsigned = r.get_str();
-    string privkey1 = "\"5t9pdUbF2atWYjj5DgFyzbiJyghzkFfFcjj9NqLkGGc3vDbngLf\"";
-    string privkey2 = "\"NYmwDzn8uzaMR5ahcxH8ZEDLMCFwsuhqWjb1yNN9xPshsWru8NBX\"";
+    std::string notsigned = r.get_str();
+    std::string privkey1 = "\"5t9pdUbF2atWYjj5DgFyzbiJyghzkFfFcjj9NqLkGGc3vDbngLf\"";
+    std::string privkey2 = "\"NYmwDzn8uzaMR5ahcxH8ZEDLMCFwsuhqWjb1yNN9xPshsWru8NBX\"";
     r = CallRPC(string("signrawtransaction ")+notsigned+" "+prevout+" "+"[]");
     BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == false);
     r = CallRPC(string("signrawtransaction ")+notsigned+" "+prevout+" "+"["+privkey1+","+privkey2+"]");

@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(util_ParseTorReplyMapping)
         });
 
     // Special handling for null case
-    // (needed because string comparison reads the null as end-of-string)
+    // (needed because std::string comparison reads the null as end-of-string)
     BOOST_TEST_MESSAGE(std::string("CheckParseTorReplyMapping(Null=\"\\0\")"));
     auto ret = ParseTorReplyMapping("Null=\"\\0\"");
     BOOST_CHECK_EQUAL(ret.size(), 1);
