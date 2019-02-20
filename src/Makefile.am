@@ -330,6 +330,8 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/sha512.h \
   crypto/rfc6979_hmac_sha256.cpp \
   crypto/rfc6979_hmac_sha256.h \
+  crypto/siphash.cpp \
+  crypto/siphash.h \
   crypto/scrypt.cpp \
   crypto/scrypt.h
 
