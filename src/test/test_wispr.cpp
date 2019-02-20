@@ -38,6 +38,7 @@ extern bool fPrintToConsole;
 BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
 {
     ECC_Start();
+    RandomInit();
     SetupEnvironment();
     SetupNetworking();
     fPrintToDebugLog = false; // don't want to write to debug.log file
