@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(DoS_mapOrphans)
     CKey key;
     key.MakeNewKey(true);
     CBasicKeyStore keystore;
-    keystore.AddKey(key);
+    BOOST_CHECK(keystore.AddKey(key));
 
     // 50 orphan transactions:
     for (int i = 0; i < 50; i++)
