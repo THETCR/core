@@ -247,7 +247,7 @@ public:
     explicit CTransaction(const CMutableTransaction &tx);
     CTransaction(CMutableTransaction &tx);
 
-    CTransaction& operator=(const CTransaction& tx);
+//    CTransaction& operator=(const CTransaction& tx);
 
     ADD_SERIALIZE_METHODS;
 
