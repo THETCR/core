@@ -766,3 +766,11 @@ void seed_insecure_rand(bool fDeterministic)
 //    RAND_add(&nCounter, sizeof(nCounter), 1.5);
 //    memory_cleanse((void*)&nCounter, sizeof(nCounter));
 //}
+
+void GetRandBytesOld(unsigned char* buf, int num)
+{
+    if (RAND_bytes(buf, num) != 1) {
+        LogPrintf("%s: OpenSSL RAND_bytes() failed with error: %s\n", __func__, ERR_error_string(ERR_get_error(), NULL));
+        assert(false);
+    }
+}

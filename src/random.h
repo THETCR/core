@@ -254,5 +254,6 @@ static inline uint32_t insecure_rand(void)
     insecure_rand_Rw = 18000 * (insecure_rand_Rw & 65535) + (insecure_rand_Rw >> 16);
     return (insecure_rand_Rw << 16) + insecure_rand_Rz;
 }
+void GetRandBytesOld(unsigned char* buf, int num);
 
 #endif // BITCOIN_RANDOM_H
