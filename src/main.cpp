@@ -2436,9 +2436,12 @@ static int64_t nTimePostConnect = 0;
 bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CBlock* pblock, bool fAlreadyChecked)
 {
     const CChainParams& chainparams = Params();
+    cout << "ConnectTip...\n";
     assert(pindexNew->pprev == chainActive.Tip());
     mempool.check(pcoinsTip);
+    cout << "mempool check...\n";
     CCoinsViewCache view(pcoinsTip);
+    cout << "CCoinsViewCache...\n";
 
     if (pblock == nullptr)
         fAlreadyChecked = false;
@@ -2447,6 +2450,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     int64_t nTime1 = GetTimeMicros();
     CBlock block;
     if (!pblock) {
+        cout << "ReadBlockFromDisk...\n";
         if (!ReadBlockFromDisk(block, pindexNew))
             return AbortNode(state, "Failed to read block");
         pblock = &block;
@@ -2477,9 +2481,10 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     // Write the chain state to disk, if necessary. Always write to disk if this is the first of a new file.
     FlushStateMode flushMode = FlushStateMode::IF_NEEDED;
     if (pindexNew->pprev && (pindexNew->GetBlockPos().nFile != pindexNew->pprev->GetBlockPos().nFile))
-        flushMode = FlushStateMode::ALWAYS
-;
+        flushMode = FlushStateMode::ALWAYS;
+
     // Write the chain state to disk, if necessary.
+    cout << "FlushStateToDisk...\n";
     if (!FlushStateToDisk(chainparams, state, FlushStateMode::IF_NEEDED))
         return false;
     int64_t nTime5 = GetTimeMicros();
@@ -2492,13 +2497,16 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     mempool.check(pcoinsTip);
     // Update chainActive & related variables.
     UpdateTip(pindexNew);
+    cout << "UpdateTip...\n";
     // Tell wallet about transactions that went from mempool
     // to conflicted:
     for (const CTransaction& tx: txConflicted) {
+        cout << "SyncWithWallets...\n";
         SyncWithWallets(tx, NULL);
     }
     // ... and about transactions that got confirmed:
     for (const CTransaction& tx: pblock->vtx) {
+        cout << "SyncWithWallets 2...\n";
         SyncWithWallets(tx, pblock);
     }
 
