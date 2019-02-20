@@ -2320,7 +2320,7 @@ bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& 
             // Update best block in wallet (so we can detect restored wallets).
             if (mode != FlushStateMode::IF_NEEDED) {
                 cout << "FlushStateToDisk Set best chain\n";
-                GetMainSignals().SetBestChain(chainActive.GetLocator());
+//                GetMainSignals().SetBestChain(chainActive.GetLocator());
             }
             nLastWrite = GetTimeMicros();
             full_flush_completed = true;
