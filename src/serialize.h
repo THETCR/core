@@ -508,9 +508,9 @@ public:
   template<typename Stream>
   void Serialize(Stream& s) const
   {
-      WriteCompactSize(s, std::string.size());
+      WriteCompactSize(s, string.size());
       if (!string.empty())
-          s.write((char*)string.data(), std::string.size());
+          s.write((char*)string.data(), string.size());
   }
 };
 
