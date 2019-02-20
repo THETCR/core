@@ -16,6 +16,7 @@
 #include "clientversion.h"
 #include "consensus/consensus.h"
 #include "consensus/validation.h"
+#include "crypto/siphash.h"
 #include "miner.h"
 #include "obfuscation.h"
 #include "primitives/transaction.h"
