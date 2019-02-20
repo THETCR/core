@@ -124,7 +124,7 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
     bool fIncludeHex)
 {
     txnouttype type;
-    vector<CTxDestination> addresses;
+    std::vector<CTxDestination> addresses;
     int nRequired;
 
     out.pushKV("asm", scriptPubKey.ToString());

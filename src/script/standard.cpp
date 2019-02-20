@@ -122,7 +122,7 @@ txnouttype Solver(const CScript& scriptPubKey, std::vector<std::vector<unsigned 
     // Zerocoin
     if (scriptPubKey.IsZerocoinMint()){
         if(scriptPubKey.size() > 150) return TX_NONSTANDARD;
-        vector<unsigned char> hashBytes(scriptPubKey.begin()+2, scriptPubKey.end());
+        std::vector<unsigned char> hashBytes(scriptPubKey.begin()+2, scriptPubKey.end());
         vSolutionsRet.push_back(hashBytes);
         return TX_ZEROCOINMINT;
     }

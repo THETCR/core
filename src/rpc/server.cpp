@@ -156,7 +156,7 @@ uint256 ParseHashO(const UniValue& o, string strKey)
 {
     return ParseHashV(find_value(o, strKey), strKey);
 }
-vector<unsigned char> ParseHexV(const UniValue& v, string strName)
+std::vector<unsigned char> ParseHexV(const UniValue& v, string strName)
 {
     string strHex;
     if (v.isStr())
@@ -165,7 +165,7 @@ vector<unsigned char> ParseHexV(const UniValue& v, string strName)
         throw JSONRPCError(RPC_INVALID_PARAMETER, strName + " must be hexadecimal string (not '" + strHex + "')");
     return ParseHex(strHex);
 }
-vector<unsigned char> ParseHexO(const UniValue& o, string strKey)
+std::vector<unsigned char> ParseHexO(const UniValue& o, string strKey)
 {
     return ParseHexV(find_value(o, strKey), strKey);
 }
@@ -198,7 +198,7 @@ string CRPCTable::help(string strCommand) const
     string strRet;
     string category;
     set<rpcfn_type> setDone;
-    vector<pair<string, const CRPCCommand*> > vCommands;
+    std::vector<pair<string, const CRPCCommand*> > vCommands;
 
     for (map<string, const CRPCCommand*>::const_iterator mi = mapCommands.begin(); mi != mapCommands.end(); ++mi)
         vCommands.push_back(make_pair(mi->second->category + mi->first, mi->second));

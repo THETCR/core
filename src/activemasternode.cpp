@@ -352,7 +352,7 @@ bool CActiveMasternode::GetMasterNodeVin(CTxIn& vin, CPubKey& pubkey, CKey& secr
     TRY_LOCK(pwalletMain->cs_wallet, fWallet);
     if (!fWallet) return false;
 
-    vector<COutput> possibleCoins = SelectCoinsMasternode();
+    std::vector<COutput> possibleCoins = SelectCoinsMasternode();
     COutput* selectedOutput;
 
     // Find the vin
@@ -425,11 +425,11 @@ bool CActiveMasternode::GetVinFromOutput(COutput out, CTxIn& vin, CPubKey& pubke
 }
 
 // get all possible outputs for running Masternode
-vector<COutput> CActiveMasternode::SelectCoinsMasternode()
+std::vector<COutput> CActiveMasternode::SelectCoinsMasternode()
 {
-    vector<COutput> vCoins;
-    vector<COutput> filteredCoins;
-    vector<COutPoint> confLockedCoins;
+    std::vector<COutput> vCoins;
+    std::vector<COutput> filteredCoins;
+    std::vector<COutPoint> confLockedCoins;
 
     // Temporary unlock MN coins from masternode.conf
     if (gArgs.GetBoolArg("-mnconflock", true)) {

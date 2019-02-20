@@ -204,7 +204,7 @@ void PrivacyDialog::on_pushButtonMintzWSP_clicked()
     int64_t nTime = GetTimeMillis();
 
     CWalletTx wtx;
-    vector<CDeterministicMint> vMints;
+    std::vector<CDeterministicMint> vMints;
     string strError = pwalletMain->MintZerocoin(nAmount, wtx, vMints, CoinControlDialog::coinControl);
 
     // Return if something went wrong during minting
@@ -421,8 +421,8 @@ void PrivacyDialog::sendzWSP()
     ui->TEMintStatus->repaint();
 
     // use mints from zWSP selector if applicable
-    vector<CMintMeta> vMintsToFetch;
-    vector<CZerocoinMint> vMintsSelected;
+    std::vector<CMintMeta> vMintsToFetch;
+    std::vector<CZerocoinMint> vMintsSelected;
     if (!ZWspControlDialog::setSelectedMints.empty()) {
         vMintsToFetch = ZWspControlDialog::GetSelectedMints();
 

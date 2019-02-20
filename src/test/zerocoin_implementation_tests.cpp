@@ -491,7 +491,7 @@ BOOST_AUTO_TEST_CASE(checksum_tests)
                 uint32_t c6 = 0xbbbbbbbb;
                 uint32_t c7 = 0x11111111;
                 uint32_t c8 = 0xeeeeeeee;
-                vector<uint32_t> vChecksums {c1,c2,c3,c4,c5,c6,c7,c8};
+                std::vector<uint32_t> vChecksums {c1,c2,c3,c4,c5,c6,c7,c8};
                 for(uint32_t c : vChecksums)
                 checksum = checksum << 32 | c;
 

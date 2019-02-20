@@ -311,7 +311,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
             return;
         }
 
-        vector<CTxIn> sigs;
+        std::vector<CTxIn> sigs;
         vRecv >> sigs;
 
         bool success = false;
@@ -824,7 +824,7 @@ void CObfuscationPool::CheckTimeout()
 
     // check Obfuscation queue objects for timeouts
     int c = 0;
-    vector<CObfuscationQueue>::iterator it = vecObfuscationQueue.begin();
+    std::vector<CObfuscationQueue>::iterator it = vecObfuscationQueue.begin();
     while (it != vecObfuscationQueue.end()) {
         if ((*it).IsExpired()) {
             LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() : Removing expired queue entry - %d\n", c);
@@ -841,7 +841,7 @@ void CObfuscationPool::CheckTimeout()
         c = 0;
 
         // check for a timeout and reset if needed
-        vector<CObfuScationEntry>::iterator it2 = entries.begin();
+        std::vector<CObfuScationEntry>::iterator it2 = entries.begin();
         while (it2 != entries.end()) {
             if ((*it2).IsExpired()) {
                 LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() : Removing expired entry - %d\n", c);
@@ -1263,7 +1263,7 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
     finalTransaction = finalTransactionNew;
     LogPrintf("CObfuscationPool::SignFinalTransaction %s", finalTransaction.ToString());
 
-    vector<CTxIn> sigs;
+    std::vector<CTxIn> sigs;
 
     //make sure my inputs/outputs are present, otherwise refuse to sign
     for (const CObfuScationEntry e: entries) {
@@ -1686,7 +1686,7 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
     CWalletTx wtx;
     CAmount nFeeRet = 0;
     std::string strFail = "";
-    vector<pair<CScript, CAmount> > vecSend;
+    std::vector<pair<CScript, CAmount> > vecSend;
 
     // ****** Add fees ************ /
     vecSend.push_back(make_pair(scriptChange, nPayment));
@@ -1711,7 +1711,7 @@ bool CObfuscationPool::MakeCollateralAmounts()
     CWalletTx wtx;
     CAmount nFeeRet = 0;
     std::string strFail = "";
-    vector<pair<CScript, CAmount> > vecSend;
+    std::vector<pair<CScript, CAmount> > vecSend;
     CCoinControl coinControl;
     coinControl.fAllowOtherInputs = false;
     coinControl.fAllowWatchOnly = false;
@@ -1765,7 +1765,7 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
     CWalletTx wtx;
     CAmount nFeeRet = 0;
     std::string strFail = "";
-    vector<pair<CScript, CAmount> > vecSend;
+    std::vector<pair<CScript, CAmount> > vecSend;
     CAmount nValueLeft = nTotalValue;
 
     // make our collateral address
@@ -2149,7 +2149,7 @@ bool CObfuScationSigner::GetKeysFromSecret(std::string strSecret, CKey& keyRet, 
     return true;
 }
 
-bool CObfuScationSigner::SignMessage(std::string strMessage, std::string& errorMessage, vector<unsigned char>& vchSig, CKey key)
+bool CObfuScationSigner::SignMessage(std::string strMessage, std::string& errorMessage, std::vector<unsigned char>& vchSig, CKey key)
 {
     CHashWriter ss(SER_GETHASH, 0);
     ss << strMessageMagic;
@@ -2163,7 +2163,7 @@ bool CObfuScationSigner::SignMessage(std::string strMessage, std::string& errorM
     return true;
 }
 
-bool CObfuScationSigner::VerifyMessage(CPubKey pubkey, vector<unsigned char>& vchSig, std::string strMessage, std::string& errorMessage)
+bool CObfuScationSigner::VerifyMessage(CPubKey pubkey, std::vector<unsigned char>& vchSig, std::string strMessage, std::string& errorMessage)
 {
     CHashWriter ss(SER_GETHASH, 0);
     ss << strMessageMagic;

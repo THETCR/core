@@ -65,8 +65,8 @@ private:
 	// this is s_notprime instead of s
 	// because the serialization macros
 	// define something named s and it conflicts
-	vector<CBigNum> s_notprime;
-	vector<CBigNum> sprime;
+	std::vector<CBigNum> s_notprime;
+	std::vector<CBigNum> sprime;
 	inline CBigNum challengeCalculation(const CBigNum& a_exp, const CBigNum& b_exp,
 	                                   const CBigNum& h_exp) const;
 };

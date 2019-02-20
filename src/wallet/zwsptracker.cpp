@@ -113,7 +113,7 @@ bool CzWSPTracker::GetMetaFromStakeHash(const uint256& hashStake, CMintMeta& met
 
 std::vector<uint256> CzWSPTracker::GetSerialHashes()
 {
-    vector<uint256> vHashes;
+    std::vector<uint256> vHashes;
     for (auto it : mapSerialHashes) {
         if (it.second.isArchived)
             continue;
@@ -164,7 +164,7 @@ CAmount CzWSPTracker::GetUnconfirmedBalance() const
 
 std::vector<CMintMeta> CzWSPTracker::GetMints(bool fConfirmedOnly) const
 {
-    vector<CMintMeta> vMints;
+    std::vector<CMintMeta> vMints;
     for (auto& it : mapSerialHashes) {
         CMintMeta mint = it.second;
         if (mint.isArchived || mint.isUsed)

@@ -475,7 +475,7 @@ QString CoinControlDialog::getPriorityLabel(double dPriority, double mempoolEsti
 // shows count of locked unspent outputs
 void CoinControlDialog::updateLabelLocked()
 {
-    vector<COutPoint> vOutpts;
+    std::vector<COutPoint> vOutpts;
     model->listLockedCoins(vOutpts);
     if (vOutpts.size() > 0) {
         ui->labelLocked->setText(tr("(%1 locked)").arg(vOutpts.size()));
@@ -492,8 +492,8 @@ void CoinControlDialog::updateDialogLabels()
         return;
     }
 
-    vector<COutPoint> vCoinControl;
-    vector<COutput> vOutputs;
+    std::vector<COutPoint> vCoinControl;
+    std::vector<COutput> vOutputs;
     coinControl->ListSelected(vCoinControl);
     model->getOutputs(vCoinControl, vOutputs);
 
@@ -533,7 +533,7 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
         nPayAmount += amount;
 
         if (amount > 0) {
-            CTxOut txout(amount, (CScript)vector<unsigned char>(24, 0));
+            CTxOut txout(amount, (CScript)std::vector<unsigned char>(24, 0));
             txDummy.vout.push_back(txout);
             fDust |= IsDust(txout, ::minRelayTxFee);
         }
@@ -552,8 +552,8 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
     int nQuantityUncompressed = 0;
     bool fAllowFree = false;
 
-    vector<COutPoint> vCoinControl;
-    vector<COutput> vOutputs;
+    std::vector<COutPoint> vCoinControl;
+    std::vector<COutput> vOutputs;
     coinControl->ListSelected(vCoinControl);
     model->getOutputs(vCoinControl, vOutputs);
 
@@ -622,7 +622,7 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
 
             // Never create dust outputs; if we would, just add the dust to the fee.
             if (nChange > 0 && nChange < CENT) {
-                CTxOut txout(nChange, (CScript)vector<unsigned char>(24, 0));
+                CTxOut txout(nChange, (CScript)std::vector<unsigned char>(24, 0));
                 if (IsDust(txout, ::minRelayTxFee)) {
                     nPayFee += nChange;
                     nChange = 0;
@@ -734,10 +734,10 @@ void CoinControlDialog::updateView()
     int nDisplayUnit = model->getOptionsModel()->getDisplayUnit();
     double mempoolEstimatePriority = mempool.estimatePriority(nTxConfirmTarget);
 
-    map<QString, vector<COutput>> mapCoins;
+    map<QString, std::vector<COutput>> mapCoins;
     model->listCoins(mapCoins);
 
-    for (std::pair<QString, vector<COutput>> coins: mapCoins) {
+    for (std::pair<QString, std::vector<COutput>> coins: mapCoins) {
         CCoinControlWidgetItem* itemWalletAddress = new CCoinControlWidgetItem();
         itemWalletAddress->setCheckState(COLUMN_CHECKBOX, Qt::Unchecked);
         QString sWalletAddress = coins.first;

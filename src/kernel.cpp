@@ -101,7 +101,7 @@ static int64_t GetStakeModifierSelectionInterval()
 // already selected blocks in vSelectedBlocks, and with timestamp up to
 // nSelectionIntervalStop.
 static bool SelectBlockFromCandidates(
-        vector<pair<int64_t, uint256> >& vSortedByTimestamp,
+        std::vector<pair<int64_t, uint256> >& vSortedByTimestamp,
         map<uint256, const CBlockIndex*>& mapSelectedBlocks,
         int64_t nSelectionIntervalStop,
         uint64_t nStakeModifierPrev,
@@ -220,7 +220,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
         return true;
 
     // Sort candidate blocks by timestamp
-    vector<pair<int64_t, uint256> > vSortedByTimestamp;
+    std::vector<pair<int64_t, uint256> > vSortedByTimestamp;
     vSortedByTimestamp.reserve(64 * getIntervalVersion(fTestNet) / GetTargetSpacing());
     int64_t nSelectionInterval = GetStakeModifierSelectionInterval();
     int64_t nSelectionIntervalStart = (pindexPrev->GetBlockTime() / getIntervalVersion(fTestNet)) * getIntervalVersion(fTestNet) - nSelectionInterval;

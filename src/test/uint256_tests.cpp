@@ -69,7 +69,7 @@ std::string ArrayToString(const unsigned char A[], unsigned int width)
 BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
 {
     BOOST_CHECK(1 == 0+1);
-    // constructor uint256(vector<char>):
+    // constructor uint256(std::vector<char>):
     BOOST_CHECK(R1L.ToString() == ArrayToString(R1Array,32));
     BOOST_CHECK(R1S.ToString() == ArrayToString(R1Array,20));
     BOOST_CHECK(R2L.ToString() == ArrayToString(R2Array,32));
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE( shifts ) { // "<<"  ">>"  "<<="  ">>="
         BOOST_CHECK(TmpL == (R1L << i));
 
         shiftArrayRight(TmpArray, R1Array, 32, i);
-        BOOST_CHECK(uint256(std::vector<unsigned char>(TmpArray,TmpArray+32)) == (R1L >> i)); 
+        BOOST_CHECK(uint256(std::vector<unsigned char>(TmpArray,TmpArray+32)) == (R1L >> i));
         TmpL = R1L; TmpL >>= i;
         BOOST_CHECK(TmpL == (R1L >> i));
 
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE( shifts ) { // "<<"  ">>"  "<<="  ">>="
         BOOST_CHECK(TmpS == (R1S << i));
 
         shiftArrayRight(TmpArray, R1Array, 20, i);
-        BOOST_CHECK(uint160(std::vector<unsigned char>(TmpArray,TmpArray+20)) == (R1S >> i)); 
+        BOOST_CHECK(uint160(std::vector<unsigned char>(TmpArray,TmpArray+20)) == (R1S >> i));
         TmpS = R1S; TmpS >>= i;
         BOOST_CHECK(TmpS == (R1S >> i));
 

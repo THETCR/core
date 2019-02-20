@@ -49,7 +49,7 @@ using namespace std;
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fIncludeHex)
 {
     txnouttype type;
-    vector<CTxDestination> addresses;
+    std::vector<CTxDestination> addresses;
     int nRequired;
 
     out.push_back(Pair("asm", scriptPubKey.ToString()));
@@ -278,7 +278,7 @@ UniValue listunspent(const UniValue& params, bool fHelp)
     }
 
     UniValue results(UniValue::VARR);
-    vector<COutput> vecOutputs;
+    std::vector<COutput> vecOutputs;
     assert(pwalletMain != nullptr);
     LOCK2(cs_main, pwalletMain->cs_wallet);
     pwalletMain->AvailableCoins(vecOutputs, false, NULL, false, ALL_COINS, false, nWatchonlyConfig);
@@ -383,7 +383,7 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
     }
 
     set<CBitcoinAddress> setAddress;
-    vector<string> addrList = sendTo.getKeys();
+    std::vector<string> addrList = sendTo.getKeys();
     for(const string& name_: addrList) {
         CBitcoinAddress address(name_);
         if (!address.IsValid())
@@ -498,7 +498,7 @@ UniValue decodescript(const UniValue& params, bool fHelp)
     UniValue r(UniValue::VOBJ);
     CScript script;
     if (params[0].get_str().size() > 0) {
-        vector<unsigned char> scriptData(ParseHexV(params[0], "argument"));
+        std::vector<unsigned char> scriptData(ParseHexV(params[0], "argument"));
         script = CScript(scriptData.begin(), scriptData.end());
     } else {
         // Empty scripts are valid
@@ -586,9 +586,9 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
 #endif
     RPCTypeCheck(params, boost::assign::list_of(UniValue::VSTR)(UniValue::VARR)(UniValue::VARR)(UniValue::VSTR), true);
 
-    vector<unsigned char> txData(ParseHexV(params[0], "argument 1"));
+    std::vector<unsigned char> txData(ParseHexV(params[0], "argument 1"));
     CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION);
-    vector<CMutableTransaction> txVariants;
+    std::vector<CMutableTransaction> txVariants;
     while (!ssData.empty()) {
         try {
             CMutableTransaction tx;
@@ -664,7 +664,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
             if (nOut < 0)
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "vout must be positive");
 
-            vector<unsigned char> pkData(ParseHexO(prevOut, "scriptPubKey"));
+            std::vector<unsigned char> pkData(ParseHexO(prevOut, "scriptPubKey"));
             CScript scriptPubKey(pkData.begin(), pkData.end());
 
             {
@@ -687,7 +687,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
                 RPCTypeCheckObj(prevOut, boost::assign::map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR)("redeemScript",UniValue::VSTR));
                 UniValue v = find_value(prevOut, "redeemScript");
                 if (!v.isNull()) {
-                    vector<unsigned char> rsData(ParseHexV(v, "redeemScript"));
+                    std::vector<unsigned char> rsData(ParseHexV(v, "redeemScript"));
                     CScript redeemScript(rsData.begin(), rsData.end());
                     tempKeystore.AddCScript(redeemScript);
                 }

@@ -123,7 +123,7 @@ bool CZWspStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
     return true;
 }
 
-bool CZWspStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout, CAmount nTotal)
+bool CZWspStake::CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal)
 {
     //Create an output returning the zWSP that was staked
     CTxOut outReward;
@@ -192,9 +192,9 @@ CAmount CWspStake::GetValue()
     return txFrom.vout[nPosition].nValue;
 }
 
-bool CWspStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout, CAmount nTotal)
+bool CWspStake::CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal)
 {
-    vector<valtype> vSolutions;
+    std::vector<valtype> vSolutions;
     CScript scriptPubKeyKernel = txFrom.vout[nPosition].scriptPubKey;
     txnouttype whichType = Solver(scriptPubKeyKernel, vSolutions);
     if (whichType == TX_NONSTANDARD) {

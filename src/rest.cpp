@@ -72,7 +72,7 @@ static bool RESTERR(HTTPRequest* req, enum HTTPStatusCode status, string message
     return false;
 }
 
-static enum RetFormat ParseDataFormat(vector<string>& params, const string& strReq)
+static enum RetFormat ParseDataFormat(std::vector<string>& params, const string& strReq)
 {
     boost::split(params, strReq, boost::is_any_of("."));
     if (params.size() > 1) {
@@ -122,9 +122,9 @@ static bool rest_headers(HTTPRequest* req,
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
+    std::vector<string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
-    vector<string> path;
+    std::vector<string> path;
     boost::split(path, params[0], boost::is_any_of("/"));
 
     if (path.size() != 2)
@@ -197,7 +197,7 @@ static bool rest_block(HTTPRequest* req,
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
+    std::vector<string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
 
     string hashStr = params[0];
@@ -269,7 +269,7 @@ static bool rest_chaininfo(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
+    std::vector<string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
 
     switch (rf) {
@@ -294,7 +294,7 @@ static bool rest_mempool_info(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
+    std::vector<string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
 
     switch (rf) {
@@ -319,7 +319,7 @@ static bool rest_mempool_contents(HTTPRequest* req, const std::string& strURIPar
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
+    std::vector<string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
 
     switch (rf) {
@@ -344,7 +344,7 @@ static bool rest_tx(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
+    std::vector<string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
 
     string hashStr = params[0];
@@ -397,10 +397,10 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
+    std::vector<string> params;
     enum RetFormat rf = ParseDataFormat(params, strURIPart);
 
-    vector<string> uriParts;
+    std::vector<string> uriParts;
     if (params.size() > 0 && params[0].length() > 1)
     {
         std::string strUriParams = params[0].substr(1);
@@ -414,7 +414,7 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
 
     bool fInputParsed = false;
     bool fCheckMemPool = false;
-    vector<COutPoint> vOutPoints;
+    std::vector<COutPoint> vOutPoints;
 
     // parse/deserialize input
     // input-format = output-format, rest/getutxos/bin requires binary input, gives binary output, ...
@@ -488,8 +488,8 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
         return RESTERR(req, HTTP_INTERNAL_SERVER_ERROR, strprintf("Error: max outpoints exceeded (max: %d, tried: %d)", MAX_GETUTXOS_OUTPOINTS, vOutPoints.size()));
 
     // check spentness and form a bitmap (as well as a JSON capable human-readble string representation)
-    vector<unsigned char> bitmap;
-    vector<CCoin> outs;
+    std::vector<unsigned char> bitmap;
+    std::vector<CCoin> outs;
     std::string bitmapStringRepresentation;
     boost::dynamic_bitset<unsigned char> hits(vOutPoints.size());
     {

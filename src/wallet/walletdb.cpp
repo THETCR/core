@@ -466,7 +466,7 @@ public:
     bool fIsEncrypted;
     bool fAnyUnordered;
     int nFileVersion;
-    vector<uint256> vWalletUpgrade;
+    std::vector<uint256> vWalletUpgrade;
 
     CWalletScanState()
     {
@@ -628,7 +628,7 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
         } else if (strType == "ckey") {
             CPubKey vchPubKey;
             ssKey >> vchPubKey;
-            vector<unsigned char> vchPrivKey;
+            std::vector<unsigned char> vchPrivKey;
             ssValue >> vchPrivKey;
             wss.nCKeys++;
 
@@ -831,7 +831,7 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
     return result;
 }
 
-DBErrors CWalletDB::FindWalletTx(CWallet* pwallet, vector<uint256>& vTxHash, vector<CWalletTx>& vWtx)
+DBErrors CWalletDB::FindWalletTx(CWallet* pwallet, std::vector<uint256>& vTxHash, std::vector<CWalletTx>& vWtx)
 {
     pwallet->vchDefaultKey = CPubKey();
     bool fNoncriticalErrors = false;
@@ -892,10 +892,10 @@ DBErrors CWalletDB::FindWalletTx(CWallet* pwallet, vector<uint256>& vTxHash, vec
     return result;
 }
 
-DBErrors CWalletDB::ZapWalletTx(CWallet* pwallet, vector<CWalletTx>& vWtx)
+DBErrors CWalletDB::ZapWalletTx(CWallet* pwallet, std::vector<CWalletTx>& vWtx)
 {
     // build list of wallet TXs
-    vector<uint256> vTxHash;
+    std::vector<uint256> vTxHash;
     DBErrors err = FindWalletTx(pwallet, vTxHash, vWtx);
     if (err != DB_LOAD_OK)
         return err;
@@ -1330,7 +1330,7 @@ bool CWalletDB::ReadCurrentSeedHash(uint256& hashSeed)
     return Read(string("seedhash"), hashSeed);
 }
 
-bool CWalletDB::WriteZWSPSeed(const uint256& hashSeed, const vector<unsigned char>& seed)
+bool CWalletDB::WriteZWSPSeed(const uint256& hashSeed, const std::vector<unsigned char>& seed)
 {
     if (!WriteCurrentSeedHash(hashSeed))
         return error("%s: failed to write current seed hash", __func__);
@@ -1359,7 +1359,7 @@ bool CWalletDB::EraseZWSPSeed_deprecated()
     return Erase(string("dzs"));
 }
 
-bool CWalletDB::ReadZWSPSeed(const uint256& hashSeed, vector<unsigned char>& seed)
+bool CWalletDB::ReadZWSPSeed(const uint256& hashSeed, std::vector<unsigned char>& seed)
 {
     return Read(make_pair(string("dzs"), hashSeed), seed);
 }
@@ -1430,7 +1430,7 @@ std::map<uint256, std::vector<pair<uint256, uint32_t> > > CWalletDB::MapMintPool
         if (mapPool.count(hashMasterSeed)) {
             mapPool.at(hashMasterSeed).emplace_back(pMint);
         } else {
-            vector<pair<uint256, uint32_t> > vPairs;
+            std::vector<pair<uint256, uint32_t> > vPairs;
             vPairs.emplace_back(pMint);
             mapPool.insert(make_pair(hashMasterSeed, vPairs));
         }
@@ -1491,8 +1491,8 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins()
     if (!pcursor)
         throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
-    vector<CZerocoinMint> vOverWrite;
-    vector<CZerocoinMint> vArchive;
+    std::vector<CZerocoinMint> vOverWrite;
+    std::vector<CZerocoinMint> vArchive;
     for (;;)
     {
         // Read next record

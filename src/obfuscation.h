@@ -237,7 +237,7 @@ class CObfuscationBroadcastTx
 public:
     CTransaction tx;
     CTxIn vin;
-    vector<unsigned char> vchSig;
+    std::vector<unsigned char> vchSig;
     int64_t sigTime;
 };
 

@@ -831,7 +831,7 @@ UniValue mnbudgetrawvote(const UniValue& params, bool fHelp)
     int64_t nTime = params[4].get_int64();
     std::string strSig = params[5].get_str();
     bool fInvalid = false;
-    vector<unsigned char> vchSig = DecodeBase64(strSig.c_str(), &fInvalid);
+    std::vector<unsigned char> vchSig = DecodeBase64(strSig.c_str(), &fInvalid);
 
     if (fInvalid)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Malformed base64 encoding");

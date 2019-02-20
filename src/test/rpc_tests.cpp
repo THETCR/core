@@ -31,7 +31,7 @@ createArgs(int nRequired, const char* address1= nullptr, const char* address2= n
 
 UniValue CallRPC(string args)
 {
-    vector<string> vArgs;
+    std::vector<string> vArgs;
     boost::split(vArgs, args, boost::is_any_of(" \t"));
     string strMethod = vArgs[0];
     vArgs.erase(vArgs.begin());

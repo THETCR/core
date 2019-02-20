@@ -182,8 +182,8 @@ public:
     bool ReadZerocoinSpendSerialEntry(const CBigNum& bnSerial);
     bool WriteCurrentSeedHash(const uint256& hashSeed);
     bool ReadCurrentSeedHash(uint256& hashSeed);
-    bool WriteZWSPSeed(const uint256& hashSeed, const vector<unsigned char>& seed);
-    bool ReadZWSPSeed(const uint256& hashSeed, vector<unsigned char>& seed);
+    bool WriteZWSPSeed(const uint256& hashSeed, const std::vector<unsigned char>& seed);
+    bool ReadZWSPSeed(const uint256& hashSeed, std::vector<unsigned char>& seed);
     bool ReadZWSPSeed_deprecated(uint256& seed);
     bool EraseZWSPSeed();
     bool EraseZWSPSeed_deprecated();

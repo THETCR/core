@@ -544,7 +544,7 @@ UniValue signmessage(const UniValue& params, bool fHelp)
     ss << strMessageMagic;
     ss << strMessage;
 
-    vector<unsigned char> vchSig;
+    std::vector<unsigned char> vchSig;
     if (!key.SignCompact(ss.GetHash(), vchSig))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Sign failed");
 
@@ -957,10 +957,10 @@ UniValue sendmany(const UniValue& params, bool fHelp)
         wtx.mapValue["comment"] = params[3].get_str();
 
     set<CBitcoinAddress> setAddress;
-    vector<pair<CScript, CAmount> > vecSend;
+    std::vector<pair<CScript, CAmount> > vecSend;
 
     CAmount totalAmount = 0;
-    vector<string> keys = sendTo.getKeys();
+    std::vector<string> keys = sendTo.getKeys();
     for(const string& name_: keys) {
         CBitcoinAddress address(name_);
         if (!address.IsValid())
@@ -1047,7 +1047,7 @@ struct tallyitem {
     CAmount nAmount;
     int nConf;
     int nBCConf;
-    vector<uint256> txids;
+    std::vector<uint256> txids;
     bool fIsWatchonly;
     tallyitem()
     {
@@ -1427,11 +1427,11 @@ UniValue listtransactions(const UniValue& params, bool fHelp)
     if ((nFrom + nCount) > (int)ret.size())
         nCount = ret.size() - nFrom;
 
-    vector<UniValue> arrTmp = ret.getValues();
+    std::vector<UniValue> arrTmp = ret.getValues();
 
-    vector<UniValue>::iterator first = arrTmp.begin();
+    std::vector<UniValue>::iterator first = arrTmp.begin();
     std::advance(first, nFrom);
-    vector<UniValue>::iterator last = arrTmp.begin();
+    std::vector<UniValue>::iterator last = arrTmp.begin();
     std::advance(last, nFrom+nCount);
 
     if (last != arrTmp.end()) arrTmp.erase(last, arrTmp.end());
@@ -2072,7 +2072,7 @@ UniValue listlockunspent(const UniValue& params, bool fHelp)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    vector<COutPoint> vOutpts;
+    std::vector<COutPoint> vOutpts;
     pwalletMain->ListLockedCoins(vOutpts);
 
     UniValue ret(UniValue::VARR);
@@ -2771,9 +2771,9 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
     CAmount nAmount = params[0].get_int() * COIN;
 
     CWalletTx wtx;
-    vector<CDeterministicMint> vDMints;
+    std::vector<CDeterministicMint> vDMints;
     string strError;
-    vector<COutPoint> vOutpts;
+    std::vector<COutPoint> vOutpts;
 
     if (params.size() == 2)
     {
@@ -2882,7 +2882,7 @@ UniValue spendzerocoin(const UniValue& params, bool fHelp)
     int nSecurityLevel = params[3].get_int();       // Security level
     std::string address_str = params.size() > 4 ? params[4].get_str() : "";
 
-    vector<CZerocoinMint> vMintsSelected;
+    std::vector<CZerocoinMint> vMintsSelected;
 
     return DoZwspSpend(nAmount, fMintChange, fMinimizeChange, nSecurityLevel, vMintsSelected, address_str);
 }
@@ -2950,7 +2950,7 @@ UniValue spendzerocoinmints(const UniValue& params, bool fHelp)
     CAmount nAmount(0);   // Spending amount
 
     // fetch mints and update nAmount
-    vector<CZerocoinMint> vMintsSelected;
+    std::vector<CZerocoinMint> vMintsSelected;
     for(unsigned int i=0; i < arrMints.size(); i++) {
 
         CZerocoinMint mint;
@@ -2973,7 +2973,7 @@ UniValue spendzerocoinmints(const UniValue& params, bool fHelp)
 }
 
 
-extern UniValue DoZwspSpend(const CAmount nAmount, bool fMintChange, bool fMinimizeChange, const int nSecurityLevel, vector<CZerocoinMint>& vMintsSelected, std::string address_str)
+extern UniValue DoZwspSpend(const CAmount nAmount, bool fMintChange, bool fMinimizeChange, const int nSecurityLevel, std::vector<CZerocoinMint>& vMintsSelected, std::string address_str)
 {
     int64_t nTimeStart = GetTimeMillis();
     CBitcoinAddress address = CBitcoinAddress(); // Optional sending address. Dummy initialization here.
@@ -3067,9 +3067,9 @@ UniValue resetmintzerocoin(const UniValue& params, bool fHelp)
     CWalletDB walletdb(pwalletMain->strWalletFile);
     CzWSPTracker* zwspTracker = pwalletMain->zwspTracker.get();
     set<CMintMeta> setMints = zwspTracker->ListMints(false, false, true);
-    vector<CMintMeta> vMintsToFind(setMints.begin(), setMints.end());
-    vector<CMintMeta> vMintsMissing;
-    vector<CMintMeta> vMintsToUpdate;
+    std::vector<CMintMeta> vMintsToFind(setMints.begin(), setMints.end());
+    std::vector<CMintMeta> vMintsMissing;
+    std::vector<CMintMeta> vMintsToUpdate;
 
     // search all of our available data for these mints
     FindMints(vMintsToFind, vMintsToUpdate, vMintsMissing);

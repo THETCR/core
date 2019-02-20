@@ -120,7 +120,7 @@ public:
 
 
 /**
- * Used to relay blocks as header + vector<merkle branch>
+ * Used to relay blocks as header + std::vector<merkle branch>
  * to filtered nodes.
  */
 class CMerkleBlock

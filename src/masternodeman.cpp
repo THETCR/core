@@ -106,7 +106,7 @@ CMasternodeDB::ReadResult CMasternodeDB::Read(CMasternodeMan& mnodemanToLoad, bo
     // Don't try to resize to a negative number if file is small
     if (dataSize < 0)
         dataSize = 0;
-    vector<unsigned char> vchData;
+    std::vector<unsigned char> vchData;
     vchData.resize(dataSize);
     uint256 hashIn;
 
@@ -251,7 +251,7 @@ void CMasternodeMan::CheckAndRemove(bool forceExpiredRemoval)
     LOCK(cs);
 
     //remove inactive and outdated
-    vector<CMasternode>::iterator it = vMasternodes.begin();
+    std::vector<CMasternode>::iterator it = vMasternodes.begin();
     while (it != vMasternodes.end()) {
         if ((*it).activeState == CMasternode::MASTERNODE_REMOVE ||
             (*it).activeState == CMasternode::MASTERNODE_VIN_SPENT ||
@@ -867,7 +867,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         CService addr;
         CPubKey pubkey;
         CPubKey pubkey2;
-        vector<unsigned char> vchSig;
+        std::vector<unsigned char> vchSig;
         int64_t sigTime;
         int count;
         int current;
@@ -1069,7 +1069,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         if (IsSporkActive(SPORK_10_MASTERNODE_PAY_UPDATED_NODES)) return;
 
         CTxIn vin;
-        vector<unsigned char> vchSig;
+        std::vector<unsigned char> vchSig;
         int64_t sigTime;
         bool stop;
         vRecv >> vin >> vchSig >> sigTime >> stop;
@@ -1139,7 +1139,7 @@ void CMasternodeMan::Remove(CTxIn vin)
 {
     LOCK(cs);
 
-    vector<CMasternode>::iterator it = vMasternodes.begin();
+    std::vector<CMasternode>::iterator it = vMasternodes.begin();
     while (it != vMasternodes.end()) {
         if ((*it).vin == vin) {
             LogPrint(BCLog::MASTERNODE, "CMasternodeMan: Removing Masternode %s - %i now\n", (*it).vin.prevout.hash.ToString(), size() - 1);

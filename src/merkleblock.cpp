@@ -16,8 +16,8 @@ CMerkleBlock::CMerkleBlock(const CBlock& block, CBloomFilter& filter)
 {
     header = block.GetBlockHeader();
 
-    vector<bool> vMatch;
-    vector<uint256> vHashes;
+    std::vector<bool> vMatch;
+    std::vector<uint256> vHashes;
 
     vMatch.reserve(block.vtx.size());
     vHashes.reserve(block.vtx.size());

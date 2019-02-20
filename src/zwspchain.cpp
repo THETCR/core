@@ -16,7 +16,7 @@
 // For Script size (BIGNUM/Uint256 size)
 #define BIGNUM_SIZE   4
 
-bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomination denom, vector<CBigNum>& vValues)
+bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomination denom, std::vector<CBigNum>& vValues)
 {
     for (const CTransaction& tx : block.vtx) {
         if(!tx.IsZerocoinMint())
@@ -354,7 +354,7 @@ libzerocoin::CoinSpend TxInToZerocoinSpend(const CTxIn& txin)
 bool TxOutToPublicCoin(const CTxOut& txout, libzerocoin::PublicCoin& pubCoin, CValidationState& state)
 {
     CBigNum publicZerocoin;
-    vector<unsigned char> vchZeroMint;
+    std::vector<unsigned char> vchZeroMint;
     vchZeroMint.insert(vchZeroMint.end(), txout.scriptPubKey.begin() + SCRIPT_OFFSET,
                        txout.scriptPubKey.begin() + txout.scriptPubKey.size());
     publicZerocoin.setvch(vchZeroMint);

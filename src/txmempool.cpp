@@ -304,7 +304,7 @@ void CTxMemPool::check(const CCoinsViewCache *pcoins) const
     assert(totalTxSize == checkTotal);
 }
 
-void CTxMemPool::queryHashes(vector<uint256>& vtxid)
+void CTxMemPool::queryHashes(std::vector<uint256>& vtxid)
 {
     vtxid.clear();
 

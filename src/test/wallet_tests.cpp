@@ -26,7 +26,7 @@ typedef set<pair<const CWalletTx*,unsigned int> > CoinSet;
 BOOST_AUTO_TEST_SUITE(wallet_tests)
 
 static CWallet wallet;
-static vector<COutput> vCoins;
+static std::vector<COutput> vCoins;
 
 static void add_coin(const CAmount& nValue, int nAge = 6*24, bool fIsFromMe = false, int nInput=0)
 {

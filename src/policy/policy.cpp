@@ -31,7 +31,7 @@ bool IsDust(const CTxOut& txout, const CFeeRate& dustRelayFeeIn)
 
 bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType)
 {
-    vector<valtype> vSolutions;
+    std::vector<valtype> vSolutions;
     whichType = Solver(scriptPubKey, vSolutions);
     if (whichType == TX_NONSTANDARD)
         return false;

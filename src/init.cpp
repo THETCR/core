@@ -1155,7 +1155,7 @@ bool AppInit2()
 
     fDebug = !mapMultiArgs["-debug"].empty();
     // Special-case: if -debug=0/-nodebug is set, turn off debugging messages
-    const vector<string>& categories = mapMultiArgs["-debug"];
+    const std::vector<string>& categories = mapMultiArgs["-debug"];
     if (gArgs.GetBoolArg("-nodebug", false) || find(categories.begin(), categories.end(), string("0")) != categories.end())
         fDebug = false;
 

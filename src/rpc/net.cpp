@@ -121,7 +121,7 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp)
 
     LOCK(cs_main);
 
-    vector<CNodeStats> vstats;
+    std::vector<CNodeStats> vstats;
     CopyNodeStats(vstats);
 
     UniValue ret(UniValue::VARR);
@@ -197,7 +197,7 @@ UniValue addnode(const UniValue& params, bool fHelp)
     }
 
     LOCK(cs_vAddedNodes);
-    vector<string>::iterator it = vAddedNodes.begin();
+    std::vector<string>::iterator it = vAddedNodes.begin();
     for (; it != vAddedNodes.end(); it++)
         if (strNode == *it)
             break;
@@ -301,9 +301,9 @@ UniValue getaddednodeinfo(const UniValue& params, bool fHelp)
         return ret;
     }
 
-    list<pair<string, vector<CService> > > laddedAddreses(0);
+    list<pair<string, std::vector<CService> > > laddedAddreses(0);
     for (string& strAddNode: laddedNodes) {
-        vector<CService> vservNode(0);
+        std::vector<CService> vservNode(0);
         if (Lookup(strAddNode.c_str(), vservNode, Params().GetDefaultPort(), fNameLookup, 0))
             laddedAddreses.push_back(make_pair(strAddNode, vservNode));
         else {
@@ -316,7 +316,7 @@ UniValue getaddednodeinfo(const UniValue& params, bool fHelp)
     }
 
     LOCK(cs_vNodes);
-    for (list<pair<string, vector<CService> > >::iterator it = laddedAddreses.begin(); it != laddedAddreses.end(); it++) {
+    for (list<pair<string, std::vector<CService> > >::iterator it = laddedAddreses.begin(); it != laddedAddreses.end(); it++) {
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("addednode", it->first));
 

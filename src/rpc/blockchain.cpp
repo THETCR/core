@@ -227,7 +227,7 @@ UniValue mempoolToJSON(bool fVerbose = false)
         }
         return o;
     } else {
-        vector<uint256> vtxid;
+        std::vector<uint256> vtxid;
         mempool.queryHashes(vtxid);
 
         UniValue a(UniValue::VARR);

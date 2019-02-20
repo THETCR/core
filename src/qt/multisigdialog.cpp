@@ -194,7 +194,7 @@ void MultisigDialog::on_addMultisigButton_clicked()
 
     int m = ui->enterMSpinbox->value();
 
-    vector<string> keys;
+    std::vector<string> keys;
 
     for (int i = 0; i < ui->addressList->count(); i++) {
         QWidget* address = qobject_cast<QWidget*>(ui->addressList->itemAt(i)->widget());
@@ -220,7 +220,7 @@ void MultisigDialog::on_importAddressButton_clicked(){
         return;
     }
 
-    vector<string> vRedeem;
+    std::vector<string> vRedeem;
     size_t pos = 0;
 
     //search redeem input delimited by space
@@ -229,7 +229,7 @@ void MultisigDialog::on_importAddressButton_clicked(){
         sRedeem.erase(0, pos + 1);
     }
 
-    vector<string> keys(vRedeem.begin()+1, vRedeem.end()-1);
+    std::vector<string> keys(vRedeem.begin()+1, vRedeem.end()-1);
 
     addMultisig(stoi(vRedeem[0]), keys);
 
@@ -238,7 +238,7 @@ void MultisigDialog::on_importAddressButton_clicked(){
     pwalletMain->ReacceptWalletTransactions();
 }
 
-bool MultisigDialog::addMultisig(int m, vector<string> keys){
+bool MultisigDialog::addMultisig(int m, std::vector<string> keys){
     try{
         string error;
         CScript redeem;
@@ -282,12 +282,12 @@ void MultisigDialog::on_createButton_clicked()
     if(!model)
         return;
 
-    vector<CTxIn> vUserIn;
-    vector<CTxOut> vUserOut;
+    std::vector<CTxIn> vUserIn;
+    std::vector<CTxOut> vUserOut;
     try{
         //Add inputs from Coin Control if any are selected
         if (CoinControlDialog::coinControl->HasSelected()) {
-            vector<COutPoint> vSelected;
+            std::vector<COutPoint> vSelected;
             CoinControlDialog::coinControl->ListSelected(vSelected);
             for (auto outpoint : vSelected)
                 vUserIn.emplace_back(CTxIn(outpoint));
@@ -376,7 +376,7 @@ void MultisigDialog::on_createButton_clicked()
     }
 }
 
-bool MultisigDialog::createMultisigTransaction(vector<CTxIn> vUserIn, vector<CTxOut> vUserOut, string& feeStringRet, string& errorRet)
+bool MultisigDialog::createMultisigTransaction(std::vector<CTxIn> vUserIn, std::vector<CTxOut> vUserOut, string& feeStringRet, string& errorRet)
 {
     try{
         //attempt to access the given inputs
@@ -384,7 +384,7 @@ bool MultisigDialog::createMultisigTransaction(vector<CTxIn> vUserIn, vector<CTx
 
         //retrieve total input val and change dest
         CAmount totalIn = 0;
-        vector<CAmount> vInputVals;
+        std::vector<CAmount> vInputVals;
         CScript changePubKey;
         bool fFirst = true;
 
@@ -460,7 +460,7 @@ bool MultisigDialog::createMultisigTransaction(vector<CTxIn> vUserIn, vector<CTx
             throw runtime_error("could not redeem");
         }
         txnouttype type;
-        vector<CTxDestination> addresses;
+        std::vector<CTxDestination> addresses;
         int nReq;
         if(!ExtractDestinations(redeemScript, type, addresses, nReq)){
             throw runtime_error("Could not extract destinations from redeem script.");
@@ -564,7 +564,7 @@ QString MultisigDialog::buildMultisigTxStatusString(bool fComplete, const CMutab
 }
 
 
-CCoinsViewCache MultisigDialog::getInputsCoinsViewCache(const vector<CTxIn>& vin)
+CCoinsViewCache MultisigDialog::getInputsCoinsViewCache(const std::vector<CTxIn>& vin)
 {
     CCoinsView viewDummy;
     CCoinsViewCache view(&viewDummy);
@@ -597,7 +597,7 @@ bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, string& errorOut, Q
     try{
 
         //copy of vin for reference before vin is mutated
-        vector<CTxIn> oldVin(tx.vin);
+        std::vector<CTxIn> oldVin(tx.vin);
         CBasicKeyStore privKeystore;
 
         //if keys were given, attempt to collect redeem and scriptpubkey
@@ -761,7 +761,7 @@ void MultisigDialog::commitMultisigTx()
     }
 }
 
-bool MultisigDialog::createRedeemScript(int m, vector<string> vKeys, CScript& redeemRet, string& errorRet)
+bool MultisigDialog::createRedeemScript(int m, std::vector<string> vKeys, CScript& redeemRet, string& errorRet)
 {
     try{
         int n = vKeys.size();
@@ -776,11 +776,11 @@ bool MultisigDialog::createRedeemScript(int m, vector<string> vKeys, CScript& re
         if (n > 15)
             throw runtime_error("Number of addresses involved in the Multisignature address creation > 15\nReduce the number");
 
-        vector<CPubKey> pubkeys;
+        std::vector<CPubKey> pubkeys;
         pubkeys.resize(n);
 
         int i = 0;
-        for(vector<string>::iterator it = vKeys.begin(); it != vKeys.end(); ++it) {
+        for(std::vector<string>::iterator it = vKeys.begin(); it != vKeys.end(); ++it) {
             string keyString = *it;
 #ifdef ENABLE_WALLET
             // Case 1: WISPR address and we have full public key:
@@ -820,7 +820,7 @@ bool MultisigDialog::createRedeemScript(int m, vector<string> vKeys, CScript& re
         redeemRet << redeemRet.EncodeOP_N(m);
         //public keys
         for(CPubKey& key : pubkeys){
-            vector<unsigned char> vKey= ToByteVector(key);
+            std::vector<unsigned char> vKey= ToByteVector(key);
             redeemRet << vKey;
         }
         //OP_N for total pubkeys
