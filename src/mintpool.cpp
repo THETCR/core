@@ -22,7 +22,7 @@ CMintPool::CMintPool(uint32_t nCount)
 void CMintPool::Add(const CBigNum& bnValue, const uint32_t& nCount)
 {
     uint256 hash = GetPubCoinHash(bnValue);
-    Add(make_pair(hash, nCount));
+    Add(std::make_pair(hash, nCount));
     LogPrintf("%s : add %s to mint pool, nCountLastGenerated=%d\n", __func__, bnValue.GetHex().substr(0, 6), nCountLastGenerated);
 }
 

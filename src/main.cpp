@@ -2018,7 +2018,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                 nValueIn += spend.getDenomination() * COIN;
 
                 //queue for db write after the 'justcheck' section has concluded
-                vSpends.emplace_back(make_pair(spend, tx.GetHash()));
+                vSpends.emplace_back(std::make_pair(spend, tx.GetHash()));
                 if (!ContextualCheckZerocoinSpend(tx, spend, pindex, hashBlock))
                     return state.DoS(100, error("%s: failed to add block %s with invalid zerocoinspend", __func__, tx.GetHash().GetHex()), REJECT_INVALID);
             }
@@ -2036,7 +2036,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                     if (!ContextualCheckZerocoinMint(tx, coin, pindex))
                         return state.DoS(100, error("%s: zerocoin mint failed contextual check", __func__));
 
-                    vMints.emplace_back(make_pair(coin, tx.GetHash()));
+                    vMints.emplace_back(std::make_pair(coin, tx.GetHash()));
                 }
             }
         } else if (!tx.IsCoinBase()) {
@@ -2935,7 +2935,7 @@ CBlockIndex* AddToBlockIndex(const CBlockHeader& block)
         pindexNew->BuildSkip();
         //mark as PoS seen
         if (pindexNew->IsProofOfStake())
-            setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
+            setStakeSeen.insert(std::make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
         //update previous block pointer
         pindexNew->pprev->pnext = pindexNew;
 
@@ -3197,7 +3197,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
                 for (const CTxIn& in: tx.vin) {
                     if (mapLockedInputs.count(in.prevout)) {
                         if (mapLockedInputs[in.prevout] != tx.GetHash()) {
-                            mapRejectedBlocks.insert(make_pair(block.GetHash(), GetTime()));
+                            mapRejectedBlocks.insert(std::make_pair(block.GetHash(), GetTime()));
                             LogPrintf("CheckBlock() : found conflicting transaction with transaction lock %s %s\n", mapLockedInputs[in.prevout].ToString(), tx.GetHash().ToString());
                             return state.DoS(0, error("CheckBlock() : found conflicting transaction with transaction lock"),
                                              REJECT_INVALID, "conflicting-tx-ix");
@@ -3230,7 +3230,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
         // that this block is invalid, so don't issue an outright ban.
         if (nHeight != 0 && !IsInitialBlockDownload()) {
             if (!IsBlockPayeeValid(block, nHeight)) {
-                mapRejectedBlocks.insert(make_pair(block.GetHash(), GetTime()));
+                mapRejectedBlocks.insert(std::make_pair(block.GetHash(), GetTime()));
                 return state.DoS(0, error("CheckBlock() : Couldn't find masternode/budget payment"),
                                  REJECT_INVALID, "bad-cb-payee");
             }
@@ -3559,12 +3559,12 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
             return state.DoS(100, error("%s: staked zWSP fails context checks", __func__));
 
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
-            mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
+            mapProofOfStake.insert(std::make_pair(hash, hashProofOfStake));
     }
     if(block.IsProofOfWork()){
         uint256 hashProofOfStake = block.GetPoWHash();
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
-            mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
+            mapProofOfStake.insert(std::make_pair(hash, hashProofOfStake));
     }
 
     pindex->hashProofOfStake = mapProofOfStake[hash];
@@ -3849,11 +3849,11 @@ CBlockIndex* InsertBlockIndex(uint256 hash)
     CBlockIndex* pindexNew = new CBlockIndex();
     if (!pindexNew)
         throw runtime_error("LoadBlockIndex() : new CBlockIndex failed");
-    mi = mapBlockIndex.insert(make_pair(hash, pindexNew)).first;
+    mi = mapBlockIndex.insert(std::make_pair(hash, pindexNew)).first;
 
     //mark as PoS seen
     if (pindexNew->IsProofOfStake())
-        setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
+        setStakeSeen.insert(std::make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
 
     pindexNew->phashBlock = &((*mi).first);
 
@@ -3872,7 +3872,7 @@ bool static LoadBlockIndexDB(string& strError)
     vSortedByHeight.reserve(mapBlockIndex.size());
     for (const std::pair<const uint256, CBlockIndex*>& item : mapBlockIndex) {
         CBlockIndex* pindex = item.second;
-        vSortedByHeight.push_back(make_pair(pindex->nHeight, pindex));
+        vSortedByHeight.push_back(std::make_pair(pindex->nHeight, pindex));
     }
     sort(vSortedByHeight.begin(), vSortedByHeight.end());
     for (const std::pair<int, CBlockIndex*> & item: vSortedByHeight) {

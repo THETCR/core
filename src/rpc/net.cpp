@@ -305,7 +305,7 @@ UniValue getaddednodeinfo(const UniValue& params, bool fHelp)
     for (string& strAddNode: laddedNodes) {
         std::vector<CService> vservNode(0);
         if (Lookup(strAddNode.c_str(), vservNode, Params().GetDefaultPort(), fNameLookup, 0))
-            laddedAddreses.push_back(make_pair(strAddNode, vservNode));
+            laddedAddreses.push_back(std::make_pair(strAddNode, vservNode));
         else {
             UniValue obj(UniValue::VOBJ);
             obj.push_back(Pair("addednode", strAddNode));

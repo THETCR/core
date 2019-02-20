@@ -805,7 +805,7 @@ UniValue sendrawtransaction(const UniValue& params, bool fHelp)
     if (!fHaveMempool && !fHaveChain) {
         // push to local node and sync with wallets
         if (fSwiftX) {
-            mapTxLockReq.insert(make_pair(tx.GetHash(), tx));
+            mapTxLockReq.insert(std::make_pair(tx.GetHash(), tx));
             CreateNewLock(tx);
             RelayTransactionLockReq(tx, true);
         }

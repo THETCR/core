@@ -1311,7 +1311,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                         memcpy(&nPointer, &pnode, sizeof(nPointer));
                         uint256 hashKey = hashRand ^ nPointer;
                         hashKey = Hash(BEGIN(hashKey), END(hashKey));
-                        mapMix.insert(make_pair(hashKey, pnode));
+                        mapMix.insert(std::make_pair(hashKey, pnode));
                     }
                     FastRandomContext insecure_rand;
                     int nRelayNodes = fReachable ? 2 : 1; // limited relaying of addresses outside our network(s)
@@ -1516,7 +1516,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                     dstx.vchSig = vchSig;
                     dstx.sigTime = sigTime;
 
-                    mapObfuscationBroadcastTxes.insert(make_pair(tx.GetHash(), dstx));
+                    mapObfuscationBroadcastTxes.insert(std::make_pair(tx.GetHash(), dstx));
                 }
             }
         }

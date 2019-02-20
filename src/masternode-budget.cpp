@@ -223,7 +223,7 @@ void CBudgetManager::SubmitFinalBudget()
         pwalletMain->CommitTransaction(wtx, reservekey, "NO-ix");
         tx = (CTransaction)wtx;
         txidCollateral = tx.GetHash();
-        mapCollateralTxids.insert(make_pair(tempBudget.GetHash(), txidCollateral));
+        mapCollateralTxids.insert(std::make_pair(tempBudget.GetHash(), txidCollateral));
     } else {
         txidCollateral = mapCollateralTxids[tempBudget.GetHash()];
     }
@@ -266,7 +266,7 @@ void CBudgetManager::SubmitFinalBudget()
     }
 
     LOCK(cs);
-    mapSeenFinalizedBudgets.insert(make_pair(finalizedBudgetBroadcast.GetHash(), finalizedBudgetBroadcast));
+    mapSeenFinalizedBudgets.insert(std::make_pair(finalizedBudgetBroadcast.GetHash(), finalizedBudgetBroadcast));
     finalizedBudgetBroadcast.Relay();
     budget.AddFinalizedBudget(finalizedBudgetBroadcast);
     nSubmittedHeight = nCurrentHeight;
@@ -437,7 +437,7 @@ bool CBudgetManager::AddFinalizedBudget(CFinalizedBudget& finalizedBudget)
         return false;
     }
 
-    mapFinalizedBudgets.insert(make_pair(finalizedBudget.GetHash(), finalizedBudget));
+    mapFinalizedBudgets.insert(std::make_pair(finalizedBudget.GetHash(), finalizedBudget));
     return true;
 }
 
@@ -454,7 +454,7 @@ bool CBudgetManager::AddProposal(CBudgetProposal& budgetProposal)
         return false;
     }
 
-    mapProposals.insert(make_pair(budgetProposal.GetHash(), budgetProposal));
+    mapProposals.insert(std::make_pair(budgetProposal.GetHash(), budgetProposal));
     LogPrint(BCLog::MNBUDGET,"CBudgetManager::AddProposal - proposal %s added\n", budgetProposal.GetName ().c_str ());
     return true;
 }
@@ -497,7 +497,7 @@ void CBudgetManager::CheckAndRemove()
 
         if (pfinalizedBudget->fValid) {
             pfinalizedBudget->CheckAndVote();
-            tmpMapFinalizedBudgets.insert(make_pair(pfinalizedBudget->GetHash(), *pfinalizedBudget));
+            tmpMapFinalizedBudgets.insert(std::make_pair(pfinalizedBudget->GetHash(), *pfinalizedBudget));
         }
 
         ++it;
@@ -517,7 +517,7 @@ void CBudgetManager::CheckAndRemove()
                       pbudgetProposal->strProposalName.c_str(), pbudgetProposal->nFeeTXHash.ToString().c_str());
         }
         if (pbudgetProposal->fValid) {
-            tmpMapProposals.insert(make_pair(pbudgetProposal->GetHash(), *pbudgetProposal));
+            tmpMapProposals.insert(std::make_pair(pbudgetProposal->GetHash(), *pbudgetProposal));
         }
 
         ++it2;
@@ -786,7 +786,7 @@ std::vector<CBudgetProposal*> CBudgetManager::GetBudget()
     std::map<uint256, CBudgetProposal>::iterator it = mapProposals.begin();
     while (it != mapProposals.end()) {
         (*it).second.CleanAndRemove(false);
-        vBudgetPorposalsSort.push_back(make_pair(&((*it).second), (*it).second.GetYeas() - (*it).second.GetNays()));
+        vBudgetPorposalsSort.push_back(std::make_pair(&((*it).second), (*it).second.GetYeas() - (*it).second.GetNays()));
         ++it;
     }
 
@@ -867,7 +867,7 @@ std::vector<CFinalizedBudget*> CBudgetManager::GetFinalizedBudgets()
     while (it != mapFinalizedBudgets.end()) {
         CFinalizedBudget* pfinalizedBudget = &((*it).second);
 
-        vFinalizedBudgetsSort.push_back(make_pair(pfinalizedBudget, pfinalizedBudget->GetVoteCount()));
+        vFinalizedBudgetsSort.push_back(std::make_pair(pfinalizedBudget, pfinalizedBudget->GetVoteCount()));
         ++it;
     }
     std::sort(vFinalizedBudgetsSort.begin(), vFinalizedBudgetsSort.end(), sortFinalizedBudgetsByVotes());
@@ -1079,7 +1079,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
             return;
         }
 
-        mapSeenMasternodeBudgetProposals.insert(make_pair(budgetProposalBroadcast.GetHash(), budgetProposalBroadcast));
+        mapSeenMasternodeBudgetProposals.insert(std::make_pair(budgetProposalBroadcast.GetHash(), budgetProposalBroadcast));
 
         if (!budgetProposalBroadcast.IsValid(strError)) {
             LogPrint(BCLog::MNBUDGET,"mprop - invalid budget proposal - %s\n", strError);
@@ -1116,7 +1116,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         }
 
 
-        mapSeenMasternodeBudgetVotes.insert(make_pair(vote.GetHash(), vote));
+        mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
         if (!vote.SignatureValid(true)) {
             if (masternodeSync.IsSynced()) {
                 LogPrintf("CBudgetManager::ProcessMessage() : mvote - signature invalid\n");
@@ -1154,7 +1154,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
             return;
         }
 
-        mapSeenFinalizedBudgets.insert(make_pair(finalizedBudgetBroadcast.GetHash(), finalizedBudgetBroadcast));
+        mapSeenFinalizedBudgets.insert(std::make_pair(finalizedBudgetBroadcast.GetHash(), finalizedBudgetBroadcast));
 
         if (!finalizedBudgetBroadcast.IsValid(strError)) {
             LogPrint(BCLog::MNBUDGET,"fbs - invalid finalized budget - %s\n", strError);
@@ -1190,7 +1190,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
             return;
         }
 
-        mapSeenFinalizedBudgetVotes.insert(make_pair(vote.GetHash(), vote));
+        mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
         if (!vote.SignatureValid(true)) {
             if (masternodeSync.IsSynced()) {
                 LogPrintf("CBudgetManager::ProcessMessage() : fbvote - signature from masternode %s invalid\n", HexStr(pmn->pubKeyMasternode));
@@ -2189,7 +2189,7 @@ void CFinalizedBudget::SubmitVote()
     if (budget.UpdateFinalizedBudget(vote, NULL, strError)) {
         LogPrint(BCLog::MNBUDGET,"CFinalizedBudget::SubmitVote  - new finalized budget vote - %s\n", vote.GetHash().ToString());
 
-        budget.mapSeenFinalizedBudgetVotes.insert(make_pair(vote.GetHash(), vote));
+        budget.mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
         vote.Relay();
     } else {
         LogPrint(BCLog::MNBUDGET,"CFinalizedBudget::SubmitVote : Error submitting vote - %s\n", strError);

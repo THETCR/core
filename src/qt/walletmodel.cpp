@@ -383,10 +383,10 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction& tran
                 std::string key("PaymentRequest");
                 std::string value;
                 rcp.paymentRequest.SerializeToString(&value);
-                newTx->vOrderForm.push_back(make_pair(key, value));
+                newTx->vOrderForm.push_back(std::make_pair(key, value));
             } else if (!rcp.message.isEmpty()) // Message from normal wispr:URI (wispr:XyZ...?message=example)
             {
-                newTx->vOrderForm.push_back(make_pair("Message", rcp.message.toStdString()));
+                newTx->vOrderForm.push_back(std::make_pair("Message", rcp.message.toStdString()));
             }
         }
 
@@ -534,7 +534,7 @@ static std::vector<std::pair<uint256, ChangeType> > vQueueNotifications;
 static void NotifyTransactionChanged(WalletModel* walletmodel, CWallet* wallet, const uint256& hash, ChangeType status)
 {
     if (fQueueNotifications) {
-        vQueueNotifications.push_back(make_pair(hash, status));
+        vQueueNotifications.push_back(std::make_pair(hash, status));
         return;
     }
 

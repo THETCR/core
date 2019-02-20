@@ -227,7 +227,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
     const CBlockIndex* pindex = pindexPrev;
 
     while (pindex && pindex->GetBlockTime() >= nSelectionIntervalStart) {
-        vSortedByTimestamp.push_back(make_pair(pindex->GetBlockTime(), pindex->GetBlockHash()));
+        vSortedByTimestamp.push_back(std::make_pair(pindex->GetBlockTime(), pindex->GetBlockHash()));
         pindex = pindex->pprev;
     }
 
@@ -251,7 +251,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
         nStakeModifierNew |= (((uint64_t)pindex->GetStakeEntropyBit()) << nRound);
 
         // add the selected block from candidates to selected list
-        mapSelectedBlocks.insert(make_pair(pindex->GetBlockHash(), pindex));
+        mapSelectedBlocks.insert(std::make_pair(pindex->GetBlockHash(), pindex));
         if (gArgs.GetBoolArg("-printstakemodifier", false))
             LogPrintf("ComputeNextStakeModifier: selected round %d stop=%s height=%d bit=%d\n",
                       nRound, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nSelectionIntervalStop).c_str(), pindex->nHeight, pindex->GetStakeEntropyBit());

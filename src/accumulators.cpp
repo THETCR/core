@@ -88,7 +88,7 @@ void AddAccumulatorChecksum(const uint32_t nChecksum, const CBigNum &bnValue)
     //Since accumulators are switching at v2, stop databasing v1 because its useless. Only focus on v2.
     if (chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
         zerocoinDB->WriteAccumulatorValue(nChecksum, bnValue);
-        mapAccumulatorValues.insert(make_pair(nChecksum, bnValue));
+        mapAccumulatorValues.insert(std::make_pair(nChecksum, bnValue));
     }
 }
 
@@ -140,7 +140,7 @@ bool LoadAccumulatorValuesFromDB(const uint256 nCheckpoint)
             LogPrint(BCLog::ZERO, "%s : Missing databased value for checksum %d", __func__, nChecksum);
             return false;
         }
-        mapAccumulatorValues.insert(make_pair(nChecksum, bnValue));
+        mapAccumulatorValues.insert(std::make_pair(nChecksum, bnValue));
     }
     return true;
 }
@@ -732,7 +732,7 @@ map<CoinDenomination, int> GetMintMaturityHeight()
 {
     map<CoinDenomination, pair<int, int > > mapDenomMaturity;
     for (auto denom : libzerocoin::zerocoinDenomList)
-        mapDenomMaturity.insert(make_pair(denom, make_pair(0, 0)));
+        mapDenomMaturity.insert(std::make_pair(denom, make_pair(0, 0)));
 
     int nConfirmedHeight = chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations();
 
@@ -765,7 +765,7 @@ map<CoinDenomination, int> GetMintMaturityHeight()
     //Generate final map
     map<CoinDenomination, int> mapRet;
     for (auto denom : libzerocoin::zerocoinDenomList)
-        mapRet.insert(make_pair(denom, mapDenomMaturity.at(denom).second));
+        mapRet.insert(std::make_pair(denom, mapDenomMaturity.at(denom).second));
 
     return mapRet;
 }

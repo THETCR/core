@@ -630,7 +630,7 @@ void CObfuscationPool::CheckFinalTransaction()
             dstx.vchSig = vchSig;
             dstx.sigTime = sigTime;
 
-            mapObfuscationBroadcastTxes.insert(make_pair(txNew.GetHash(), dstx));
+            mapObfuscationBroadcastTxes.insert(std::make_pair(txNew.GetHash(), dstx));
         }
 
         CInv inv(MSG_DSTX, txNew.GetHash());
@@ -1689,7 +1689,7 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
     std::vector<pair<CScript, CAmount> > vecSend;
 
     // ****** Add fees ************ /
-    vecSend.push_back(make_pair(scriptChange, nPayment));
+    vecSend.push_back(std::make_pair(scriptChange, nPayment));
 
     CCoinControl* coinControl = nullptr;
     bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFail, coinControl, ONLY_DENOMINATED);
@@ -1725,7 +1725,7 @@ bool CObfuscationPool::MakeCollateralAmounts()
     assert(reservekeyCollateral.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
     scriptCollateral = GetScriptForDestination(vchPubKey.GetID());
 
-    vecSend.push_back(make_pair(scriptCollateral, OBFUSCATION_COLLATERAL * 4));
+    vecSend.push_back(std::make_pair(scriptCollateral, OBFUSCATION_COLLATERAL * 4));
 
     // try to use non-denominated and not mn-like funds
     bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekeyChange,
@@ -1782,7 +1782,7 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
 
     // ****** Add collateral outputs ************ /
     if (!pwalletMain->HasCollateralInputs()) {
-        vecSend.push_back(make_pair(scriptCollateral, OBFUSCATION_COLLATERAL * 4));
+        vecSend.push_back(std::make_pair(scriptCollateral, OBFUSCATION_COLLATERAL * 4));
         nValueLeft -= OBFUSCATION_COLLATERAL * 4;
     }
 
@@ -1800,7 +1800,7 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
             // TODO: do not keep reservekeyDenom here
             reservekeyDenom.KeepKey();
 
-            vecSend.push_back(make_pair(scriptDenom, v));
+            vecSend.push_back(std::make_pair(scriptDenom, v));
 
             //increment outputs and subtract denomination amount
             nOutputs++;
@@ -1965,7 +1965,7 @@ int CObfuscationPool::GetDenominations(const std::vector<CTxOut>& vout, bool fSi
 
     // make a list of denominations, with zero uses
     for (int64_t d: obfuScationDenominations)
-        denomUsed.push_back(make_pair(d, 0));
+        denomUsed.push_back(std::make_pair(d, 0));
 
     // look for denominations and update uses to 1
     for (CTxOut out: vout) {

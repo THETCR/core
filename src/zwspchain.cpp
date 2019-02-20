@@ -292,7 +292,7 @@ std::string ReindexZerocoinDB()
                                 continue;
 
                             libzerocoin::CoinSpend spend = TxInToZerocoinSpend(in);
-                            vSpendInfo.push_back(make_pair(spend, txid));
+                            vSpendInfo.push_back(std::make_pair(spend, txid));
                         }
                     }
 
@@ -305,7 +305,7 @@ std::string ReindexZerocoinDB()
                             CValidationState state;
                             libzerocoin::PublicCoin coin(Params().Zerocoin_Params(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()));
                             TxOutToPublicCoin(out, coin, state);
-                            vMintInfo.push_back(make_pair(coin, txid));
+                            vMintInfo.push_back(std::make_pair(coin, txid));
                         }
                     }
                 }

@@ -198,7 +198,7 @@ bool CDBEnv::Salvage(std::string strFile, bool fAggressive, std::vector<CDBEnv::
         getline(strDump, keyHex);
         if (keyHex != "DATA=END") {
             getline(strDump, valueHex);
-            vResult.push_back(make_pair(ParseHex(keyHex), ParseHex(valueHex)));
+            vResult.push_back(std::make_pair(ParseHex(keyHex), ParseHex(valueHex)));
         }
     }
 

@@ -38,7 +38,7 @@ static uint64_t nAccountingEntryNumber = 0;
 bool CWalletDB::WriteName(const string& strAddress, const string& strName)
 {
     nWalletDBUpdated++;
-    return Write(make_pair(string("name"), strAddress), strName);
+    return Write(std::make_pair(string("name"), strAddress), strName);
 }
 
 bool CWalletDB::EraseName(const string& strAddress)
@@ -46,19 +46,19 @@ bool CWalletDB::EraseName(const string& strAddress)
     // This should only be used for sending addresses, never for receiving addresses,
     // receiving addresses must always have an address book entry if they're not change return.
     nWalletDBUpdated++;
-    return Erase(make_pair(string("name"), strAddress));
+    return Erase(std::make_pair(string("name"), strAddress));
 }
 
 bool CWalletDB::WritePurpose(const string& strAddress, const string& strPurpose)
 {
     nWalletDBUpdated++;
-    return Write(make_pair(string("purpose"), strAddress), strPurpose);
+    return Write(std::make_pair(string("purpose"), strAddress), strPurpose);
 }
 
 bool CWalletDB::ErasePurpose(const string& strPurpose)
 {
     nWalletDBUpdated++;
-    return Erase(make_pair(string("purpose"), strPurpose));
+    return Erase(std::make_pair(string("purpose"), strPurpose));
 }
 
 bool CWalletDB::WriteTx(uint256 hash, const CWalletTx& wtx)
@@ -323,12 +323,12 @@ bool CWalletDB::WriteMinVersion(int nVersion)
 bool CWalletDB::ReadAccount(const string& strAccount, CAccount& account)
 {
     account.SetNull();
-    return Read(make_pair(string("acc"), strAccount), account);
+    return Read(std::make_pair(string("acc"), strAccount), account);
 }
 
 bool CWalletDB::WriteAccount(const string& strAccount, const CAccount& account)
 {
-    return Write(make_pair(string("acc"), strAccount), account);
+    return Write(std::make_pair(string("acc"), strAccount), account);
 }
 
 bool CWalletDB::WriteAccountingEntry(const uint64_t nAccEntryNum, const CAccountingEntry& acentry)
@@ -407,12 +407,12 @@ DBErrors CWalletDB::ReorderTransactions(CWallet* pwallet)
 
     for (map<uint256, CWalletTx>::iterator it = pwallet->mapWallet.begin(); it != pwallet->mapWallet.end(); ++it) {
         CWalletTx* wtx = &((*it).second);
-        txByTime.insert(make_pair(wtx->nTimeReceived, TxPair(wtx, (CAccountingEntry*)0)));
+        txByTime.insert(std::make_pair(wtx->nTimeReceived, TxPair(wtx, (CAccountingEntry*)0)));
     }
     list<CAccountingEntry> acentries;
     ListAccountCreditDebit("", acentries);
     for (CAccountingEntry& entry: acentries) {
-        txByTime.insert(make_pair(entry.nTime, TxPair((CWalletTx*)0, &entry)));
+        txByTime.insert(std::make_pair(entry.nTime, TxPair((CWalletTx*)0, &entry)));
     }
 
     int64_t& nOrderPosNext = pwallet->nOrderPosNext;
@@ -825,7 +825,7 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
     pwallet->laccentries.clear();
     ListAccountCreditDebit("*", pwallet->laccentries);
     for(CAccountingEntry& entry: pwallet->laccentries) {
-        pwallet->wtxOrdered.insert(make_pair(entry.nOrderPos, CWallet::TxPair((CWalletTx*)0, &entry)));
+        pwallet->wtxOrdered.insert(std::make_pair(entry.nOrderPos, CWallet::TxPair((CWalletTx*)0, &entry)));
     }
 
     return result;
@@ -1199,33 +1199,33 @@ bool CWalletDB::EraseDestData(const std::string& address, const std::string& key
 
 bool CWalletDB::WriteZerocoinSpendSerialEntry(const CZerocoinSpend& zerocoinSpend)
 {
-    return Write(make_pair(string("zcserial"), zerocoinSpend.GetSerial()), zerocoinSpend, true);
+    return Write(std::make_pair(string("zcserial"), zerocoinSpend.GetSerial()), zerocoinSpend, true);
 }
 bool CWalletDB::EraseZerocoinSpendSerialEntry(const CBigNum& serialEntry)
 {
-    return Erase(make_pair(string("zcserial"), serialEntry));
+    return Erase(std::make_pair(string("zcserial"), serialEntry));
 }
 
 bool CWalletDB::ReadZerocoinSpendSerialEntry(const CBigNum& bnSerial)
 {
     CZerocoinSpend spend;
-    return Read(make_pair(string("zcserial"), bnSerial), spend);
+    return Read(std::make_pair(string("zcserial"), bnSerial), spend);
 }
 
 bool CWalletDB::WriteDeterministicMint(const CDeterministicMint& dMint)
 {
     uint256 hash = dMint.GetPubcoinHash();
-    return Write(make_pair(string("dzwsp"), hash), dMint, true);
+    return Write(std::make_pair(string("dzwsp"), hash), dMint, true);
 }
 
 bool CWalletDB::ReadDeterministicMint(const uint256& hashPubcoin, CDeterministicMint& dMint)
 {
-    return Read(make_pair(string("dzwsp"), hashPubcoin), dMint);
+    return Read(std::make_pair(string("dzwsp"), hashPubcoin), dMint);
 }
 
 bool CWalletDB::EraseDeterministicMint(const uint256& hashPubcoin)
 {
-    return Erase(make_pair(string("dzwsp"), hashPubcoin));
+    return Erase(std::make_pair(string("dzwsp"), hashPubcoin));
 }
 
 bool CWalletDB::WriteZerocoinMint(const CZerocoinMint& zerocoinMint)
@@ -1234,8 +1234,8 @@ bool CWalletDB::WriteZerocoinMint(const CZerocoinMint& zerocoinMint)
     ss << zerocoinMint.GetValue();
     uint256 hash = Hash(ss.begin(), ss.end());
 
-    Erase(make_pair(string("zerocoin"), hash));
-    return Write(make_pair(string("zerocoin"), hash), zerocoinMint, true);
+    Erase(std::make_pair(string("zerocoin"), hash));
+    return Write(std::make_pair(string("zerocoin"), hash), zerocoinMint, true);
 }
 
 bool CWalletDB::ReadZerocoinMint(const CBigNum &bnPubCoinValue, CZerocoinMint& zerocoinMint)
@@ -1249,7 +1249,7 @@ bool CWalletDB::ReadZerocoinMint(const CBigNum &bnPubCoinValue, CZerocoinMint& z
 
 bool CWalletDB::ReadZerocoinMint(const uint256& hashPubcoin, CZerocoinMint& mint)
 {
-    return Read(make_pair(string("zerocoin"), hashPubcoin), mint);
+    return Read(std::make_pair(string("zerocoin"), hashPubcoin), mint);
 }
 
 bool CWalletDB::EraseZerocoinMint(const CZerocoinMint& zerocoinMint)
@@ -1258,7 +1258,7 @@ bool CWalletDB::EraseZerocoinMint(const CZerocoinMint& zerocoinMint)
     ss << zerocoinMint.GetValue();
     uint256 hash = Hash(ss.begin(), ss.end());
 
-    return Erase(make_pair(string("zerocoin"), hash));
+    return Erase(std::make_pair(string("zerocoin"), hash));
 }
 
 bool CWalletDB::ArchiveMintOrphan(const CZerocoinMint& zerocoinMint)
@@ -1267,12 +1267,12 @@ bool CWalletDB::ArchiveMintOrphan(const CZerocoinMint& zerocoinMint)
     ss << zerocoinMint.GetValue();
     uint256 hash = Hash(ss.begin(), ss.end());;
 
-    if (!Write(make_pair(string("zco"), hash), zerocoinMint)) {
+    if (!Write(std::make_pair(string("zco"), hash), zerocoinMint)) {
         LogPrintf("%s : failed to database orphaned zerocoin mint\n", __func__);
         return false;
     }
 
-    if (!Erase(make_pair(string("zerocoin"), hash))) {
+    if (!Erase(std::make_pair(string("zerocoin"), hash))) {
         LogPrintf("%s : failed to erase orphaned zerocoin mint\n", __func__);
         return false;
     }
@@ -1282,10 +1282,10 @@ bool CWalletDB::ArchiveMintOrphan(const CZerocoinMint& zerocoinMint)
 
 bool CWalletDB::ArchiveDeterministicOrphan(const CDeterministicMint& dMint)
 {
-    if (!Write(make_pair(string("dzco"), dMint.GetPubcoinHash()), dMint))
+    if (!Write(std::make_pair(string("dzco"), dMint.GetPubcoinHash()), dMint))
         return error("%s: write failed", __func__);
 
-    if (!Erase(make_pair(string("dzwsp"), dMint.GetPubcoinHash())))
+    if (!Erase(std::make_pair(string("dzwsp"), dMint.GetPubcoinHash())))
         return error("%s: failed to erase", __func__);
 
     return true;
@@ -1293,13 +1293,13 @@ bool CWalletDB::ArchiveDeterministicOrphan(const CDeterministicMint& dMint)
 
 bool CWalletDB::UnarchiveDeterministicMint(const uint256& hashPubcoin, CDeterministicMint& dMint)
 {
-    if (!Read(make_pair(string("dzco"), hashPubcoin), dMint))
+    if (!Read(std::make_pair(string("dzco"), hashPubcoin), dMint))
         return error("%s: failed to retrieve deterministic mint from archive", __func__);
 
     if (!WriteDeterministicMint(dMint))
         return error("%s: failed to write deterministic mint", __func__);
 
-    if (!Erase(make_pair(string("dzco"), dMint.GetPubcoinHash())))
+    if (!Erase(std::make_pair(string("dzco"), dMint.GetPubcoinHash())))
         return error("%s : failed to erase archived deterministic mint", __func__);
 
     return true;
@@ -1307,14 +1307,14 @@ bool CWalletDB::UnarchiveDeterministicMint(const uint256& hashPubcoin, CDetermin
 
 bool CWalletDB::UnarchiveZerocoinMint(const uint256& hashPubcoin, CZerocoinMint& mint)
 {
-    if (!Read(make_pair(string("zco"), hashPubcoin), mint))
+    if (!Read(std::make_pair(string("zco"), hashPubcoin), mint))
         return error("%s: failed to retrieve zerocoinmint from archive", __func__);
 
     if (!WriteZerocoinMint(mint))
         return error("%s: failed to write zerocoinmint", __func__);
 
     uint256 hash = GetPubCoinHash(mint.GetValue());
-    if (!Erase(make_pair(string("zco"), hash)))
+    if (!Erase(std::make_pair(string("zco"), hash)))
         return error("%s : failed to erase archived zerocoin mint", __func__);
 
     return true;
@@ -1335,7 +1335,7 @@ bool CWalletDB::WriteZWSPSeed(const uint256& hashSeed, const std::vector<unsigne
     if (!WriteCurrentSeedHash(hashSeed))
         return error("%s: failed to write current seed hash", __func__);
 
-    return Write(make_pair(string("dzs"), hashSeed), seed);
+    return Write(std::make_pair(string("dzs"), hashSeed), seed);
 }
 
 bool CWalletDB::EraseZWSPSeed()
@@ -1361,7 +1361,7 @@ bool CWalletDB::EraseZWSPSeed_deprecated()
 
 bool CWalletDB::ReadZWSPSeed(const uint256& hashSeed, std::vector<unsigned char>& seed)
 {
-    return Read(make_pair(string("dzs"), hashSeed), seed);
+    return Read(std::make_pair(string("dzs"), hashSeed), seed);
 }
 
 bool CWalletDB::ReadZWSPSeed_deprecated(uint256& seed)
@@ -1381,7 +1381,7 @@ bool CWalletDB::ReadZWSPCount(uint32_t& nCount)
 
 bool CWalletDB::WriteMintPoolPair(const uint256& hashMasterSeed, const uint256& hashPubcoin, const uint32_t& nCount)
 {
-    return Write(make_pair(string("mintpool"), hashPubcoin), make_pair(hashMasterSeed, nCount));
+    return Write(std::make_pair(string("mintpool"), hashPubcoin), make_pair(hashMasterSeed, nCount));
 }
 
 //! map with hashMasterSeed as the key, paired with vector of hashPubcoins and their count
@@ -1432,7 +1432,7 @@ std::map<uint256, std::vector<pair<uint256, uint32_t> > > CWalletDB::MapMintPool
         } else {
             std::vector<pair<uint256, uint32_t> > vPairs;
             vPairs.emplace_back(pMint);
-            mapPool.insert(make_pair(hashMasterSeed, vPairs));
+            mapPool.insert(std::make_pair(hashMasterSeed, vPairs));
         }
     }
 

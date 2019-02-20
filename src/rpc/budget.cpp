@@ -330,7 +330,7 @@ UniValue submitbudget(const UniValue& params, bool fHelp)
     //     return "Proposal is not valid - " + budgetProposalBroadcast.GetHash().ToString() + " - " + strError;
     // }
 
-    budget.mapSeenMasternodeBudgetProposals.insert(make_pair(budgetProposalBroadcast.GetHash(), budgetProposalBroadcast));
+    budget.mapSeenMasternodeBudgetProposals.insert(std::make_pair(budgetProposalBroadcast.GetHash(), budgetProposalBroadcast));
     budgetProposalBroadcast.Relay();
     if(budget.AddProposal(budgetProposalBroadcast)) {
         return budgetProposalBroadcast.GetHash().ToString();
@@ -432,7 +432,7 @@ UniValue mnbudgetvote(const UniValue& params, bool fHelp)
             std::string strError = "";
             if (budget.UpdateProposal(vote, NULL, strError)) {
                 success++;
-                budget.mapSeenMasternodeBudgetVotes.insert(make_pair(vote.GetHash(), vote));
+                budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
                 vote.Relay();
                 statusObj.push_back(Pair("node", "local"));
                 statusObj.push_back(Pair("result", "success"));
@@ -498,7 +498,7 @@ UniValue mnbudgetvote(const UniValue& params, bool fHelp)
 
             std::string strError = "";
             if (budget.UpdateProposal(vote, NULL, strError)) {
-                budget.mapSeenMasternodeBudgetVotes.insert(make_pair(vote.GetHash(), vote));
+                budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
                 vote.Relay();
                 success++;
                 statusObj.push_back(Pair("node", mne.getAlias()));
@@ -573,7 +573,7 @@ UniValue mnbudgetvote(const UniValue& params, bool fHelp)
 
             std::string strError = "";
             if(budget.UpdateProposal(vote, NULL, strError)) {
-                budget.mapSeenMasternodeBudgetVotes.insert(make_pair(vote.GetHash(), vote));
+                budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
                 vote.Relay();
                 success++;
                 statusObj.push_back(Pair("node", mne.getAlias()));
@@ -851,7 +851,7 @@ UniValue mnbudgetrawvote(const UniValue& params, bool fHelp)
 
     std::string strError = "";
     if (budget.UpdateProposal(vote, NULL, strError)) {
-        budget.mapSeenMasternodeBudgetVotes.insert(make_pair(vote.GetHash(), vote));
+        budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
         vote.Relay();
         return "Voted successfully";
     } else {
@@ -930,7 +930,7 @@ UniValue mnfinalbudget(const UniValue& params, bool fHelp)
 
             std::string strError = "";
             if (budget.UpdateFinalizedBudget(vote, NULL, strError)) {
-                budget.mapSeenFinalizedBudgetVotes.insert(make_pair(vote.GetHash(), vote));
+                budget.mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
                 vote.Relay();
                 success++;
                 statusObj.push_back(Pair("result", "success"));
@@ -975,7 +975,7 @@ UniValue mnfinalbudget(const UniValue& params, bool fHelp)
 
         std::string strError = "";
         if (budget.UpdateFinalizedBudget(vote, NULL, strError)) {
-            budget.mapSeenFinalizedBudgetVotes.insert(make_pair(vote.GetHash(), vote));
+            budget.mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
             vote.Relay();
             return "success";
         } else {

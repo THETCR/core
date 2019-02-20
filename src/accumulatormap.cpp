@@ -17,7 +17,7 @@ AccumulatorMap::AccumulatorMap(libzerocoin::ZerocoinParams* params)
     this->params = params;
     for (auto& denom : zerocoinDenomList) {
         unique_ptr<Accumulator> uptr(new Accumulator(params, denom));
-        mapAccumulators.insert(make_pair(denom, std::move(uptr)));
+        mapAccumulators.insert(std::make_pair(denom, std::move(uptr)));
     }
 }
 
@@ -33,7 +33,7 @@ void AccumulatorMap::Reset(libzerocoin::ZerocoinParams* params2)
     mapAccumulators.clear();
     for (auto& denom : zerocoinDenomList) {
         unique_ptr<Accumulator> uptr(new Accumulator(params2, denom));
-        mapAccumulators.insert(make_pair(denom, std::move(uptr)));
+        mapAccumulators.insert(std::make_pair(denom, std::move(uptr)));
     }
 }
 

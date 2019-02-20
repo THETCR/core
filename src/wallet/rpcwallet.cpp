@@ -974,7 +974,7 @@ UniValue sendmany(const UniValue& params, bool fHelp)
         CAmount nAmount = AmountFromValue(sendTo[name_]);
         totalAmount += nAmount;
 
-        vecSend.push_back(make_pair(scriptPubKey, nAmount));
+        vecSend.push_back(std::make_pair(scriptPubKey, nAmount));
     }
 
     EnsureWalletIsUnlocked();
@@ -3581,7 +3581,7 @@ void static SearchThread(CzWSPWallet* zwallet, int nCountStart, int nCountEnd)
             zwallet->SeedToZWSP(zerocoinSeed, bnValue, bnSerial, bnRandomness, key);
 
             uint256 hashPubcoin = GetPubCoinHash(bnValue);
-            zwallet->AddToMintPool(make_pair(hashPubcoin, i), true);
+            zwallet->AddToMintPool(std::make_pair(hashPubcoin, i), true);
             walletDB.WriteMintPoolPair(hashSeed, hashPubcoin, i);
         }
     } catch (std::exception& e) {
