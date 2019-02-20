@@ -2465,6 +2465,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
         CInv inv(MSG_BLOCK, pindexNew->GetBlockHash());
         cout << "ConnectBlock...\n";
         bool rv = ConnectBlock(*pblock, state, pindexNew, view, false, fAlreadyChecked);
+        cout << "Block connected...\n";
         GetMainSignals().BlockChecked(*pblock, state);
         cout << "BlockChecked...\n";
         if (!rv) {
