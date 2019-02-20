@@ -85,14 +85,18 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     bool fFirstRun;
     pwalletMain = new CWallet("wallet.dat");
     pwalletMain->LoadWallet(fFirstRun);
+    cout << "RegisterValidationInterface\n";
     RegisterValidationInterface(pwalletMain);
+    cout << "RegisterValidationInterface Done\n";
 #endif
     nScriptCheckThreads = 3;
     for (int i=0; i < nScriptCheckThreads-1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
     g_connman = std::unique_ptr<CConnman>(new CConnman()); // Deterministic randomness for tests.
     connman = g_connman.get();
+    cout << "RegisterNodeSignals\n";
     RegisterNodeSignals(GetNodeSignals());
+    cout << "RegisterNodeSignals Done\n";
 }
 
 TestingSetup::~TestingSetup()
