@@ -72,8 +72,10 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     pcoinsdbview = new CCoinsViewDB(1 << 23, true);
     pcoinsTip = new CCoinsViewCache(pcoinsdbview);
     InitBlockIndex(chainparams);
+    cout << "InitBLockIndex DONE\n";
     {
         CValidationState state;
+        cout << "Activate best chain...\n";
         if (!ActivateBestChain(state)) {
             throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
         }
