@@ -2507,12 +2507,12 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     // to conflicted:
     for (const CTransaction& tx: txConflicted) {
         cout << "SyncWithWallets...\n";
-        SyncWithWallets(tx, NULL);
+//        SyncWithWallets(tx, NULL);
     }
     // ... and about transactions that got confirmed:
     for (const CTransaction& tx: pblock->vtx) {
-        cout << "SyncWithWallets 2...\n";
-        SyncWithWallets(tx, pblock);
+//        cout << "SyncWithWallets 2...\n";
+//        SyncWithWallets(tx, pblock);
     }
 
     int64_t nTime6 = GetTimeMicros();
@@ -3763,7 +3763,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const CBlock* pblock, bool
         bool ret = AcceptBlock(*pblock, state, &pindex, dbp, fNewBlock);
 //        bool ret = AcceptBlock(*pblock, state, &pindex, fForceProcessing, dbp, fNewBlock);
         if (!ret) {
-            GetMainSignals().BlockChecked(*pblock, state);
+//            GetMainSignals().BlockChecked(*pblock, state);
             return error("%s: AcceptBlock FAILED", __func__);
         }
     }
