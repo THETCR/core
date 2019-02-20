@@ -671,7 +671,7 @@ bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, string& errorOut, Q
             CAmount amount = txVin.vout[txin.prevout.n].nValue;
 
             //sign what we can
-            SignSignature(keystore, prevPubKey, tx, nIn);
+            SignSignature(keystore, CTransaction(txVin), tx, nIn);
 
             //merge in any previous signatures
 //            txin.scriptSig = CombineSignatures(prevPubKey, tx, nIn, txin.scriptSig, oldVin[nIn].scriptSig);
