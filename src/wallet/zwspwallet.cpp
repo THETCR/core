@@ -194,7 +194,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
         LogPrintf("%s: Mintpool size=%d\n", __func__, mintPool.size());
 
         std::set<uint256> setChecked;
-        list<pair<uint256,uint32_t> > listMints = mintPool.List();
+        std::list<pair<uint256,uint32_t> > listMints = mintPool.List();
         for (pair<uint256, uint32_t> pMint : listMints) {
             LOCK(cs_main);
             if (setChecked.count(pMint.first))

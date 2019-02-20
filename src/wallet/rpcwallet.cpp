@@ -315,7 +315,7 @@ UniValue getaddressesbyaccount(const UniValue& params, bool fHelp)
     UniValue ret(UniValue::VARR);
     for (const std::pair<CBitcoinAddress, CAddressBookData> & item: pwalletMain->mapAddressBook) {
         const CBitcoinAddress& address = item.first;
-        const string& strName = item.second.name;
+        const std::string& strName = item.second.name;
         if (strName == strAccount)
             ret.push_back(address.ToString());
     }
@@ -661,7 +661,7 @@ UniValue getreceivedbyaccount(const UniValue& params, bool fHelp)
 }
 
 
-CAmount GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMinDepth, const isminefilter& filter)
+CAmount GetAccountBalance(CWalletDB& walletdb, const std::string& strAccount, int nMinDepth, const isminefilter& filter)
 {
     CAmount nBalance = 0;
 
@@ -685,7 +685,7 @@ CAmount GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMi
     return nBalance;
 }
 
-CAmount GetAccountBalance(const string& strAccount, int nMinDepth, const isminefilter& filter)
+CAmount GetAccountBalance(const std::string& strAccount, int nMinDepth, const isminefilter& filter)
 {
     CWalletDB walletdb(pwalletMain->strWalletFile);
     return GetAccountBalance(walletdb, strAccount, nMinDepth, filter);
@@ -747,8 +747,8 @@ UniValue getbalance(const UniValue& params, bool fHelp)
 
             CAmount allFee;
             string strSentAccount;
-            list<COutputEntry> listReceived;
-            list<COutputEntry> listSent;
+            std::list<COutputEntry> listReceived;
+            std::list<COutputEntry> listSent;
             wtx.GetAmounts(listReceived, listSent, allFee, strSentAccount, filter);
             if (wtx.GetDepthInMainChain() >= nMinDepth) {
                 for (const COutputEntry& r: listReceived)
@@ -961,7 +961,7 @@ UniValue sendmany(const UniValue& params, bool fHelp)
 
     CAmount totalAmount = 0;
     std::vector<string> keys = sendTo.getKeys();
-    for(const string& name_: keys) {
+    for(const std::string& name_: keys) {
         CBitcoinAddress address(name_);
         if (!address.IsValid())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid WISPR address: ")+name_);
@@ -1112,7 +1112,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
     map<string, tallyitem> mapAccountTally;
     for (const std::pair<CBitcoinAddress, CAddressBookData> & item: pwalletMain->mapAddressBook) {
         const CBitcoinAddress& address = item.first;
-        const string& strAccount = item.second.name;
+        const std::string& strAccount = item.second.name;
         map<CBitcoinAddress, tallyitem>::iterator it = mapTally.find(address);
         if (it == mapTally.end() && !fIncludeEmpty)
             continue;
@@ -1245,12 +1245,12 @@ static void MaybePushAddress(UniValue & entry, const CTxDestination &dest)
         entry.push_back(Pair("address", addr.ToString()));
 }
 
-void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDepth, bool fLong, UniValue& ret, const isminefilter& filter)
+void ListTransactions(const CWalletTx& wtx, const std::string& strAccount, int nMinDepth, bool fLong, UniValue& ret, const isminefilter& filter)
 {
     CAmount nFee;
     string strSentAccount;
-    list<COutputEntry> listReceived;
-    list<COutputEntry> listSent;
+    std::list<COutputEntry> listReceived;
+    std::list<COutputEntry> listSent;
 
     wtx.GetAmounts(listReceived, listSent, nFee, strSentAccount, filter);
 
@@ -1308,7 +1308,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
     }
 }
 
-void AcentryToJSON(const CAccountingEntry& acentry, const string& strAccount, UniValue& ret)
+void AcentryToJSON(const CAccountingEntry& acentry, const std::string& strAccount, UniValue& ret)
 {
     bool fAllAccounts = (strAccount == string("*"));
 
@@ -1493,8 +1493,8 @@ UniValue listaccounts(const UniValue& params, bool fHelp)
         const CWalletTx& wtx = (*it).second;
         CAmount nFee;
         string strSentAccount;
-        list<COutputEntry> listReceived;
-        list<COutputEntry> listSent;
+        std::list<COutputEntry> listReceived;
+        std::list<COutputEntry> listSent;
         int nDepth = wtx.GetDepthInMainChain();
         if (wtx.GetBlocksToMaturity() > 0 || nDepth < 0)
             continue;
@@ -1511,7 +1511,7 @@ UniValue listaccounts(const UniValue& params, bool fHelp)
         }
     }
 
-    const list<CAccountingEntry> & acentries = pwalletMain->laccentries;
+    const std::list<CAccountingEntry> & acentries = pwalletMain->laccentries;
     for (const CAccountingEntry& entry: acentries)
         mapAccountBalances[entry.strAccount] += entry.nCreditDebit;
 
@@ -2701,7 +2701,7 @@ UniValue listspentzerocoins(const UniValue& params, bool fHelp)
     EnsureWalletIsUnlocked(true);
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CBigNum> listPubCoin = walletdb.ListSpentCoinsSerial();
+    std::list<CBigNum> listPubCoin = walletdb.ListSpentCoinsSerial();
 
     UniValue jsonList(UniValue::VARR);
     for (const CBigNum& pubCoinItem : listPubCoin) {
@@ -3120,8 +3120,8 @@ UniValue resetspentzerocoin(const UniValue& params, bool fHelp)
     CWalletDB walletdb(pwalletMain->strWalletFile);
     CzWSPTracker* zwspTracker = pwalletMain->zwspTracker.get();
     set<CMintMeta> setMints = zwspTracker->ListMints(false, false, false);
-    list<CZerocoinSpend> listSpends = walletdb.ListSpentCoins();
-    list<CZerocoinSpend> listUnconfirmedSpends;
+    std::list<CZerocoinSpend> listSpends = walletdb.ListSpentCoins();
+    std::list<CZerocoinSpend> listUnconfirmedSpends;
 
     for (CZerocoinSpend spend : listSpends) {
         CTransaction tx;
@@ -3185,8 +3185,8 @@ UniValue getarchivedzerocoin(const UniValue& params, bool fHelp)
     EnsureWalletIsUnlocked();
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listMints = walletdb.ListArchivedZerocoins();
-    list<CDeterministicMint> listDMints = walletdb.ListArchivedDeterministicMints();
+    std::list<CZerocoinMint> listMints = walletdb.ListArchivedZerocoins();
+    std::list<CDeterministicMint> listDMints = walletdb.ListArchivedDeterministicMints();
 
     UniValue arrRet(UniValue::VARR);
     for (const CZerocoinMint& mint : listMints) {
@@ -3407,8 +3407,8 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
 
     EnsureWalletIsUnlocked(true);
 
-    list<CZerocoinMint> listMints;
-    list<CDeterministicMint> listDMints;
+    std::list<CZerocoinMint> listMints;
+    std::list<CDeterministicMint> listDMints;
     pwalletMain->ReconsiderZerocoins(listMints, listDMints);
 
     UniValue arrRet(UniValue::VARR);

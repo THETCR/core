@@ -384,7 +384,7 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
 
     set<CBitcoinAddress> setAddress;
     std::vector<string> addrList = sendTo.getKeys();
-    for(const string& name_: addrList) {
+    for(const std::string& name_: addrList) {
         CBitcoinAddress address(name_);
         if (!address.IsValid())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid WISPR address: ")+name_);

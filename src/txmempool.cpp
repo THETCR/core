@@ -161,7 +161,7 @@ void CTxMemPool::removeCoinbaseSpends(const CCoinsViewCache *pcoins, unsigned in
 {
     // Remove transactions spending a coinbase which are now immature
     LOCK(cs);
-    list<CTransaction> transactionsToRemove;
+    std::list<CTransaction> transactionsToRemove;
     for (std::map<uint256, CTxMemPoolEntry>::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {
         const CTransaction& tx = it->second.GetTx();
         for (const CTxIn& txin: tx.vin) {
@@ -177,7 +177,7 @@ void CTxMemPool::removeCoinbaseSpends(const CCoinsViewCache *pcoins, unsigned in
         }
     }
     for (const CTransaction& tx: transactionsToRemove) {
-        list<CTransaction> removed;
+        std::list<CTransaction> removed;
         remove(tx, removed, true);
     }
 }
@@ -185,7 +185,7 @@ void CTxMemPool::removeCoinbaseSpends(const CCoinsViewCache *pcoins, unsigned in
 void CTxMemPool::removeConflicts(const CTransaction &tx, std::list<CTransaction>& removed)
 {
     // Remove transactions which depend on inputs of tx, recursively
-    list<CTransaction> result;
+    std::list<CTransaction> result;
     LOCK(cs);
     for (const CTxIn& txin: tx.vin) {
         std::map<COutPoint, CInPoint>::iterator it = mapNextTx.find(txin.prevout);
@@ -242,7 +242,7 @@ void CTxMemPool::check(const CCoinsViewCache *pcoins) const
     CCoinsViewCache mempoolDuplicate(const_cast<CCoinsViewCache*>(pcoins));
 
     LOCK(cs);
-    list<const CTxMemPoolEntry*> waitingOnDependants;
+    std::list<const CTxMemPoolEntry*> waitingOnDependants;
     for (std::map<uint256, CTxMemPoolEntry>::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {
         unsigned int i = 0;
         checkTotal += it->second.GetTxSize();
@@ -377,7 +377,7 @@ bool CTxMemPool::ReadFeeEstimates(CAutoFile& filein)
     return true;
 }
 
-void CTxMemPool::PrioritiseTransaction(const uint256 hash, const string strHash, double dPriorityDelta, const CAmount& nFeeDelta)
+void CTxMemPool::PrioritiseTransaction(const uint256 hash, const std::string strHash, double dPriorityDelta, const CAmount& nFeeDelta)
 {
     {
         LOCK(cs);

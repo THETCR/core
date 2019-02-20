@@ -54,7 +54,7 @@ bool SortSmallest(const pair<uint256, uint32_t>& a, const pair<uint256, uint32_t
 
 std::list<pair<uint256, uint32_t> > CMintPool::List()
 {
-    list<pair<uint256, uint32_t> > listMints;
+    std::list<pair<uint256, uint32_t> > listMints;
     for (auto pMint : *(this)) {
         listMints.emplace_back(pMint);
     }

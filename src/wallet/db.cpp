@@ -303,7 +303,7 @@ void CDB::Close()
     }
 }
 
-void CDBEnv::CloseDb(const string& strFile)
+void CDBEnv::CloseDb(const std::string& strFile)
 {
     {
         LOCK(cs_db);
@@ -317,7 +317,7 @@ void CDBEnv::CloseDb(const string& strFile)
     }
 }
 
-bool CDBEnv::RemoveDb(const string& strFile)
+bool CDBEnv::RemoveDb(const std::string& strFile)
 {
     this->CloseDb(strFile);
 
@@ -326,7 +326,7 @@ bool CDBEnv::RemoveDb(const string& strFile)
     return (rc == 0);
 }
 
-bool CDB::Rewrite(const string& strFile, const char* pszSkip)
+bool CDB::Rewrite(const std::string& strFile, const char* pszSkip)
 {
     while (true) {
         {

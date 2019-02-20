@@ -730,7 +730,7 @@ void MultisigDialog::commitMultisigTx()
         CWalletTx wtx(pwalletMain, tx);
         CReserveKey keyChange(pwalletMain);
         if (!pwalletMain->CommitTransaction(wtx, keyChange))
-            throw runtime_error(string("Transaction rejected - Failed to commit"));
+            throw runtime_error(std::string("Transaction rejected - Failed to commit"));
 #else
         uint256 hashTx = tx.GetHash();
         CCoinsViewCache& view = *pcoinsTip;
@@ -746,7 +746,7 @@ void MultisigDialog::commitMultisigTx()
                 if (state.IsInvalid())
                     throw runtime_error(strprintf("Transaction rejected - %i: %s", state.GetRejectCode(), state.GetRejectReason()));
                 else
-                    throw runtime_error(string("Transaction rejected - ") + state.GetRejectReason());
+                    throw runtime_error(std::string("Transaction rejected - ") + state.GetRejectReason());
             }
         } else if (fHaveChain) {
             throw runtime_error("transaction already in block chain");

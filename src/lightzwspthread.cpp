@@ -41,7 +41,7 @@ void CLightWorker::ThreadLightZWSPSimplified() {
                     int nMintsAdded = 0;
                     CZerocoinSpendReceipt receipt;
 
-                    list<CBigNum> ret;
+                    std::list<CBigNum> ret;
                     int heightStop;
 
                     bool res;

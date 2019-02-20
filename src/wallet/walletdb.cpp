@@ -35,13 +35,13 @@ static uint64_t nAccountingEntryNumber = 0;
 // CWalletDB
 //
 
-bool CWalletDB::WriteName(const string& strAddress, const string& strName)
+bool CWalletDB::WriteName(const std::string& strAddress, const std::string& strName)
 {
     nWalletDBUpdated++;
     return Write(std::make_pair(string("name"), strAddress), strName);
 }
 
-bool CWalletDB::EraseName(const string& strAddress)
+bool CWalletDB::EraseName(const std::string& strAddress)
 {
     // This should only be used for sending addresses, never for receiving addresses,
     // receiving addresses must always have an address book entry if they're not change return.
@@ -49,13 +49,13 @@ bool CWalletDB::EraseName(const string& strAddress)
     return Erase(std::make_pair(string("name"), strAddress));
 }
 
-bool CWalletDB::WritePurpose(const string& strAddress, const string& strPurpose)
+bool CWalletDB::WritePurpose(const std::string& strAddress, const std::string& strPurpose)
 {
     nWalletDBUpdated++;
     return Write(std::make_pair(string("purpose"), strAddress), strPurpose);
 }
 
-bool CWalletDB::ErasePurpose(const string& strPurpose)
+bool CWalletDB::ErasePurpose(const std::string& strPurpose)
 {
     nWalletDBUpdated++;
     return Erase(std::make_pair(string("purpose"), strPurpose));
@@ -320,13 +320,13 @@ bool CWalletDB::WriteMinVersion(int nVersion)
     return Write(std::string("minversion"), nVersion);
 }
 
-bool CWalletDB::ReadAccount(const string& strAccount, CAccount& account)
+bool CWalletDB::ReadAccount(const std::string& strAccount, CAccount& account)
 {
     account.SetNull();
     return Read(std::make_pair(string("acc"), strAccount), account);
 }
 
-bool CWalletDB::WriteAccount(const string& strAccount, const CAccount& account)
+bool CWalletDB::WriteAccount(const std::string& strAccount, const CAccount& account)
 {
     return Write(std::make_pair(string("acc"), strAccount), account);
 }
@@ -341,9 +341,9 @@ bool CWalletDB::WriteAccountingEntry_Backend(const CAccountingEntry& acentry)
     return WriteAccountingEntry(++nAccountingEntryNumber, acentry);
 }
 
-CAmount CWalletDB::GetAccountCreditDebit(const string& strAccount)
+CAmount CWalletDB::GetAccountCreditDebit(const std::string& strAccount)
 {
-    list<CAccountingEntry> entries;
+    std::list<CAccountingEntry> entries;
     ListAccountCreditDebit(strAccount, entries);
 
     CAmount nCreditDebit = 0;
@@ -353,7 +353,7 @@ CAmount CWalletDB::GetAccountCreditDebit(const string& strAccount)
     return nCreditDebit;
 }
 
-void CWalletDB::ListAccountCreditDebit(const string& strAccount, list<CAccountingEntry>& entries)
+void CWalletDB::ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& entries)
 {
     bool fAllAccounts = (strAccount == "*");
 
@@ -409,7 +409,7 @@ DBErrors CWalletDB::ReorderTransactions(CWallet* pwallet)
         CWalletTx* wtx = &((*it).second);
         txByTime.insert(std::make_pair(wtx->nTimeReceived, TxPair(wtx, (CAccountingEntry*)0)));
     }
-    list<CAccountingEntry> acentries;
+    std::list<CAccountingEntry> acentries;
     ListAccountCreditDebit("", acentries);
     for (CAccountingEntry& entry: acentries) {
         txByTime.insert(std::make_pair(entry.nTime, TxPair((CWalletTx*)0, &entry)));
@@ -909,7 +909,7 @@ DBErrors CWalletDB::ZapWalletTx(CWallet* pwallet, std::vector<CWalletTx>& vWtx)
     return DB_LOAD_OK;
 }
 
-void ThreadFlushWalletDB(const string& strFile)
+void ThreadFlushWalletDB(const std::string& strFile)
 {
     // Make this thread recognisable as the wallet flushing thread
     RenameThread("wispr-wallet");

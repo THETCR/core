@@ -125,7 +125,7 @@ static void CheckBlockIndex();
 /** Constant stuff for coinbase transactions we create: */
 CScript COINBASE_FLAGS;
 
-const string strMessageMagic = "DarkNet Signed Message:\n";
+const std::string strMessageMagic = "DarkNet Signed Message:\n";
 
 // Internal stuff
 namespace
@@ -371,7 +371,7 @@ bool CheckZerocoinSpend(const CTransaction& tx, bool fVerifySignature, CValidati
 
     bool fValidated = false;
     set<CBigNum> serials;
-    list<CoinSpend> vSpends;
+    std::list<CoinSpend> vSpends;
     CAmount nTotalRedeemed = 0;
     for (const CTxIn& txin : tx.vin) {
 
@@ -1704,7 +1704,7 @@ void RecalculateZWSPSpent()
         CBlock block;
         assert(ReadBlockFromDisk(block, pindex));
 
-        list<libzerocoin::CoinDenomination> listDenomsSpent = ZerocoinSpendListFromBlock(block, true);
+        std::list<libzerocoin::CoinDenomination> listDenomsSpent = ZerocoinSpendListFromBlock(block, true);
 
         //Reset the supply to previous block
         pindex->mapZerocoinSupply = pindex->pprev->mapZerocoinSupply;
@@ -2397,7 +2397,7 @@ bool static DisconnectTip(CValidationState& state)
     // Resurrect mempool transactions from the disconnected block.
     for (const CTransaction& tx: block.vtx) {
         // ignore validation errors in resurrected transactions
-        list<CTransaction> removed;
+        std::list<CTransaction> removed;
         CValidationState stateDummy;
         if (tx.IsCoinBase() || tx.IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
             mempool.remove(tx, removed, true);
@@ -2478,7 +2478,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     LogPrint(BCLog::BENCH, "  - Writing chainstate: %.2fms [%.2fs]\n", (nTime5 - nTime4) * 0.001, nTimeChainState * 0.000001);
 
     // Remove conflicting transactions from the mempool.
-    list<CTransaction> txConflicted;
+    std::list<CTransaction> txConflicted;
     mempool.removeForBlock(pblock->vtx, pindexNew->nHeight, txConflicted, !IsInitialBlockDownload());
     mempool.check(pcoinsTip);
     // Update chainActive & related variables.
@@ -2533,7 +2533,7 @@ bool DisconnectBlockAndInputs(CValidationState& state, CTransaction txLock)
     bool foundConflictingTx = false;
 
     //remove anything conflicting in the memory pool
-    list<CTransaction> txConflicted;
+    std::list<CTransaction> txConflicted;
     mempool.removeConflicts(txLock, txConflicted);
 
 

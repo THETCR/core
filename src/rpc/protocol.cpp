@@ -30,7 +30,7 @@ using namespace std;
  * http://www.codeproject.com/KB/recipes/JSON_Spirit.aspx
  */
 
-string JSONRPCRequest(const string& strMethod, const UniValue& params, const UniValue& id)
+string JSONRPCRequest(const std::string& strMethod, const UniValue& params, const UniValue& id)
 {
     UniValue request(UniValue::VOBJ);
     request.push_back(Pair("method", strMethod));
@@ -57,7 +57,7 @@ string JSONRPCReply(const UniValue& result, const UniValue& error, const UniValu
     return reply.write() + "\n";
 }
 
-UniValue JSONRPCError(int code, const string& message)
+UniValue JSONRPCError(int code, const std::string& message)
 {
     UniValue error(UniValue::VOBJ);
     error.push_back(Pair("code", code));

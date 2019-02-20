@@ -72,7 +72,7 @@ static bool RESTERR(HTTPRequest* req, enum HTTPStatusCode status, string message
     return false;
 }
 
-static enum RetFormat ParseDataFormat(std::vector<string>& params, const string& strReq)
+static enum RetFormat ParseDataFormat(std::vector<string>& params, const std::string& strReq)
 {
     boost::split(params, strReq, boost::is_any_of("."));
     if (params.size() > 1) {
@@ -100,7 +100,7 @@ static string AvailableDataFormatsString()
     return formats;
 }
 
-static bool ParseHashStr(const string& strReq, uint256& v)
+static bool ParseHashStr(const std::string& strReq, uint256& v)
 {
     if (!IsHex(strReq) || (strReq.size() != 64))
         return false;

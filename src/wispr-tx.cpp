@@ -135,7 +135,7 @@ static bool AppInitRawTx(int argc, char* argv[])
     return true;
 }
 
-static void RegisterSetJson(const string& key, const string& rawJson)
+static void RegisterSetJson(const std::string& key, const std::string& rawJson)
 {
     UniValue val;
     if (!val.read(rawJson)) {
@@ -146,7 +146,7 @@ static void RegisterSetJson(const string& key, const string& rawJson)
     registers[key] = val;
 }
 
-static void RegisterSet(const string& strInput)
+static void RegisterSet(const std::string& strInput)
 {
     // separate NAME:VALUE in string
     size_t pos = strInput.find(':');
@@ -161,7 +161,7 @@ static void RegisterSet(const string& strInput)
     RegisterSetJson(key, valStr);
 }
 
-static void RegisterLoad(const string& strInput)
+static void RegisterLoad(const std::string& strInput)
 {
     // separate NAME:FILENAME in string
     size_t pos = strInput.find(':');
@@ -201,7 +201,7 @@ static void RegisterLoad(const string& strInput)
     RegisterSetJson(key, valStr);
 }
 
-static void MutateTxVersion(CMutableTransaction& tx, const string& cmdVal)
+static void MutateTxVersion(CMutableTransaction& tx, const std::string& cmdVal)
 {
     int64_t newVersion = atoi64(cmdVal);
     if (newVersion < 1 || newVersion > CTransaction::CURRENT_VERSION)
@@ -210,7 +210,7 @@ static void MutateTxVersion(CMutableTransaction& tx, const string& cmdVal)
     tx.nVersion = (int)newVersion;
 }
 
-static void MutateTxLocktime(CMutableTransaction& tx, const string& cmdVal)
+static void MutateTxLocktime(CMutableTransaction& tx, const std::string& cmdVal)
 {
     int64_t newLocktime = atoi64(cmdVal);
     if (newLocktime < 0LL || newLocktime > 0xffffffffLL)
@@ -219,7 +219,7 @@ static void MutateTxLocktime(CMutableTransaction& tx, const string& cmdVal)
     tx.nLockTime = (unsigned int)newLocktime;
 }
 
-static void MutateTxAddInput(CMutableTransaction& tx, const string& strInput)
+static void MutateTxAddInput(CMutableTransaction& tx, const std::string& strInput)
 {
     // separate TXID:VOUT in string
     size_t pos = strInput.find(':');
@@ -249,7 +249,7 @@ static void MutateTxAddInput(CMutableTransaction& tx, const string& strInput)
     tx.vin.push_back(txin);
 }
 
-static void MutateTxAddOutAddr(CMutableTransaction& tx, const string& strInput)
+static void MutateTxAddOutAddr(CMutableTransaction& tx, const std::string& strInput)
 {
     // separate VALUE:ADDRESS in string
     size_t pos = strInput.find(':');
@@ -278,7 +278,7 @@ static void MutateTxAddOutAddr(CMutableTransaction& tx, const string& strInput)
     tx.vout.push_back(txout);
 }
 
-static void MutateTxAddOutScript(CMutableTransaction& tx, const string& strInput)
+static void MutateTxAddOutScript(CMutableTransaction& tx, const std::string& strInput)
 {
     // separate VALUE:SCRIPT in string
     size_t pos = strInput.find(':');
@@ -301,7 +301,7 @@ static void MutateTxAddOutScript(CMutableTransaction& tx, const string& strInput
     tx.vout.push_back(txout);
 }
 
-static void MutateTxDelInput(CMutableTransaction& tx, const string& strInIdx)
+static void MutateTxDelInput(CMutableTransaction& tx, const std::string& strInIdx)
 {
     // parse requested deletion index
     int inIdx = atoi(strInIdx);
@@ -314,7 +314,7 @@ static void MutateTxDelInput(CMutableTransaction& tx, const string& strInIdx)
     tx.vin.erase(tx.vin.begin() + inIdx);
 }
 
-static void MutateTxDelOutput(CMutableTransaction& tx, const string& strOutIdx)
+static void MutateTxDelOutput(CMutableTransaction& tx, const std::string& strOutIdx)
 {
     // parse requested deletion index
     int outIdx = atoi(strOutIdx);
@@ -340,7 +340,7 @@ static const struct {
     {"SINGLE|ANYONECANPAY", SIGHASH_SINGLE | SIGHASH_ANYONECANPAY},
 };
 
-static bool findSighashFlags(int& flags, const string& flagStr)
+static bool findSighashFlags(int& flags, const std::string& flagStr)
 {
     flags = 0;
 
@@ -370,7 +370,7 @@ std::vector<unsigned char> ParseHexUO(map<string, UniValue>& o, string strKey)
     return ParseHexUV(o[strKey], strKey);
 }
 
-static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
+static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
 {
     int nHashType = SIGHASH_ALL;
 
@@ -505,7 +505,7 @@ public:
     }
 };
 
-static void MutateTx(CMutableTransaction& tx, const string& command, const string& commandVal)
+static void MutateTx(CMutableTransaction& tx, const std::string& command, const std::string& commandVal)
 {
     boost::scoped_ptr<Secp256k1Init> ecc;
     if (command == "nversion")

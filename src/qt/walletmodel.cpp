@@ -247,7 +247,7 @@ bool WalletModel::validateAddress(const QString& address)
     return addressParsed.IsValid();
 }
 
-void WalletModel::updateAddressBookLabels(const CTxDestination& dest, const string& strName, const string& strPurpose)
+void WalletModel::updateAddressBookLabels(const CTxDestination& dest, const std::string& strName, const std::string& strPurpose)
 {
     LOCK(wallet->cs_wallet);
 
@@ -584,7 +584,7 @@ static void NotifyzWSPReset(WalletModel* walletmodel)
     QMetaObject::invokeMethod(walletmodel, "checkBalanceChanged", Qt::QueuedConnection);
 }
 
-static void NotifyWalletBacked(WalletModel* model, const bool& fSuccess, const string& filename)
+static void NotifyWalletBacked(WalletModel* model, const bool& fSuccess, const std::string& filename)
 {
     string message;
     string title = "Backup ";

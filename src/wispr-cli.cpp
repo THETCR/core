@@ -190,7 +190,7 @@ static void http_request_done(struct evhttp_request *req, void *ctx)
     }
 }
 
-UniValue CallRPC(const string& strMethod, const UniValue& params)
+UniValue CallRPC(const std::string& strMethod, const UniValue& params)
 {
     std::string host = gArgs.GetArg("-rpcconnect", "127.0.0.1");
     int port = gArgs.GetArg("-rpcport", BaseParams().RPCPort());

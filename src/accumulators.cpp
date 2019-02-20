@@ -157,7 +157,7 @@ bool EraseCheckpoints(int nStartHeight, int nEndHeight)
     uint256 nCheckpointPrev = pindex->pprev->nAccumulatorCheckpoint;
 
     //Keep a list of checkpoints from the previous block so that we don't delete them
-    list<uint32_t> listCheckpointsPrev;
+    std::list<uint32_t> listCheckpointsPrev;
     for (auto denom : zerocoinDenomList)
         listCheckpointsPrev.emplace_back(ParseChecksum(nCheckpointPrev, denom));
 
@@ -366,20 +366,20 @@ list<PublicCoin> GetPubcoinFromBlock(const CBlockIndex* pindex){
     CBlock block;
     if(!ReadBlockFromDisk(block, pindex))
         throw GetPubcoinException("GetPubcoinFromBlock: failed to read block from disk while adding pubcoins to witness");
-    list<libzerocoin::PublicCoin> listPubcoins;
+    std::list<libzerocoin::PublicCoin> listPubcoins;
     if(!BlockToPubcoinList(block, listPubcoins, true))
         throw GetPubcoinException("GetPubcoinFromBlock: failed to get zerocoin mintlist from block "+std::to_string(pindex->nHeight)+"\n");
     return listPubcoins;
 }
 
 int AddBlockMintsToAccumulator(const CoinDenomination den, const CBloomFilter filter, const CBlockIndex* pindex,
-                               libzerocoin::Accumulator* accumulator, bool isWitness, list<CBigNum>& notAddedCoins)
+                               libzerocoin::Accumulator* accumulator, bool isWitness, std::list<CBigNum>& notAddedCoins)
 {
     // if this block contains mints of the denomination that is being spent, then add them to the witness
     int nMintsAdded = 0;
     if (pindex->MintedDenomination(den)) {
         //grab mints from this block
-        list<PublicCoin> listPubcoins = GetPubcoinFromBlock(pindex);
+        std::list<PublicCoin> listPubcoins = GetPubcoinFromBlock(pindex);
 
         //add the mints to the witness
         for (const PublicCoin& pubcoin : listPubcoins) {
@@ -409,7 +409,7 @@ int AddBlockMintsToAccumulator(const libzerocoin::PublicCoin& coin, const int nH
     int nMintsAdded = 0;
     if (pindex->MintedDenomination(coin.getDenomination())) {
         //grab mints from this block
-        list<PublicCoin> listPubcoins = GetPubcoinFromBlock(pindex);
+        std::list<PublicCoin> listPubcoins = GetPubcoinFromBlock(pindex);
 
         //add the mints to the witness
         for (const PublicCoin& pubcoin : listPubcoins) {
@@ -538,7 +538,7 @@ bool CalculateAccumulatorWitnessFor(
         int nSecurityLevel,
         int& nMintsAdded,
         string& strError,
-        list<CBigNum>& ret,
+        std::list<CBigNum>& ret,
         int &heightStop
 ){
     // Lock

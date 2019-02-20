@@ -1369,7 +1369,7 @@ CAmount CWalletTx::GetLockedWatchOnlyCredit() const
 }
 
 void CWalletTx::GetAmounts(list<COutputEntry>& listReceived,
-    list<COutputEntry>& listSent,
+    std::list<COutputEntry>& listSent,
     CAmount& nFee,
     string& strSentAccount,
     const isminefilter& filter) const
@@ -1424,14 +1424,14 @@ void CWalletTx::GetAmounts(list<COutputEntry>& listReceived,
     }
 }
 
-void CWalletTx::GetAccountAmounts(const string& strAccount, CAmount& nReceived, CAmount& nSent, CAmount& nFee, const isminefilter& filter) const
+void CWalletTx::GetAccountAmounts(const std::string& strAccount, CAmount& nReceived, CAmount& nSent, CAmount& nFee, const isminefilter& filter) const
 {
     nReceived = nSent = nFee = 0;
 
     CAmount allFee;
     string strSentAccount;
-    list<COutputEntry> listReceived;
-    list<COutputEntry> listSent;
+    std::list<COutputEntry> listReceived;
+    std::list<COutputEntry> listSent;
     GetAmounts(listReceived, listSent, allFee, strSentAccount, filter);
 
     if (strAccount == strSentAccount) {
@@ -1498,7 +1498,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
 
             //If this is a zapwallettx, need to readd zwsp
             if (fCheckZWSP && pindex->nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
-                list<CZerocoinMint> listMints;
+                std::list<CZerocoinMint> listMints;
                 BlockToZerocoinMintList(block, listMints, true);
 
                 for (auto& m : listMints) {
@@ -3438,7 +3438,7 @@ DBErrors CWallet::ZapWalletTx(std::vector<CWalletTx>& vWtx)
     return DB_LOAD_OK;
 }
 
-bool CWallet::SetAddressBook(const CTxDestination& address, const string& strName, const string& strPurpose)
+bool CWallet::SetAddressBook(const CTxDestination& address, const std::string& strName, const std::string& strPurpose)
 {
     bool fUpdated = false;
     {
@@ -3754,7 +3754,7 @@ set<CTxDestination> CWallet::GetAccountAddresses(string strAccount) const
     set<CTxDestination> result;
     for (const std::pair<CTxDestination, CAddressBookData> & item: mapAddressBook) {
         const CTxDestination& address = item.first;
-        const string& strName = item.second.name;
+        const std::string& strName = item.second.name;
         if (strName == strAccount)
             result.insert(address);
     }
@@ -4847,7 +4847,7 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLevel,
 
         // Select the zWSP mints to use in this spend
         std::map<libzerocoin::CoinDenomination, CAmount> DenomMap = GetMyZerocoinDistribution();
-        list<CMintMeta> listMints(setMints.begin(), setMints.end());
+        std::list<CMintMeta> listMints(setMints.begin(), setMints.end());
         vMintsToFetch = SelectMintsFromList(nValueToSelect, nValueSelected, nMaxSpends, fMinimizeChange,
                                              nCoinsReturned, listMints, DenomMap, nNeededSpends);
         for (auto& meta : vMintsToFetch) {
@@ -5078,8 +5078,8 @@ string CWallet::ResetSpentZerocoin()
     CWalletDB walletdb(pwalletMain->strWalletFile);
 
     set<CMintMeta> setMints = zwspTracker->ListMints(false, false, true);
-    list<CZerocoinSpend> listSpends = walletdb.ListSpentCoins();
-    list<CZerocoinSpend> listUnconfirmedSpends;
+    std::list<CZerocoinSpend> listSpends = walletdb.ListSpentCoins();
+    std::list<CZerocoinSpend> listUnconfirmedSpends;
 
     for (CZerocoinSpend spend : listSpends) {
         CTransaction tx;
@@ -5132,8 +5132,8 @@ bool IsMintInChain(const uint256& hashPubcoin, uint256& txid, int& nHeight)
 void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, std::list<CDeterministicMint>& listDMintsRestored)
 {
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listMints = walletdb.ListArchivedZerocoins();
-    list<CDeterministicMint> listDMints = walletdb.ListArchivedDeterministicMints();
+    std::list<CZerocoinMint> listMints = walletdb.ListArchivedZerocoins();
+    std::list<CDeterministicMint> listDMints = walletdb.ListArchivedDeterministicMints();
 
     if (listMints.empty() && listDMints.empty())
         return;

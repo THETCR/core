@@ -185,7 +185,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, string& strError)
 
     bool fValidated = false;
     set<CBigNum> serials;
-    list<CoinSpend> vSpends;
+    std::list<CoinSpend> vSpends;
     CAmount nTotalRedeemed = 0;
     for(const CTxIn& txin: tx.vin) {
 

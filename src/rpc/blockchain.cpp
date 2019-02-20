@@ -218,7 +218,7 @@ UniValue mempoolToJSON(bool fVerbose = false)
             }
 
             UniValue depends(UniValue::VARR);
-            for(const string& dep: setDepends) {
+            for(const std::string& dep: setDepends) {
                 depends.push_back(dep);
             }
 

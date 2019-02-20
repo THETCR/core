@@ -274,7 +274,7 @@ UniValue getaddednodeinfo(const UniValue& params, bool fHelp)
 
     bool fDns = params[0].get_bool();
 
-    list<string> laddedNodes(0);
+    std::list<string> laddedNodes(0);
     if (params.size() == 1) {
         LOCK(cs_vAddedNodes);
         for (string& strAddNode: vAddedNodes)
@@ -301,7 +301,7 @@ UniValue getaddednodeinfo(const UniValue& params, bool fHelp)
         return ret;
     }
 
-    list<pair<string, std::vector<CService> > > laddedAddreses(0);
+    std::list<pair<string, std::vector<CService> > > laddedAddreses(0);
     for (string& strAddNode: laddedNodes) {
         std::vector<CService> vservNode(0);
         if (Lookup(strAddNode.c_str(), vservNode, Params().GetDefaultPort(), fNameLookup, 0))

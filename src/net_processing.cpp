@@ -102,7 +102,7 @@ struct QueuedBlock {
   int nValidatedQueuedBefore; //! Number of blocks queued with validated headers (globally) at the time this one is requested.
   bool fValidatedHeaders;     //! Whether this block has validated headers at the time of request.
 };
-map<uint256, pair<NodeId, list<QueuedBlock>::iterator> > mapBlocksInFlight GUARDED_BY(cs_main);
+map<uint256, pair<NodeId, std::list<QueuedBlock>::iterator> > mapBlocksInFlight GUARDED_BY(cs_main);
 
 /** Number of blocks in flight with validated headers. */
 int nQueuedValidatedHeaders GUARDED_BY(cs_main) = 0;
@@ -160,7 +160,7 @@ struct CNodeState {
   bool fSyncStarted;
   //! Since when we're stalling block download progress (in microseconds), or 0.
   int64_t nStallingSince;
-  list<QueuedBlock> vBlocksInFlight;
+  std::list<QueuedBlock> vBlocksInFlight;
   int nBlocksInFlight;
   //! Whether we consider this a preferred download peer.
   bool fPreferredDownload;
@@ -245,7 +245,7 @@ void FinalizeNode(NodeId nodeid)
 // Requires cs_main.
 bool MarkBlockAsReceived(const uint256& hash)
 {
-    map<uint256, pair<NodeId, list<QueuedBlock>::iterator> >::iterator itInFlight = mapBlocksInFlight.find(hash);
+    map<uint256, pair<NodeId, std::list<QueuedBlock>::iterator> >::iterator itInFlight = mapBlocksInFlight.find(hash);
     if (itInFlight != mapBlocksInFlight.end()) {
         CNodeState* state = State(itInFlight->second.first);
         nQueuedValidatedHeaders -= itInFlight->second.second->fValidatedHeaders;
@@ -269,7 +269,7 @@ void MarkBlockAsInFlight(NodeId nodeid, const uint256& hash, CBlockIndex* pindex
 
     QueuedBlock newentry = {hash, pindex, GetTimeMicros(), nQueuedValidatedHeaders, pindex != NULL};
     nQueuedValidatedHeaders += newentry.fValidatedHeaders;
-    list<QueuedBlock>::iterator it = state->vBlocksInFlight.insert(state->vBlocksInFlight.end(), newentry);
+    std::list<QueuedBlock>::iterator it = state->vBlocksInFlight.insert(state->vBlocksInFlight.end(), newentry);
     state->nBlocksInFlight++;
     mapBlocksInFlight[hash] = std::make_pair(nodeid, it);
 }
@@ -958,7 +958,7 @@ void static ProcessGetData(CNode* pfrom)
                         // Don't send not-validated blocks
                         if (send && (mi->second->nStatus & BLOCK_HAVE_DATA)) {
                             try {
-                                list<libzerocoin::PublicCoin> pubcoins = GetPubcoinFromBlock((*mi).second);
+                                std::list<libzerocoin::PublicCoin> pubcoins = GetPubcoinFromBlock((*mi).second);
                                 CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                                 ss.reserve(2000);
                                 ss << inv.hash.Get32();
@@ -2242,7 +2242,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
         }
 
         for (const CBlockReject& reject: state.rejects)
-            pto->PushMessage(NetMsgType::REJECT, (string) NetMsgType::BLOCK, reject.chRejectCode, reject.strRejectReason, reject.hashBlock);
+            pto->PushMessage(NetMsgType::REJECT, (std::string) NetMsgType::BLOCK, reject.chRejectCode, reject.strRejectReason, reject.hashBlock);
         state.rejects.clear();
 
         // Start block sync

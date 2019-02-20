@@ -18,17 +18,17 @@
 
 using namespace std;
 
-static const string strSecret1     ("5t9pdUbF2atWYjj5DgFyzbiJyghzkFfFcjj9NqLkGGc3vDbngLf");
-static const string strSecret2     ("5tdesoG8SXoP8cEt6TkEgSxN4T46MgCa5yQAGZ6a46ctoYjY1Fm");
-static const string strSecret1C    ("NYmwDzn8uzaMR5ahcxH8ZEDLMCFwsuhqWjb1yNN9xPshsWru8NBX");
-static const string strSecret2C    ("NatnBDBmqgwigaYGX73qP7ZMxDzeeG252wwDuefatfoRe16ZuWAo");
+static const std::string strSecret1     ("5t9pdUbF2atWYjj5DgFyzbiJyghzkFfFcjj9NqLkGGc3vDbngLf");
+static const std::string strSecret2     ("5tdesoG8SXoP8cEt6TkEgSxN4T46MgCa5yQAGZ6a46ctoYjY1Fm");
+static const std::string strSecret1C    ("NYmwDzn8uzaMR5ahcxH8ZEDLMCFwsuhqWjb1yNN9xPshsWru8NBX");
+static const std::string strSecret2C    ("NatnBDBmqgwigaYGX73qP7ZMxDzeeG252wwDuefatfoRe16ZuWAo");
 static const CBitcoinAddress addr1 ("Wa4qRD6Eg9zZAUGA9NYgRDVeW3VEXC1x3N");
 static const CBitcoinAddress addr2 ("WkXd585snjGTk5cKzHCVyEkSHjPfrS7nTr");
 static const CBitcoinAddress addr1C("WPfjarmXy9uJ8UoYSQeAGyUHnWeECSsfM4");
 static const CBitcoinAddress addr2C("WZgjraM3dneKgC42JHs3PgQAyusbe5QcKE");
 
 
-static const string strAddressBad("Xta1praZQjyELweyMByXyiREw1ZRsjXzVP");
+static const std::string strAddressBad("Xta1praZQjyELweyMByXyiREw1ZRsjXzVP");
 
 //#define KEY_TESTS_DUMPINFO
 #ifdef KEY_TESTS_DUMPINFO

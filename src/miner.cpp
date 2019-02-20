@@ -191,7 +191,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         CCoinsViewCache view(pcoinsTip);
 
         // Priority order to process transactions
-        list<COrphan> vOrphan; // list memory doesn't move
+        std::list<COrphan> vOrphan; // list memory doesn't move
         map<uint256, std::vector<COrphan*> > mapDependers;
         bool fPrintPriority = gArgs.GetBoolArg("-printpriority", false);
 
