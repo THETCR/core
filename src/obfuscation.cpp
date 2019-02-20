@@ -1312,7 +1312,7 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
                 const CKeyStore& keystore = *pwalletMain;
 
                 LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Sign - Signing my input %i\n", mine);
-                if (!SignSignature(keystore, prevPubKey, finalTransaction, mine, int(SIGHASH_ALL | SIGHASH_ANYONECANPAY))) { // changes scriptSig
+                if (!SignSignature(keystore, prevPubKey, finalTransaction, mine, nValue1, int(SIGHASH_ALL | SIGHASH_ANYONECANPAY))) { // changes scriptSig
                     LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Sign - Unable to sign my own transaction! \n");
                     // not sure what to do here, it will timeout...?
                 }
