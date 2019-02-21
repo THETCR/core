@@ -16,6 +16,19 @@
 #include <string>
 
 
+
+/** Compute the 256-bit hash of a void pointer */
+inline void Hash(void* in, unsigned int len, unsigned char* out)
+{
+//    uint256 result;
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, in, len);
+    SHA256_Final(out, &sha256);
+//    CHash256().Write((const unsigned char*)in, len)
+//        .Finalize((unsigned char*)out);
+}
+
 /** 39 bytes - 78 characters
  * 1) Prefix - 2 bytes - 4 chars - strKey[0..3]
  * 2) Flagbyte - 1 byte - 2 chars - strKey[4..5]
