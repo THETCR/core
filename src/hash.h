@@ -11,6 +11,7 @@
 #include <crypto/common.h>
 #include <crypto/ripemd160.h>
 #include <crypto/sha256.h>
+#include <crypto/sha512.h>
 #include <prevector.h>
 #include <serialize.h>
 #include <uint256.h>
@@ -206,5 +207,15 @@ void BIP32Hash(const ChainCode &chainCode, unsigned int nChild, unsigned char he
 
 
 void scrypt_hash(const char* pass, unsigned int pLen, const char* salt, unsigned int sLen, char* output, unsigned int N, unsigned int r, unsigned int p, unsigned int dkLen);
+
+/** Compute the 512-bit hash of an object. */
+template <typename T1>
+inline uint512 Hash512(const T1 pbegin, const T1 pend)
+{
+    static const unsigned char pblank[1] = {};
+    uint512 result;
+    CHash512().Write(pbegin == pend ? pblank : (const unsigned char*)&pbegin[0], (pend - pbegin) * sizeof(pbegin[0])).Finalize((unsigned char*)&result);
+    return result;
+}
 
 #endif // WISPR_HASH_H
