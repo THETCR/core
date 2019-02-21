@@ -63,7 +63,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     // instead of unit tests, but for now we need these here.
 
 //    RegisterAllCoreRPCCommands(tableRPC);
-//    ClearDatadirCache();
+    ClearDatadirCache();
     // We have to run a scheduler thread to prevent ActivateBestChain
     // from blocking due to queue overrun.
     threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
