@@ -208,6 +208,35 @@ void BIP32Hash(const ChainCode &chainCode, unsigned int nChild, unsigned char he
 
 void scrypt_hash(const char* pass, unsigned int pLen, const char* salt, unsigned int sLen, char* output, unsigned int N, unsigned int r, unsigned int p, unsigned int dkLen);
 
+
+class CHash512
+{
+private:
+  CSHA512 sha;
+
+public:
+  static const size_t OUTPUT_SIZE = CSHA512::OUTPUT_SIZE;
+
+  void Finalize(unsigned char hash[OUTPUT_SIZE])
+  {
+      unsigned char buf[CSHA512::OUTPUT_SIZE];
+      sha.Finalize(buf);
+      sha.Reset().Write(buf, CSHA512::OUTPUT_SIZE).Finalize(hash);
+  }
+
+  CHash512& Write(const unsigned char* data, size_t len)
+  {
+      sha.Write(data, len);
+      return *this;
+  }
+
+  CHash512& Reset()
+  {
+      sha.Reset();
+      return *this;
+  }
+};
+
 /** Compute the 512-bit hash of an object. */
 template <typename T1>
 inline uint512 Hash512(const T1 pbegin, const T1 pend)
