@@ -18,12 +18,12 @@ class CSerializeMethodsTestSingle
 protected:
   int intval;
   bool boolval;
-  std::string std::stringval;
+  std::string stringval;
   char charstrval[16];
   CTransactionRef txval;
 public:
   CSerializeMethodsTestSingle() = default;
-  CSerializeMethodsTestSingle(int intvalin, bool boolvalin, std::string std::stringvalin, const char* charstrvalin, const CTransactionRef& txvalin) : intval(intvalin), boolval(boolvalin), std::stringval(std::move(stringvalin)), txval(txvalin)
+  CSerializeMethodsTestSingle(int intvalin, bool boolvalin, std::string stringvalin, const char* charstrvalin, const CTransactionRef& txvalin) : intval(intvalin), boolval(boolvalin), stringval(std::move(stringvalin)), txval(txvalin)
   {
       memcpy(charstrval, charstrvalin, sizeof(charstrval));
   }
@@ -43,7 +43,7 @@ public:
   {
       return  intval == rhs.intval && \
                 boolval == rhs.boolval && \
-                std::stringval == rhs.stringval && \
+                stringval == rhs.stringval && \
                 strcmp(charstrval, rhs.charstrval) == 0 && \
                 *txval == *rhs.txval;
   }
@@ -57,7 +57,7 @@ public:
 
   template <typename Stream, typename Operation>
   inline void SerializationOp(Stream& s, Operation ser_action) {
-      READWRITE(intval, boolval, std::stringval, charstrval, txval);
+      READWRITE(intval, boolval, stringval, charstrval, txval);
   }
 };
 
@@ -347,12 +347,12 @@ BOOST_AUTO_TEST_CASE(class_methods)
 {
     int intval(100);
     bool boolval(true);
-    std::string std::stringval("testing");
+    std::string stringval("testing");
     const char charstrval[16] = "testing charstr";
     CMutableTransaction txval;
     CTransactionRef tx_ref{MakeTransactionRef(txval)};
-    CSerializeMethodsTestSingle methodtest1(intval, boolval, std::stringval, charstrval, tx_ref);
-    CSerializeMethodsTestMany methodtest2(intval, boolval, std::stringval, charstrval, tx_ref);
+    CSerializeMethodsTestSingle methodtest1(intval, boolval, stringval, charstrval, tx_ref);
+    CSerializeMethodsTestMany methodtest2(intval, boolval, stringval, charstrval, tx_ref);
     CSerializeMethodsTestSingle methodtest3;
     CSerializeMethodsTestMany methodtest4;
     CDataStream ss(SER_DISK, PROTOCOL_VERSION);
@@ -365,7 +365,7 @@ BOOST_AUTO_TEST_CASE(class_methods)
     BOOST_CHECK(methodtest2 == methodtest3);
     BOOST_CHECK(methodtest3 == methodtest4);
 
-    CDataStream ss2(SER_DISK, PROTOCOL_VERSION, intval, boolval, std::stringval, charstrval, txval);
+    CDataStream ss2(SER_DISK, PROTOCOL_VERSION, intval, boolval, stringval, charstrval, txval);
     ss2 >> methodtest3;
     BOOST_CHECK(methodtest3 == methodtest4);
 }
