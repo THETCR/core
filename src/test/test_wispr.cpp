@@ -37,10 +37,12 @@ FastRandomContext g_insecure_rand_ctx;
 extern bool fPrintToConsole;
 BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
 {
+    SHA256AutoDetect();
     ECC_Start();
-    RandomInit();
     SetupEnvironment();
     SetupNetworking();
+    InitSignatureCache();
+    InitScriptExecutionCache();
     fPrintToDebugLog = false; // don't want to write to debug.log file
     fCheckBlockIndex = true;
     SelectParams(chainName);

@@ -409,7 +409,8 @@ public:
 
   ScriptError GetScriptError() const { return error; }
 };
-
+/** Initializes the script-execution cache */
+void InitScriptExecutionCache();
 
 /** Functions for disk access for blocks */
 bool WriteBlockToDisk(const CBlock& block, CDiskBlockPos& pos);
