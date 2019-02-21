@@ -104,7 +104,7 @@ PrivateCoin::PrivateCoin(const ZerocoinParams* p, const CoinDenomination denomin
 bool PrivateCoin::IsValid()
 {
     if (!IsValidSerial(params, serialNumber)) {
-        cout << "Serial not valid\n";
+        std::cout << "Serial not valid\n";
         return false;
     }
 

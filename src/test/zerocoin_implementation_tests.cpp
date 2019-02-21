@@ -113,7 +113,7 @@ std::vector<std::pair<std::string, std::string> > vecRawMints = {std::make_pair(
 //create a zerocoin mint from vecsend
 BOOST_AUTO_TEST_CASE(checkzerocoinmint_test)
         {
-                cout << "generating privkeys\n";
+                std::cout << "generating privkeys\n";
 
                 //generate a privkey
                 CKey key;
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinmint_test)
                 BOOST_CHECK_MESSAGE(bnSerial == bnSerial2, "Serials do not match!");
 
 
-                cout << "Running check_zerocoinmint_test...\n";
+                std::cout << "Running check_zerocoinmint_test...\n";
                 CTransaction tx;
                 BOOST_CHECK(DecodeHexTx(tx, rawTx1));
 
@@ -265,7 +265,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, std::string& strError)
 //                bnTrustedModulus.SetDec(zerocoinModulus);
 //                libzerocoin::ZerocoinParams zerocoinParams = libzerocoin::ZerocoinParams(bnTrustedModulus);
 //
-//                cout << "Running check_zerocoinspend_test...\n";
+//                std::cout << "Running check_zerocoinspend_test...\n";
 //
 //                //load our serialized pubcoin
 //                CBigNum bnpubcoin;
@@ -309,7 +309,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, std::string& strError)
 //                uint32_t nChecksum = GetChecksum(accumulator.getValue());
 //                //AddAccumulatorChecksum(nChecksum, accumulator.getValue(), true);
 //                CoinSpend coinSpend(Params().Zerocoin_Params(true), Params().Zerocoin_Params(false), privateCoin, accumulator, nChecksum, witness, 0, SpendType::SPEND);
-//                cout << coinSpend.ToString() << endl;
+//                std::cout << coinSpend.ToString() << endl;
 //                BOOST_CHECK_MESSAGE(coinSpend.Verify(accumulator), "Coinspend construction failed to create valid proof");
 //
 //                CBigNum serial = coinSpend.getCoinSerialNumber();
@@ -359,7 +359,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, std::string& strError)
 //
 //                std::string strError = "";
 //                if (!CheckZerocoinSpendNoDB(txNew, strError)) {
-//            cout << state.GetRejectCode() << endl;
+//            std::cout << state.GetRejectCode() << endl;
 //            BOOST_CHECK_MESSAGE(false, strError);
 //        }
 //
@@ -374,7 +374,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, std::string& strError)
 //                BOOST_CHECK_MESSAGE(strError == "Transaction spend more than was redeemed in zerocoins", str);
 //
 //
-//                cout << "checking v2 spend\n";
+//                std::cout << "checking v2 spend\n";
 //
 //                CMutableTransaction tx;
 //                uint256 txHash = 0;
@@ -402,7 +402,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, std::string& strError)
 //            accumulator_v2 += pubTemp;
 //            witness_v2 += pubTemp;
 //        }
-//                cout << (GetTimeMillis() - nTimeStart)/5 << "ms per mint\n";
+//                std::cout << (GetTimeMillis() - nTimeStart)/5 << "ms per mint\n";
 //
 //                accumulator_v2 += pubcoin_v2;
 //
@@ -539,18 +539,18 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
         }
 
                 int64_t nTotalTime = GetTimeMillis() - nTimeStart;
-                cout << "Total time:" << nTotalTime << "ms. Per Deterministic Mint:" << (nTotalTime/nTests) << "ms" << endl;
+                std::cout << "Total time:" << nTotalTime << "ms. Per Deterministic Mint:" << (nTotalTime/nTests) << "ms" << endl;
 
-                cout << "Checking that mints are valid" << endl;
+                std::cout << "Checking that mints are valid" << endl;
                 CDataStream ss(SER_GETHASH, 0);
                 for (PrivateCoin& coin : vCoins) {
             BOOST_CHECK_MESSAGE(coin.IsValid(), "Generated Mint is not valid");
             ss << coin.getPublicCoin().getValue();
         }
 
-                cout << "Checking that mints are deterministic: sha256 checksum=";
+                std::cout << "Checking that mints are deterministic: sha256 checksum=";
                 uint256 hash = Hash(ss.begin(), ss.end());
-                cout << hash.GetHex() << endl;
+                std::cout << hash.GetHex() << endl;
                 BOOST_CHECK_MESSAGE(hash == uint256("c90c225f2cbdee5ef053b1f9f70053dd83724c58126d0e1b8425b88091d1f73f"), "minting determinism isn't as expected");
         }
 

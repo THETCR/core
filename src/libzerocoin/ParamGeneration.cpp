@@ -365,7 +365,7 @@ calculateGroupModulusAndOrder(uint256 seed, uint32_t pLen, uint32_t qLen,
 	}
 
 #ifdef ZEROCOIN_DEBUG
-	cout << "calculateGroupModulusAndOrder: pLen = " << pLen << endl;
+	std::cout << "calculateGroupModulusAndOrder: pLen = " << pLen << endl;
 #endif
 
 	// Generate a random prime for the group order.
