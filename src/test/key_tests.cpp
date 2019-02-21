@@ -116,10 +116,10 @@ BOOST_AUTO_TEST_CASE(key_test1)
 
         std::vector<unsigned char> sign1, sign2, sign1C, sign2C;
 
-        BOOST_CHECK(key1.Sign (hashMsg, sign1));
-        BOOST_CHECK(key2.Sign (hashMsg, sign2));
-        BOOST_CHECK(key1C.Sign(hashMsg, sign1C));
-        BOOST_CHECK(key2C.Sign(hashMsg, sign2C));
+        BOOST_CHECK(key1.Sign (hashMsg, sign1, false));
+        BOOST_CHECK(key2.Sign (hashMsg, sign2, false));
+        BOOST_CHECK(key1C.Sign(hashMsg, sign1C, false));
+        BOOST_CHECK(key2C.Sign(hashMsg, sign2C, false));
 
         BOOST_CHECK( pubkey1.Verify(hashMsg, sign1));
         BOOST_CHECK(!pubkey1.Verify(hashMsg, sign2));
@@ -168,12 +168,12 @@ BOOST_AUTO_TEST_CASE(key_test1)
     std::vector<unsigned char> detsig, detsigc;
     std::string strMsg = "Very deterministic message";
     uint256 hashMsg = Hash(strMsg.begin(), strMsg.end());
-    BOOST_CHECK(key1.Sign(hashMsg, detsig));
-    BOOST_CHECK(key1C.Sign(hashMsg, detsigc));
+    BOOST_CHECK(key1.Sign(hashMsg, detsig, false));
+    BOOST_CHECK(key1C.Sign(hashMsg, detsigc, false));
     BOOST_CHECK(detsig == detsigc);
     BOOST_CHECK(detsig == ParseHex("3045022100d022ce1083dcec6171f101008cc37300127c864292d1ba5392e48652bccf557e02201471b2b887b9d39e106d7dc4ce18bbcc254b9dd5f7042dea5ba51ddd91c05358"));
-    BOOST_CHECK(key2.Sign(hashMsg, detsig));
-    BOOST_CHECK(key2C.Sign(hashMsg, detsigc));
+    BOOST_CHECK(key2.Sign(hashMsg, detsig, false));
+    BOOST_CHECK(key2C.Sign(hashMsg, detsigc, false));
     BOOST_CHECK(detsig == detsigc);
     BOOST_CHECK(detsig == ParseHex("30440220194fb53e6ef8b9976160a427a03e3180a7f0a73b6c1ec38df4d15544b730d7d9022069d378c0dd4e14763f6d3b6e2ce1b3e3a4b8dca63133e136ac4e6e47164fe2dc"));
     BOOST_CHECK(key1.SignCompact(hashMsg, detsig));
