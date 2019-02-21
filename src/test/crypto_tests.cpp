@@ -28,12 +28,12 @@ static void TestVector(const Hasher &h, const In &in, const Out &out) {
     BOOST_CHECK(out.size() == h.OUTPUT_SIZE);
     hash.resize(out.size());
     {
-        // Test that writing the whole input std::string at once works.
+        // Test that writing the whole input string at once works.
         Hasher(h).Write((unsigned char*)&in[0], in.size()).Finalize(&hash[0]);
         BOOST_CHECK(hash == out);
     }
     for (int i=0; i<32; i++) {
-        // Test that writing the std::string broken up in random pieces works.
+        // Test that writing the string broken up in random pieces works.
         Hasher hasher(h);
         size_t pos = 0;
         while (pos < in.size()) {
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(ripemd160_testvectors) {
     TestRIPEMD160("RIPEMD160 is considered to be safe", "a7d78608c7af8a8e728778e81576870734122b66");
     TestRIPEMD160("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
                   "12a053384a9c0c88e405a06c27dcf49ada62eb2b");
-    TestRIPEMD160("For this sample, this 63-byte std::string will be used as input data",
+    TestRIPEMD160("For this sample, this 63-byte string will be used as input data",
                   "de90dbfee14b63fb5abf27c2ad4a82aaa5f27a11");
     TestRIPEMD160("This is exactly 64 bytes long, not counting the terminating byte",
                   "eda31d51d3a623b81e19eb02e24ff65d27d67b37");
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE(sha1_testvectors) {
     TestSHA1("SHA1 is considered to be safe", "f2b6650569ad3a8720348dd6ea6c497dee3a842a");
     TestSHA1("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
              "84983e441c3bd26ebaae4aa1f95129e5e54670f1");
-    TestSHA1("For this sample, this 63-byte std::string will be used as input data",
+    TestSHA1("For this sample, this 63-byte string will be used as input data",
              "4f0ea5cd0585a23d028abdc1a6684e5a8094dc49");
     TestSHA1("This is exactly 64 bytes long, not counting the terminating byte",
              "fb679f23e7d1ce053313e66e127ab1b444397057");
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(sha256_testvectors) {
                "6819d915c73f4d1e77e4e1b52d1fa0f9cf9beaead3939f15874bd988e2a23630");
     TestSHA256("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
                "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1");
-    TestSHA256("For this sample, this 63-byte std::string will be used as input data",
+    TestSHA256("For this sample, this 63-byte string will be used as input data",
                "f08a78cbbaee082b052ae0708f32fa1e50c5c421aa772ba5dbb406a2ea6be342");
     TestSHA256("This is exactly 64 bytes long, not counting the terminating byte",
                "ab64eff7e88e2e46165e29f2bce41826bd4c7b3552f6b382a9e7d3af47c245f8");
@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE(sha512_testvectors) {
     TestSHA512("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
                "204a8fc6dda82f0a0ced7beb8e08a41657c16ef468b228a8279be331a703c335"
                "96fd15c13b1b07f9aa1d3bea57789ca031ad85c7a71dd70354ec631238ca3445");
-    TestSHA512("For this sample, this 63-byte std::string will be used as input data",
+    TestSHA512("For this sample, this 63-byte string will be used as input data",
                "b3de4afbc516d2478fe9b518d063bda6c8dd65fc38402dd81d1eb7364e72fb6e"
                "6663cf6d2771c8f5a6da09601712fb3d2a36c6ffea3e28b0818b05b0a8660766");
     TestSHA512("This is exactly 64 bytes long, not counting the terminating byte",
