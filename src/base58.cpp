@@ -16,6 +16,7 @@
 #include <string.h>
 #include <string>
 #include <vector>
+#include <iomanip>
 
 /** All alphanumeric characters except for "0", "I", "O", and "l" */
 static const char* pszBase58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -75,7 +76,7 @@ std::string DecodeBase58(const char* psz)
 
     for (unsigned int i = 0; i < vch.size(); i++) {
         unsigned char* c = &vch[i];
-        ss << setw(2) << setfill('0') << (int)c[0];
+        ss << std::setw(2) << std::setfill('0') << (int)c[0];
     }
 
     return ss.str();
