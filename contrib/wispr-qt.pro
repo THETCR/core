@@ -295,8 +295,7 @@ HEADERS += src/activemasternode.h \
            src/test/data/base58_encode_decode.json.h \
            src/test/data/base58_keys_invalid.json.h \
            src/test/data/base58_keys_valid.json.h \
-           src/test/data/script_invalid.json.h \
-           src/test/data/script_valid.json.h \
+           src/test/data/script_tests.json.h \
            src/test/data/sig_canonical.json.h \
            src/test/data/sig_noncanonical.json.h \
            src/test/data/sighash.json.h \
