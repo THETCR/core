@@ -247,7 +247,7 @@ public:
 
     /** Convert a CMutableTransaction into a CTransaction. */
     CTransaction(const CMutableTransaction &tx);
-    CTransaction(CMutableTransaction &tx);
+//    CTransaction(CMutableTransaction &tx);
 
     CTransaction& operator=(const CTransaction& tx);
 
