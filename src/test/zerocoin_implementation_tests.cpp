@@ -4,6 +4,7 @@
 
 #include <test/test_wispr.h>
 
+#include <core_io.h>
 #include "libzerocoin/Denominations.h"
 #include "amount.h"
 #include "chainparams.h"
@@ -23,8 +24,6 @@
 #include "zwspchain.h"
 
 using namespace libzerocoin;
-
-extern bool DecodeHexTx(CTransaction& tx, const std::string& strHexTx);
 
 BOOST_AUTO_TEST_SUITE(zerocoin_implementation_tests)
 
