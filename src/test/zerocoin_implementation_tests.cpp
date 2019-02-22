@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinmint_test)
 
 
                 std::cout << "Running check_zerocoinmint_test...\n";
-                CTransaction tx;
+                CMutableTransaction tx;
                 BOOST_CHECK(DecodeHexTx(tx, rawTx1));
 
                 CValidationState state;
