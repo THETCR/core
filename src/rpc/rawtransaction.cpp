@@ -785,7 +785,7 @@ UniValue sendrawtransaction(const UniValue& params, bool fHelp)
     RPCTypeCheck(params, boost::assign::list_of(UniValue::VSTR)(UniValue::VBOOL));
 
     // parse hex std::string from parameter
-    CTransaction tx;
+    CMutableTransaction tx;
     if (!DecodeHexTx(tx, params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
     uint256 hashTx = tx.GetHash();
