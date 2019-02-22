@@ -103,13 +103,13 @@ void DoTest(const CScript& scriptPubKey, const CScript& scriptSig, int flags, bo
     CMutableTransaction tx2 = tx;
     BOOST_CHECK_MESSAGE(VerifyScript(scriptSig, scriptPubKey, nullptr, flags, MutableTransactionSignatureChecker(&tx, 0, txCredit.vout[0].nValue), &err) == expect, message);
     BOOST_CHECK_MESSAGE(expect == (err == SCRIPT_ERR_OK), std::string(ScriptErrorString(err)) + ": " + message);
-//#if defined(HAVE_CONSENSUS_LIB)
-//    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
-//    stream << tx2;
-//    int libconsensus_flags = flags & bitcoinconsensus_SCRIPT_FLAGS_VERIFY_ALL;
-//    int expectedSuccessCode = expect ? 1 : 0;
-//    BOOST_CHECK_MESSAGE(bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), 0, libconsensus_flags, nullptr) == expectedSuccessCode, message);
-//#endif
+#if defined(HAVE_CONSENSUS_LIB)
+    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+    stream << tx2;
+    int libconsensus_flags = flags & bitcoinconsensus_SCRIPT_FLAGS_VERIFY_ALL;
+    int expectedSuccessCode = expect ? 1 : 0;
+    BOOST_CHECK_MESSAGE(bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), 0, flags, nullptr) == expect, message);
+#endif
 }
 
 void static NegateSignatureS(std::vector<unsigned char>& vchSig) {
