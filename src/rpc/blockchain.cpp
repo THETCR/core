@@ -9,6 +9,7 @@
 #include "checkpoints.h"
 #include "clientversion.h"
 #include "consensus/validation.h"
+#include <core_io.h>
 #include "main.h"
 #include "policy/feerate.h"
 #include "policy/policy.h"

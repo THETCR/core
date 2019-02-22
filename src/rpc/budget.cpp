@@ -5,6 +5,7 @@
 
 #include "activemasternode.h"
 #include <wallet/db.h>
+#include <core_io.h>
 #include "main.h"
 #include "masternode-budget.h"
 #include "masternode-payments.h"
