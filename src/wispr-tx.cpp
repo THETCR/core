@@ -600,32 +600,30 @@ static int CommandLineRawTx(int argc, char* argv[])
     try {
         // Skip switches; Permit common stdin convention "-"
         while (argc > 1 && IsSwitchChar(argv[1][0]) &&
-               (argv[1][1] != 0)) {
+            (argv[1][1] != 0)) {
             argc--;
             argv++;
         }
 
-        CTransaction txDecodeTmp;
+        CMutableTransaction tx;
         int startArg;
 
         if (!fCreateBlank) {
             // require at least one param
             if (argc < 2)
-                throw runtime_error("too few parameters");
+                throw std::runtime_error("too few parameters");
 
-            // param: hex-encoded wispr transaction
+            // param: hex-encoded bitcoin transaction
             std::string strHexTx(argv[1]);
-            if (strHexTx == "-") // "-" implies standard input
+            if (strHexTx == "-")                 // "-" implies standard input
                 strHexTx = readStdin();
 
-            if (!DecodeHexTx(txDecodeTmp, strHexTx))
-                throw runtime_error("invalid transaction encoding");
+            if (!DecodeHexTx(tx, strHexTx, true))
+                throw std::runtime_error("invalid transaction encoding");
 
             startArg = 2;
         } else
             startArg = 1;
-
-        CMutableTransaction tx(txDecodeTmp);
 
         for (int i = startArg; i < argc; i++) {
             std::string arg = argv[i];
@@ -641,15 +639,13 @@ static int CommandLineRawTx(int argc, char* argv[])
             MutateTx(tx, key, value);
         }
 
-        OutputTx(tx);
+        OutputTx(CTransaction(tx));
     }
-
-    catch (boost::thread_interrupted) {
-        throw;
-    } catch (std::exception& e) {
+    catch (const std::exception& e) {
         strPrint = std::string("error: ") + e.what();
         nRet = EXIT_FAILURE;
-    } catch (...) {
+    }
+    catch (...) {
         PrintExceptionContinue(nullptr, "CommandLineRawTx()");
         throw;
     }
