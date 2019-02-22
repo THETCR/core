@@ -504,7 +504,7 @@ void MultisigDialog::on_signButton_clicked()
         return;
     try{
         //parse tx hex
-        CTransaction txRead;
+        CMutableTransaction txRead;
         if(!DecodeHexTx(txRead, ui->transactionHex->text().toStdString())){
             throw runtime_error("Failed to decode transaction hex!");
         }
