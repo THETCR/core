@@ -103,13 +103,6 @@ void DoTest(const CScript& scriptPubKey, const CScript& scriptSig, int flags, bo
     CMutableTransaction tx2 = tx;
     BOOST_CHECK_MESSAGE(VerifyScript(scriptSig, scriptPubKey, nullptr, flags, MutableTransactionSignatureChecker(&tx, 0, txCredit.vout[0].nValue), &err) == expect, message);
     BOOST_CHECK_MESSAGE(expect == (err == SCRIPT_ERR_OK), std::string(ScriptErrorString(err)) + ": " + message);
-#if defined(HAVE_CONSENSUS_LIB)
-    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
-    stream << tx2;
-    int libconsensus_flags = flags & bitcoinconsensus_SCRIPT_FLAGS_VERIFY_ALL;
-    int expectedSuccessCode = expect ? 1 : 0;
-    BOOST_CHECK_MESSAGE(bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), 0, flags, nullptr) == expect, message);
-#endif
 }
 
 void static NegateSignatureS(std::vector<unsigned char>& vchSig) {
@@ -253,7 +246,7 @@ public:
       std::vector<unsigned char> vchSig, r, s;
       uint32_t iter = 0;
       do {
-          key.Sign(hash, vchSig, iter++);
+          key.Sign(hash, vchSig, false, iter++);
           if ((lenS == 33) != (vchSig[5 + vchSig[3]] == 33)) {
               NegateSignatureS(vchSig);
           }
@@ -720,7 +713,7 @@ sign_multisig(CScript scriptPubKey, std::vector<CKey> keys, CTransaction transac
     for(const CKey &key: keys)
     {
         vector<unsigned char> vchSig;
-        BOOST_CHECK(key.Sign(hash, vchSig));
+        BOOST_CHECK(key.Sign(hash, vchSig, false));
         vchSig.push_back((unsigned char)SIGHASH_ALL);
         result << vchSig;
     }
