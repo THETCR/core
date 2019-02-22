@@ -8,6 +8,7 @@
 
 #include "clientversion.h"
 #include "main.h"
+#include <core_io.h>
 #include <net.h>
 #include <net_processing.h>
 #include <netbase.h>
