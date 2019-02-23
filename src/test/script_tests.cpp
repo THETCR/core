@@ -584,7 +584,7 @@ BOOST_AUTO_TEST_CASE(script_build)
         std::string strGen;
 #endif
         for (TestBuilder& test : tests) {
-            test.Test();
+            test.Test(true);
             std::string str = JSONPrettyPrint(test.GetJSON());
 #ifdef UPDATE_JSON_TESTS
             strGen += str + ",\n";
