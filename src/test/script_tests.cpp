@@ -416,6 +416,7 @@ BOOST_AUTO_TEST_SUITE(script_tests)
                 BOOST_CHECK_MESSAGE(std::vector<unsigned char>(push.begin() + pos, push.begin() + pos + datain.size()) == datain, comment);
                 push.erase(push.begin() + pos, push.begin() + pos + datain.size());
                 push.insert(push.begin() + pos, dataout.begin(), dataout.end());
+                BOOST_TEST_PASSPOINT();
                 return *this;
             }
 
