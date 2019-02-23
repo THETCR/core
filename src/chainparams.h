@@ -150,6 +150,7 @@ public:
     int NEW_PROTOCOLS_STARTTIME() const { return consensus.nNewProtocolStartTime; }
     bool PivProtocolsStartHeightEqualOrGreaterThen(int nHeight) const { return nHeight >= consensus.nNewProtocolStartHeight; }
     bool PivProtocolsStartHeightSmallerThen(int nHeight) const { return nHeight < consensus.nNewProtocolStartHeight; }
+    const std::string& Bech32HRP() const { return bech32_hrp; }
 protected:
     CChainParams() {}
 
@@ -171,6 +172,7 @@ protected:
     bool fMineBlocksOnDemand;
     bool fTestnetToBeDeprecatedFieldRPC;
     bool fHeadersFirstSyncingActive;
+    std::string bech32_hrp;
 };
 
 /**

@@ -105,6 +105,7 @@ BITCOIN_CORE_H = \
   alert.h \
   attributes.h \
   base58.h \
+  bech32.h \
   bip38.h \
   bloom.h \
   blocksignature.h \
@@ -145,6 +146,7 @@ BITCOIN_CORE_H = \
   kernel.h \
   swifttx.h \
   key.h \
+  key_io.h \
   keystore.h \
   leveldbwrapper.h \
   limitedmap.h \
@@ -204,6 +206,7 @@ BITCOIN_CORE_H = \
   txmempool.h \
   ui_interface.h \
   undo.h \
+  util/bip32.h \
   util/system.h \
   util/strencodings.h \
   util/memory.h \
@@ -439,6 +442,7 @@ libbitcoin_common_a_SOURCES = \
   accumulatorcheckpoints.cpp \
   accumulatormap.cpp \
   base58.cpp \
+  bech32.cpp \
   bip38.cpp \
   chainparams.cpp \
   coins.cpp \
@@ -449,6 +453,7 @@ libbitcoin_common_a_SOURCES = \
   core_write.cpp \
   invalid.cpp \
   key.cpp \
+  key_io.cpp \
   keystore.cpp \
   netaddress.cpp \
   netbase.cpp \
@@ -483,6 +488,7 @@ libbitcoin_util_a_SOURCES = \
   support/cleanse.cpp \
   sync.cpp \
   threadinterrupt.cpp \
+  util/bip32.cpp \
   util/system.cpp \
   util/moneystr.cpp \
   util/strencodings.cpp \
