@@ -630,11 +630,11 @@ BOOST_AUTO_TEST_CASE(script_valid)
             }
             continue;
         }
-        string scriptSigString = test[0].get_str();
+        std::string scriptSigString = test[0].get_str();
         BOOST_TEST_PASSPOINT();
         CScript scriptSig = ParseScript(scriptSigString);
         BOOST_TEST_PASSPOINT();
-        string scriptPubKeyString = test[1].get_str();
+        std::string scriptPubKeyString = test[1].get_str();
         BOOST_TEST_PASSPOINT();
         CScript scriptPubKey = ParseScript(scriptPubKeyString);
         BOOST_TEST_PASSPOINT();
