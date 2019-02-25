@@ -103,12 +103,13 @@ class CBlock : public CBlockHeader
 {
 public:
     // network and disk
-    std::vector<CTransaction> vtx;
+    std::vector<CTransactionRef> vtx;
 
     // ppcoin: block signature - signed by one of the coin base txout[N]'s owner
     std::vector<unsigned char> vchBlockSig;
 
     // memory only
+    mutable bool fChecked;
     mutable CScript payee;
 
     CBlock()
@@ -138,6 +139,7 @@ public:
         vtx.clear();
         payee = CScript();
         vchBlockSig.clear();
+        fChecked = false;
     }
 
     CBlockHeader GetBlockHeader() const
@@ -156,7 +158,7 @@ public:
     // ppcoin: two types of block: proof-of-work or proof-of-stake
     bool IsProofOfStake() const
     {
-        return (vtx.size() > 1 && vtx[1].IsCoinStake());
+        return (vtx.size() > 1 && vtx[1]->IsCoinStake());
     }
 
     bool IsProofOfWork() const
@@ -168,8 +170,9 @@ public:
     int64_t GetMaxTransactionTime() const
     {
         int64_t maxTransactionTime = 0;
-        for(const CTransaction& tx: vtx)
-        maxTransactionTime = std::max(maxTransactionTime, (int64_t)tx.nTime);
+        for(const CTransactionRef& tx: vtx){
+            maxTransactionTime = std::max(maxTransactionTime, (int64_t)tx->nTime);
+        }
         return maxTransactionTime;
     }
 
@@ -194,10 +197,7 @@ struct CBlockLocator
 
     CBlockLocator() {}
 
-    CBlockLocator(const std::vector<uint256>& vHaveIn)
-    {
-        vHave = vHaveIn;
-    }
+    explicit CBlockLocator(const std::vector<uint256>& vHaveIn) : vHave(vHaveIn) {}
 
     ADD_SERIALIZE_METHODS;
 
