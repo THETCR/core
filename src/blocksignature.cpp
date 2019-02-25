@@ -36,7 +36,7 @@ bool SignBlock(CBlock& block, const CKeyStore& keystore)
     CKeyID keyID;
     if (block.IsProofOfWork()) {
         bool fFoundID = false;
-        for (const CTxOut& txout :block.vtx[0].vout) {
+        for (const CTxOut& txout :block.vtx[0]->vout) {
             if (!GetKeyIDFromUTXO(txout, keyID))
                 continue;
             fFoundID = true;
@@ -45,7 +45,7 @@ bool SignBlock(CBlock& block, const CKeyStore& keystore)
         if (!fFoundID)
             return error("%s: failed to find key for PoW", __func__);
     } else {
-        if (!GetKeyIDFromUTXO(block.vtx[1].vout[1], keyID))
+        if (!GetKeyIDFromUTXO(block.vtx[1]->vout[1], keyID))
             return error("%s: failed to find key for PoS", __func__);
     }
 
@@ -69,13 +69,13 @@ bool CheckBlockSignature(const CBlock& block)
      *  UTXO: The public key that signs must match the public key associated with the first utxo of the coinstake tx.
      */
     CPubKey pubkey;
-    bool fzWSPStake = block.vtx[1].IsZerocoinSpend();
+    bool fzWSPStake = block.vtx[1]->IsZerocoinSpend();
     if (fzWSPStake) {
-        libzerocoin::CoinSpend spend = TxInToZerocoinSpend(block.vtx[1].vin[0]);
+        libzerocoin::CoinSpend spend = TxInToZerocoinSpend(block.vtx[1]->vin[0]);
         pubkey = spend.getPubKey();
     } else {
         std::vector<valtype> vSolutions;
-        const CTxOut& txout = block.vtx[1].vout[1];
+        const CTxOut& txout = block.vtx[1]->vout[1];
         txnouttype whichType = Solver(txout.scriptPubKey, vSolutions);
         if (whichType == TX_NONSTANDARD)
             return false;

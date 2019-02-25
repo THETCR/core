@@ -121,7 +121,7 @@ static std::vector<uint256> BlockMerkleBranch(const CBlock& block, uint32_t posi
     std::vector<uint256> leaves;
     leaves.resize(block.vtx.size());
     for (size_t s = 0; s < block.vtx.size(); s++) {
-        leaves[s] = block.vtx[s].GetHash();
+        leaves[s] = block.vtx[s]->GetHash();
     }
     return ComputeMerkleBranch(leaves, position);
 }
@@ -131,8 +131,8 @@ static uint256 BlockBuildMerkleTree(const CBlock& block, bool* fMutated, std::ve
 {
     vMerkleTree.clear();
     vMerkleTree.reserve(block.vtx.size() * 2 + 16); // Safe upper bound for the number of total nodes.
-    for (std::vector<CTransaction>::const_iterator it(block.vtx.begin()); it != block.vtx.end(); ++it)
-        vMerkleTree.push_back((*it).GetHash());
+    for (std::vector<CTransactionRef>::const_iterator it(block.vtx.begin()); it != block.vtx.end(); ++it)
+        vMerkleTree.push_back((*it)->GetHash());
     int j = 0;
     bool mutated = false;
     for (int nSize = block.vtx.size(); nSize > 1; nSize = (nSize + 1) / 2)
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(merkle_test)
             for (int j = 0; j < ntx; j++) {
                 CMutableTransaction mtx;
                 mtx.nLockTime = j;
-                block.vtx[j] = mtx;
+                block.vtx[j] = MakeTransactionRef(std::move(mtx));
             }
             // Compute the root of the block before mutating it.
             bool unmutatedMutated = false;
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(merkle_test)
                     std::vector<uint256> newBranch = BlockMerkleBranch(block, mtx);
                     std::vector<uint256> oldBranch = BlockGetMerkleBranch(block, merkleTree, mtx);
                     BOOST_CHECK(oldBranch == newBranch);
-                    BOOST_CHECK(ComputeMerkleRootFromBranch(block.vtx[mtx].GetHash(), newBranch, mtx) == oldRoot);
+                    BOOST_CHECK(ComputeMerkleRootFromBranch(block.vtx[mtx]->GetHash(), newBranch, mtx) == oldRoot);
                 }
             }
         }
