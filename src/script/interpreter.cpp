@@ -1190,36 +1190,30 @@ public:
 template <class T>
 uint256 GetPrevoutHash(const T& txTo)
 {
-    std::cout << "GetPrevoutHash\n";
     CHashWriter ss(SER_GETHASH, 0);
     for (const auto& txin : txTo.vin) {
         ss << txin.prevout;
     }
-    std::cout << "GetPrevoutHash\n";
     return ss.GetHash();
 }
 
 template <class T>
 uint256 GetSequenceHash(const T& txTo)
 {
-    std::cout << "GetSequenceHash\n";
     CHashWriter ss(SER_GETHASH, 0);
     for (const auto& txin : txTo.vin) {
         ss << txin.nSequence;
     }
-    std::cout << "GetSequenceHash\n";
     return ss.GetHash();
 }
 
 template <class T>
 uint256 GetOutputsHash(const T& txTo)
 {
-    std::cout << "GetOutputsHash\n";
     CHashWriter ss(SER_GETHASH, 0);
     for (const auto& txout : txTo.vout) {
         ss << txout;
     }
-    std::cout << "GetOutputsHash\n";
     return ss.GetHash();
 }
 
@@ -1252,15 +1246,17 @@ uint256 SignatureHash(const CScript& scriptCode, const T& txTo, unsigned int nIn
         uint256 hashOutputs;
         const bool cacheready = cache && cache->ready;
 
+        std::cout << "GetPrevoutHash\n";
         if (!(nHashType & SIGHASH_ANYONECANPAY)) {
             hashPrevouts = cacheready ? cache->hashPrevouts : GetPrevoutHash(txTo);
         }
 
+        std::cout << "GetSequenceHash\n";
         if (!(nHashType & SIGHASH_ANYONECANPAY) && (nHashType & 0x1f) != SIGHASH_SINGLE && (nHashType & 0x1f) != SIGHASH_NONE) {
             hashSequence = cacheready ? cache->hashSequence : GetSequenceHash(txTo);
         }
 
-
+        std::cout << "GetOutputsHash\n";
         if ((nHashType & 0x1f) != SIGHASH_SINGLE && (nHashType & 0x1f) != SIGHASH_NONE) {
             hashOutputs = cacheready ? cache->hashOutputs : GetOutputsHash(txTo);
         } else if ((nHashType & 0x1f) == SIGHASH_SINGLE && nIn < txTo.vout.size()) {
@@ -1268,10 +1264,13 @@ uint256 SignatureHash(const CScript& scriptCode, const T& txTo, unsigned int nIn
             ss << txTo.vout[nIn];
             hashOutputs = ss.GetHash();
         }
-
+        std::cout << "Stream\n";
         CHashWriter ss(SER_GETHASH, 0);
         // Version
         ss << txTo.nVersion;
+        if(txTo.nVersion == 1){
+            ss << txTo.nTime;
+        }
         // Input prevouts/nSequence (none/all, depending on flags)
         ss << hashPrevouts;
         ss << hashSequence;
