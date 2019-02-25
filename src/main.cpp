@@ -1523,7 +1523,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
 
     // undo transactions in reverse order
     for (int i = block.vtx.size() - 1; i >= 0; i--) {
-        const CTransaction& tx = block.vtx[i];
+        const CTransaction &tx = *(block.vtx[i]);
 
         /** UNDO ZEROCOIN DATABASING
          * note we only undo zerocoin databasing in the following statement, value to and from WISPR
