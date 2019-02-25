@@ -450,7 +450,9 @@ BOOST_AUTO_TEST_SUITE(script_tests)
             TestBuilder& AsWit()
             {
                 assert(havePush);
+                BOOST_TEST_PASSPOINT();
                 scriptWitness.stack.push_back(push);
+                BOOST_TEST_PASSPOINT();
                 havePush = false;
                 return *this;
             }
