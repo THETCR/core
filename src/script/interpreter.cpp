@@ -1267,24 +1267,35 @@ uint256 SignatureHash(const CScript& scriptCode, const T& txTo, unsigned int nIn
         std::cout << "Stream\n";
         CHashWriter ss(SER_GETHASH, 0);
         // Version
+        std::cout << "Stream: nVersion\n";
         ss << txTo.nVersion;
         if(txTo.nVersion == 1){
+            std::cout << "Stream: nTime\n";
             ss << txTo.nTime;
         }
         // Input prevouts/nSequence (none/all, depending on flags)
+        std::cout << "Stream: hashPrevouts\n";
         ss << hashPrevouts;
+        std::cout << "Stream: hashSequence\n";
         ss << hashSequence;
         // The input being signed (replacing the scriptSig with scriptCode + amount)
         // The prevout may already be contained in hashPrevout, and the nSequence
         // may already be contain in hashSequence.
+        std::cout << "Stream: prevout\n";
         ss << txTo.vin[nIn].prevout;
+        std::cout << "Stream: scriptCode\n";
         ss << scriptCode;
+        std::cout << "Stream: amount\n";
         ss << amount;
+        std::cout << "Stream: nSequence\n";
         ss << txTo.vin[nIn].nSequence;
         // Outputs (none/one/all, depending on flags)
+        std::cout << "Stream: hashOutputs\n";
         ss << hashOutputs;
         // Locktime
+        std::cout << "Stream: nLockTime\n";
         ss << txTo.nLockTime;
+        std::cout << "Stream: nHashType\n";
         // Sighash type
         ss << nHashType;
 
