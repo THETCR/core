@@ -11,6 +11,7 @@
 #include <pubkey.h>
 #include <script/script.h>
 #include <uint256.h>
+#include <iostream>
 
 typedef std::vector<unsigned char> valtype;
 
@@ -1189,30 +1190,36 @@ public:
 template <class T>
 uint256 GetPrevoutHash(const T& txTo)
 {
+    std::cout << "GetPrevoutHash\n";
     CHashWriter ss(SER_GETHASH, 0);
     for (const auto& txin : txTo.vin) {
         ss << txin.prevout;
     }
+    std::cout << "GetPrevoutHash\n";
     return ss.GetHash();
 }
 
 template <class T>
 uint256 GetSequenceHash(const T& txTo)
 {
+    std::cout << "GetSequenceHash\n";
     CHashWriter ss(SER_GETHASH, 0);
     for (const auto& txin : txTo.vin) {
         ss << txin.nSequence;
     }
+    std::cout << "GetSequenceHash\n";
     return ss.GetHash();
 }
 
 template <class T>
 uint256 GetOutputsHash(const T& txTo)
 {
+    std::cout << "GetOutputsHash\n";
     CHashWriter ss(SER_GETHASH, 0);
     for (const auto& txout : txTo.vout) {
         ss << txout;
     }
+    std::cout << "GetOutputsHash\n";
     return ss.GetHash();
 }
 
