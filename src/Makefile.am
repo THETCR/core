@@ -181,6 +181,7 @@ BITCOIN_CORE_H = \
   rpc/protocol.h \
   rpc/server.h \
   scheduler.h \
+  script/descriptor.h \
   script/interpreter.h \
   script/script.h \
   script/ismine.h \
@@ -460,6 +461,7 @@ libbitcoin_common_a_SOURCES = \
   policy/feerate.cpp \
   protocol.cpp \
   scheduler.cpp \
+  script/descriptor.cpp \
   script/interpreter.cpp \
   script/script.cpp \
   script/ismine.cpp \
