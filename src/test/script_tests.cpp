@@ -804,6 +804,7 @@ BOOST_AUTO_TEST_SUITE(script_tests)
                                     "P2WPKH with future witness version", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH |
                                                                           SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM, false, WitnessMode::PKH, 1
         ).PushWitSig(keys.key0).Push(keys.pubkey0).AsWit().ScriptError(SCRIPT_ERR_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM));
+        BOOST_TEST_PASSPOINT();
         {
             CScript witscript = CScript() << ToByteVector(keys.pubkey0);
             uint256 hash;
