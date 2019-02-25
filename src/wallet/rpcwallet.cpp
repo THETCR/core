@@ -15,6 +15,7 @@
 #include "rpc/server.h"
 #include "main.h"
 #include "shutdown.h"
+#include <script/descriptor.h>
 #include "timedata.h"
 #include <util/system.h>
 #include <util/moneystr.h>

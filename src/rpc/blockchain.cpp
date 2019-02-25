@@ -26,6 +26,7 @@
 #include "txmempool.h"
 #include <wallet/wallet.h>
 #include "libzerocoin/Coin.h"
+#include <script/descriptor.h>
 #include <stdint.h>
 #include <fstream>
 #include <iostream>

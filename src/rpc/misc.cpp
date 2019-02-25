@@ -13,6 +13,7 @@
 #include "net.h"
 #include "netbase.h"
 #include "rpc/server.h"
+#include <script/descriptor.h>
 #include "spork.h"
 #include "timedata.h"
 #include <util/system.h>

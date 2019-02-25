@@ -14,6 +14,7 @@
 #include <util/strencodings.h>
 #include <util/time.h>
 #include <wallet/wallet.h>
+#include <script/descriptor.h>
 
 #include <fstream>
 #include <secp256k1.h>
