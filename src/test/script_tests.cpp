@@ -366,6 +366,7 @@ BOOST_AUTO_TEST_SUITE(script_tests)
 
             TestBuilder& PushSig(const CKey& key, int nHashType = SIGHASH_ALL, unsigned int lenR = 32, unsigned int lenS = 32, SigVersion sigversion = SigVersion::BASE, CAmount amount = 0)
             {
+                BOOST_TEST_PASSPOINT();
                 uint256 hash = SignatureHash(script, spendTx, 0, nHashType, amount, sigversion);
                 std::vector<unsigned char> vchSig, r, s;
                 uint32_t iter = 0;
@@ -379,6 +380,7 @@ BOOST_AUTO_TEST_SUITE(script_tests)
                 } while (lenR != r.size() || lenS != s.size());
                 vchSig.push_back(static_cast<unsigned char>(nHashType));
                 DoPush(vchSig);
+                BOOST_TEST_PASSPOINT();
                 return *this;
             }
 
