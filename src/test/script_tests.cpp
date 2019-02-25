@@ -609,6 +609,7 @@ BOOST_AUTO_TEST_SUITE(script_tests)
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey1C) << OP_CHECKSIG << OP_NOT,
                                     "BIP66 example 6, with DERSIG", SCRIPT_VERIFY_DERSIG
         ).Num(1).ScriptError(SCRIPT_ERR_SIG_DER));
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << OP_2 << ToByteVector(keys.pubkey1C) << ToByteVector(keys.pubkey2C) << OP_2 << OP_CHECKMULTISIG,
                                     "BIP66 example 7, without DERSIG", 0
         ).Num(0).PushSig(keys.key1, SIGHASH_ALL, 33, 32).EditPush(1, "45022100", "440220").PushSig(keys.key2));
@@ -651,7 +652,7 @@ BOOST_AUTO_TEST_SUITE(script_tests)
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey2C) << OP_CHECKSIG,
                                     "P2PK with multi-byte hashtype, with DERSIG", SCRIPT_VERIFY_DERSIG
         ).PushSig(keys.key2, SIGHASH_ALL).EditPush(70, "01", "0101").ScriptError(SCRIPT_ERR_SIG_DER));
-
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey2C) << OP_CHECKSIG,
                                     "P2PK with high S but no LOW_S", 0
         ).PushSig(keys.key2, SIGHASH_ALL, 32, 33));
