@@ -403,6 +403,7 @@ BOOST_AUTO_TEST_SUITE(script_tests)
 
             TestBuilder& PushWitRedeem()
             {
+                BOOST_TEST_PASSPOINT();
                 DoPush(std::vector<unsigned char>(witscript.begin(), witscript.end()));
                 return AsWit();
             }
