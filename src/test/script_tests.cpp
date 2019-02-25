@@ -368,17 +368,24 @@ BOOST_AUTO_TEST_SUITE(script_tests)
             {
                 BOOST_TEST_PASSPOINT();
                 uint256 hash = SignatureHash(script, spendTx, 0, nHashType, amount, sigversion);
+                BOOST_TEST_PASSPOINT();
                 std::vector<unsigned char> vchSig, r, s;
                 uint32_t iter = 0;
+                BOOST_TEST_PASSPOINT();
                 do {
                     key.Sign(hash, vchSig, false, iter++);
                     if ((lenS == 33) != (vchSig[5 + vchSig[3]] == 33)) {
+                        BOOST_TEST_PASSPOINT();
                         NegateSignatureS(vchSig);
                     }
+                    BOOST_TEST_PASSPOINT();
                     r = std::vector<unsigned char>(vchSig.begin() + 4, vchSig.begin() + 4 + vchSig[3]);
                     s = std::vector<unsigned char>(vchSig.begin() + 6 + vchSig[3], vchSig.begin() + 6 + vchSig[3] + vchSig[5 + vchSig[3]]);
+                    BOOST_TEST_PASSPOINT();
                 } while (lenR != r.size() || lenS != s.size());
+                BOOST_TEST_PASSPOINT();
                 vchSig.push_back(static_cast<unsigned char>(nHashType));
+                BOOST_TEST_PASSPOINT();
                 DoPush(vchSig);
                 BOOST_TEST_PASSPOINT();
                 return *this;
