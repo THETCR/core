@@ -754,52 +754,67 @@ BOOST_AUTO_TEST_SUITE(script_tests)
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey0) << OP_CHECKSIG,
                                     "Basic P2WSH", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, false, WitnessMode::SH,
                                     0, 1).PushWitSig(keys.key0).PushWitRedeem());
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey0),
                                     "Basic P2WPKH", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, false, WitnessMode::PKH,
                                     0, 1).PushWitSig(keys.key0).Push(keys.pubkey0).AsWit());
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey0) << OP_CHECKSIG,
                                     "Basic P2SH(P2WSH)", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, true, WitnessMode::SH,
                                     0, 1).PushWitSig(keys.key0).PushWitRedeem().PushRedeem());
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey0),
                                     "Basic P2SH(P2WPKH)", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, true, WitnessMode::PKH,
                                     0, 1).PushWitSig(keys.key0).Push(keys.pubkey0).AsWit().PushRedeem());
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey1) << OP_CHECKSIG,
                                     "Basic P2WSH with the wrong key", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, false, WitnessMode::SH
         ).PushWitSig(keys.key0).PushWitRedeem().ScriptError(SCRIPT_ERR_EVAL_FALSE));
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey1),
                                     "Basic P2WPKH with the wrong key", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, false, WitnessMode::PKH
         ).PushWitSig(keys.key0).Push(keys.pubkey1).AsWit().ScriptError(SCRIPT_ERR_EVAL_FALSE));
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey1) << OP_CHECKSIG,
                                     "Basic P2SH(P2WSH) with the wrong key", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, true, WitnessMode::SH
         ).PushWitSig(keys.key0).PushWitRedeem().PushRedeem().ScriptError(SCRIPT_ERR_EVAL_FALSE));
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey1),
                                     "Basic P2SH(P2WPKH) with the wrong key", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, true, WitnessMode::PKH
         ).PushWitSig(keys.key0).Push(keys.pubkey1).AsWit().PushRedeem().ScriptError(SCRIPT_ERR_EVAL_FALSE));
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey1) << OP_CHECKSIG,
                                     "Basic P2WSH with the wrong key but no WITNESS", SCRIPT_VERIFY_P2SH, false, WitnessMode::SH
         ).PushWitSig(keys.key0).PushWitRedeem());
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey1),
                                     "Basic P2WPKH with the wrong key but no WITNESS", SCRIPT_VERIFY_P2SH, false, WitnessMode::PKH
         ).PushWitSig(keys.key0).Push(keys.pubkey1).AsWit());
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey1) << OP_CHECKSIG,
                                     "Basic P2SH(P2WSH) with the wrong key but no WITNESS", SCRIPT_VERIFY_P2SH, true, WitnessMode::SH
         ).PushWitSig(keys.key0).PushWitRedeem().PushRedeem());
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey1),
                                     "Basic P2SH(P2WPKH) with the wrong key but no WITNESS", SCRIPT_VERIFY_P2SH, true, WitnessMode::PKH
         ).PushWitSig(keys.key0).Push(keys.pubkey1).AsWit().PushRedeem());
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey0) << OP_CHECKSIG,
                                     "Basic P2WSH with wrong value", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, false, WitnessMode::SH,
                                     0, 0).PushWitSig(keys.key0, 1).PushWitRedeem().ScriptError(SCRIPT_ERR_EVAL_FALSE));
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey0),
                                     "Basic P2WPKH with wrong value", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, false, WitnessMode::PKH,
                                     0, 0).PushWitSig(keys.key0, 1).Push(keys.pubkey0).AsWit().ScriptError(SCRIPT_ERR_EVAL_FALSE));
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey0) << OP_CHECKSIG,
                                     "Basic P2SH(P2WSH) with wrong value", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, true, WitnessMode::SH,
                                     0, 0).PushWitSig(keys.key0, 1).PushWitRedeem().PushRedeem().ScriptError(SCRIPT_ERR_EVAL_FALSE));
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey0),
                                     "Basic P2SH(P2WPKH) with wrong value", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH, true, WitnessMode::PKH,
                                     0, 0).PushWitSig(keys.key0, 1).Push(keys.pubkey0).AsWit().PushRedeem().ScriptError(SCRIPT_ERR_EVAL_FALSE));
-
+        BOOST_TEST_PASSPOINT();
         tests.push_back(TestBuilder(CScript() << ToByteVector(keys.pubkey0),
                                     "P2WPKH with future witness version", SCRIPT_VERIFY_WITNESS | SCRIPT_VERIFY_P2SH |
                                                                           SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM, false, WitnessMode::PKH, 1
