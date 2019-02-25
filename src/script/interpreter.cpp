@@ -1223,12 +1223,12 @@ template <class T>
 PrecomputedTransactionData::PrecomputedTransactionData(const T& txTo)
 {
     // Cache is calculated only for transactions with witness
-//    if (txTo.HasWitness()) {
-//        hashPrevouts = GetPrevoutHash(txTo);
-//        hashSequence = GetSequenceHash(txTo);
-//        hashOutputs = GetOutputsHash(txTo);
-//        ready = true;
-//    }
+    if (txTo.HasWitness()) {
+        hashPrevouts = GetPrevoutHash(txTo);
+        hashSequence = GetSequenceHash(txTo);
+        hashOutputs = GetOutputsHash(txTo);
+        ready = true;
+    }
 }
 
 // explicit instantiation
