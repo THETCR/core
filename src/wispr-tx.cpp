@@ -638,12 +638,12 @@ static int CommandLineRawTx(int argc, char* argv[])
     try {
         // Skip switches; Permit common stdin convention "-"
         while (argc > 1 && IsSwitchChar(argv[1][0]) &&
-            (argv[1][1] != 0)) {
+               (argv[1][1] != 0)) {
             argc--;
             argv++;
         }
 
-        CMutableTransaction txDecodeTmp;
+        CMutableTransaction tx;
         int startArg;
 
         if (!fCreateBlank) {
@@ -656,14 +656,13 @@ static int CommandLineRawTx(int argc, char* argv[])
             if (strHexTx == "-")                 // "-" implies standard input
                 strHexTx = readStdin();
 
-            if (!DecodeHexTx(txDecodeTmp, strHexTx, true))
+            if (!DecodeHexTx(tx, strHexTx, true))
                 throw std::runtime_error("invalid transaction encoding");
 
             startArg = 2;
         } else
             startArg = 1;
 
-        CMutableTransaction tx(txDecodeTmp);
         for (int i = startArg; i < argc; i++) {
             std::string arg = argv[i];
             std::string key, value;
@@ -678,7 +677,7 @@ static int CommandLineRawTx(int argc, char* argv[])
             MutateTx(tx, key, value);
         }
 
-        OutputTx(tx);
+        OutputTx(CTransaction(tx));
     }
     catch (const std::exception& e) {
         strPrint = std::string("error: ") + e.what();
@@ -700,9 +699,11 @@ int main(int argc, char* argv[])
     SetupEnvironment();
 
     try {
-        if (!AppInitRawTx(argc, argv))
-            return EXIT_FAILURE;
-    } catch (std::exception& e) {
+        int ret = AppInitRawTx(argc, argv);
+        if (ret != CONTINUE_EXECUTION)
+            return ret;
+    }
+    catch (const std::exception& e) {
         PrintExceptionContinue(&e, "AppInitRawTx()");
         return EXIT_FAILURE;
     } catch (...) {
@@ -713,7 +714,8 @@ int main(int argc, char* argv[])
     int ret = EXIT_FAILURE;
     try {
         ret = CommandLineRawTx(argc, argv);
-    } catch (std::exception& e) {
+    }
+    catch (const std::exception& e) {
         PrintExceptionContinue(&e, "CommandLineRawTx()");
     } catch (...) {
         PrintExceptionContinue(nullptr, "CommandLineRawTx()");
