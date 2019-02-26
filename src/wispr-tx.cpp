@@ -67,7 +67,11 @@ static void SetupBitcoinTxArgs()
     gArgs.AddArg("set=NAME:JSON-STRING", "Set register NAME to given JSON-STRING", false, OptionsCategory::REGISTER_COMMANDS);
 }
 
-static bool AppInitRawTx(int argc, char* argv[])
+//
+// This function returns either one of EXIT_ codes when it's expected to stop the process or
+// CONTINUE_EXECUTION when it's expected to continue further.
+//
+static int AppInitRawTx(int argc, char* argv[])
 {
     //
     // Parameters
@@ -78,6 +82,7 @@ static bool AppInitRawTx(int argc, char* argv[])
         fprintf(stderr, "Error parsing command line arguments: %s\n", error.c_str());
         return EXIT_FAILURE;
     }
+
     // Check for -testnet or -regtest parameter (Params() calls are only valid after this clause)
     try {
         SelectParams(gArgs.GetChainName());
@@ -88,45 +93,14 @@ static bool AppInitRawTx(int argc, char* argv[])
 
     fCreateBlank = gArgs.GetBoolArg("-create", false);
 
-    if (argc < 2 || gArgs.IsArgSet("-?") || gArgs.IsArgSet("-help")) {
+    if (argc < 2 || HelpRequested(gArgs)) {
         // First part of help message is specific to this utility
-        std::string strUsage = _("Wispr Core wispr-tx utility version") + " " + FormatFullVersion() + "\n\n" +
-                               _("Usage:") + "\n" +
-                               "  wispr-tx [options] <hex-tx> [commands]  " + _("Update hex-encoded wispr transaction") + "\n" +
-                               "  wispr-tx [options] -create [commands]   " + _("Create hex-encoded wispr transaction") + "\n" +
-                               "\n";
+        std::string strUsage = PACKAGE_NAME " wispr-tx utility version " + FormatFullVersion() + "\n\n" +
+                                            "Usage:  wispr-tx [options] <hex-tx> [commands]  Update hex-encoded bitcoin transaction\n" +
+                                            "or:     wispr-tx [options] -create [commands]   Create hex-encoded bitcoin transaction\n" +
+                                            "\n";
+        strUsage += gArgs.GetHelpMessage();
 
-        fprintf(stdout, "%s", strUsage.c_str());
-
-        strUsage = HelpMessageGroup(_("Options:"));
-        strUsage += HelpMessageOpt("-?", _("This help message"));
-        strUsage += HelpMessageOpt("-create", _("Create new, empty TX."));
-        strUsage += HelpMessageOpt("-json", _("Select JSON output"));
-        strUsage += HelpMessageOpt("-txid", _("Output only the hex-encoded transaction id of the resultant transaction."));
-        strUsage += HelpMessageOpt("-regtest", _("Enter regression test mode, which uses a special chain in which blocks can be solved instantly."));
-        strUsage += HelpMessageOpt("-testnet", _("Use the test network"));
-
-        fprintf(stdout, "%s", strUsage.c_str());
-
-
-        strUsage = HelpMessageGroup(_("Commands:"));
-        strUsage += HelpMessageOpt("delin=N", _("Delete input N from TX"));
-        strUsage += HelpMessageOpt("delout=N", _("Delete output N from TX"));
-        strUsage += HelpMessageOpt("in=TXID:VOUT", _("Add input to TX"));
-        strUsage += HelpMessageOpt("locktime=N", _("Set TX lock time to N"));
-        strUsage += HelpMessageOpt("nversion=N", _("Set TX version to N"));
-        strUsage += HelpMessageOpt("outaddr=VALUE:ADDRESS", _("Add address-based output to TX"));
-        strUsage += HelpMessageOpt("outscript=VALUE:SCRIPT", _("Add raw script output to TX"));
-        strUsage += HelpMessageOpt("sign=SIGHASH-FLAGS", _("Add zero or more signatures to transaction") + ". " +
-            _("This command requires JSON registers:") +
-            _("prevtxs=JSON object") + ", " +
-            _("privatekeys=JSON object") + ". " +
-            _("See signrawtransaction docs for format of sighash flags, JSON objects."));
-        fprintf(stdout, "%s", strUsage.c_str());
-
-        strUsage = HelpMessageGroup(_("Register Commands:"));
-        strUsage += HelpMessageOpt("load=NAME:FILENAME", _("Load JSON file FILENAME into register NAME"));
-        strUsage += HelpMessageOpt("set=NAME:JSON-STRING", _("Set register NAME to given JSON-STRING"));
         fprintf(stdout, "%s", strUsage.c_str());
 
         if (argc < 2) {
@@ -135,7 +109,7 @@ static bool AppInitRawTx(int argc, char* argv[])
         }
         return EXIT_SUCCESS;
     }
-    return true;
+    return CONTINUE_EXECUTION;
 }
 
 static void RegisterSetJson(const std::string& key, const std::string& rawJson)
