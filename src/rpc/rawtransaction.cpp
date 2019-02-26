@@ -711,6 +711,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
         else
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid sighash param");
     }
+//    int nHashType = ParseSighashString(hashType);
 
     bool fHashSingle = ((nHashType & ~SIGHASH_ANYONECANPAY) == SIGHASH_SINGLE);
 
