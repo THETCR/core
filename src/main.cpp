@@ -950,7 +950,7 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
 }
 
 /** Return transaction in tx, and if it was found inside a block, its hash is placed in hashBlock */
-bool GetTransaction(const uint256& hash, CTransaction& txOut, uint256& hashBlock, bool fAllowSlow)
+bool GetTransaction(const uint256& hash, CTransactionRef& txOut, uint256& hashBlock, bool fAllowSlow)
 {
     CBlockIndex* pindexSlow = nullptr;
     {
@@ -976,7 +976,7 @@ bool GetTransaction(const uint256& hash, CTransaction& txOut, uint256& hashBlock
                     return error("%s : Deserialize or I/O error - %s", __func__, e.what());
                 }
                 hashBlock = header.GetHash();
-                if (txOut.GetHash() != hash)
+                if (txOut->GetHash() != hash)
                     return error("%s : txid mismatch", __func__);
                 return true;
             }
@@ -1001,8 +1001,8 @@ bool GetTransaction(const uint256& hash, CTransaction& txOut, uint256& hashBlock
     if (pindexSlow) {
         CBlock block;
         if (ReadBlockFromDisk(block, pindexSlow)) {
-            for (const CTransaction& tx: block.vtx) {
-                if (tx.GetHash() == hash) {
+            for (const auto& tx: block.vtx) {
+                if (tx->GetHash() == hash) {
                     txOut = tx;
                     hashBlock = pindexSlow->GetBlockHash();
                     return true;
@@ -1968,7 +1968,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                          !((pindex->nHeight == 91842 && pindex->GetBlockHash() == uint256("0x00000000000a4d0a398161ffc163c503763b1f4360639393e0e4c8e300e0caec")) ||
                            (pindex->nHeight == 91880 && pindex->GetBlockHash() == uint256("0x00000000000743f190a18c5577a3c2d2a1f610ae9601ac046a38084ccb7cd721")));
     if (fEnforceBIP30) {
-        for (const CTransaction& tx: block.vtx) {
+        for (const CTransactionRef& tx: block.vtx) {
             const CCoins* coins = view.AccessCoins(tx.GetHash());
             if (coins && !coins->IsPruned())
                 return state.DoS(100, error("ConnectBlock() : tried to overwrite transaction"),
@@ -2224,7 +2224,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
 
     // add new entries
-    for (const CTransaction& tx: block.vtx) {
+    for (const CTransactionRef& tx: block.vtx) {
         if (tx.IsCoinBase() || tx.IsZerocoinSpend())
             continue;
         for (const CTxIn& in: tx.vin) {
@@ -2405,7 +2405,7 @@ bool static DisconnectTip(CValidationState& state)
     if (!FlushStateToDisk(chainparams, state, FlushStateMode::IF_NEEDED))
         return false;
     // Resurrect mempool transactions from the disconnected block.
-    for (const CTransaction& tx: block.vtx) {
+    for (const CTransactionRef& tx: block.vtx) {
         // ignore validation errors in resurrected transactions
         std::list<CTransaction> removed;
         CValidationState stateDummy;
@@ -2418,7 +2418,7 @@ bool static DisconnectTip(CValidationState& state)
     UpdateTip(pindexDelete->pprev);
     // Let wallets know transactions went from 1-confirmed to
     // 0-confirmed or conflicted:
-    for (const CTransaction& tx: block.vtx) {
+    for (const CTransactionRef& tx: block.vtx) {
         SyncWithWallets(tx, NULL);
     }
     return true;
@@ -2561,7 +2561,7 @@ bool DisconnectBlockAndInputs(CValidationState& state, CTransaction txLock)
         // Queue memory transactions to resurrect.
         // We only do this for blocks after the last checkpoint (reorganisation before that
         // point should only happen with -reindex/-loadblock, or a misbehaving peer.
-        for (const CTransaction& tx: block.vtx) {
+        for (const CTransactionRef& tx: block.vtx) {
             if (!tx.IsCoinBase()) {
                 for (const CTxIn& in1: txLock.vin) {
                     for (const CTxIn& in2: tx.vin) {
@@ -3201,7 +3201,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 
     // ----------- swiftTX transaction scanning -----------
     if (IsSporkActive(SPORK_3_SWIFTTX_BLOCK_FILTERING)) {
-        for (const CTransaction& tx: block.vtx) {
+        for (const CTransactionRef& tx: block.vtx) {
             if (!tx.IsCoinBase()) {
                 //only reject blocks when it's based on complete consensus
                 for (const CTxIn& in: tx.vin) {
@@ -3274,7 +3274,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 
 
     unsigned int nSigOps = 0;
-    for (const CTransaction& tx: block.vtx) {
+    for (const CTransactionRef& tx: block.vtx) {
         nSigOps += GetLegacySigOpCount(tx);
     }
     unsigned int nMaxBlockSigOps = fZerocoinActive ? MAX_BLOCK_SIGOPS_CURRENT : MAX_BLOCK_SIGOPS_LEGACY;
@@ -3403,7 +3403,7 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
     const int nHeight = pindexPrev == nullptr ? 0 : pindexPrev->nHeight + 1;
 
     // Check that all transactions are finalized
-    for (const CTransaction& tx: block.vtx)
+    for (const CTransactionRef& tx: block.vtx)
     if (!IsFinalTx(tx, nHeight, block.GetBlockTime())) {
         return state.DoS(10, error("%s : contains a non-final transaction", __func__), REJECT_INVALID, "bad-txns-nonfinal");
     }
@@ -3554,7 +3554,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
 
     if (block.IsProofOfStake()) {
         pindex->SetProofOfStake();
-        pindex->prevoutStake = block.vtx[1].vin[0].prevout;
+        pindex->prevoutStake = block.vtx[1]->vin[0].prevout;
         pindex->nStakeTime = block.nTime;
         uint256 hashProofOfStake = 0;
         unique_ptr<CStakeInput> stake;

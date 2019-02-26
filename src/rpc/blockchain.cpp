@@ -111,7 +111,7 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
     result.push_back(Pair("merkleroot", block.hashMerkleRoot.GetHex()));
     result.push_back(Pair("acc_checkpoint", block.nAccumulatorCheckpoint.GetHex()));
     UniValue txs(UniValue::VARR);
-    for (const CTransaction& tx: block.vtx) {
+    for (const auto& tx: block.vtx) {
         if (txDetails) {
             UniValue objTx(UniValue::VOBJ);
             TxToJSON(tx, uint256(0), objTx);
@@ -886,7 +886,7 @@ UniValue getfeeinfo(const UniValue& params, bool fHelp)
 
         CAmount nValueIn = 0;
         CAmount nValueOut = 0;
-        for (const CTransaction& tx : block.vtx) {
+        for (const auto& tx : block.vtx) {
             if (tx.IsCoinBase() || tx.IsCoinStake())
                 continue;
 

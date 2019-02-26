@@ -524,7 +524,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     UniValue transactions(UniValue::VARR);
     map<uint256, int64_t> setTxIndex;
     int i = 0;
-    for (CTransaction& tx: pblock->vtx) {
+    for (auto& tx: pblock->vtx) {
         uint256 txHash = tx.GetHash();
         setTxIndex[txHash] = i++;
 

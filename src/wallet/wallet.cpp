@@ -1492,7 +1492,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
 
             CBlock block;
             ReadBlockFromDisk(block, pindex);
-            for (CTransaction& tx: block.vtx) {
+            for (auto& tx: block.vtx) {
                 if (AddToWalletIfInvolvingMe(tx, &block, fUpdate))
                     ret++;
             }
