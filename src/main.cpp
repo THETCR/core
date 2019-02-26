@@ -1305,11 +1305,11 @@ map<CBigNum, CAmount> mapInvalidSerials;
 void AddInvalidSpendsToMap(const CBlock& block)
 {
     for (const auto& tx : block.vtx) {
-        if (!tx.ContainsZerocoins())
+        if (!tx->ContainsZerocoins())
             continue;
 
         //Check all zerocoinspends for bad serials
-        for (const CTxIn& in : tx.vin) {
+        for (const CTxIn& in : tx->vin) {
             if (in.scriptSig.IsZerocoinSpend()) {
                 CoinSpend spend = TxInToZerocoinSpend(in);
 
@@ -1337,9 +1337,9 @@ void AddInvalidSpendsToMap(const CBlock& block)
                     }
 
                     //Record all txouts from this invalid zerocoin spend tx as invalid
-                    for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                    for (unsigned int i = 0; i < tx->vout.size(); i++) {
                         //map to an empty outpoint to represent that this is the first in the chain of bad outs
-                        mapInvalidOutPoints[COutPoint(tx.GetHash(), i)] = COutPoint();
+                        mapInvalidOutPoints[COutPoint(tx->GetHash(), i)] = COutPoint();
                     }
                 }
             }
@@ -1759,27 +1759,27 @@ bool RecalculateWSPSupply(int nHeightStart)
         CAmount nValueIn = 0;
         CAmount nValueOut = 0;
         for (const auto& tx : block.vtx) {
-            for (unsigned int i = 0; i < tx.vin.size(); i++) {
-                if (tx.IsCoinBase())
+            for (unsigned int i = 0; i < tx->vin.size(); i++) {
+                if (tx->IsCoinBase())
                     break;
 
-                if (tx.vin[i].scriptSig.IsZerocoinSpend()) {
-                    nValueIn += tx.vin[i].nSequence * COIN;
+                if (tx->vin[i].scriptSig.IsZerocoinSpend()) {
+                    nValueIn += tx->vin[i].nSequence * COIN;
                     continue;
                 }
 
-                COutPoint prevout = tx.vin[i].prevout;
+                COutPoint prevout = tx->vin[i].prevout;
                 CTransaction txPrev;
                 uint256 hashBlock;
                 assert(GetTransaction(prevout.hash, txPrev, hashBlock, true));
                 nValueIn += txPrev.vout[prevout.n].nValue;
             }
 
-            for (unsigned int i = 0; i < tx.vout.size(); i++) {
-                if (i == 0 && tx.IsCoinStake())
+            for (unsigned int i = 0; i < tx->vout.size(); i++) {
+                if (i == 0 && tx->IsCoinStake())
                     continue;
 
-                nValueOut += tx.vout[i].nValue;
+                nValueOut += tx->vout[i].nValue;
             }
         }
 
@@ -1879,11 +1879,11 @@ bool UpdateZWSPSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck)
 
                     // Add the transaction to the wallet
                     for (auto& tx : block.vtx) {
-                        uint256 txid = tx.GetHash();
+                        uint256 txid = tx->GetHash();
                         if (setAddedToWallet.count(txid))
                             continue;
                         if (txid == m.GetTxHash()) {
-                            CWalletTx wtx(pwalletMain, tx);
+                            CWalletTx wtx(pwalletMain, *tx);
                             wtx.nTimeReceived = block.GetBlockTime();
                             wtx.SetMerkleBranch(block);
                             pwalletMain->AddToWallet(wtx);
@@ -1968,8 +1968,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                          !((pindex->nHeight == 91842 && pindex->GetBlockHash() == uint256("0x00000000000a4d0a398161ffc163c503763b1f4360639393e0e4c8e300e0caec")) ||
                            (pindex->nHeight == 91880 && pindex->GetBlockHash() == uint256("0x00000000000743f190a18c5577a3c2d2a1f610ae9601ac046a38084ccb7cd721")));
     if (fEnforceBIP30) {
-        for (const CTransactionRef& tx: block.vtx) {
-            const CCoins* coins = view.AccessCoins(tx.GetHash());
+        for (const auto& tx: block.vtx) {
+            const CCoins* coins = view.AccessCoins(tx->GetHash());
             if (coins && !coins->IsPruned())
                 return state.DoS(100, error("ConnectBlock() : tried to overwrite transaction"),
                                  REJECT_INVALID, "bad-txns-BIP30");
@@ -1995,21 +1995,21 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     std::vector<uint256> vSpendsInBlock;
     uint256 hashBlock = block.GetHash();
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
-        const CTransaction& tx = block.vtx[i];
+        const CTransactionRef& tx = block.vtx[i];
 
-        nInputs += tx.vin.size();
+        nInputs += tx->vin.size();
         nSigOps += GetLegacySigOpCount(tx);
         if (nSigOps > nMaxBlockSigOps)
             return state.DoS(100, error("ConnectBlock() : too many sigops"), REJECT_INVALID, "bad-blk-sigops");
 
         //Temporarily disable zerocoin transactions for maintenance
-        if (block.nTime > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE) && !IsInitialBlockDownload() && tx.ContainsZerocoins()) {
+        if (block.nTime > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE) && !IsInitialBlockDownload() && tx->ContainsZerocoins()) {
             return state.DoS(100, error("ConnectBlock() : zerocoin transactions are currently in maintenance mode"));
         }
 
-        if (tx.IsZerocoinSpend()) {
+        if (tx->IsZerocoinSpend()) {
             int nHeightTx = 0;
-            uint256 txid = tx.GetHash();
+            uint256 txid = tx->GetHash();
             vSpendsInBlock.emplace_back(txid);
             if (IsTransactionInChain(txid, nHeightTx)) {
                 //when verifying blocks on init, the blocks are scanned without being disconnected - prevent that from causing an error
@@ -2028,14 +2028,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                 nValueIn += spend.getDenomination() * COIN;
 
                 //queue for db write after the 'justcheck' section has concluded
-                vSpends.emplace_back(std::make_pair(spend, tx.GetHash()));
+                vSpends.emplace_back(std::make_pair(spend, tx->GetHash()));
                 if (!ContextualCheckZerocoinSpend(tx, spend, pindex, hashBlock))
                     return state.DoS(100, error("%s: failed to add block %s with invalid zerocoinspend", __func__, tx.GetHash().GetHex()), REJECT_INVALID);
             }
 
             // Check that zWSP mints are not already known
-            if (tx.IsZerocoinMint()) {
-                for (auto& out : tx.vout) {
+            if (tx->IsZerocoinMint()) {
+                for (auto& out : tx->vout) {
                     if (!out.IsZerocoinMint())
                         continue;
 
@@ -2046,36 +2046,36 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                     if (!ContextualCheckZerocoinMint(tx, coin, pindex))
                         return state.DoS(100, error("%s: zerocoin mint failed contextual check", __func__));
 
-                    vMints.emplace_back(std::make_pair(coin, tx.GetHash()));
+                    vMints.emplace_back(std::make_pair(coin, tx->GetHash()));
                 }
             }
-        } else if (!tx.IsCoinBase()) {
+        } else if (!tx->IsCoinBase()) {
             if (!view.HaveInputs(tx))
                 return state.DoS(100, error("ConnectBlock() : inputs missing/spent"),
                                  REJECT_INVALID, "bad-txns-inputs-missingorspent");
 
             // Check that the inputs are not marked as invalid/fraudulent
-            for (CTxIn in : tx.vin) {
+            for (CTxIn in : tx->vin) {
                 if (!ValidOutPoint(in.prevout, pindex->nHeight)) {
                     return state.DoS(100, error("%s : tried to spend invalid input %s in tx %s", __func__, in.prevout.ToString(),
-                                                tx.GetHash().GetHex()), REJECT_INVALID, "bad-txns-invalid-inputs");
+                                                tx->GetHash().GetHex()), REJECT_INVALID, "bad-txns-invalid-inputs");
                 }
             }
 
             // Check that zWSP mints are not already known
-            if (tx.IsZerocoinMint()) {
-                for (auto& out : tx.vout) {
+            if (tx->IsZerocoinMint()) {
+                for (auto& out : tx->vout) {
                     if (!out.IsZerocoinMint())
                         continue;
 
                     PublicCoin coin(Params().Zerocoin_Params(false));
                     if (!TxOutToPublicCoin(out, coin, state))
-                        return state.DoS(100, error("%s: failed final check of zerocoinmint for tx %s", __func__, tx.GetHash().GetHex()));
+                        return state.DoS(100, error("%s: failed final check of zerocoinmint for tx %s", __func__, tx->GetHash().GetHex()));
 
                     if (!ContextualCheckZerocoinMint(tx, coin, pindex))
                         return state.DoS(100, error("%s: zerocoin mint failed contextual check", __func__));
 
-                    vMints.emplace_back(std::make_pair(coin, tx.GetHash()));
+                    vMints.emplace_back(std::make_pair(coin, tx->GetHash()));
                 }
             }
 
@@ -2086,8 +2086,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             if (nSigOps > nMaxBlockSigOps)
                 return state.DoS(100, error("ConnectBlock() : too many sigops"), REJECT_INVALID, "bad-blk-sigops");
 
-            if (!tx.IsCoinStake())
-                nFees += view.GetValueIn(tx) - tx.GetValueOut();
+            if (!tx->IsCoinStake())
+                nFees += view.GetValueIn(tx) - tx->GetValueOut();
             nValueIn += view.GetValueIn(tx);
 
             std::vector<CScriptCheck> vChecks;
@@ -2107,7 +2107,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         }
         UpdateCoins(tx, state, view, i == 0 ? undoDummy : blockundo.vtxundo.back(), pindex->nHeight);
 
-        vPos.push_back(std::make_pair(tx.GetHash(), pos));
+        vPos.push_back(std::make_pair(tx->GetHash(), pos));
         pos.nTxOffset += ::GetSerializeSize(tx, CLIENT_VERSION);
     }
 
@@ -2224,10 +2224,10 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
 
     // add new entries
-    for (const CTransactionRef& tx: block.vtx) {
-        if (tx.IsCoinBase() || tx.IsZerocoinSpend())
+    for (const auto& tx: block.vtx) {
+        if (tx->IsCoinBase() || tx->IsZerocoinSpend())
             continue;
-        for (const CTxIn& in: tx.vin) {
+        for (const CTxIn& in: tx->vin) {
             mapStakeSpent.insert(std::make_pair(in.prevout, pindex->nHeight));
         }
     }
@@ -2405,11 +2405,11 @@ bool static DisconnectTip(CValidationState& state)
     if (!FlushStateToDisk(chainparams, state, FlushStateMode::IF_NEEDED))
         return false;
     // Resurrect mempool transactions from the disconnected block.
-    for (const CTransactionRef& tx: block.vtx) {
+    for (const auto& tx: block.vtx) {
         // ignore validation errors in resurrected transactions
         std::list<CTransaction> removed;
         CValidationState stateDummy;
-        if (tx.IsCoinBase() || tx.IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
+        if (tx->IsCoinBase() || tx->IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
             mempool.remove(tx, removed, true);
     }
     mempool.removeCoinbaseSpends(pcoinsTip, pindexDelete->nHeight);
@@ -2561,10 +2561,10 @@ bool DisconnectBlockAndInputs(CValidationState& state, CTransaction txLock)
         // Queue memory transactions to resurrect.
         // We only do this for blocks after the last checkpoint (reorganisation before that
         // point should only happen with -reindex/-loadblock, or a misbehaving peer.
-        for (const CTransactionRef& tx: block.vtx) {
-            if (!tx.IsCoinBase()) {
+        for (const auto& tx: block.vtx) {
+            if (!tx->IsCoinBase()) {
                 for (const CTxIn& in1: txLock.vin) {
-                    for (const CTxIn& in2: tx.vin) {
+                    for (const CTxIn& in2: tx->vin) {
                         if (in1.prevout == in2.prevout) foundConflictingTx = true;
                     }
                 }
