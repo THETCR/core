@@ -70,7 +70,10 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
 
         int nDenom;
         CTransaction txCollateral;
-        vRecv >> nDenom >> txCollateral;
+        CTransactionRef ptx;
+        vRecv >> nDenom >> ptx;
+        txCollateral = *ptx;
+
 
         CMasternode* pmn = mnodeman.Find(activeMasternode.vin);
         if (pmn == nullptr) {
