@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(BlockPolicyEstimates)
     CFeeRate baseRate(basefee, ::GetSerializeSize(tx, PROTOCOL_VERSION));
 
     // Create a fake block
-    std::vector<CTransaction> block;
+    std::vector<CTransactionRef> block;
     int blocknum = 0;
 
     // Loop through 200 blocks
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(BlockPolicyEstimates)
             while (txHashes[9-h].size()) {
                 CTransaction btx;
                 if (mpool.lookup(txHashes[9-h].back(), btx))
-                    block.push_back(btx);
+                    block.push_back(MakeTransactionRef(btx));
                 txHashes[9-h].pop_back();
             }
         }
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(BlockPolicyEstimates)
         while(txHashes[j].size()) {
             CTransaction btx;
             if (mpool.lookup(txHashes[j].back(), btx))
-                block.push_back(btx);
+                block.push_back(MakeTransactionRef(btx));
             txHashes[j].pop_back();
         }
     }
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(BlockPolicyEstimates)
                 mpool.addUnchecked(hash, CTxMemPoolEntry(tx, feeV[k/4][j], GetTime(), priV[k/4][j], blocknum, mpool.HasNoInputsOf(tx)));
                 CTransaction btx;
                 if (mpool.lookup(hash, btx))
-                    block.push_back(btx);
+                    block.push_back(MakeTransactionRef(btx));
             }
         }
         mpool.removeForBlock(block, ++blocknum, dummyConflicted);
