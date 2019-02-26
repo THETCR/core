@@ -5,7 +5,6 @@
 #if defined(HAVE_CONFIG_H)
 #include <config/wispr-config.h>
 #endif
-#include <base58.h>
 #include <clientversion.h>
 #include <coins.h>
 #include <consensus/consensus.h>
@@ -25,7 +24,6 @@
 #include <stdio.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/assign/list_of.hpp>
 
 using namespace std;
 
@@ -435,13 +433,11 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
 
     for (unsigned int kidx = 0; kidx < keysObj.size(); kidx++) {
         if (!keysObj[kidx].isStr())
-            throw runtime_error("privatekey not a std::string");
-        CBitcoinSecret vchSecret;
-        bool fGood = vchSecret.SetString(keysObj[kidx].getValStr());
-        if (!fGood)
-            throw runtime_error("privatekey not valid");
-
-        CKey key = vchSecret.GetKey();
+            throw std::runtime_error("privatekey not a std::string");
+        CKey key = DecodeSecret(keysObj[kidx].getValStr());
+        if (!key.IsValid()) {
+            throw std::runtime_error("privatekey not valid");
+        }
         tempKeystore.AddKey(key);
     }
 
