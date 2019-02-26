@@ -348,12 +348,12 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
-        nVersion = this->nVersion;
+        int _nVersion = this->nVersion;
 //        int newProtocolTime = !GetBoolArg("-testnet", false) ? 1538567022 : 1537448663;
 //        nVersion = GetAdjustedTime() >= newProtocolTime ? this->nVersion : 1;
-        if(nVersion < 2){
+        if(_nVersion == 1){
             READWRITE(*const_cast<unsigned int *>(&nTime));
         }
         READWRITE(*const_cast<std::vector<CTxIn>*>(&vin));
