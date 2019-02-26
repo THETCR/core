@@ -3259,8 +3259,8 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
             return error("CheckBlock() : CheckTransaction failed");
 
         // double check that there are no double spent zWSP spends in this block
-        if (tx.IsZerocoinSpend()) {
-            for (const CTxIn& txIn : tx.vin) {
+        if (tx->IsZerocoinSpend()) {
+            for (const CTxIn& txIn : tx->vin) {
                 if (txIn.scriptSig.IsZerocoinSpend()) {
                     libzerocoin::CoinSpend spend = TxInToZerocoinSpend(txIn);
                     if (count(vBlockSerials.begin(), vBlockSerials.end(), spend.getCoinSerialNumber()))
@@ -3274,7 +3274,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 
 
     unsigned int nSigOps = 0;
-    for (const CTransactionRef& tx: block.vtx) {
+    for (const auto& tx: block.vtx) {
         nSigOps += GetLegacySigOpCount(tx);
     }
     unsigned int nMaxBlockSigOps = fZerocoinActive ? MAX_BLOCK_SIGOPS_CURRENT : MAX_BLOCK_SIGOPS_LEGACY;
