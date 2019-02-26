@@ -18,7 +18,7 @@
 
 bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomination denom, std::vector<CBigNum>& vValues)
 {
-    for (const CTransaction& tx : block.vtx) {
+    for (const auto& tx : block.vtx) {
         if(!tx.IsZerocoinMint())
             continue;
 
@@ -43,7 +43,7 @@ bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomina
 
 bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>& listPubcoins, bool fFilterInvalid)
 {
-    for (const CTransaction& tx : block.vtx) {
+    for (const auto& tx : block.vtx) {
         if(!tx.IsZerocoinMint())
             continue;
 
@@ -85,7 +85,7 @@ bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>&
 //return a list of zerocoin mints contained in a specific block
 bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMints, bool fFilterInvalid)
 {
-    for (const CTransaction& tx : block.vtx) {
+    for (const auto& tx : block.vtx) {
         if(!tx.IsZerocoinMint())
             continue;
 
@@ -278,7 +278,7 @@ std::string ReindexZerocoinDB()
             return _("Reindexing zerocoin failed");
         }
 
-        for (const CTransaction& tx : block.vtx) {
+        for (const auto& tx : block.vtx) {
             for (unsigned int i = 0; i < tx.vin.size(); i++) {
                 if (tx.IsCoinBase())
                     break;
@@ -374,7 +374,7 @@ bool TxOutToPublicCoin(const CTxOut& txout, libzerocoin::PublicCoin& pubCoin, CV
 std::list<libzerocoin::CoinDenomination> ZerocoinSpendListFromBlock(const CBlock& block, bool fFilterInvalid)
 {
     std::list<libzerocoin::CoinDenomination> vSpends;
-    for (const CTransaction& tx : block.vtx) {
+    for (const auto& tx : block.vtx) {
         if (!tx.IsZerocoinSpend())
             continue;
 

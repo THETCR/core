@@ -1304,7 +1304,7 @@ map<COutPoint, COutPoint> mapInvalidOutPoints;
 map<CBigNum, CAmount> mapInvalidSerials;
 void AddInvalidSpendsToMap(const CBlock& block)
 {
-    for (const CTransaction& tx : block.vtx) {
+    for (const auto& tx : block.vtx) {
         if (!tx.ContainsZerocoins())
             continue;
 
@@ -1758,7 +1758,7 @@ bool RecalculateWSPSupply(int nHeightStart)
 
         CAmount nValueIn = 0;
         CAmount nValueOut = 0;
-        for (const CTransaction& tx : block.vtx) {
+        for (const auto& tx : block.vtx) {
             for (unsigned int i = 0; i < tx.vin.size(); i++) {
                 if (tx.IsCoinBase())
                     break;
@@ -3254,7 +3254,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
     bool fZerocoinActive = chainActive.Height() + 1 >= Params().NEW_PROTOCOLS_STARTHEIGHT();
 //    bool fZerocoinActive = block.GetBlockTime() > Params().NEW_PROTOCOLS_STARTTIME();
     std::vector<CBigNum> vBlockSerials;
-    for (const CTransaction& tx : block.vtx) {
+    for (const auto& tx : block.vtx) {
         if (!CheckTransaction(tx, fZerocoinActive, true, state))
             return error("CheckBlock() : CheckTransaction failed");
 
