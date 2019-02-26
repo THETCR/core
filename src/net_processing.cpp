@@ -1478,7 +1478,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         bool ignoreFees = false;
         CTxIn vin;
         std::vector<unsigned char> vchSig;
-        int64_t sigTime;
+        int64_t sigTime = 0;
 
 //        if (strCommand == NetMsgType::TX) {
 //            CTransactionRef ptx;
