@@ -1495,13 +1495,13 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         }
         const CTransaction &tx = *ptx;
         if (strCommand == NetMsgType::DSTX){
-        CMasternode *pmn = mnodeman.Find(vin);
-        if (pmn != nullptr) {
-            if (!pmn->allowFreeTx) {
-                //multiple peers can send us a valid masternode transaction
-                if (fDebug) LogPrintf("dstx: Masternode sending too many transactions %s\n", tx.GetHash().ToString());
-                return true;
-            }
+            CMasternode *pmn = mnodeman.Find(vin);
+            if (pmn != nullptr) {
+                if (!pmn->allowFreeTx) {
+                    //multiple peers can send us a valid masternode transaction
+                    if (fDebug) LogPrintf("dstx: Masternode sending too many transactions %s\n", tx.GetHash().ToString());
+                    return true;
+                }
 
             std::string strMessage = tx.GetHash().ToString() + std::to_string(sigTime);
 
@@ -1526,8 +1526,8 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
 
                 mapObfuscationBroadcastTxes.insert(std::make_pair(tx.GetHash(), dstx));
             }
+          }
         }
-    }
         CInv inv(MSG_TX, tx.GetHash());
         pfrom->AddInventoryKnown(inv);
 
