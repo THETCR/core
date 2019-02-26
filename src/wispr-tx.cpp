@@ -604,7 +604,7 @@ static int CommandLineRawTx(int argc, char* argv[])
             argv++;
         }
 
-        CMutableTransaction tx;
+        CMutableTransaction txDecodeTmp;
         int startArg;
 
         if (!fCreateBlank) {
@@ -617,13 +617,14 @@ static int CommandLineRawTx(int argc, char* argv[])
             if (strHexTx == "-")                 // "-" implies standard input
                 strHexTx = readStdin();
 
-            if (!DecodeHexTx(tx, strHexTx, true))
+            if (!DecodeHexTx(txDecodeTmp, strHexTx, true))
                 throw std::runtime_error("invalid transaction encoding");
 
             startArg = 2;
         } else
             startArg = 1;
 
+        CMutableTransaction tx(txDecodeTmp);
         for (int i = startArg; i < argc; i++) {
             std::string arg = argv[i];
             std::string key, value;
@@ -638,7 +639,7 @@ static int CommandLineRawTx(int argc, char* argv[])
             MutateTx(tx, key, value);
         }
 
-        OutputTx(CTransaction(tx));
+        OutputTx(tx);
     }
     catch (const std::exception& e) {
         strPrint = std::string("error: ") + e.what();

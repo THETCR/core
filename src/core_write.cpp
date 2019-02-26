@@ -130,7 +130,8 @@ std::string ScriptToAsmStr(const CScript& script, const bool fAttemptSighashDeco
 
 std::string EncodeHexTx(const CTransaction& tx, const int serializeFlags)
 {
-    CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION | serializeFlags);
+    CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
+//    CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION | serializeFlags);
     ssTx << tx;
     return HexStr(ssTx.begin(), ssTx.end());
 }
@@ -235,7 +236,7 @@ void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry,
     if (!hashBlock.IsNull())
         entry.pushKV("blockhash", hashBlock.GetHex());
 
-    if (include_hex) {
-        entry.pushKV("hex", EncodeHexTx(tx, serialize_flags)); // The hex-encoded transaction. Used the name "hex" to be consistent with the verbose output of "getrawtransaction".
-    }
+//    if (include_hex) {
+    entry.pushKV("hex", EncodeHexTx(tx, serialize_flags)); // The hex-encoded transaction. Used the name "hex" to be consistent with the verbose output of "getrawtransaction".
+//    }
 }
