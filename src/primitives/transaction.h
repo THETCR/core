@@ -340,11 +340,28 @@ public:
 
     CTransaction& operator=(const CTransaction& tx);
 
-    template <typename Stream>
-    inline void Serialize(Stream& s) const {
-        SerializeTransaction(*this, s);
-    }
+//    template <typename Stream>
+//    inline void Serialize(Stream& s) const {
+//        SerializeTransaction(*this, s);
+//    }
 
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(*const_cast<int32_t*>(&this->nVersion));
+        nVersion = this->nVersion;
+//        int newProtocolTime = !GetBoolArg("-testnet", false) ? 1538567022 : 1537448663;
+//        nVersion = GetAdjustedTime() >= newProtocolTime ? this->nVersion : 1;
+        if(nVersion < 2){
+            READWRITE(*const_cast<unsigned int *>(&nTime));
+        }
+        READWRITE(*const_cast<std::vector<CTxIn>*>(&vin));
+        READWRITE(*const_cast<std::vector<CTxOut>*>(&vout));
+        READWRITE(*const_cast<uint32_t*>(&nLockTime));
+        if (ser_action.ForRead())
+            UpdateHash();
+    }
     /** This deserializing constructor is provided instead of an Unserialize method.
      *  Unserialize is not possible, since it would require overwriting const fields. */
     template <typename Stream>
