@@ -447,7 +447,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         // Compute final coinbase transaction.
         pblock->vtx[0]->vin[0].scriptSig = CScript() << nHeight << OP_0;
         if (!fProofOfStake) {
-            pblock->vtx[0] = txNew;
+            pblock->vtx[0] = MakeTransactionRef(std::move(txNew));
             pblocktemplate->vTxFees[0] = -nFees;
         }
 
@@ -512,7 +512,7 @@ void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& 
     txCoinbase.vin[0].scriptSig = (CScript() << nHeight << CScriptNum(nExtraNonce)) + COINBASE_FLAGS;
     assert(txCoinbase.vin[0].scriptSig.size() <= 100);
 
-    pblock->vtx[0] = txCoinbase;
+    pblock->vtx[0] = MakeTransactionRef(std::move(txCoinbase));
     pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
 }
 
