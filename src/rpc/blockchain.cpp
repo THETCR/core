@@ -114,10 +114,10 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
     for (const auto& tx: block.vtx) {
         if (txDetails) {
             UniValue objTx(UniValue::VOBJ);
-            TxToJSON(tx, uint256(0), objTx);
+            TxToJSON(*tx, uint256(0), objTx);
             txs.push_back(objTx);
         } else
-            txs.push_back(tx.GetHash().GetHex());
+            txs.push_back(tx->GetHash().GetHex());
     }
     result.push_back(Pair("tx", txs));
     result.push_back(Pair("time", block.GetBlockTime()));
@@ -887,16 +887,16 @@ UniValue getfeeinfo(const UniValue& params, bool fHelp)
         CAmount nValueIn = 0;
         CAmount nValueOut = 0;
         for (const auto& tx : block.vtx) {
-            if (tx.IsCoinBase() || tx.IsCoinStake())
+            if (tx->IsCoinBase() || tx->IsCoinStake())
                 continue;
 
-            for (unsigned int j = 0; j < tx.vin.size(); j++) {
-                if (tx.vin[j].scriptSig.IsZerocoinSpend()) {
-                    nValueIn += tx.vin[j].nSequence * COIN;
+            for (unsigned int j = 0; j < tx->vin.size(); j++) {
+                if (tx->vin[j].scriptSig.IsZerocoinSpend()) {
+                    nValueIn += tx->vin[j].nSequence * COIN;
                     continue;
                 }
 
-                COutPoint prevout = tx.vin[j].prevout;
+                COutPoint prevout = tx->vin[j].prevout;
                 CTransaction txPrev;
                 uint256 hashBlock;
                 if(!GetTransaction(prevout.hash, txPrev, hashBlock, true))
@@ -904,8 +904,8 @@ UniValue getfeeinfo(const UniValue& params, bool fHelp)
                 nValueIn += txPrev.vout[prevout.n].nValue;
             }
 
-            for (unsigned int j = 0; j < tx.vout.size(); j++) {
-                nValueOut += tx.vout[j].nValue;
+            for (unsigned int j = 0; j < tx->vout.size(); j++) {
+                nValueOut += tx->vout[j].nValue;
             }
 
             nFees += nValueIn - nValueOut;
