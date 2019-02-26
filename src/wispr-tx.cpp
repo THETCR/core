@@ -531,7 +531,8 @@ public:
     }
 };
 
-static void MutateTx(CMutableTransaction& tx, const std::string& command, const std::string& commandVal)
+static void MutateTx(CMutableTransaction& tx, const std::string& command,
+                     const std::string& commandVal)
 {
     std::unique_ptr<Secp256k1Init> ecc;
     if (command == "nversion")
@@ -569,7 +570,7 @@ static void MutateTx(CMutableTransaction& tx, const std::string& command, const 
 static void OutputTxJSON(const CTransaction& tx)
 {
     UniValue entry(UniValue::VOBJ);
-    TxToUniv(tx, 0, entry);
+    TxToUniv(tx, uint256(), entry);
 
     std::string jsonOutput = entry.write(4);
     fprintf(stdout, "%s\n", jsonOutput.c_str());
