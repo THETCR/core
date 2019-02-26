@@ -465,8 +465,8 @@ UniValue bip38encrypt(const UniValue& params, bool fHelp)
     std::string encryptedOut = BIP38_Encrypt(strAddress, strPassphrase, privKey, vchSecret.IsCompressed());
 
     UniValue result(UniValue::VOBJ);
-    result.push_back(Pair("Addess", strAddress));
-    result.push_back(Pair("Encrypted Key", encryptedOut));
+    result.pushKV("Addess", strAddress);
+    result.pushKV("Encrypted Key", encryptedOut);
 
     return result;
 }
@@ -504,7 +504,7 @@ UniValue bip38decrypt(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_ERROR, "Failed To Decrypt");
 
     UniValue result(UniValue::VOBJ);
-    result.push_back(Pair("privatekey", HexStr(privKey)));
+    result.pushKV("privatekey", HexStr(privKey));
 
     CKey key;
     key.Set(privKey.begin(), privKey.end(), fCompressed);
@@ -515,7 +515,7 @@ UniValue bip38decrypt(const UniValue& params, bool fHelp)
     CPubKey pubkey = key.GetPubKey();
     pubkey.IsCompressed();
     assert(key.VerifyPubKey(pubkey));
-    result.push_back(Pair("Address", CBitcoinAddress(pubkey.GetID()).ToString()));
+    result.pushKV("Address", CBitcoinAddress(pubkey.GetID()).ToString());
     CKeyID vchAddress = pubkey.GetID();
     {
         pwalletMain->MarkDirty();

@@ -53,25 +53,25 @@ void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
 {
     int confirms = wtx.GetDepthInMainChain(false);
     int confirmsTotal = GetIXConfirmations(wtx.GetHash()) + confirms;
-    entry.push_back(Pair("confirmations", confirmsTotal));
-    entry.push_back(Pair("bcconfirmations", confirms));
+    entry.pushKV("confirmations", confirmsTotal);
+    entry.pushKV("bcconfirmations", confirms);
     if (wtx.IsCoinBase() || wtx.IsCoinStake())
-        entry.push_back(Pair("generated", true));
+        entry.pushKV("generated", true);
     if (confirms > 0) {
-        entry.push_back(Pair("blockhash", wtx.hashBlock.GetHex()));
-        entry.push_back(Pair("blockindex", wtx.nIndex));
-        entry.push_back(Pair("blocktime", mapBlockIndex[wtx.hashBlock]->GetBlockTime()));
+        entry.pushKV("blockhash", wtx.hashBlock.GetHex());
+        entry.pushKV("blockindex", wtx.nIndex);
+        entry.pushKV("blocktime", mapBlockIndex[wtx.hashBlock]->GetBlockTime());
     }
     uint256 hash = wtx.GetHash();
-    entry.push_back(Pair("txid", hash.GetHex()));
+    entry.pushKV("txid", hash.GetHex());
     UniValue conflicts(UniValue::VARR);
     for (const uint256& conflict: wtx.GetConflicts())
         conflicts.push_back(conflict.GetHex());
-    entry.push_back(Pair("walletconflicts", conflicts));
-    entry.push_back(Pair("time", wtx.GetTxTime()));
-    entry.push_back(Pair("timereceived", (int64_t)wtx.nTimeReceived));
+    entry.pushKV("walletconflicts", conflicts);
+    entry.pushKV("time", wtx.GetTxTime());
+    entry.pushKV("timereceived", (int64_t)wtx.nTimeReceived);
     for (const std::pair<string, std::string> & item: wtx.mapValue)
-        entry.push_back(Pair(item.first, item.second));
+        entry.pushKV(item.first, item.second);
 }
 
 string AccountFromValue(const UniValue& value)
@@ -1138,19 +1138,19 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
         } else {
             UniValue obj(UniValue::VOBJ);
             if (fIsWatchonly)
-                obj.push_back(Pair("involvesWatchonly", true));
-            obj.push_back(Pair("address", address.ToString()));
-            obj.push_back(Pair("account", strAccount));
-            obj.push_back(Pair("amount", ValueFromAmount(nAmount)));
-            obj.push_back(Pair("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf)));
-            obj.push_back(Pair("bcconfirmations", (nBCConf == std::numeric_limits<int>::max() ? 0 : nBCConf)));
+                obj.pushKV("involvesWatchonly", true);
+            obj.pushKV("address", address.ToString());
+            obj.pushKV("account", strAccount);
+            obj.pushKV("amount", ValueFromAmount(nAmount));
+            obj.pushKV("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf));
+            obj.pushKV("bcconfirmations", (nBCConf == std::numeric_limits<int>::max() ? 0 : nBCConf));
             UniValue transactions(UniValue::VARR);
             if (it != mapTally.end()) {
                 for (const uint256& item: (*it).second.txids) {
                     transactions.push_back(item.GetHex());
                 }
             }
-            obj.push_back(Pair("txids", transactions));
+            obj.pushKV("txids", transactions);
             ret.push_back(obj);
         }
     }
@@ -1162,11 +1162,11 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
             int nBCConf = (*it).second.nBCConf;
             UniValue obj(UniValue::VOBJ);
             if ((*it).second.fIsWatchonly)
-                obj.push_back(Pair("involvesWatchonly", true));
-            obj.push_back(Pair("account", (*it).first));
-            obj.push_back(Pair("amount", ValueFromAmount(nAmount)));
-            obj.push_back(Pair("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf)));
-            obj.push_back(Pair("bcconfirmations", (nBCConf == std::numeric_limits<int>::max() ? 0 : nBCConf)));
+                obj.pushKV("involvesWatchonly", true);
+            obj.pushKV("account", (*it).first);
+            obj.pushKV("amount", ValueFromAmount(nAmount));
+            obj.pushKV("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf));
+            obj.pushKV("bcconfirmations", (nBCConf == std::numeric_limits<int>::max() ? 0 : nBCConf));
             ret.push_back(obj);
         }
     }
@@ -1243,7 +1243,7 @@ static void MaybePushAddress(UniValue & entry, const CTxDestination &dest)
 {
     CBitcoinAddress addr;
     if (addr.Set(dest))
-        entry.push_back(Pair("address", addr.ToString()));
+        entry.pushKV("address", addr.ToString());
 }
 
 void ListTransactions(const CWalletTx& wtx, const std::string& strAccount, int nMinDepth, bool fLong, UniValue& ret, const isminefilter& filter)
@@ -1263,14 +1263,14 @@ void ListTransactions(const CWalletTx& wtx, const std::string& strAccount, int n
         for (const COutputEntry& s: listSent) {
             UniValue entry(UniValue::VOBJ);
             if (involvesWatchonly || (::IsMine(*pwalletMain, s.destination) & ISMINE_WATCH_ONLY))
-                entry.push_back(Pair("involvesWatchonly", true));
-            entry.push_back(Pair("account", strSentAccount));
+                entry.pushKV("involvesWatchonly", true);
+            entry.pushKV("account", strSentAccount);
             MaybePushAddress(entry, s.destination);
             std::map<std::string, std::string>::const_iterator it = wtx.mapValue.find("DS");
-            entry.push_back(Pair("category", (it != wtx.mapValue.end() && it->second == "1") ? "darksent" : "send"));
-            entry.push_back(Pair("amount", ValueFromAmount(-s.amount)));
-            entry.push_back(Pair("vout", s.vout));
-            entry.push_back(Pair("fee", ValueFromAmount(-nFee)));
+            entry.pushKV("category", (it != wtx.mapValue.end() && it->second == "1") ? "darksent" : "send");
+            entry.pushKV("amount", ValueFromAmount(-s.amount));
+            entry.pushKV("vout", s.vout);
+            entry.pushKV("fee", ValueFromAmount(-nFee));
             if (fLong)
                 WalletTxToJSON(wtx, entry);
             ret.push_back(entry);
@@ -1286,21 +1286,21 @@ void ListTransactions(const CWalletTx& wtx, const std::string& strAccount, int n
             if (fAllAccounts || (account == strAccount)) {
                 UniValue entry(UniValue::VOBJ);
                 if (involvesWatchonly || (::IsMine(*pwalletMain, r.destination) & ISMINE_WATCH_ONLY))
-                    entry.push_back(Pair("involvesWatchonly", true));
-                entry.push_back(Pair("account", account));
+                    entry.pushKV("involvesWatchonly", true);
+                entry.pushKV("account", account);
                 MaybePushAddress(entry, r.destination);
                 if (wtx.IsCoinBase()) {
                     if (wtx.GetDepthInMainChain() < 1)
-                        entry.push_back(Pair("category", "orphan"));
+                        entry.pushKV("category", "orphan");
                     else if (wtx.GetBlocksToMaturity() > 0)
-                        entry.push_back(Pair("category", "immature"));
+                        entry.pushKV("category", "immature");
                     else
-                        entry.push_back(Pair("category", "generate"));
+                        entry.pushKV("category", "generate");
                 } else {
-                    entry.push_back(Pair("category", "receive"));
+                    entry.pushKV("category", "receive");
                 }
-                entry.push_back(Pair("amount", ValueFromAmount(r.amount)));
-                entry.push_back(Pair("vout", r.vout));
+                entry.pushKV("amount", ValueFromAmount(r.amount));
+                entry.pushKV("vout", r.vout);
                 if (fLong)
                     WalletTxToJSON(wtx, entry);
                 ret.push_back(entry);
@@ -1315,12 +1315,12 @@ void AcentryToJSON(const CAccountingEntry& acentry, const std::string& strAccoun
 
     if (fAllAccounts || acentry.strAccount == strAccount) {
         UniValue entry(UniValue::VOBJ);
-        entry.push_back(Pair("account", acentry.strAccount));
-        entry.push_back(Pair("category", "move"));
-        entry.push_back(Pair("time", acentry.nTime));
-        entry.push_back(Pair("amount", ValueFromAmount(acentry.nCreditDebit)));
-        entry.push_back(Pair("otheraccount", acentry.strOtherAccount));
-        entry.push_back(Pair("comment", acentry.strComment));
+        entry.pushKV("account", acentry.strAccount);
+        entry.pushKV("category", "move");
+        entry.pushKV("time", acentry.nTime);
+        entry.pushKV("amount", ValueFromAmount(acentry.nCreditDebit));
+        entry.pushKV("otheraccount", acentry.strOtherAccount);
+        entry.pushKV("comment", acentry.strComment);
         ret.push_back(entry);
     }
 }
@@ -1518,7 +1518,7 @@ UniValue listaccounts(const UniValue& params, bool fHelp)
 
     UniValue ret(UniValue::VOBJ);
     for (const std::pair<string, CAmount> & accountBalance: mapAccountBalances) {
-        ret.push_back(Pair(accountBalance.first, ValueFromAmount(accountBalance.second)));
+        ret.pushKV(accountBalance.first, ValueFromAmount(accountBalance.second));
     }
     return ret;
 }
@@ -1605,8 +1605,8 @@ UniValue listsinceblock(const UniValue& params, bool fHelp)
     uint256 lastblock = pblockLast ? pblockLast->GetBlockHash() : 0;
 
     UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("transactions", transactions));
-    ret.push_back(Pair("lastblock", lastblock.GetHex()));
+    ret.pushKV("transactions", transactions);
+    ret.pushKV("lastblock", lastblock.GetHex());
 
     return ret;
 }
@@ -1671,18 +1671,18 @@ UniValue gettransaction(const UniValue& params, bool fHelp)
     CAmount nNet = nCredit - nDebit;
     CAmount nFee = (wtx.IsFromMe(filter) ? wtx.GetValueOut() - nDebit : 0);
 
-    entry.push_back(Pair("amount", ValueFromAmount(nNet - nFee)));
+    entry.pushKV("amount", ValueFromAmount(nNet - nFee));
     if (wtx.IsFromMe(filter))
-        entry.push_back(Pair("fee", ValueFromAmount(nFee)));
+        entry.pushKV("fee", ValueFromAmount(nFee));
 
     WalletTxToJSON(wtx, entry);
 
     UniValue details(UniValue::VARR);
     ListTransactions(wtx, "*", 0, false, details, filter);
-    entry.push_back(Pair("details", details));
+    entry.pushKV("details", details);
 
     std::string strHex = EncodeHexTx(static_cast<CTransaction>(wtx));
-    entry.push_back(Pair("hex", strHex));
+    entry.pushKV("hex", strHex);
 
     return entry;
 }
@@ -2081,8 +2081,8 @@ UniValue listlockunspent(const UniValue& params, bool fHelp)
     for (COutPoint& outpt: vOutpts) {
         UniValue o(UniValue::VOBJ);
 
-        o.push_back(Pair("txid", outpt.hash.GetHex()));
-        o.push_back(Pair("vout", (int)outpt.n));
+        o.pushKV("txid", outpt.hash.GetHex());
+        o.pushKV("vout", (int)outpt.n);
         ret.push_back(o);
     }
 
@@ -2140,15 +2140,15 @@ UniValue getwalletinfo(const UniValue& params, bool fHelp)
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     UniValue obj(UniValue::VOBJ);
-    obj.push_back(Pair("walletversion", pwalletMain->GetVersion()));
-    obj.push_back(Pair("balance", ValueFromAmount(pwalletMain->GetBalance())));
-    obj.push_back(Pair("txcount", (int)pwalletMain->mapWallet.size()));
-    obj.push_back(Pair("keypoololdest", pwalletMain->GetOldestKeyPoolTime()));
-    obj.push_back(Pair("keypoolsize", (int)pwalletMain->GetKeyPoolSize()));
+    obj.pushKV("walletversion", pwalletMain->GetVersion());
+    obj.pushKV("balance", ValueFromAmount(pwalletMain->GetBalance()));
+    obj.pushKV("txcount", (int)pwalletMain->mapWallet.size());
+    obj.pushKV("keypoololdest", pwalletMain->GetOldestKeyPoolTime());
+    obj.pushKV("keypoolsize", (int)pwalletMain->GetKeyPoolSize());
     if (pwalletMain->IsCrypted())
-        obj.push_back(Pair("unlocked_until", nWalletUnlockTime));
-    obj.push_back(Pair("paytxfee",      ValueFromAmount(payTxFee.GetFeePerK())));
-    obj.push_back(Pair("automintaddresses", fEnableAutoConvert));
+        obj.pushKV("unlocked_until", nWalletUnlockTime);
+    obj.pushKV("paytxfee",      ValueFromAmount(payTxFee.GetFeePerK()));
+    obj.pushKV("automintaddresses", fEnableAutoConvert);
     return obj;
 }
 
@@ -2192,8 +2192,8 @@ UniValue reservebalance(const UniValue& params, bool fHelp)
     }
 
     UniValue result(UniValue::VOBJ);
-    result.push_back(Pair("reserve", (nReserveBalance > 0)));
-    result.push_back(Pair("amount", ValueFromAmount(nReserveBalance)));
+    result.pushKV("reserve", (nReserveBalance > 0));
+    result.pushKV("amount", ValueFromAmount(nReserveBalance));
     return result;
 }
 
@@ -2232,12 +2232,12 @@ UniValue setstakesplitthreshold(const UniValue& params, bool fHelp)
 
         UniValue result(UniValue::VOBJ);
         pwalletMain->nStakeSplitThreshold = nStakeSplitThreshold;
-        result.push_back(Pair("threshold", int(pwalletMain->nStakeSplitThreshold)));
+        result.pushKV("threshold", int(pwalletMain->nStakeSplitThreshold));
         if (fFileBacked) {
             walletdb.WriteStakeSplitThreshold(nStakeSplitThreshold);
-            result.push_back(Pair("saved", "true"));
+            result.pushKV("saved", "true");
         } else
-            result.push_back(Pair("saved", "false"));
+            result.pushKV("saved", "false");
 
         return result;
     }
@@ -2298,14 +2298,14 @@ UniValue printMultiSend()
 {
     UniValue ret(UniValue::VARR);
     UniValue act(UniValue::VOBJ);
-    act.push_back(Pair("MultiSendStake Activated?", pwalletMain->fMultiSendStake));
-    act.push_back(Pair("MultiSendMasternode Activated?", pwalletMain->fMultiSendMasternodeReward));
+    act.pushKV("MultiSendStake Activated?", pwalletMain->fMultiSendStake);
+    act.pushKV("MultiSendMasternode Activated?", pwalletMain->fMultiSendMasternodeReward);
     ret.push_back(act);
 
     if (pwalletMain->vDisabledAddresses.size() >= 1) {
         UniValue disAdd(UniValue::VOBJ);
         for (unsigned int i = 0; i < pwalletMain->vDisabledAddresses.size(); i++) {
-            disAdd.push_back(Pair("Disabled From Sending", pwalletMain->vDisabledAddresses[i]));
+            disAdd.pushKV("Disabled From Sending", pwalletMain->vDisabledAddresses[i]);
         }
         ret.push_back(disAdd);
     }
@@ -2314,8 +2314,8 @@ UniValue printMultiSend()
 
     UniValue vMS(UniValue::VOBJ);
     for (unsigned int i = 0; i < pwalletMain->vMultiSend.size(); i++) {
-        vMS.push_back(Pair("Address " + std::to_string(i), pwalletMain->vMultiSend[i].first));
-        vMS.push_back(Pair("Percent", pwalletMain->vMultiSend[i].second));
+        vMS.pushKV("Address " + std::to_string(i), pwalletMain->vMultiSend[i].first);
+        vMS.pushKV("Percent", pwalletMain->vMultiSend[i].second);
     }
 
     ret.push_back(vMS);
@@ -2343,8 +2343,8 @@ UniValue printAddresses()
         UniValue obj(UniValue::VOBJ);
         const std::string* strAdd = &(*it).first;
         const double* nBalance = &(*it).second;
-        obj.push_back(Pair("Address ", *strAdd));
-        obj.push_back(Pair("Balance ", *nBalance));
+        obj.pushKV("Address ", *strAdd);
+        obj.pushKV("Balance ", *nBalance);
         ret.push_back(obj);
     }
 
@@ -2384,8 +2384,8 @@ UniValue multisend(const UniValue& params, bool fHelp)
                 pwalletMain->setMultiSendDisabled();
 
                 UniValue obj(UniValue::VOBJ);
-                obj.push_back(Pair("Erased from database", erased));
-                obj.push_back(Pair("Erased from RAM", true));
+                obj.pushKV("Erased from database", erased);
+                obj.pushKV("Erased from RAM", true);
 
                 return obj;
             }
@@ -2397,7 +2397,7 @@ UniValue multisend(const UniValue& params, bool fHelp)
                 pwalletMain->fMultiSendStake = true;
                 if (!walletdb.WriteMSettings(true, pwalletMain->fMultiSendMasternodeReward, pwalletMain->nLastMultiSendHeight)) {
                     UniValue obj(UniValue::VOBJ);
-                    obj.push_back(Pair("error", "MultiSend activated but writing settings to DB failed"));
+                    obj.pushKV("error", "MultiSend activated but writing settings to DB failed");
                     UniValue arr(UniValue::VARR);
                     arr.push_back(obj);
                     arr.push_back(printMultiSend());
@@ -2416,7 +2416,7 @@ UniValue multisend(const UniValue& params, bool fHelp)
 
                 if (!walletdb.WriteMSettings(pwalletMain->fMultiSendStake, true, pwalletMain->nLastMultiSendHeight)) {
                     UniValue obj(UniValue::VOBJ);
-                    obj.push_back(Pair("error", "MultiSend activated but writing settings to DB failed"));
+                    obj.pushKV("error", "MultiSend activated but writing settings to DB failed");
                     UniValue arr(UniValue::VARR);
                     arr.push_back(obj);
                     arr.push_back(printMultiSend());
@@ -2556,10 +2556,10 @@ UniValue getzerocoinbalance(const UniValue& params, bool fHelp)
     EnsureWalletIsUnlocked(true);
 
         UniValue ret(UniValue::VOBJ);
-        ret.push_back(Pair("Total", ValueFromAmount(pwalletMain->GetZerocoinBalance(false))));
-        ret.push_back(Pair("Mature", ValueFromAmount(pwalletMain->GetZerocoinBalance(true))));
-        ret.push_back(Pair("Unconfirmed", ValueFromAmount(pwalletMain->GetUnconfirmedZerocoinBalance())));
-        ret.push_back(Pair("Immature", ValueFromAmount(pwalletMain->GetImmatureZerocoinBalance())));
+        ret.pushKV("Total", ValueFromAmount(pwalletMain->GetZerocoinBalance(false)));
+        ret.pushKV("Mature", ValueFromAmount(pwalletMain->GetZerocoinBalance(true)));
+        ret.pushKV("Unconfirmed", ValueFromAmount(pwalletMain->GetUnconfirmedZerocoinBalance()));
+        ret.pushKV("Immature", ValueFromAmount(pwalletMain->GetImmatureZerocoinBalance()));
         return ret;
 
 }
@@ -2617,13 +2617,13 @@ UniValue listmintedzerocoins(const UniValue& params, bool fHelp)
         for (const CMintMeta& m : setMints) {
             // Construct mint object
             UniValue objMint(UniValue::VOBJ);
-            objMint.push_back(Pair("serial hash", m.hashSerial.GetHex()));  // Serial hash
-            objMint.push_back(Pair("version", m.nVersion));                 // Zerocoin version
-            objMint.push_back(Pair("zWSP ID", m.hashPubcoin.GetHex()));     // PubCoin
+            objMint.pushKV("serial hash", m.hashSerial.GetHex()));  // Serial hah
+            objMint.pushKV("version", m.nVersion));                 // Zerocoin versin
+            objMint.pushKV("zWSP ID", m.hashPubcoin.GetHex()));     // PubCon
             int denom = libzerocoin::ZerocoinDenominationToInt(m.denom);
-            objMint.push_back(Pair("denomination", denom));                 // Denomination
+            objMint.pushKV("denomination", denom));                 // Denominatin
             int nConfirmations = (m.nHeight && nBestHeight > m.nHeight) ? nBestHeight - m.nHeight : 0;
-            objMint.push_back(Pair("confirmations", nConfirmations));       // Confirmations
+            objMint.pushKV("confirmations", nConfirmations));       // Confirmatios
             // Push back mint object
             jsonList.push_back(objMint);
         }
@@ -2672,8 +2672,8 @@ UniValue listzerocoinamounts(const UniValue& params, bool fHelp)
     UniValue ret(UniValue::VARR);
     for (const auto& m : libzerocoin::zerocoinDenomList) {
         UniValue val(UniValue::VOBJ);
-        val.push_back(Pair("denomination", libzerocoin::ZerocoinDenominationToInt(m)));
-        val.push_back(Pair("mints", (int64_t)spread.at(m)));
+        val.pushKV("denomination", libzerocoin::ZerocoinDenominationToInt(m));
+        val.pushKV("mints", (int64_t)spread.at(m));
         ret.push_back(val);
     }
     return ret;
@@ -2810,13 +2810,13 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
     UniValue arrMints(UniValue::VARR);
     for (CDeterministicMint dMint : vDMints) {
         UniValue m(UniValue::VOBJ);
-        m.push_back(Pair("txid", wtx.GetHash().ToString()));
-        m.push_back(Pair("value", ValueFromAmount(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination()))));
-        m.push_back(Pair("pubcoinhash", dMint.GetPubcoinHash().GetHex()));
-        m.push_back(Pair("serialhash", dMint.GetSerialHash().GetHex()));
-        m.push_back(Pair("seedhash", dMint.GetSeedHash().GetHex()));
-        m.push_back(Pair("count", (int64_t)dMint.GetCount()));
-        m.push_back(Pair("time", GetTimeMillis() - nTime));
+        m.pushKV("txid", wtx.GetHash().ToString());
+        m.pushKV("value", ValueFromAmount(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination())));
+        m.pushKV("pubcoinhash", dMint.GetPubcoinHash().GetHex());
+        m.pushKV("serialhash", dMint.GetSerialHash().GetHex());
+        m.pushKV("seedhash", dMint.GetSeedHash().GetHex());
+        m.pushKV("count", (int64_t)dMint.GetCount());
+        m.pushKV("time", GetTimeMillis() - nTime);
         arrMints.push_back(m);
     }
 
@@ -2997,11 +2997,11 @@ extern UniValue DoZwspSpend(const CAmount nAmount, bool fMintChange, bool fMinim
     UniValue arrSpends(UniValue::VARR);
     for (CZerocoinSpend spend : receipt.GetSpends()) {
         UniValue obj(UniValue::VOBJ);
-        obj.push_back(Pair("denomination", spend.GetDenomination()));
-        obj.push_back(Pair("pubcoin", spend.GetPubCoin().GetHex()));
-        obj.push_back(Pair("serial", spend.GetSerial().GetHex()));
+        obj.pushKV("denomination", spend.GetDenomination());
+        obj.pushKV("pubcoin", spend.GetPubCoin().GetHex());
+        obj.pushKV("serial", spend.GetSerial().GetHex());
         uint32_t nChecksum = spend.GetAccumulatorChecksum();
-        obj.push_back(Pair("acc_checksum", HexStr(BEGIN(nChecksum), END(nChecksum))));
+        obj.pushKV("acc_checksum", HexStr(BEGIN(nChecksum), END(nChecksum)));
         arrSpends.push_back(obj);
         nValueIn += libzerocoin::ZerocoinDenominationToAmount(spend.GetDenomination());
     }
@@ -3011,25 +3011,25 @@ extern UniValue DoZwspSpend(const CAmount nAmount, bool fMintChange, bool fMinim
     for (unsigned int i = 0; i < wtx.vout.size(); i++) {
         const CTxOut& txout = wtx.vout[i];
         UniValue out(UniValue::VOBJ);
-        out.push_back(Pair("value", ValueFromAmount(txout.nValue)));
+        out.pushKV("value", ValueFromAmount(txout.nValue));
         nValueOut += txout.nValue;
 
         CTxDestination dest;
         if(txout.scriptPubKey.IsZerocoinMint())
-            out.push_back(Pair("address", "zerocoinmint"));
+            out.pushKV("address", "zerocoinmint");
         else if(ExtractDestination(txout.scriptPubKey, dest))
-            out.push_back(Pair("address", CBitcoinAddress(dest).ToString()));
+            out.pushKV("address", CBitcoinAddress(dest).ToString());
         vout.push_back(out);
     }
 
     //construct JSON to return
     UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("txid", wtx.GetHash().ToString()));
-    ret.push_back(Pair("bytes", (int64_t)GetSerializeSize(wtx, CTransaction::CURRENT_VERSION)));
-    ret.push_back(Pair("fee", ValueFromAmount(nValueIn - nValueOut)));
-    ret.push_back(Pair("duration_millis", (GetTimeMillis() - nTimeStart)));
-    ret.push_back(Pair("spends", arrSpends));
-    ret.push_back(Pair("outputs", vout));
+    ret.pushKV("txid", wtx.GetHash().ToString());
+    ret.pushKV("bytes", (int64_t)GetSerializeSize(wtx, CTransaction::CURRENT_VERSION));
+    ret.pushKV("fee", ValueFromAmount(nValueIn - nValueOut));
+    ret.pushKV("duration_millis", (GetTimeMillis() - nTimeStart));
+    ret.pushKV("spends", arrSpends);
+    ret.pushKV("outputs", vout);
 
     return ret;
 }
@@ -3090,8 +3090,8 @@ UniValue resetmintzerocoin(const UniValue& params, bool fHelp)
     }
 
     UniValue obj(UniValue::VOBJ);
-    obj.push_back(Pair("updated", arrUpdated));
-    obj.push_back(Pair("archived", arrDeleted));
+    obj.pushKV("updated", arrUpdated);
+    obj.pushKV("archived", arrDeleted);
     return obj;
 }
 
@@ -3146,14 +3146,14 @@ UniValue resetspentzerocoin(const UniValue& params, bool fHelp)
                 walletdb.EraseZerocoinSpendSerialEntry(spend.GetSerial());
                 RemoveSerialFromDB(spend.GetSerial());
                 UniValue obj(UniValue::VOBJ);
-                obj.push_back(Pair("serial", spend.GetSerial().GetHex()));
+                obj.pushKV("serial", spend.GetSerial().GetHex());
                 arrRestored.push_back(obj);
                 continue;
             }
         }
     }
 
-    objRet.push_back(Pair("restored", arrRestored));
+    objRet.pushKV("restored", arrRestored);
     return objRet;
 }
 
@@ -3192,22 +3192,22 @@ UniValue getarchivedzerocoin(const UniValue& params, bool fHelp)
     UniValue arrRet(UniValue::VARR);
     for (const CZerocoinMint& mint : listMints) {
         UniValue objMint(UniValue::VOBJ);
-        objMint.push_back(Pair("txid", mint.GetTxHash().GetHex()));
-        objMint.push_back(Pair("denomination", ValueFromAmount(mint.GetDenominationAsAmount())));
-        objMint.push_back(Pair("serial", mint.GetSerialNumber().GetHex()));
-        objMint.push_back(Pair("randomness", mint.GetRandomness().GetHex()));
-        objMint.push_back(Pair("pubcoin", mint.GetValue().GetHex()));
+        objMint.pushKV("txid", mint.GetTxHash().GetHex());
+        objMint.pushKV("denomination", ValueFromAmount(mint.GetDenominationAsAmount()));
+        objMint.pushKV("serial", mint.GetSerialNumber().GetHex());
+        objMint.pushKV("randomness", mint.GetRandomness().GetHex());
+        objMint.pushKV("pubcoin", mint.GetValue().GetHex());
         arrRet.push_back(objMint);
     }
 
     for (const CDeterministicMint& dMint : listDMints) {
         UniValue objDMint(UniValue::VOBJ);
-        objDMint.push_back(Pair("txid", dMint.GetTxHash().GetHex()));
-        objDMint.push_back(Pair("denomination", ValueFromAmount(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination()))));
-        objDMint.push_back(Pair("serialhash", dMint.GetSerialHash().GetHex()));
-        objDMint.push_back(Pair("pubcoinhash", dMint.GetPubcoinHash().GetHex()));
-        objDMint.push_back(Pair("seedhash", dMint.GetSeedHash().GetHex()));
-        objDMint.push_back(Pair("count", (int64_t)dMint.GetCount()));
+        objDMint.pushKV("txid", dMint.GetTxHash().GetHex());
+        objDMint.pushKV("denomination", ValueFromAmount(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination())));
+        objDMint.pushKV("serialhash", dMint.GetSerialHash().GetHex());
+        objDMint.pushKV("pubcoinhash", dMint.GetPubcoinHash().GetHex());
+        objDMint.pushKV("seedhash", dMint.GetSeedHash().GetHex());
+        objDMint.pushKV("count", (int64_t)dMint.GetCount());
         arrRet.push_back(objDMint);
     }
 
@@ -3269,20 +3269,20 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
             continue;
 
         UniValue objMint(UniValue::VOBJ);
-        objMint.push_back(Pair("d", mint.GetDenomination()));
-        objMint.push_back(Pair("p", mint.GetValue().GetHex()));
-        objMint.push_back(Pair("s", mint.GetSerialNumber().GetHex()));
-        objMint.push_back(Pair("r", mint.GetRandomness().GetHex()));
-        objMint.push_back(Pair("t", mint.GetTxHash().GetHex()));
-        objMint.push_back(Pair("h", mint.GetHeight()));
-        objMint.push_back(Pair("u", mint.IsUsed()));
-        objMint.push_back(Pair("v", mint.GetVersion()));
+        objMint.pushKV("d", mint.GetDenomination());
+        objMint.pushKV("p", mint.GetValue().GetHex());
+        objMint.pushKV("s", mint.GetSerialNumber().GetHex());
+        objMint.pushKV("r", mint.GetRandomness().GetHex());
+        objMint.pushKV("t", mint.GetTxHash().GetHex());
+        objMint.pushKV("h", mint.GetHeight());
+        objMint.pushKV("u", mint.IsUsed());
+        objMint.pushKV("v", mint.GetVersion());
         if (mint.GetVersion() >= 2) {
             CKey key;
             key.SetPrivKey(mint.GetPrivKey(), true);
             CBitcoinSecret cBitcoinSecret;
             cBitcoinSecret.SetKey(key);
-            objMint.push_back(Pair("k", cBitcoinSecret.ToString()));
+            objMint.pushKV("k", cBitcoinSecret.ToString());
         }
         jsonList.push_back(objMint);
     }
@@ -3377,8 +3377,8 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
     }
 
     UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("added", count));
-    ret.push_back(Pair("value", ValueFromAmount(nValue)));
+    ret.pushKV("added", count);
+    ret.pushKV("value", ValueFromAmount(nValue));
     return ret;
 }
 
@@ -3415,18 +3415,18 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
     UniValue arrRet(UniValue::VARR);
     for (const CZerocoinMint& mint : listMints) {
         UniValue objMint(UniValue::VOBJ);
-        objMint.push_back(Pair("txid", mint.GetTxHash().GetHex()));
-        objMint.push_back(Pair("denomination", ValueFromAmount(mint.GetDenominationAsAmount())));
-        objMint.push_back(Pair("pubcoin", mint.GetValue().GetHex()));
-        objMint.push_back(Pair("height", mint.GetHeight()));
+        objMint.pushKV("txid", mint.GetTxHash().GetHex());
+        objMint.pushKV("denomination", ValueFromAmount(mint.GetDenominationAsAmount()));
+        objMint.pushKV("pubcoin", mint.GetValue().GetHex());
+        objMint.pushKV("height", mint.GetHeight());
         arrRet.push_back(objMint);
     }
     for (const CDeterministicMint& dMint : listDMints) {
         UniValue objMint(UniValue::VOBJ);
-        objMint.push_back(Pair("txid", dMint.GetTxHash().GetHex()));
-        objMint.push_back(Pair("denomination", FormatMoney(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination()))));
-        objMint.push_back(Pair("pubcoinhash", dMint.GetPubcoinHash().GetHex()));
-        objMint.push_back(Pair("height", dMint.GetHeight()));
+        objMint.pushKV("txid", dMint.GetTxHash().GetHex());
+        objMint.pushKV("denomination", FormatMoney(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination())));
+        objMint.pushKV("pubcoinhash", dMint.GetPubcoinHash().GetHex());
+        objMint.pushKV("height", dMint.GetHeight());
         arrRet.push_back(objMint);
     }
 
@@ -3462,7 +3462,7 @@ UniValue setzwspseed(const UniValue& params, bool fHelp)
         zwallet->SyncWithChain();
 
     UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("success", fSuccess));
+    ret.pushKV("success", fSuccess);
 
     return ret;
 }
@@ -3487,7 +3487,7 @@ UniValue getzwspseed(const UniValue& params, bool fHelp)
     uint256 seed = zwallet->GetMasterSeed();
 
     UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("seed", seed.GetHex()));
+    ret.pushKV("seed", seed.GetHex());
 
     return ret;
 }
@@ -3531,10 +3531,10 @@ UniValue generatemintlist(const UniValue& params, bool fHelp)
         CDeterministicMint dMint;
         zwallet->GenerateMint(i, denom, coin, dMint);
         UniValue obj(UniValue::VOBJ);
-        obj.push_back(Pair("count", i));
-        obj.push_back(Pair("value", coin.getPublicCoin().getValue().GetHex()));
-        obj.push_back(Pair("randomness", coin.getRandomness().GetHex()));
-        obj.push_back(Pair("serial", coin.getSerialNumber().GetHex()));
+        obj.pushKV("count", i);
+        obj.pushKV("value", coin.getPublicCoin().getValue().GetHex());
+        obj.pushKV("randomness", coin.getRandomness().GetHex());
+        obj.pushKV("serial", coin.getSerialNumber().GetHex());
         arrRet.push_back(obj);
     }
 
@@ -3555,8 +3555,8 @@ UniValue dzwspstate(const UniValue& params, bool fHelp) {
     UniValue obj(UniValue::VOBJ);
     int nCount, nCountLastUsed;
     zwallet->GetState(nCount, nCountLastUsed);
-    obj.push_back(Pair("dzwsp_count", nCount));
-    obj.push_back(Pair("mintpool_count", nCountLastUsed));
+    obj.pushKV("dzwsp_count", nCount);
+    obj.pushKV("mintpool_count", nCountLastUsed);
 
     return obj;
 }
