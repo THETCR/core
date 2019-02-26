@@ -178,9 +178,10 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
         std::vector<CTxIn> in;
         CAmount nAmount;
         CTransaction txCollateral;
+        CTransactionRef ptx;
         std::vector<CTxOut> out;
-        vRecv >> in >> nAmount >> txCollateral >> out;
-
+        vRecv >> in >> nAmount >> ptx >> out;
+        txCollateral = *ptx;
         //do we have enough users in the current session?
         if (!IsSessionReady()) {
             LogPrintf("dsi -- session not complete! \n");
