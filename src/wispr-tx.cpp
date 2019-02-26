@@ -25,10 +25,8 @@
 
 #include <boost/algorithm/string.hpp>
 
-using namespace std;
-
 static bool fCreateBlank;
-static map<string, UniValue> registers;
+static std::map<std::string, UniValue> registers;
 static const int CONTINUE_EXECUTION=-1;
 
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
@@ -390,14 +388,14 @@ static bool findSighashFlags(int& flags, const std::string& flagStr)
     return false;
 }
 
-uint256 ParseHashUO(map<string, UniValue>& o, std::string strKey)
+uint256 ParseHashUO(std::map<std::string, UniValue>& o, std::string strKey)
 {
     if (!o.count(strKey))
         return 0;
     return ParseHashUV(o[strKey], strKey);
 }
 
-std::vector<unsigned char> ParseHexUO(map<string, UniValue>& o, std::string strKey)
+std::vector<unsigned char> ParseHexUO(std::map<std::string, UniValue>& o, std::string strKey)
 {
     if (!o.count(strKey)) {
         std::vector<unsigned char> emptyVec;
@@ -472,7 +470,7 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
                     std::string err("Previous output scriptPubKey mismatch:\n");
                     err = err + coins->vout[nOut].scriptPubKey.ToString() + "\nvs:\n" +
                           scriptPubKey.ToString();
-                    throw runtime_error(err);
+                    throw std::runtime_error(err);
                 }
                 if ((unsigned int)nOut >= coins->vout.size())
                     coins->vout.resize(nOut + 1);
@@ -564,7 +562,7 @@ static void MutateTx(CMutableTransaction& tx, const std::string& command,
         RegisterSet(commandVal);
 
     else
-        throw runtime_error("unknown command");
+        throw std::runtime_error("unknown command");
 }
 
 static void OutputTxJSON(const CTransaction& tx)
@@ -613,7 +611,7 @@ static std::string readStdin()
     }
 
     if (ferror(stdin))
-        throw runtime_error("error reading stdin");
+        throw std::runtime_error("error reading stdin");
 
     boost::algorithm::trim_right(ret);
 
