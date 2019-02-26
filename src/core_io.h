@@ -38,7 +38,7 @@ uint256 ParseHashUV(const UniValue& v, const std::string& strName);
 bool ParseHashStr(const std::string& strHex, uint256& result);
 std::vector<unsigned char> ParseHexUV(const UniValue& v, const std::string& strName);
 
-int ParseSighashString(const UniValue& sighash);
+//int ParseSighashString(const UniValue& sighash);
 
 // core_write.cpp
 UniValue ValueFromAmount(const CAmount& amount);
