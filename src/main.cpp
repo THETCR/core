@@ -2489,7 +2489,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
 
     // Remove conflicting transactions from the mempool.
     std::list<CTransaction> txConflicted;
-    mempool.removeForBlock(*pblock->vtx, pindexNew->nHeight, txConflicted, !IsInitialBlockDownload());
+    mempool.removeForBlock(pblock->vtx, pindexNew->nHeight, txConflicted, !IsInitialBlockDownload());
     mempool.check(pcoinsTip);
     // Update chainActive & related variables.
     UpdateTip(pindexNew);
