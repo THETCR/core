@@ -18,7 +18,6 @@ class CZMQNotificationInterface : public CValidationInterface
 public:
     virtual ~CZMQNotificationInterface();
     std::list<const CZMQAbstractNotifier*> GetActiveNotifiers() const;
-    static CZMQNotificationInterface* CreateWithArguments(const std::map<std::string, std::string> &args);
     static CZMQNotificationInterface* Create();
 protected:
     bool Initialize();

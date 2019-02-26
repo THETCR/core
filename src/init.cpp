@@ -1670,7 +1670,7 @@ bool AppInit2()
         AddOneShot(strDest);
 
 #if ENABLE_ZMQ
-    g_zmq_notification_interface = CZMQNotificationInterface::CreateWithArguments(mapArgs);
+    g_zmq_notification_interface = CZMQNotificationInterface::Create();
 
     if (g_zmq_notification_interface) {
         RegisterValidationInterface(g_zmq_notification_interface);
