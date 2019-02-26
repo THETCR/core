@@ -464,16 +464,16 @@ struct CMutableTransaction
         READWRITE(vout);
         READWRITE(nLockTime);
     }
-    template <typename Stream>
-    inline void Serialize(Stream& s) const {
-        SerializeTransaction(*this, s);
-    }
-
-
-    template <typename Stream>
-    inline void Unserialize(Stream& s) {
-        UnserializeTransaction(*this, s);
-    }
+//    template <typename Stream>
+//    inline void Serialize(Stream& s) const {
+//        SerializeTransaction(*this, s);
+//    }
+//
+//
+//    template <typename Stream>
+//    inline void Unserialize(Stream& s) {
+//        UnserializeTransaction(*this, s);
+//    }
 
     template <typename Stream>
     CMutableTransaction(deserialize_type, Stream& s) {
