@@ -543,7 +543,7 @@ public:
 
 static void MutateTx(CMutableTransaction& tx, const std::string& command, const std::string& commandVal)
 {
-    boost::scoped_ptr<Secp256k1Init> ecc;
+    std::unique_ptr<Secp256k1Init> ecc;
     if (command == "nversion")
         MutateTxVersion(tx, commandVal);
     else if (command == "locktime")
@@ -561,8 +561,8 @@ static void MutateTx(CMutableTransaction& tx, const std::string& command, const 
     else if (command == "outscript")
         MutateTxAddOutScript(tx, commandVal);
 
-    else if (command == "sign"){
-        if (!ecc) { ecc.reset(new Secp256k1Init()); }
+    else if (command == "sign") {
+        ecc.reset(new Secp256k1Init());
         MutateTxSign(tx, commandVal);
     }
 
