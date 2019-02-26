@@ -971,7 +971,9 @@ bool GetTransaction(const uint256& hash, CTransaction& txOut, uint256& hashBlock
                 try {
                     file >> header;
                     fseek(file.Get(), postx.nTxOffset, SEEK_CUR);
-                    file >> txOut;
+                    CTransactionRef ptx;
+                    file >> ptx;
+                    txOut = *ptx;
                 } catch (std::exception& e) {
                     return error("%s : Deserialize or I/O error - %s", __func__, e.what());
                 }
