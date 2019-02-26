@@ -189,17 +189,13 @@ BOOST_AUTO_TEST_CASE(sighash_from_data)
             nIn = test[2].get_int();
             nHashType = test[3].get_int();
             sigHashHex = test[4].get_str();
-            std::cout << "Stream\n";
             CDataStream stream(ParseHex(raw_tx), SER_NETWORK, PROTOCOL_VERSION);
             stream >> tx;
             CValidationState state;
-            std::cout << "CheckTransaction\n";
             BOOST_CHECK_MESSAGE(CheckTransaction(tx, false, false, state), strTest);
             BOOST_CHECK(state.IsValid());
 
-            std::cout << "raw\n";
             std::vector<unsigned char> raw = ParseHex(raw_script);
-            std::cout << "scriptCode\n";
             scriptCode.insert(scriptCode.end(), raw.begin(), raw.end());
         } catch (...) {
             BOOST_ERROR("Bad test, couldn't deserialize data: " << strTest);
