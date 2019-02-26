@@ -78,7 +78,7 @@ public:
 
   // TODO uncomment after implementing transaction witnesses and GetTransactionSigOpCost in consensus/tx_verify.cpp
 
-    CScriptWitness scriptWitness; //!< Only serialized through CTransaction
+//    CScriptWitness scriptWitness; //!< Only serialized through CTransaction
 
   /* Setting nSequence to this value for every input in a transaction
 * disables nLockTime. */
@@ -413,11 +413,11 @@ public:
     std::string ToString() const;
     bool HasWitness() const
     {
-        for (size_t i = 0; i < vin.size(); i++) {
-            if (!vin[i].scriptWitness.IsNull()) {
-                return true;
-            }
-        }
+//        for (size_t i = 0; i < vin.size(); i++) {
+//            if (!vin[i].scriptWitness.IsNull()) {
+//                return true;
+//            }
+//        }
         return false;
     }
 };
@@ -469,11 +469,11 @@ struct CMutableTransaction
     }
   bool HasWitness() const
   {
-      for (size_t i = 0; i < vin.size(); i++) {
-          if (!vin[i].scriptWitness.IsNull()) {
-              return true;
-          }
-      }
+//      for (size_t i = 0; i < vin.size(); i++) {
+//          if (!vin[i].scriptWitness.IsNull()) {
+//              return true;
+//          }
+//      }
       return false;
   }
 };
