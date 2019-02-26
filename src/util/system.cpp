@@ -95,8 +95,8 @@ bool fSucessfullyLoaded = false;
 std::vector<int64_t> obfuScationDenominations;
 std::string strBudgetMode = "";
 
-std::map<std::string, std::string> mapArgs;
-std::map<std::string, std::vector<std::string> > mapMultiArgs;
+//std::map<std::string, std::string> mapArgs;
+//std::map<std::string, std::vector<std::string> > mapMultiArgs;
 bool fDebug = false;
 bool fDaemon = false;
 bool fServer = false;

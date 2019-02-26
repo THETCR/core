@@ -1080,7 +1080,7 @@ bool AppInit2()
             LogPrintf("AppInit2 : parameter interaction: -bind or -whitebind set -> setting -listen=1\n");
     }
 
-    if (gArgs.IsArgSet("-connect") && mapMultiArgs["-connect"].size() > 0) {
+    if (gArgs.IsArgSet("-connect") && gArgs.GetArgs("-connect").size() > 0) {
         // when only connecting to trusted nodes, do not seed via DNS, or listen by default
         if (gArgs.SoftSetBoolArg("-dnsseed", false))
             LogPrintf("AppInit2 : parameter interaction: -connect set -> setting -dnsseed=0\n");
@@ -1153,9 +1153,9 @@ bool AppInit2()
 
     // ********************************************************* Step 3: parameter-to-internal-flags
 
-    fDebug = !mapMultiArgs["-debug"].empty();
+    fDebug = !gArgs.GetArgs("-debug").empty();
     // Special-case: if -debug=0/-nodebug is set, turn off debugging messages
-    const std::vector<string>& categories = mapMultiArgs["-debug"];
+    const std::vector<string>& categories = gArgs.GetArgs("-debug");
     if (gArgs.GetBoolArg("-nodebug", false) || find(categories.begin(), categories.end(), std::string("0")) != categories.end())
         fDebug = false;
 
@@ -1544,7 +1544,7 @@ bool AppInit2()
 
     // sanitize comments per BIP-0014, format user agent and check total size
     std::vector<std::string> uacomments;
-    for (const std::string& cmt : mapMultiArgs["-uacomment"]) {
+    for (const std::string& cmt : gArgs.GetArgs("-uacomment")) {
         if (cmt != SanitizeString(cmt, SAFE_CHARS_UA_COMMENT))
             return InitError(strprintf(_("User Agent comment (%s) contains unsafe characters."), cmt));
         uacomments.push_back(cmt);
@@ -1559,7 +1559,7 @@ bool AppInit2()
 
     if (gArgs.IsArgSet("-onlynet")) {
         std::set<enum Network> nets;
-        for (std::string snet: mapMultiArgs["-onlynet"]) {
+        for (std::string snet: gArgs.GetArgs("-onlynet")) {
             enum Network net = ParseNetwork(snet);
             if (net == NET_UNROUTABLE)
                 return InitError(strprintf(_("Unknown network specified in -onlynet: '%s'"), snet));
@@ -1573,7 +1573,7 @@ bool AppInit2()
     }
 
     if (gArgs.IsArgSet("-whitelist")) {
-        for (const std::string& net: mapMultiArgs["-whitelist"]) {
+        for (const std::string& net: gArgs.GetArgs("-whitelist")) {
             CSubNet subnet(net);
             if (!subnet.IsValid())
                 return InitError(strprintf(_("Invalid netmask specified in -whitelist: '%s'"), net));
@@ -1633,13 +1633,13 @@ bool AppInit2()
     bool fBound = false;
     if (fListen) {
         if (gArgs.IsArgSet("-bind") || gArgs.IsArgSet("-whitebind")) {
-            for (std::string strBind: mapMultiArgs["-bind"]) {
+            for (std::string strBind: gArgs.GetArgs("-bind")) {
                 CService addrBind;
                 if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false))
                     return InitError(strprintf(_("Cannot resolve -bind address: '%s'"), strBind));
                 fBound |= Bind(addrBind, (BF_EXPLICIT | BF_REPORT_ERROR));
             }
-            for (std::string strBind: mapMultiArgs["-whitebind"]) {
+            for (std::string strBind: gArgs.GetArgs("-whitebind")) {
                 CService addrBind;
                 if (!Lookup(strBind.c_str(), addrBind, 0, false))
                     return InitError(strprintf(_("Cannot resolve -whitebind address: '%s'"), strBind));
@@ -1658,7 +1658,7 @@ bool AppInit2()
     }
 
     if (gArgs.IsArgSet("-externalip")) {
-        for (string strAddr: mapMultiArgs["-externalip"]) {
+        for (string strAddr: gArgs.GetArgs("-externalip")) {
             CService addrLocal(strAddr, GetListenPort(), fNameLookup);
             if (!addrLocal.IsValid())
                 return InitError(strprintf(_("Cannot resolve -externalip address: '%s'"), strAddr));
@@ -1666,7 +1666,7 @@ bool AppInit2()
         }
     }
 
-    for (string strDest: mapMultiArgs["-seednode"])
+    for (string strDest: gArgs.GetArgs("-seednode"))
         AddOneShot(strDest);
 
 #if ENABLE_ZMQ
@@ -2049,7 +2049,7 @@ bool AppInit2()
 
     std::vector<fs::path> vImportFiles;
     if (gArgs.IsArgSet("-loadblock")) {
-        for (string strFile: mapMultiArgs["-loadblock"])
+        for (string strFile: gArgs.GetArgs("-loadblock"))
             vImportFiles.push_back(strFile);
     }
     threadGroup.create_thread(boost::bind(&ThreadImport, vImportFiles));
