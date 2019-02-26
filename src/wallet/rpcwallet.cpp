@@ -2617,13 +2617,13 @@ UniValue listmintedzerocoins(const UniValue& params, bool fHelp)
         for (const CMintMeta& m : setMints) {
             // Construct mint object
             UniValue objMint(UniValue::VOBJ);
-            objMint.pushKV("serial hash", m.hashSerial.GetHex()));  // Serial hah
-            objMint.pushKV("version", m.nVersion));                 // Zerocoin versin
-            objMint.pushKV("zWSP ID", m.hashPubcoin.GetHex()));     // PubCon
+            objMint.pushKV("serial hash", m.hashSerial.GetHex());  // Serial hah
+            objMint.pushKV("version", m.nVersion);                 // Zerocoin versin
+            objMint.pushKV("zWSP ID", m.hashPubcoin.GetHex());     // PubCon
             int denom = libzerocoin::ZerocoinDenominationToInt(m.denom);
-            objMint.pushKV("denomination", denom));                 // Denominatin
+            objMint.pushKV("denomination", denom);                 // Denominatin
             int nConfirmations = (m.nHeight && nBestHeight > m.nHeight) ? nBestHeight - m.nHeight : 0;
-            objMint.pushKV("confirmations", nConfirmations));       // Confirmatios
+            objMint.pushKV("confirmations", nConfirmations);       // Confirmatios
             // Push back mint object
             jsonList.push_back(objMint);
         }
