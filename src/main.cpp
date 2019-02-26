@@ -2499,7 +2499,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
         SyncWithWallets(tx, NULL);
     }
     // ... and about transactions that got confirmed:
-    for (const CTransaction& tx: pblock->vtx) {
+    for (const auto& tx: pblock->vtx) {
         SyncWithWallets(tx, pblock);
     }
 
@@ -3627,8 +3627,8 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
                 CBlock bl;
                 ReadBlockFromDisk(bl, last);
                 // loop through every spent input from said block
-                for (const CTransaction& t : bl.vtx) {
-                    for (const CTxIn& in: t.vin) {
+                for (const auto& t : bl.vtx) {
+                    for (const CTxIn& in: t->vin) {
                         // loop through every spent input in the staking transaction of the new block
                         for (const CTxIn& stakeIn : block.vtx[1]->vin) {
                             // if they spend the same input
@@ -3700,7 +3700,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const CBlock* pblock, bool
 
     int nMints = 0;
     int nSpends = 0;
-    for (const CTransaction& tx : pblock->vtx) {
+    for (const auto& tx : pblock->vtx) {
         if (tx.ContainsZerocoins()) {
             for (const CTxIn& in : tx.vin) {
                 if (in.scriptSig.IsZerocoinSpend())
