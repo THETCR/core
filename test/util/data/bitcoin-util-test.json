@@ -1,6 +1,6 @@
 [
   { "exec": "./wispr-tx",
-    "args": ["-create"],
+    "args": ["-create", "nversion=2"],
     "output_cmp": "blanktxv1.hex",
     "description": "Creates a blank v1 transaction"
   },
