@@ -412,24 +412,19 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
 
     if (flagStr.size() > 0)
         if (!findSighashFlags(nHashType, flagStr))
-            throw runtime_error("unknown sighash flag/sign option");
-
-    std::vector<CTransaction> txVariants;
-    txVariants.push_back(tx);
+            throw std::runtime_error("unknown sighash flag/sign option");
 
     // mergedTx will end up with all the signatures; it
     // starts as a clone of the raw tx:
-    CMutableTransaction mergedTx(txVariants[0]);
-    bool fComplete = true;
+    CMutableTransaction mergedTx{tx};
+    const CMutableTransaction txv{tx};
     CCoinsView viewDummy;
     CCoinsViewCache view(&viewDummy);
 
     if (!registers.count("privatekeys"))
-        throw runtime_error("privatekeys register variable must be set.");
-    bool fGivenKeys = false;
+        throw std::runtime_error("privatekeys register variable must be set.");
     CBasicKeyStore tempKeystore;
     UniValue keysObj = registers["privatekeys"];
-    fGivenKeys = true;
 
     for (unsigned int kidx = 0; kidx < keysObj.size(); kidx++) {
         if (!keysObj[kidx].isStr())
@@ -443,29 +438,30 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
 
     // Add previous txouts given in the RPC call:
     if (!registers.count("prevtxs"))
-        throw runtime_error("prevtxs register variable must be set.");
+        throw std::runtime_error("prevtxs register variable must be set.");
     UniValue prevtxsObj = registers["prevtxs"];
     {
         for (unsigned int previdx = 0; previdx < prevtxsObj.size(); previdx++) {
             UniValue prevOut = prevtxsObj[previdx];
             if (!prevOut.isObject())
-                throw runtime_error("expected prevtxs internal object");
+                throw std::runtime_error("expected prevtxs internal object");
 
             std::map<std::string, UniValue::VType> types = {
-                {"txid", UniValue::VSTR},
-                {"vout", UniValue::VNUM},
-                {"scriptPubKey", UniValue::VSTR},
+                    {"txid", UniValue::VSTR},
+                    {"vout", UniValue::VNUM},
+                    {"scriptPubKey", UniValue::VSTR},
             };
             if (!prevOut.checkObject(types))
-                throw runtime_error("prevtxs internal object typecheck fail");
+                throw std::runtime_error("prevtxs internal object typecheck fail");
 
             uint256 txid;
             if (!ParseHashStr(prevOut["txid"].get_str(), txid)) {
                 throw std::runtime_error("txid must be hexadecimal string (not '" + prevOut["txid"].get_str() + "')");
             }
+
             const int nOut = prevOut["vout"].get_int();
             if (nOut < 0)
-                throw runtime_error("vout must be positive");
+                throw std::runtime_error("vout must be positive");
 
             std::vector<unsigned char> pkData(ParseHexUV(prevOut["scriptPubKey"], "scriptPubKey"));
             CScript scriptPubKey(pkData.begin(), pkData.end());
@@ -486,7 +482,7 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
 
             // if redeemScript given and private keys given,
             // add redeemScript to the tempKeystore so it can be signed:
-            if (fGivenKeys && scriptPubKey.IsPayToScriptHash() &&
+            if ((scriptPubKey.IsPayToScriptHash() || scriptPubKey.IsPayToWitnessScriptHash()) &&
                 prevOut.exists("redeemScript")) {
                 UniValue v = prevOut["redeemScript"];
                 std::vector<unsigned char> rsData(ParseHexUV(v, "redeemScript"));
@@ -505,7 +501,6 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
         CTxIn& txin = mergedTx.vin[i];
         const CCoins* coins = view.AccessCoins(txin.prevout.hash);
         if (!coins || !coins->IsAvailable(txin.prevout.n)) {
-            fComplete = false;
             continue;
         }
         const CScript& prevPubKey = coins->vout[txin.prevout.n].scriptPubKey;
@@ -518,11 +513,6 @@ static void MutateTxSign(CMutableTransaction& tx, const std::string& flagStr)
             ProduceSignature(keystore, MutableTransactionSignatureCreator(&mergedTx, i, amount, nHashType), prevPubKey, sigdata);
 
         UpdateInput(txin, sigdata);
-    }
-
-    if (fComplete) {
-        // do nothing... for now
-        // perhaps store this for later optional JSON output
     }
 
     tx = mergedTx;

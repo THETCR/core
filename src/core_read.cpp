@@ -195,6 +195,21 @@ std::vector<unsigned char> ParseHexUV(const UniValue& v, const std::string& strN
     return ParseHex(strHex);
 }
 
+uint256 ParseHashUV(const UniValue& v, const std::string& strName)
+{
+    std::string strHex;
+    uint256 result;
+    if (v.isStr())
+        strHex = v.getValStr();
+
+    if(ParseHashStr(strHex, result)){
+        return result;
+    }else{
+        return result;
+    }
+//    return ParseHashStr(strHex, strName); // Note: ParseHashStr("") throws a runtime_error
+}
+
 int ParseSighashString(const UniValue& sighash)
 {
     int hash_type = SIGHASH_ALL;
@@ -216,19 +231,4 @@ int ParseSighashString(const UniValue& sighash)
         }
     }
     return hash_type;
-}
-
-uint256 ParseHashUV(const UniValue& v, const std::string& strName)
-{
-    std::string strHex;
-    uint256 result;
-    if (v.isStr())
-        strHex = v.getValStr();
-
-    if(ParseHashStr(strHex, result)){
-        return result;
-    }else{
-        return result;
-    }
-//    return ParseHashStr(strHex, strName); // Note: ParseHashStr("") throws a runtime_error
 }
