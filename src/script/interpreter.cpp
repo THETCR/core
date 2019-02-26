@@ -1168,10 +1168,10 @@ namespace {
         void Serialize(S &s) const {
             // Serialize nVersion
             ::Serialize(s, txTo.nVersion);
-        if(txTo.nVersion < 2){
+            if(txTo.nVersion == 1){
             // Serialize nTime
-            ::Serialize(s, txTo.nTime);
-        }
+               ::Serialize(s, txTo.nTime);
+            }
             // Serialize vin
             unsigned int nInputs = fAnyoneCanPay ? 1 : txTo.vin.size();
             ::WriteCompactSize(s, nInputs);
@@ -1277,8 +1277,10 @@ uint256 SignatureHash(const CScript& scriptCode, const T& txTo, unsigned int nIn
         // The prevout may already be contained in hashPrevout, and the nSequence
         // may already be contain in hashSequence.
         ss << txTo.vin[nIn].prevout;
-        std::cout << "Stream: scriptCode\n";
-        ss << scriptCode;
+        if(!scriptCode.empty()){
+            std::cout << "Stream: scriptCode\n";
+            ss << scriptCode;
+        }
         std::cout << "Stream: amount\n";
         ss << amount;
         ss << txTo.vin[nIn].nSequence;
