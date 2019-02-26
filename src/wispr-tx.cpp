@@ -203,20 +203,19 @@ static void RegisterLoad(const std::string& strInput)
 
 static void MutateTxVersion(CMutableTransaction& tx, const std::string& cmdVal)
 {
-    int64_t newVersion = atoi64(cmdVal);
-    if (newVersion < 1 || newVersion > CTransaction::CURRENT_VERSION)
-        throw runtime_error("Invalid TX version requested");
+    int64_t newVersion;
+    if (!ParseInt64(cmdVal, &newVersion) || newVersion < 1 || newVersion > CTransaction::CURRENT_VERSION)
+        throw std::runtime_error("Invalid TX version requested: '" + cmdVal + "'");
 
-    tx.nVersion = (int)newVersion;
+    tx.nVersion = (int) newVersion;
 }
-
 static void MutateTxLocktime(CMutableTransaction& tx, const std::string& cmdVal)
 {
-    int64_t newLocktime = atoi64(cmdVal);
-    if (newLocktime < 0LL || newLocktime > 0xffffffffLL)
-        throw runtime_error("Invalid TX locktime requested");
+    int64_t newLocktime;
+    if (!ParseInt64(cmdVal, &newLocktime) || newLocktime < 0LL || newLocktime > 0xffffffffLL)
+        throw std::runtime_error("Invalid TX locktime requested: '" + cmdVal + "'");
 
-    tx.nLockTime = (unsigned int)newLocktime;
+    tx.nLockTime = (unsigned int) newLocktime;
 }
 
 static void MutateTxAddInput(CMutableTransaction& tx, const std::string& strInput)
