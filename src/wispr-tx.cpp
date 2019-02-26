@@ -5,22 +5,23 @@
 #if defined(HAVE_CONFIG_H)
 #include <config/wispr-config.h>
 #endif
-#include "base58.h"
-#include "consensus/consensus.h"
-#include "clientversion.h"
-#include "coins.h"
-#include "core_io.h"
-#include "keystore.h"
-#include "policy/policy.h"
-#include "primitives/transaction.h"
-#include "script/script.h"
-#include "script/sign.h"
-#include "ui_interface.h" // for _(...)
+#include <base58.h>
+#include <clientversion.h>
+#include <coins.h>
+#include <consensus/consensus.h>
+#include <core_io.h>
+#include <key_io.h>
+#include <keystore.h>
+#include <policy/policy.h>
+#include <primitives/transaction.h>
+#include <script/script.h>
+#include <script/sign.h>
 #include <univalue.h>
 #include <util/system.h>
 #include <util/moneystr.h>
 #include <util/strencodings.h>
 
+#include <memory>
 #include <stdio.h>
 
 #include <boost/algorithm/string.hpp>

@@ -158,7 +158,8 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
     std::vector<CTxDestination> addresses;
     int nRequired;
 
-    out.pushKV("asm", ScriptToAsmStr(scriptPubKey));
+//    out.pushKV("asm", ScriptToAsmStr(scriptPubKey));
+    out.pushKV("asm", scriptPubKey.ToString());
     if (fIncludeHex)
         out.pushKV("hex", HexStr(scriptPubKey.begin(), scriptPubKey.end()));
 
