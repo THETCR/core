@@ -21,7 +21,7 @@
 
 // TODO Enable after all components are in place.
 
-BOOST_FIXTURE_TEST_SUITE(bloom_tests, BasicTestingSetup)
+BOOST_AUTO_TEST_SUITE(bloom_tests)
 
 BOOST_AUTO_TEST_CASE(bloom_create_insert_serialize)
     {

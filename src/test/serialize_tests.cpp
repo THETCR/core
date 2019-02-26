@@ -11,7 +11,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(serialize_tests, BasicTestingSetup)
+BOOST_AUTO_TEST_SUITE(serialize_tests)
 
 class CSerializeMethodsTestSingle
 {
