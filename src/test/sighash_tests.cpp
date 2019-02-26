@@ -180,6 +180,7 @@ BOOST_AUTO_TEST_CASE(sighash_from_data)
         int nIn, nHashType;
         uint256 sh;
         CTransaction tx;
+        CMutableTransaction mtx;
         CScript scriptCode = CScript();
 
         try {
@@ -191,8 +192,8 @@ BOOST_AUTO_TEST_CASE(sighash_from_data)
             sigHashHex = test[4].get_str();
             std::cout << "Stream\n";
             CDataStream stream(ParseHex(raw_tx), SER_NETWORK, PROTOCOL_VERSION);
-            stream >> tx;
-
+            stream >> mtx;
+            tx = mtx;
             CValidationState state;
             std::cout << "CheckTransaction\n";
             BOOST_CHECK_MESSAGE(CheckTransaction(tx, false, false, state), strTest);
