@@ -1474,8 +1474,6 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         std::vector<uint256> vWorkQueue;
         std::vector<uint256> vEraseQueue;
         CTransactionRef ptx;
-        vRecv >> ptx;
-        CTransaction& tx = *ptx;
         //masternode signed transaction
         bool ignoreFees = false;
         CTxIn vin;
@@ -1487,44 +1485,49 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
 //            vRecv >> ptx;
 //            tx = *ptx;
 //        } else
-            if (strCommand == NetMsgType::DSTX) {
-            //these allow masternodes to publish a limited amount of free transactions
-            vRecv >> tx >> vin >> vchSig >> sigTime;
+//            if (strCommand == NetMsgType::DSTX) {
+        //these allow masternodes to publish a limited amount of free transactions
+//            vRecv >> tx >> vin >> vchSig >> sigTime;
+        if (strCommand == NetMsgType::TX){
+            vRecv >> ptx;
+        } else if (strCommand == NetMsgType::DSTX){
+            vRecv >> ptx >> vin >> vchSig >> sigTime;
+        }
+        const CTransaction &tx = *ptx;
+        if (strCommand == NetMsgType::DSTX){
+        CMasternode *pmn = mnodeman.Find(vin);
+        if (pmn != nullptr) {
+            if (!pmn->allowFreeTx) {
+                //multiple peers can send us a valid masternode transaction
+                if (fDebug) LogPrintf("dstx: Masternode sending too many transactions %s\n", tx.GetHash().ToString());
+                return true;
+            }
 
-            CMasternode* pmn = mnodeman.Find(vin);
-            if (pmn != nullptr) {
-                if (!pmn->allowFreeTx) {
-                    //multiple peers can send us a valid masternode transaction
-                    if (fDebug) LogPrintf("dstx: Masternode sending too many transactions %s\n", tx.GetHash().ToString());
-                    return true;
-                }
+            std::string strMessage = tx.GetHash().ToString() + std::to_string(sigTime);
 
-                std::string strMessage = tx.GetHash().ToString() + std::to_string(sigTime);
+            std::string errorMessage = "";
+            if (!obfuScationSigner.VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, errorMessage)) {
+                LogPrintf("dstx: Got bad masternode address signature %s \n", vin.ToString());
+                //pfrom->Misbehaving(20);
+                return false;
+            }
 
-                std::string errorMessage = "";
-                if (!obfuScationSigner.VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, errorMessage)) {
-                    LogPrintf("dstx: Got bad masternode address signature %s \n", vin.ToString());
-                    //pfrom->Misbehaving(20);
-                    return false;
-                }
+            LogPrintf("dstx: Got Masternode transaction %s\n", tx.GetHash().ToString());
 
-                LogPrintf("dstx: Got Masternode transaction %s\n", tx.GetHash().ToString());
+            ignoreFees = true;
+            pmn->allowFreeTx = false;
 
-                ignoreFees = true;
-                pmn->allowFreeTx = false;
+            if (!mapObfuscationBroadcastTxes.count(tx.GetHash())) {
+                CObfuscationBroadcastTx dstx;
+                dstx.tx = tx;
+                dstx.vin = vin;
+                dstx.vchSig = vchSig;
+                dstx.sigTime = sigTime;
 
-                if (!mapObfuscationBroadcastTxes.count(tx.GetHash())) {
-                    CObfuscationBroadcastTx dstx;
-                    dstx.tx = tx;
-                    dstx.vin = vin;
-                    dstx.vchSig = vchSig;
-                    dstx.sigTime = sigTime;
-
-                    mapObfuscationBroadcastTxes.insert(std::make_pair(tx.GetHash(), dstx));
-                }
+                mapObfuscationBroadcastTxes.insert(std::make_pair(tx.GetHash(), dstx));
             }
         }
-
+    }
         CInv inv(MSG_TX, tx.GetHash());
         pfrom->AddInventoryKnown(inv);
 

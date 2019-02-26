@@ -2021,7 +2021,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
             //Check for double spending of serial #'s
             set<CBigNum> setSerials;
-            for (const CTxIn& txIn : tx.vin) {
+            for (const CTxIn& txIn : tx->vin) {
                 if (!txIn.scriptSig.IsZerocoinSpend())
                     continue;
                 CoinSpend spend = TxInToZerocoinSpend(txIn);
@@ -2410,7 +2410,7 @@ bool static DisconnectTip(CValidationState& state)
         std::list<CTransaction> removed;
         CValidationState stateDummy;
         if (tx->IsCoinBase() || tx->IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, *tx, false, NULL))
-            mempool.remove(tx, removed, true);
+            mempool.remove(*tx, removed, true);
     }
     mempool.removeCoinbaseSpends(pcoinsTip, pindexDelete->nHeight);
     mempool.check(pcoinsTip);
@@ -2489,7 +2489,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
 
     // Remove conflicting transactions from the mempool.
     std::list<CTransaction> txConflicted;
-    mempool.removeForBlock(pblock->vtx, pindexNew->nHeight, txConflicted, !IsInitialBlockDownload());
+    mempool.removeForBlock(*pblock->vtx, pindexNew->nHeight, txConflicted, !IsInitialBlockDownload());
     mempool.check(pcoinsTip);
     // Update chainActive & related variables.
     UpdateTip(pindexNew);
