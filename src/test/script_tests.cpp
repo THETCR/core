@@ -1342,324 +1342,324 @@ BOOST_AUTO_TEST_SUITE(script_tests)
         BOOST_CHECK(!CScript(direct, direct+sizeof(direct)).IsPushOnly());
     }
 
-    BOOST_AUTO_TEST_CASE(script_GetScriptAsm)
-    {
-        BOOST_CHECK_EQUAL("OP_CHECKLOCKTIMEVERIFY", ScriptToAsmStr(CScript() << OP_NOP2, true));
-        BOOST_CHECK_EQUAL("OP_CHECKLOCKTIMEVERIFY", ScriptToAsmStr(CScript() << OP_CHECKLOCKTIMEVERIFY, true));
-        BOOST_CHECK_EQUAL("OP_CHECKLOCKTIMEVERIFY", ScriptToAsmStr(CScript() << OP_NOP2));
-        BOOST_CHECK_EQUAL("OP_CHECKLOCKTIMEVERIFY", ScriptToAsmStr(CScript() << OP_CHECKLOCKTIMEVERIFY));
-
-        std::string derSig("304502207fa7a6d1e0ee81132a269ad84e68d695483745cde8b541e3bf630749894e342a022100c1f7ab20e13e22fb95281a870f3dcf38d782e53023ee313d741ad0cfbc0c5090");
-        std::string pubKey("03b0da749730dc9b4b1f4a14d6902877a92541f5368778853d9c4a0cb7802dcfb2");
-        std::vector<unsigned char> vchPubKey = ToByteVector(ParseHex(pubKey));
-
-        BOOST_CHECK_EQUAL(derSig + "00 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "00")) << vchPubKey, true));
-        BOOST_CHECK_EQUAL(derSig + "80 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "80")) << vchPubKey, true));
-        BOOST_CHECK_EQUAL(derSig + "[ALL] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "01")) << vchPubKey, true));
-        BOOST_CHECK_EQUAL(derSig + "[NONE] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "02")) << vchPubKey, true));
-        BOOST_CHECK_EQUAL(derSig + "[SINGLE] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "03")) << vchPubKey, true));
-        BOOST_CHECK_EQUAL(derSig + "[ALL|ANYONECANPAY] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "81")) << vchPubKey, true));
-        BOOST_CHECK_EQUAL(derSig + "[NONE|ANYONECANPAY] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "82")) << vchPubKey, true));
-        BOOST_CHECK_EQUAL(derSig + "[SINGLE|ANYONECANPAY] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "83")) << vchPubKey, true));
-
-        BOOST_CHECK_EQUAL(derSig + "00 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "00")) << vchPubKey));
-        BOOST_CHECK_EQUAL(derSig + "80 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "80")) << vchPubKey));
-        BOOST_CHECK_EQUAL(derSig + "01 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "01")) << vchPubKey));
-        BOOST_CHECK_EQUAL(derSig + "02 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "02")) << vchPubKey));
-        BOOST_CHECK_EQUAL(derSig + "03 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "03")) << vchPubKey));
-        BOOST_CHECK_EQUAL(derSig + "81 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "81")) << vchPubKey));
-        BOOST_CHECK_EQUAL(derSig + "82 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "82")) << vchPubKey));
-        BOOST_CHECK_EQUAL(derSig + "83 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "83")) << vchPubKey));
-    }
-
-    static CScript
-    ScriptFromHex(const char* hex)
-    {
-        std::vector<unsigned char> data = ParseHex(hex);
-        return CScript(data.begin(), data.end());
-    }
-
-
-    BOOST_AUTO_TEST_CASE(script_FindAndDelete)
-    {
-        // Exercise the FindAndDelete functionality
-        CScript s;
-        CScript d;
-        CScript expect;
-
-        s = CScript() << OP_1 << OP_2;
-        d = CScript(); // delete nothing should be a no-op
-        expect = s;
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 0);
-        BOOST_CHECK(s == expect);
-
-        s = CScript() << OP_1 << OP_2 << OP_3;
-        d = CScript() << OP_2;
-        expect = CScript() << OP_1 << OP_3;
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
-        BOOST_CHECK(s == expect);
-
-        s = CScript() << OP_3 << OP_1 << OP_3 << OP_3 << OP_4 << OP_3;
-        d = CScript() << OP_3;
-        expect = CScript() << OP_1 << OP_4;
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 4);
-        BOOST_CHECK(s == expect);
-
-        s = ScriptFromHex("0302ff03"); // PUSH 0x02ff03 onto stack
-        d = ScriptFromHex("0302ff03");
-        expect = CScript();
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
-        BOOST_CHECK(s == expect);
-
-        s = ScriptFromHex("0302ff030302ff03"); // PUSH 0x2ff03 PUSH 0x2ff03
-        d = ScriptFromHex("0302ff03");
-        expect = CScript();
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 2);
-        BOOST_CHECK(s == expect);
-
-        s = ScriptFromHex("0302ff030302ff03");
-        d = ScriptFromHex("02");
-        expect = s; // FindAndDelete matches entire opcodes
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 0);
-        BOOST_CHECK(s == expect);
-
-        s = ScriptFromHex("0302ff030302ff03");
-        d = ScriptFromHex("ff");
-        expect = s;
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 0);
-        BOOST_CHECK(s == expect);
-
-        // This is an odd edge case: strip of the push-three-bytes
-        // prefix, leaving 02ff03 which is push-two-bytes:
-        s = ScriptFromHex("0302ff030302ff03");
-        d = ScriptFromHex("03");
-        expect = CScript() << ParseHex("ff03") << ParseHex("ff03");
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 2);
-        BOOST_CHECK(s == expect);
-
-        // Byte sequence that spans multiple opcodes:
-        s = ScriptFromHex("02feed5169"); // PUSH(0xfeed) OP_1 OP_VERIFY
-        d = ScriptFromHex("feed51");
-        expect = s;
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 0); // doesn't match 'inside' opcodes
-        BOOST_CHECK(s == expect);
-
-        s = ScriptFromHex("02feed5169"); // PUSH(0xfeed) OP_1 OP_VERIFY
-        d = ScriptFromHex("02feed51");
-        expect = ScriptFromHex("69");
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
-        BOOST_CHECK(s == expect);
-
-        s = ScriptFromHex("516902feed5169");
-        d = ScriptFromHex("feed51");
-        expect = s;
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 0);
-        BOOST_CHECK(s == expect);
-
-        s = ScriptFromHex("516902feed5169");
-        d = ScriptFromHex("02feed51");
-        expect = ScriptFromHex("516969");
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
-        BOOST_CHECK(s == expect);
-
-        s = CScript() << OP_0 << OP_0 << OP_1 << OP_1;
-        d = CScript() << OP_0 << OP_1;
-        expect = CScript() << OP_0 << OP_1; // FindAndDelete is single-pass
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
-        BOOST_CHECK(s == expect);
-
-        s = CScript() << OP_0 << OP_0 << OP_1 << OP_0 << OP_1 << OP_1;
-        d = CScript() << OP_0 << OP_1;
-        expect = CScript() << OP_0 << OP_1; // FindAndDelete is single-pass
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 2);
-        BOOST_CHECK(s == expect);
-
-        // Another weird edge case:
-        // End with invalid push (not enough data)...
-        s = ScriptFromHex("0003feed");
-        d = ScriptFromHex("03feed"); // ... can remove the invalid push
-        expect = ScriptFromHex("00");
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
-        BOOST_CHECK(s == expect);
-
-        s = ScriptFromHex("0003feed");
-        d = ScriptFromHex("00");
-        expect = ScriptFromHex("03feed");
-        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
-        BOOST_CHECK(s == expect);
-    }
-
-    BOOST_AUTO_TEST_CASE(script_HasValidOps)
-    {
-        // Exercise the HasValidOps functionality
-        CScript script;
-        script = ScriptFromHex("76a9141234567890abcdefa1a2a3a4a5a6a7a8a9a0aaab88ac"); // Normal script
-        BOOST_CHECK(script.HasValidOps());
-        script = ScriptFromHex("76a914ff34567890abcdefa1a2a3a4a5a6a7a8a9a0aaab88ac");
-        BOOST_CHECK(script.HasValidOps());
-        script = ScriptFromHex("ff88ac"); // Script with OP_INVALIDOPCODE explicit
-        BOOST_CHECK(!script.HasValidOps());
-        script = ScriptFromHex("88acc0"); // Script with undefined opcode
-        BOOST_CHECK(!script.HasValidOps());
-    }
-
-    BOOST_AUTO_TEST_CASE(script_can_append_self)
-    {
-        CScript s, d;
-
-        s = ScriptFromHex("00");
-        s += s;
-        d = ScriptFromHex("0000");
-        BOOST_CHECK(s == d);
-
-        // check doubling a script that's large enough to require reallocation
-        static const char hex[] = "04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f";
-        s = CScript() << ParseHex(hex) << OP_CHECKSIG;
-        d = CScript() << ParseHex(hex) << OP_CHECKSIG << ParseHex(hex) << OP_CHECKSIG;
-        s += s;
-        BOOST_CHECK(s == d);
-    }
-
-
-#if defined(HAVE_CONSENSUS_LIB)
-
-    /* Test simple (successful) usage of bitcoinconsensus_verify_script */
-BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_returns_true)
-{
-    unsigned int libconsensus_flags = 0;
-    int nIn = 0;
-
-    CScript scriptPubKey;
-    CScript scriptSig;
-    CScriptWitness wit;
-
-    scriptPubKey << OP_1;
-    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
-    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
-
-    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
-    stream << spendTx;
-
-    bitcoinconsensus_error err;
-    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), nIn, libconsensus_flags, &err);
-    BOOST_CHECK_EQUAL(result, 1);
-    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_OK);
-}
-
+//    BOOST_AUTO_TEST_CASE(script_GetScriptAsm)
+//    {
+//        BOOST_CHECK_EQUAL("OP_CHECKLOCKTIMEVERIFY", ScriptToAsmStr(CScript() << OP_NOP2, true));
+//        BOOST_CHECK_EQUAL("OP_CHECKLOCKTIMEVERIFY", ScriptToAsmStr(CScript() << OP_CHECKLOCKTIMEVERIFY, true));
+//        BOOST_CHECK_EQUAL("OP_CHECKLOCKTIMEVERIFY", ScriptToAsmStr(CScript() << OP_NOP2));
+//        BOOST_CHECK_EQUAL("OP_CHECKLOCKTIMEVERIFY", ScriptToAsmStr(CScript() << OP_CHECKLOCKTIMEVERIFY));
+//
+//        std::string derSig("304502207fa7a6d1e0ee81132a269ad84e68d695483745cde8b541e3bf630749894e342a022100c1f7ab20e13e22fb95281a870f3dcf38d782e53023ee313d741ad0cfbc0c5090");
+//        std::string pubKey("03b0da749730dc9b4b1f4a14d6902877a92541f5368778853d9c4a0cb7802dcfb2");
+//        std::vector<unsigned char> vchPubKey = ToByteVector(ParseHex(pubKey));
+//
+//        BOOST_CHECK_EQUAL(derSig + "00 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "00")) << vchPubKey, true));
+//        BOOST_CHECK_EQUAL(derSig + "80 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "80")) << vchPubKey, true));
+//        BOOST_CHECK_EQUAL(derSig + "[ALL] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "01")) << vchPubKey, true));
+//        BOOST_CHECK_EQUAL(derSig + "[NONE] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "02")) << vchPubKey, true));
+//        BOOST_CHECK_EQUAL(derSig + "[SINGLE] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "03")) << vchPubKey, true));
+//        BOOST_CHECK_EQUAL(derSig + "[ALL|ANYONECANPAY] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "81")) << vchPubKey, true));
+//        BOOST_CHECK_EQUAL(derSig + "[NONE|ANYONECANPAY] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "82")) << vchPubKey, true));
+//        BOOST_CHECK_EQUAL(derSig + "[SINGLE|ANYONECANPAY] " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "83")) << vchPubKey, true));
+//
+//        BOOST_CHECK_EQUAL(derSig + "00 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "00")) << vchPubKey));
+//        BOOST_CHECK_EQUAL(derSig + "80 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "80")) << vchPubKey));
+//        BOOST_CHECK_EQUAL(derSig + "01 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "01")) << vchPubKey));
+//        BOOST_CHECK_EQUAL(derSig + "02 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "02")) << vchPubKey));
+//        BOOST_CHECK_EQUAL(derSig + "03 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "03")) << vchPubKey));
+//        BOOST_CHECK_EQUAL(derSig + "81 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "81")) << vchPubKey));
+//        BOOST_CHECK_EQUAL(derSig + "82 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "82")) << vchPubKey));
+//        BOOST_CHECK_EQUAL(derSig + "83 " + pubKey, ScriptToAsmStr(CScript() << ToByteVector(ParseHex(derSig + "83")) << vchPubKey));
+//    }
+//
+//    static CScript
+//    ScriptFromHex(const char* hex)
+//    {
+//        std::vector<unsigned char> data = ParseHex(hex);
+//        return CScript(data.begin(), data.end());
+//    }
+//
+//
+//    BOOST_AUTO_TEST_CASE(script_FindAndDelete)
+//    {
+//        // Exercise the FindAndDelete functionality
+//        CScript s;
+//        CScript d;
+//        CScript expect;
+//
+//        s = CScript() << OP_1 << OP_2;
+//        d = CScript(); // delete nothing should be a no-op
+//        expect = s;
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 0);
+//        BOOST_CHECK(s == expect);
+//
+//        s = CScript() << OP_1 << OP_2 << OP_3;
+//        d = CScript() << OP_2;
+//        expect = CScript() << OP_1 << OP_3;
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
+//        BOOST_CHECK(s == expect);
+//
+//        s = CScript() << OP_3 << OP_1 << OP_3 << OP_3 << OP_4 << OP_3;
+//        d = CScript() << OP_3;
+//        expect = CScript() << OP_1 << OP_4;
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 4);
+//        BOOST_CHECK(s == expect);
+//
+//        s = ScriptFromHex("0302ff03"); // PUSH 0x02ff03 onto stack
+//        d = ScriptFromHex("0302ff03");
+//        expect = CScript();
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
+//        BOOST_CHECK(s == expect);
+//
+//        s = ScriptFromHex("0302ff030302ff03"); // PUSH 0x2ff03 PUSH 0x2ff03
+//        d = ScriptFromHex("0302ff03");
+//        expect = CScript();
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 2);
+//        BOOST_CHECK(s == expect);
+//
+//        s = ScriptFromHex("0302ff030302ff03");
+//        d = ScriptFromHex("02");
+//        expect = s; // FindAndDelete matches entire opcodes
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 0);
+//        BOOST_CHECK(s == expect);
+//
+//        s = ScriptFromHex("0302ff030302ff03");
+//        d = ScriptFromHex("ff");
+//        expect = s;
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 0);
+//        BOOST_CHECK(s == expect);
+//
+//        // This is an odd edge case: strip of the push-three-bytes
+//        // prefix, leaving 02ff03 which is push-two-bytes:
+//        s = ScriptFromHex("0302ff030302ff03");
+//        d = ScriptFromHex("03");
+//        expect = CScript() << ParseHex("ff03") << ParseHex("ff03");
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 2);
+//        BOOST_CHECK(s == expect);
+//
+//        // Byte sequence that spans multiple opcodes:
+//        s = ScriptFromHex("02feed5169"); // PUSH(0xfeed) OP_1 OP_VERIFY
+//        d = ScriptFromHex("feed51");
+//        expect = s;
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 0); // doesn't match 'inside' opcodes
+//        BOOST_CHECK(s == expect);
+//
+//        s = ScriptFromHex("02feed5169"); // PUSH(0xfeed) OP_1 OP_VERIFY
+//        d = ScriptFromHex("02feed51");
+//        expect = ScriptFromHex("69");
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
+//        BOOST_CHECK(s == expect);
+//
+//        s = ScriptFromHex("516902feed5169");
+//        d = ScriptFromHex("feed51");
+//        expect = s;
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 0);
+//        BOOST_CHECK(s == expect);
+//
+//        s = ScriptFromHex("516902feed5169");
+//        d = ScriptFromHex("02feed51");
+//        expect = ScriptFromHex("516969");
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
+//        BOOST_CHECK(s == expect);
+//
+//        s = CScript() << OP_0 << OP_0 << OP_1 << OP_1;
+//        d = CScript() << OP_0 << OP_1;
+//        expect = CScript() << OP_0 << OP_1; // FindAndDelete is single-pass
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
+//        BOOST_CHECK(s == expect);
+//
+//        s = CScript() << OP_0 << OP_0 << OP_1 << OP_0 << OP_1 << OP_1;
+//        d = CScript() << OP_0 << OP_1;
+//        expect = CScript() << OP_0 << OP_1; // FindAndDelete is single-pass
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 2);
+//        BOOST_CHECK(s == expect);
+//
+//        // Another weird edge case:
+//        // End with invalid push (not enough data)...
+//        s = ScriptFromHex("0003feed");
+//        d = ScriptFromHex("03feed"); // ... can remove the invalid push
+//        expect = ScriptFromHex("00");
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
+//        BOOST_CHECK(s == expect);
+//
+//        s = ScriptFromHex("0003feed");
+//        d = ScriptFromHex("00");
+//        expect = ScriptFromHex("03feed");
+//        BOOST_CHECK_EQUAL(FindAndDelete(s, d), 1);
+//        BOOST_CHECK(s == expect);
+//    }
+//
+//    BOOST_AUTO_TEST_CASE(script_HasValidOps)
+//    {
+//        // Exercise the HasValidOps functionality
+//        CScript script;
+//        script = ScriptFromHex("76a9141234567890abcdefa1a2a3a4a5a6a7a8a9a0aaab88ac"); // Normal script
+//        BOOST_CHECK(script.HasValidOps());
+//        script = ScriptFromHex("76a914ff34567890abcdefa1a2a3a4a5a6a7a8a9a0aaab88ac");
+//        BOOST_CHECK(script.HasValidOps());
+//        script = ScriptFromHex("ff88ac"); // Script with OP_INVALIDOPCODE explicit
+//        BOOST_CHECK(!script.HasValidOps());
+//        script = ScriptFromHex("88acc0"); // Script with undefined opcode
+//        BOOST_CHECK(!script.HasValidOps());
+//    }
+//
+//    BOOST_AUTO_TEST_CASE(script_can_append_self)
+//    {
+//        CScript s, d;
+//
+//        s = ScriptFromHex("00");
+//        s += s;
+//        d = ScriptFromHex("0000");
+//        BOOST_CHECK(s == d);
+//
+//        // check doubling a script that's large enough to require reallocation
+//        static const char hex[] = "04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f";
+//        s = CScript() << ParseHex(hex) << OP_CHECKSIG;
+//        d = CScript() << ParseHex(hex) << OP_CHECKSIG << ParseHex(hex) << OP_CHECKSIG;
+//        s += s;
+//        BOOST_CHECK(s == d);
+//    }
+//
+//
+//#if defined(HAVE_CONSENSUS_LIB)
+//
+/* Test simple (successful) usage of bitcoinconsensus_verify_script */
+//BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_returns_true)
+//{
+//    unsigned int libconsensus_flags = 0;
+//    int nIn = 0;
+//
+//    CScript scriptPubKey;
+//    CScript scriptSig;
+//    CScriptWitness wit;
+//
+//    scriptPubKey << OP_1;
+//    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
+//    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
+//
+//    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+//    stream << spendTx;
+//
+//    bitcoinconsensus_error err;
+//    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), nIn, libconsensus_flags, &err);
+//    BOOST_CHECK_EQUAL(result, 1);
+//    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_OK);
+//}
+//
 /* Test bitcoinconsensus_verify_script returns invalid tx index err*/
-BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_tx_index_err)
-{
-    unsigned int libconsensus_flags = 0;
-    int nIn = 3;
-
-    CScript scriptPubKey;
-    CScript scriptSig;
-    CScriptWitness wit;
-
-    scriptPubKey << OP_EQUAL;
-    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
-    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
-
-    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
-    stream << spendTx;
-
-    bitcoinconsensus_error err;
-    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), nIn, libconsensus_flags, &err);
-    BOOST_CHECK_EQUAL(result, 0);
-    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_TX_INDEX);
-}
-
+//BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_tx_index_err)
+//{
+//    unsigned int libconsensus_flags = 0;
+//    int nIn = 3;
+//
+//    CScript scriptPubKey;
+//    CScript scriptSig;
+//    CScriptWitness wit;
+//
+//    scriptPubKey << OP_EQUAL;
+//    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
+//    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
+//
+//    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+//    stream << spendTx;
+//
+//    bitcoinconsensus_error err;
+//    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), nIn, libconsensus_flags, &err);
+//    BOOST_CHECK_EQUAL(result, 0);
+//    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_TX_INDEX);
+//}
+//
 /* Test bitcoinconsensus_verify_script returns tx size mismatch err*/
-BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_tx_size)
-{
-    unsigned int libconsensus_flags = 0;
-    int nIn = 0;
-
-    CScript scriptPubKey;
-    CScript scriptSig;
-    CScriptWitness wit;
-
-    scriptPubKey << OP_EQUAL;
-    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
-    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
-
-    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
-    stream << spendTx;
-
-    bitcoinconsensus_error err;
-    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size() * 2, nIn, libconsensus_flags, &err);
-    BOOST_CHECK_EQUAL(result, 0);
-    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_TX_SIZE_MISMATCH);
-}
-
+//BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_tx_size)
+//{
+//    unsigned int libconsensus_flags = 0;
+//    int nIn = 0;
+//
+//    CScript scriptPubKey;
+//    CScript scriptSig;
+//    CScriptWitness wit;
+//
+//    scriptPubKey << OP_EQUAL;
+//    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
+//    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
+//
+//    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+//    stream << spendTx;
+//
+//    bitcoinconsensus_error err;
+//    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size() * 2, nIn, libconsensus_flags, &err);
+//    BOOST_CHECK_EQUAL(result, 0);
+//    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_TX_SIZE_MISMATCH);
+//}
+//
 /* Test bitcoinconsensus_verify_script returns invalid tx serialization error */
-BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_tx_serialization)
-{
-    unsigned int libconsensus_flags = 0;
-    int nIn = 0;
-
-    CScript scriptPubKey;
-    CScript scriptSig;
-    CScriptWitness wit;
-
-    scriptPubKey << OP_EQUAL;
-    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
-    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
-
-    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
-    stream << 0xffffffff;
-
-    bitcoinconsensus_error err;
-    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), nIn, libconsensus_flags, &err);
-    BOOST_CHECK_EQUAL(result, 0);
-    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_TX_DESERIALIZE);
-}
-
+//BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_tx_serialization)
+//{
+//    unsigned int libconsensus_flags = 0;
+//    int nIn = 0;
+//
+//    CScript scriptPubKey;
+//    CScript scriptSig;
+//    CScriptWitness wit;
+//
+//    scriptPubKey << OP_EQUAL;
+//    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
+//    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
+//
+//    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+//    stream << 0xffffffff;
+//
+//    bitcoinconsensus_error err;
+//    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), nIn, libconsensus_flags, &err);
+//    BOOST_CHECK_EQUAL(result, 0);
+//    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_TX_DESERIALIZE);
+//}
+//
 /* Test bitcoinconsensus_verify_script returns amount required error */
-BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_amount_required_err)
-{
-    unsigned int libconsensus_flags = bitcoinconsensus_SCRIPT_FLAGS_VERIFY_WITNESS;
-    int nIn = 0;
-
-    CScript scriptPubKey;
-    CScript scriptSig;
-    CScriptWitness wit;
-
-    scriptPubKey << OP_EQUAL;
-    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
-    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
-
-    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
-    stream << spendTx;
-
-    bitcoinconsensus_error err;
-    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), nIn, libconsensus_flags, &err);
-    BOOST_CHECK_EQUAL(result, 0);
-    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_AMOUNT_REQUIRED);
-}
-
+//BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_amount_required_err)
+//{
+//    unsigned int libconsensus_flags = bitcoinconsensus_SCRIPT_FLAGS_VERIFY_WITNESS;
+//    int nIn = 0;
+//
+//    CScript scriptPubKey;
+//    CScript scriptSig;
+//    CScriptWitness wit;
+//
+//    scriptPubKey << OP_EQUAL;
+//    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
+//    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
+//
+//    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+//    stream << spendTx;
+//
+//    bitcoinconsensus_error err;
+//    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), nIn, libconsensus_flags, &err);
+//    BOOST_CHECK_EQUAL(result, 0);
+//    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_AMOUNT_REQUIRED);
+//}
+//
 /* Test bitcoinconsensus_verify_script returns invalid flags err */
-BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_invalid_flags)
-{
-    unsigned int libconsensus_flags = 1 << 3;
-    int nIn = 0;
+//BOOST_AUTO_TEST_CASE(bitcoinconsensus_verify_script_invalid_flags)
+//{
+//    unsigned int libconsensus_flags = 1 << 3;
+//    int nIn = 0;
+//
+//    CScript scriptPubKey;
+//    CScript scriptSig;
+//    CScriptWitness wit;
+//
+//    scriptPubKey << OP_EQUAL;
+//    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
+//    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
+//
+//    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
+//    stream << spendTx;
+//
+//    bitcoinconsensus_error err;
+//    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), nIn, libconsensus_flags, &err);
+//    BOOST_CHECK_EQUAL(result, 0);
+//    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_INVALID_FLAGS);
+//}
 
-    CScript scriptPubKey;
-    CScript scriptSig;
-    CScriptWitness wit;
-
-    scriptPubKey << OP_EQUAL;
-    CTransaction creditTx = BuildCreditingTransaction(scriptPubKey, 1);
-    CTransaction spendTx = BuildSpendingTransaction(scriptSig, wit, creditTx);
-
-    CDataStream stream(SER_NETWORK, PROTOCOL_VERSION);
-    stream << spendTx;
-
-    bitcoinconsensus_error err;
-    int result = bitcoinconsensus_verify_script(scriptPubKey.data(), scriptPubKey.size(), (const unsigned char*)&stream[0], stream.size(), nIn, libconsensus_flags, &err);
-    BOOST_CHECK_EQUAL(result, 0);
-    BOOST_CHECK_EQUAL(err, bitcoinconsensus_ERR_INVALID_FLAGS);
-}
-
-#endif
+//#endif
 BOOST_AUTO_TEST_SUITE_END()
