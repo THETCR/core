@@ -874,7 +874,8 @@ DBErrors CWalletDB::FindWalletTx(CWallet* pwallet, std::vector<uint256>& vTxHash
                 ssKey >> hash;
 
                 CWalletTx wtx;
-                ssValue >> wtx;
+//             TODO ENABLE AFTER WTX UPGRADE
+//                ssValue >> wtx;
 
                 vTxHash.push_back(hash);
                 vWtx.push_back(wtx);
