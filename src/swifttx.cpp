@@ -51,7 +51,9 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
         //LogPrintf("ProcessMessageSwiftTX::ix\n");
         CDataStream vMsg(vRecv);
         CTransaction tx;
-        vRecv >> tx;
+        CTransactionRef ptx;
+        vRecv >> ptx;
+        tx = *ptx;
 
         CInv inv(MSG_TXLOCK_REQUEST, tx.GetHash());
         pfrom->AddInventoryKnown(inv);

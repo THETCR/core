@@ -344,8 +344,9 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
 
         int sessionIDMessage;
         CTransaction txNew;
-        vRecv >> sessionIDMessage >> txNew;
-
+        CTransactionRef ptx;
+        vRecv >> sessionIDMessage >> ptx;
+        txNew = *ptx;
         if (sessionID != sessionIDMessage) {
             LogPrint(BCLog::OBFUSCATION, "dsf - message doesn't match current Obfuscation session %d %d\n", sessionID, sessionIDMessage);
             return;
