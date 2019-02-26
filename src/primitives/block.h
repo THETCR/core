@@ -130,7 +130,7 @@ public:
         READWRITE(*(CBlockHeader*)this);
         READWRITE(vtx);
         READWRITE(vchBlockSig);
-//	if(vtx.size() > 1 && vtx[1].IsCoinStake())
+//	if(vtx.size() > 1 && vtx[1]->IsCoinStake())
     }
 
     void SetNull()

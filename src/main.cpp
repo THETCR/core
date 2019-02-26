@@ -2249,7 +2249,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // Watch for changes to the previous coinbase transaction.
     static uint256 hashPrevBestCoinBase;
     GetMainSignals().UpdatedTransaction(hashPrevBestCoinBase);
-    hashPrevBestCoinBase = block.vtx[0].GetHash();
+    hashPrevBestCoinBase = block.vtx[0]->GetHash();
 
     int64_t nTime4 = GetTimeMicros();
     nTimeCallbacks += nTime4 - nTime3;
@@ -2924,7 +2924,7 @@ CBlockIndex* AddToBlockIndex(const CBlockHeader& block)
 {
     // Check for duplicate
     uint256 hash = block.GetHash();
-//    uint256 bn2Hash = block.IsProofOfWork() ? hash : block.vtx[1].vin[0].prevout.hash;
+//    uint256 bn2Hash = block.IsProofOfWork() ? hash : block.vtx[1]->vin[0].prevout.hash;
     BlockMap::iterator it = mapBlockIndex.find(hash);
     if (it != mapBlockIndex.end())
         return it->second;
@@ -3178,24 +3178,24 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
                          REJECT_INVALID, "bad-blk-length");
 
     // First transaction must be coinbase, the rest must not be
-    if (block.vtx.empty() || !block.vtx[0].IsCoinBase())
+    if (block.vtx.empty() || !block.vtx[0]->IsCoinBase())
         return state.DoS(100, error("CheckBlock() : first tx is not coinbase"),
                          REJECT_INVALID, "bad-cb-missing");
     for (unsigned int i = 1; i < block.vtx.size(); i++)
-        if (block.vtx[i].IsCoinBase())
+        if (block.vtx[i]->IsCoinBase())
             return state.DoS(100, error("CheckBlock() : more than one coinbase"),
                              REJECT_INVALID, "bad-cb-multiple");
 
     if (block.IsProofOfStake()) {
         // Coinbase output should be empty if proof-of-stake block
-        if (block.vtx[0].vout.size() != 1 || !block.vtx[0].vout[0].IsEmpty())
+        if (block.vtx[0]->vout.size() != 1 || !block.vtx[0]->vout[0].IsEmpty())
             return state.DoS(100, error("CheckBlock() : coinbase output not empty for proof-of-stake block"));
 
         // Second transaction must be coinstake, the rest must not be
-        if (block.vtx.empty() || !block.vtx[1].IsCoinStake())
+        if (block.vtx.empty() || !block.vtx[1]->IsCoinStake())
             return state.DoS(100, error("CheckBlock() : second tx is not coinstake"));
         for (unsigned int i = 2; i < block.vtx.size(); i++)
-            if (block.vtx[i].IsCoinStake())
+            if (block.vtx[i]->IsCoinStake())
                 return state.DoS(100, error("CheckBlock() : more than one coinstake"));
     }
 
@@ -3413,8 +3413,8 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
     if (block.nVersion >= 6 &&
         CBlockIndex::IsSuperMajority(6, pindexPrev, Params().EnforceBlockUpgradeMajority())) {
         CScript expect = CScript() << nHeight;
-        if (block.vtx[0].vin[0].scriptSig.size() < expect.size() ||
-            !std::equal(expect.begin(), expect.end(), block.vtx[0].vin[0].scriptSig.begin())) {
+        if (block.vtx[0]->vin[0].scriptSig.size() < expect.size() ||
+            !std::equal(expect.begin(), expect.end(), block.vtx[0]->vin[0].scriptSig.begin())) {
             return state.DoS(100, error("%s : block height mismatch in coinbase", __func__), REJECT_INVALID, "bad-cb-height");
         }
     }
@@ -3515,7 +3515,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
 
     CBlockIndex*& pindex = *ppindex;
     uint256 hash = block.GetHash();
-    uint256 bn2Hash = block.IsProofOfWork() ? hash : block.vtx[1].vin[0].prevout.hash;
+    uint256 bn2Hash = block.IsProofOfWork() ? hash : block.vtx[1]->vin[0].prevout.hash;
 
     // Get prev block index
     CBlockIndex* pindexPrev = nullptr;
@@ -3544,9 +3544,9 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
         return false;
 
     if(Params().PivProtocolsStartHeightSmallerThen(pindexPrev->nHeight + 1)) {
-        if (block.IsProofOfStake() && !CheckCoinStakeTimestamp(block.GetBlockTime(), (int64_t) block.vtx[1].nTime)) {
+        if (block.IsProofOfStake() && !CheckCoinStakeTimestamp(block.GetBlockTime(), (int64_t) block.vtx[1]->nTime)) {
             return state.DoS(50, error("AcceptBlock() : coinstake timestamp violation nTimeBlock=%d nTimeTx=%u\n",
-                                       block.GetBlockTime(), block.vtx[1].nTime));
+                                       block.GetBlockTime(), block.vtx[1]->nTime));
         }
     }
     if (block.GetHash() != Params().GetConsensus().hashGenesisBlock && !CheckWork(block, pindexPrev))
@@ -3606,7 +3606,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
         if (!coins.HaveInputs(block.vtx[1])) {
             // the inputs are spent at the chain tip so we should look at the recently spent outputs
 
-            for (CTxIn in : block.vtx[1].vin) {
+            for (CTxIn in : block.vtx[1]->vin) {
                 auto it = mapStakeSpent.find(in.prevout);
                 if (it == mapStakeSpent.end()) {
                     return false;
@@ -3630,7 +3630,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
                 for (const CTransaction& t : bl.vtx) {
                     for (const CTxIn& in: t.vin) {
                         // loop through every spent input in the staking transaction of the new block
-                        for (const CTxIn& stakeIn : block.vtx[1].vin) {
+                        for (const CTxIn& stakeIn : block.vtx[1]->vin) {
                             // if they spend the same input
                             if (stakeIn.prevout == in.prevout) {
                                 // reject the block
