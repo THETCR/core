@@ -495,9 +495,9 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
         } else if (strType == "tx") {
             uint256 hash;
             ssKey >> hash;
-            CWalletTx wtx(nullptr /* pwallet */, MakeTransactionRef());
+            CWalletTx wtx;
             // TODO ENABLE AFTER WTX UPGRADE
-//            ssValue >> (*wtx);
+            ssValue >> wtx;
             CValidationState state;
             // false because there is no reason to go through the zerocoin checks for our own wallet
             if (!(CheckTransaction(wtx, false, false, state) && (wtx.GetHash() == hash) && state.IsValid()))
@@ -875,7 +875,7 @@ DBErrors CWalletDB::FindWalletTx(CWallet* pwallet, std::vector<uint256>& vTxHash
 
                 CWalletTx wtx;
 //             TODO ENABLE AFTER WTX UPGRADE
-//                ssValue >> wtx;
+                ssValue >> wtx;
 
                 vTxHash.push_back(hash);
                 vWtx.push_back(wtx);
