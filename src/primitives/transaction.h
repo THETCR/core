@@ -464,21 +464,21 @@ struct CMutableTransaction
         READWRITE(vout);
         READWRITE(nLockTime);
     }
-//    template <typename Stream>
-//    inline void Serialize(Stream& s) const {
-//        SerializeTransaction(*this, s);
-//    }
-//
-//
-//    template <typename Stream>
-//    inline void Unserialize(Stream& s) {
-//        UnserializeTransaction(*this, s);
-//    }
-//
-//    template <typename Stream>
-//    CMutableTransaction(deserialize_type, Stream& s) {
-//        Unserialize(s);
-//    }
+    template <typename Stream>
+    inline void Serialize(Stream& s) const {
+        SerializeTransaction(*this, s);
+    }
+
+
+    template <typename Stream>
+    inline void Unserialize(Stream& s) {
+        UnserializeTransaction(*this, s);
+    }
+
+    template <typename Stream>
+    CMutableTransaction(deserialize_type, Stream& s) {
+        Unserialize(s);
+    }
 
   /** Compute the hash of this CMutableTransaction. This is computed on the
      * fly, as opposed to GetHash() in CTransaction, which uses a cached result.
