@@ -496,7 +496,8 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
             uint256 hash;
             ssKey >> hash;
             CWalletTx wtx(nullptr /* pwallet */, MakeTransactionRef());
-            ssValue >> wtx;
+            // TODO ENABLE AFTER WTX UPGRADE
+//            ssValue >> (*wtx);
             CValidationState state;
             // false because there is no reason to go through the zerocoin checks for our own wallet
             if (!(CheckTransaction(wtx, false, false, state) && (wtx.GetHash() == hash) && state.IsValid()))
