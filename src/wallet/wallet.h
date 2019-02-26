@@ -768,13 +768,20 @@ public:
     {
         Init();
     }
-
+    explicit CMerkleTx(CTransactionRef arg) : CTransaction(*std::move(arg))
+    {
+//        SetTx(std::move(arg));
+        Init();
+    }
     void Init()
     {
         hashBlock = 0;
         nIndex = -1;
     }
-
+//    void SetTx(CTransactionRef arg)
+//    {
+//        tx = std::move(arg);
+//    }
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
@@ -879,7 +886,10 @@ public:
     {
         Init(pwalletIn);
     }
-
+    CWalletTx(const CWallet* pwalletIn, CTransactionRef arg) : CMerkleTx(std::move(arg))
+    {
+        Init(pwalletIn);
+    }
     void Init(const CWallet* pwalletIn)
     {
         pwallet = pwalletIn;
