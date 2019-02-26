@@ -1493,7 +1493,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
             CBlock block;
             ReadBlockFromDisk(block, pindex);
             for (auto& tx: block.vtx) {
-                if (AddToWalletIfInvolvingMe(tx, &block, fUpdate))
+                if (AddToWalletIfInvolvingMe(*tx, &block, fUpdate))
                     ret++;
             }
 
@@ -1509,7 +1509,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
 
                         // Add the transaction to the wallet
                         for (auto& tx : block.vtx) {
-                            uint256 txid = tx.GetHash();
+                            uint256 txid = tx->GetHash();
                             if (setAddedToWallet.count(txid) || mapWallet.count(txid))
                                 continue;
                             if (txid == m.GetTxHash()) {
