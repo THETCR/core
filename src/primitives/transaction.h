@@ -365,7 +365,7 @@ public:
     /** This deserializing constructor is provided instead of an Unserialize method.
      *  Unserialize is not possible, since it would require overwriting const fields. */
     template <typename Stream>
-    CTransaction(deserialize_type, Stream& s) : CTransaction(CMutableTransaction(deserialize, s)) {}
+//    CTransaction(deserialize_type, Stream& s) : CTransaction(CMutableTransaction(deserialize, s)) {}
 
     bool IsNull() const {
         return vin.empty() && vout.empty();
@@ -451,22 +451,34 @@ struct CMutableTransaction
     CMutableTransaction();
     CMutableTransaction(const CTransaction& tx);
 
+    ADD_SERIALIZE_METHODS;
 
-    template <typename Stream>
-    inline void Serialize(Stream& s) const {
-        SerializeTransaction(*this, s);
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action) {
+        READWRITE(this->nVersion);
+        int _nVersion = this->nVersion;
+        if(_nVersion == 2){
+            READWRITE(nTime);
+        }
+        READWRITE(vin);
+        READWRITE(vout);
+        READWRITE(nLockTime);
     }
-
-
-    template <typename Stream>
-    inline void Unserialize(Stream& s) {
-        UnserializeTransaction(*this, s);
-    }
-
-    template <typename Stream>
-    CMutableTransaction(deserialize_type, Stream& s) {
-        Unserialize(s);
-    }
+//    template <typename Stream>
+//    inline void Serialize(Stream& s) const {
+//        SerializeTransaction(*this, s);
+//    }
+//
+//
+//    template <typename Stream>
+//    inline void Unserialize(Stream& s) {
+//        UnserializeTransaction(*this, s);
+//    }
+//
+//    template <typename Stream>
+//    CMutableTransaction(deserialize_type, Stream& s) {
+//        Unserialize(s);
+//    }
 
   /** Compute the hash of this CMutableTransaction. This is computed on the
      * fly, as opposed to GetHash() in CTransaction, which uses a cached result.
