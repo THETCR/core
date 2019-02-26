@@ -525,20 +525,20 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     map<uint256, int64_t> setTxIndex;
     int i = 0;
     for (auto& tx: pblock->vtx) {
-        uint256 txHash = tx.GetHash();
+        uint256 txHash = tx->GetHash();
         setTxIndex[txHash] = i++;
 
-        if (tx.IsCoinBase())
+        if (tx->IsCoinBase())
             continue;
 
         UniValue entry(UniValue::VOBJ);
 
-        entry.push_back(Pair("data", EncodeHexTx(tx)));
+        entry.push_back(Pair("data", EncodeHexTx(*tx)));
 
         entry.push_back(Pair("hash", txHash.GetHex()));
 
         UniValue deps(UniValue::VARR);
-        for (const CTxIn& in: tx.vin) {
+        for (const CTxIn& in: tx->vin) {
             if (setTxIndex.count(in.prevout.hash))
                 deps.push_back(setTxIndex[in.prevout.hash]);
         }
