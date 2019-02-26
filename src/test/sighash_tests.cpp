@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(sighash_from_data)
         std::string raw_tx, raw_script, sigHashHex;
         int nIn, nHashType;
         uint256 sh;
-        CTransactionRef tx;
+        CTransaction tx;
         CScript scriptCode = CScript();
 
         try {
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(sighash_from_data)
 
             CValidationState state;
             std::cout << "CheckTransaction\n";
-            BOOST_CHECK_MESSAGE(CheckTransaction(*tx, false, false, state), strTest);
+            BOOST_CHECK_MESSAGE(CheckTransaction(tx, false, false, state), strTest);
             BOOST_CHECK(state.IsValid());
 
             std::cout << "raw\n";
