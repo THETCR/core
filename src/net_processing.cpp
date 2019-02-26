@@ -1473,19 +1473,21 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
     else if (strCommand == NetMsgType::TX || strCommand == NetMsgType::DSTX) {
         std::vector<uint256> vWorkQueue;
         std::vector<uint256> vEraseQueue;
-        CTransaction tx;
-
+        CTransactionRef ptx;
+        vRecv >> ptx;
+        CTransaction& tx = *ptx;
         //masternode signed transaction
         bool ignoreFees = false;
         CTxIn vin;
         std::vector<unsigned char> vchSig;
         int64_t sigTime;
 
-        if (strCommand == NetMsgType::TX) {
-            CTransactionRef ptx;
-            vRecv >> ptx;
-            const CTransaction& tx = *ptx;
-        } else if (strCommand == NetMsgType::DSTX) {
+//        if (strCommand == NetMsgType::TX) {
+//            CTransactionRef ptx;
+//            vRecv >> ptx;
+//            tx = *ptx;
+//        } else
+            if (strCommand == NetMsgType::DSTX) {
             //these allow masternodes to publish a limited amount of free transactions
             vRecv >> tx >> vin >> vchSig >> sigTime;
 
