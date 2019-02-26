@@ -1482,7 +1482,9 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         int64_t sigTime;
 
         if (strCommand == NetMsgType::TX) {
-            vRecv >> tx;
+            CTransactionRef ptx;
+            vRecv >> ptx;
+            const CTransaction& tx = *ptx;
         } else if (strCommand == NetMsgType::DSTX) {
             //these allow masternodes to publish a limited amount of free transactions
             vRecv >> tx >> vin >> vchSig >> sigTime;
