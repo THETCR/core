@@ -304,10 +304,9 @@ static void MutateTxAddOutScript(CMutableTransaction& tx, const std::string& str
 static void MutateTxDelInput(CMutableTransaction& tx, const std::string& strInIdx)
 {
     // parse requested deletion index
-    int inIdx = atoi(strInIdx);
-    if (inIdx < 0 || inIdx >= (int)tx.vin.size()) {
-        std::string strErr = "Invalid TX input index '" + strInIdx + "'";
-        throw runtime_error(strErr.c_str());
+    int64_t inIdx;
+    if (!ParseInt64(strInIdx, &inIdx) || inIdx < 0 || inIdx >= static_cast<int64_t>(tx.vin.size())) {
+        throw std::runtime_error("Invalid TX input index '" + strInIdx + "'");
     }
 
     // delete input from transaction
