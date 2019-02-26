@@ -131,7 +131,11 @@ static bool AppInitRawTx(int argc, char* argv[])
         strUsage += HelpMessageOpt("set=NAME:JSON-STRING", _("Set register NAME to given JSON-STRING"));
         fprintf(stdout, "%s", strUsage.c_str());
 
-        return false;
+        if (argc < 2) {
+            fprintf(stderr, "Error: too few parameters\n");
+            return EXIT_FAILURE;
+        }
+        return EXIT_SUCCESS;
     }
     return true;
 }
@@ -141,7 +145,7 @@ static void RegisterSetJson(const std::string& key, const std::string& rawJson)
     UniValue val;
     if (!val.read(rawJson)) {
         std::string strErr = "Cannot parse JSON for key " + key;
-        throw runtime_error(strErr);
+        throw std::runtime_error(strErr);
     }
 
     registers[key] = val;
@@ -149,12 +153,12 @@ static void RegisterSetJson(const std::string& key, const std::string& rawJson)
 
 static void RegisterSet(const std::string& strInput)
 {
-    // separate NAME:VALUE in std::string
+    // separate NAME:VALUE in string
     size_t pos = strInput.find(':');
     if ((pos == std::string::npos) ||
         (pos == 0) ||
         (pos == (strInput.size() - 1)))
-        throw runtime_error("Register input requires NAME:VALUE");
+        throw std::runtime_error("Register input requires NAME:VALUE");
 
     std::string key = strInput.substr(0, pos);
     std::string valStr = strInput.substr(pos + 1, std::string::npos);
@@ -164,20 +168,20 @@ static void RegisterSet(const std::string& strInput)
 
 static void RegisterLoad(const std::string& strInput)
 {
-    // separate NAME:FILENAME in std::string
+    // separate NAME:FILENAME in string
     size_t pos = strInput.find(':');
     if ((pos == std::string::npos) ||
         (pos == 0) ||
         (pos == (strInput.size() - 1)))
-        throw runtime_error("Register load requires NAME:FILENAME");
+        throw std::runtime_error("Register load requires NAME:FILENAME");
 
     std::string key = strInput.substr(0, pos);
     std::string filename = strInput.substr(pos + 1, std::string::npos);
 
-    FILE* f = fopen(filename.c_str(), "r");
+    FILE *f = fopen(filename.c_str(), "r");
     if (!f) {
         std::string strErr = "Cannot open file " + filename;
-        throw runtime_error(strErr);
+        throw std::runtime_error(strErr);
     }
 
     // load file chunks into one big buffer
@@ -191,25 +195,35 @@ static void RegisterLoad(const std::string& strInput)
         valStr.insert(valStr.size(), buf, bread);
     }
 
-    if (ferror(f)) {
-        std::string strErr = "Error reading file " + filename;
-        throw runtime_error(strErr);
-    }
-
+    int error = ferror(f);
     fclose(f);
+
+    if (error) {
+        std::string strErr = "Error reading file " + filename;
+        throw std::runtime_error(strErr);
+    }
 
     // evaluate as JSON buffer register
     RegisterSetJson(key, valStr);
 }
 
+static CAmount ExtractAndValidateValue(const std::string& strValue)
+{
+    CAmount value;
+    if (!ParseMoney(strValue, value))
+        throw std::runtime_error("invalid TX output value");
+    return value;
+}
+
 static void MutateTxVersion(CMutableTransaction& tx, const std::string& cmdVal)
 {
     int64_t newVersion;
-    if (!ParseInt64(cmdVal, &newVersion) || newVersion < 1 || newVersion > CTransaction::CURRENT_VERSION)
+    if (!ParseInt64(cmdVal, &newVersion) || newVersion < 1 || newVersion > CTransaction::MAX_STANDARD_VERSION)
         throw std::runtime_error("Invalid TX version requested: '" + cmdVal + "'");
 
     tx.nVersion = (int) newVersion;
 }
+
 static void MutateTxLocktime(CMutableTransaction& tx, const std::string& cmdVal)
 {
     int64_t newLocktime;
@@ -221,57 +235,58 @@ static void MutateTxLocktime(CMutableTransaction& tx, const std::string& cmdVal)
 
 static void MutateTxAddInput(CMutableTransaction& tx, const std::string& strInput)
 {
-    // separate TXID:VOUT in std::string
-    size_t pos = strInput.find(':');
-    if ((pos == std::string::npos) ||
-        (pos == 0) ||
-        (pos == (strInput.size() - 1)))
-        throw runtime_error("TX input missing separator");
+    std::vector<std::string> vStrInputParts;
+    boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
+
+    // separate TXID:VOUT in string
+    if (vStrInputParts.size()<2)
+        throw std::runtime_error("TX input missing separator");
 
     // extract and validate TXID
-    std::string strTxid = strInput.substr(0, pos);
-    if ((strTxid.size() != 64) || !IsHex(strTxid))
-        throw runtime_error("invalid TX input txid");
-    uint256 txid(strTxid);
+    uint256 txid;
+    if (!ParseHashStr(vStrInputParts[0], txid)) {
+        throw std::runtime_error("invalid TX input txid");
+    }
 
     static const unsigned int minTxOutSz = 9;
     unsigned int nMaxSize = MAX_BLOCK_SIZE_LEGACY;
     static const unsigned int maxVout = nMaxSize / minTxOutSz;
 
     // extract and validate vout
-    std::string strVout = strInput.substr(pos + 1, std::string::npos);
-    int vout = atoi(strVout);
-    if ((vout < 0) || (vout > (int)maxVout))
-        throw runtime_error("invalid TX input vout");
+    const std::string& strVout = vStrInputParts[1];
+    int64_t vout;
+    if (!ParseInt64(strVout, &vout) || vout < 0 || vout > static_cast<int64_t>(maxVout))
+        throw std::runtime_error("invalid TX input vout '" + strVout + "'");
+
+    // extract the optional sequence number
+    uint32_t nSequenceIn = CTxIn::SEQUENCE_FINAL;
+    if (vStrInputParts.size() > 2)
+        nSequenceIn = std::stoul(vStrInputParts[2]);
 
     // append to transaction input list
-    CTxIn txin(txid, vout);
+    CTxIn txin(txid, vout, CScript(), nSequenceIn);
     tx.vin.push_back(txin);
 }
 
 static void MutateTxAddOutAddr(CMutableTransaction& tx, const std::string& strInput)
 {
-    // separate VALUE:ADDRESS in std::string
-    size_t pos = strInput.find(':');
-    if ((pos == std::string::npos) ||
-        (pos == 0) ||
-        (pos == (strInput.size() - 1)))
-        throw runtime_error("TX output missing separator");
+    // Separate into VALUE:ADDRESS
+    std::vector<std::string> vStrInputParts;
+    boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
 
-    // extract and validate VALUE
-    std::string strValue = strInput.substr(0, pos);
-    CAmount value;
-    if (!ParseMoney(strValue, value))
-        throw runtime_error("invalid TX output value");
+    if (vStrInputParts.size() != 2)
+        throw std::runtime_error("TX output missing or too many separators");
+
+    // Extract and validate VALUE
+    CAmount value = ExtractAndValidateValue(vStrInputParts[0]);
 
     // extract and validate ADDRESS
-    std::string strAddr = strInput.substr(pos + 1, std::string::npos);
-    CBitcoinAddress addr(strAddr);
-    if (!addr.IsValid())
-        throw runtime_error("invalid TX output address");
-
-    // build standard output script via GetScriptForDestination()
-    CScript scriptPubKey = GetScriptForDestination(addr.Get());
+    std::string strAddr = vStrInputParts[1];
+    CTxDestination destination = DecodeDestination(strAddr);
+    if (!IsValidDestination(destination)) {
+        throw std::runtime_error("invalid TX output address");
+    }
+    CScript scriptPubKey = GetScriptForDestination(destination);
 
     // construct TxOut, append to transaction output list
     CTxOut txout(value, scriptPubKey);
@@ -280,21 +295,43 @@ static void MutateTxAddOutAddr(CMutableTransaction& tx, const std::string& strIn
 
 static void MutateTxAddOutScript(CMutableTransaction& tx, const std::string& strInput)
 {
-    // separate VALUE:SCRIPT in std::string
-    size_t pos = strInput.find(':');
-    if ((pos == std::string::npos) ||
-        (pos == 0))
-        throw runtime_error("TX output missing separator");
+    // separate VALUE:SCRIPT[:FLAGS]
+    std::vector<std::string> vStrInputParts;
+    boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
+    if (vStrInputParts.size() < 2)
+        throw std::runtime_error("TX output missing separator");
 
-    // extract and validate VALUE
-    std::string strValue = strInput.substr(0, pos);
-    CAmount value;
-    if (!ParseMoney(strValue, value))
-        throw runtime_error("invalid TX output value");
+    // Extract and validate VALUE
+    CAmount value = ExtractAndValidateValue(vStrInputParts[0]);
 
     // extract and validate script
-    std::string strScript = strInput.substr(pos + 1, std::string::npos);
-    CScript scriptPubKey = ParseScript(strScript); // throws on err
+    std::string strScript = vStrInputParts[1];
+    CScript scriptPubKey = ParseScript(strScript);
+
+    // Extract FLAGS
+    bool bSegWit = false;
+    bool bScriptHash = false;
+    if (vStrInputParts.size() == 3) {
+        std::string flags = vStrInputParts.back();
+        bSegWit = (flags.find('W') != std::string::npos);
+        bScriptHash = (flags.find('S') != std::string::npos);
+    }
+
+    if (scriptPubKey.size() > MAX_SCRIPT_SIZE) {
+        throw std::runtime_error(strprintf(
+                "script exceeds size limit: %d > %d", scriptPubKey.size(), MAX_SCRIPT_SIZE));
+    }
+
+    if (bSegWit) {
+        scriptPubKey = GetScriptForWitness(scriptPubKey);
+    }
+    if (bScriptHash) {
+        if (scriptPubKey.size() > MAX_SCRIPT_ELEMENT_SIZE) {
+            throw std::runtime_error(strprintf(
+                    "redeemScript exceeds size limit: %d > %d", scriptPubKey.size(), MAX_SCRIPT_ELEMENT_SIZE));
+        }
+        scriptPubKey = GetScriptForDestination(CScriptID(scriptPubKey));
+    }
 
     // construct TxOut, append to transaction output list
     CTxOut txout(value, scriptPubKey);
