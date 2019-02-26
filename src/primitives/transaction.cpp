@@ -130,10 +130,10 @@ uint256 CTransaction::ComputeHash() const
 
 uint256 CTransaction::ComputeWitnessHash() const
 {
-//    if (!HasWitness()) {
+    if (!HasWitness()) {
         return hash;
-//    }
-//    return SerializeHash(*this, SER_GETHASH, 0);
+    }
+    return SerializeHash(*this, SER_GETHASH, 0);
 }
 CTransaction::CTransaction() : hash(), nVersion(CTransaction::CURRENT_VERSION), nTime(0), vin(), vout(), nLockTime(0) { }
 
