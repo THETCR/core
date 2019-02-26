@@ -258,13 +258,13 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         /* We read a non-empty vin. Assume a normal vout follows. */
         s >> tx.vout;
     }
-    if ((flags & 1) && fAllowWitness) {
-        /* The witness flag is present, and we support witnesses. */
-        flags ^= 1;
-        for (size_t i = 0; i < tx.vin.size(); i++) {
-            s >> tx.vin[i].scriptWitness.stack;
-        }
-    }
+//    if ((flags & 1) && fAllowWitness) {
+//        /* The witness flag is present, and we support witnesses. */
+//        flags ^= 1;
+//        for (size_t i = 0; i < tx.vin.size(); i++) {
+//            s >> tx.vin[i].scriptWitness.stack;
+//        }
+//    }
     if (flags) {
         /* Unknown flag in the serialization */
         throw std::ios_base::failure("Unknown transaction optional data");
@@ -296,11 +296,11 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     }
     s << tx.vin;
     s << tx.vout;
-    if (flags & 1) {
-        for (size_t i = 0; i < tx.vin.size(); i++) {
-            s << tx.vin[i].scriptWitness.stack;
-        }
-    }
+//    if (flags & 1) {
+//        for (size_t i = 0; i < tx.vin.size(); i++) {
+//            s << tx.vin[i].scriptWitness.stack;
+//        }
+//    }
     s << tx.nLockTime;
 }
 
