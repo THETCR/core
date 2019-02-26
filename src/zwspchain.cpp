@@ -19,10 +19,10 @@
 bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomination denom, std::vector<CBigNum>& vValues)
 {
     for (const auto& tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if(!tx->IsZerocoinMint())
             continue;
 
-        for (const CTxOut& txOut : tx.vout) {
+        for (const CTxOut& txOut : tx->vout) {
             if(!txOut.scriptPubKey.IsZerocoinMint())
                 continue;
 
@@ -44,13 +44,13 @@ bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomina
 bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>& listPubcoins, bool fFilterInvalid)
 {
     for (const auto& tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if(!tx->IsZerocoinMint())
             continue;
 
         // Filter out mints that have used invalid outpoints
         if (fFilterInvalid) {
             bool fValid = true;
-            for (const CTxIn& in : tx.vin) {
+            for (const CTxIn& in : tx->vin) {
                 if (!ValidOutPoint(in.prevout, INT_MAX)) {
                     fValid = false;
                     break;
@@ -60,13 +60,13 @@ bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>&
                 continue;
         }
 
-        uint256 txHash = tx.GetHash();
-        for (unsigned int i = 0; i < tx.vout.size(); i++) {
+        uint256 txHash = tx->GetHash();
+        for (unsigned int i = 0; i < tx->vout.size(); i++) {
             //Filter out mints that use invalid outpoints - edge case: invalid spend with minted change
             if (fFilterInvalid && !ValidOutPoint(COutPoint(txHash, i), INT_MAX))
                 break;
 
-            const CTxOut txOut = tx.vout[i];
+            const CTxOut txOut = tx->vout[i];
             if(!txOut.scriptPubKey.IsZerocoinMint())
                 continue;
 
@@ -86,13 +86,13 @@ bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>&
 bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMints, bool fFilterInvalid)
 {
     for (const auto& tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if(!tx->IsZerocoinMint())
             continue;
 
         // Filter out mints that have used invalid outpoints
         if (fFilterInvalid) {
             bool fValid = true;
-            for (const CTxIn& in : tx.vin) {
+            for (const CTxIn& in : tx->vin) {
                 if (!ValidOutPoint(in.prevout, INT_MAX)) {
                     fValid = false;
                     break;
@@ -102,13 +102,13 @@ bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMin
                 continue;
         }
 
-        uint256 txHash = tx.GetHash();
-        for (unsigned int i = 0; i < tx.vout.size(); i++) {
+        uint256 txHash = tx->GetHash();
+        for (unsigned int i = 0; i < tx->vout.size(); i++) {
             //Filter out mints that use invalid outpoints - edge case: invalid spend with minted change
             if (fFilterInvalid && !ValidOutPoint(COutPoint(txHash, i), INT_MAX))
                 break;
 
-            const CTxOut txOut = tx.vout[i];
+            const CTxOut txOut = tx->vout[i];
             if(!txOut.scriptPubKey.IsZerocoinMint())
                 continue;
 
@@ -120,7 +120,7 @@ bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMin
             //version should not actually matter here since it is just a reference to the pubcoin, not to the privcoin
             uint8_t version = 1;
             CZerocoinMint mint = CZerocoinMint(pubCoin.getDenomination(), pubCoin.getValue(), 0, 0, false, version, nullptr);
-            mint.SetTxHash(tx.GetHash());
+            mint.SetTxHash(tx->GetHash());
             vMints.push_back(mint);
         }
     }
@@ -279,15 +279,15 @@ std::string ReindexZerocoinDB()
         }
 
         for (const auto& tx : block.vtx) {
-            for (unsigned int i = 0; i < tx.vin.size(); i++) {
-                if (tx.IsCoinBase())
+            for (unsigned int i = 0; i < tx->vin.size(); i++) {
+                if (tx->IsCoinBase())
                     break;
 
-                if (tx.ContainsZerocoins()) {
-                    uint256 txid = tx.GetHash();
+                if (tx->ContainsZerocoins()) {
+                    uint256 txid = tx->GetHash();
                     //Record Serials
-                    if (tx.IsZerocoinSpend()) {
-                        for (auto& in : tx.vin) {
+                    if (tx->IsZerocoinSpend()) {
+                        for (auto& in : tx->vin) {
                             if (!in.scriptSig.IsZerocoinSpend())
                                 continue;
 
@@ -297,8 +297,8 @@ std::string ReindexZerocoinDB()
                     }
 
                     //Record mints
-                    if (tx.IsZerocoinMint()) {
-                        for (auto& out : tx.vout) {
+                    if (tx->IsZerocoinMint()) {
+                        for (auto& out : tx->vout) {
                             if (!out.IsZerocoinMint())
                                 continue;
 
@@ -375,10 +375,10 @@ std::list<libzerocoin::CoinDenomination> ZerocoinSpendListFromBlock(const CBlock
 {
     std::list<libzerocoin::CoinDenomination> vSpends;
     for (const auto& tx : block.vtx) {
-        if (!tx.IsZerocoinSpend())
+        if (!tx->IsZerocoinSpend())
             continue;
 
-        for (const CTxIn& txin : tx.vin) {
+        for (const CTxIn& txin : tx->vin) {
             if (!txin.scriptSig.IsZerocoinSpend())
                 continue;
 
