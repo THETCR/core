@@ -2095,11 +2095,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             if (fCLTVHasMajority)
                 flags |= SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY;
 
-            if (!CheckInputs(tx, state, view, fScriptChecks, flags, false, nScriptCheckThreads ? &vChecks : NULL))
+            if (!CheckInputs(*tx, state, view, fScriptChecks, flags, false, nScriptCheckThreads ? &vChecks : NULL))
                 return false;
             control.Add(vChecks);
         }
-        nValueOut += tx.GetValueOut();
+        nValueOut += tx->GetValueOut();
 
         CTxUndo undoDummy;
         if (i > 0) {
@@ -2409,7 +2409,7 @@ bool static DisconnectTip(CValidationState& state)
         // ignore validation errors in resurrected transactions
         std::list<CTransaction> removed;
         CValidationState stateDummy;
-        if (tx->IsCoinBase() || tx->IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
+        if (tx->IsCoinBase() || tx->IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, *tx, false, NULL))
             mempool.remove(tx, removed, true);
     }
     mempool.removeCoinbaseSpends(pcoinsTip, pindexDelete->nHeight);
@@ -2418,8 +2418,8 @@ bool static DisconnectTip(CValidationState& state)
     UpdateTip(pindexDelete->pprev);
     // Let wallets know transactions went from 1-confirmed to
     // 0-confirmed or conflicted:
-    for (const CTransactionRef& tx: block.vtx) {
-        SyncWithWallets(tx, NULL);
+    for (const auto& tx: block.vtx) {
+        SyncWithWallets(*tx, NULL);
     }
     return true;
 }
@@ -2495,12 +2495,12 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     UpdateTip(pindexNew);
     // Tell wallet about transactions that went from mempool
     // to conflicted:
-    for (const CTransaction& tx: txConflicted) {
+    for (const auto& tx: txConflicted) {
         SyncWithWallets(tx, NULL);
     }
     // ... and about transactions that got confirmed:
     for (const auto& tx: pblock->vtx) {
-        SyncWithWallets(tx, pblock);
+        SyncWithWallets(*tx, pblock);
     }
 
     int64_t nTime6 = GetTimeMicros();
@@ -3202,13 +3202,13 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
     // ----------- swiftTX transaction scanning -----------
     if (IsSporkActive(SPORK_3_SWIFTTX_BLOCK_FILTERING)) {
         for (const CTransactionRef& tx: block.vtx) {
-            if (!tx.IsCoinBase()) {
+            if (!tx->IsCoinBase()) {
                 //only reject blocks when it's based on complete consensus
-                for (const CTxIn& in: tx.vin) {
+                for (const CTxIn& in: tx->vin) {
                     if (mapLockedInputs.count(in.prevout)) {
-                        if (mapLockedInputs[in.prevout] != tx.GetHash()) {
+                        if (mapLockedInputs[in.prevout] != tx->GetHash()) {
                             mapRejectedBlocks.insert(std::make_pair(block.GetHash(), GetTime()));
-                            LogPrintf("CheckBlock() : found conflicting transaction with transaction lock %s %s\n", mapLockedInputs[in.prevout].ToString(), tx.GetHash().ToString());
+                            LogPrintf("CheckBlock() : found conflicting transaction with transaction lock %s %s\n", mapLockedInputs[in.prevout].ToString(), tx->GetHash().ToString());
                             return state.DoS(0, error("CheckBlock() : found conflicting transaction with transaction lock"),
                                              REJECT_INVALID, "conflicting-tx-ix");
                         }
@@ -3255,7 +3255,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 //    bool fZerocoinActive = block.GetBlockTime() > Params().NEW_PROTOCOLS_STARTTIME();
     std::vector<CBigNum> vBlockSerials;
     for (const auto& tx : block.vtx) {
-        if (!CheckTransaction(tx, fZerocoinActive, true, state))
+        if (!CheckTransaction(*tx, fZerocoinActive, true, state))
             return error("CheckBlock() : CheckTransaction failed");
 
         // double check that there are no double spent zWSP spends in this block
@@ -3404,7 +3404,7 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
 
     // Check that all transactions are finalized
     for (const CTransactionRef& tx: block.vtx)
-    if (!IsFinalTx(tx, nHeight, block.GetBlockTime())) {
+    if (!IsFinalTx(*tx, nHeight, block.GetBlockTime())) {
         return state.DoS(10, error("%s : contains a non-final transaction", __func__), REJECT_INVALID, "bad-txns-nonfinal");
     }
 
@@ -3603,7 +3603,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
 
         CCoinsViewCache coins(pcoinsTip);
 
-        if (!coins.HaveInputs(block.vtx[1])) {
+        if (!coins.HaveInputs(*block.vtx[1])) {
             // the inputs are spent at the chain tip so we should look at the recently spent outputs
 
             for (CTxIn in : block.vtx[1]->vin) {
@@ -3701,12 +3701,12 @@ bool ProcessNewBlock(const CChainParams& chainparams, const CBlock* pblock, bool
     int nMints = 0;
     int nSpends = 0;
     for (const auto& tx : pblock->vtx) {
-        if (tx.ContainsZerocoins()) {
-            for (const CTxIn& in : tx.vin) {
+        if (tx->ContainsZerocoins()) {
+            for (const CTxIn& in : tx->vin) {
                 if (in.scriptSig.IsZerocoinSpend())
                     nSpends++;
             }
-            for (const CTxOut& out : tx.vout) {
+            for (const CTxOut& out : tx->vout) {
                 if (out.IsZerocoinMint())
                     nMints++;
             }
