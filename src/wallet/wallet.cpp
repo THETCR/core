@@ -38,6 +38,7 @@
 #include <zwspchain.h>
 
 #include <denomination_functions.h>
+#include <libzerocoin/bignum.h>
 #include <libzerocoin/Denominations.h>
 #include <wallet/zwspwallet.h>
 #include <primitives/deterministicmint.h>
@@ -4430,7 +4431,7 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block)
 
     // Locate the transaction
     for (nIndex = 0; nIndex < (int)block.vtx.size(); nIndex++)
-        if (block.vtx[nIndex] == *(CTransaction*)this)
+        if (*block.vtx[nIndex] == *(CTransaction*)this)
             break;
     if (nIndex == (int)block.vtx.size()) {
         nIndex = -1;
