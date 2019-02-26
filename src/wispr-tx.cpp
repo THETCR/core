@@ -316,15 +316,15 @@ static void MutateTxDelInput(CMutableTransaction& tx, const std::string& strInId
 static void MutateTxDelOutput(CMutableTransaction& tx, const std::string& strOutIdx)
 {
     // parse requested deletion index
-    int outIdx = atoi(strOutIdx);
-    if (outIdx < 0 || outIdx >= (int)tx.vout.size()) {
-        std::string strErr = "Invalid TX output index '" + strOutIdx + "'";
-        throw runtime_error(strErr.c_str());
+    int64_t outIdx;
+    if (!ParseInt64(strOutIdx, &outIdx) || outIdx < 0 || outIdx >= static_cast<int64_t>(tx.vout.size())) {
+        throw std::runtime_error("Invalid TX output index '" + strOutIdx + "'");
     }
 
     // delete output from transaction
     tx.vout.erase(tx.vout.begin() + outIdx);
 }
+
 
 static const unsigned int N_SIGHASH_OPTS = 6;
 static const struct {
