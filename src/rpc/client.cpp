@@ -154,14 +154,17 @@ static const CRPCConvertParam vRPCConvertParams[] =
 class CRPCConvertTable
 {
 private:
-    std::set<std::pair<std::string, int> > members;
+    std::set<std::pair<std::string, int>> members;
+    std::set<std::pair<std::string, std::string>> membersByName;
 
 public:
     CRPCConvertTable();
 
-    bool convert(const std::string& method, int idx)
-    {
+    bool convert(const std::string& method, int idx) {
         return (members.count(std::make_pair(method, idx)) > 0);
+    }
+    bool convert(const std::string& method, const std::string& name) {
+        return (membersByName.count(std::make_pair(method, name)) > 0);
     }
 };
 
