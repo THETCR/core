@@ -21,13 +21,13 @@
 #include <boost/algorithm/string.hpp> // boost::trim
 
 /** Simple one-shot callback timer to be used by the RPC mechanism to e.g.
- * re-lock the wellet.
+ * re-lock the wallet.
  */
 class HTTPRPCTimer : public RPCTimerBase
 {
 public:
-    HTTPRPCTimer(struct event_base* eventBase, boost::function<void(void)>& func, int64_t millis) :
-        ev(eventBase, false, func)
+    HTTPRPCTimer(struct event_base* eventBase, std::function<void()>& func, int64_t millis) :
+            ev(eventBase, false, func)
     {
         struct timeval tv;
         tv.tv_sec = millis/1000;
@@ -41,14 +41,14 @@ private:
 class HTTPRPCTimerInterface : public RPCTimerInterface
 {
 public:
-    HTTPRPCTimerInterface(struct event_base* base) : base(base)
+    explicit HTTPRPCTimerInterface(struct event_base* _base) : base(_base)
     {
     }
-    const char* Name()
+    const char* Name() override
     {
         return "HTTP";
     }
-    RPCTimerBase* NewTimer(boost::function<void(void)>& func, int64_t millis)
+    RPCTimerBase* NewTimer(std::function<void()>& func, int64_t millis) override
     {
         return new HTTPRPCTimer(base, func, millis);
     }
