@@ -374,6 +374,7 @@ static const CRPCCommand vRPCCommands[] =
         { "control",            "getrpcinfo",             &getrpcinfo,             {}  },
         {"control", "help", &help, {"command"} },
         {"control", "stop", &stop, {"wait"} },
+    { "control",            "uptime",                 &uptime,                 {}  },
 
         /* P2P networking */
     { "network",            "getconnectioncount",     &getconnectioncount,     {} },
