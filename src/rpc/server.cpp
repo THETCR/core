@@ -376,46 +376,47 @@ static const CRPCCommand vRPCCommands[] =
         {"control", "stop", &stop, {"wait"} },
 
         /* P2P networking */
-        {"network", "getnetworkinfo", &getnetworkinfo, {}},
-        {"network", "addnode", &addnode, {}},
-        {"network", "disconnectnode", &disconnectnode, {}},
-        {"network", "getaddednodeinfo", &getaddednodeinfo, {}},
-        {"network", "getconnectioncount", &getconnectioncount, {}},
-        {"network", "getnettotals", &getnettotals, {}},
-        {"network", "getpeerinfo", &getpeerinfo, {}},
-        {"network", "ping", &ping, {}},
-        {"network", "setban", &setban, {}},
-        {"network", "listbanned", &listbanned, {}},
-        {"network", "clearbanned", &clearbanned, {}},
-
+    { "network",            "getconnectioncount",     &getconnectioncount,     {} },
+    { "network",            "ping",                   &ping,                   {} },
+    { "network",            "getpeerinfo",            &getpeerinfo,            {} },
+    { "network",            "addnode",                &addnode,                {"node","command"} },
+    { "network",            "disconnectnode",         &disconnectnode,         {"address"} },
+    { "network",            "getaddednodeinfo",       &getaddednodeinfo,       {"node"} },
+    { "network",            "getnettotals",           &getnettotals,           {} },
+    { "network",            "getnetworkinfo",         &getnetworkinfo,         {} },
+    { "network",            "setban",                 &setban,                 {"subnet", "command", "bantime", "absolute"} },
+    { "network",            "listbanned",             &listbanned,             {} },
+    { "network",            "clearbanned",            &clearbanned,            {} },
         /* Block chain and UTXO */
         {"blockchain", "findserial", &findserial, {}},
         {"blockchain", "getaccumulatorvalues", &getaccumulatorvalues, {}},
         {"blockchain", "getaccumulatorwitness", &getaccumulatorwitness, {}},
         {"blockchain", "getmintsinblocks", &getmintsinblocks, {}},
-        {"blockchain", "getblockchaininfo", &getblockchaininfo, {}},
-        {"blockchain", "getbestblockhash", &getbestblockhash, {}},
-        {"blockchain", "getblockcount", &getblockcount, {}},
-        {"blockchain", "getblock", &getblock, {}},
-        {"blockchain", "getblockhash", &getblockhash, {}},
-        {"blockchain", "getblockheader", &getblockheader, {}},
-        {"blockchain", "getchaintips", &getchaintips, {}},
-        {"blockchain", "getdifficulty", &getdifficulty, {}},
-        {"blockchain", "getfeeinfo", &getfeeinfo, {}},
-        {"blockchain", "getmempoolinfo", &getmempoolinfo,{}},
-        {"blockchain", "getrawmempool", &getrawmempool, {}},
-        {"blockchain", "gettxout", &gettxout, {}},
-        {"blockchain", "gettxoutsetinfo", &gettxoutsetinfo, {}},
-        {"blockchain", "invalidateblock", &invalidateblock,{}},
-        {"blockchain", "reconsiderblock", &reconsiderblock,{}},
-        {"blockchain", "verifychain", &verifychain, {}},
+    { "blockchain",         "getblockchaininfo",      &getblockchaininfo,      {} },
+    { "blockchain",         "getbestblockhash",       &getbestblockhash,       {} },
+    { "blockchain",         "getblockcount",          &getblockcount,          {} },
+    { "blockchain",         "getblock",               &getblock,               {"blockhash","verbosity|verbose"} },
+    { "blockchain",         "getblockhash",           &getblockhash,           {"height"} },
+    { "blockchain",         "getblockheader",         &getblockheader,         {"blockhash","verbose"} },
+    { "blockchain",         "getchaintips",           &getchaintips,           {"count","branchlen"} },
+    { "blockchain",         "getdifficulty",          &getdifficulty,          {} },
+    { "blockchain",         "getmempoolinfo",         &getmempoolinfo,         {} },
+    { "blockchain",         "getrawmempool",          &getrawmempool,          {"verbose"} },
+    { "blockchain",         "gettxout",               &gettxout,               {"txid","n","include_mempool"} },
+    { "blockchain",         "gettxoutsetinfo",        &gettxoutsetinfo,        {} },
+    { "blockchain",         "verifychain",            &verifychain,            {"checklevel","nblocks"} },
+
+    /* Not shown in help */
+    { "hidden",             "invalidateblock",        &invalidateblock,        {"blockhash"} },
+    { "hidden",             "reconsiderblock",        &reconsiderblock,        {"blockhash"} },
 
         /* Mining */
-        {"mining", "getblocktemplate", &getblocktemplate, {}},
-        {"mining", "getmininginfo", &getmininginfo, {}},
-        {"mining", "getnetworkhashps", &getnetworkhashps, {}},
-        {"mining", "prioritisetransaction", &prioritisetransaction, {}},
-        {"mining", "submitblock", &submitblock,{}},
+    { "mining",             "getnetworkhashps",       &getnetworkhashps,       {"nblocks","height"} },
+    { "mining",             "getmininginfo",          &getmininginfo,          {} },
+    { "mining",             "prioritisetransaction",  &prioritisetransaction,  {"txid","priority_delta","fee_delta"} },
+    { "mining",             "getblocktemplate",       &getblocktemplate,       {"template_request"} },
+    { "mining",             "submitblock",            &submitblock,            {"hexdata","parameters"} },
+
         {"mining", "reservebalance", &reservebalance,{}},
 
 #ifdef ENABLE_WALLET
@@ -426,23 +427,22 @@ static const CRPCCommand vRPCCommands[] =
 #endif
 
         /* Raw transactions */
-        {"rawtransactions", "createrawtransaction", &createrawtransaction, {}},
-        {"rawtransactions", "decoderawtransaction", &decoderawtransaction, {}},
-        {"rawtransactions", "decodescript", &decodescript, {}},
-        {"rawtransactions", "getrawtransaction", &getrawtransaction, {}},
-        {"rawtransactions", "sendrawtransaction", &sendrawtransaction, {}},
-        {"rawtransactions", "signrawtransaction", &signrawtransaction, {}}, /* uses wallet if enabled */
+    { "rawtransactions",    "getrawtransaction",      &getrawtransaction,      {"txid","verbose"} },
+    { "rawtransactions",    "createrawtransaction",   &createrawtransaction,   {"inputs","outputs","locktime"} },
+    { "rawtransactions",    "decoderawtransaction",   &decoderawtransaction,   {"hexstring"} },
+    { "rawtransactions",    "decodescript",           &decodescript,           {"hexstring"} },
+    { "rawtransactions",    "sendrawtransaction",     &sendrawtransaction,     {"hexstring","allowhighfees","instantsend","bypasslimits"} },
+    { "rawtransactions",    "signrawtransaction",     &signrawtransaction,     {"hexstring","prevtxs","privkeys","sighashtype"} }, /* uses wallet if enabled */
+
 
         /* Utility functions */
         {"util", "createmultisig", &createmultisig,{}},
         {"util", "validateaddress", &validateaddress, {}}, /* uses wallet if enabled */
         {"util", "verifymessage", &verifymessage, {}},
-        {"util", "estimatefee", &estimatefee,{}},
-        {"util", "estimatepriority", &estimatepriority,{}},
+    { "util",               "estimatefee",            &estimatefee,            {"nblocks"} },
+    { "util",               "estimatepriority",       &estimatepriority,       {"nblocks"} },
 
         /* Not shown in help */
-        {"hidden", "invalidateblock", &invalidateblock,{}},
-        {"hidden", "reconsiderblock", &reconsiderblock,{}},
         {"hidden", "setmocktime", &setmocktime, {}},
 
         /* WISPR features */
