@@ -141,9 +141,6 @@ public:
     std::string category;
     std::string name;
     rpcfn_type actor;
-    bool okSafeMode;
-    bool threadSafe;
-    bool reqWallet;
     std::vector<std::string> argNames;
 };
 

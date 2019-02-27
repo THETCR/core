@@ -441,7 +441,7 @@ UniValue validateaddress(const JSONRPCRequest& request)
  */
 CScript _createmultisig_redeemScript(const UniValue& params)
 {
-    int nRequired = request.params[0].get_int();
+    int nRequired = params[0].get_int();
     const UniValue& keys = params[1].get_array();
 
     // Gather public keys

@@ -367,8 +367,8 @@ static UniValue getrpcinfo(const JSONRPCRequest& request)
  */
 static const CRPCCommand vRPCCommands[] =
     {
-        //  category              name                      actor (function)         okSafeMode threadSafe reqWallet
-        //  --------------------- ------------------------  -----------------------  ---------- ---------- ---------
+        //  category              name                      actor (function)         argNames
+        //  --------------------- ------------------------  -----------------------  ----------
         /* Overall control/query calls */
         {"control", "getinfo", &getinfo, {} }, /* uses wallet if enabled */
         {"control", "help", &help, {"command"} },
