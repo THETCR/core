@@ -30,24 +30,26 @@ createArgs(int nRequired, const char* address1= nullptr, const char* address2= n
     return result;
 }
 
-UniValue CallRPC(string args)
+UniValue CallRPC(std::string args)
 {
-    std::vector<string> vArgs;
+    std::vector<std::string> vArgs;
     boost::split(vArgs, args, boost::is_any_of(" \t"));
     std::string strMethod = vArgs[0];
     vArgs.erase(vArgs.begin());
-    UniValue params = RPCConvertValues(strMethod, vArgs);
-
+    JSONRPCRequest request;
+    request.strMethod = strMethod;
+    request.params = RPCConvertValues(strMethod, vArgs);
+    request.fHelp = false;
+    BOOST_CHECK(tableRPC[strMethod]);
     rpcfn_type method = tableRPC[strMethod]->actor;
     try {
-        UniValue result = (*method)(params, false);
+        UniValue result = (*method)(request);
         return result;
     }
     catch (const UniValue& objError) {
-        throw runtime_error(find_value(objError, "message").get_str());
+        throw std::runtime_error(find_value(objError, "message").get_str());
     }
 }
-
 
 BOOST_AUTO_TEST_SUITE(rpc_tests)
 
