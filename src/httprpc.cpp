@@ -16,6 +16,8 @@
 #include "util/strencodings.h"
 #include "ui_interface.h"
 
+#include <memory>
+
 #include <boost/algorithm/string.hpp> // boost::trim
 
 /** Simple one-shot callback timer to be used by the RPC mechanism to e.g.
