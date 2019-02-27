@@ -207,11 +207,10 @@ uint256 ParseHashUV(const UniValue& v, const std::string& strName)
     if (v.isStr())
         strHex = v.getValStr();
 
-    if(ParseHashStr(strHex, result)){
-        return result;
-    }else{
-        return result;
+    if (!ParseHashStr(strHex, result)) {
+        throw std::runtime_error("invalid TX input txid");
     }
+    return result;
 //    return ParseHashStr(strHex, strName); // Note: ParseHashStr("") throws a runtime_error
 }
 
