@@ -70,7 +70,7 @@
     ["-create",
      "outaddr=1"],
     "return_code": 1,
-    "error_txt": "error: TX output missing separator",
+    "error_txt": "error: TX output missing or too many separators",
     "description": "Malformed outaddr argument (no address specified). Expected to fail."
   },
   { "exec": "./wispr-tx",
@@ -78,7 +78,7 @@
     ["-create",
      "outaddr=1:Wa4qRD6Eg9zZAUGA9NYgRDVeW3VEXC1x3N:garbage"],
     "return_code": 1,
-    "error_txt": "error: invalid TX output address",
+    "error_txt": "error: TX output missing or too many separators",
     "description": "Malformed outaddr argument (too many separators). Expected to fail."
   },
   { "exec": "./wispr-tx",
