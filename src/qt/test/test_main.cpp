@@ -8,11 +8,12 @@
 #include <config/wispr-config.h>
 #endif
 
+#include <chainparams.h>
 #include <util/system.h>
-#include "uritests.h"
+#include <qt/test/uritests.h>
 
 #ifdef ENABLE_WALLET
-#include "paymentservertests.h"
+#include <qt/test/paymentservertests.h>
 #endif
 
 #include <QCoreApplication>
@@ -41,6 +42,13 @@ extern void noui_connect();
 int main(int argc, char *argv[])
 {
     SetupEnvironment();
+    SetupNetworking();
+    SelectParams(CBaseChainParams::REGTEST);
+    noui_connect();
+    ClearDatadirCache();
+    fs::path pathTemp = fs::temp_directory_path() / strprintf("test_wispr-qt_%lu_%i", (unsigned long)GetTime(), (int)GetRand(100000));
+    fs::create_directories(pathTemp);
+    gArgs.ForceSetArg("-datadir", pathTemp.string());
     bool fInvalid = false;
 
     // Don't remove this, it's needed to access
@@ -58,6 +66,8 @@ int main(int argc, char *argv[])
     if (QTest::qExec(&test2) != 0)
         fInvalid = true;
 #endif
+
+    fs::remove_all(pathTemp);
 
     return fInvalid;
 }
