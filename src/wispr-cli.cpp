@@ -104,12 +104,18 @@ static void libevent_log_cb(int severity, const char *msg)
 class CConnectionFailed : public std::runtime_error
 {
 public:
-    explicit inline CConnectionFailed(const std::string& msg) : std::runtime_error(msg)
-    {
-    }
+
+    explicit inline CConnectionFailed(const std::string& msg) :
+            std::runtime_error(msg)
+    {}
+
 };
 
-static bool AppInitRPC(int argc, char* argv[])
+//
+// This function returns either one of EXIT_ codes when it's expected to stop the process or
+// CONTINUE_EXECUTION when it's expected to continue further.
+//
+static int AppInitRPC(int argc, char* argv[])
 {
     //
     // Parameters
@@ -120,19 +126,23 @@ static bool AppInitRPC(int argc, char* argv[])
         fprintf(stderr, "Error parsing command line arguments: %s\n", error.c_str());
         return EXIT_FAILURE;
     }
-    if (argc < 2 || gArgs.IsArgSet("-?") || gArgs.IsArgSet("-help") || gArgs.IsArgSet("-version")) {
-        std::string strUsage = _("WISPR Core RPC client version") + " " + FormatFullVersion() + "\n";
+    if (argc < 2 || HelpRequested(gArgs) || gArgs.IsArgSet("-version")) {
+        std::string strUsage = PACKAGE_NAME " RPC client version " + FormatFullVersion() + "\n";
         if (!gArgs.IsArgSet("-version")) {
-            strUsage += "\n" + _("Usage:") + "\n" +
-                        "  wispr-cli [options] <command> [params]  " + _("Send command to WISPR Core") + "\n" +
-                        "  wispr-cli [options] help                " + _("List commands") + "\n" +
-                        "  wispr-cli [options] help <command>      " + _("Get help for a command") + "\n";
-
-            strUsage += "\n" + HelpMessageCli();
+            strUsage += "\n"
+                "Usage:  wispr-cli [options] <command> [params]  Send command to " PACKAGE_NAME "\n"
+                "or:     wispr-cli [options] -named <command> [name=value]...  Send command to " PACKAGE_NAME " (with named arguments)\n"
+                "or:     wispr-cli [options] help                List commands\n"
+                "or:     wispr-cli [options] help <command>      Get help for a command\n";
+            strUsage += "\n" + gArgs.GetHelpMessage();
         }
 
         fprintf(stdout, "%s", strUsage.c_str());
-        return false;
+        if (argc < 2) {
+            fprintf(stderr, "Error: too few parameters\n");
+            return EXIT_FAILURE;
+        }
+        return EXIT_SUCCESS;
     }
     if (!fs::is_directory(GetDataDir(false))) {
         fprintf(stderr, "Error: Specified data directory \"%s\" does not exist.\n", gArgs.GetArg("-datadir", "").c_str());
@@ -149,13 +159,10 @@ static bool AppInitRPC(int argc, char* argv[])
         fprintf(stderr, "Error: %s\n", e.what());
         return EXIT_FAILURE;
     }
-    if (gArgs.GetBoolArg("-rpcssl", false))
-    {
-        fprintf(stderr, "Error: SSL mode for RPC (-rpcssl) is no longer supported.\n");
-        return false;
-    }
-    return true;
+    return CONTINUE_EXECUTION;
 }
+
+
 
 
 /** Reply structure for request_done to fill in */
@@ -174,8 +181,8 @@ static void http_request_done(struct evhttp_request *req, void *ctx)
     HTTPReply *reply = static_cast<HTTPReply*>(ctx);
 
     if (req == nullptr) {
-        /* If req is NULL, it means an error occurred while connecting, but
-         * I'm not sure how to find out which one. We also don't really care.
+        /* If req is nullptr, it means an error occurred while connecting: the
+         * error code will have been passed to http_error_cb.
          */
         reply->status = 0;
         return;
@@ -193,6 +200,7 @@ static void http_request_done(struct evhttp_request *req, void *ctx)
         evbuffer_drain(buf, size);
     }
 }
+
 
 #if LIBEVENT_VERSION_NUMBER >= 0x02010300
 static void http_error_cb(enum evhttp_request_error err, void *ctx)
