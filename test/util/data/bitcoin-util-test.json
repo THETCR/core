@@ -11,8 +11,8 @@
   },
   { "exec": "./wispr-tx",
     "args": ["-"],
-    "input": "blanktxv1.hex",
-    "output_cmp": "blanktxv1.hex",
+    "input": "blanktxv2.hex",
+    "output_cmp": "blanktxv2.hex",
     "description": "Creates a blank transaction when nothing is piped into wispr-tx"
   },
   { "exec": "./wispr-tx",
