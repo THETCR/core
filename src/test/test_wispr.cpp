@@ -35,7 +35,15 @@ const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 FastRandomContext g_insecure_rand_ctx;
 
 extern bool fPrintToConsole;
+
+std::ostream& operator<<(std::ostream& os, const uint256& num)
+{
+    os << num.ToString();
+    return os;
+}
+
 BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
+        : m_path_root(fs::temp_directory_path() / "test_wispr" / strprintf("%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(1 << 30))))
 {
     SHA256AutoDetect();
     ECC_Start();
@@ -54,10 +62,21 @@ BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
 
 BasicTestingSetup::~BasicTestingSetup()
 {
+    fs::remove_all(m_path_root);
     ECC_Stop();
 }
+
+fs::path BasicTestingSetup::SetDataDir(const std::string& name)
+{
+    fs::path ret = m_path_root / name;
+    fs::create_directories(ret);
+    gArgs.ForceSetArg("-datadir", ret.string());
+    return ret;
+}
+
 TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(chainName)
 {
+    SetDataDir("tempdir");
     const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
@@ -68,9 +87,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     // from blocking due to queue overrun.
     threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
     GetMainSignals().RegisterBackgroundSignalScheduler(scheduler);
-    pathTemp = GetTempPath() / strprintf("test_wispr_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
-    fs::create_directories(pathTemp);
-    gArgs.ForceSetArg("-datadir", pathTemp.string());
+
 //    mempool.setSanityCheck(1.0);
     pblocktree = new CBlockTreeDB(1 << 20, true);
     pcoinsdbview = new CCoinsViewDB(1 << 23, true);
@@ -116,7 +133,6 @@ TestingSetup::~TestingSetup()
 #ifdef ENABLE_WALLET
     bitdb.Flush(true);
 #endif
-    fs::remove_all(pathTemp);
 }
 
 //TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
