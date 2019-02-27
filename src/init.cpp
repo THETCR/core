@@ -991,7 +991,7 @@ bool AppInitServers()
     RPCServer::OnPreCommand(&OnRPCPreCommand);
     if (!InitHTTPServer())
         return false;
-    if (!StartRPC())
+    StartRPC();
         return false;
     if (!StartHTTPRPC())
         return false;
