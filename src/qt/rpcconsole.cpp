@@ -87,7 +87,7 @@ class QtRPCTimerBase: public QObject, public RPCTimerBase
 {
     Q_OBJECT
 public:
-    QtRPCTimerBase(boost::function<void(void)>& func, int64_t millis):
+    QtRPCTimerBase(std::function<void(void)>& func, int64_t millis):
         func(func)
     {
         timer.setSingleShot(true);
@@ -107,7 +107,7 @@ class QtRPCTimerInterface: public RPCTimerInterface
 public:
     ~QtRPCTimerInterface() {}
     const char *Name() { return "Qt"; }
-    RPCTimerBase* NewTimer(boost::function<void(void)>& func, int64_t millis)
+    RPCTimerBase* NewTimer(std::function<void(void)>& func, int64_t millis)
     {
         return new QtRPCTimerBase(func, millis);
     }
@@ -226,9 +226,11 @@ void RPCExecutor::request(const QString& command)
         std::string strPrint;
         // Convert argument list to JSON objects in method-dependent way,
         // and pass it along with the method name to the dispatcher.
-        UniValue result = tableRPC.execute(
-            args[0],
-            RPCConvertValues(args[0], std::vector<std::string>(args.begin() + 1, args.end())));
+        JSONRPCRequest req;
+        req.params = RPCConvertValues(args[0], std::vector<std::string>(args.begin() + 1, args.end()));
+        req.strMethod = args[0];
+        UniValue result = tableRPC.execute(req);
+
 
         // Format result reply
         if (result.isNull())
