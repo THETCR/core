@@ -2881,7 +2881,7 @@ UniValue spendzerocoin(const JSONRPCRequest& request)
     bool fMintChange = request.params[1].get_bool();        // Mint change to zWSP
     bool fMinimizeChange = request.params[2].get_bool();    // Minimize change
     int nSecurityLevel = request.params[3].get_int();       // Security level
-    std::string address_str = params.size() > 4 ? request.params[4].get_str() : "";
+    std::string address_str = request.params.size() > 4 ? request.params[4].get_str() : "";
 
     std::vector<CZerocoinMint> vMintsSelected;
 
