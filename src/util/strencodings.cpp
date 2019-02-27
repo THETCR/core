@@ -35,22 +35,22 @@ std::string SanitizeString(const std::string& str, int rule)
 }
 
 const signed char p_util_hexdigit[256] =
-    { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      0,1,2,3,4,5,6,7,8,9,-1,-1,-1,-1,-1,-1,
-      -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-      -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, };
+        { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          0,1,2,3,4,5,6,7,8,9,-1,-1,-1,-1,-1,-1,
+          -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,0xa,0xb,0xc,0xd,0xe,0xf,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+          -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, };
 
 signed char HexDigit(char c)
 {
@@ -286,8 +286,8 @@ bool ParseInt32(const std::string& str, int32_t *out)
     // we still have to check that the returned value is within the range of an *int32_t*. On 64-bit
     // platforms the size of these types may be different.
     return endp && *endp == 0 && !errno &&
-        n >= std::numeric_limits<int32_t>::min() &&
-        n <= std::numeric_limits<int32_t>::max();
+           n >= std::numeric_limits<int32_t>::min() &&
+           n <= std::numeric_limits<int32_t>::max();
 }
 
 bool ParseInt64(const std::string& str, int64_t *out)
@@ -301,8 +301,8 @@ bool ParseInt64(const std::string& str, int64_t *out)
     // Note that strtoll returns a *long long int*, so even if strtol doesn't report an over/underflow
     // we still have to check that the returned value is within the range of an *int64_t*.
     return endp && *endp == 0 && !errno &&
-        n >= std::numeric_limits<int64_t>::min() &&
-        n <= std::numeric_limits<int64_t>::max();
+           n >= std::numeric_limits<int64_t>::min() &&
+           n <= std::numeric_limits<int64_t>::max();
 }
 
 bool ParseUInt32(const std::string& str, uint32_t *out)
@@ -319,7 +319,7 @@ bool ParseUInt32(const std::string& str, uint32_t *out)
     // we still have to check that the returned value is within the range of an *uint32_t*. On 64-bit
     // platforms the size of these types may be different.
     return endp && *endp == 0 && !errno &&
-        n <= std::numeric_limits<uint32_t>::max();
+           n <= std::numeric_limits<uint32_t>::max();
 }
 
 bool ParseUInt64(const std::string& str, uint64_t *out)
@@ -335,9 +335,8 @@ bool ParseUInt64(const std::string& str, uint64_t *out)
     // Note that strtoull returns a *unsigned long long int*, so even if it doesn't report an over/underflow
     // we still have to check that the returned value is within the range of an *uint64_t*.
     return endp && *endp == 0 && !errno &&
-        n <= std::numeric_limits<uint64_t>::max();
+           n <= std::numeric_limits<uint64_t>::max();
 }
-
 
 bool ParseDouble(const std::string& str, double *out)
 {
@@ -453,6 +452,7 @@ static inline bool ProcessMantissaDigit(char ch, int64_t &mantissa, int &mantiss
     }
     return true;
 }
+
 
 bool ParseFixedPoint(const std::string &val, int decimals, int64_t *amount_out)
 {
