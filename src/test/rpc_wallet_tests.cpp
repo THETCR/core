@@ -37,30 +37,30 @@ BOOST_AUTO_TEST_CASE(rpc_addmultisig)
 
     UniValue v;
     CBitcoinAddress address;
-    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(1, address1Hex), false));
+    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(1, address1Hex)));
     address.SetString(v.get_str());
     BOOST_CHECK(address.IsValid() && address.IsScript());
 
-    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(1, address1Hex, address2Hex), false));
+    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(1, address1Hex, address2Hex)));
     address.SetString(v.get_str());
     BOOST_CHECK(address.IsValid() && address.IsScript());
 
-    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(2, address1Hex, address2Hex), false));
+    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(2, address1Hex, address2Hex)));
     address.SetString(v.get_str());
     BOOST_CHECK(address.IsValid() && address.IsScript());
 
-    BOOST_CHECK_THROW(addmultisig(createArgs(0), false), runtime_error);
-    BOOST_CHECK_THROW(addmultisig(createArgs(1), false), runtime_error);
-    BOOST_CHECK_THROW(addmultisig(createArgs(2, address1Hex), false), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(0)), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(1)), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(2, address1Hex)), runtime_error);
 
-    BOOST_CHECK_THROW(addmultisig(createArgs(1, ""), false), runtime_error);
-    BOOST_CHECK_THROW(addmultisig(createArgs(1, "NotAValidPubkey"), false), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(1, "")), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(1, "NotAValidPubkey")), runtime_error);
 
     std::string short1(address1Hex, address1Hex + sizeof(address1Hex) - 2); // last byte missing
-    BOOST_CHECK_THROW(addmultisig(createArgs(2, short1.c_str()), false), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(2, short1.c_str())), runtime_error);
 
     std::string short2(address1Hex + 1, address1Hex + sizeof(address1Hex)); // first byte missing
-    BOOST_CHECK_THROW(addmultisig(createArgs(2, short2.c_str()), false), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(2, short2.c_str())), runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(rpc_wallet)
