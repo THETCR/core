@@ -41,7 +41,7 @@ std::string FormatScript(const CScript& script)
             } else if ((op >= OP_1 && op <= OP_16) || op == OP_1NEGATE) {
                 ret += strprintf("%i ", op - OP_1NEGATE - 1);
                 continue;
-            } else if (op >= OP_NOP && op <= OP_NOP10) {
+            } else if (op >= OP_NOP && op <= OP_CHECKMULTISIGVERIFY) {
                 std::string str(GetOpName(op));
                 if (str.substr(0, 3) == std::string("OP_")) {
                     ret += str.substr(3, std::string::npos) + " ";
@@ -51,7 +51,7 @@ std::string FormatScript(const CScript& script)
             if (vch.size() > 0) {
                 ret += strprintf("0x%x 0x%x ", HexStr(it2, it - vch.size()), HexStr(it - vch.size(), it));
             } else {
-                ret += strprintf("0x%x ", HexStr(it2, it));
+                ret += strprintf("0x%x", HexStr(it2, it));
             }
             continue;
         }
@@ -128,10 +128,9 @@ std::string ScriptToAsmStr(const CScript& script, const bool fAttemptSighashDeco
     return str;
 }
 
-std::string EncodeHexTx(const CTransaction& tx, const int serializeFlags)
+std::string EncodeHexTx(const CTransaction& tx)
 {
     CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
-//    CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION | serializeFlags);
     ssTx << tx;
     return HexStr(ssTx.begin(), ssTx.end());
 }
@@ -171,9 +170,8 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
     out.pushKV("type", GetTxnOutputType(type));
 
     UniValue a(UniValue::VARR);
-    for (const CTxDestination& addr : addresses) {
+    for (const CTxDestination& addr: addresses)
         a.push_back(CBitcoinAddress(addr).ToString());
-    }
     out.pushKV("addresses", a);
 }
 
