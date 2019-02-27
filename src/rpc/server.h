@@ -207,8 +207,8 @@ extern int64_t nWalletUnlockTime;
 extern CAmount AmountFromValue(const UniValue& value);
 extern double GetDifficulty(const CBlockIndex* blockindex = nullptr);
 extern std::string HelpRequiringPassphrase();
-extern std::string HelpExampleCli(std::string methodname, std::string args);
-extern std::string HelpExampleRpc(std::string methodname, std::string args);
+extern std::string HelpExampleCli(const std::string& methodname, const std::string& args);
+extern std::string HelpExampleRpc(const std::string& methodname, const std::string& args);
 
 extern void EnsureWalletIsUnlocked(bool fAllowAnonOnly = false);
 extern UniValue DoZwspSpend(const CAmount nAmount, bool fMintChange, bool fMinimizeChange, const int nSecurityLevel, std::vector<CZerocoinMint>& vMintsSelected, std::string address_str);
