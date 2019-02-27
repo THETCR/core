@@ -18,16 +18,18 @@
 
 using namespace std;
 
-UniValue
+JSONRPCRequest
 createArgs(int nRequired, const char* address1= nullptr, const char* address2= nullptr)
 {
+    JSONRPCRequest newRequest;
+    newRequest.params.setArray();
     UniValue result(UniValue::VARR);
-    result.push_back(nRequired);
+    newRequest.params.push_back(nRequired);
     UniValue addresses(UniValue::VARR);
     if (address1) addresses.push_back(address1);
     if (address2) addresses.push_back(address2);
-    result.push_back(addresses);
-    return result;
+    newRequest.params.push_back(addresses);
+    return newRequest;
 }
 
 UniValue CallRPC(std::string args)
