@@ -639,8 +639,6 @@ bool SetStartOnSystemStartup(bool fAutoStart)
 
 fs::path static GetAutostartDir()
 {
-    namespace fs = boost::filesystem;
-
     char* pszConfigHome = getenv("XDG_CONFIG_HOME");
     if (pszConfigHome) return fs::path(pszConfigHome) / "autostart";
     char* pszHome = getenv("HOME");
@@ -650,7 +648,10 @@ fs::path static GetAutostartDir()
 
 fs::path static GetAutostartFilePath()
 {
-    return GetAutostartDir() / "wispr.desktop";
+    std::string chain = gArgs.GetChainName();
+    if (chain == CBaseChainParams::MAIN)
+        return GetAutostartDir() / "wispr.desktop";
+    return GetAutostartDir() / strprintf("wispr-%s.lnk", chain);
 }
 
 bool GetStartOnSystemStartup()
