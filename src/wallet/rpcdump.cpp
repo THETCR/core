@@ -78,7 +78,7 @@ std::string DecodeDumpString(const std::string& str)
     return ret.str();
 }
 
-UniValue importprivkey(const UniValue& params, bool fHelp)
+UniValue importprivkey(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 1 || params.size() > 3)
         throw runtime_error(
@@ -152,7 +152,7 @@ UniValue importprivkey(const UniValue& params, bool fHelp)
     return NullUniValue;
 }
 
-UniValue importaddress(const UniValue& params, bool fHelp)
+UniValue importaddress(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 1 || params.size() > 3)
         throw runtime_error(
@@ -223,7 +223,7 @@ UniValue importaddress(const UniValue& params, bool fHelp)
     return NullUniValue;
 }
 
-UniValue importwallet(const UniValue& params, bool fHelp)
+UniValue importwallet(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
@@ -326,7 +326,7 @@ UniValue importwallet(const UniValue& params, bool fHelp)
     return NullUniValue;
 }
 
-UniValue dumpprivkey(const UniValue& params, bool fHelp)
+UniValue dumpprivkey(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
@@ -362,7 +362,7 @@ UniValue dumpprivkey(const UniValue& params, bool fHelp)
 }
 
 
-UniValue dumpwallet(const UniValue& params, bool fHelp)
+UniValue dumpwallet(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
@@ -425,7 +425,7 @@ UniValue dumpwallet(const UniValue& params, bool fHelp)
     return NullUniValue;
 }
 
-UniValue bip38encrypt(const UniValue& params, bool fHelp)
+UniValue bip38encrypt(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 2)
         throw runtime_error(
@@ -471,7 +471,7 @@ UniValue bip38encrypt(const UniValue& params, bool fHelp)
     return result;
 }
 
-UniValue bip38decrypt(const UniValue& params, bool fHelp)
+UniValue bip38decrypt(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 2)
         throw runtime_error(

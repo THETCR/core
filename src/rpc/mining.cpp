@@ -76,9 +76,9 @@ UniValue GetNetworkHashPS(int lookup, int height)
     return (int64_t)(workDiff.getdouble() / timeDiff);
 }
 
-UniValue getnetworkhashps(const UniValue& params, bool fHelp)
+UniValue getnetworkhashps(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() > 2)
+    if (request.fHelp || request.params.size() > 2)
         throw runtime_error(
             "getnetworkhashps ( blocks height )\n"
             "\nReturns the estimated network hashes per second based on the last n blocks.\n"
@@ -95,13 +95,13 @@ UniValue getnetworkhashps(const UniValue& params, bool fHelp)
             HelpExampleCli("getnetworkhashps", "") + HelpExampleRpc("getnetworkhashps", ""));
 
     LOCK(cs_main);
-    return GetNetworkHashPS(params.size() > 0 ? params[0].get_int() : 120, params.size() > 1 ? params[1].get_int() : -1);
+    return GetNetworkHashPS(request.params.size() > 0 ? request.params[0].get_int() : 120, request.params.size() > 1 ? request.params[1].get_int() : -1);
 }
 
 #ifdef ENABLE_WALLET
-UniValue getgenerate(const UniValue& params, bool fHelp)
+UniValue getgenerate(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 0)
+    if (request.fHelp || request.params.size() != 0)
         throw runtime_error(
             "getgenerate\n"
             "\nReturn if the server is set to generate coins or not. The default is false.\n"
@@ -119,9 +119,9 @@ UniValue getgenerate(const UniValue& params, bool fHelp)
 }
 
 
-UniValue setgenerate(const UniValue& params, bool fHelp)
+UniValue setgenerate(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() < 1 || params.size() > 2)
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
         throw runtime_error(
             "setgenerate generate ( genproclimit )\n"
             "\nSet 'generate' true or false to turn generation on or off.\n"
@@ -147,12 +147,12 @@ UniValue setgenerate(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found (disabled)");
 
     bool fGenerate = true;
-    if (params.size() > 0)
-        fGenerate = params[0].get_bool();
+    if (request.params.size() > 0)
+        fGenerate = request.params[0].get_bool();
 
     int nGenProcLimit = -1;
-    if (params.size() > 1) {
-        nGenProcLimit = params[1].get_int();
+    if (request.params.size() > 1) {
+        nGenProcLimit = request.params[1].get_int();
         if (nGenProcLimit == 0)
             fGenerate = false;
     }
@@ -203,9 +203,9 @@ UniValue setgenerate(const UniValue& params, bool fHelp)
     return NullUniValue;
 }
 
-UniValue gethashespersec(const UniValue& params, bool fHelp)
+UniValue gethashespersec(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 0)
+    if (request.fHelp || request.params.size() != 0)
         throw runtime_error(
             "gethashespersec\n"
             "\nReturns a recent hashes per second performance measurement while generating.\n"
@@ -224,9 +224,9 @@ UniValue gethashespersec(const UniValue& params, bool fHelp)
 #endif
 
 
-UniValue getmininginfo(const UniValue& params, bool fHelp)
+UniValue getmininginfo(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 0)
+    if (request.fHelp || request.params.size() != 0)
         throw runtime_error(
             "getmininginfo\n"
             "\nReturns a json object containing mining-related information."
@@ -258,22 +258,22 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
     obj.pushKV("difficulty", (double)GetDifficulty());
     obj.pushKV("errors", GetWarnings("statusbar"));
     obj.pushKV("genproclimit", (int)gArgs.GetArg("-genproclimit", -1));
-    obj.pushKV("networkhashps", getnetworkhashps(params, false));
+    obj.pushKV("networkhashps", getnetworkhashps(request));
     obj.pushKV("pooledtx", (uint64_t)mempool.size());
     obj.pushKV("testnet", Params().TestnetToBeDeprecatedFieldRPC());
     obj.pushKV("chain", Params().NetworkIDString());
 #ifdef ENABLE_WALLET
-    obj.pushKV("generate", getgenerate(params, false));
-    obj.pushKV("hashespersec", gethashespersec(params, false));
+    obj.pushKV("generate", getgenerate(request));
+    obj.pushKV("hashespersec", gethashespersec(request));
 #endif
     return obj;
 }
 
 
 // NOTE: Unlike wallet RPC (which use BTC values), mining RPCs follow GBT (BIP 22) in using satoshi amounts
-UniValue prioritisetransaction(const UniValue& params, bool fHelp)
+UniValue prioritisetransaction(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 3)
+    if (request.fHelp || request.params.size() != 3)
         throw runtime_error(
             "prioritisetransaction <txid> <priority delta> <fee delta>\n"
             "Accepts the transaction into mined blocks at a higher (or lower) priority\n"
@@ -295,10 +295,10 @@ UniValue prioritisetransaction(const UniValue& params, bool fHelp)
 
     LOCK(cs_main);
 
-    uint256 hash(ParseHashV(params[0].get_str(), "txid"));
-    CAmount nAmount = params[2].get_int64();
+    uint256 hash(ParseHashV(request.params[0].get_str(), "txid"));
+    CAmount nAmount = request.params[2].get_int64();
 
-    mempool.PrioritiseTransaction(hash, params[0].get_str(), params[1].get_real(), nAmount);
+    mempool.PrioritiseTransaction(hash, request.params[0].get_str(), request.params[1].get_real(), nAmount);
     return true;
 }
 
@@ -321,9 +321,9 @@ static UniValue BIP22ValidationResult(const CValidationState& state)
     return "valid?";
 }
 
-UniValue getblocktemplate(const UniValue& params, bool fHelp)
+UniValue getblocktemplate(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() > 1)
+    if (request.fHelp || request.params.size() > 1)
         throw runtime_error(
             "getblocktemplate ( \"jsonrequestobject\" )\n"
             "\nIf the request parameters include a 'mode' key, that is used to explicitly select between the default 'template' request or a 'proposal'.\n"
@@ -393,8 +393,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
     std::string strMode = "template";
     UniValue lpval = NullUniValue;
-    if (params.size() > 0) {
-        const UniValue& oparam = params[0].get_obj();
+    if (request.params.size() > 0) {
+        const UniValue& oparam = request.params[0].get_obj();
         const UniValue& modeval = find_value(oparam, "mode");
         if (modeval.isStr())
             strMode = modeval.get_str();
@@ -621,9 +621,9 @@ protected:
     };
 };
 
-UniValue submitblock(const UniValue& params, bool fHelp)
+UniValue submitblock(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() < 1 || params.size() > 2)
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
         throw runtime_error(
             "submitblock \"hexdata\" ( \"jsonparametersobject\" )\n"
             "\nAttempts to submit new block to network.\n"
@@ -643,7 +643,7 @@ UniValue submitblock(const UniValue& params, bool fHelp)
             HelpExampleCli("submitblock", "\"mydata\"") + HelpExampleRpc("submitblock", "\"mydata\""));
 
     CBlock block;
-    if (!DecodeHexBlk(block, params[0].get_str()))
+    if (!DecodeHexBlk(block, request.params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
     uint256 hash = block.GetHash();
@@ -676,9 +676,9 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     return BIP22ValidationResult(sc.state);
 }
 
-UniValue estimatefee(const UniValue& params, bool fHelp)
+UniValue estimatefee(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 1)
+    if (request.fHelp || request.params.size() != 1)
         throw runtime_error(
             "estimatefee nblocks\n"
             "\nEstimates the approximate fee per kilobyte\n"
@@ -697,9 +697,9 @@ UniValue estimatefee(const UniValue& params, bool fHelp)
             "\nExample:\n" +
             HelpExampleCli("estimatefee", "6"));
 
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
+    RPCTypeCheck(request.params, boost::assign::list_of(UniValue::VNUM));
 
-    int nBlocks = params[0].get_int();
+    int nBlocks = request.params[0].get_int();
     if (nBlocks < 1)
         nBlocks = 1;
 
@@ -710,9 +710,9 @@ UniValue estimatefee(const UniValue& params, bool fHelp)
     return ValueFromAmount(feeRate.GetFeePerK());
 }
 
-UniValue estimatepriority(const UniValue& params, bool fHelp)
+UniValue estimatepriority(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 1)
+    if (request.fHelp || request.params.size() != 1)
         throw runtime_error(
             "estimatepriority nblocks\n"
             "\nEstimates the approximate priority\n"
@@ -731,9 +731,9 @@ UniValue estimatepriority(const UniValue& params, bool fHelp)
             "\nExample:\n" +
             HelpExampleCli("estimatepriority", "6"));
 
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
+    RPCTypeCheck(request.params, boost::assign::list_of(UniValue::VNUM));
 
-    int nBlocks = params[0].get_int();
+    int nBlocks = request.params[0].get_int();
     if (nBlocks < 1)
         nBlocks = 1;
 

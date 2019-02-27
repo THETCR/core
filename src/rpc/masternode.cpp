@@ -19,9 +19,9 @@
 #include <boost/tokenizer.hpp>
 #include <fstream>
 
-UniValue getpoolinfo(const UniValue& params, bool fHelp)
+UniValue getpoolinfo(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 0)
+    if (request.fHelp || request.params.size() != 0)
         throw runtime_error(
             "getpoolinfo\n"
             "\nReturns anonymous pool-related information\n"
@@ -47,13 +47,13 @@ UniValue getpoolinfo(const UniValue& params, bool fHelp)
 
 // This command is retained for backwards compatibility, but is depreciated.
 // Future removal of this command is planned to keep things clean.
-UniValue masternode(const UniValue& params, bool fHelp)
+UniValue masternode(const JSONRPCRequest& request)
 {
     std::string strCommand;
-    if (params.size() >= 1)
-        strCommand = params[0].get_str();
+    if (request.params.size() >= 1)
+        strCommand = request.params[0].get_str();
 
-    if (fHelp ||
+    if (request.fHelp ||
         (strCommand != "start" && strCommand != "start-alias" && strCommand != "start-many" && strCommand != "start-all" && strCommand != "start-missing" &&
             strCommand != "start-disabled" && strCommand != "list" && strCommand != "list-conf" && strCommand != "count" && strCommand != "enforce" &&
             strCommand != "debug" && strCommand != "current" && strCommand != "winners" && strCommand != "genkey" && strCommand != "connect" &&
@@ -81,118 +81,140 @@ UniValue masternode(const UniValue& params, bool fHelp)
             "  winners      - Print list of masternode winners\n");
 
     if (strCommand == "list") {
-        UniValue newParams(UniValue::VARR);
+            JSONRPCRequest newRequest = request;
+            newRequest.params.setArray();
         // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+                   newRequest.params.push_back(request.params[i]);
+
         }
-        return listmasternodes(newParams, fHelp);
+        return listmasternodes(newRequest);
     }
 
     if (strCommand == "connect") {
-        UniValue newParams(UniValue::VARR);
+            JSONRPCRequest newRequest = request;
+            newRequest.params.setArray();
         // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+                   newRequest.params.push_back(request.params[i]);
+
         }
-        return masternodeconnect(newParams, fHelp);
+        return masternodeconnect(newRequest);
     }
 
     if (strCommand == "count") {
-        UniValue newParams(UniValue::VARR);
+            JSONRPCRequest newRequest = request;
+            newRequest.params.setArray();
         // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+                   newRequest.params.push_back(request.params[i]);
+
         }
-        return getmasternodecount(newParams, fHelp);
+        return getmasternodecount(newRequest);
     }
 
     if (strCommand == "current") {
-        UniValue newParams(UniValue::VARR);
+            JSONRPCRequest newRequest = request;
+            newRequest.params.setArray();
         // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+                   newRequest.params.push_back(request.params[i]);
+
         }
-        return masternodecurrent(newParams, fHelp);
+        return masternodecurrent(newRequest);
     }
 
     if (strCommand == "debug") {
-        UniValue newParams(UniValue::VARR);
+            JSONRPCRequest newRequest = request;
+         newRequest.params.setArray();
         // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+                   newRequest.params.push_back(request.params[i]);
+
         }
-        return masternodedebug(newParams, fHelp);
+        return masternodedebug(newRequest);
     }
 
     if (strCommand == "start" || strCommand == "start-alias" || strCommand == "start-many" || strCommand == "start-all" || strCommand == "start-missing" || strCommand == "start-disabled") {
-        return startmasternode(params, fHelp);
+        return startmasternode(request);
     }
 
     if (strCommand == "genkey") {
-        UniValue newParams(UniValue::VARR);
+            JSONRPCRequest newRequest = request;
+            newRequest.params.setArray();
         // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+                   newRequest.params.push_back(request.params[i]);
+
         }
-        return createmasternodekey(newParams, fHelp);
+        return createmasternodekey(newRequest);
     }
 
     if (strCommand == "list-conf") {
-        UniValue newParams(UniValue::VARR);
+            JSONRPCRequest newRequest = request;
+            newRequest.params.setArray();
         // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+                   newRequest.params.push_back(request.params[i]);
+
         }
-        return listmasternodeconf(newParams, fHelp);
+        return listmasternodeconf(newRequest);
     }
 
     if (strCommand == "outputs") {
-        UniValue newParams(UniValue::VARR);
+            JSONRPCRequest newRequest = request;
+            newRequest.params.setArray();
         // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+                   newRequest.params.push_back(request.params[i]);
+
         }
-        return getmasternodeoutputs(newParams, fHelp);
+        return getmasternodeoutputs(newRequest);
     }
 
     if (strCommand == "status") {
-        UniValue newParams(UniValue::VARR);
+            JSONRPCRequest newRequest = request;
+            newRequest.params.setArray();
         // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+                   newRequest.params.push_back(request.params[i]);
+
         }
-        return getmasternodestatus(newParams, fHelp);
+        return getmasternodestatus(newRequest);
     }
 
     if (strCommand == "winners") {
-        UniValue newParams(UniValue::VARR);
+            JSONRPCRequest newRequest = request;
+            newRequest.params.setArray();
         // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+                   newRequest.params.push_back(request.params[i]);
+
         }
-        return getmasternodewinners(newParams, fHelp);
+        return getmasternodewinners(newRequest);
     }
 
     if (strCommand == "calcscore") {
-        UniValue newParams(UniValue::VARR);
+            JSONRPCRequest newRequest = request;
+            newRequest.params.setArray();
         // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+                   newRequest.params.push_back(request.params[i]);
+
         }
-        return getmasternodescores(newParams, fHelp);
+        return getmasternodescores(newRequest);
     }
 
     return NullUniValue;
 }
 
-UniValue listmasternodes(const UniValue& params, bool fHelp)
+UniValue listmasternodes(const JSONRPCRequest& request)
 {
     std::string strFilter = "";
 
-    if (params.size() == 1) strFilter = params[0].get_str();
+    if (request.params.size() == 1) strFilter = request.params[0].get_str();
 
-    if (fHelp || (params.size() > 1))
+    if (request.fHelp || (request.params.size() > 1))
         throw runtime_error(
             "listmasternodes ( \"filter\" )\n"
             "\nGet a ranked list of masternodes\n"
@@ -268,9 +290,9 @@ UniValue listmasternodes(const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue masternodeconnect(const UniValue& params, bool fHelp)
+UniValue masternodeconnect(const JSONRPCRequest& request)
 {
-    if (fHelp || (params.size() != 1))
+    if (request.fHelp || (request.params.size() != 1))
         throw runtime_error(
             "masternodeconnect \"address\"\n"
             "\nAttempts to connect to specified masternode address\n"
@@ -281,7 +303,7 @@ UniValue masternodeconnect(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("masternodeconnect", "\"192.168.0.6:17000\"") + HelpExampleRpc("masternodeconnect", "\"192.168.0.6:17000\""));
 
-    std::string strAddress = params[0].get_str();
+    std::string strAddress = request.params[0].get_str();
 
     CService addr = CService(strAddress);
 
@@ -294,9 +316,9 @@ UniValue masternodeconnect(const UniValue& params, bool fHelp)
     }
 }
 
-UniValue getmasternodecount (const UniValue& params, bool fHelp)
+UniValue getmasternodecount (const JSONRPCRequest& request)
 {
-    if (fHelp || (params.size() > 0))
+    if (request.fHelp || (request.params.size() > 0))
         throw runtime_error(
             "getmasternodecount\n"
             "\nGet masternode count values\n"
@@ -334,9 +356,9 @@ UniValue getmasternodecount (const UniValue& params, bool fHelp)
     return obj;
 }
 
-UniValue masternodecurrent (const UniValue& params, bool fHelp)
+UniValue masternodecurrent (const JSONRPCRequest& request)
 {
-    if (fHelp || (params.size() != 0))
+    if (request.fHelp || (request.params.size() != 0))
         throw runtime_error(
             "masternodecurrent\n"
             "\nGet current masternode winner\n"
@@ -368,9 +390,9 @@ UniValue masternodecurrent (const UniValue& params, bool fHelp)
     throw runtime_error("unknown");
 }
 
-UniValue masternodedebug (const UniValue& params, bool fHelp)
+UniValue masternodedebug (const JSONRPCRequest& request)
 {
-    if (fHelp || (params.size() != 0))
+    if (request.fHelp || (request.params.size() != 0))
         throw runtime_error(
             "masternodedebug\n"
             "\nPrint masternode status\n"
@@ -393,11 +415,11 @@ UniValue masternodedebug (const UniValue& params, bool fHelp)
         return activeMasternode.GetStatus();
 }
 
-UniValue startmasternode (const UniValue& params, bool fHelp)
+UniValue startmasternode (const JSONRPCRequest& request)
 {
     std::string strCommand;
-    if (params.size() >= 1) {
-        strCommand = params[0].get_str();
+    if (request.params.size() >= 1) {
+        strCommand = request.params[0].get_str();
 
         // Backwards compatibility with legacy 'masternode' super-command forwarder
         if (strCommand == "start") strCommand = "local";
@@ -408,9 +430,9 @@ UniValue startmasternode (const UniValue& params, bool fHelp)
         if (strCommand == "start-disabled") strCommand = "disabled";
     }
 
-    if (fHelp || params.size() < 2 || params.size() > 3 ||
-        (params.size() == 2 && (strCommand != "local" && strCommand != "all" && strCommand != "many" && strCommand != "missing" && strCommand != "disabled")) ||
-        (params.size() == 3 && strCommand != "alias"))
+    if (request.fHelp || request.params.size() < 2 || request.params.size() > 3 ||
+        (request.params.size() == 2 && (strCommand != "local" && strCommand != "all" && strCommand != "many" && strCommand != "missing" && strCommand != "disabled")) ||
+        (request.params.size() == 3 && strCommand != "alias"))
         throw runtime_error(
             "startmasternode \"local|all|many|missing|disabled|alias\" lockwallet ( \"alias\" )\n"
             "\nAttempts to start one or more masternode(s)\n"
@@ -439,7 +461,7 @@ UniValue startmasternode (const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("startmasternode", "\"alias\" \"0\" \"my_mn\"") + HelpExampleRpc("startmasternode", "\"alias\" \"0\" \"my_mn\""));
 
-    bool fLock = (params[1].get_str() == "true" ? true : false);
+    bool fLock = (request.params[1].get_str() == "true" ? true : false);
 
     EnsureWalletIsUnlocked();
 
@@ -512,7 +534,7 @@ UniValue startmasternode (const UniValue& params, bool fHelp)
     }
 
     if (strCommand == "alias") {
-        std::string alias = params[2].get_str();
+        std::string alias = request.params[2].get_str();
 
         bool found = false;
         int successful = 0;
@@ -564,9 +586,9 @@ UniValue startmasternode (const UniValue& params, bool fHelp)
     return NullUniValue;
 }
 
-UniValue createmasternodekey (const UniValue& params, bool fHelp)
+UniValue createmasternodekey (const JSONRPCRequest& request)
 {
-    if (fHelp || (params.size() != 0))
+    if (request.fHelp || (request.params.size() != 0))
         throw runtime_error(
             "createmasternodekey\n"
             "\nCreate a new masternode private key\n"
@@ -583,9 +605,9 @@ UniValue createmasternodekey (const UniValue& params, bool fHelp)
     return CBitcoinSecret(secret).ToString();
 }
 
-UniValue getmasternodeoutputs (const UniValue& params, bool fHelp)
+UniValue getmasternodeoutputs (const JSONRPCRequest& request)
 {
-    if (fHelp || (params.size() != 0))
+    if (request.fHelp || (request.params.size() != 0))
         throw runtime_error(
             "getmasternodeoutputs\n"
             "\nPrint all masternode transaction outputs\n"
@@ -616,13 +638,13 @@ UniValue getmasternodeoutputs (const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue listmasternodeconf (const UniValue& params, bool fHelp)
+UniValue listmasternodeconf (const JSONRPCRequest& request)
 {
     std::string strFilter = "";
 
-    if (params.size() == 1) strFilter = params[0].get_str();
+    if (request.params.size() == 1) strFilter = request.params[0].get_str();
 
-    if (fHelp || (params.size() > 1))
+    if (request.fHelp || (request.params.size() > 1))
         throw runtime_error(
             "listmasternodeconf ( \"filter\" )\n"
             "\nPrint masternode.conf in JSON format\n"
@@ -678,9 +700,9 @@ UniValue listmasternodeconf (const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue getmasternodestatus (const UniValue& params, bool fHelp)
+UniValue getmasternodestatus (const JSONRPCRequest& request)
 {
-    if (fHelp || (params.size() != 0))
+    if (request.fHelp || (request.params.size() != 0))
         throw runtime_error(
             "getmasternodestatus\n"
             "\nPrint masternode status\n"
@@ -716,9 +738,9 @@ UniValue getmasternodestatus (const UniValue& params, bool fHelp)
                         + activeMasternode.GetStatus());
 }
 
-UniValue getmasternodewinners (const UniValue& params, bool fHelp)
+UniValue getmasternodewinners (const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() > 3)
+    if (request.fHelp || request.params.size() > 3)
         throw runtime_error(
             "getmasternodewinners ( blocks \"filter\" )\n"
             "\nPrint the masternode winners for the last n blocks\n"
@@ -768,11 +790,11 @@ UniValue getmasternodewinners (const UniValue& params, bool fHelp)
     int nLast = 10;
     std::string strFilter = "";
 
-    if (params.size() >= 1)
-        nLast = atoi(params[0].get_str());
+    if (request.params.size() >= 1)
+        nLast = atoi(request.params[0].get_str());
 
-    if (params.size() == 2)
-        strFilter = params[1].get_str();
+    if (request.params.size() == 2)
+        strFilter = request.params[1].get_str();
 
     UniValue ret(UniValue::VARR);
 
@@ -818,9 +840,9 @@ UniValue getmasternodewinners (const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue getmasternodescores (const UniValue& params, bool fHelp)
+UniValue getmasternodescores (const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() > 1)
+    if (request.fHelp || request.params.size() > 1)
         throw runtime_error(
             "getmasternodescores ( blocks )\n"
             "\nPrint list of winning masternode by score\n"
@@ -839,9 +861,9 @@ UniValue getmasternodescores (const UniValue& params, bool fHelp)
 
     int nLast = 10;
 
-    if (params.size() == 1) {
+    if (request.params.size() == 1) {
         try {
-            nLast = std::stoi(params[0].get_str());
+            nLast = std::stoi(request.params[0].get_str());
         } catch (const std::invalid_argument&) {
             throw runtime_error("Exception on param 2");
         }
@@ -882,12 +904,12 @@ bool DecodeHexMnb(CMasternodeBroadcast& mnb, std::string strHexMnb) {
 
     return true;
 }
-UniValue createmasternodebroadcast(const UniValue& params, bool fHelp)
+UniValue createmasternodebroadcast(const JSONRPCRequest& request)
 {
     std::string strCommand;
-    if (params.size() >= 1)
-        strCommand = params[0].get_str();
-    if (fHelp || (strCommand != "alias" && strCommand != "all") || (strCommand == "alias" && params.size() < 2))
+    if (request.params.size() >= 1)
+        strCommand = request.params[0].get_str();
+    if (request.fHelp || (strCommand != "alias" && strCommand != "all") || (strCommand == "alias" && request.params.size() < 2))
         throw runtime_error(
             "createmasternodebroadcast \"command\" ( \"alias\")\n"
             "\nCreates a masternode broadcast message for one or all masternodes configured in masternode.conf\n" +
@@ -930,7 +952,7 @@ UniValue createmasternodebroadcast(const UniValue& params, bool fHelp)
         if (fImporting || fReindex)
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Wait for reindex and/or import to finish");
 
-        std::string alias = params[1].get_str();
+        std::string alias = request.params[1].get_str();
         bool found = false;
 
         UniValue statusObj(UniValue::VOBJ);
@@ -1013,9 +1035,9 @@ UniValue createmasternodebroadcast(const UniValue& params, bool fHelp)
     return NullUniValue;
 }
 
-UniValue decodemasternodebroadcast(const UniValue& params, bool fHelp)
+UniValue decodemasternodebroadcast(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 1)
+    if (request.fHelp || request.params.size() != 1)
         throw runtime_error(
             "decodemasternodebroadcast \"hexstring\"\n"
             "\nCommand to decode masternode broadcast messages\n"
@@ -1045,7 +1067,7 @@ UniValue decodemasternodebroadcast(const UniValue& params, bool fHelp)
 
     CMasternodeBroadcast mnb;
 
-    if (!DecodeHexMnb(mnb, params[0].get_str()))
+    if (!DecodeHexMnb(mnb, request.params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Masternode broadcast message decode failed");
 
     if(!mnb.VerifySignature())
@@ -1073,9 +1095,9 @@ UniValue decodemasternodebroadcast(const UniValue& params, bool fHelp)
     return resultObj;
 }
 
-UniValue relaymasternodebroadcast(const UniValue& params, bool fHelp)
+UniValue relaymasternodebroadcast(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 1)
+    if (request.fHelp || request.params.size() != 1)
         throw runtime_error(
             "relaymasternodebroadcast \"hexstring\"\n"
             "\nCommand to relay masternode broadcast messages\n"
@@ -1089,7 +1111,7 @@ UniValue relaymasternodebroadcast(const UniValue& params, bool fHelp)
 
     CMasternodeBroadcast mnb;
 
-    if (!DecodeHexMnb(mnb, params[0].get_str()))
+    if (!DecodeHexMnb(mnb, request.params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Masternode broadcast message decode failed");
 
     if(!mnb.VerifySignature())

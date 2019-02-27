@@ -43,9 +43,9 @@ using namespace std;
  *
  * Or alternatively, create a specific query method for the information.
  **/
-UniValue getinfo(const UniValue& params, bool fHelp)
+UniValue getinfo(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 0)
+    if (request.fHelp || request.params.size() != 0)
         throw runtime_error(
             "getinfo\n"
             "\nReturns an object containing various state info.\n"
@@ -170,13 +170,13 @@ UniValue getinfo(const UniValue& params, bool fHelp)
     return obj;
 }
 
-UniValue mnsync(const UniValue& params, bool fHelp)
+UniValue mnsync(const JSONRPCRequest& request)
 {
     std::string strMode;
-    if (params.size() == 1)
-        strMode = params[0].get_str();
+    if (request.params.size() == 1)
+        strMode = request.params[0].get_str();
 
-    if (fHelp || params.size() != 1 || (strMode != "status" && strMode != "reset")) {
+    if (request.fHelp || request.params.size() != 1 || (strMode != "status" && strMode != "reset")) {
         throw runtime_error(
             "mnsync \"status|reset\"\n"
             "\nReturns the sync status or resets sync.\n"
@@ -317,30 +317,30 @@ public:
 /*
     Used for updating/reading spork settings on the network
 */
-UniValue spork(const UniValue& params, bool fHelp)
+UniValue spork(const JSONRPCRequest& request)
 {
-    if (params.size() == 1 && params[0].get_str() == "show") {
+    if (request.params.size() == 1 && request.params[0].get_str() == "show") {
         UniValue ret(UniValue::VOBJ);
         for (int nSporkID = SPORK_START; nSporkID <= SPORK_END; nSporkID++) {
             if (sporkManager.GetSporkNameByID(nSporkID) != "Unknown")
                 ret.pushKV(sporkManager.GetSporkNameByID(nSporkID), GetSporkValue(nSporkID));
         }
         return ret;
-    } else if (params.size() == 1 && params[0].get_str() == "active") {
+    } else if (request.params.size() == 1 && request.params[0].get_str() == "active") {
         UniValue ret(UniValue::VOBJ);
         for (int nSporkID = SPORK_START; nSporkID <= SPORK_END; nSporkID++) {
             if (sporkManager.GetSporkNameByID(nSporkID) != "Unknown")
                 ret.pushKV(sporkManager.GetSporkNameByID(nSporkID), IsSporkActive(nSporkID));
         }
         return ret;
-    } else if (params.size() == 2) {
-        int nSporkID = sporkManager.GetSporkIDByName(params[0].get_str());
+    } else if (request.params.size() == 2) {
+        int nSporkID = sporkManager.GetSporkIDByName(request.params[0].get_str());
         if (nSporkID == -1) {
             return "Invalid spork name";
         }
 
         // SPORK VALUE
-        int64_t nValue = params[1].get_int64();
+        int64_t nValue = request.params[1].get_int64();
 
         //broadcast new spork
         if (sporkManager.UpdateSpork(nSporkID, nValue)) {
@@ -378,9 +378,9 @@ UniValue spork(const UniValue& params, bool fHelp)
         HelpExampleCli("spork", "show") + HelpExampleRpc("spork", "show"));
 }
 
-UniValue validateaddress(const UniValue& params, bool fHelp)
+UniValue validateaddress(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 1)
+    if (request.fHelp || request.params.size() != 1)
         throw runtime_error(
             "validateaddress \"wispraddress\"\n"
             "\nReturn information about the given wispr address.\n"
@@ -411,7 +411,7 @@ UniValue validateaddress(const UniValue& params, bool fHelp)
     LOCK(cs_main);
 #endif
 
-    CBitcoinAddress address(params[0].get_str());
+    CBitcoinAddress address(request.params[0].get_str());
     bool isValid = address.IsValid();
 
     UniValue ret(UniValue::VOBJ);
@@ -441,7 +441,7 @@ UniValue validateaddress(const UniValue& params, bool fHelp)
  */
 CScript _createmultisig_redeemScript(const UniValue& params)
 {
-    int nRequired = params[0].get_int();
+    int nRequired = request.params[0].get_int();
     const UniValue& keys = params[1].get_array();
 
     // Gather public keys
@@ -496,9 +496,9 @@ CScript _createmultisig_redeemScript(const UniValue& params)
     return result;
 }
 
-UniValue createmultisig(const UniValue& params, bool fHelp)
+UniValue createmultisig(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() < 2 || params.size() > 2)
+    if (request.fHelp || request.params.size() < 2 || request.params.size() > 2)
         throw runtime_error(
             "createmultisig nrequired [\"key\",...]\n"
             "\nCreates a multi-signature address with n signature of m keys required.\n"
@@ -525,7 +525,7 @@ UniValue createmultisig(const UniValue& params, bool fHelp)
             HelpExampleRpc("createmultisig", "2, \"[\\\"16sSauSf5pF2UkUwvKGq4qjNRzBZYqgEL5\\\",\\\"171sgjn4YtPu27adkKGrdDwzRTxnRkBfKV\\\"]\""));
 
     // Construct using pay-to-script-hash:
-    CScript inner = _createmultisig_redeemScript(params);
+    CScript inner = _createmultisig_redeemScript(request.params);
     CScriptID innerID(inner);
     CBitcoinAddress address(innerID);
 
@@ -536,9 +536,9 @@ UniValue createmultisig(const UniValue& params, bool fHelp)
     return result;
 }
 
-UniValue verifymessage(const UniValue& params, bool fHelp)
+UniValue verifymessage(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 3)
+    if (request.fHelp || request.params.size() != 3)
         throw runtime_error(
             "verifymessage \"wispraddress\" \"signature\" \"message\"\n"
             "\nVerify a signed message\n"
@@ -563,9 +563,9 @@ UniValue verifymessage(const UniValue& params, bool fHelp)
 
     LOCK(cs_main);
 
-    std::string strAddress = params[0].get_str();
-    std::string strSign = params[1].get_str();
-    std::string strMessage = params[2].get_str();
+    std::string strAddress = request.params[0].get_str();
+    std::string strSign = request.params[1].get_str();
+    std::string strMessage = request.params[2].get_str();
 
     CBitcoinAddress addr(strAddress);
     if (!addr.IsValid())
@@ -592,9 +592,9 @@ UniValue verifymessage(const UniValue& params, bool fHelp)
     return (pubkey.GetID() == keyID);
 }
 
-UniValue setmocktime(const UniValue& params, bool fHelp)
+UniValue setmocktime(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 1)
+    if (request.fHelp || request.params.size() != 1)
         throw runtime_error(
             "setmocktime timestamp\n"
             "\nSet the local time to given timestamp (-regtest only)\n"
@@ -608,16 +608,16 @@ UniValue setmocktime(const UniValue& params, bool fHelp)
 
     LOCK(cs_main);
 
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
-    SetMockTime(params[0].get_int64());
+    RPCTypeCheck(request.params, boost::assign::list_of(UniValue::VNUM));
+    SetMockTime(request.params[0].get_int64());
 
     return NullUniValue;
 }
 
 #ifdef ENABLE_WALLET
-UniValue getstakingstatus(const UniValue& params, bool fHelp)
+UniValue getstakingstatus(const JSONRPCRequest& request)
 {
-    if (fHelp || params.size() != 0)
+    if (request.fHelp || request.params.size() != 0)
         throw runtime_error(
             "getstakingstatus\n"
             "\nReturns an object containing various staking information.\n"

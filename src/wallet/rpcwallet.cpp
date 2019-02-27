@@ -82,7 +82,7 @@ string AccountFromValue(const UniValue& value)
     return strAccount;
 }
 
-UniValue getnewaddress(const UniValue& params, bool fHelp)
+UniValue getnewaddress(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 1)
         throw runtime_error(
@@ -157,7 +157,7 @@ CBitcoinAddress GetAccountAddress(string strAccount, bool bForceNew = false)
     return CBitcoinAddress(account.vchPubKey.GetID());
 }
 
-UniValue getaccountaddress(const UniValue& params, bool fHelp)
+UniValue getaccountaddress(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
@@ -186,7 +186,7 @@ UniValue getaccountaddress(const UniValue& params, bool fHelp)
 }
 
 
-UniValue getrawchangeaddress(const UniValue& params, bool fHelp)
+UniValue getrawchangeaddress(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 1)
         throw runtime_error(
@@ -218,7 +218,7 @@ UniValue getrawchangeaddress(const UniValue& params, bool fHelp)
 }
 
 
-UniValue setaccount(const UniValue& params, bool fHelp)
+UniValue setaccount(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
@@ -259,7 +259,7 @@ UniValue setaccount(const UniValue& params, bool fHelp)
 }
 
 
-UniValue getaccount(const UniValue& params, bool fHelp)
+UniValue getaccount(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
@@ -289,7 +289,7 @@ UniValue getaccount(const UniValue& params, bool fHelp)
 }
 
 
-UniValue getaddressesbyaccount(const UniValue& params, bool fHelp)
+UniValue getaddressesbyaccount(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
@@ -355,7 +355,7 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
         throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
 }
 
-UniValue sendtoaddress(const UniValue& params, bool fHelp)
+UniValue sendtoaddress(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
         throw runtime_error(
@@ -403,7 +403,7 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp)
     return wtx.GetHash().GetHex();
 }
 
-UniValue sendtoaddressix(const UniValue& params, bool fHelp)
+UniValue sendtoaddressix(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
         throw runtime_error(
@@ -451,7 +451,7 @@ UniValue sendtoaddressix(const UniValue& params, bool fHelp)
     return wtx.GetHash().GetHex();
 }
 
-UniValue listaddressgroupings(const UniValue& params, bool fHelp)
+UniValue listaddressgroupings(const JSONRPCRequest& request)
 {
     if (fHelp)
         throw runtime_error(
@@ -497,7 +497,7 @@ UniValue listaddressgroupings(const UniValue& params, bool fHelp)
     return jsonGroupings;
 }
 
-UniValue signmessage(const UniValue& params, bool fHelp)
+UniValue signmessage(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 2)
         throw runtime_error(
@@ -552,7 +552,7 @@ UniValue signmessage(const UniValue& params, bool fHelp)
     return EncodeBase64(&vchSig[0], vchSig.size());
 }
 
-UniValue getreceivedbyaddress(const UniValue& params, bool fHelp)
+UniValue getreceivedbyaddress(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw std::runtime_error(
@@ -608,7 +608,7 @@ UniValue getreceivedbyaddress(const UniValue& params, bool fHelp)
 }
 
 
-UniValue getreceivedbyaccount(const UniValue& params, bool fHelp)
+UniValue getreceivedbyaccount(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
@@ -693,7 +693,7 @@ CAmount GetAccountBalance(const std::string& strAccount, int nMinDepth, const is
 }
 
 
-UniValue getbalance(const UniValue& params, bool fHelp)
+UniValue getbalance(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 3)
         throw runtime_error(
@@ -782,7 +782,7 @@ UniValue getunconfirmedbalance(const UniValue &params, bool fHelp)
 }
 
 
-UniValue movecmd(const UniValue& params, bool fHelp)
+UniValue movecmd(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 3 || params.size() > 5)
         throw std::runtime_error(
@@ -852,7 +852,7 @@ UniValue movecmd(const UniValue& params, bool fHelp)
 }
 
 
-UniValue sendfrom(const UniValue& params, bool fHelp)
+UniValue sendfrom(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 3 || params.size() > 6)
         throw runtime_error(
@@ -914,7 +914,7 @@ UniValue sendfrom(const UniValue& params, bool fHelp)
 }
 
 
-UniValue sendmany(const UniValue& params, bool fHelp)
+UniValue sendmany(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
         throw runtime_error(
@@ -1001,7 +1001,7 @@ UniValue sendmany(const UniValue& params, bool fHelp)
 // Defined in rpc/misc.cpp
 extern CScript _createmultisig_redeemScript(const UniValue& params);
 
-UniValue addmultisigaddress(const UniValue& params, bool fHelp)
+UniValue addmultisigaddress(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 2 || params.size() > 3)
         throw runtime_error(
@@ -1174,7 +1174,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
     return ret;
 }
 
-UniValue listreceivedbyaddress(const UniValue& params, bool fHelp)
+UniValue listreceivedbyaddress(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 3)
         throw runtime_error(
@@ -1207,7 +1207,7 @@ UniValue listreceivedbyaddress(const UniValue& params, bool fHelp)
     return ListReceived(params, false);
 }
 
-UniValue listreceivedbyaccount(const UniValue& params, bool fHelp)
+UniValue listreceivedbyaccount(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 3)
         throw runtime_error(
@@ -1325,7 +1325,7 @@ void AcentryToJSON(const CAccountingEntry& acentry, const std::string& strAccoun
     }
 }
 
-UniValue listtransactions(const UniValue& params, bool fHelp)
+UniValue listtransactions(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 4)
         throw runtime_error(
@@ -1447,7 +1447,7 @@ UniValue listtransactions(const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue listaccounts(const UniValue& params, bool fHelp)
+UniValue listaccounts(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 2)
         throw runtime_error(
@@ -1523,7 +1523,7 @@ UniValue listaccounts(const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue listsinceblock(const UniValue& params, bool fHelp)
+UniValue listsinceblock(const JSONRPCRequest& request)
 {
     if (fHelp)
         throw runtime_error(
@@ -1611,7 +1611,7 @@ UniValue listsinceblock(const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue gettransaction(const UniValue& params, bool fHelp)
+UniValue gettransaction(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
@@ -1688,7 +1688,7 @@ UniValue gettransaction(const UniValue& params, bool fHelp)
 }
 
 
-UniValue backupwallet(const UniValue& params, bool fHelp)
+UniValue backupwallet(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
@@ -1711,7 +1711,7 @@ UniValue backupwallet(const UniValue& params, bool fHelp)
 }
 
 
-UniValue keypoolrefill(const UniValue& params, bool fHelp)
+UniValue keypoolrefill(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 1)
         throw runtime_error(
@@ -1753,7 +1753,7 @@ static void LockWallet(CWallet* pWallet)
     pWallet->Lock();
 }
 
-UniValue walletpassphrase(const UniValue& params, bool fHelp)
+UniValue walletpassphrase(const JSONRPCRequest& request)
 {
     if (pwalletMain->IsCrypted() && (fHelp || params.size() < 2 || params.size() > 3))
         throw runtime_error(
@@ -1827,7 +1827,7 @@ UniValue walletpassphrase(const UniValue& params, bool fHelp)
 }
 
 
-UniValue walletpassphrasechange(const UniValue& params, bool fHelp)
+UniValue walletpassphrasechange(const JSONRPCRequest& request)
 {
     if (pwalletMain->IsCrypted() && (fHelp || params.size() != 2))
         throw runtime_error(
@@ -1870,7 +1870,7 @@ UniValue walletpassphrasechange(const UniValue& params, bool fHelp)
 }
 
 
-UniValue walletlock(const UniValue& params, bool fHelp)
+UniValue walletlock(const JSONRPCRequest& request)
 {
     if (pwalletMain->IsCrypted() && (fHelp || params.size() != 0))
         throw runtime_error(
@@ -1906,7 +1906,7 @@ UniValue walletlock(const UniValue& params, bool fHelp)
 }
 
 
-UniValue encryptwallet(const UniValue& params, bool fHelp)
+UniValue encryptwallet(const JSONRPCRequest& request)
 {
     if (!pwalletMain->IsCrypted() && (fHelp || params.size() != 1))
         throw runtime_error(
@@ -1961,7 +1961,7 @@ UniValue encryptwallet(const UniValue& params, bool fHelp)
     return "wallet encrypted; wispr server stopping, restart to run with encrypted wallet. The keypool has been flushed, you need to make a new backup.";
 }
 
-UniValue lockunspent(const UniValue& params, bool fHelp)
+UniValue lockunspent(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
@@ -2042,7 +2042,7 @@ UniValue lockunspent(const UniValue& params, bool fHelp)
     return true;
 }
 
-UniValue listlockunspent(const UniValue& params, bool fHelp)
+UniValue listlockunspent(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 0)
         throw runtime_error(
@@ -2089,7 +2089,7 @@ UniValue listlockunspent(const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue settxfee(const UniValue& params, bool fHelp)
+UniValue settxfee(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 1 || params.size() > 1)
         throw runtime_error(
@@ -2115,7 +2115,7 @@ UniValue settxfee(const UniValue& params, bool fHelp)
     return true;
 }
 
-UniValue getwalletinfo(const UniValue& params, bool fHelp)
+UniValue getwalletinfo(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error(
@@ -2153,7 +2153,7 @@ UniValue getwalletinfo(const UniValue& params, bool fHelp)
 }
 
 // ppcoin: reserve balance from being staked for network protection
-UniValue reservebalance(const UniValue& params, bool fHelp)
+UniValue reservebalance(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 2)
         throw runtime_error(
@@ -2198,7 +2198,7 @@ UniValue reservebalance(const UniValue& params, bool fHelp)
 }
 
 // presstab HyperStake
-UniValue setstakesplitthreshold(const UniValue& params, bool fHelp)
+UniValue setstakesplitthreshold(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
@@ -2244,7 +2244,7 @@ UniValue setstakesplitthreshold(const UniValue& params, bool fHelp)
 }
 
 // presstab HyperStake
-UniValue getstakesplitthreshold(const UniValue& params, bool fHelp)
+UniValue getstakesplitthreshold(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error(
@@ -2260,7 +2260,7 @@ UniValue getstakesplitthreshold(const UniValue& params, bool fHelp)
     return int(pwalletMain->nStakeSplitThreshold);
 }
 
-UniValue autocombinerewards(const UniValue& params, bool fHelp)
+UniValue autocombinerewards(const JSONRPCRequest& request)
 {
     bool fEnable;
     if (params.size() >= 1)
@@ -2359,7 +2359,7 @@ unsigned int sumMultiSend()
     return sum;
 }
 
-UniValue multisend(const UniValue& params, bool fHelp)
+UniValue multisend(const JSONRPCRequest& request)
 {
     CWalletDB walletdb(pwalletMain->strWalletFile);
     bool fFileBacked;
@@ -2536,7 +2536,7 @@ UniValue multisend(const UniValue& params, bool fHelp)
     return printMultiSend();
 }
 
-UniValue getzerocoinbalance(const UniValue& params, bool fHelp)
+UniValue getzerocoinbalance(const JSONRPCRequest& request)
 {
 
     if (fHelp || params.size() != 0)
@@ -2564,7 +2564,7 @@ UniValue getzerocoinbalance(const UniValue& params, bool fHelp)
 
 }
 
-UniValue listmintedzerocoins(const UniValue& params, bool fHelp)
+UniValue listmintedzerocoins(const JSONRPCRequest& request)
 {
 
     if (fHelp || params.size() > 2)
@@ -2635,7 +2635,7 @@ UniValue listmintedzerocoins(const UniValue& params, bool fHelp)
     return jsonList;
 }
 
-UniValue listzerocoinamounts(const UniValue& params, bool fHelp)
+UniValue listzerocoinamounts(const JSONRPCRequest& request)
 {
 
     if (fHelp || params.size() != 0)
@@ -2679,7 +2679,7 @@ UniValue listzerocoinamounts(const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue listspentzerocoins(const UniValue& params, bool fHelp)
+UniValue listspentzerocoins(const JSONRPCRequest& request)
 {
 
     if (fHelp || params.size() != 0)
@@ -2712,7 +2712,7 @@ UniValue listspentzerocoins(const UniValue& params, bool fHelp)
     return jsonList;
 }
 
-UniValue mintzerocoin(const UniValue& params, bool fHelp)
+UniValue mintzerocoin(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
@@ -2823,7 +2823,7 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
     return arrMints;
 }
 
-UniValue spendzerocoin(const UniValue& params, bool fHelp)
+UniValue spendzerocoin(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 5 || params.size() < 4)
         throw runtime_error(
@@ -2889,7 +2889,7 @@ UniValue spendzerocoin(const UniValue& params, bool fHelp)
 }
 
 
-UniValue spendzerocoinmints(const UniValue& params, bool fHelp)
+UniValue spendzerocoinmints(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
@@ -3035,7 +3035,7 @@ extern UniValue DoZwspSpend(const CAmount nAmount, bool fMintChange, bool fMinim
 }
 
 
-UniValue resetmintzerocoin(const UniValue& params, bool fHelp)
+UniValue resetmintzerocoin(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() > 1)
         throw runtime_error(
@@ -3095,7 +3095,7 @@ UniValue resetmintzerocoin(const UniValue& params, bool fHelp)
     return obj;
 }
 
-UniValue resetspentzerocoin(const UniValue& params, bool fHelp)
+UniValue resetspentzerocoin(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error(
@@ -3157,7 +3157,7 @@ UniValue resetspentzerocoin(const UniValue& params, bool fHelp)
     return objRet;
 }
 
-UniValue getarchivedzerocoin(const UniValue& params, bool fHelp)
+UniValue getarchivedzerocoin(const JSONRPCRequest& request)
 {
     if(fHelp || params.size() != 0)
         throw runtime_error(
@@ -3214,7 +3214,7 @@ UniValue getarchivedzerocoin(const UniValue& params, bool fHelp)
     return arrRet;
 }
 
-UniValue exportzerocoins(const UniValue& params, bool fHelp)
+UniValue exportzerocoins(const JSONRPCRequest& request)
 {
     if(fHelp || params.empty() || params.size() > 2)
         throw runtime_error(
@@ -3290,7 +3290,7 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
     return jsonList;
 }
 
-UniValue importzerocoins(const UniValue& params, bool fHelp)
+UniValue importzerocoins(const JSONRPCRequest& request)
 {
     if(fHelp || params.size() == 0)
         throw runtime_error(
@@ -3382,7 +3382,7 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
+UniValue reconsiderzerocoins(const JSONRPCRequest& request)
 {
     if(fHelp || !params.empty())
         throw runtime_error(
@@ -3433,7 +3433,7 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
     return arrRet;
 }
 
-UniValue setzwspseed(const UniValue& params, bool fHelp)
+UniValue setzwspseed(const JSONRPCRequest& request)
 {
     if(fHelp || params.size() != 1)
         throw runtime_error(
@@ -3467,7 +3467,7 @@ UniValue setzwspseed(const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue getzwspseed(const UniValue& params, bool fHelp)
+UniValue getzwspseed(const JSONRPCRequest& request)
 {
     if(fHelp || !params.empty())
         throw runtime_error(
@@ -3492,7 +3492,7 @@ UniValue getzwspseed(const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue generatemintlist(const UniValue& params, bool fHelp)
+UniValue generatemintlist(const JSONRPCRequest& request)
 {
     if(fHelp || params.size() != 2)
         throw runtime_error(
@@ -3541,7 +3541,7 @@ UniValue generatemintlist(const UniValue& params, bool fHelp)
     return arrRet;
 }
 
-UniValue dzwspstate(const UniValue& params, bool fHelp) {
+UniValue dzwspstate(const JSONRPCRequest& request) {
     if (fHelp || params.size() != 0)
         throw runtime_error(
                 "dzwspstate\n"
@@ -3592,7 +3592,7 @@ void static SearchThread(CzWSPWallet* zwallet, int nCountStart, int nCountEnd)
     }
 }
 
-UniValue searchdzwsp(const UniValue& params, bool fHelp)
+UniValue searchdzwsp(const JSONRPCRequest& request)
 {
     if(fHelp || params.size() != 3)
         throw runtime_error(
@@ -3642,7 +3642,7 @@ UniValue searchdzwsp(const UniValue& params, bool fHelp)
     return "done";
 }
 
-UniValue enableautomintaddress(const UniValue& params, bool fHelp)
+UniValue enableautomintaddress(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 1)
         throw std::runtime_error(
@@ -3660,7 +3660,7 @@ UniValue enableautomintaddress(const UniValue& params, bool fHelp)
     return NullUniValue;
 }
 
-UniValue createautomintaddress(const UniValue& params, bool fHelp)
+UniValue createautomintaddress(const JSONRPCRequest& request)
 {
     if (fHelp || params.size() != 0)
         throw std::runtime_error(
