@@ -16,6 +16,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
+#include <src/chainparams.h>
 
 /* Minimum free space (in bytes) needed for data directory */
 static const uint64_t GB_BYTES = 1000000000LL;
@@ -147,47 +148,61 @@ QString Intro::getDefaultDataDirectory()
 
 bool Intro::pickDataDirectory()
 {
-    namespace fs = boost::filesystem;
     QSettings settings;
     /* If data directory provided on command line, no need to look at settings
        or show a picking dialog */
-    if (!gArgs.GetArg("-datadir", "").empty())
+    if(!gArgs.GetArg("-datadir", "").empty())
         return true;
     /* 1) Default data directory for operating system */
     QString dataDir = getDefaultDataDirectory();
     /* 2) Allow QSettings to override default dir */
     dataDir = settings.value("strDataDir", dataDir).toString();
 
-    if (!fs::exists(GUIUtil::qstringToBoostPath(dataDir)) || gArgs.GetBoolArg("-choosedatadir", false)) {
+    if(!fs::exists(GUIUtil::qstringToBoostPath(dataDir)) || gArgs.GetBoolArg("-choosedatadir", DEFAULT_CHOOSE_DATADIR) || settings.value("fReset", false).toBool() || gArgs.GetBoolArg("-resetguisettings", false))
+    {
+        /* Use selectParams here to guarantee Params() can be used by node interface */
+        try {
+            SelectParams(gArgs.GetChainName());
+        } catch (const std::exception&) {
+            return false;
+        }
+
         /* If current default data directory does not exist, let the user choose one */
         Intro intro;
         intro.setDataDirectory(dataDir);
         intro.setWindowIcon(QIcon(":icons/bitcoin"));
 
-        while (true) {
-            if (!intro.exec()) {
+        while(true)
+        {
+            if(!intro.exec())
+            {
                 /* Cancel clicked */
                 return false;
             }
             dataDir = intro.getDataDirectory();
             try {
-                TryCreateDirectories(GUIUtil::qstringToBoostPath(dataDir));
+                if (TryCreateDirectories(GUIUtil::qstringToBoostPath(dataDir))) {
+                    // If a new data directory has been created, make wallets subdirectory too
+                    TryCreateDirectories(GUIUtil::qstringToBoostPath(dataDir) / "wallets");
+                }
                 break;
-            } catch (fs::filesystem_error& e) {
-                QMessageBox::critical(0, tr("WISPR Core"),
-                    tr("Error: Specified data directory \"%1\" cannot be created.").arg(dataDir));
+            } catch (const fs::filesystem_error&) {
+                QMessageBox::critical(nullptr, tr(PACKAGE_NAME),
+                                      tr("Error: Specified data directory \"%1\" cannot be created.").arg(dataDir));
                 /* fall through, back to choosing screen */
             }
         }
 
         settings.setValue("strDataDir", dataDir);
+        settings.setValue("fReset", false);
     }
     /* Only override -datadir if different from the default, to make it possible to
      * override -datadir in the wispr.conf file in the default data directory
      * (to be consistent with wisprd behavior)
      */
-    if (dataDir != getDefaultDataDirectory())
+    if(dataDir != getDefaultDataDirectory()) {
         gArgs.SoftSetArg("-datadir", GUIUtil::qstringToBoostPath(dataDir).string()); // use OS locale for path setting
+    }
     return true;
 }
 

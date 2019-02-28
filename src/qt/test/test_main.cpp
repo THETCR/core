@@ -43,13 +43,21 @@ int main(int argc, char *argv[])
 {
     SetupEnvironment();
     SetupNetworking();
-    SelectParams(CBaseChainParams::REGTEST);
+    SelectParams(CBaseChainParams::UNITTEST);
     noui_connect();
     ClearDatadirCache();
     fs::path pathTemp = fs::temp_directory_path() / strprintf("test_wispr-qt_%lu_%i", (unsigned long)GetTime(), (int)GetRand(100000));
     fs::create_directories(pathTemp);
     gArgs.ForceSetArg("-datadir", pathTemp.string());
     bool fInvalid = false;
+    // Prefer the "minimal" platform for the test instead of the normal default
+    // platform ("xcb", "windows", or "cocoa") so tests can't unintentionally
+    // interfere with any background GUIs and don't require extra resources.
+    #if defined(WIN32)
+        _putenv_s("QT_QPA_PLATFORM", "minimal");
+    #else
+        setenv("QT_QPA_PLATFORM", "minimal", 0);
+    #endif
 
     // Don't remove this, it's needed to access
     // QCoreApplication:: in the tests
