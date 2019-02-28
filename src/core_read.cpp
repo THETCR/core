@@ -113,12 +113,15 @@ static bool CheckTxScriptsSanity(const CMutableTransaction& tx)
 bool DecodeHexTx(CMutableTransaction& tx, const std::string& hex_tx, bool try_no_witness, bool try_witness)
 {
     if (!IsHex(hex_tx)) {
+        std::cout << "IsHex failed\n";
         return false;
     }
 
+    std::cout << "ParseHex \n";
     std::vector<unsigned char> txData(ParseHex(hex_tx));
     CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION);
     try {
+        std::cout << "Stream \n";
         ssData >> tx;
     } catch (const std::exception&) {
         return false;
