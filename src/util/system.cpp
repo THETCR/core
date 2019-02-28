@@ -105,7 +105,6 @@ std::string strMiscWarning;
 const int64_t nStartupTime = GetTime();
 
 const char * const BITCOIN_CONF_FILENAME = "wispr.conf";
-const char * const BITCOIN_PID_FILENAME = "wisprd.pid";
 
 ArgsManager gArgs;
 
@@ -1003,23 +1002,6 @@ std::string ArgsManager::GetChainName() const
         return CBaseChainParams::TESTNET;
     return CBaseChainParams::MAIN;
 }
-
-#ifndef WIN32
-fs::path GetPidFile()
-{
-    return AbsPathForConfigVal(fs::path(gArgs.GetArg("-pid", BITCOIN_PID_FILENAME)));
-}
-
-void CreatePidFile(const fs::path &path, pid_t pid)
-{
-    FILE* file = fsbridge::fopen(path, "w");
-    if (file)
-    {
-        fprintf(file, "%d\n", pid);
-        fclose(file);
-    }
-}
-#endif
 
 bool RenameOver(fs::path src, fs::path dest)
 {

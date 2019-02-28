@@ -65,7 +65,6 @@ extern std::string strMiscWarning;
 int64_t GetStartupTime();
 
 extern const char * const BITCOIN_CONF_FILENAME;
-extern const char * const BITCOIN_PID_FILENAME;
 
 /** Translate a message to the native language of the user. */
 const extern std::function<std::string(const char*)> G_TRANSLATION_FUN;
@@ -112,10 +111,6 @@ const fs::path &GetDataDir(bool fNetSpecific = true);
 void ClearDatadirCache();
 fs::path GetConfigFile(const std::string& confPath);
 fs::path GetMasternodeConfigFile();
-#ifndef WIN32
-fs::path GetPidFile();
-void CreatePidFile(const fs::path &path, pid_t pid);
-#endif
 #ifdef WIN32
 fs::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 #endif
@@ -276,7 +271,7 @@ public:
    */
   bool SoftSetBoolArg(const std::string& strArg, bool fValue);
 
-  // Forces an arg setting. Called by gArgs.SoftSetArg() if the arg hasn't already
+    // Forces an arg setting. Called by SoftSetArg() if the arg hasn't already
   // been set. Also called directly in testing.
   void ForceSetArg(const std::string& strArg, const std::string& strValue);
 

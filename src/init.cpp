@@ -66,6 +66,8 @@
 #include <stdio.h>
 
 #ifndef WIN32
+#include <attributes.h>
+#include <cerrno>
 #include <signal.h>
 #include <sys/stat.h>
 #endif
@@ -116,7 +118,31 @@ enum BindFlags {
 };
 
 static const char* FEE_ESTIMATES_FILENAME = "fee_estimates.dat";
+/**
+ * The PID file facilities.
+ */
+static const char* BITCOIN_PID_FILENAME = "wisprd.pid";
 
+static fs::path GetPidFile()
+{
+    return AbsPathForConfigVal(fs::path(gArgs.GetArg("-pid", BITCOIN_PID_FILENAME)));
+}
+
+NODISCARD static bool CreatePidFile()
+{
+    FILE* file = fsbridge::fopen(GetPidFile(), "w");
+    if (file) {
+#ifdef WIN32
+        fprintf(file, "%d\n", GetCurrentProcessId());
+#else
+        fprintf(file, "%d\n", getpid());
+#endif
+        fclose(file);
+        return true;
+    } else {
+        return InitError(strprintf(_("Unable to create the PID file '%s': %s"), GetPidFile().string(), std::strerror(errno)));
+    }
+}
 //////////////////////////////////////////////////////////////////////////////
 //
 // Shutdown
@@ -1065,7 +1091,6 @@ bool AppInit2()
     std::set_new_handler(new_handler_terminate);
     // ********************************************************* Step 2: parameter interactions
     // Set this early so that parameter interactions go to console
-    fPrintToConsole = gArgs.GetBoolArg("-printtoconsole", false);
     fLogTimestamps = gArgs.GetBoolArg("-logtimestamps", true);
     fLogIPs = gArgs.GetBoolArg("-logips", false);
 
@@ -1295,9 +1320,10 @@ bool AppInit2()
     // Make sure only a single WISPR process is using the data directory.
     LockDataDirectory(true);
 
-#ifndef WIN32
-    CreatePidFile(GetPidFile(), getpid());
-#endif
+    if (!CreatePidFile()) {
+        // Detailed error printed inside CreatePidFile().
+        return false;
+    }
     if (LogInstance().m_print_to_file) {
         if (gArgs.GetBoolArg("-shrinkdebugfile", LogInstance().DefaultShrinkDebugFile())) {
             // Do this first since it both loads a bunch of debug.log into memory,
@@ -1306,7 +1332,7 @@ bool AppInit2()
         }
         if (!LogInstance().OpenDebugLog()) {
             return InitError(strprintf("Could not open debug log file %s",
-                                       LogInstance().m_file_path.string()));
+                LogInstance().m_file_path.string()));
         }
     }
 
@@ -1329,20 +1355,14 @@ bool AppInit2()
 
     LogPrintf("Using at most %i automatic connections (%i file descriptors available)\n", nMaxConnections, nFD);
 
-    if (gArgs.GetBoolArg("-shrinkdebugfile", !fDebug))
-        LogInstance().ShrinkDebugFile();
-    LogPrintf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-    LogPrintf("WISPR version %s (%s)\n", FormatFullVersion(), CLIENT_DATE);
-    LogPrintf("Using OpenSSL version %s\n", SSLeay_version(SSLEAY_VERSION));
-#ifdef ENABLE_WALLET
-    LogPrintf("Using BerkeleyDB version %s\n", DbEnv::version(0, 0, 0));
-#endif
-    if (!fLogTimestamps)
-        LogPrintf("Startup time: %s\n", DateTimeStrFormat("%Y-%m-%d %H:%M:%S", GetTime()));
-    LogPrintf("Default data directory %s\n", GetDefaultDataDir().string());
-    LogPrintf("Using data directory %s\n", strDataDir);
-    LogPrintf("Using config file %s\n", GetConfigFile(gArgs.GetArg("-conf", BITCOIN_CONF_FILENAME)).string());
-    LogPrintf("Using at most %i connections (%i file descriptors available)\n", nMaxConnections, nFD);
+    // Warn about relative -datadir path.
+    if (gArgs.IsArgSet("-datadir") && !fs::path(gArgs.GetArg("-datadir", "")).is_absolute()) {
+        LogPrintf("Warning: relative datadir option '%s' specified, which will be interpreted relative to the " /* Continued */
+                  "current working directory '%s'. This is fragile, because if bitcoin is started in the future "
+                  "from a different location, it will be unable to locate the current data files. There could "
+                  "also be data loss if bitcoin is started while in a temporary directory.\n",
+            gArgs.GetArg("-datadir", ""), fs::current_path().string());
+    }
     std::ostringstream strErrors;
 
     InitSignatureCache();

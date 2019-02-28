@@ -21,8 +21,6 @@ static const bool DEFAULT_LOGIPS        = false;
 static const bool DEFAULT_LOGTIMESTAMPS = true;
 extern const char * const DEFAULT_DEBUGLOGFILE;
 
-extern bool fPrintToConsole;
-extern bool fPrintToDebugLog;
 extern bool fLogTimestamps;
 extern volatile bool fReopenDebugLog;
 extern bool fLogIPs;
@@ -97,7 +95,7 @@ public:
   fs::path m_file_path;
   std::atomic<bool> m_reopen_file{false};
 
-  /** Send a std::string to the log output */
+        /** Send a string to the log output */
   void LogPrintStr(const std::string &str);
 
   /** Returns whether logs will be written to any output */
@@ -128,7 +126,7 @@ static inline bool LogAcceptCategory(BCLog::LogFlags category)
     return LogInstance().WillLogCategory(category);
 }
 
-/** Returns a std::string with the log categories. */
+/** Returns a string with the log categories. */
 std::string ListLogCategories();
 
 /** Returns a vector of the active log categories. */
@@ -149,7 +147,7 @@ static inline void LogPrintf(const char* fmt, const Args&... args)
         try {
             log_msg = tfm::format(fmt, args...);
         } catch (tinyformat::format_error& fmterr) {
-            /* Original format std::string will have newline so don't add one here */
+            /* Original format string will have newline so don't add one here */
             log_msg = "Error \"" + std::string(fmterr.what()) + "\" while formatting log message: " + fmt;
         }
         LogInstance().LogPrintStr(log_msg);
