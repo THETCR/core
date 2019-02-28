@@ -10,10 +10,10 @@
 
 #include <chainparams.h>
 #include <util/system.h>
-#include <qt/test/uritests.h>
+#include "uritests.h"
 
 #ifdef ENABLE_WALLET
-#include <qt/test/paymentservertests.h>
+#include "paymentservertests.h"
 #endif
 
 #include <QCoreApplication>
@@ -42,13 +42,13 @@ extern void noui_connect();
 int main(int argc, char *argv[])
 {
     SetupEnvironment();
-    SetupNetworking();
-    SelectParams(CBaseChainParams::UNITTEST);
-    noui_connect();
-    ClearDatadirCache();
-    fs::path pathTemp = fs::temp_directory_path() / strprintf("test_wispr-qt_%lu_%i", (unsigned long)GetTime(), (int)GetRand(100000));
-    fs::create_directories(pathTemp);
-    gArgs.ForceSetArg("-datadir", pathTemp.string());
+//    SetupNetworking();
+//    SelectParams(CBaseChainParams::UNITTEST);
+//    noui_connect();
+//    ClearDatadirCache();
+//    fs::path pathTemp = fs::temp_directory_path() / strprintf("test_wispr-qt_%lu_%i", (unsigned long)GetTime(), (int)GetRand(100000));
+//    fs::create_directories(pathTemp);
+//    gArgs.ForceSetArg("-datadir", pathTemp.string());
     bool fInvalid = false;
     // Prefer the "minimal" platform for the test instead of the normal default
     // platform ("xcb", "windows", or "cocoa") so tests can't unintentionally
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         fInvalid = true;
 #endif
 
-    fs::remove_all(pathTemp);
+//    fs::remove_all(pathTemp);
 
     return fInvalid;
 }
