@@ -21,7 +21,6 @@
 #include <ui_interface.h>
 #include <txdb.h>
 #include <util/system.h>
-#include <test/testutil.h>
 #include <memory>
 
 #ifdef ENABLE_WALLET
