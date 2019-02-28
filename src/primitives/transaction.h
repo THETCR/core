@@ -25,7 +25,7 @@ public:
     uint256 hash;
     uint32_t n;
 
-    static constexpr uint32_t NULL_INDEX = std::numeric_limits<uint32_t>::max();
+    static constexpr uint32_t NULL_INDEX = (uint32_t) -1;
 
     COutPoint(): n(NULL_INDEX) { }
     COutPoint(const uint256& hashIn, uint32_t nIn): hash(hashIn), n(nIn) { }
@@ -34,8 +34,7 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(hash);
-        READWRITE(n);
+        READWRITE(*this);
     }
 
     void SetNull() { hash.SetNull(); n = NULL_INDEX; }
@@ -109,11 +108,11 @@ public:
 
     CTxIn()
     {
-        nSequence = SEQUENCE_FINAL;
+        nSequence = std::numeric_limits<unsigned int>::max();
     }
 
-    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
-    CTxIn(uint256 hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
+    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=std::numeric_limits<unsigned int>::max());
+    CTxIn(uint256 hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=std::numeric_limits<uint32_t>::max());
 
     ADD_SERIALIZE_METHODS;
 
@@ -353,8 +352,6 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
         int _nVersion = this->nVersion;
-//        int newProtocolTime = !GetBoolArg("-testnet", false) ? 1538567022 : 1537448663;
-//        nVersion = GetAdjustedTime() >= newProtocolTime ? this->nVersion : 1;
         if(_nVersion == 1){
             READWRITE(*const_cast<unsigned int *>(&nTime));
         }
