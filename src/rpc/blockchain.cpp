@@ -540,7 +540,7 @@ UniValue gettxoutsetinfo(const JSONRPCRequest& request)
 
     CCoinsStats stats;
     FlushStateToDisk();
-    if (GetUTXOStats(pcoinsTip, stats)) {
+    if (GetUTXOStats(pcoinsTip.get(), stats)) {
         ret.pushKV("height", (int64_t)stats.nHeight);
         ret.pushKV("bestblock", stats.hashBlock.GetHex());
         ret.pushKV("transactions", (int64_t)stats.nTransactions);
@@ -605,7 +605,7 @@ UniValue gettxout(const JSONRPCRequest& request)
     CCoins coins;
     if (fMempool) {
         LOCK(mempool.cs);
-        CCoinsViewMemPool view(pcoinsTip, mempool);
+        CCoinsViewMemPool view(pcoinsTip.get(), mempool);
         if (!view.GetCoins(hash, coins))
             return NullUniValue;
         mempool.pruneSpent(hash, coins); // TODO: this should be done by the CCoinsViewMemPool
@@ -657,7 +657,7 @@ UniValue verifychain(const JSONRPCRequest& request)
         nCheckDepth = request.params[0].get_int();
 
     fVerifyingBlocks = true;
-    bool fVerified = CVerifyDB().VerifyDB(pcoinsTip, nCheckLevel, nCheckDepth);
+    bool fVerified = CVerifyDB().VerifyDB(pcoinsTip.get(), nCheckLevel, nCheckDepth);
     fVerifyingBlocks = false;
 
     return fVerified;
