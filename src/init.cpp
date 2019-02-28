@@ -1377,6 +1377,7 @@ bool AppInitParameterInteraction()
             nLocalServices = ServiceFlags(nLocalServices | NODE_BLOOM);
 
     }
+    return true;
 }
 
 static bool LockDataDirectory(bool probeOnly)
