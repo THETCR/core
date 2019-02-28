@@ -204,7 +204,8 @@ public:
     void createWindow(const NetworkStyle* networkStyle);
     /// Create splash screen
     void createSplashScreen(const NetworkStyle* networkStyle);
-
+    /// Basic initialization, before starting initialization/shutdown thread. Return true on success.
+    bool baseInitialize();
     /// Request core initialization
     void requestInitialize();
     /// Request core shutdown
@@ -396,6 +397,12 @@ void BitcoinApplication::createSplashScreen(const NetworkStyle* networkStyle)
     splash->setAttribute(Qt::WA_DeleteOnClose);
     splash->show();
     connect(this, SIGNAL(splashFinished(QWidget*)), splash, SLOT(slotFinish(QWidget*)));
+}
+
+bool BitcoinApplication::baseInitialize()
+{
+    return AppInitBasicSetup() && AppInitParameterInteraction() && AppInitSanityChecks() &&
+           AppInitLockDataDirectory();
 }
 
 void BitcoinApplication::startThread()
@@ -603,10 +610,11 @@ int main(int argc, char* argv[])
 
     /// 6. Determine availability of data directory and parse wispr.conf
     /// - Do not call GetDataDir(true) before this step finishes
-    if (!fs::is_directory(GetDataDir(false))) {
-        QMessageBox::critical(0, QObject::tr("WISPR Core"),
+    if (!fs::is_directory(GetDataDir(false)))
+    {
+        QMessageBox::critical(nullptr, QObject::tr(PACKAGE_NAME),
                               QObject::tr("Error: Specified data directory \"%1\" does not exist.").arg(QString::fromStdString(gArgs.GetArg("-datadir", ""))));
-        return 1;
+        return EXIT_FAILURE;
     }
     if (!gArgs.ReadConfigFiles(error)) {
         QMessageBox::critical(nullptr, QObject::tr(PACKAGE_NAME),
@@ -681,15 +689,22 @@ int main(int argc, char* argv[])
     if (gArgs.GetBoolArg("-splash", true) && !gArgs.GetBoolArg("-min", false))
         app.createSplashScreen(networkStyle.data());
 
+    int rv = EXIT_SUCCESS;
     try {
         app.createWindow(networkStyle.data());
-        app.requestInitialize();
+        if (app.baseInitialize()) {
+            app.requestInitialize();
 #if defined(Q_OS_WIN)
         WinShutdownMonitor::registerShutdownBlockReason(QObject::tr("WISPR Core didn't yet exit safely..."), (HWND)app.getMainWinId());
 #endif
-        app.exec();
-        app.requestShutdown();
-        app.exec();
+            app.exec();
+            app.requestShutdown();
+            app.exec();
+            rv = app.getReturnValue();
+        } else {
+            // A dialog with detailed error will have been shown by InitError()
+            rv = EXIT_FAILURE;
+        }
     } catch (std::exception& e) {
         PrintExceptionContinue(&e, "Runaway exception");
         app.handleRunawayException(QString::fromStdString(strMiscWarning));
