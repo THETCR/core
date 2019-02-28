@@ -5,8 +5,8 @@
 #ifndef BITCOIN_ZMQ_ZMQRPC_H
 #define BITCOIN_ZMQ_ZMQRPC_H
 
-class CRPCTable;
-
-void RegisterZMQRPCCommands(CRPCTable& t);
+//class CRPCTable;
+//
+//void RegisterZMQRPCCommands(CRPCTable& t);
 
 #endif // BITCOIN_ZMQ_ZMRRPC_H
