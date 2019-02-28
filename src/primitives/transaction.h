@@ -32,10 +32,11 @@ public:
 
     ADD_SERIALIZE_METHODS;
 
-  template <typename Stream, typename Operation>
-  inline void SerializationOp(Stream& s, Operation ser_action) {
-      READWRITE(*this);
-  }
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action) {
+        READWRITE(hash);
+        READWRITE(n);
+    }
 
     void SetNull() { hash.SetNull(); n = NULL_INDEX; }
     bool IsNull() const { return (hash.IsNull() && n == NULL_INDEX); }
@@ -75,44 +76,44 @@ public:
     uint32_t nSequence;
     CScript prevPubKey;
 
-  // TODO uncomment after implementing transaction witnesses and GetTransactionSigOpCost in consensus/tx_verify.cpp
+    // TODO uncomment after implementing transaction witnesses and GetTransactionSigOpCost in consensus/tx_verify.cpp
 
 //    CScriptWitness scriptWitness; //!< Only serialized through CTransaction
 
-  /* Setting nSequence to this value for every input in a transaction
-* disables nLockTime. */
-  static const uint32_t SEQUENCE_FINAL = 0xffffffff;
+    /* Setting nSequence to this value for every input in a transaction
+  * disables nLockTime. */
+    static const uint32_t SEQUENCE_FINAL = 0xffffffff;
 
-  /* Below flags apply in the context of BIP 68*/
-  /* If this flag set, CTxIn::nSequence is NOT interpreted as a
-   * relative lock-time. */
-  static const uint32_t SEQUENCE_LOCKTIME_DISABLE_FLAG = (1U << 31);
+    /* Below flags apply in the context of BIP 68*/
+    /* If this flag set, CTxIn::nSequence is NOT interpreted as a
+     * relative lock-time. */
+    static const uint32_t SEQUENCE_LOCKTIME_DISABLE_FLAG = (1U << 31);
 
-  /* If CTxIn::nSequence encodes a relative lock-time and this flag
-   * is set, the relative lock-time has units of 512 seconds,
-   * otherwise it specifies blocks with a granularity of 1. */
-  static const uint32_t SEQUENCE_LOCKTIME_TYPE_FLAG = (1 << 22);
+    /* If CTxIn::nSequence encodes a relative lock-time and this flag
+     * is set, the relative lock-time has units of 512 seconds,
+     * otherwise it specifies blocks with a granularity of 1. */
+    static const uint32_t SEQUENCE_LOCKTIME_TYPE_FLAG = (1 << 22);
 
-  /* If CTxIn::nSequence encodes a relative lock-time, this mask is
-   * applied to extract that lock-time from the sequence field. */
-  static const uint32_t SEQUENCE_LOCKTIME_MASK = 0x0000ffff;
+    /* If CTxIn::nSequence encodes a relative lock-time, this mask is
+     * applied to extract that lock-time from the sequence field. */
+    static const uint32_t SEQUENCE_LOCKTIME_MASK = 0x0000ffff;
 
-  /* In order to use the same number of bits to encode roughly the
-   * same wall-clock duration, and because blocks are naturally
-   * limited to occur every 600s on average, the minimum granularity
-   * for time-based relative lock-time is fixed at 512 seconds.
-   * Converting from CTxIn::nSequence to seconds is performed by
-   * multiplying by 512 = 2^9, or equivalently shifting up by
-   * 9 bits. */
-  static const int SEQUENCE_LOCKTIME_GRANULARITY = 9;
+    /* In order to use the same number of bits to encode roughly the
+     * same wall-clock duration, and because blocks are naturally
+     * limited to occur every 600s on average, the minimum granularity
+     * for time-based relative lock-time is fixed at 512 seconds.
+     * Converting from CTxIn::nSequence to seconds is performed by
+     * multiplying by 512 = 2^9, or equivalently shifting up by
+     * 9 bits. */
+    static const int SEQUENCE_LOCKTIME_GRANULARITY = 9;
 
-  CTxIn()
-  {
-      nSequence = SEQUENCE_FINAL;
-  }
+    CTxIn()
+    {
+        nSequence = SEQUENCE_FINAL;
+    }
 
-  explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
-  CTxIn(uint256 hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
+    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
+    CTxIn(uint256 hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
 
     ADD_SERIALIZE_METHODS;
 
@@ -352,6 +353,8 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
         int _nVersion = this->nVersion;
+//        int newProtocolTime = !GetBoolArg("-testnet", false) ? 1538567022 : 1537448663;
+//        nVersion = GetAdjustedTime() >= newProtocolTime ? this->nVersion : 1;
         if(_nVersion == 1){
             READWRITE(*const_cast<unsigned int *>(&nTime));
         }
@@ -479,9 +482,9 @@ struct CMutableTransaction
         Unserialize(s);
     }
 
-  /** Compute the hash of this CMutableTransaction. This is computed on the
-     * fly, as opposed to GetHash() in CTransaction, which uses a cached result.
-     */
+    /** Compute the hash of this CMutableTransaction. This is computed on the
+       * fly, as opposed to GetHash() in CTransaction, which uses a cached result.
+       */
     uint256 GetHash() const;
 
     std::string ToString() const;
@@ -495,15 +498,15 @@ struct CMutableTransaction
     {
         return !(a == b);
     }
-  bool HasWitness() const
-  {
+    bool HasWitness() const
+    {
 //      for (size_t i = 0; i < vin.size(); i++) {
 //          if (!vin[i].scriptWitness.IsNull()) {
 //              return true;
 //          }
 //      }
-      return false;
-  }
+        return false;
+    }
 };
 
 typedef std::shared_ptr<const CTransaction> CTransactionRef;
