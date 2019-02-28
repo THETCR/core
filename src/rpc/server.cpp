@@ -35,7 +35,6 @@ static bool fRPCInWarmup GUARDED_BY(cs_rpcWarmup) = true;
 static std::string rpcWarmupStatus GUARDED_BY(cs_rpcWarmup) = "RPC server started";
 /* Timer-creating functions */
 static RPCTimerInterface* timerInterface = nullptr;
-
 /* Map of name to timer. */
 static std::map<std::string, std::unique_ptr<RPCTimerBase> > deadlineTimers;
 
@@ -176,7 +175,6 @@ uint256 ParseHashV(const UniValue& v, std::string strName)
         throw JSONRPCError(RPC_INVALID_PARAMETER, strName+" must be hexadecimal string (not '"+strHex+"')");
     return uint256S(strHex);
 }
-
 uint256 ParseHashO(const UniValue& o, std::string strKey)
 {
     return ParseHashV(find_value(o, strKey), strKey);
@@ -361,10 +359,7 @@ static UniValue getrpcinfo(const JSONRPCRequest& request)
     return result;
 }
 
-
-/**
- * Call Table
- */
+// clang-format off
 static const CRPCCommand vRPCCommands[] =
     {
         //  category              name                      actor (function)         argNames
@@ -552,6 +547,7 @@ static const CRPCCommand vRPCCommands[] =
 
 #endif // ENABLE_WALLET
 };
+// clang-format on
 
 CRPCTable::CRPCTable()
 {
@@ -706,6 +702,7 @@ std::string JSONRPCExecBatch(const JSONRPCRequest& jreq, const UniValue& vReq)
 
     return ret.write() + "\n";
 }
+
 /**
  * Process named arguments into a vector of positional arguments, based on the
  * passed-in specification for the RPC call's arguments.
@@ -755,6 +752,7 @@ static inline JSONRPCRequest transformNamedArguments(const JSONRPCRequest& in, c
     // Return request with named arguments transformed to positional arguments
     return out;
 }
+
 UniValue CRPCTable::execute(const JSONRPCRequest &request) const
 {
     // Return immediately if in warmup

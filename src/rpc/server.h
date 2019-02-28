@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_RPCSERVER_H
-#define BITCOIN_RPCSERVER_H
+#ifndef BITCOIN_RPC_SERVER_H
+#define BITCOIN_RPC_SERVER_H
 
 #include <amount.h>
 #include <primitives/zerocoin.h>
@@ -56,7 +56,6 @@ public:
     JSONRPCRequest() : id(NullUniValue), params(NullUniValue), fHelp(false) {}
     void parse(const UniValue& valRequest);
 };
-
 
 /** Query whether RPC is running */
 bool IsRPCRunning();
@@ -377,6 +376,8 @@ void StartRPC();
 void InterruptRPC();
 void StopRPC();
 std::string JSONRPCExecBatch(const JSONRPCRequest& jreq, const UniValue& vReq);
+
 // Retrieves any serialization flags requested in command line argument
 int RPCSerializationFlags();
-#endif // BITCOIN_RPCSERVER_H
+
+#endif // BITCOIN_RPC_SERVER_H
