@@ -112,12 +112,11 @@ bool AppInit(int argc, char* argv[])
             return false;
         }
 
-        // Error out when loose non-argument tokens are encountered on command line
-        for (int i = 1; i < argc; i++) {
-            if (!IsSwitchChar(argv[i][0])) {
-                fprintf(stderr, "Error: Command line contains unexpected token '%s', see bitcoind -h for a list of options.\n", argv[i]);
-                return false;
-            }
+        // parse masternode.conf
+        std::string strErr;
+        if (!masternodeConfig.read(strErr)) {
+            fprintf(stderr, "Error reading masternode configuration file: %s\n", strErr.c_str());
+            return false;
         }
 
         // Error out when loose non-argument tokens are encountered on command line
@@ -132,14 +131,6 @@ bool AppInit(int argc, char* argv[])
         gArgs.SoftSetBoolArg("-server", true);
         // Set this early so that parameter interactions go to console
         InitLogging();
-
-        // parse masternode.conf
-        std::string strErr;
-        if (!masternodeConfig.read(strErr)) {
-            fprintf(stderr, "Error reading masternode configuration file: %s\n", strErr.c_str());
-            return false;
-        }
-
         InitParameterInteraction();
         if (!AppInitBasicSetup())
         {
