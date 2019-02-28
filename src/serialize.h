@@ -414,6 +414,48 @@ I ReadVarInt(Stream& is)
 #define COMPACTSIZE(obj) CCompactSize(REF(obj))
 #define LIMITED_STRING(obj,n) LimitedString< n >(REF(obj))
 
+#define FLATDATA(obj) REF(CFlatData((char*)&(obj), (char*)&(obj) + sizeof(obj)))
+
+/**
+ * Wrapper for serializing arrays and POD.
+ */
+class CFlatData
+{
+protected:
+    char* pbegin;
+    char* pend;
+
+public:
+    CFlatData(void* pbeginIn, void* pendIn) : pbegin((char*)pbeginIn), pend((char*)pendIn) {}
+    template <class T, class TAl>
+    explicit CFlatData(std::vector<T, TAl>& v)
+    {
+        pbegin = (char*)v.data();
+        pend = (char*)(v.data() + v.size());
+    }
+    char* begin() { return pbegin; }
+    const char* begin() const { return pbegin; }
+    char* end() { return pend; }
+    const char* end() const { return pend; }
+
+    unsigned int GetSerializeSize(int, int = 0) const
+    {
+        return pend - pbegin;
+    }
+
+    template <typename Stream>
+    void Serialize(Stream& s, int, int = 0) const
+    {
+        s.write(pbegin, pend - pbegin);
+    }
+
+    template <typename Stream>
+    void Unserialize(Stream& s, int, int = 0)
+    {
+        s.read(pbegin, pend - pbegin);
+    }
+};
+
 template<VarIntMode Mode, typename I>
 class CVarInt
 {
