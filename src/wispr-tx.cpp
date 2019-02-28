@@ -281,12 +281,12 @@ static void MutateTxAddOutScript(CMutableTransaction& tx, const std::string& str
     CScript scriptPubKey = ParseScript(strScript);
 
     // Extract FLAGS
-    bool bSegWit = false;
-    bool bScriptHash = false;
+//    bool bSegWit = false;
+//    bool bScriptHash = false;
     if (vStrInputParts.size() == 3) {
         std::string flags = vStrInputParts.back();
-        bSegWit = (flags.find('W') != std::string::npos);
-        bScriptHash = (flags.find('S') != std::string::npos);
+//        bSegWit = (flags.find('W') != std::string::npos);
+//        bScriptHash = (flags.find('S') != std::string::npos);
     }
 
 //    if (scriptPubKey.size() > MAX_SCRIPT_SIZE) {

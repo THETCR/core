@@ -691,7 +691,7 @@ static std::string FormatException(const std::exception* pex, const char* pszThr
     char pszModule[MAX_PATH] = "";
     GetModuleFileNameA(nullptr, pszModule, sizeof(pszModule));
 #else
-    const char* pszModule = "wispr";
+    const char* pszModule = "WISPR";
 #endif
     if (pex)
         return strprintf(
@@ -816,8 +816,9 @@ fs::path GetConfigFile(const std::string& confPath)
 fs::path GetMasternodeConfigFile()
 {
     fs::path pathConfigFile(gArgs.GetArg("-mnconf", "masternode.conf"));
-    if (!pathConfigFile.is_complete()) pathConfigFile = GetDataDir() / pathConfigFile;
-    return pathConfigFile;
+//    if (!pathConfigFile.is_complete()) pathConfigFile = GetDataDir() / pathConfigFile;
+//    return pathConfigFile;
+    return AbsPathForConfigVal(fs::path(pathConfigFile), false);
 }
 
 
