@@ -113,7 +113,7 @@ static bool CheckTxScriptsSanity(const CMutableTransaction& tx)
 bool DecodeHexTx(CMutableTransaction& tx, const std::string& hex_tx, bool try_no_witness, bool try_witness)
 {
     if (!IsHex(hex_tx)) {
-        std::cout << "IsHex failed\n";
+        throw std::runtime_error("ÏsHEx failed");
         return false;
     }
 
@@ -122,7 +122,7 @@ bool DecodeHexTx(CMutableTransaction& tx, const std::string& hex_tx, bool try_no
     try {
         ssData >> tx;
     } catch (const std::exception&) {
-        std::cout << "Stream \n";
+        throw std::runtime_error("Stream failed");
         return false;
     }
 //    if (try_no_witness) {
