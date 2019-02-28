@@ -527,6 +527,7 @@ static int CommandLineRPC(int argc, char *argv[])
 
 int main(int argc, char* argv[])
 {
+    std::cout << "wispr-cli main\n";
 #ifdef WIN32
     util::WinCmdLineArgs winArgs;
     std::tie(argc, argv) = winArgs.get();
