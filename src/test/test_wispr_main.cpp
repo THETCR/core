@@ -4,7 +4,7 @@
 
 #define BOOST_TEST_MODULE Wispr Test Suite
 
-//#include <net.h>
+#include <net.h>
 #include <test/test_wispr.h>
 
 #include <memory>
