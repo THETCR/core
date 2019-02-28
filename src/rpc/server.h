@@ -189,7 +189,7 @@ public:
 
 bool IsDeprecatedRPCEnabled(const std::string& method);
 
-extern const CRPCTable tableRPC;
+extern CRPCTable tableRPC;
 
 /**
  * Utilities: convert hex-encoded Values
