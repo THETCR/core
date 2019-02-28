@@ -63,7 +63,6 @@ static void WaitForShutdown()
 //
 bool AppInit(int argc, char* argv[])
 {
-    std::cout << "wisprd AppInit\n";
     bool fRet = false;
 
     //
@@ -197,12 +196,10 @@ bool AppInit(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    std::cout << "wisprd main\n";
 #ifdef WIN32
     util::WinCmdLineArgs winArgs;
     std::tie(argc, argv) = winArgs.get();
 #endif
-    std::cout << "wisprd SetupEnvironment\n";
     SetupEnvironment();
 
     // Connect bitcoind signal handlers

@@ -983,7 +983,6 @@ static bool AppInitServers()
 // Parameter interaction based on rules
 void InitParameterInteraction()
 {
-    std::cout << "InitParameterInteraction\n";
     // when specifying an explicit binding address, you want to listen on it
     // even when -connect or -proxy is specified
     if (gArgs.IsArgSet("-bind")) {
@@ -1071,7 +1070,6 @@ static std::string ResolveErrMsg(const char * const optname, const std::string& 
  */
 void InitLogging()
 {
-    std::cout << "InitLogging\n";
     LogInstance().m_print_to_file = !gArgs.IsArgNegated("-debuglogfile");
     LogInstance().m_file_path = AbsPathForConfigVal(gArgs.GetArg("-debuglogfile", DEFAULT_DEBUGLOGFILE));
 
@@ -1120,7 +1118,6 @@ void InitLogging()
 
 bool AppInitBasicSetup()
 {
-    std::cout << "AppInitBasicSetup\n";
     // ********************************************************* Step 1: setup
 #ifdef _MSC_VER
     // Turn off Microsoft heap dump noise
@@ -1161,7 +1158,6 @@ bool AppInitBasicSetup()
 }
 bool AppInitParameterInteraction()
 {
-    std::cout << "AppInitParameterInteraction\n";
     // ********************************************************* Step 2: parameter interactions
     // Set this early so that parameter interactions go to console
     fLogTimestamps = gArgs.GetBoolArg("-logtimestamps", true);
@@ -1375,7 +1371,6 @@ bool AppInitParameterInteraction()
 
 static bool LockDataDirectory(bool probeOnly)
 {
-    std::cout << "LockDataDirectory\n";
     // Make sure only a single Bitcoin process is using the data directory.
     fs::path datadir = GetDataDir();
     if (!DirIsWritable(datadir)) {
@@ -1390,7 +1385,6 @@ static bool LockDataDirectory(bool probeOnly)
 bool AppInitSanityChecks()
 {
     // ********************************************************* Step 4: sanity checks
-    std::cout << "AppInitSanityChecks\n";
 
     // Initialize elliptic curve code
     std::string sha256_algo = SHA256AutoDetect();
@@ -1410,7 +1404,6 @@ bool AppInitSanityChecks()
 }
 bool AppInitLockDataDirectory()
 {
-    std::cout << "AppInitLockDataDirectory\n";
     // After daemonization get the data directory lock again and hold on to it until exit
     // This creates a slight window for a race condition to happen, however this condition is harmless: it
     // will at most make us exit without printing a message to console.
@@ -1423,7 +1416,6 @@ bool AppInitLockDataDirectory()
 bool AppInitMain()
 {
     const CChainParams& chainparams = Params();
-    std::cout << "AppInitMain\n";
     // ********************************************************* Step 4: application initialization: dir lock, daemonize, pidfile, debug log
 
     // Initialize elliptic curve code
