@@ -710,13 +710,13 @@ void PrintExceptionContinue(const std::exception* pex, const char* pszThread)
 
 fs::path GetDefaultDataDir()
 {
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Wispr
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Wispr
-    // Mac: ~/Library/Application Support/Wispr
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\WISPR
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\WISPR
+    // Mac: ~/Library/Application Support/WISPR
     // Unix: ~/.wispr
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Wispr";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "WISPR";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -726,7 +726,7 @@ fs::path GetDefaultDataDir()
         pathRet = fs::path(pszHome);
 #ifdef MAC_OSX
     // Mac
-    return pathRet / "Library/Application Support/Wispr";
+    return pathRet / "Library/Application Support/WISPR";
 #else
     // Unix
     return pathRet / ".wispr";
@@ -1246,8 +1246,8 @@ std::string CopyrightHolders(const std::string& strPrefix)
     std::string strCopyrightHolders = strPrefix + strprintf(_(COPYRIGHT_HOLDERS), _(COPYRIGHT_HOLDERS_SUBSTITUTION));
 
     // Check for untranslated substitution to make sure Wispr Core copyright is not removed by accident
-    if (strprintf(COPYRIGHT_HOLDERS, COPYRIGHT_HOLDERS_SUBSTITUTION).find("Wispr Core") == std::string::npos) {
-        strCopyrightHolders += "\n" + strPrefix + "The Wispr Core developers";
+    if (strprintf(COPYRIGHT_HOLDERS, COPYRIGHT_HOLDERS_SUBSTITUTION).find("WISPR Core") == std::string::npos) {
+        strCopyrightHolders += "\n" + strPrefix + "The WISPR Core developers";
     }
     return strCopyrightHolders;
 }
