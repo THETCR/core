@@ -263,7 +263,7 @@ void BitcoinCore::initialize()
 
     try {
         qDebug() << __func__ << ": Running AppInit2 in thread";
-        int rv = AppInit2();
+        int rv = AppInitMain();
         Q_EMIT initializeResult(rv);
     } catch (std::exception& e) {
         handleRunawayException(&e);

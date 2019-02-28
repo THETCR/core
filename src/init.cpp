@@ -99,6 +99,9 @@ static constexpr int DUMP_BANS_INTERVAL = 60 * 15;
 std::unique_ptr<CConnman> g_connman;
 std::unique_ptr<PeerLogicValidation> peerLogic;
 
+// TODO Remove this after net.h backport
+int nFD;
+
 #ifdef WIN32
 #include <winbase.h>
 // Win32 LevelDB doesn't use filedescriptors, and the ones used for
@@ -402,37 +405,6 @@ void OnRPCPreCommand(const CRPCCommand& cmd)
 //        throw JSONRPCError(RPC_FORBIDDEN_BY_SAFE_MODE, std::string("Safe mode: ") + strWarning);
 }
 
-/**
- * Initialize global loggers.
- *
- * Note that this is called very early in the process lifetime, so you should be
- * careful about what global state you rely on here.
- */
-void InitLogging()
-{
-    LogInstance().m_print_to_file = !gArgs.IsArgNegated("-debuglogfile");
-    LogInstance().m_file_path = AbsPathForConfigVal(gArgs.GetArg("-debuglogfile", DEFAULT_DEBUGLOGFILE));
-
-    // Add newlines to the logfile to distinguish this execution from the last
-    // one; called before console logging is set up, so this is only sent to
-    // debug.log.
-    LogPrintf("\n\n\n\n\n");
-
-    LogInstance().m_print_to_console = gArgs.GetBoolArg("-printtoconsole", !gArgs.GetBoolArg("-daemon", false));
-    LogInstance().m_log_timestamps = gArgs.GetBoolArg("-logtimestamps", DEFAULT_LOGTIMESTAMPS);
-    LogInstance().m_log_time_micros = gArgs.GetBoolArg("-logtimemicros", DEFAULT_LOGTIMEMICROS);
-
-    fLogIPs = gArgs.GetBoolArg("-logips", DEFAULT_LOGIPS);
-
-    std::string version_string = FormatFullVersion();
-#ifdef DEBUG
-    version_string += " (debug build)";
-#else
-    version_string += " (release build)";
-#endif
-    LogPrintf(PACKAGE_NAME " version %s\n", version_string);
-}
-
 void SetupServerArgs()
 {
     SetupHelpOptions(gArgs);
@@ -447,9 +419,9 @@ void SetupServerArgs()
 
     // Hidden Options
     std::vector<std::string> hidden_args = {
-        "-dbcrashratio", "-forcecompactdb",
-        // GUI args. These will be overwritten by SetupUIArgs for the GUI
-        "-allowselfsignedrootcertificates", "-choosedatadir", "-lang=<lang>", "-min", "-resetguisettings", "-rootcertificates=<file>", "-splash", "-uiplatform"};
+            "-dbcrashratio", "-forcecompactdb",
+            // GUI args. These will be overwritten by SetupUIArgs for the GUI
+            "-allowselfsignedrootcertificates", "-choosedatadir", "-lang=<lang>", "-min", "-resetguisettings", "-rootcertificates=<file>", "-splash", "-uiplatform"};
 
     gArgs.AddArg("-version", "Print version and exit", false, OptionsCategory::OPTIONS);
     gArgs.AddArg("-alertnotify=<cmd>", "Execute command when a relevant alert is received or we see a really long fork (%s in cmd is replaced by message)", false, OptionsCategory::OPTIONS);
@@ -634,6 +606,29 @@ void SetupServerArgs()
     // Add the hidden options
     gArgs.AddHiddenArgs(hidden_args);
 }
+
+std::string LicenseInfo()
+{
+    const std::string URL_SOURCE_CODE = "<https://github.com/bitcoin/bitcoin>";
+    const std::string URL_WEBSITE = "<https://bitcoincore.org>";
+
+    return CopyrightHolders(strprintf(_("Copyright (C) %i-%i"), 2009, COPYRIGHT_YEAR) + " ") + "\n" +
+           "\n" +
+           strprintf(_("Please contribute if you find %s useful. "
+                       "Visit %s for further information about the software."),
+                     PACKAGE_NAME, URL_WEBSITE) +
+           "\n" +
+           strprintf(_("The source code is available from %s."),
+                     URL_SOURCE_CODE) +
+           "\n" +
+           "\n" +
+           _("This is experimental software.") + "\n" +
+           strprintf(_("Distributed under the MIT software license, see the accompanying file %s or %s"), "COPYING", "<https://opensource.org/licenses/MIT>") + "\n" +
+           "\n" +
+           strprintf(_("This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard."), "<https://www.openssl.org>") +
+           "\n";
+}
+
 std::string HelpMessage(HelpMessageMode mode)
 {
 
@@ -700,7 +695,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-torcontrol=<ip>:<port>", strprintf(_("Tor control port to use if onion listening enabled (default: %s)"), DEFAULT_TOR_CONTROL));
     strUsage += HelpMessageOpt("-torpassword=<pass>", _("Tor control port password (default: empty)"));
 #ifdef USE_UPNP
-#if USE_UPNP
+    #if USE_UPNP
     strUsage += HelpMessageOpt("-upnp", _("Use UPnP to map the listening port (default: 1 when listening)"));
 #else
     strUsage += HelpMessageOpt("-upnp", strprintf(_("Use UPnP to map the listening port (default: %u)"), 0));
@@ -708,7 +703,7 @@ std::string HelpMessage(HelpMessageMode mode)
 #endif
     strUsage += HelpMessageOpt("-whitebind=<addr>", _("Bind to given address and whitelist peers connecting to it. Use [host]:port notation for IPv6"));
     strUsage += HelpMessageOpt("-whitelist=<netmask>", _("Whitelist peers connecting from the given netmask or IP address. Can be specified multiple times.") +
-        " " + _("Whitelisted peers cannot be DoS banned and their transactions are always relayed, even if they are already in the mempool, useful e.g. for a gateway"));
+                                                       " " + _("Whitelisted peers cannot be DoS banned and their transactions are always relayed, even if they are already in the mempool, useful e.g. for a gateway"));
 
 
 #ifdef ENABLE_WALLET
@@ -720,7 +715,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-keypool=<n>", strprintf(_("Set key pool size to <n> (default: %u)"), 100));
     if (gArgs.GetBoolArg("-help-debug", false))
         strUsage += HelpMessageOpt("-mintxfee=<amt>", strprintf(_("Fees (in WSP/Kb) smaller than this are considered zero fee for transaction creation (default: %s)"),
-            FormatMoney(CWallet::minTxFee.GetFeePerK())));
+                                                                FormatMoney(CWallet::minTxFee.GetFeePerK())));
     strUsage += HelpMessageOpt("-paytxfee=<amt>", strprintf(_("Fee (in WSP/kB) to add to transactions you send (default: %s)"), FormatMoney(payTxFee.GetFeePerK())));
     strUsage += HelpMessageOpt("-rescan", _("Rescan the block chain for missing wallet transactions") + " " + _("on startup"));
     strUsage += HelpMessageOpt("-salvagewallet", _("Attempt to recover private keys from a corrupt wallet.dat") + " " + _("on startup"));
@@ -729,14 +724,14 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-disablesystemnotifications", strprintf(_("Disable OS notifications for incoming transactions (default: %u)"), 0));
     strUsage += HelpMessageOpt("-txconfirmtarget=<n>", strprintf(_("If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)"), 1));
     strUsage += HelpMessageOpt("-maxtxfee=<amt>", strprintf(_("Maximum total fees to use in a single wallet transaction, setting too low may abort large transactions (default: %s)"),
-        FormatMoney(maxTxFee)));
+                                                            FormatMoney(maxTxFee)));
     strUsage += HelpMessageOpt("-upgradewallet", _("Upgrade wallet to latest format") + " " + _("on startup"));
     strUsage += HelpMessageOpt("-wallet=<file>", _("Specify wallet file (within data directory)") + " " + strprintf(_("(default: %s)"), "wallet.dat"));
     strUsage += HelpMessageOpt("-walletnotify=<cmd>", _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)"));
     if (mode == HMM_BITCOIN_QT)
         strUsage += HelpMessageOpt("-windowtitle=<name>", _("Wallet window title"));
     strUsage += HelpMessageOpt("-zapwallettxes=<mode>", _("Delete all wallet transactions and only recover those parts of the blockchain through -rescan on startup") +
-        " " + _("(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)"));
+                                                        " " + _("(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)"));
 #endif
 
 #if ENABLE_ZMQ
@@ -769,7 +764,7 @@ std::string HelpMessage(HelpMessageMode mode)
     if (mode == HMM_BITCOIN_QT)
         debugCategories += ", qt";
     strUsage += HelpMessageOpt("-debug=<category>", strprintf(_("Output debugging information (default: %u, supplying <category> is optional)"), 0) + ". " +
-        _("If <category> is not supplied, output all debugging information.") + _("<category> can be:") + " " + debugCategories + ".");
+                                                    _("If <category> is not supplied, output all debugging information.") + _("<category> can be:") + " " + debugCategories + ".");
     if (gArgs.GetBoolArg("-help-debug", false))
         strUsage += HelpMessageOpt("-nodebug", "Turn off debugging messages, same as -debug=0");
 #ifdef ENABLE_WALLET
@@ -790,8 +785,8 @@ std::string HelpMessage(HelpMessageMode mode)
         strUsage += HelpMessageOpt("-printpriority", strprintf(_("Log transaction priority and fee per kB when mining blocks (default: %u)"), 0));
         strUsage += HelpMessageOpt("-privdb", strprintf(_("Sets the DB_PRIVATE flag in the wallet db environment (default: %u)"), 1));
         strUsage += HelpMessageOpt("-regtest", _("Enter regression test mode, which uses a special chain in which blocks can be solved instantly.") + " " +
-            _("This is intended for regression testing tools and app development.") + " " +
-            _("In this mode -genproclimit controls how many blocks are generated immediately."));
+                                               _("This is intended for regression testing tools and app development.") + " " +
+                                               _("In this mode -genproclimit controls how many blocks are generated immediately."));
     }
     strUsage += HelpMessageOpt("-shrinkdebugfile", _("Shrink debug.log file on client startup (default: 1 when no -debug)"));
     strUsage += HelpMessageOpt("-testnet", _("Use the test network"));
@@ -864,24 +859,6 @@ std::string HelpMessage(HelpMessageMode mode)
 
     }
     return strUsage;
-}
-
-std::string LicenseInfo()
-{
-    return FormatParagraph(strprintf(_("Copyright (C) 2009-%i The Bitcoin Core Developers"), COPYRIGHT_YEAR)) + "\n" +
-           "\n" +
-           FormatParagraph(strprintf(_("Copyright (C) 2014-%i The Dash Core Developers"), COPYRIGHT_YEAR)) + "\n" +
-           "\n" +
-           FormatParagraph(strprintf(_("Copyright (C) 2015-%i The PIVX Core Developers"), COPYRIGHT_YEAR)) + "\n" +
-           "\n" +
-           FormatParagraph(strprintf(_("Copyright (C) 2017-%i The WISPR Core Developers"), COPYRIGHT_YEAR)) + "\n" +
-           "\n" +
-           FormatParagraph(_("This is experimental software.")) + "\n" +
-           "\n" +
-           FormatParagraph(_("Distributed under the MIT software license, see the accompanying file COPYING or <http://www.opensource.org/licenses/mit-license.php>.")) + "\n" +
-           "\n" +
-           FormatParagraph(_("This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit <https://www.openssl.org/> and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.")) +
-           "\n";
 }
 
 static void BlockNotifyCallback(bool initialSync, const CBlockIndex *pBlockIndex)
@@ -978,31 +955,24 @@ void ThreadImport(std::vector<fs::path> vImportFiles)
     }
 }
 
-static bool LockDataDirectory(bool probeOnly)
-{
-    // Make sure only a single Bitcoin process is using the data directory.
-    fs::path datadir = GetDataDir();
-    if (!DirIsWritable(datadir)) {
-        return InitError(strprintf(_("Cannot write to data directory '%s'; check permissions."), datadir.string()));
-    }
-    if (!LockDirectory(datadir, ".lock", probeOnly)) {
-        return InitError(strprintf(_("Cannot obtain a lock on data directory %s. %s is probably already running."), datadir.string(), _(PACKAGE_NAME)));
-    }
-    return true;
-}
-
 /** Sanity checks
- *  Ensure that WISPR is running in a usable environment with all
+ *  Ensure that Bitcoin is running in a usable environment with all
  *  necessary library support.
  */
-bool InitSanityCheck(void)
+static bool InitSanityCheck()
 {
-    if (!ECC_InitSanityCheck()) {
+    if(!ECC_InitSanityCheck()) {
         InitError("Elliptic curve cryptography sanity check failure. Aborting.");
         return false;
     }
+
     if (!glibc_sanity_test() || !glibcxx_sanity_test())
         return false;
+
+    if (!Random_SanityCheck()) {
+        InitError("OS cryptographic RNG sanity check failure. Aborting.");
+        return false;
+    }
 
     return true;
 }
@@ -1016,12 +986,134 @@ static bool AppInitServers()
     StartRPC();
     if (!StartHTTPRPC())
         return false;
-    if (gArgs.GetBoolArg("-rest", false) && !StartREST())
-        return false;
-    if (!StartHTTPServer())
-        return false;
+    if (gArgs.GetBoolArg("-rest", DEFAULT_REST_ENABLE)) StartREST();
+    StartHTTPServer();
     return true;
 }
+
+// Parameter interaction based on rules
+void InitParameterInteraction()
+{
+    // when specifying an explicit binding address, you want to listen on it
+    // even when -connect or -proxy is specified
+    if (gArgs.IsArgSet("-bind")) {
+        if (gArgs.SoftSetBoolArg("-listen", true))
+            LogPrintf("%s: parameter interaction: -bind set -> setting -listen=1\n", __func__);
+    }
+    if (gArgs.IsArgSet("-whitebind")) {
+        if (gArgs.SoftSetBoolArg("-listen", true))
+            LogPrintf("%s: parameter interaction: -whitebind set -> setting -listen=1\n", __func__);
+    }
+
+    if (gArgs.IsArgSet("-connect")) {
+        // when only connecting to trusted nodes, do not seed via DNS, or listen by default
+        if (gArgs.SoftSetBoolArg("-dnsseed", false))
+            LogPrintf("%s: parameter interaction: -connect set -> setting -dnsseed=0\n", __func__);
+        if (gArgs.SoftSetBoolArg("-listen", false))
+            LogPrintf("%s: parameter interaction: -connect set -> setting -listen=0\n", __func__);
+    }
+
+    if (gArgs.IsArgSet("-proxy")) {
+        // to protect privacy, do not listen by default if a default proxy server is specified
+        if (gArgs.SoftSetBoolArg("-listen", false))
+            LogPrintf("%s: parameter interaction: -proxy set -> setting -listen=0\n", __func__);
+        // to protect privacy, do not use UPNP when a proxy is set. The user may still specify -listen=1
+        // to listen locally, so don't rely on this happening through -listen below.
+        if (gArgs.SoftSetBoolArg("-upnp", false))
+            LogPrintf("%s: parameter interaction: -proxy set -> setting -upnp=0\n", __func__);
+        // to protect privacy, do not discover addresses by default
+        if (gArgs.SoftSetBoolArg("-discover", false))
+            LogPrintf("%s: parameter interaction: -proxy set -> setting -discover=0\n", __func__);
+    }
+
+    if (!gArgs.GetBoolArg("-listen", DEFAULT_LISTEN)) {
+        // do not map ports or try to retrieve public IP when not listening (pointless)
+        if (gArgs.SoftSetBoolArg("-upnp", false))
+            LogPrintf("%s: parameter interaction: -listen=0 -> setting -upnp=0\n", __func__);
+        if (gArgs.SoftSetBoolArg("-discover", false))
+            LogPrintf("%s: parameter interaction: -listen=0 -> setting -discover=0\n", __func__);
+        if (gArgs.SoftSetBoolArg("-listenonion", false))
+            LogPrintf("%s: parameter interaction: -listen=0 -> setting -listenonion=0\n", __func__);
+    }
+
+    if (gArgs.IsArgSet("-externalip")) {
+        // if an explicit public IP is specified, do not try to find others
+        if (gArgs.SoftSetBoolArg("-discover", false))
+            LogPrintf("%s: parameter interaction: -externalip set -> setting -discover=0\n", __func__);
+    }
+
+    // disable whitelistrelay in blocksonly mode
+    if (gArgs.GetBoolArg("-blocksonly", DEFAULT_BLOCKSONLY)) {
+        if (gArgs.SoftSetBoolArg("-whitelistrelay", false))
+            LogPrintf("%s: parameter interaction: -blocksonly=1 -> setting -whitelistrelay=0\n", __func__);
+    }
+
+    // Forcing relay from whitelisted hosts implies we will accept relays from them in the first place.
+    if (gArgs.GetBoolArg("-whitelistforcerelay", DEFAULT_WHITELISTFORCERELAY)) {
+        if (gArgs.SoftSetBoolArg("-whitelistrelay", true))
+            LogPrintf("%s: parameter interaction: -whitelistforcerelay=1 -> setting -whitelistrelay=1\n", __func__);
+    }
+
+    // Warn if network-specific options (-addnode, -connect, etc) are
+    // specified in default section of config file, but not overridden
+    // on the command line or in this network's section of the config file.
+    std::string network = gArgs.GetChainName();
+    for (const auto& arg : gArgs.GetUnsuitableSectionOnlyArgs()) {
+        InitWarning(strprintf(_("Config setting for %s only applied on %s network when in [%s] section."), arg, network, network));
+    }
+
+    // Warn if unrecognized section name are present in the config file.
+    for (const auto& section : gArgs.GetUnrecognizedSections()) {
+        InitWarning(strprintf(_("Section [%s] is not recognized."), section));
+    }
+}
+
+static std::string ResolveErrMsg(const char * const optname, const std::string& strBind)
+{
+    return strprintf(_("Cannot resolve -%s address: '%s'"), optname, strBind);
+}
+
+/**
+ * Initialize global loggers.
+ *
+ * Note that this is called very early in the process lifetime, so you should be
+ * careful about what global state you rely on here.
+ */
+void InitLogging()
+{
+    LogInstance().m_print_to_file = !gArgs.IsArgNegated("-debuglogfile");
+    LogInstance().m_file_path = AbsPathForConfigVal(gArgs.GetArg("-debuglogfile", DEFAULT_DEBUGLOGFILE));
+
+    // Add newlines to the logfile to distinguish this execution from the last
+    // one; called before console logging is set up, so this is only sent to
+    // debug.log.
+    LogPrintf("\n\n\n\n\n");
+
+    LogInstance().m_print_to_console = gArgs.GetBoolArg("-printtoconsole", !gArgs.GetBoolArg("-daemon", false));
+    LogInstance().m_log_timestamps = gArgs.GetBoolArg("-logtimestamps", DEFAULT_LOGTIMESTAMPS);
+    LogInstance().m_log_time_micros = gArgs.GetBoolArg("-logtimemicros", DEFAULT_LOGTIMEMICROS);
+
+    fLogIPs = gArgs.GetBoolArg("-logips", DEFAULT_LOGIPS);
+
+    std::string version_string = FormatFullVersion();
+#ifdef DEBUG
+    version_string += " (debug build)";
+#else
+    version_string += " (release build)";
+#endif
+    LogPrintf(PACKAGE_NAME " version %s\n", version_string);
+}
+
+//namespace { // Variables internal to initialization process only
+//
+//    int nMaxConnections;
+//    int nUserMaxConnections;
+//    int nFD;
+//    ServiceFlags nLocalServices = ServiceFlags(NODE_NETWORK | NODE_NETWORK_LIMITED);
+//    int64_t peer_connect_timeout;
+//
+//} // namespace
+
 [[noreturn]] static void new_handler_terminate()
 {
     // Rather than throwing std::bad-alloc if allocation fails, terminate
@@ -1035,25 +1127,9 @@ static bool AppInitServers()
     std::terminate();
 };
 
-bool AppInitLockDataDirectory()
+bool AppInitBasicSetup()
 {
-    // After daemonization get the data directory lock again and hold on to it until exit
-    // This creates a slight window for a race condition to happen, however this condition is harmless: it
-    // will at most make us exit without printing a message to console.
-    if (!LockDataDirectory(false)) {
-        // Detailed error printed inside LockDataDirectory
-        return false;
-    }
-    return true;
-}
-
-/** Initialize wispr.
- *  @pre Parameters should be parsed and config file should be read.
- */
-bool AppInit2()
-{
-    const CChainParams& chainparams = Params();
-// ********************************************************* Step 1: setup
+    // ********************************************************* Step 1: setup
 #ifdef _MSC_VER
     // Turn off Microsoft heap dump noise
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
@@ -1067,7 +1143,7 @@ bool AppInit2()
 #endif
 
     if (!SetupNetworking())
-        return InitError("Error: Initializing networking failed");
+        return InitError("Initializing networking failed");
 
 #ifndef WIN32
     if (!gArgs.GetBoolArg("-sysperms", false)) {
@@ -1088,6 +1164,11 @@ bool AppInit2()
 #endif
 
     std::set_new_handler(new_handler_terminate);
+
+    return true;
+}
+bool AppInitParameterInteraction()
+{
     // ********************************************************* Step 2: parameter interactions
     // Set this early so that parameter interactions go to console
     fLogTimestamps = gArgs.GetBoolArg("-logtimestamps", true);
@@ -1165,7 +1246,7 @@ bool AppInit2()
     int nBind = std::max((int)gArgs.IsArgSet("-bind") + (int)gArgs.IsArgSet("-whitebind"), 1);
     nMaxConnections = gArgs.GetArg("-maxconnections", 125);
     nMaxConnections = std::max(std::min(nMaxConnections, (int)(FD_SETSIZE - nBind - MIN_CORE_FILEDESCRIPTORS)), 0);
-    int nFD = RaiseFileDescriptorLimit(nMaxConnections + MIN_CORE_FILEDESCRIPTORS);
+    nFD = RaiseFileDescriptorLimit(nMaxConnections + MIN_CORE_FILEDESCRIPTORS);
     if (nFD < MIN_CORE_FILEDESCRIPTORS)
         return InitError(_("Not enough file descriptors available."));
     if (nFD - MIN_CORE_FILEDESCRIPTORS < nMaxConnections)
@@ -1296,6 +1377,53 @@ bool AppInit2()
             nLocalServices = ServiceFlags(nLocalServices | NODE_BLOOM);
 
     }
+}
+static bool LockDataDirectory(bool probeOnly)
+{
+    // Make sure only a single Bitcoin process is using the data directory.
+    fs::path datadir = GetDataDir();
+    if (!DirIsWritable(datadir)) {
+        return InitError(strprintf(_("Cannot write to data directory '%s'; check permissions."), datadir.string()));
+    }
+    if (!LockDirectory(datadir, ".lock", probeOnly)) {
+        return InitError(strprintf(_("Cannot obtain a lock on data directory %s. %s is probably already running."), datadir.string(), _(PACKAGE_NAME)));
+    }
+    return true;
+}
+bool AppInitSanityChecks()
+{
+    // ********************************************************* Step 4: sanity checks
+
+    // Initialize elliptic curve code
+    std::string sha256_algo = SHA256AutoDetect();
+    LogPrintf("Using the '%s' SHA256 implementation\n", sha256_algo);
+    RandomInit();
+    ECC_Start();
+    globalVerifyHandle.reset(new ECCVerifyHandle());
+
+    // Sanity check
+    if (!InitSanityCheck())
+        return InitError(strprintf(_("Initialization sanity check failed. %s is shutting down."), _(PACKAGE_NAME)));
+
+    // Probe the data directory lock to give an early error message, if possible
+    // We cannot hold the data directory lock here, as the forking for daemon() hasn't yet happened,
+    // and a fork will cause weird behavior to it.
+    return LockDataDirectory(true);
+}
+bool AppInitLockDataDirectory()
+{
+    // After daemonization get the data directory lock again and hold on to it until exit
+    // This creates a slight window for a race condition to happen, however this condition is harmless: it
+    // will at most make us exit without printing a message to console.
+    if (!LockDataDirectory(false)) {
+        // Detailed error printed inside LockDataDirectory
+        return false;
+    }
+    return true;
+}
+bool AppInitMain()
+{
+    const CChainParams& chainparams = Params();
 
     // ********************************************************* Step 4: application initialization: dir lock, daemonize, pidfile, debug log
 
@@ -1312,6 +1440,7 @@ bool AppInit2()
 
     std::string strDataDir = GetDataDir().string();
 #ifdef ENABLE_WALLET
+    std::string strWalletFile = gArgs.GetArg("-wallet", "wallet.dat");
     // Wallet file must be a plain filename without a directory
     if (strWalletFile != fs::basename(strWalletFile) + fs::extension(strWalletFile))
         return InitError(strprintf(_("Wallet %s resides outside data directory %s"), strWalletFile, strDataDir));
@@ -1331,7 +1460,7 @@ bool AppInit2()
         }
         if (!LogInstance().OpenDebugLog()) {
             return InitError(strprintf("Could not open debug log file %s",
-                LogInstance().m_file_path.string()));
+                                       LogInstance().m_file_path.string()));
         }
     }
 
@@ -1360,7 +1489,7 @@ bool AppInit2()
                   "current working directory '%s'. This is fragile, because if bitcoin is started in the future "
                   "from a different location, it will be unable to locate the current data files. There could "
                   "also be data loss if bitcoin is started while in a temporary directory.\n",
-            gArgs.GetArg("-datadir", ""), fs::current_path().string());
+                  gArgs.GetArg("-datadir", ""), fs::current_path().string());
     }
     std::ostringstream strErrors;
 
@@ -1383,9 +1512,9 @@ bool AppInit2()
     threadGroup.create_thread(boost::bind(&TraceThread<CScheduler::Function>, "scheduler", serviceLoop));
     GetMainSignals().RegisterBackgroundSignalScheduler(scheduler);
 
-//#if ENABLE_ZMQ
-//    RegisterZMQRPCCommands(tableRPC);
-//#endif
+#if ENABLE_ZMQ
+    RegisterZMQRPCCommands(tableRPC);
+#endif
     /* Start the RPC server already.  It will be started in "warmup" mode
      * and not really process calls already (but it will signify connections
      * that the server is there and will be ready later).  Warmup mode will
@@ -1401,6 +1530,7 @@ bool AppInit2()
 
 // ********************************************************* Step 5: Backup wallet and verify wallet database integrity
 #ifdef ENABLE_WALLET
+    bool fDisableWallet = gArgs.GetBoolArg("-disablewallet", false);
     if (!fDisableWallet) {
         fs::path backupDir = GetDataDir() / "backups";
         if (!fs::exists(backupDir)) {
@@ -1537,10 +1667,10 @@ bool AppInit2()
             CDBEnv::VerifyResult r = bitdb.Verify(strWalletFile, CWalletDB::Recover);
             if (r == CDBEnv::RECOVER_OK) {
                 std::string msg = strprintf(_("Warning: wallet.dat corrupt, data salvaged!"
-                                         " Original wallet.dat saved as wallet.{timestamp}.bak in %s; if"
-                                         " your balance or transactions are incorrect you should"
-                                         " restore from a backup."),
-                    strDataDir);
+                                              " Original wallet.dat saved as wallet.{timestamp}.bak in %s; if"
+                                              " your balance or transactions are incorrect you should"
+                                              " restore from a backup."),
+                                            strDataDir);
                 InitWarning(msg);
             }
             if (r == CDBEnv::RECOVER_FAIL)
@@ -1569,7 +1699,7 @@ bool AppInit2()
     strSubVersion = FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, uacomments);
     if (strSubVersion.size() > MAX_SUBVERSION_LENGTH) {
         return InitError(strprintf(_("Total length of network version std::string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments."),
-            strSubVersion.size(), MAX_SUBVERSION_LENGTH));
+                                   strSubVersion.size(), MAX_SUBVERSION_LENGTH));
     }
 
     if (gArgs.IsArgSet("-onlynet")) {
@@ -1870,8 +2000,8 @@ bool AppInit2()
             // first suggest a reindex
             if (!fReset) {
                 bool fRet = uiInterface.ThreadSafeMessageBox(
-                    strLoadError + ".\n\n" + _("Do you want to rebuild the block database now?"),
-                    "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
+                        strLoadError + ".\n\n" + _("Do you want to rebuild the block database now?"),
+                        "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
                 if (fRet) {
                     fReindex = true;
                     AbortShutdown();
@@ -1937,7 +2067,7 @@ bool AppInit2()
                 strErrors << _("Error loading wallet.dat: Wallet corrupted") << "\n";
             else if (nLoadWalletRet == DB_NONCRITICAL_ERROR) {
                 std::string msg(_("Warning: error reading wallet.dat! All keys read correctly, but transaction data"
-                             " or address book entries might be missing or incorrect."));
+                                  " or address book entries might be missing or incorrect."));
                 InitWarning(msg);
             } else if (nLoadWalletRet == DB_TOO_NEW)
                 strErrors << _("Error loading wallet.dat: Wallet requires newer version of WISPR Core") << "\n";
@@ -2300,7 +2430,6 @@ bool AppInit2()
         threadGroup.create_thread(boost::bind(&ThreadFlushWalletDB, boost::ref(pwalletMain->strWalletFile)));
     }
 #endif
-
 
     return !ShutdownRequested();
 }

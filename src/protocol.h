@@ -314,6 +314,10 @@ enum ServiceFlags : uint64_t {
   // NODE_BLOOM_LIGHT_ZC means the node has the same feature as NODE_BLOOM_WITHOUT_MN with the addition of
   // support for the light zerocoin protocol.
       NODE_BLOOM_LIGHT_ZC = (1 << 5),
+  // NODE_NETWORK_LIMITED means the same as NODE_NETWORK with the limitation of only
+    // serving the last 288 (2 day) blocks
+    // See BIP159 for details on how this is implemented.
+    NODE_NETWORK_LIMITED = (1 << 10),
   // Bits 24-31 are reserved for temporary experiments. Just pick a bit that
   // isn't getting used, or one not being used much, and notify the
   // bitcoin-development mailing list. Remember that service bits are just

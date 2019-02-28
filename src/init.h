@@ -26,7 +26,7 @@ void Shutdown();
 void PrepareShutdown();
 //!Initialize the logging infrastructure
 void InitLogging();
-bool AppInit2();
+//bool AppInit2();
 
 /** The help message mode determines what help message to show */
 enum HelpMessageMode {
@@ -45,35 +45,35 @@ std::string LicenseInfo();
 
 
 //!Parameter interaction: change current parameters depending on various rules
-//void InitParameterInteraction();
+void InitParameterInteraction();
 
 /** Initialize bitcoin core: Basic context setup.
  *  @note This can be done before daemonization. Do not call Shutdown() if this function fails.
  *  @pre Parameters should be parsed and config file should be read.
  */
-//bool AppInitBasicSetup();
+bool AppInitBasicSetup();
 /**
  * Initialization: parameter interaction.
  * @note This can be done before daemonization. Do not call Shutdown() if this function fails.
  * @pre Parameters should be parsed and config file should be read, AppInitBasicSetup should have been called.
  */
-//bool AppInitParameterInteraction();
+bool AppInitParameterInteraction();
 /**
  * Initialization sanity checks: ecc init, sanity checks, dir lock.
  * @note This can be done before daemonization. Do not call Shutdown() if this function fails.
  * @pre Parameters should be parsed and config file should be read, AppInitParameterInteraction should have been called.
  */
-//bool AppInitSanityChecks();
+bool AppInitSanityChecks();
 /**
  * Lock bitcoin core data directory.
  * @note This should only be done after daemonization. Do not call Shutdown() if this function fails.
  * @pre Parameters should be parsed and config file should be read, AppInitSanityChecks should have been called.
  */
-//bool AppInitLockDataDirectory();
+bool AppInitLockDataDirectory();
 /**
  * Bitcoin core main initialization.
  * @note This should only be done after daemonization. Call Shutdown() if this function fails.
  * @pre Parameters should be parsed and config file should be read, AppInitLockDataDirectory should have been called.
  */
-//bool AppInitMain();
+bool AppInitMain();
 #endif // BITCOIN_INIT_H
