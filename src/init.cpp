@@ -1007,14 +1007,13 @@ bool InitSanityCheck(void)
     return true;
 }
 
-bool AppInitServers()
+static bool AppInitServers()
 {
     RPCServer::OnStopped(&OnRPCStopped);
     RPCServer::OnPreCommand(&OnRPCPreCommand);
     if (!InitHTTPServer())
         return false;
     StartRPC();
-        return false;
     if (!StartHTTPRPC())
         return false;
     if (gArgs.GetBoolArg("-rest", false) && !StartREST())
