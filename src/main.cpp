@@ -216,11 +216,12 @@ CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& loc
     return chain.Genesis();
 }
 
-CCoinsViewDB* pcoinsdbview = nullptr;
-CCoinsViewCache* pcoinsTip = nullptr;
-CBlockTreeDB* pblocktree = nullptr;
-CZerocoinDB* zerocoinDB = nullptr;
-CSporkDB* pSporkDB = nullptr;
+std::unique_ptr<CCoinsViewDB> pcoinsdbview;
+std::unique_ptr<CCoinsViewCache> pcoinsTip;
+std::unique_ptr<CBlockTreeDB> pblocktree;
+std::unique_ptr<CZerocoinDB> zerocoinDB;
+std::unique_ptr<CSporkDB> pSporkDB;
+
 enum class FlushStateMode {
   NONE,
   IF_NEEDED,

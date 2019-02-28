@@ -198,7 +198,7 @@ public:
 };
 
 //static CCoinsViewDB* pcoinsdbview = nullptr;
-static CCoinsViewErrorCatcher* pcoinscatcher = nullptr;
+static std::unique_ptr<CCoinsViewErrorCatcher> pcoinscatcher;
 static std::unique_ptr<ECCVerifyHandle> globalVerifyHandle;
 static boost::thread_group threadGroup;
 static CScheduler scheduler;
@@ -274,18 +274,12 @@ void PrepareShutdown()
             //record that client took the proper shutdown procedure
             pblocktree->WriteFlag("shutdown", true);
         }
-        delete pcoinsTip;
-        pcoinsTip = nullptr;
-        delete pcoinscatcher;
-        pcoinscatcher = nullptr;
-        delete pcoinsdbview;
-        pcoinsdbview = nullptr;
-        delete pblocktree;
-        pblocktree = nullptr;
-        delete zerocoinDB;
-        zerocoinDB = nullptr;
-        delete pSporkDB;
-        pSporkDB = nullptr;
+        pcoinsTip.reset();
+        pcoinscatcher.reset();
+        pcoinsdbview.reset();
+        pblocktree.reset();
+        zerocoinDB.reset();
+        pSporkDB.reset();
     }
 #ifdef ENABLE_WALLET
     if (pwalletMain)
@@ -1882,21 +1876,21 @@ bool AppInitMain()
         do {
             try {
                 UnloadBlockIndex();
-                delete pcoinsTip;
-                delete pcoinsdbview;
-                delete pcoinscatcher;
-                delete pblocktree;
-                delete zerocoinDB;
-                delete pSporkDB;
+                pcoinsTip.reset();
+                pcoinsdbview.reset();
+                pcoinscatcher.reset();
+                pblocktree.reset();
+                zerocoinDB.reset();
+                pSporkDB.reset();
 
                 //WISPR specific: zerocoin and spork DB's
-                zerocoinDB = new CZerocoinDB(0, false, fReindex);
-                pSporkDB = new CSporkDB(0, false, false);
+                zerocoinDB.reset(new CZerocoinDB(0, false, fReindex));
+                pSporkDB.reset(new CSporkDB(0, false, false));
 
-                pblocktree = new CBlockTreeDB(nBlockTreeDBCache, false, fReindex);
-                pcoinsdbview = new CCoinsViewDB(nCoinDBCache, false, fReindex);
-                pcoinscatcher = new CCoinsViewErrorCatcher(pcoinsdbview);
-                pcoinsTip = new CCoinsViewCache(pcoinscatcher);
+                pblocktree.reset(new CBlockTreeDB(nBlockTreeDBCache, false, fReindex));
+                pcoinsdbview.reset(new CCoinsViewDB(nCoinDBCache, false, fReindex));
+                pcoinscatcher.reset(new CCoinsViewErrorCatcher(pcoinsdbview.get()));
+                pcoinsTip.reset(new CCoinsViewCache(pcoinscatcher.get()));
 
                 if (fReindex)
                     pblocktree->WriteReindexing(true);

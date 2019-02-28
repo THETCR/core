@@ -87,9 +87,9 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     GetMainSignals().RegisterBackgroundSignalScheduler(scheduler);
 
 //    mempool.setSanityCheck(1.0);
-    pblocktree = new CBlockTreeDB(1 << 20, true);
-    pcoinsdbview = new CCoinsViewDB(1 << 23, true);
-    pcoinsTip = new CCoinsViewCache(pcoinsdbview);
+    pblocktree.reset(new CBlockTreeDB(1 << 20, true));
+    pcoinsdbview.reset(new CCoinsViewDB(1 << 23, true));
+    pcoinsTip.reset(new CCoinsViewCache(pcoinsdbview.get()));
     InitBlockIndex(chainparams);
     {
         CValidationState state;
@@ -106,7 +106,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     nScriptCheckThreads = 3;
     for (int i=0; i < nScriptCheckThreads-1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
-    g_connman = std::unique_ptr<CConnman>(new CConnman()); // Deterministic randomness for tests.
+    g_connman = MakeUnique<CConnman>(); // Deterministic randomness for tests.
     connman = g_connman.get();
     RegisterNodeSignals(GetNodeSignals());
 }
@@ -125,9 +125,9 @@ TestingSetup::~TestingSetup()
     delete pwalletMain;
     pwalletMain = nullptr;
 #endif
-    delete pcoinsTip;
-    delete pcoinsdbview;
-    delete pblocktree;
+    pcoinsTip.reset();
+    pcoinsdbview.reset();
+    pblocktree.reset();
 #ifdef ENABLE_WALLET
     bitdb.Flush(true);
 #endif
