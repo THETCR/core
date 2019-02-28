@@ -189,7 +189,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
         CBlockIndex* pindexPrev = chainActive.Tip();
         const int nHeight = pindexPrev->nHeight + 1;
-        CCoinsViewCache view(pcoinsTip);
+        CCoinsViewCache view(pcoinsTip.get());
 
         // Priority order to process transactions
         std::list<COrphan> vOrphan; // list memory doesn't move
