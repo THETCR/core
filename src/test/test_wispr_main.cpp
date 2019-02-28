@@ -4,14 +4,14 @@
 
 #define BOOST_TEST_MODULE Wispr Test Suite
 
-#include <net.h>
+//#include <net.h>
 #include <test/test_wispr.h>
 
 #include <memory>
 
 #include <boost/test/unit_test.hpp>
 
-std::unique_ptr<CConnman> g_connman;
+//std::unique_ptr<CConnman> g_connman;
 //BOOST_GLOBAL_FIXTURE(TestingSetup);
 
 [[noreturn]] void Shutdown(void* parg) {
