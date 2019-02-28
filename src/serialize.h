@@ -444,13 +444,13 @@ public:
     }
 
     template <typename Stream>
-    void Serialize(Stream& s, int, int = 0) const
+    void Serialize(Stream& s) const
     {
         s.write(pbegin, pend - pbegin);
     }
 
     template <typename Stream>
-    void Unserialize(Stream& s, int, int = 0)
+    void Unserialize(Stream& s)
     {
         s.read(pbegin, pend - pbegin);
     }

@@ -34,7 +34,7 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITEAS(COutPoint, *this);
+        READWRITE(FLATDATA(*this));
     }
 
     void SetNull() { hash.SetNull(); n = NULL_INDEX; }
