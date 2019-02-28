@@ -1540,7 +1540,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         mapAlreadyAskedFor.erase(inv);
 
         if (!tx.IsZerocoinSpend() && AcceptToMemoryPool(mempool, state, tx, true, &fMissingInputs, false, ignoreFees)) {
-            mempool.check(pcoinsTip);
+            mempool.check(pcoinsTip.get());
             RelayTransaction(tx);
             vWorkQueue.push_back(inv.hash);
 
@@ -1588,7 +1588,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
                         LogPrint(BCLog::MEMPOOL, "   removed orphan tx %s\n", orphanHash.ToString());
                         vEraseQueue.push_back(orphanHash);
                     }
-                    mempool.check(pcoinsTip);
+                    mempool.check(pcoinsTip.get());
                 }
             }
 
