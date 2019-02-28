@@ -1378,6 +1378,7 @@ bool AppInitParameterInteraction()
 
     }
 }
+
 static bool LockDataDirectory(bool probeOnly)
 {
     // Make sure only a single Bitcoin process is using the data directory.
@@ -1390,6 +1391,7 @@ static bool LockDataDirectory(bool probeOnly)
     }
     return true;
 }
+
 bool AppInitSanityChecks()
 {
     // ********************************************************* Step 4: sanity checks
