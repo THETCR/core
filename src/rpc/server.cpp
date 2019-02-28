@@ -71,8 +71,8 @@ static struct CRPCSignals
 {
     boost::signals2::signal<void ()> Started;
     boost::signals2::signal<void ()> Stopped;
-    boost::signals2::signal<void (const CRPCCommand&)> PreCommand;
-    boost::signals2::signal<void (const CRPCCommand&)> PostCommand;
+//    boost::signals2::signal<void (const CRPCCommand&)> PreCommand;
+//    boost::signals2::signal<void (const CRPCCommand&)> PostCommand;
 } g_rpcSignals;
 
 void RPCServer::OnStarted(std::function<void ()> slot)
@@ -85,15 +85,15 @@ void RPCServer::OnStopped(std::function<void ()> slot)
     g_rpcSignals.Stopped.connect(slot);
 }
 
-void RPCServer::OnPreCommand(std::function<void (const CRPCCommand&)> slot)
-{
-    g_rpcSignals.PreCommand.connect(boost::bind(slot, _1));
-}
-
-void RPCServer::OnPostCommand(std::function<void (const CRPCCommand&)> slot)
-{
-    g_rpcSignals.PostCommand.connect(boost::bind(slot, _1));
-}
+//void RPCServer::OnPreCommand(std::function<void (const CRPCCommand&)> slot)
+//{
+//    g_rpcSignals.PreCommand.connect(std::bind(slot, _1));
+//}
+//
+//void RPCServer::OnPostCommand(std::function<void (const CRPCCommand&)> slot)
+//{
+//    g_rpcSignals.PostCommand.connect(std::bind(slot, _1));
+//}
 
 void RPCTypeCheck(const UniValue& params,
                   const std::list<UniValueType>& typesExpected,

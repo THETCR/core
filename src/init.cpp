@@ -385,19 +385,10 @@ bool static Bind(const CService& addr, unsigned int flags)
     return true;
 }
 
-void OnRPCStopped()
+static void OnRPCStopped()
 {
     cvBlockChange.notify_all();
     LogPrint(BCLog::RPC, "RPC stopped.\n");
-}
-
-void OnRPCPreCommand(const CRPCCommand& cmd)
-{
-    // Observe safe mode
-//    std::string strWarning = GetWarnings("rpc");
-//    if (strWarning != "" && !gArgs.GetBoolArg("-disablesafemode", DEFAULT_DISABLE_SAFEMODE) &&
-//        !cmd.okSafeMode)
-//        throw JSONRPCError(RPC_FORBIDDEN_BY_SAFE_MODE, std::string("Safe mode: ") + strWarning);
 }
 
 void SetupServerArgs()
@@ -978,7 +969,7 @@ static bool AppInitServers()
 {
     std::cout << "AppInitServers\n";
     RPCServer::OnStopped(&OnRPCStopped);
-    RPCServer::OnPreCommand(&OnRPCPreCommand);
+//    RPCServer::OnPreCommand(&OnRPCPreCommand);
     if (!InitHTTPServer())
         return false;
     StartRPC();
