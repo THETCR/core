@@ -5,6 +5,10 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#if defined(HAVE_CONFIG_H)
+#include <config/wispr-config.h>
+#endif
+
 #include <chainparamsbase.h>
 #include <clientversion.h>
 #include <fs.h>
@@ -12,9 +16,7 @@
 #include <rpc/protocol.h>
 #include <util/system.h>
 #include <util/strencodings.h>
-#include <fs.h>
 
-#include <boost/filesystem/operations.hpp>
 #include <memory>
 #include <stdio.h>
 #include <tuple>
@@ -25,11 +27,8 @@
 
 #include <univalue.h>
 
-#define _(x) std::string(x) /* Keep the _() around in case gettext or such will be used later to translate non-UI */
-
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
-using namespace std;
 static const char DEFAULT_RPCCONNECT[] = "127.0.0.1";
 static const int DEFAULT_HTTP_CLIENT_TIMEOUT=900;
 static const bool DEFAULT_NAMED=false;
