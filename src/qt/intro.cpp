@@ -16,7 +16,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
-#include <src/chainparams.h>
+#include <chainparams.h>
 
 /* Minimum free space (in bytes) needed for data directory */
 static const uint64_t GB_BYTES = 1000000000LL;
