@@ -59,7 +59,7 @@ const CRPCCommand commands[] =
 
 } // anonymous namespace
 
-void RegisterZMQRPCCommands(CRPCTable& t)
+void RegisterZMQRPCCommands(const CRPCTable& t)
 {
     for (const auto& c : commands) {
         t.appendCommand(c.name, &c);

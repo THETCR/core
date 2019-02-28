@@ -7,6 +7,6 @@
 
 class CRPCTable;
 
-void RegisterZMQRPCCommands(CRPCTable& t);
+void RegisterZMQRPCCommands(const CRPCTable& t);
 
 #endif // BITCOIN_ZMQ_ZMRRPC_H
