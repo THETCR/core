@@ -1520,9 +1520,9 @@ bool AppInitMain()
     threadGroup.create_thread(boost::bind(&TraceThread<CScheduler::Function>, "scheduler", serviceLoop));
     GetMainSignals().RegisterBackgroundSignalScheduler(scheduler);
 
-#if ENABLE_ZMQ
-    RegisterZMQRPCCommands(tableRPC);
-#endif
+//#if ENABLE_ZMQ
+//    RegisterZMQRPCCommands(tableRPC);
+//#endif
     /* Start the RPC server already.  It will be started in "warmup" mode
      * and not really process calls already (but it will signify connections
      * that the server is there and will be ready later).  Warmup mode will
