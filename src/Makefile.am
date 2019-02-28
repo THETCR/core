@@ -130,7 +130,6 @@ BITCOIN_CORE_H = \
   primitives/deterministicmint.h \
   primitives/zerocoin.h \
   core_io.h \
-  core_memusage.h \
   wallet/crypter.h \
   denomination_functions.h \
   obfuscation.h \
