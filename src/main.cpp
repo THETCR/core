@@ -245,7 +245,7 @@ int GetInputAge(CTxIn& vin)
     CCoinsViewCache view(&viewDummy);
     {
         LOCK(mempool.cs);
-        CCoinsViewMemPool viewMempool(pcoinsTip, mempool);
+        CCoinsViewMemPool viewMempool(pcoinsTip.get(), mempool);
         view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
 
         const CCoins* coins = view.AccessCoins(vin.prevout.hash);
@@ -575,7 +575,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             }
         } else {
             LOCK(pool.cs);
-            CCoinsViewMemPool viewMemPool(pcoinsTip, pool);
+            CCoinsViewMemPool viewMemPool(pcoinsTip.get(), pool);
             view.SetBackend(viewMemPool);
 
             // do we already have it?
@@ -806,7 +806,7 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
         CAmount nValueIn = 0;
         {
             LOCK(pool.cs);
-            CCoinsViewMemPool viewMemPool(pcoinsTip, pool);
+            CCoinsViewMemPool viewMemPool(pcoinsTip.get(), pool);
             view.SetBackend(viewMemPool);
 
             // do we already have it?
@@ -1361,7 +1361,7 @@ CAmount GetInvalidUTXOValue()
     CAmount nValue = 0;
     for (auto out : invalid_out::setInvalidOutPoints) {
         bool fSpent = false;
-        CCoinsViewCache cache(pcoinsTip);
+        CCoinsViewCache cache(pcoinsTip.get());
         const CCoins *coins = cache.AccessCoins(out.hash);
         if(!coins || !coins->IsAvailable(out.n))
             fSpent = true;
@@ -2390,7 +2390,7 @@ bool static DisconnectTip(CValidationState& state)
     const CChainParams& chainparams = Params();
     CBlockIndex* pindexDelete = chainActive.Tip();
     assert(pindexDelete);
-    mempool.check(pcoinsTip);
+    mempool.check(pcoinsTip.get());
     // Read block from disk.
     CBlock block;
     if (!ReadBlockFromDisk(block, pindexDelete))
@@ -2398,7 +2398,7 @@ bool static DisconnectTip(CValidationState& state)
     // Apply the block atomically to the chain state.
     int64_t nStart = GetTimeMicros();
     {
-        CCoinsViewCache view(pcoinsTip);
+        CCoinsViewCache view(pcoinsTip.get());
         if (!DisconnectBlock(block, state, pindexDelete, view))
             return error("DisconnectTip() : DisconnectBlock %s failed", pindexDelete->GetBlockHash().ToString());
         assert(view.Flush());
@@ -2415,8 +2415,8 @@ bool static DisconnectTip(CValidationState& state)
         if (tx->IsCoinBase() || tx->IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, *tx, false, NULL))
             mempool.remove(*tx, removed, true);
     }
-    mempool.removeCoinbaseSpends(pcoinsTip, pindexDelete->nHeight);
-    mempool.check(pcoinsTip);
+    mempool.removeCoinbaseSpends(pcoinsTip.get(), pindexDelete->nHeight);
+    mempool.check(pcoinsTip.get());
     // Update chainActive and related variables.
     UpdateTip(pindexDelete->pprev);
     // Let wallets know transactions went from 1-confirmed to
@@ -2441,8 +2441,8 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
 {
     const CChainParams& chainparams = Params();
     assert(pindexNew->pprev == chainActive.Tip());
-    mempool.check(pcoinsTip);
-    CCoinsViewCache view(pcoinsTip);
+    mempool.check(pcoinsTip.get());
+    CCoinsViewCache view(pcoinsTip.get());
 
     if (pblock == nullptr)
         fAlreadyChecked = false;
@@ -2493,7 +2493,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     // Remove conflicting transactions from the mempool.
     std::list<CTransaction> txConflicted;
     mempool.removeForBlock(pblock->vtx, pindexNew->nHeight, txConflicted, !IsInitialBlockDownload());
-    mempool.check(pcoinsTip);
+    mempool.check(pcoinsTip.get());
     // Update chainActive & related variables.
     UpdateTip(pindexNew);
     // Tell wallet about transactions that went from mempool
@@ -3604,7 +3604,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
     if (block.IsProofOfStake()) {
         LOCK(cs_main);
 
-        CCoinsViewCache coins(pcoinsTip);
+        CCoinsViewCache coins(pcoinsTip.get());
 
         if (!coins.HaveInputs(*block.vtx[1])) {
             // the inputs are spent at the chain tip so we should look at the recently spent outputs
@@ -3780,7 +3780,7 @@ bool TestBlockValidity(CValidationState& state, const CBlock& block, CBlockIndex
     AssertLockHeld(cs_main);
     assert(pindexPrev == chainActive.Tip());
 
-    CCoinsViewCache viewNew(pcoinsTip);
+    CCoinsViewCache viewNew(pcoinsTip.get());
     CBlockIndex indexDummy(block);
     indexDummy.pprev = pindexPrev;
     indexDummy.nHeight = pindexPrev->nHeight + 1;
