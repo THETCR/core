@@ -835,4 +835,4 @@ int RPCSerializationFlags()
     return flag;
 }
 
-CRPCTable tableRPC;
+const CRPCTable tableRPC;

@@ -26,11 +26,15 @@ bool InitHTTPServer();
  * This is separate from InitHTTPServer to give users race-condition-free time
  * to register their handlers between InitHTTPServer and StartHTTPServer.
  */
-bool StartHTTPServer();
+void StartHTTPServer();
 /** Interrupt HTTP server threads */
 void InterruptHTTPServer();
 /** Stop HTTP server */
 void StopHTTPServer();
+
+/** Change logging level for libevent. Removes BCLog::LIBEVENT from log categories if
+ * libevent doesn't support debug logging.*/
+bool UpdateHTTPServerLogging(bool enable);
 
 /** Handler for requests to a certain HTTP path */
 typedef std::function<void(HTTPRequest* req, const std::string &)> HTTPRequestHandler;
@@ -143,5 +147,7 @@ public:
 private:
     struct event* ev;
 };
+
+std::string urlDecode(const std::string &urlEncoded);
 
 #endif // BITCOIN_HTTPSERVER_H
