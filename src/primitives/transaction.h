@@ -27,7 +27,7 @@ public:
 
     static constexpr uint32_t NULL_INDEX = (uint32_t) -1;
 
-    COutPoint(): n(NULL_INDEX) { }
+    COutPoint() { SetNull(); }
     COutPoint(const uint256& hashIn, uint32_t nIn): hash(hashIn), n(nIn) { }
 
     ADD_SERIALIZE_METHODS;
@@ -243,8 +243,8 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     if(nVersion == 1){
         s >> tx.nTime;
     }
-//    tx.vin.clear();
-//    tx.vout.clear();
+    tx.vin.resize(1);
+    tx.vout.resize(1);
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
     s >> tx.vin;
     s >> tx.vout;
