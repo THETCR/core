@@ -174,7 +174,8 @@ template<typename X> const X& ReadWriteAsHelper(const X& x) { return x; }
 
 #define READWRITE(...) (::SerReadWriteMany(s, ser_action, __VA_ARGS__))
 #define READWRITEAS(type, obj) (::SerReadWriteMany(s, ser_action, ReadWriteAsHelper<type>(obj)))
-
+#define WRITEDATA(s, obj) s.write((char*)&(obj), sizeof(obj))
+#define READDATA(s, obj) s.read((char*)&(obj), sizeof(obj))
 /**
  * Implement three methods for serializable objects. These are actually wrappers over
  * "SerializationOp" template, which implements the body of each class' serialization
@@ -1077,8 +1078,8 @@ size_t GetSerializeSizeMany(int nVersion, const T&... t)
 /*
  * Basic Types
  */
-#define WRITEDATA(s, obj) s.write((char*)&(obj), sizeof(obj))
-#define READDATA(s, obj) s.read((char*)&(obj), sizeof(obj))
+//#define WRITEDATA(s, obj) s.write((char*)&(obj), sizeof(obj))
+//#define READDATA(s, obj) s.read((char*)&(obj), sizeof(obj))
 // Serializatin for libzerocoin::CoinDenomination
 inline unsigned int GetSerializeSize(libzerocoin::CoinDenomination a) { return sizeof(libzerocoin::CoinDenomination); }
 template <typename Stream>
