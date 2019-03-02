@@ -113,7 +113,6 @@ static bool CheckTxScriptsSanity(const CMutableTransaction& tx)
 bool DecodeHexTx(CMutableTransaction& tx, const std::string& hex_tx, bool try_no_witness, bool try_witness)
 {
     if (!IsHex(hex_tx)) {
-        throw std::runtime_error("ÏsHEx failed");
         return false;
     }
 
