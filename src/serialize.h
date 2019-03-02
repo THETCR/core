@@ -472,7 +472,7 @@ public:
     char* end() { return pend; }
     const char* end() const { return pend; }
 
-    unsigned int GetSerializeSize(int, int = 0) const
+    unsigned int GetSerializeSize() const
     {
         return pend - pbegin;
     }
