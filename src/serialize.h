@@ -276,37 +276,70 @@ void WriteCompactSize(Stream& os, uint64_t nSize)
     return;
 }
 
-template<typename Stream>
+//template<typename Stream>
+//uint64_t ReadCompactSize(Stream& is)
+//{
+//    uint8_t chSize = ser_readdata8(is);
+//    uint64_t nSizeRet = 0;
+//    if (chSize < 253)
+//    {
+//        nSizeRet = chSize;
+//    }
+//    else if (chSize == 253)
+//    {
+//        nSizeRet = ser_readdata16(is);
+//        if (nSizeRet < 253)
+//            throw std::ios_base::failure("non-canonical ReadCompactSize()");
+//    }
+//    else if (chSize == 254)
+//    {
+//        nSizeRet = ser_readdata32(is);
+//        if (nSizeRet < 0x10000u)
+//            throw std::ios_base::failure("non-canonical ReadCompactSize()");
+//    }
+//    else
+//    {
+//        nSizeRet = ser_readdata64(is);
+//        if (nSizeRet < 0x100000000ULL)
+//            throw std::ios_base::failure("non-canonical ReadCompactSize()");
+//    }
+//    if (nSizeRet > (uint64_t)MAX_SIZE)
+//        throw std::ios_base::failure("ReadCompactSize(): size too large");
+//    return nSizeRet;
+//}
+
+template <typename Stream>
 uint64_t ReadCompactSize(Stream& is)
 {
-    uint8_t chSize = ser_readdata8(is);
+    unsigned char chSize;
+    READDATA(is, chSize);
     uint64_t nSizeRet = 0;
-    if (chSize < 253)
-    {
+    if (chSize < 253) {
         nSizeRet = chSize;
-    }
-    else if (chSize == 253)
-    {
-        nSizeRet = ser_readdata16(is);
+    } else if (chSize == 253) {
+        unsigned short xSize;
+        READDATA(is, xSize);
+        nSizeRet = xSize;
         if (nSizeRet < 253)
             throw std::ios_base::failure("non-canonical ReadCompactSize()");
-    }
-    else if (chSize == 254)
-    {
-        nSizeRet = ser_readdata32(is);
+    } else if (chSize == 254) {
+        unsigned int xSize;
+        READDATA(is, xSize);
+        nSizeRet = xSize;
         if (nSizeRet < 0x10000u)
             throw std::ios_base::failure("non-canonical ReadCompactSize()");
-    }
-    else
-    {
-        nSizeRet = ser_readdata64(is);
+    } else {
+        uint64_t xSize;
+        READDATA(is, xSize);
+        nSizeRet = xSize;
         if (nSizeRet < 0x100000000ULL)
             throw std::ios_base::failure("non-canonical ReadCompactSize()");
     }
     if (nSizeRet > (uint64_t)MAX_SIZE)
-        throw std::ios_base::failure("ReadCompactSize(): size too large");
+        throw std::ios_base::failure("ReadCompactSize() : size too large");
     return nSizeRet;
 }
+
 
 /**
  * Variable-length integers: bytes are a MSB base-128 encoding of the number.
