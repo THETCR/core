@@ -174,8 +174,7 @@ template<typename X> const X& ReadWriteAsHelper(const X& x) { return x; }
 
 #define READWRITE(...) (::SerReadWriteMany(s, ser_action, __VA_ARGS__))
 #define READWRITEAS(type, obj) (::SerReadWriteMany(s, ser_action, ReadWriteAsHelper<type>(obj)))
-#define WRITEDATA(s, obj) s.write((char*)&(obj), sizeof(obj))
-#define READDATA(s, obj) s.read((char*)&(obj), sizeof(obj))
+
 /**
  * Implement three methods for serializable objects. These are actually wrappers over
  * "SerializationOp" template, which implements the body of each class' serialization
@@ -277,70 +276,37 @@ void WriteCompactSize(Stream& os, uint64_t nSize)
     return;
 }
 
-//template<typename Stream>
-//uint64_t ReadCompactSize(Stream& is)
-//{
-//    uint8_t chSize = ser_readdata8(is);
-//    uint64_t nSizeRet = 0;
-//    if (chSize < 253)
-//    {
-//        nSizeRet = chSize;
-//    }
-//    else if (chSize == 253)
-//    {
-//        nSizeRet = ser_readdata16(is);
-//        if (nSizeRet < 253)
-//            throw std::ios_base::failure("non-canonical ReadCompactSize()");
-//    }
-//    else if (chSize == 254)
-//    {
-//        nSizeRet = ser_readdata32(is);
-//        if (nSizeRet < 0x10000u)
-//            throw std::ios_base::failure("non-canonical ReadCompactSize()");
-//    }
-//    else
-//    {
-//        nSizeRet = ser_readdata64(is);
-//        if (nSizeRet < 0x100000000ULL)
-//            throw std::ios_base::failure("non-canonical ReadCompactSize()");
-//    }
-//    if (nSizeRet > (uint64_t)MAX_SIZE)
-//        throw std::ios_base::failure("ReadCompactSize(): size too large");
-//    return nSizeRet;
-//}
-
-template <typename Stream>
+template<typename Stream>
 uint64_t ReadCompactSize(Stream& is)
 {
-    unsigned char chSize;
-    READDATA(is, chSize);
+    uint8_t chSize = ser_readdata8(is);
     uint64_t nSizeRet = 0;
-    if (chSize < 253) {
+    if (chSize < 253)
+    {
         nSizeRet = chSize;
-    } else if (chSize == 253) {
-        unsigned short xSize;
-        READDATA(is, xSize);
-        nSizeRet = xSize;
+    }
+    else if (chSize == 253)
+    {
+        nSizeRet = ser_readdata16(is);
         if (nSizeRet < 253)
             throw std::ios_base::failure("non-canonical ReadCompactSize()");
-    } else if (chSize == 254) {
-        unsigned int xSize;
-        READDATA(is, xSize);
-        nSizeRet = xSize;
+    }
+    else if (chSize == 254)
+    {
+        nSizeRet = ser_readdata32(is);
         if (nSizeRet < 0x10000u)
             throw std::ios_base::failure("non-canonical ReadCompactSize()");
-    } else {
-        uint64_t xSize;
-        READDATA(is, xSize);
-        nSizeRet = xSize;
+    }
+    else
+    {
+        nSizeRet = ser_readdata64(is);
         if (nSizeRet < 0x100000000ULL)
             throw std::ios_base::failure("non-canonical ReadCompactSize()");
     }
     if (nSizeRet > (uint64_t)MAX_SIZE)
-        throw std::ios_base::failure("ReadCompactSize() : size too large");
+        throw std::ios_base::failure("ReadCompactSize(): size too large");
     return nSizeRet;
 }
-
 
 /**
  * Variable-length integers: bytes are a MSB base-128 encoding of the number.
@@ -472,7 +438,7 @@ public:
     char* end() { return pend; }
     const char* end() const { return pend; }
 
-    unsigned int GetSerializeSize() const
+    unsigned int GetSerializeSize(int, int = 0) const
     {
         return pend - pbegin;
     }
@@ -1078,8 +1044,8 @@ size_t GetSerializeSizeMany(int nVersion, const T&... t)
 /*
  * Basic Types
  */
-//#define WRITEDATA(s, obj) s.write((char*)&(obj), sizeof(obj))
-//#define READDATA(s, obj) s.read((char*)&(obj), sizeof(obj))
+#define WRITEDATA(s, obj) s.write((char*)&(obj), sizeof(obj))
+#define READDATA(s, obj) s.read((char*)&(obj), sizeof(obj))
 // Serializatin for libzerocoin::CoinDenomination
 inline unsigned int GetSerializeSize(libzerocoin::CoinDenomination a) { return sizeof(libzerocoin::CoinDenomination); }
 template <typename Stream>
