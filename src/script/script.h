@@ -571,8 +571,10 @@ public:
   void clear()
   {
       // The default prevector::clear() does not release memory
-      CScriptBase::clear();
-      shrink_to_fit();
+      // The default std::vector::clear() does not release memory.
+      CScriptBase().swap(*this);
+//      CScriptBase::clear();
+//      shrink_to_fit();
   }
   bool IsPayToPublicKeyHash() const;
 };
