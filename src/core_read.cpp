@@ -121,7 +121,8 @@ bool DecodeHexTx(CMutableTransaction& tx, const std::string& hex_tx, bool try_no
     CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION);
     try {
         ssData >> tx;
-    } catch (const std::exception&) {
+    } catch (const std::exception& e) {
+        fprintf(stderr, "Error: %s\n", e.what());
         throw std::runtime_error("Stream failed");
         return false;
     }
