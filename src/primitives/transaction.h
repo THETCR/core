@@ -241,6 +241,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     s >> tx.nVersion;
     int32_t nVersion = tx.nVersion;
     if(nVersion == 1){
+        printf("Serialize: version 1\n");
         s >> tx.nTime;
     }
     tx.vin.resize(1);
@@ -259,7 +260,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     int32_t nVersion = tx.nVersion;
     s << tx.nVersion;
     if(nVersion == 1) {
-//        printf("Serialize: version 1\n");
+        printf("Serialize: version 1\n");
         s << tx.nTime;
     }
     s << tx.vin;
