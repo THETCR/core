@@ -203,7 +203,7 @@ BOOST_AUTO_TEST_CASE(sighash_from_data)
             continue;
         }
 
-        sh = SignatureHash(scriptCode, tx, nIn, nHashType, 0, SigVersion::BASE);
+        sh = SignatureHash(scriptCode, *tx, nIn, nHashType, 0, SigVersion::BASE);
         BOOST_CHECK_MESSAGE(sh.GetHex() == sigHashHex, strTest);
     }
 }
