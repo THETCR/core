@@ -244,8 +244,8 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         printf("Serialize: version 1\n");
         s >> tx.nTime;
     }
-    tx.vin.resize(1);
-    tx.vout.resize(1);
+    tx.vin.clear();
+    tx.vout.clear();
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
     s >> tx.vin;
     s >> tx.vout;
@@ -304,26 +304,26 @@ public:
 
     CTransaction& operator=(const CTransaction& tx);
 
-//    template <typename Stream>
-//    inline void Serialize(Stream& s) const {
-//        SerializeTransaction(*this, s);
-//    }
-
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(*const_cast<int32_t*>(&this->nVersion));
-        int32_t _nVersion = this->nVersion;
-        if(_nVersion == 1){
-            READWRITE(*const_cast<unsigned int *>(&nTime));
-        }
-        READWRITE(*const_cast<std::vector<CTxIn>*>(&vin));
-        READWRITE(*const_cast<std::vector<CTxOut>*>(&vout));
-        READWRITE(*const_cast<uint32_t*>(&nLockTime));
-        if (ser_action.ForRead())
-            UpdateHash();
+    template <typename Stream>
+    inline void Serialize(Stream& s) const {
+        SerializeTransaction(*this, s);
     }
+
+//    ADD_SERIALIZE_METHODS;
+//
+//    template <typename Stream, typename Operation>
+//    inline void SerializationOp(Stream& s, Operation ser_action) {
+//        READWRITE(*const_cast<int32_t*>(&this->nVersion));
+//        int32_t _nVersion = this->nVersion;
+//        if(_nVersion == 1){
+//            READWRITE(*const_cast<unsigned int *>(&nTime));
+//        }
+//        READWRITE(*const_cast<std::vector<CTxIn>*>(&vin));
+//        READWRITE(*const_cast<std::vector<CTxOut>*>(&vout));
+//        READWRITE(*const_cast<uint32_t*>(&nLockTime));
+//        if (ser_action.ForRead())
+//            UpdateHash();
+//    }
     /** This deserializing constructor is provided instead of an Unserialize method.
      *  Unserialize is not possible, since it would require overwriting const fields. */
     template <typename Stream>
@@ -413,29 +413,29 @@ struct CMutableTransaction
     CMutableTransaction();
     CMutableTransaction(const CTransaction& tx);
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(this->nVersion);
-        int32_t _nVersion = this->nVersion;
-        if(_nVersion == 1){
-            READWRITE(nTime);
-        }
-        READWRITE(vin);
-        READWRITE(vout);
-        READWRITE(nLockTime);
+//    ADD_SERIALIZE_METHODS;
+//
+//    template <typename Stream, typename Operation>
+//    inline void SerializationOp(Stream& s, Operation ser_action) {
+//        READWRITE(this->nVersion);
+//        int32_t _nVersion = this->nVersion;
+//        if(_nVersion == 1){
+//            READWRITE(nTime);
+//        }
+//        READWRITE(vin);
+//        READWRITE(vout);
+//        READWRITE(nLockTime);
+//    }
+    template <typename Stream>
+    inline void Serialize(Stream& s) const {
+        SerializeTransaction(*this, s);
     }
-//    template <typename Stream>
-//    inline void Serialize(Stream& s) const {
-//        SerializeTransaction(*this, s);
-//    }
-//
-//
-//    template <typename Stream>
-//    inline void Unserialize(Stream& s) {
-//        UnserializeTransaction(*this, s);
-//    }
+
+
+    template <typename Stream>
+    inline void Unserialize(Stream& s) {
+        UnserializeTransaction(*this, s);
+    }
 
     template <typename Stream>
     CMutableTransaction(deserialize_type, Stream& s) {
