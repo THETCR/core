@@ -369,7 +369,7 @@ bool CActiveMasternode::GetMasterNodeVin(CTxIn& vin, CPubKey& pubkey, CKey& secr
 
         bool found = false;
         for (COutput& out: possibleCoins) {
-            if (out.tx->GetHash() == txHash && out.i == outputIndex) {
+            if (out.tx->tx->GetHash() == txHash && out.i == outputIndex) {
                 selectedOutput = &out;
                 found = true;
                 break;
@@ -402,8 +402,8 @@ bool CActiveMasternode::GetVinFromOutput(COutput out, CTxIn& vin, CPubKey& pubke
 
     CScript pubScript;
 
-    vin = CTxIn(out.tx->GetHash(), out.i);
-    pubScript = out.tx->vout[out.i].scriptPubKey; // the inputs PubKey
+    vin = CTxIn(out.tx->tx->GetHash(), out.i);
+    pubScript = out.tx->tx->vout[out.i].scriptPubKey; // the inputs PubKey
 
     CTxDestination address1;
     ExtractDestination(pubScript, address1);
@@ -458,7 +458,7 @@ std::vector<COutput> CActiveMasternode::SelectCoinsMasternode()
 
     // Filter
     for (const COutput& out: vCoins) {
-        if (out.tx->vout[out.i].nValue == 125000 * COIN) { //exactly
+        if (out.tx->tx->vout[out.i].nValue == 125000 * COIN) { //exactly
             filteredCoins.push_back(out);
         }
     }
