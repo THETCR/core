@@ -1409,7 +1409,7 @@ void CWalletTx::GetAmounts(std::list<COutputEntry>& listReceived,
             address = CNoDestination();
         } else if (!ExtractDestination(txout.scriptPubKey, address)) {
             if (!tx->IsCoinStake() && !tx->IsCoinBase()) {
-                LogPrintf("CWalletTx::GetAmounts: Unknown transaction type found, txid %s\n", this->GetHash().ToString());
+                LogPrintf("CWalletTx::GetAmounts: Unknown transaction type found, txid %s\n", tx->GetHash().ToString());
             }
             address = CNoDestination();
         }
@@ -2135,8 +2135,8 @@ bool less_then_denom(const COutput& out1, const COutput& out2)
     bool found2 = false;
     for (CAmount d: obfuScationDenominations) // loop through predefined denoms
     {
-        if (pcoin1->vout[out1.i].nValue == d) found1 = true;
-        if (pcoin2->vout[out2.i].nValue == d) found2 = true;
+        if (pcoin1->tx->vout[out1.i].nValue == d) found1 = true;
+        if (pcoin2->tx->vout[out2.i].nValue == d) found2 = true;
     }
     return (!found1 && found2);
 }
@@ -3126,7 +3126,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
         for (CTxIn txIn : txNew.vin) {
             const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
-            if (!SignSignature(*this, wtx->vout[nIn].scriptPubKey, txNew, nIn, wtx->vout[nIn].nValue, SIGHASH_ALL))
+            if (!SignSignature(*this, wtx->tx->vout[nIn].scriptPubKey, txNew, nIn, wtx->tx->vout[nIn].nValue, SIGHASH_ALL))
                 return error("CreateCoinStake : failed to sign coinstake");
             nIn++;
         }
@@ -3164,7 +3164,7 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std:
 {
     {
         LOCK2(cs_main, cs_wallet);
-        LogPrintf("CommitTransaction:\n%s", wtxNew.ToString());
+        LogPrintf("CommitTransaction:\n%s", wtxNew.tx->ToString());
         {
             // This is only to keep the database open to defeat the auto-flush for the
             // duration of this scope.  This is the only place where this optimization
@@ -3179,9 +3179,9 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std:
             AddToWallet(wtxNew);
 
             // Notify that old coins are spent
-            if (!wtxNew.IsZerocoinSpend()) {
+            if (!wtxNew.tx->IsZerocoinSpend()) {
                 set<uint256> updated_hahes;
-                for (const CTxIn& txin: wtxNew.vin) {
+                for (const CTxIn& txin: wtxNew.tx->vin) {
                     // notify only once
                     if (updated_hahes.find(txin.prevout.hash) != updated_hahes.end()) continue;
 
@@ -3252,8 +3252,8 @@ CAmount CWallet::GetTotalValue(std::vector<CTxIn> vCoins)
     for (CTxIn i: vCoins) {
         if (mapWallet.count(i.prevout.hash)) {
             CWalletTx& wtx = mapWallet[i.prevout.hash];
-            if (i.prevout.n < wtx.vout.size()) {
-                nTotalValue += wtx.vout[i.prevout.n].nValue;
+            if (i.prevout.n < wtx.tx->vout.size()) {
+                nTotalValue += wtx.tx->vout[i.prevout.n].nValue;
             }
         } else {
             LogPrintf("GetTotalValue -- Couldn't find transaction\n");
@@ -3335,7 +3335,7 @@ string CWallet::PrepareObfuscationDenominate(int minRounds, int maxRounds)
                 std::vector<COutput>::iterator it2 = vCoins2.begin();
                 while (it2 != vCoins2.end()) {
                     // we have matching inputs
-                    if ((*it2).tx->vout[(*it2).i].nValue == v) {
+                    if ((*it2).tx->tx->vout[(*it2).i].nValue == v) {
                         // add new input in resulting vector
                         vCoinsResult.push_back(*it);
                         // remove corresponting items from initial vectors
@@ -3937,7 +3937,7 @@ void CWallet::GetKeyBirthTimes(std::map<CKeyID, int64_t>& mapKeyBirth) const
         if (blit != mapBlockIndex.end() && chainActive.Contains(blit->second)) {
             // ... which are already in a block
             int nHeight = blit->second->nHeight;
-            for (const CTxOut& txout: wtx.vout) {
+            for (const CTxOut& txout: wtx.tx->vout) {
                 // iterate over all their outputs
                 CAffectedKeysVisitor(*this, vAffected).Process(txout.scriptPubKey);
                 for (const CKeyID& keyid: vAffected) {
@@ -4491,7 +4491,7 @@ int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX)
 int CMerkleTx::GetBlocksToMaturity() const
 {
     LOCK(cs_main);
-    if (!(IsCoinBase() || IsCoinStake()))
+    if (!(tx->IsCoinBase() || tx->IsCoinStake()))
         return 0;
     return max(0, (Params().COINBASE_MATURITY() + 1) - GetDepthInMainChain());
 }
@@ -4500,7 +4500,7 @@ int CMerkleTx::GetBlocksToMaturity() const
 bool CMerkleTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool ignoreFees)
 {
     CValidationState state;
-    bool fAccepted = ::AcceptToMemoryPool(mempool, state, *this, fLimitFree, NULL, fRejectInsaneFee, ignoreFees);
+    bool fAccepted = ::AcceptToMemoryPool(mempool, state, *tx, fLimitFree, NULL, fRejectInsaneFee, ignoreFees);
     if (!fAccepted)
         LogPrintf("%s : %s\n", __func__, state.GetRejectReason());
     return fAccepted;
