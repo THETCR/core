@@ -274,7 +274,10 @@ static void MutateTxAddOutScript(CMutableTransaction& tx, const std::string& str
         throw std::runtime_error("TX output missing separator");
 
     // Extract and validate VALUE
-    CAmount value = ExtractAndValidateValue(vStrInputParts[0]);
+//    CAmount value = ExtractAndValidateValue(vStrInputParts[0]);
+    CAmount value;
+    if (!ParseMoney(vStrInputParts[0], value))
+        throw std::runtime_error("invalid TX output value");
 
     // extract and validate script
     std::string strScript = vStrInputParts[1];
