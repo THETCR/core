@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_SUITE(sighash_tests)
             std::string raw_tx, raw_script, sigHashHex;
             int nIn, nHashType;
             uint256 sh;
-            CTransaction tx;
+            CTransactionRef tx;
             CScript scriptCode = CScript();
 
             try {
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_SUITE(sighash_tests)
                 CDataStream stream(ParseHex(raw_tx), SER_NETWORK, PROTOCOL_VERSION);
                 stream >> tx;
                 CValidationState state;
-                BOOST_CHECK_MESSAGE(CheckTransaction(tx, false, false, state), strTest);
+                BOOST_CHECK_MESSAGE(CheckTransaction(*tx, false, false, state), strTest);
                 BOOST_CHECK(state.IsValid());
 
                 std::vector<unsigned char> raw = ParseHex(raw_script);
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_SUITE(sighash_tests)
                 continue;
             }
 
-            sh = SignatureHash(scriptCode, tx, nIn, nHashType, 0, SigVersion::BASE);
+            sh = SignatureHash(scriptCode, *tx, nIn, nHashType, 0, SigVersion::BASE);
             BOOST_CHECK_MESSAGE(sh.GetHex() == sigHashHex, strTest);
         }
     }
