@@ -221,7 +221,7 @@ void CBudgetManager::SubmitFinalBudget()
         CReserveKey reservekey(pwalletMain);
         // Send the tx to the network. Do NOT use SwiftTx, locking might need too much time to propagate, especially for testnet
         pwalletMain->CommitTransaction(wtx, reservekey, "NO-ix");
-        tx = (CTransaction)wtx;
+        tx = (CTransaction)*wtx.tx;
         txidCollateral = tx.GetHash();
         mapCollateralTxids.insert(std::make_pair(tempBudget.GetHash(), txidCollateral));
     } else {
