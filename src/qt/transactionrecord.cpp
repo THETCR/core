@@ -20,7 +20,7 @@
  */
 bool TransactionRecord::showTransaction(const CWalletTx& wtx)
 {
-    if (wtx.IsCoinBase()) {
+    if (wtx.tx->IsCoinBase()) {
         // Ensures we show generated coins / mined transactions at depth 1
         if (!wtx.IsInMainChain()) {
             return false;
@@ -338,7 +338,7 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
     // Sort order, unrecorded transactions sort to the top
     status.sortKey = strprintf("%010d-%01d-%010u-%03d",
         (pindex ? pindex->nHeight : std::numeric_limits<int>::max()),
-        (wtx.IsCoinBase() ? 1 : 0),
+        (wtx.tx->IsCoinBase() ? 1 : 0),
         wtx.nTimeReceived,
         idx);
     //status.countsForBalance = wtx.IsTrusted() && !(wtx.GetBlocksToMaturity() > 0);
@@ -351,13 +351,13 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
     status.cur_num_blocks = chainActive.Height();
     status.cur_num_ix_locks = nCompleteTXLocks;
 
-    if (!CheckFinalTx(wtx, chainActive.Height() + 1)) {
-        if (wtx.nLockTime < LOCKTIME_THRESHOLD) {
+    if (!CheckFinalTx(*wtx.tx, chainActive.Height() + 1)) {
+        if (wtx.tx->nLockTime < LOCKTIME_THRESHOLD) {
             status.status = TransactionStatus::OpenUntilBlock;
-            status.open_for = wtx.nLockTime - chainActive.Height();
+            status.open_for = wtx.tx->nLockTime - chainActive.Height();
         } else {
             status.status = TransactionStatus::OpenUntilDate;
-            status.open_for = wtx.nLockTime;
+            status.open_for = wtx.tx->nLockTime;
         }
     }
     // For generated transactions, determine maturity
