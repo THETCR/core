@@ -502,7 +502,7 @@ void CoinControlDialog::updateDialogLabels()
     for (const COutput& out : vOutputs) {
         // unselect already spent, very unlikely scenario, this could happen
         // when selected are spent elsewhere, like rpc or another computer
-        uint256 txhash = out.tx->GetHash();
+        uint256 txhash = out.tx->tx->GetHash();
         COutPoint outpt(txhash, out.i);
         if(model->isSpent(outpt)) {
             coinControl->UnSelect(outpt);
@@ -513,7 +513,7 @@ void CoinControlDialog::updateDialogLabels()
         nQuantity++;
 
         // Amount
-        nAmount += out.tx->vout[out.i].nValue;
+        nAmount += out.tx->tx->vout[out.i].nValue;
     }
     MultisigDialog* multisigDialog = (MultisigDialog*)this->parentWidget();
 
@@ -560,7 +560,7 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
     for (const COutput& out: vOutputs) {
         // unselect already spent, very unlikely scenario, this could happen
         // when selected are spent elsewhere, like rpc or another computer
-        uint256 txhash = out.tx->GetHash();
+        uint256 txhash = out.tx->tx->GetHash();
         COutPoint outpt(txhash, out.i);
         if (model->isSpent(outpt)) {
             coinControl->UnSelect(outpt);
@@ -571,14 +571,14 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
         nQuantity++;
 
         // Amount
-        nAmount += out.tx->vout[out.i].nValue;
+        nAmount += out.tx->tx->vout[out.i].nValue;
 
         // Priority
-        dPriorityInputs += (double)out.tx->vout[out.i].nValue * (out.nDepth + 1);
+        dPriorityInputs += (double)out.tx->tx->vout[out.i].nValue * (out.nDepth + 1);
 
         // Bytes
         CTxDestination address;
-        if (ExtractDestination(out.tx->vout[out.i].scriptPubKey, address)) {
+        if (ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, address)) {
             CPubKey pubkey;
             CKeyID* keyid = boost::get<CKeyID>(&address);
             if (keyid && model->getPubKey(*keyid, pubkey)) {
@@ -766,13 +766,13 @@ void CoinControlDialog::updateView()
         int nChildren = 0;
         int nInputSum = 0;
         for(const COutput& out: coins.second) {
-            isminetype mine = pwalletMain->IsMine(out.tx->vout[out.i]);
+            isminetype mine = pwalletMain->IsMine(out.tx->tx->vout[out.i]);
             bool fMultiSigUTXO = (mine & ISMINE_MULTISIG);
             // when multisig is enabled, it will only display outputs from multisig addresses
             if (fMultisigEnabled && !fMultiSigUTXO)
                 continue;
             int nInputSize = 0;
-            nSum += out.tx->vout[out.i].nValue;
+            nSum += out.tx->tx->vout[out.i].nValue;
             nChildren++;
 
             CCoinControlWidgetItem* itemOutput;
@@ -788,7 +788,7 @@ void CoinControlDialog::updateView()
                 itemOutput->setText(COLUMN_TYPE, "MultiSig");
 
                 if (!fMultisigEnabled) {
-                    COutPoint outpt(out.tx->GetHash(), out.i);
+                    COutPoint outpt(out.tx->tx->GetHash(), out.i);
                     coinControl->UnSelect(outpt); // just to be sure
                     itemOutput->setDisabled(true);
                     itemOutput->setIcon(COLUMN_CHECKBOX, QIcon(":/icons/lock_closed"));
@@ -800,7 +800,7 @@ void CoinControlDialog::updateView()
             // address
             CTxDestination outputAddress;
             QString sAddress = "";
-            if (ExtractDestination(out.tx->vout[out.i].scriptPubKey, outputAddress)) {
+            if (ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, outputAddress)) {
                 sAddress = QString::fromStdString(CBitcoinAddress(outputAddress).ToString());
 
                 // if listMode or change => show WISPR address. In tree mode, address is not shown again for direct wallet address outputs
@@ -843,14 +843,14 @@ void CoinControlDialog::updateView()
             itemOutput->setData(COLUMN_CONFIRMATIONS, Qt::UserRole, QVariant((qlonglong) out.nDepth));
 
             // priority
-            double dPriority = ((double)out.tx->vout[out.i].nValue / (nInputSize + 78)) * (out.nDepth + 1); // 78 = 2 * 34 + 10
+            double dPriority = ((double)out.tx->tx->vout[out.i].nValue / (nInputSize + 78)) * (out.nDepth + 1); // 78 = 2 * 34 + 10
             itemOutput->setText(COLUMN_PRIORITY, CoinControlDialog::getPriorityLabel(dPriority, mempoolEstimatePriority));
             itemOutput->setData(COLUMN_PRIORITY, Qt::UserRole, QVariant((qlonglong) dPriority));
-            dPrioritySum += (double)out.tx->vout[out.i].nValue * (out.nDepth + 1);
+            dPrioritySum += (double)out.tx->tx->vout[out.i].nValue * (out.nDepth + 1);
             nInputSum += nInputSize;
 
             // transaction hash
-            uint256 txhash = out.tx->GetHash();
+            uint256 txhash = out.tx->tx->GetHash();
             itemOutput->setText(COLUMN_TXHASH, QString::fromStdString(txhash.GetHex()));
 
             // vout index
