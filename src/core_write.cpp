@@ -4,9 +4,9 @@
 
 #include <core_io.h>
 
-#include <base58.h>
 #include <consensus/consensus.h>
 #include <consensus/validation.h>
+#include <key_io.h>
 #include <script/script.h>
 #include <script/standard.h>
 #include <serialize.h>
@@ -146,7 +146,7 @@ void ScriptToUniv(const CScript& script, UniValue& out, bool include_address)
 
     CTxDestination address;
     if (include_address && ExtractDestination(script, address)) {
-        out.pushKV("address", CBitcoinAddress(address).ToString());
+        out.pushKV("address", EncodeDestination(address));
     }
 }
 
@@ -157,7 +157,7 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
     std::vector<CTxDestination> addresses;
     int nRequired;
 
-    out.pushKV("asm", scriptPubKey.ToString());
+    out.pushKV("asm", ScriptToAsmStr(scriptPubKey));
     if (fIncludeHex)
         out.pushKV("hex", HexStr(scriptPubKey.begin(), scriptPubKey.end()));
 
@@ -170,8 +170,9 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
     out.pushKV("type", GetTxnOutputType(type));
 
     UniValue a(UniValue::VARR);
-    for (const CTxDestination& addr: addresses)
-        a.push_back(CBitcoinAddress(addr).ToString());
+    for (const CTxDestination& addr : addresses) {
+        a.push_back(EncodeDestination(addr));
+    }
     out.pushKV("addresses", a);
 }
 
