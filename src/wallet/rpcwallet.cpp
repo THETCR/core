@@ -55,7 +55,7 @@ void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
     int confirmsTotal = GetIXConfirmations(wtx.tx->GetHash()) + confirms;
     entry.pushKV("confirmations", confirmsTotal);
     entry.pushKV("bcconfirmations", confirms);
-    if (wtx.IsCoinBase() || wtx.IsCoinStake())
+    if (wtx.tx->IsCoinBase() || wtx.tx->IsCoinStake())
         entry.pushKV("generated", true);
     if (confirms > 0) {
         entry.pushKV("blockhash", wtx.hashBlock.GetHex());
@@ -595,10 +595,10 @@ UniValue getreceivedbyaddress(const JSONRPCRequest& request)
     CAmount nAmount = 0;
     for (std::map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it) {
         const CWalletTx& wtx = (*it).second;
-        if (wtx.IsCoinBase() || !CheckFinalTx(wtx))
+        if (wtx.tx->IsCoinBase() || !CheckFinalTx(*wtx.tx))
             continue;
 
-        for (const CTxOut& txout: wtx.vout)
+        for (const CTxOut& txout: wtx.tx->vout)
             if (txout.scriptPubKey == scriptPubKey)
                 if (wtx.GetDepthInMainChain() >= nMinDepth)
                     nAmount += txout.nValue;
@@ -1081,7 +1081,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it) {
         const CWalletTx& wtx = (*it).second;
 
-        if (wtx.IsCoinBase() || !CheckFinalTx(wtx))
+        if (wtx.tx->IsCoinBase() || !CheckFinalTx(*wtx.tx))
             continue;
 
         int nDepth = wtx.GetDepthInMainChain();
@@ -1089,7 +1089,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
         if (nDepth < nMinDepth)
             continue;
 
-        for (const CTxOut& txout: wtx.vout) {
+        for (const CTxOut& txout: wtx.tx->vout) {
             CTxDestination address;
             if (!ExtractDestination(txout.scriptPubKey, address))
                 continue;
@@ -1681,7 +1681,7 @@ UniValue gettransaction(const JSONRPCRequest& request)
     ListTransactions(wtx, "*", 0, false, details, filter);
     entry.pushKV("details", details);
 
-    std::string strHex = EncodeHexTx(static_cast<CTransaction>(wtx));
+    std::string strHex = EncodeHexTx(static_cast<CTransaction>(*wtx.tx));
     entry.pushKV("hex", strHex);
 
     return entry;
