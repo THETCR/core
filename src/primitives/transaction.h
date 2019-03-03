@@ -304,11 +304,6 @@ public:
 
     CTransaction& operator=(const CTransaction& tx);
 
-//    template <typename Stream>
-//    inline void Serialize(Stream& s) const {
-//        SerializeTransaction(*this, s);
-//    }
-
     template <typename Stream>
     inline void Serialize(Stream& s) const {
         int32_t n32bitVersion = this->nVersion;
@@ -423,16 +418,6 @@ struct CMutableTransaction
         READWRITE(vout);
         READWRITE(nLockTime);
     }
-//    template <typename Stream>
-//    inline void Serialize(Stream& s) const {
-//        SerializeTransaction(*this, s);
-//    }
-//
-//
-//    template <typename Stream>
-//    inline void Unserialize(Stream& s) {
-//        UnserializeTransaction(*this, s);
-//    }
 
     template <typename Stream>
     CMutableTransaction(deserialize_type, Stream& s) {
