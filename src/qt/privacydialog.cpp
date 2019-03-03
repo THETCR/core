@@ -514,7 +514,7 @@ void PrivacyDialog::sendzWSP()
     }
 
     CAmount nValueOut = 0;
-    for (const CTxOut& txout: wtxNew.vout) {
+    for (const CTxOut& txout: wtxNew.tx->vout) {
         strStats += tr("value out: ") + FormatMoney(txout.nValue).c_str() + " Wsp, ";
         nValueOut += txout.nValue;
 
@@ -531,7 +531,7 @@ void PrivacyDialog::sendzWSP()
     strStats += tr("Sending successful, return code: ") + QString::number(receipt.GetStatus()) + "\n";
 
     QString strReturn;
-    strReturn += tr("txid: ") + wtxNew.GetHash().ToString().c_str() + "\n";
+    strReturn += tr("txid: ") + wtxNew.tx->GetHash().ToString().c_str() + "\n";
     strReturn += tr("fee: ") + QString::fromStdString(FormatMoney(nValueIn-nValueOut)) + "\n";
     strReturn += strStats;
 
