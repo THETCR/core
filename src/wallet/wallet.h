@@ -1022,7 +1022,7 @@ public:
     {
         if (fChangeCached)
             return nChangeCached;
-        nChangeCached = pwallet->GetChange(*this);
+        nChangeCached = pwallet->GetChange(*tx);
         fChangeCached = true;
         return nChangeCached;
     }
