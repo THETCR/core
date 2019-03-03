@@ -235,7 +235,7 @@ struct CMutableTransaction;
  */
 template<typename Stream, typename TxType>
 inline void UnserializeTransaction(TxType& tx, Stream& s) {
-//    const bool fAllowWitness = false;
+    const bool fAllowWitness = false;
 //    const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
 
     s >> tx.nVersion;
@@ -244,8 +244,8 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         printf("Serialize: version 1\n");
         s >> tx.nTime;
     }
-    tx.vin.clear();
-    tx.vout.clear();
+    tx.vin.resize(1);
+    tx.vout.resize(1);
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
     s >> tx.vin;
     s >> tx.vout;
@@ -306,14 +306,7 @@ public:
 
 //    template <typename Stream>
 //    inline void Serialize(Stream& s) const {
-//        int32_t n32bitVersion = this->nVersion;
-//        s << n32bitVersion;
-//        if(n32bitVersion == 1){
-//            s << nTime;
-//        }
-//        s << vin;
-//        s << vout;
-//        s << nLockTime;
+//        SerializeTransaction(*this, s);
 //    }
 
     ADD_SERIALIZE_METHODS;
@@ -321,7 +314,7 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
-        int32_t _nVersion = this->nVersion;
+        int _nVersion = this->nVersion;
         if(_nVersion == 1){
             READWRITE(*const_cast<unsigned int *>(&nTime));
         }
@@ -331,8 +324,6 @@ public:
         if (ser_action.ForRead())
             UpdateHash();
     }
-
-
     /** This deserializing constructor is provided instead of an Unserialize method.
      *  Unserialize is not possible, since it would require overwriting const fields. */
     template <typename Stream>
@@ -435,6 +426,16 @@ struct CMutableTransaction
         READWRITE(vout);
         READWRITE(nLockTime);
     }
+//    template <typename Stream>
+//    inline void Serialize(Stream& s) const {
+//        SerializeTransaction(*this, s);
+//    }
+//
+//
+//    template <typename Stream>
+//    inline void Unserialize(Stream& s) {
+//        UnserializeTransaction(*this, s);
+//    }
 
     template <typename Stream>
     CMutableTransaction(deserialize_type, Stream& s) {
