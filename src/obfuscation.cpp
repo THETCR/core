@@ -589,7 +589,7 @@ void CObfuscationPool::CheckFinalTransaction()
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
     {
-        LogPrint(BCLog::OBFUSCATION, "Transaction 2: %s\n", txNew.ToString());
+        LogPrint(BCLog::OBFUSCATION, "Transaction 2: %s\n", txNew.tx->ToString());
 
         // See if the transaction is valid
         if (!txNew.AcceptToMemoryPool(false, true, true)) {
@@ -607,7 +607,7 @@ void CObfuscationPool::CheckFinalTransaction()
         // sign a message
 
         int64_t sigTime = GetAdjustedTime();
-        std::string strMessage = txNew.GetHash().ToString() + std::to_string(sigTime);
+        std::string strMessage = txNew.tx->GetHash().ToString() + std::to_string(sigTime);
         std::string strError = "";
         std::vector<unsigned char> vchSig;
         CKey key2;
@@ -628,17 +628,17 @@ void CObfuscationPool::CheckFinalTransaction()
             return;
         }
 
-        if (!mapObfuscationBroadcastTxes.count(txNew.GetHash())) {
+        if (!mapObfuscationBroadcastTxes.count(txNew.tx->GetHash())) {
             CObfuscationBroadcastTx dstx;
-            dstx.tx = txNew;
+            dstx.tx = *txNew.tx;
             dstx.vin = activeMasternode.vin;
             dstx.vchSig = vchSig;
             dstx.sigTime = sigTime;
 
-            mapObfuscationBroadcastTxes.insert(std::make_pair(txNew.GetHash(), dstx));
+            mapObfuscationBroadcastTxes.insert(std::make_pair(txNew.tx->GetHash(), dstx));
         }
 
-        CInv inv(MSG_DSTX, txNew.GetHash());
+        CInv inv(MSG_DSTX, txNew.tx->GetHash());
         RelayInv(inv);
 
         // Tell the clients it was successful
