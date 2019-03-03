@@ -235,7 +235,7 @@ struct CMutableTransaction;
  */
 template<typename Stream, typename TxType>
 inline void UnserializeTransaction(TxType& tx, Stream& s) {
-    const bool fAllowWitness = false;
+//    const bool fAllowWitness = false;
 //    const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
 
     s >> tx.nVersion;
@@ -244,8 +244,8 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         printf("Serialize: version 1\n");
         s >> tx.nTime;
     }
-    tx.vin.resize(1);
-    tx.vout.resize(1);
+    tx.vin.clear();
+    tx.vout.clear();
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
     s >> tx.vin;
     s >> tx.vout;
@@ -314,6 +314,11 @@ public:
         s << vin;
         s << vout;
         s << nLockTime;
+    }
+
+    template <typename Stream>
+    inline void Unserialize(Stream& s) {
+        UnserializeTransaction(*this, s);
     }
 
     /** This deserializing constructor is provided instead of an Unserialize method.
