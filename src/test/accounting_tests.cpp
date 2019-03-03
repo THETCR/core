@@ -85,9 +85,9 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
 
     wtx.mapValue["comment"] = "y";
     {
-        CMutableTransaction tx(wtx.tx);
+        CMutableTransaction tx(wtx);
         --tx.nLockTime;  // Just to change the hash :)
-        *static_cast<CTransaction*>(&wtx) = CTransaction(tx);
+        wtx.SetTx(MakeTransactionRef(std::move(tx)));
     }
     pwalletMain->AddToWallet(wtx);
     vpwtx.push_back(&pwalletMain->mapWallet[wtx.tx->GetHash()]);
@@ -95,9 +95,9 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
 
     wtx.mapValue["comment"] = "x";
     {
-        CMutableTransaction tx(wtx.tx);
+        CMutableTransaction tx(wtx);
         --tx.nLockTime;  // Just to change the hash :)
-        *static_cast<CTransaction*>(&wtx) = CTransaction(tx);
+        wtx.SetTx(MakeTransactionRef(std::move(tx)));
     }
     pwalletMain->AddToWallet(wtx);
     vpwtx.push_back(&pwalletMain->mapWallet[wtx.tx->GetHash()]);
