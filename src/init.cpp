@@ -2135,7 +2135,7 @@ bool AppInitMain()
             // Restore wallet transaction metadata after -zapwallettxes=1
             if (gArgs.GetBoolArg("-zapwallettxes", false) && gArgs.GetArg("-zapwallettxes", "1") != "2") {
                 for (const CWalletTx& wtxOld: vWtx) {
-                    uint256 hash = wtxOld.GetHash();
+                    uint256 hash = wtxOld.tx->GetHash();
                     std::map<uint256, CWalletTx>::iterator mi = pwalletMain->mapWallet.find(hash);
                     if (mi != pwalletMain->mapWallet.end()) {
                         const CWalletTx* copyFrom = &wtxOld;
