@@ -1705,7 +1705,7 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
 
     pwalletMain->CommitTransaction(wtx, reservekey);
 
-    LogPrintf("SendRandomPaymentToSelf Success: tx %s\n", wtx.GetHash().GetHex());
+    LogPrintf("SendRandomPaymentToSelf Success: tx %s\n", wtx.tx->GetHash().GetHex());
 
     return true;
 }
@@ -1751,7 +1751,7 @@ bool CObfuscationPool::MakeCollateralAmounts()
 
     reservekeyCollateral.KeepKey();
 
-    LogPrintf("MakeCollateralAmounts: tx %s\n", wtx.GetHash().GetHex());
+    LogPrintf("MakeCollateralAmounts: tx %s\n", wtx.tx->GetHash().GetHex());
 
     // use the same cachedLastSuccess as for DS mixinx to prevent race
     if (!pwalletMain->CommitTransaction(wtx, reservekeyChange)) {
@@ -1838,7 +1838,7 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
     else
         LogPrintf("CreateDenominated: CommitTransaction failed!\n");
 
-    LogPrintf("CreateDenominated: tx %s\n", wtx.GetHash().GetHex());
+    LogPrintf("CreateDenominated: tx %s\n", wtx.tx->GetHash().GetHex());
 
     return true;
 }

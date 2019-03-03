@@ -398,7 +398,7 @@ set<uint256> CWallet::GetConflicts(const uint256& txid) const
     std::pair<TxSpends::const_iterator, TxSpends::const_iterator> range;
 
     for (const CTxIn& txin: wtx.vin) {
-        if (mapTxSpends.count(txin.prevout) <= 1 || wtx.IsZerocoinSpend())
+        if (mapTxSpends.count(txin.prevout) <= 1 || wtx.tx->IsZerocoinSpend())
             continue; // No conflict if zero or one spends
         range = mapTxSpends.equal_range(txin.prevout);
         for (TxSpends::const_iterator it = range.first; it != range.second; ++it)
@@ -1561,7 +1561,7 @@ void CWallet::ReacceptWalletTransactions()
     for (std::pair<const uint256, CWalletTx> & item: mapWallet) {
         const uint256& wtxid = item.first;
         CWalletTx& wtx = item.second;
-        assert(wtx.GetHash() == wtxid);
+        assert(wtx.tx->GetHash() == wtxid);
 
         int nDepth = wtx.GetDepthInMainChain();
 
@@ -3992,7 +3992,7 @@ unsigned int CWallet::ComputeTimeSmart(const CWalletTx& wtx) const
             nTimeSmart = std::max(latestEntry, std::min(blocktime, latestNow));
         } else
             LogPrintf("AddToWallet() : found %s in block %s not in index\n",
-                wtx.GetHash().ToString(),
+                wtx.tx->GetHash().ToString(),
                 wtx.hashBlock.ToString());
     }
     return nTimeSmart;

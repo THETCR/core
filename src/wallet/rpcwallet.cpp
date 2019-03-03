@@ -52,7 +52,7 @@ void EnsureWalletIsUnlocked(bool fAllowAnonOnly)
 void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
 {
     int confirms = wtx.GetDepthInMainChain(false);
-    int confirmsTotal = GetIXConfirmations(wtx.GetHash()) + confirms;
+    int confirmsTotal = GetIXConfirmations(wtx.tx->GetHash()) + confirms;
     entry.pushKV("confirmations", confirmsTotal);
     entry.pushKV("bcconfirmations", confirms);
     if (wtx.IsCoinBase() || wtx.IsCoinStake())
@@ -62,7 +62,7 @@ void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
         entry.pushKV("blockindex", wtx.nIndex);
         entry.pushKV("blocktime", mapBlockIndex[wtx.hashBlock]->GetBlockTime());
     }
-    uint256 hash = wtx.GetHash();
+    uint256 hash = wtx.tx->GetHash();
     entry.pushKV("txid", hash.GetHex());
     UniValue conflicts(UniValue::VARR);
     for (const uint256& conflict: wtx.GetConflicts())
@@ -400,7 +400,7 @@ UniValue sendtoaddress(const JSONRPCRequest& request)
 
     SendMoney(address.Get(), nAmount, wtx);
 
-    return wtx.GetHash().GetHex();
+    return wtx.tx->GetHash().GetHex();
 }
 
 UniValue sendtoaddressix(const JSONRPCRequest& request)
@@ -448,7 +448,7 @@ UniValue sendtoaddressix(const JSONRPCRequest& request)
 
     SendMoney(address.Get(), nAmount, wtx, true);
 
-    return wtx.GetHash().GetHex();
+    return wtx.tx->GetHash().GetHex();
 }
 
 UniValue listaddressgroupings(const JSONRPCRequest& request)
@@ -910,7 +910,7 @@ UniValue sendfrom(const JSONRPCRequest& request)
 
     SendMoney(address.Get(), nAmount, wtx);
 
-    return wtx.GetHash().GetHex();
+    return wtx.tx->GetHash().GetHex();
 }
 
 
@@ -995,7 +995,7 @@ UniValue sendmany(const JSONRPCRequest& request)
     if (!pwalletMain->CommitTransaction(wtx, keyChange))
         throw JSONRPCError(RPC_WALLET_ERROR, "Transaction commit failed");
 
-    return wtx.GetHash().GetHex();
+    return wtx.tx->GetHash().GetHex();
 }
 
 // Defined in rpc/misc.cpp
@@ -1102,7 +1102,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
             item.nAmount += txout.nValue;
             item.nConf = min(item.nConf, nDepth);
             item.nBCConf = min(item.nBCConf, nBCDepth);
-            item.txids.push_back(wtx.GetHash());
+            item.txids.push_back(wtx.tx->GetHash());
             if (mine & ISMINE_WATCH_ONLY)
                 item.fIsWatchonly = true;
         }
@@ -2810,7 +2810,7 @@ UniValue mintzerocoin(const JSONRPCRequest& request)
     UniValue arrMints(UniValue::VARR);
     for (CDeterministicMint dMint : vDMints) {
         UniValue m(UniValue::VOBJ);
-        m.pushKV("txid", wtx.GetHash().ToString());
+        m.pushKV("txid", wtx.tx->GetHash().ToString());
         m.pushKV("value", ValueFromAmount(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination())));
         m.pushKV("pubcoinhash", dMint.GetPubcoinHash().GetHex());
         m.pushKV("serialhash", dMint.GetSerialHash().GetHex());
@@ -3024,7 +3024,7 @@ extern UniValue DoZwspSpend(const CAmount nAmount, bool fMintChange, bool fMinim
 
     //construct JSON to return
     UniValue ret(UniValue::VOBJ);
-    ret.pushKV("txid", wtx.GetHash().ToString());
+    ret.pushKV("txid", wtx.tx->GetHash().ToString());
     ret.pushKV("bytes", (int64_t)GetSerializeSize(wtx, CTransaction::CURRENT_VERSION));
     ret.pushKV("fee", ValueFromAmount(nValueIn - nValueOut));
     ret.pushKV("duration_millis", (GetTimeMillis() - nTimeStart));

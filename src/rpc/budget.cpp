@@ -251,7 +251,7 @@ UniValue preparebudget(const JSONRPCRequest& request)
     //send the tx to the network
     pwalletMain->CommitTransaction(wtx, reservekey, useIX ? NetMsgType::TXLOCKREQUEST : NetMsgType::TX);
 
-    return wtx.GetHash().ToString();
+    return wtx.tx->GetHash().ToString();
 }
 
 UniValue submitbudget(const JSONRPCRequest& request)
