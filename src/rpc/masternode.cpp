@@ -630,7 +630,7 @@ UniValue getmasternodeoutputs (const JSONRPCRequest& request)
     UniValue ret(UniValue::VARR);
     for (COutput& out: possibleCoins) {
         UniValue obj(UniValue::VOBJ);
-        obj.pushKV("txhash", out.tx->GetHash().ToString());
+        obj.pushKV("txhash", out.tx->tx->GetHash().ToString());
         obj.pushKV("outputidx", out.i);
         ret.push_back(obj);
     }
