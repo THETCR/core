@@ -314,7 +314,7 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
-        int _nVersion = this->nVersion;
+        int32_t _nVersion = this->nVersion;
         if(_nVersion == 1){
             READWRITE(*const_cast<unsigned int *>(&nTime));
         }
@@ -418,7 +418,7 @@ struct CMutableTransaction
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(this->nVersion);
-        int _nVersion = this->nVersion;
+        int32_t _nVersion = this->nVersion;
         if(_nVersion == 1){
             READWRITE(nTime);
         }
