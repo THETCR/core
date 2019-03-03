@@ -288,20 +288,20 @@ UniValue listunspent(const JSONRPCRequest& request)
 
         if (setAddress.size()) {
             CTxDestination address;
-            if (!ExtractDestination(out.tx->vout[out.i].scriptPubKey, address))
+            if (!ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, address))
                 continue;
 
             if (!setAddress.count(address))
                 continue;
         }
 
-        CAmount nValue = out.tx->vout[out.i].nValue;
-        const CScript& pk = out.tx->vout[out.i].scriptPubKey;
+        CAmount nValue = out.tx->tx->vout[out.i].nValue;
+        const CScript& pk = out.tx->tx->vout[out.i].scriptPubKey;
         UniValue entry(UniValue::VOBJ);
-        entry.pushKV("txid", out.tx->GetHash().GetHex());
+        entry.pushKV("txid", out.tx->tx->GetHash().GetHex());
         entry.pushKV("vout", out.i);
         CTxDestination address;
-        if (ExtractDestination(out.tx->vout[out.i].scriptPubKey, address)) {
+        if (ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, address)) {
             entry.pushKV("address", CBitcoinAddress(address).ToString());
             if (pwalletMain->mapAddressBook.count(address))
                 entry.pushKV("account", pwalletMain->mapAddressBook[address].name);
