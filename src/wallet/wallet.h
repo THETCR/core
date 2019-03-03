@@ -1074,16 +1074,16 @@ public:
     int Priority() const
     {
         for (CAmount d: obfuScationDenominations)
-            if (tx->vout[i].nValue == d) return 10000;
-        if (tx->vout[i].nValue < 1 * COIN) return 20000;
+            if (tx->tx->vout[i].nValue == d) return 10000;
+        if (tx->tx->vout[i].nValue < 1 * COIN) return 20000;
 
         //nondenom return largest first
-        return -(tx->vout[i].nValue / COIN);
+        return -(tx->tx->vout[i].nValue / COIN);
     }
 
     CAmount Value() const
     {
-        return tx->vout[i].nValue;
+        return tx->tx->vout[i].nValue;
     }
 
     std::string ToString() const;
