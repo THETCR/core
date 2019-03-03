@@ -16,6 +16,7 @@
 #include <list>
 
 class CTransaction;
+typedef std::shared_ptr<const CTransaction> CTransactionRef;
 static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
@@ -39,7 +40,7 @@ public:
 
     void SetNull() { hash.SetNull(); n = (uint32_t) -1; }
     bool IsNull() const { return (hash.IsNull() && n == (uint32_t) -1); }
-    bool IsMasternodeReward(const CTransaction* tx) const;
+    bool IsMasternodeReward(const CTransactionRef ptx) const;
 
     friend bool operator<(const COutPoint& a, const COutPoint& b)
     {
@@ -469,7 +470,7 @@ struct CMutableTransaction
     }
 };
 
-typedef std::shared_ptr<const CTransaction> CTransactionRef;
+//typedef std::shared_ptr<const CTransaction> CTransactionRef;
 static inline CTransactionRef MakeTransactionRef() { return std::make_shared<const CTransaction>(); }
 template <typename Tx> static inline CTransactionRef MakeTransactionRef(Tx&& txIn) { return std::make_shared<const CTransaction>(std::forward<Tx>(txIn)); }
 
