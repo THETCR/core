@@ -318,7 +318,14 @@ public:
 
     template <typename Stream>
     inline void Unserialize(Stream& s) {
-        UnserializeTransaction(*this, s);
+        s >> nVersion;
+        int32_t n32bitVersion = this->nVersion;
+        if(n32bitVersion == 1){
+            s >> nTime;
+        }
+        s >> vin;
+        s >> vout;
+        s >> nLockTime;
     }
 
     /** This deserializing constructor is provided instead of an Unserialize method.
