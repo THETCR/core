@@ -14,6 +14,7 @@
 #include <uint256.h>
 
 #include <list>
+#include <iostream>
 
 class CTransaction;
 typedef std::shared_ptr<const CTransaction> CTransactionRef;
@@ -242,6 +243,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     s >> tx.nVersion;
     int32_t nVersion = tx.nVersion;
     if(nVersion == 1){
+        std::cout << "UnserializeTransaction nTime\n";
         s >> tx.nTime;
     }
 //    tx.vin.clear();
@@ -260,6 +262,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     int32_t nVersion = tx.nVersion;
     s << tx.nVersion;
     if(nVersion == 1) {
+        std::cout << "SerializeTransaction nTime\n";
         s << tx.nTime;
     }
     s << tx.vin;
