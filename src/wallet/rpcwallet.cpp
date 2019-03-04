@@ -139,7 +139,7 @@ CBitcoinAddress GetAccountAddress(string strAccount, bool bForceNew = false)
              it != pwalletMain->mapWallet.end() && account.vchPubKey.IsValid();
              ++it) {
             const CWalletTx& wtx = (*it).second;
-            for (const CTxOut& txout: wtx.vout)
+            for (const CTxOut& txout: wtx.tx->vout)
                 if (txout.scriptPubKey == scriptPubKey)
                     bKeyUsed = true;
         }

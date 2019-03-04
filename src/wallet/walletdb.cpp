@@ -428,7 +428,7 @@ DBErrors CWalletDB::ReorderTransactions(CWallet* pwallet)
             nOrderPosOffsets.push_back(nOrderPos);
 
             if (pwtx) {
-                if (!WriteTx(pwtx->GetHash(), *pwtx))
+                if (!WriteTx(pwtx->tx->GetHash(), *pwtx))
                     return DB_LOAD_FAIL;
             } else if (!WriteAccountingEntry(pacentry->nEntryNo, *pacentry))
                 return DB_LOAD_FAIL;
@@ -446,7 +446,7 @@ DBErrors CWalletDB::ReorderTransactions(CWallet* pwallet)
 
             // Since we're changing the order, write it back
             if (pwtx) {
-                if (!WriteTx(pwtx->GetHash(), *pwtx))
+                if (!WriteTx(pwtx->tx->GetHash(), *pwtx))
                     return DB_LOAD_FAIL;
             } else if (!WriteAccountingEntry(pacentry->nEntryNo, *pacentry))
                 return DB_LOAD_FAIL;
