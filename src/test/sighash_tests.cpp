@@ -199,8 +199,8 @@ BOOST_AUTO_TEST_SUITE(sighash_tests)
 
                 std::vector<unsigned char> raw = ParseHex(raw_script);
                 scriptCode.insert(scriptCode.end(), raw.begin(), raw.end());
-            } catch (...) {
-                BOOST_ERROR("Bad test, couldn't deserialize data: " << strTest);
+            } catch (std::exception& e) {
+                BOOST_ERROR("Bad test, couldn't deserialize data: " << strTest << e.what());
                 continue;
             }
 
