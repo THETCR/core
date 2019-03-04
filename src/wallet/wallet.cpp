@@ -511,7 +511,7 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
     }
 
     for (COutput& out: vPossibleCoins)
-        if (out.tx->tx->tx->GetHash() == txHash && out.i == nOutputIndex) // found it!
+        if (out.tx->tx->GetHash() == txHash && out.i == nOutputIndex) // found it!
             return GetVinAndKeysFromOutput(out, txinRet, pubKeyRet, keyRet);
 
     LogPrintf("CWallet::GetMasternodeVinAndKeys -- Could not locate specified masternode vin\n");
@@ -525,8 +525,8 @@ bool CWallet::GetVinAndKeysFromOutput(COutput out, CTxIn& txinRet, CPubKey& pubK
 
     CScript pubScript;
 
-    txinRet = CTxIn(out.tx->tx->tx->GetHash(), out.i);
-    pubScript = out.tx->tx->tx->vout[out.i].scriptPubKey; // the inputs PubKey
+    txinRet = CTxIn(out.tx->tx->GetHash(), out.i);
+    pubScript = out.tx->tx->vout[out.i].scriptPubKey; // the inputs PubKey
 
     CTxDestination address1;
     ExtractDestination(pubScript, address1);

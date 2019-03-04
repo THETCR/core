@@ -1289,7 +1289,7 @@ void ListTransactions(const CWalletTx& wtx, const std::string& strAccount, int n
                     entry.pushKV("involvesWatchonly", true);
                 entry.pushKV("account", account);
                 MaybePushAddress(entry, r.destination);
-                if (wtx.IsCoinBase()) {
+                if (wtx.tx->IsCoinBase()) {
                     if (wtx.GetDepthInMainChain() < 1)
                         entry.pushKV("category", "orphan");
                     else if (wtx.GetBlocksToMaturity() > 0)
@@ -1669,7 +1669,7 @@ UniValue gettransaction(const JSONRPCRequest& request)
     CAmount nCredit = wtx.GetCredit(filter);
     CAmount nDebit = wtx.GetDebit(filter);
     CAmount nNet = nCredit - nDebit;
-    CAmount nFee = (wtx.IsFromMe(filter) ? wtx.GetValueOut() - nDebit : 0);
+    CAmount nFee = (wtx.IsFromMe(filter) ? wtx.tx->GetValueOut() - nDebit : 0);
 
     entry.pushKV("amount", ValueFromAmount(nNet - nFee));
     if (wtx.IsFromMe(filter))
@@ -2329,13 +2329,13 @@ UniValue printAddresses()
     std::map<std::string, double> mapAddresses;
     for (const COutput& out: vCoins) {
         CTxDestination utxoAddress;
-        ExtractDestination(out.tx->vout[out.i].scriptPubKey, utxoAddress);
+        ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, utxoAddress);
         std::string strAdd = CBitcoinAddress(utxoAddress).ToString();
 
         if (mapAddresses.find(strAdd) == mapAddresses.end()) //if strAdd is not already part of the map
-            mapAddresses[strAdd] = (double)out.tx->vout[out.i].nValue / (double)COIN;
+            mapAddresses[strAdd] = (double)out.tx->tx->vout[out.i].nValue / (double)COIN;
         else
-            mapAddresses[strAdd] += (double)out.tx->vout[out.i].nValue / (double)COIN;
+            mapAddresses[strAdd] += (double)out.tx->tx->vout[out.i].nValue / (double)COIN;
     }
 
     UniValue ret(UniValue::VARR);
@@ -3008,8 +3008,8 @@ extern UniValue DoZwspSpend(const CAmount nAmount, bool fMintChange, bool fMinim
 
     CAmount nValueOut = 0;
     UniValue vout(UniValue::VARR);
-    for (unsigned int i = 0; i < wtx.vout.size(); i++) {
-        const CTxOut& txout = wtx.vout[i];
+    for (unsigned int i = 0; i < wtx.tx->vout.size(); i++) {
+        const CTxOut& txout = wtx.tx->vout[i];
         UniValue out(UniValue::VOBJ);
         out.pushKV("value", ValueFromAmount(txout.nValue));
         nValueOut += txout.nValue;
