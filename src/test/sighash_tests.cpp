@@ -189,8 +189,10 @@ BOOST_AUTO_TEST_SUITE(sighash_tests)
                 nIn = test[2].get_int();
                 nHashType = test[3].get_int();
                 sigHashHex = test[4].get_str();
+
                 CDataStream stream(ParseHex(raw_tx), SER_NETWORK, PROTOCOL_VERSION);
                 stream >> tx;
+
                 CValidationState state;
                 BOOST_CHECK_MESSAGE(CheckTransaction(*tx, false, false, state), strTest);
                 BOOST_CHECK(state.IsValid());

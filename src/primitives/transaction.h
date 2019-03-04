@@ -242,11 +242,10 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     s >> tx.nVersion;
     int32_t nVersion = tx.nVersion;
     if(nVersion == 1){
-        printf("Serialize: version 1\n");
         s >> tx.nTime;
     }
-    tx.vin.clear();
-    tx.vout.clear();
+//    tx.vin.clear();
+//    tx.vout.clear();
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
     s >> tx.vin;
     s >> tx.vout;
@@ -261,7 +260,6 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     int32_t nVersion = tx.nVersion;
     s << tx.nVersion;
     if(nVersion == 1) {
-        printf("Serialize: version 1\n");
         s << tx.nTime;
     }
     s << tx.vin;
