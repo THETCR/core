@@ -1169,8 +1169,8 @@ namespace {
             // Serialize nVersion
             ::Serialize(s, txTo.nVersion);
             if(txTo.nVersion == 1){
-            // Serialize nTime
-               ::Serialize(s, txTo.nTime);
+                // Serialize nTime
+                ::Serialize(s, txTo.nTime);
             }
             // Serialize vin
             unsigned int nInputs = fAnyoneCanPay ? 1 : txTo.vin.size();
@@ -1267,6 +1267,7 @@ uint256 SignatureHash(const CScript& scriptCode, const T& txTo, unsigned int nIn
         // Version
         ss << txTo.nVersion;
         if(txTo.nVersion == 1){
+            std::cout << "Stream: nTime\n";
             ss << txTo.nTime;
         }
         // Input prevouts/nSequence (none/all, depending on flags)
@@ -1277,8 +1278,10 @@ uint256 SignatureHash(const CScript& scriptCode, const T& txTo, unsigned int nIn
         // may already be contain in hashSequence.
         ss << txTo.vin[nIn].prevout;
         if(!scriptCode.empty()){
+            std::cout << "Stream: scriptCode\n";
             ss << scriptCode;
         }
+        std::cout << "Stream: amount\n";
         ss << amount;
         ss << txTo.vin[nIn].nSequence;
         // Outputs (none/one/all, depending on flags)
