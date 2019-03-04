@@ -37,12 +37,9 @@ extern bool fPrintToConsole;
 BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
         : m_path_root(fs::temp_directory_path() / "test_wispr" / strprintf("%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(1 << 30))))
 {
-    std::cout << "AutoDetect\n";
     SHA256AutoDetect();
     ECC_Start();
-    std::cout << "SetupEnvironment\n";
     SetupEnvironment();
-    std::cout << "SetupNetworking\n";
     SetupNetworking();
     InitSignatureCache();
     InitScriptExecutionCache();
@@ -70,14 +67,12 @@ fs::path BasicTestingSetup::SetDataDir(const std::string& name)
 
 TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(chainName)
 {
-    std::cout << "SetDataDir\n";
     SetDataDir("tempdir");
     const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
 
 //    RegisterAllCoreRPCCommands(tableRPC);
-    std::cout << "ClearDatadirCache\n";
     ClearDatadirCache();
     // We have to run a scheduler thread to prevent ActivateBestChain
     // from blocking due to queue overrun.
@@ -88,7 +83,6 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     pblocktree.reset(new CBlockTreeDB(1 << 20, true));
     pcoinsdbview.reset(new CCoinsViewDB(1 << 23, true));
     pcoinsTip.reset(new CCoinsViewCache(pcoinsdbview.get()));
-    std::cout << "InitBlockIndex\n";
     InitBlockIndex(chainparams);
     {
         CValidationState state;
