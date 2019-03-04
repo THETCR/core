@@ -242,8 +242,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 //    const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
 
     s >> tx.nVersion;
-    int32_t nVersion = tx.nVersion;
-//    if(nVersion == 1){
+//    if(tx.nVersion == 1){
 //        std::cout << "UnserializeTransaction nTime\n";
 //        s >> tx.nTime;
 //    }
@@ -260,7 +259,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
 //    const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
 //    const bool fAllowWitness = false;
 
-    int32_t nVersion = tx.nVersion;
+//    int32_t nVersion = tx.nVersion;
     s << tx.nVersion;
 //    if(nVersion == 1) {
 //        std::cout << "SerializeTransaction nTime\n";
