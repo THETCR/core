@@ -1240,59 +1240,59 @@ uint256 SignatureHash(const CScript& scriptCode, const T& txTo, unsigned int nIn
 {
     assert(nIn < txTo.vin.size());
 
-    if (sigversion == SigVersion::WITNESS_V0) {
-        uint256 hashPrevouts;
-        uint256 hashSequence;
-        uint256 hashOutputs;
-        const bool cacheready = cache && cache->ready;
-
-        if (!(nHashType & SIGHASH_ANYONECANPAY)) {
-            hashPrevouts = cacheready ? cache->hashPrevouts : GetPrevoutHash(txTo);
-        }
-
-        if (!(nHashType & SIGHASH_ANYONECANPAY) && (nHashType & 0x1f) != SIGHASH_SINGLE && (nHashType & 0x1f) != SIGHASH_NONE) {
-            hashSequence = cacheready ? cache->hashSequence : GetSequenceHash(txTo);
-        }
-
-
-        if ((nHashType & 0x1f) != SIGHASH_SINGLE && (nHashType & 0x1f) != SIGHASH_NONE) {
-            hashOutputs = cacheready ? cache->hashOutputs : GetOutputsHash(txTo);
-        } else if ((nHashType & 0x1f) == SIGHASH_SINGLE && nIn < txTo.vout.size()) {
-            CHashWriter ss(SER_GETHASH, 0);
-            ss << txTo.vout[nIn];
-            hashOutputs = ss.GetHash();
-        }
-
-        CHashWriter ss(SER_GETHASH, 0);
-        // Version
-        ss << txTo.nVersion;
-        if(txTo.nVersion == 1){
-            std::cout << "Stream: nTime\n";
-            ss << txTo.nTime;
-        }
-        // Input prevouts/nSequence (none/all, depending on flags)
-        ss << hashPrevouts;
-        ss << hashSequence;
-        // The input being signed (replacing the scriptSig with scriptCode + amount)
-        // The prevout may already be contained in hashPrevout, and the nSequence
-        // may already be contain in hashSequence.
-        ss << txTo.vin[nIn].prevout;
-        if(!scriptCode.empty()){
-            std::cout << "Stream: scriptCode\n";
-            ss << scriptCode;
-        }
-        std::cout << "Stream: amount\n";
-        ss << amount;
-        ss << txTo.vin[nIn].nSequence;
-        // Outputs (none/one/all, depending on flags)
-        ss << hashOutputs;
-        // Locktime
-        ss << txTo.nLockTime;
-        // Sighash type
-        ss << nHashType;
-
-        return ss.GetHash();
-    }
+//    if (sigversion == SigVersion::WITNESS_V0) {
+//        uint256 hashPrevouts;
+//        uint256 hashSequence;
+//        uint256 hashOutputs;
+//        const bool cacheready = cache && cache->ready;
+//
+//        if (!(nHashType & SIGHASH_ANYONECANPAY)) {
+//            hashPrevouts = cacheready ? cache->hashPrevouts : GetPrevoutHash(txTo);
+//        }
+//
+//        if (!(nHashType & SIGHASH_ANYONECANPAY) && (nHashType & 0x1f) != SIGHASH_SINGLE && (nHashType & 0x1f) != SIGHASH_NONE) {
+//            hashSequence = cacheready ? cache->hashSequence : GetSequenceHash(txTo);
+//        }
+//
+//
+//        if ((nHashType & 0x1f) != SIGHASH_SINGLE && (nHashType & 0x1f) != SIGHASH_NONE) {
+//            hashOutputs = cacheready ? cache->hashOutputs : GetOutputsHash(txTo);
+//        } else if ((nHashType & 0x1f) == SIGHASH_SINGLE && nIn < txTo.vout.size()) {
+//            CHashWriter ss(SER_GETHASH, 0);
+//            ss << txTo.vout[nIn];
+//            hashOutputs = ss.GetHash();
+//        }
+//
+//        CHashWriter ss(SER_GETHASH, 0);
+//        // Version
+//        ss << txTo.nVersion;
+//        if(txTo.nVersion == 1){
+//            std::cout << "Stream: nTime\n";
+//            ss << txTo.nTime;
+//        }
+//        // Input prevouts/nSequence (none/all, depending on flags)
+//        ss << hashPrevouts;
+//        ss << hashSequence;
+//        // The input being signed (replacing the scriptSig with scriptCode + amount)
+//        // The prevout may already be contained in hashPrevout, and the nSequence
+//        // may already be contain in hashSequence.
+//        ss << txTo.vin[nIn].prevout;
+//        if(!scriptCode.empty()){
+//            std::cout << "Stream: scriptCode\n";
+//            ss << scriptCode;
+//        }
+//        std::cout << "Stream: amount\n";
+//        ss << amount;
+//        ss << txTo.vin[nIn].nSequence;
+//        // Outputs (none/one/all, depending on flags)
+//        ss << hashOutputs;
+//        // Locktime
+//        ss << txTo.nLockTime;
+//        // Sighash type
+//        ss << nHashType;
+//
+//        return ss.GetHash();
+//    }
 
     static const uint256 one(uint256S("0000000000000000000000000000000000000000000000000000000000000001"));
 
