@@ -162,10 +162,10 @@ class CSizeComputer;
 
 enum
 {
-  // primary actions
-      SER_NETWORK         = (1 << 0),
-  SER_DISK            = (1 << 1),
-  SER_GETHASH         = (1 << 2),
+    // primary actions
+            SER_NETWORK         = (1 << 0),
+    SER_DISK            = (1 << 1),
+    SER_GETHASH         = (1 << 2),
 };
 
 //! Convert the reference base type to X, without changing constness or reference type.
@@ -346,11 +346,11 @@ enum class VarIntMode { DEFAULT, NONNEGATIVE_SIGNED };
 
 template <VarIntMode Mode, typename I>
 struct CheckVarIntMode {
-  constexpr CheckVarIntMode()
-  {
-      static_assert(Mode != VarIntMode::DEFAULT || std::is_unsigned<I>::value, "Unsigned type required with mode DEFAULT.");
-      static_assert(Mode != VarIntMode::NONNEGATIVE_SIGNED || std::is_signed<I>::value, "Signed type required with mode NONNEGATIVE_SIGNED.");
-  }
+    constexpr CheckVarIntMode()
+    {
+        static_assert(Mode != VarIntMode::DEFAULT || std::is_unsigned<I>::value, "Unsigned type required with mode DEFAULT.");
+        static_assert(Mode != VarIntMode::NONNEGATIVE_SIGNED || std::is_signed<I>::value, "Signed type required with mode NONNEGATIVE_SIGNED.");
+    }
 };
 
 template<VarIntMode Mode, typename I>
@@ -414,65 +414,23 @@ I ReadVarInt(Stream& is)
 #define COMPACTSIZE(obj) CCompactSize(REF(obj))
 #define LIMITED_STRING(obj,n) LimitedString< n >(REF(obj))
 
-#define FLATDATA(obj) REF(CFlatData((char*)&(obj), (char*)&(obj) + sizeof(obj)))
-
-/**
- * Wrapper for serializing arrays and POD.
- */
-class CFlatData
-{
-protected:
-    char* pbegin;
-    char* pend;
-
-public:
-    CFlatData(void* pbeginIn, void* pendIn) : pbegin((char*)pbeginIn), pend((char*)pendIn) {}
-    template <class T, class TAl>
-    explicit CFlatData(std::vector<T, TAl>& v)
-    {
-        pbegin = (char*)v.data();
-        pend = (char*)(v.data() + v.size());
-    }
-    char* begin() { return pbegin; }
-    const char* begin() const { return pbegin; }
-    char* end() { return pend; }
-    const char* end() const { return pend; }
-
-    unsigned int GetSerializeSize(int, int = 0) const
-    {
-        return pend - pbegin;
-    }
-
-    template <typename Stream>
-    void Serialize(Stream& s) const
-    {
-        s.write(pbegin, pend - pbegin);
-    }
-
-    template <typename Stream>
-    void Unserialize(Stream& s)
-    {
-        s.read(pbegin, pend - pbegin);
-    }
-};
-
 template<VarIntMode Mode, typename I>
 class CVarInt
 {
 protected:
-  I &n;
+    I &n;
 public:
-  explicit CVarInt(I& nIn) : n(nIn) { }
+    explicit CVarInt(I& nIn) : n(nIn) { }
 
-  template<typename Stream>
-  void Serialize(Stream &s) const {
-      WriteVarInt<Stream,Mode,I>(s, n);
-  }
+    template<typename Stream>
+    void Serialize(Stream &s) const {
+        WriteVarInt<Stream,Mode,I>(s, n);
+    }
 
-  template<typename Stream>
-  void Unserialize(Stream& s) {
-      n = ReadVarInt<Stream,Mode,I>(s);
-  }
+    template<typename Stream>
+    void Unserialize(Stream& s) {
+        n = ReadVarInt<Stream,Mode,I>(s);
+    }
 };
 
 /** Serialization wrapper class for big-endian integers.
@@ -488,72 +446,72 @@ template<typename I>
 class BigEndian
 {
 protected:
-  I& m_val;
+    I& m_val;
 public:
-  explicit BigEndian(I& val) : m_val(val)
-  {
-      static_assert(std::is_unsigned<I>::value, "BigEndian type must be unsigned integer");
-      static_assert(sizeof(I) == 2 && std::numeric_limits<I>::min() == 0 && std::numeric_limits<I>::max() == std::numeric_limits<uint16_t>::max(), "Unsupported BigEndian size");
-  }
+    explicit BigEndian(I& val) : m_val(val)
+    {
+        static_assert(std::is_unsigned<I>::value, "BigEndian type must be unsigned integer");
+        static_assert(sizeof(I) == 2 && std::numeric_limits<I>::min() == 0 && std::numeric_limits<I>::max() == std::numeric_limits<uint16_t>::max(), "Unsupported BigEndian size");
+    }
 
-  template<typename Stream>
-  void Serialize(Stream& s) const
-  {
-      ser_writedata16be(s, m_val);
-  }
+    template<typename Stream>
+    void Serialize(Stream& s) const
+    {
+        ser_writedata16be(s, m_val);
+    }
 
-  template<typename Stream>
-  void Unserialize(Stream& s)
-  {
-      m_val = ser_readdata16be(s);
-  }
+    template<typename Stream>
+    void Unserialize(Stream& s)
+    {
+        m_val = ser_readdata16be(s);
+    }
 };
 
 class CCompactSize
 {
 protected:
-  uint64_t &n;
+    uint64_t &n;
 public:
-  explicit CCompactSize(uint64_t& nIn) : n(nIn) { }
+    explicit CCompactSize(uint64_t& nIn) : n(nIn) { }
 
-  template<typename Stream>
-  void Serialize(Stream &s) const {
-      WriteCompactSize<Stream>(s, n);
-  }
+    template<typename Stream>
+    void Serialize(Stream &s) const {
+        WriteCompactSize<Stream>(s, n);
+    }
 
-  template<typename Stream>
-  void Unserialize(Stream& s) {
-      n = ReadCompactSize<Stream>(s);
-  }
+    template<typename Stream>
+    void Unserialize(Stream& s) {
+        n = ReadCompactSize<Stream>(s);
+    }
 };
 
 template<size_t Limit>
 class LimitedString
 {
 protected:
-  std::string& string;
+    std::string& string;
 public:
-  explicit LimitedString(std::string& _string) : string(_string) {}
+    explicit LimitedString(std::string& _string) : string(_string) {}
 
-  template<typename Stream>
-  void Unserialize(Stream& s)
-  {
-      size_t size = ReadCompactSize(s);
-      if (size > Limit) {
-          throw std::ios_base::failure("String length limit exceeded");
-      }
-      string.resize(size);
-      if (size != 0)
-          s.read((char*)string.data(), size);
-  }
+    template<typename Stream>
+    void Unserialize(Stream& s)
+    {
+        size_t size = ReadCompactSize(s);
+        if (size > Limit) {
+            throw std::ios_base::failure("String length limit exceeded");
+        }
+        string.resize(size);
+        if (size != 0)
+            s.read((char*)string.data(), size);
+    }
 
-  template<typename Stream>
-  void Serialize(Stream& s) const
-  {
-      WriteCompactSize(s, string.size());
-      if (!string.empty())
-          s.write((char*)string.data(), string.size());
-  }
+    template<typename Stream>
+    void Serialize(Stream& s) const
+    {
+        WriteCompactSize(s, string.size());
+        if (!string.empty())
+            s.write((char*)string.data(), string.size());
+    }
 };
 
 template<VarIntMode Mode=VarIntMode::DEFAULT, typename I>
@@ -920,11 +878,11 @@ void Unserialize(Stream& is, std::shared_ptr<const T>& p)
  */
 struct CSerActionSerialize
 {
-  constexpr bool ForRead() const { return false; }
+    constexpr bool ForRead() const { return false; }
 };
 struct CSerActionUnserialize
 {
-  constexpr bool ForRead() const { return true; }
+    constexpr bool ForRead() const { return true; }
 };
 
 
@@ -948,35 +906,35 @@ struct CSerActionUnserialize
 class CSizeComputer
 {
 protected:
-  size_t nSize;
+    size_t nSize;
 
-  const int nVersion;
+    const int nVersion;
 public:
-  explicit CSizeComputer(int nVersionIn) : nSize(0), nVersion(nVersionIn) {}
+    explicit CSizeComputer(int nVersionIn) : nSize(0), nVersion(nVersionIn) {}
 
-  void write(const char *psz, size_t _nSize)
-  {
-      this->nSize += _nSize;
-  }
+    void write(const char *psz, size_t _nSize)
+    {
+        this->nSize += _nSize;
+    }
 
-  /** Pretend _nSize bytes are written, without specifying them. */
-  void seek(size_t _nSize)
-  {
-      this->nSize += _nSize;
-  }
+    /** Pretend _nSize bytes are written, without specifying them. */
+    void seek(size_t _nSize)
+    {
+        this->nSize += _nSize;
+    }
 
-  template<typename T>
-  CSizeComputer& operator<<(const T& obj)
-  {
-      ::Serialize(*this, obj);
-      return (*this);
-  }
+    template<typename T>
+    CSizeComputer& operator<<(const T& obj)
+    {
+        ::Serialize(*this, obj);
+        return (*this);
+    }
 
-  size_t size() const {
-      return nSize;
-  }
+    size_t size() const {
+        return nSize;
+    }
 
-  int GetVersion() const { return nVersion; }
+    int GetVersion() const { return nVersion; }
 };
 
 template<typename Stream>
