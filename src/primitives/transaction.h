@@ -244,7 +244,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         std::cout << "UnserializeTransaction nTime\n";
         s >> tx.nTime;
     }
-//    unsigned char flags = 0;
+    unsigned char flags = 0;
     tx.vin.clear();
     tx.vout.clear();
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
@@ -272,10 +272,10 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 //            s >> tx.vin[i].scriptWitness.stack;
 //        }
 //    }
-//    if (flags) {
+    if (flags) {
         /* Unknown flag in the serialization */
-//        throw std::ios_base::failure("Unknown transaction optional data");
-//    }
+        throw std::ios_base::failure("Unknown transaction optional data");
+    }
     s >> tx.nLockTime;
 }
 
@@ -298,12 +298,12 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
             flags |= 1;
         }
     }
-//    if (flags) {
+    if (flags) {
         /* Use extended format in case witnesses are to be serialized. */
-//        std::vector<CTxIn> vinDummy;
-//        s << vinDummy;
-//        s << flags;
-//    }
+        std::vector<CTxIn> vinDummy;
+        s << vinDummy;
+        s << flags;
+    }
     s << tx.vin;
     s << tx.vout;
     if (flags & 1) {
