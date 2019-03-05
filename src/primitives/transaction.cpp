@@ -262,6 +262,11 @@ unsigned int CTransaction::CalculateModifiedSize(unsigned int nTxSize) const
     return nTxSize;
 }
 
+unsigned int CTransaction::GetTotalSize() const
+{
+    return ::GetSerializeSize(*this, PROTOCOL_VERSION);
+}
+
 std::string CTransaction::ToString() const
 {
     std::string str;
