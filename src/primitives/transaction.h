@@ -244,7 +244,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         std::cout << "UnserializeTransaction nTime\n";
         s >> tx.nTime;
     }
-    unsigned char flags = 0;
+//    unsigned char flags = 0;
     tx.vin.clear();
     tx.vout.clear();
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
