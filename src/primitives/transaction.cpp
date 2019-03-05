@@ -69,12 +69,12 @@ CTxOut::CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn)
     nRounds = -10;
 }
 
-bool COutPoint::IsMasternodeReward(const CTransactionRef ptx) const
+bool COutPoint::IsMasternodeReward(const CTransaction tx) const
 {
-    if(!ptx->IsCoinStake())
+    if(!tx.IsCoinStake())
         return false;
 
-    return (n == ptx->vout.size() - 1) && (ptx->vout[1].scriptPubKey != ptx->vout[n].scriptPubKey);
+    return (n == tx.vout.size() - 1) && (tx.vout[1].scriptPubKey != tx.vout[n].scriptPubKey);
 }
 
 uint256 CTxOut::GetHash() const
