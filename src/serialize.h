@@ -1039,28 +1039,28 @@ inline void Unserialize(Stream& s, libzerocoin::SpendType & a)
 }
 
 
-class CScript;
-extern inline unsigned int GetSerializeSize(const CScript& v);
-template <typename Stream>
-void Serialize(Stream& os, const CScript& v);
-template <typename Stream>
-void Unserialize(Stream& is, CScript& v);
-inline unsigned int GetSerializeSize(const CScript& v)
-{
-    return GetSerializeSize((const std::vector<unsigned char>&)v);
-}
-
-template <typename Stream>
-void Serialize(Stream& os, const CScript& v)
-{
-    Serialize(os, (const std::vector<unsigned char>&)v);
-}
-
-template <typename Stream>
-void Unserialize(Stream& is, CScript& v)
-{
-    Unserialize(is, (std::vector<unsigned char>&)v);
-}
+//class CScript;
+//extern inline unsigned int GetSerializeSize(const CScript& v);
+//template <typename Stream>
+//void Serialize(Stream& os, const CScript& v);
+//template <typename Stream>
+//void Unserialize(Stream& is, CScript& v);
+//inline unsigned int GetSerializeSize(const CScript& v)
+//{
+//    return GetSerializeSize((const std::vector<unsigned char>&)v);
+//}
+//
+//template <typename Stream>
+//void Serialize(Stream& os, const CScript& v)
+//{
+//    Serialize(os, (const std::vector<unsigned char>&)v);
+//}
+//
+//template <typename Stream>
+//void Unserialize(Stream& is, CScript& v)
+//{
+//    Unserialize(is, (std::vector<unsigned char>&)v);
+//}
 
 
 #endif // BITCOIN_SERIALIZE_H
