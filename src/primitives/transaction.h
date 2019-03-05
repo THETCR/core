@@ -281,7 +281,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     int32_t _nVersion = tx.nVersion;
     s << tx.nVersion;
     if(_nVersion == 1){
-        s >> tx.nTime;
+        s << tx.nTime;
     }
     unsigned char flags = 0;
     // Consistency check
