@@ -241,6 +241,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 
     s >> tx.nVersion;
     if(tx.nVersion == 1){
+        std::cout << "UnserializeTransaction nTime\n";
         s >> tx.nTime;
     }
     unsigned char flags = 0;
@@ -248,6 +249,9 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     tx.vout.clear();
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
     s >> tx.vin;
+    if(fAllowWitness){
+        std::cout << "UnserializeTransaction Allow Witness\n";
+    }
     if (tx.vin.size() == 0 && fAllowWitness) {
         /* We read a dummy or an empty vin. */
         s >> flags;
@@ -280,11 +284,13 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     int32_t _nVersion = tx.nVersion;
     s << tx.nVersion;
     if(_nVersion == 1){
+        std::cout << "SerializeTransaction nTime\n";
         s << tx.nTime;
     }
     unsigned char flags = 0;
     // Consistency check
     if (fAllowWitness) {
+        std::cout << "SerializeTransaction Allow Witness\n";
         /* Check whether witnesses need to be serialized. */
         if (tx.HasWitness()) {
             flags |= 1;
