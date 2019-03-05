@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_SUITE(sighash_tests)
                 nHashType = test[3].get_int();
                 sigHashHex = test[4].get_str();
 
-                CDataStream stream(ParseHex(raw_tx), SER_NETWORK, SERIALIZE_TRANSACTION_NO_WITNESS);
+                CDataStream stream(ParseHex(raw_tx), SER_NETWORK, PROTOCOL_VERSION);
                 stream >> tx;
 
                 CValidationState state;
