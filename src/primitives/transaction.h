@@ -348,7 +348,7 @@ public:
     CTransaction(const CMutableTransaction &tx);
 //    CTransaction(CMutableTransaction &tx);
 
-    CTransaction& operator=(const CTransaction& tx);
+//    CTransaction& operator=(const CTransaction& tx);
 
     template <typename Stream>
     inline void Serialize(Stream& s) const {

@@ -1017,7 +1017,7 @@ template <typename Stream>
 inline void Unserialize(Stream& os, libzerocoin::CoinDenomination& p)
 {
     int f=0;
-    ser_writedata64(os, f);
+    f = ser_readdata64(os);
     p = libzerocoin::IntToZerocoinDenomination(f);
 }
 
@@ -1034,7 +1034,7 @@ template <typename Stream>
 inline void Unserialize(Stream& s, libzerocoin::SpendType & a)
 {
     uint8_t f=0;
-    ser_readdata8(s, f);
+    f = ser_readdata8(s);
     a = static_cast<libzerocoin::SpendType>(f);
 }
 
