@@ -296,12 +296,12 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
             flags |= 1;
         }
     }
-    if (flags) {
+//    if (flags) {
         /* Use extended format in case witnesses are to be serialized. */
-        std::vector<CTxIn> vinDummy;
-        s << vinDummy;
-        s << flags;
-    }
+//        std::vector<CTxIn> vinDummy;
+//        s << vinDummy;
+//        s << flags;
+//    }
     s << tx.vin;
     s << tx.vout;
     if (flags & 1) {
