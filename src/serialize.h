@@ -525,7 +525,7 @@ BigEndian<I> WrapBigEndian(I& n) { return BigEndian<I>(n); }
  */
 
 /**
- *  std::string
+ *  string
  */
 template<typename Stream, typename C> void Serialize(Stream& os, const std::basic_string<C>& str);
 template<typename Stream, typename C> void Unserialize(Stream& is, std::basic_string<C>& str);
@@ -609,7 +609,7 @@ inline void Unserialize(Stream& is, T&& a)
 
 
 /**
- * std::string
+ * string
  */
 template<typename Stream, typename C>
 void Serialize(Stream& os, const std::basic_string<C>& str)
@@ -1002,22 +1002,22 @@ size_t GetSerializeSizeMany(int nVersion, const T&... t)
 /*
  * Basic Types
  */
-#define WRITEDATA(s, obj) s.write((char*)&(obj), sizeof(obj))
-#define READDATA(s, obj) s.read((char*)&(obj), sizeof(obj))
+//#define WRITEDATA(s, obj) s.write((char*)&(obj), sizeof(obj))
+//#define READDATA(s, obj) s.read((char*)&(obj), sizeof(obj))
 // Serializatin for libzerocoin::CoinDenomination
 inline unsigned int GetSerializeSize(libzerocoin::CoinDenomination a) { return sizeof(libzerocoin::CoinDenomination); }
 template <typename Stream>
 inline void Serialize(Stream& os, const libzerocoin::CoinDenomination& p)
 {
     int f = libzerocoin::ZerocoinDenominationToInt(p);
-    WRITEDATA(os, f);
+    ser_writedata64(os, f);
 }
 
 template <typename Stream>
 inline void Unserialize(Stream& os, libzerocoin::CoinDenomination& p)
 {
     int f=0;
-    READDATA(os, f);
+    ser_writedata64(os, f);
     p = libzerocoin::IntToZerocoinDenomination(f);
 }
 
@@ -1027,22 +1027,14 @@ template <typename Stream>
 inline void Serialize(Stream& os, const libzerocoin::SpendType& p)
 {
     uint8_t f = static_cast<uint8_t>(p);
-    WRITEDATA(os, f);
+    ser_writedata8(os, f);
 }
-
-//template<typename Stream, typename T>
-//inline void Unserialize(Stream& is, libzerocoin::SpendType & a)
-//{
-//    uint8_t f=0;
-//    READDATA(is, f);
-//    a = static_cast<libzerocoin::SpendType>(f);
-//}
 
 template <typename Stream>
 inline void Unserialize(Stream& s, libzerocoin::SpendType & a)
 {
     uint8_t f=0;
-    READDATA(s, f);
+    ser_readdata8(s, f);
     a = static_cast<libzerocoin::SpendType>(f);
 }
 
