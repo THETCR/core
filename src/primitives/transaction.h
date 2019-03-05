@@ -252,28 +252,30 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     if(fAllowWitness){
         std::cout << "UnserializeTransaction Allow Witness\n";
     }
-    if (tx.vin.size() == 0 && fAllowWitness) {
+    s >> tx.vin;
+    s >> tx.vout;
+//    if (tx.vin.size() == 0 && fAllowWitness) {
         /* We read a dummy or an empty vin. */
-        s >> flags;
-        if (flags != 0) {
-            s >> tx.vin;
-            s >> tx.vout;
-        }
-    } else {
+//        s >> flags;
+//        if (flags != 0) {
+//            s >> tx.vin;
+//            s >> tx.vout;
+//        }
+//    } else {
         /* We read a non-empty vin. Assume a normal vout follows. */
-        s >> tx.vout;
-    }
-    if ((flags & 1) && fAllowWitness) {
+//        s >> tx.vout;
+//    }
+//    if ((flags & 1) && fAllowWitness) {
         /* The witness flag is present, and we support witnesses. */
-        flags ^= 1;
+//        flags ^= 1;
 //        for (size_t i = 0; i < tx.vin.size(); i++) {
 //            s >> tx.vin[i].scriptWitness.stack;
 //        }
-    }
-    if (flags) {
+//    }
+//    if (flags) {
         /* Unknown flag in the serialization */
-        throw std::ios_base::failure("Unknown transaction optional data");
-    }
+//        throw std::ios_base::failure("Unknown transaction optional data");
+//    }
     s >> tx.nLockTime;
 }
 
@@ -290,7 +292,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     unsigned char flags = 0;
     // Consistency check
     if (fAllowWitness) {
-        std::cout << "SerializeTransaction Allow Witness\n";
+//        std::cout << "SerializeTransaction Allow Witness\n";
         /* Check whether witnesses need to be serialized. */
         if (tx.HasWitness()) {
             flags |= 1;
