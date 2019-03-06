@@ -240,7 +240,6 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     s >> tx.nVersion;
     int32_t _nVersion = tx.nVersion;
     if(_nVersion < 2){
-        std::cout << "UnserializeTransaction nTime\n";
         s >> tx.nTime;
     }
     s >> tx.vin;
@@ -253,7 +252,6 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     int32_t _nVersion = tx.nVersion;
     s << tx.nVersion;
     if(_nVersion < 2){
-        std::cout << "SerializeTransaction nTime\n";
         s << tx.nTime;
     }
     s << tx.vin;
