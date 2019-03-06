@@ -116,17 +116,17 @@ bool DecodeHexTx(CMutableTransaction& tx, const std::string& hex_tx, bool try_no
         return false;
 
     std::vector<unsigned char> txData(ParseHex(hex_tx));
-    CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION);
+    CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS);
     try {
         ssData >> tx;
-        if (!ssData.empty())
-            return false;
-    }
-    catch (const std::exception&) {
-        return false;
+        if (ssData.eof() && (!try_witness || CheckTxScriptsSanity(tx))) {
+            return true;
+        }
+    } catch (const std::exception&) {
+        // Fall through.
     }
 
-    return true;
+    return false;
 }
 
 bool DecodeHexBlockHeader(CBlockHeader& header, const std::string& hex_header)
