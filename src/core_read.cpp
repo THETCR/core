@@ -121,8 +121,8 @@ bool DecodeHexTx(CMutableTransaction& tx, const std::string& hex_tx, bool try_no
     try {
         ssData >> tx;
     } catch (const std::exception& e) {
-        fprintf(stderr, "Error: %s\n", e.what());
-        throw std::runtime_error("Stream failed");
+//        fprintf(stderr, "Error: %s\n", e.what());
+//        throw std::runtime_error("Stream failed");
         return false;
     }
 //    if (try_no_witness) {
