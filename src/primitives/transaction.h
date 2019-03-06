@@ -245,25 +245,21 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         s >> tx.nTime;
     }
     unsigned char flags = 0;
-//    tx.vin.clear();
-//    tx.vout.clear();
+    tx.vin.clear();
+    tx.vout.clear();
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
-    if(fAllowWitness){
-//        std::cout << "UnserializeTransaction Allow Witness\n";
-    }
     s >> tx.vin;
-    s >> tx.vout;
-//    if (tx.vin.size() == 0 && fAllowWitness) {
+    if (tx.vin.size() == 0 && fAllowWitness) {
         /* We read a dummy or an empty vin. */
-//        s >> flags;
-//        if (flags != 0) {
-//            s >> tx.vin;
-//            s >> tx.vout;
-//        }
-//    } else {
+        s >> flags;
+        if (flags != 0) {
+            s >> tx.vin;
+            s >> tx.vout;
+        }
+    } else {
         /* We read a non-empty vin. Assume a normal vout follows. */
-//        s >> tx.vout;
-//    }
+        s >> tx.vout;
+    }
 //    if ((flags & 1) && fAllowWitness) {
         /* The witness flag is present, and we support witnesses. */
 //        flags ^= 1;
