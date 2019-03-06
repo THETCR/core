@@ -251,14 +251,14 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
 template<typename Stream, typename TxType>
 inline void SerializeTransaction(const TxType& tx, Stream& s) {
     int32_t _nVersion = tx.nVersion;
-    s << _nVersion;
+    s << tx.nVersion;
     if(_nVersion == 1){
         std::cout << "SerializeTransaction nTime\n";
         s << tx.nTime;
     }
-    s << vin;
-    s << vout;
-    s << nLockTime;
+    s << tx.vin;
+    s << tx.vout;
+    s << tx.nLockTime;
 }
 
 /** The basic transaction that is broadcasted on the network and contained in
