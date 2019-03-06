@@ -245,11 +245,11 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         s >> tx.nTime;
     }
     unsigned char flags = 0;
-    tx.vin.clear();
-    tx.vout.clear();
+//    tx.vin.clear();
+//    tx.vout.clear();
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
     if(fAllowWitness){
-        std::cout << "UnserializeTransaction Allow Witness\n";
+//        std::cout << "UnserializeTransaction Allow Witness\n";
     }
     s >> tx.vin;
     s >> tx.vout;
