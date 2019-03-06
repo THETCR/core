@@ -391,19 +391,6 @@ struct CMutableTransaction
     CMutableTransaction();
     CMutableTransaction(const CTransaction& tx);
 
-//    ADD_SERIALIZE_METHODS;
-//
-//    template <typename Stream, typename Operation>
-//    inline void SerializationOp(Stream& s, Operation ser_action) {
-//        READWRITE(this->nVersion);
-//        int32_t _nVersion = this->nVersion;
-//        if(_nVersion == 1){
-//            READWRITE(nTime);
-//        }
-//        READWRITE(vin);
-//        READWRITE(vout);
-//        READWRITE(nLockTime);
-//    }
     template <typename Stream>
     inline void Serialize(Stream& s) const {
         SerializeTransaction(*this, s);
