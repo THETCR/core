@@ -1168,7 +1168,7 @@ namespace {
         void Serialize(S &s) const {
             // Serialize nVersion
             ::Serialize(s, txTo.nVersion);
-            if(txTo.nVersion == 1){
+            if(txTo.nVersion < 2){
                 // Serialize nTime
                 ::Serialize(s, txTo.nTime);
             }
