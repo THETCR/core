@@ -2287,7 +2287,7 @@ bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& 
     LOCK(cs_main);
     static int64_t nLastWrite = 0;
 //    static int64_t nLastFlush = 0;
-//    bool full_flush_completed = false;
+    bool full_flush_completed = false;
     try {
         if ((mode == FlushStateMode::ALWAYS) ||
             ((mode == FlushStateMode::PERIODIC || mode == FlushStateMode::IF_NEEDED) && pcoinsTip->GetCacheSize() > nCoinCacheSize) ||
@@ -2328,7 +2328,11 @@ bool static FlushStateToDisk(const CChainParams& chainParams, CValidationState& 
                 GetMainSignals().SetBestChain(chainActive.GetLocator());
             }
             nLastWrite = GetTimeMicros();
-//            full_flush_completed = true;
+            full_flush_completed = true;
+        }
+        if (full_flush_completed) {
+            // Update best block in wallet (so we can detect restored wallets).
+            GetMainSignals().ChainStateFlushed(chainActive.GetLocator());
         }
     } catch (const std::runtime_error& e) {
         return AbortNode(state, std::string("System error while flushing: ") + e.what());

@@ -79,7 +79,7 @@ protected:
    * Protected destructor so that instances can only be deleted by derived classes.
    * If that restriction is no longer desired, this should be made public and virtual.
    */
-//  ~CValidationInterface() = default;
+  ~CValidationInterface() = default;
   /**
    * Notifies listeners when the block chain tip advances.
    *
@@ -113,13 +113,13 @@ protected:
    *
    * Called on a background thread.
    */
-//  virtual void BlockConnected(const std::shared_ptr<const CBlock> &block, const CBlockIndex *pindex, const std::vector<CTransactionRef> &txnConflicted) {}
+  virtual void BlockConnected(const std::shared_ptr<const CBlock> &block, const CBlockIndex *pindex, const std::vector<CTransactionRef> &txnConflicted) {}
   /**
    * Notifies listeners of a block being disconnected
    *
    * Called on a background thread.
    */
-//  virtual void BlockDisconnected(const std::shared_ptr<const CBlock> &block) {}
+  virtual void BlockDisconnected(const std::shared_ptr<const CBlock> &block) {}
   /**
    * Notifies listeners of the new active block chain on-disk.
    *
@@ -136,7 +136,7 @@ protected:
    *
    * Called on a background thread.
    */
-//  virtual void ChainStateFlushed(const CBlockLocator &locator) {}
+  virtual void ChainStateFlushed(const CBlockLocator &locator) {}
   /** Tells listeners to broadcast their data. */
   virtual void ResendWalletTransactions(int64_t nBestBlockTime) {}
   /**
@@ -149,14 +149,14 @@ protected:
   /**
    * Notifies listeners that a block which builds directly on our current tip
    * has been received and connected to the headers tree, though not validated yet */
-//  virtual void NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& block) {}
+  virtual void NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& block) {}
 
   virtual void SyncTransaction(const CTransaction &tx, const CBlock *pblock){}
   virtual void NotifyTransactionLock(const CTransaction &tx){}
   virtual bool UpdatedTransaction(const uint256 &hash){ return false; }
   virtual void SetBestChain(const CBlockLocator &chain){}
   virtual void Inventory(const uint256 &hash){}
-//  virtual void BlockFound(const uint256 &hash){};
+  virtual void BlockFound(const uint256 &hash){};
   virtual void ResetRequestCount(const uint256 &hash) {};
   friend void ::RegisterValidationInterface(CValidationInterface*);
   friend void ::UnregisterValidationInterface(CValidationInterface*);
@@ -192,12 +192,12 @@ public:
 
   void UpdatedBlockTip(const CBlockIndex *, const CBlockIndex *, bool fInitialDownload);
 //  void TransactionAddedToMempool(const CTransactionRef &);
-//  void BlockConnected(const std::shared_ptr<const CBlock> &, const CBlockIndex *pindex, const std::shared_ptr<const std::vector<CTransactionRef>> &);
-//  void BlockDisconnected(const std::shared_ptr<const CBlock> &);
-//  void ChainStateFlushed(const CBlockLocator &);
+  void BlockConnected(const std::shared_ptr<const CBlock> &, const CBlockIndex *pindex, const std::shared_ptr<const std::vector<CTransactionRef>> &);
+  void BlockDisconnected(const std::shared_ptr<const CBlock> &);
+  void ChainStateFlushed(const CBlockLocator &);
   void Broadcast(int64_t nBestBlockTime);
   void BlockChecked(const CBlock&, const CValidationState&);
-//  void NewPoWValidBlock(const CBlockIndex *, const std::shared_ptr<const CBlock>&);
+  void NewPoWValidBlock(const CBlockIndex *, const std::shared_ptr<const CBlock>&);
 
   //!wispr
   /** Notifies listeners of updated transaction data (transaction, and optionally the block it is found in. */
