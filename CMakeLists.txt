@@ -8,6 +8,7 @@
 cmake_minimum_required(VERSION 3.13.2)
 project(WISPR)
 
+set(CMAKE_PREFIX_PATH D:/Development/Libraries/CPP/Qt/5.9.7/mingw53_32)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 # Add path for custom modules
@@ -29,14 +30,13 @@ set(BDB_INCLUDE_DIR D:/Development/Libraries/CPP/bdb/include)
 set(BDBXX_LIBRARY D:/Development/Libraries/CPP/bdb/lib/libdb48d.lib)
 set(ZMQ_LIBRARY D:/Development/Libraries/CPP/ZeroMQ 4.0.4/lib/libzmq-v120-mt-4_0_4.lib)
 set(ZMQ_INCLUDE_DIR D:/Development/Libraries/CPP/ZeroMQ 4.0.4/include)
-set(SHLWAPI_INCLUDE_DIR D:/Development/Compilers/C++/win/include)
-set(GMP_INCLUDE_DIR D:/Development/Compilers/C++/win/include)
-set(GMP_LIBRARY D:/Development/Compilers/C++/win/lib64/libgmp.dll.a)
-set(GMPXX_LIBRARY D:/Development/Compilers/C++/win/lib64/libgmpxx.dll.a)
+set(SHLWAPI_INCLUDE_DIR D:/Development/Compilers/C++/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/include)
+set(GMP_INCLUDE_DIR D:/Development/Compilers/C++/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/include)
+set(GMP_LIBRARY D:/Development/Compilers/C++/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/lib64/libgmp.dll.a)
+set(GMPXX_LIBRARY D:/Development/Compilers/C++/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/lib64/libgmpxx.dll.a)
 set(Protobuf_LIBRARIES D:/Development/Libraries/CPP/protoc/lib/libprotobuf.lib)
 set(Protobuf_INCLUDE_DIR D:/Development/Libraries/CPP/protoc/include)
 set(Protobuf_PROTOC_EXECUTABLE D:/Development/Libraries/CPP/protoc/bin/protoc.exe)
-set(CMAKE_PREFIX_PATH D:/Development/Libraries/CPP/Qt/5.9.6/mingw53_32)
 
 set(Boost_NO_SYSTEM_PATHS true)
 #set(Boost_USE_STATIC_LIBS OFF CACHE BOOL "use static libraries from Boost")
@@ -70,6 +70,12 @@ include_directories(
         src/secp256k1/include
         src/univalue/include
         ${Boost_INCLUDE_DIR}
+        ${BDB_INCLUDE_DIR}
+        ${OPENSSL_INCLUDE_DIR}
+        ${EVENT_INCLUDE_DIR}
+        ${Protobuf_INCLUDE_DIR}
+        ${GMP_INCLUDE_DIR}
+        ${ZMQ_INCLUDE_DIR}
 )
 
 if(UNIX AND NOT APPLE)
@@ -91,30 +97,6 @@ add_definitions(
         -DENABLE_WALLET=1
 )
 
-qt5_wrap_ui(UI_GENERATED_HEADERS
-        qt/forms/addressbookpage.ui
-        qt/forms/askpassphrasedialog.ui
-        qt/forms/coincontroldialog.ui
-        qt/forms/darksendconfig.ui
-        qt/forms/editaddressdialog.ui
-        qt/forms/helpmessagedialog.ui
-        qt/forms/intro.ui
-        qt/forms/modaloverlay.ui
-        qt/forms/masternodelist.ui
-        qt/forms/openuridialog.ui
-        qt/forms/optionsdialog.ui
-        qt/forms/overviewpage.ui
-        qt/forms/receivecoinsdialog.ui
-        qt/forms/receiverequestdialog.ui
-        qt/forms/debugwindow.ui
-        qt/forms/sendcoinsdialog.ui
-        qt/forms/sendcoinsentry.ui
-        qt/forms/signverifymessagedialog.ui
-        qt/forms/transactiondescdialog.ui
-        qt/forms/coldstakingdialog.ui
-        qt/forms/mnemonicdialog.ui
-        qt/forms/zwspcontroldialog.ui
-        )
 file(GLOB SOURCE_FILES
         src/bench/*.c
         src/bench/*.h
@@ -146,6 +128,10 @@ file(GLOB SOURCE_FILES
         src/primitives/*.h
         src/qt/*.cpp
         src/qt/*.h
+        src/qt/*.qrc
+        src/qt/locale/*.ts
+        src/qt/forms/*.ui
+        src/qt/res/wispr-qt-res.rc
         src/qt/test/*.cpp
         src/qt/test/*.h
         src/rpc/*.cpp
@@ -174,9 +160,7 @@ file(GLOB SOURCE_FILES
         src/zmq/*.h
         src/*.cpp
         src/*.h
-        # Handle ui files
-        ${UI_GENERATED_HEADERS}
         )
 
-add_executable(WISPR ${SOURCE_FILES})
-target_link_libraries(WISPR ${QT_LIBRARIES} ${Boost_LIBRARIES} ${Protobuf_LIBRARIES} Event zmq GMP)
+add_executable(WISPR WIN32 ${SOURCE_FILES})
+target_link_libraries(WISPR ${Boost_LIBRARIES} ${Protobuf_LIBRARIES} Event zmq GMP Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Test Qt5::Network)
