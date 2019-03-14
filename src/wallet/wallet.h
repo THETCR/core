@@ -1092,12 +1092,12 @@ public:
     {
     }
 
-    CWallet()
+    CWallet() : m_chain(*interfaces::MakeChain())
     {
         SetNull();
     }
 
-    CWallet(std::string strWalletFileIn)
+    CWallet(std::string strWalletFileIn) : m_chain(*interfaces::MakeChain())
     {
         SetNull();
 
