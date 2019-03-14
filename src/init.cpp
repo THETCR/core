@@ -1632,44 +1632,44 @@ bool AppInitMain()
         LogPrintf("Using wallet %s\n", strWalletFile);
         uiInterface.InitMessage(_("Verifying wallet..."));
 
-        if (!bitdb.Open(GetDataDir())) {
-            // try moving the database env out of the way
-            fs::path pathDatabase = GetDataDir() / "database";
-            fs::path pathDatabaseBak = GetDataDir() / strprintf("database.%d.bak", GetTime());
-            try {
-                fs::rename(pathDatabase, pathDatabaseBak);
-                LogPrintf("Moved old %s to %s. Retrying.\n", pathDatabase.string(), pathDatabaseBak.string());
-            } catch (fs::filesystem_error& error) {
-                // failure is ok (well, not really, but it's not worse than what we started with)
-            }
-
-            // try again
-            if (!pwalletMain->Open(GetDataDir())) {
-                // if it still fails, it probably means we can't even create the database env
-                std::string msg = strprintf(_("Error initializing wallet database environment %s!"), strDataDir);
-                return InitError(msg);
-            }
-        }
-
-        if (gArgs.GetBoolArg("-salvagewallet", false)) {
-            // Recover readable keypairs:
-            if (!WalletBatch::Recover(bitdb, strWalletFile, true))
-                return false;
-        }
-
-        if (fs::exists(GetDataDir() / strWalletFile)) {
-            BerkeleyEnvironment::VerifyResult r = bitdb.Verify(strWalletFile, WalletBatch::Recover);
-            if (r == BerkeleyEnvironment::VerifyResult::RECOVER_OK) {
-                std::string msg = strprintf(_("Warning: wallet.dat corrupt, data salvaged!"
-                                              " Original wallet.dat saved as wallet.{timestamp}.bak in %s; if"
-                                              " your balance or transactions are incorrect you should"
-                                              " restore from a backup."),
-                                            strDataDir);
-                InitWarning(msg);
-            }
-            if (r == BerkeleyEnvironment::VerifyResult::RECOVER_FAIL)
-                return InitError(_("wallet.dat corrupt, salvage failed"));
-        }
+//        if (!bitdb.Open(GetDataDir())) {
+//            // try moving the database env out of the way
+//            fs::path pathDatabase = GetDataDir() / "database";
+//            fs::path pathDatabaseBak = GetDataDir() / strprintf("database.%d.bak", GetTime());
+//            try {
+//                fs::rename(pathDatabase, pathDatabaseBak);
+//                LogPrintf("Moved old %s to %s. Retrying.\n", pathDatabase.string(), pathDatabaseBak.string());
+//            } catch (fs::filesystem_error& error) {
+//                // failure is ok (well, not really, but it's not worse than what we started with)
+//            }
+//
+//            // try again
+//            if (!pwalletMain->Open(GetDataDir())) {
+//                // if it still fails, it probably means we can't even create the database env
+//                std::string msg = strprintf(_("Error initializing wallet database environment %s!"), strDataDir);
+//                return InitError(msg);
+//            }
+//        }
+//
+//        if (gArgs.GetBoolArg("-salvagewallet", false)) {
+//            // Recover readable keypairs:
+//            if (!WalletBatch::Recover(bitdb, strWalletFile, true))
+//                return false;
+//        }
+//
+//        if (fs::exists(GetDataDir() / strWalletFile)) {
+//            BerkeleyEnvironment::VerifyResult r = bitdb.Verify(strWalletFile, WalletBatch::Recover);
+//            if (r == BerkeleyEnvironment::VerifyResult::RECOVER_OK) {
+//                std::string msg = strprintf(_("Warning: wallet.dat corrupt, data salvaged!"
+//                                              " Original wallet.dat saved as wallet.{timestamp}.bak in %s; if"
+//                                              " your balance or transactions are incorrect you should"
+//                                              " restore from a backup."),
+//                                            strDataDir);
+//                InitWarning(msg);
+//            }
+//            if (r == BerkeleyEnvironment::VerifyResult::RECOVER_FAIL)
+//                return InitError(_("wallet.dat corrupt, salvage failed"));
+//        }
 
     }  // (!fDisableWallet)
 #endif // ENABLE_WALLET
