@@ -8,11 +8,13 @@
 
 #include "chainparams.h"
 #include "clientversion.h"
+#include "netmessagemaker.h"
 #include "net.h"
 #include "pubkey.h"
 #include "timedata.h"
 #include "ui_interface.h"
 #include <util/system.h>
+#include <util/strencodings.h>
 
 #include <algorithm>
 #include <map>
@@ -124,7 +126,7 @@ bool CAlert::AppliesToMe() const
     return AppliesTo(PROTOCOL_VERSION, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<std::string>()));
 }
 
-bool CAlert::RelayTo(CNode* pnode) const
+bool CAlert::RelayTo(CNode* pnode, CConnman* connman) const
 {
     if (!IsInEffect())
         return false;
@@ -136,7 +138,7 @@ bool CAlert::RelayTo(CNode* pnode) const
         if (AppliesTo(pnode->nVersion, pnode->strSubVer) ||
             AppliesToMe() ||
             GetAdjustedTime() < nRelayUntil) {
-            pnode->PushMessage(NetMsgType::ALERT, *this);
+            connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::ALERT, *this));
             return true;
         }
     }
