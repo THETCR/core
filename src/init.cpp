@@ -2270,7 +2270,10 @@ bool AppInitMain()
         LogPrintf(" addr %s\n", strMasterNodeAddr.c_str());
 
         if (!strMasterNodeAddr.empty()) {
-            CService addrTest = CService(strMasterNodeAddr);
+            CService addrTest;
+            if (Lookup(strMasterNodeAddr.c_str(), addrTest, GetListenPort(), fNameLookup) && addrTest.IsValid()){
+                AddLocal(addrTest, LOCAL_MANUAL);
+            }
             if (!addrTest.IsValid()) {
                 return InitError("Invalid -masternodeaddr address: " + strMasterNodeAddr);
             }
@@ -2452,7 +2455,7 @@ bool AppInitMain()
         pwalletMain->ReacceptWalletTransactions();
 
         // Run a thread to flush wallet periodically
-        threadGroup.create_thread(boost::bind(&ThreadFlushWalletDB, boost::ref(pwalletMain->strWalletFile)));
+//        threadGroup.create_thread(boost::bind(&ThreadFlushWalletDB, boost::ref(pwalletMain->strWalletFile)));
     }
 #endif
 
