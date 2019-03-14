@@ -266,7 +266,9 @@ libbitcoin_server_a_SOURCES = \
   httprpc.cpp \
   httpserver.cpp \
   interfaces/chain.cpp \
+  interfaces/handler.cpp \
   interfaces/node.cpp \
+  interfaces/wallet.h \
   init.cpp \
   leveldbwrapper.cpp \
   main.cpp \
