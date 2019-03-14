@@ -192,7 +192,7 @@ public:
     }
 
     bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
-    bool IsValid(CNode* pnode, std::string& strError);
+    bool IsValid(CNode* pnode, std::string& strError, CConnman* connman);
     bool SignatureValid();
     void Relay();
 
@@ -256,7 +256,7 @@ public:
     bool AddWinningMasternode(CMasternodePaymentWinner& winner);
     bool ProcessBlock(int nBlockHeight);
 
-    void Sync(CNode* node, int nCountNeeded);
+    void Sync(CNode* node, int nCountNeeded, CConnman* connman);
     void CleanPaymentList();
     int LastPayment(CMasternode& mn);
 
@@ -280,7 +280,7 @@ public:
     }
 
     int GetMinMasternodePaymentsProto();
-    void ProcessMessageMasternodePayments(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
+    void ProcessMessageMasternodePayments(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman);
     std::string GetRequiredPaymentsString(int nBlockHeight);
     void FillBlockPayee(CMutableTransaction& txNew, int64_t nFees, bool fProofOfStake, bool fZWSPStake);
     std::string ToString() const;

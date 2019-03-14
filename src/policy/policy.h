@@ -84,6 +84,12 @@ static constexpr unsigned int STANDARD_SCRIPT_VERIFY_FLAGS = MANDATORY_SCRIPT_VE
 /** For convenience, standard but not mandatory verify flags. */
 static const unsigned int STANDARD_NOT_MANDATORY_VERIFY_FLAGS = STANDARD_SCRIPT_VERIFY_FLAGS & ~MANDATORY_SCRIPT_VERIFY_FLAGS;
 
+/** Used as the flags parameter to sequence and nLocktime checks in non-consensus code. */
+static constexpr unsigned int STANDARD_LOCKTIME_VERIFY_FLAGS = LOCKTIME_VERIFY_SEQUENCE |
+                                                               LOCKTIME_MEDIAN_TIME_PAST;
+
+CAmount GetDustThreshold(const CTxOut& txout, const CFeeRate& dustRelayFee);
+
 bool IsDust(const CTxOut& txout, const CFeeRate& dustRelayFeeIn);
 
 bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType);
@@ -99,5 +105,14 @@ bool IsStandardTx(const CTransaction& tx, std::string& reason);
  * @return True if all inputs (scriptSigs) use only standard transaction forms
  */
 bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs);
+
+extern CFeeRate incrementalRelayFee;
+extern CFeeRate dustRelayFee;
+extern unsigned int nBytesPerSigOp;
+
+/** Compute the virtual transaction size (weight reinterpreted as bytes). */
+int64_t GetVirtualTransactionSize(int64_t nWeight, int64_t nSigOpCost);
+int64_t GetVirtualTransactionSize(const CTransaction& tx, int64_t nSigOpCost = 0);
+int64_t GetVirtualTransactionInputSize(const CTxIn& tx, int64_t nSigOpCost = 0);
 
 #endif // BITCOIN_POLICY_H

@@ -13,6 +13,7 @@
 #include <string>
 #include <boost/signals2/last_value.hpp>
 #include <boost/signals2/signal.hpp>
+
 class CBasicKeyStore;
 class CWallet;
 class uint256;
@@ -22,6 +23,10 @@ namespace signals2 {
 class connection;
 }
 } // namespace boost
+
+namespace interfaces {
+    class Wallet;
+} // namespace interfaces
 
 /** General change type (added, updated, removed). */
 enum ChangeType {
@@ -112,7 +117,7 @@ public:
   ADD_SIGNALS_DECL_WRAPPER(NotifyAlertChanged, void, const uint256& hash, ChangeType status);
 
   /** A wallet has been loaded. */
-  ADD_SIGNALS_DECL_WRAPPER(LoadWallet, void, CWallet* wallet);
+  ADD_SIGNALS_DECL_WRAPPER(LoadWallet, void, std::unique_ptr<interfaces::Wallet>& wallet);
 
   /**
    * Show progress e.g. for verifychain.

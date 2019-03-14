@@ -64,12 +64,12 @@ public:
     void AddedBudgetItem(uint256 hash);
     void GetNextAsset();
     std::string GetSyncStatus();
-    void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman);
     bool IsBudgetFinEmpty();
     bool IsBudgetPropEmpty();
 
     void Reset();
-    void Process();
+    void Process(CConnman* connman);
     bool IsSynced();
     bool IsBlockchainSynced();
     bool IsMasternodeListSynced() { return RequestedMasternodeAssets > MASTERNODE_SYNC_LIST; }

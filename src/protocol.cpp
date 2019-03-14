@@ -15,6 +15,8 @@
 # include <arpa/inet.h>
 #endif
 
+static std::atomic<bool> g_initial_block_download_completed(false);
+
 namespace NetMsgType {
 const char *VERSION="version";
 const char *VERACK="verack";
@@ -38,6 +40,7 @@ const char *FILTERADD="filteradd";
 const char *FILTERCLEAR="filterclear";
 const char *REJECT="reject";
 const char *SENDHEADERS="sendheaders";
+const char *FEEFILTER="feefilter";
 const char *SENDCMPCT="sendcmpct";
 const char *CMPCTBLOCK="cmpctblock";
 const char *GETBLOCKTXN="getblocktxn";
@@ -132,6 +135,8 @@ const static std::string allNetMessageTypes[] = {
     NetMsgType::FILTERADD,
     NetMsgType::FILTERCLEAR,
     NetMsgType::REJECT,
+    NetMsgType::SENDHEADERS,
+    NetMsgType::FEEFILTER,
     NetMsgType::SENDCMPCT,
     NetMsgType::CMPCTBLOCK,
     NetMsgType::GETBLOCKTXN,
@@ -174,21 +179,21 @@ const static std::string allNetMessageTypes[] = {
 
 const static std::vector<std::string> allNetMessageTypesVec(allNetMessageTypes, allNetMessageTypes+ARRAYLEN(allNetMessageTypes));
 
-CMessageHeader::CMessageHeader()
+CMessageHeader::CMessageHeader(const MessageStartChars& pchMessageStartIn)
 {
-    memcpy(pchMessageStart, Params().MessageStart(), MESSAGE_START_SIZE);
+    memcpy(pchMessageStart, pchMessageStartIn, MESSAGE_START_SIZE);
     memset(pchCommand, 0, sizeof(pchCommand));
     nMessageSize = -1;
-    nChecksum = 0;
+    memset(pchChecksum, 0, CHECKSUM_SIZE);
 }
 
-CMessageHeader::CMessageHeader(const char* pszCommand, unsigned int nMessageSizeIn)
+CMessageHeader::CMessageHeader(const MessageStartChars& pchMessageStartIn, const char* pszCommand, unsigned int nMessageSizeIn)
 {
-    memcpy(pchMessageStart, Params().MessageStart(), MESSAGE_START_SIZE);
+    memcpy(pchMessageStart, pchMessageStartIn, MESSAGE_START_SIZE);
     memset(pchCommand, 0, sizeof(pchCommand));
     strncpy(pchCommand, pszCommand, COMMAND_SIZE);
     nMessageSize = nMessageSizeIn;
-    nChecksum = 0;
+    memset(pchChecksum, 0, CHECKSUM_SIZE);
 }
 
 std::string CMessageHeader::GetCommand() const
@@ -196,30 +201,45 @@ std::string CMessageHeader::GetCommand() const
     return std::string(pchCommand, pchCommand + strnlen(pchCommand, COMMAND_SIZE));
 }
 
-bool CMessageHeader::IsValid() const
+bool CMessageHeader::IsValid(const MessageStartChars& pchMessageStartIn) const
 {
-    // Check start std::string
-    if (memcmp(pchMessageStart, Params().MessageStart(), MESSAGE_START_SIZE) != 0)
+    // Check start string
+    if (memcmp(pchMessageStart, pchMessageStartIn, MESSAGE_START_SIZE) != 0)
         return false;
 
-    // Check the command std::string for errors
-    for (const char* p1 = pchCommand; p1 < pchCommand + COMMAND_SIZE; p1++) {
-        if (*p1 == 0) {
+    // Check the command string for errors
+    for (const char* p1 = pchCommand; p1 < pchCommand + COMMAND_SIZE; p1++)
+    {
+        if (*p1 == 0)
+        {
             // Must be all zeros after the first zero
             for (; p1 < pchCommand + COMMAND_SIZE; p1++)
                 if (*p1 != 0)
                     return false;
-        } else if (*p1 < ' ' || *p1 > 0x7E)
+        }
+        else if (*p1 < ' ' || *p1 > 0x7E)
             return false;
     }
 
     // Message size
-    if (nMessageSize > MAX_SIZE) {
-        LogPrintf("CMessageHeader::IsValid() : (%s, %u bytes) nMessageSize > MAX_SIZE\n", GetCommand(), nMessageSize);
+    if (nMessageSize > MAX_SIZE)
+    {
+        LogPrintf("CMessageHeader::IsValid(): (%s, %u bytes) nMessageSize > MAX_SIZE\n", GetCommand(), nMessageSize);
         return false;
     }
 
     return true;
+}
+
+ServiceFlags GetDesirableServiceFlags(ServiceFlags services) {
+    if ((services & NODE_NETWORK_LIMITED) && g_initial_block_download_completed) {
+        return ServiceFlags(NODE_NETWORK_LIMITED | NODE_WITNESS);
+    }
+    return ServiceFlags(NODE_NETWORK | NODE_WITNESS);
+}
+
+void SetServiceFlagsIBDCache(bool state) {
+    g_initial_block_download_completed = state;
 }
 
 

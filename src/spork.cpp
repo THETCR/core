@@ -13,6 +13,7 @@
 #include "protocol.h"
 #include "sync.h"
 #include "sporkdb.h"
+#include "netmessagemaker.h"
 #include <util/system.h>
 
 using namespace std;
@@ -56,7 +57,7 @@ void LoadSporksFromDB()
     }
 }
 
-void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void ProcessSpork(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman)
 {
     if (fLiteMode) return; //disable all obfuscation/masternode related functionality
 
@@ -101,7 +102,7 @@ void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
         std::map<int, CSporkMessage>::iterator it = mapSporksActive.begin();
 
         while (it != mapSporksActive.end()) {
-            pfrom->PushMessage(NetMsgType::SPORK, it->second);
+            connman->PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::SPORK, it->second));
             it++;
         }
     }

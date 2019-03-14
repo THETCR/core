@@ -13,6 +13,7 @@
 #include <util/system.h>
 #include <wallet/wallet.h>
 #include <fs.h>
+#include <netmessagemaker.h>
 
 
 
@@ -124,7 +125,7 @@ void CBudgetManager::CheckOrphanVotes()
     std::string strError = "";
     std::map<uint256, CBudgetVote>::iterator it1 = mapOrphanMasternodeBudgetVotes.begin();
     while (it1 != mapOrphanMasternodeBudgetVotes.end()) {
-        if (budget.UpdateProposal(((*it1).second), NULL, strError)) {
+        if (budget.UpdateProposal(((*it1).second), NULL, strError, NULL)) {
             LogPrint(BCLog::MNBUDGET,"CBudgetManager::CheckOrphanVotes - Proposal/Budget is known, activating and removing orphan vote\n");
             mapOrphanMasternodeBudgetVotes.erase(it1++);
         } else {
@@ -133,7 +134,7 @@ void CBudgetManager::CheckOrphanVotes()
     }
     std::map<uint256, CFinalizedBudgetVote>::iterator it2 = mapOrphanFinalizedBudgetVotes.begin();
     while (it2 != mapOrphanFinalizedBudgetVotes.end()) {
-        if (budget.UpdateFinalizedBudget(((*it2).second), NULL, strError)) {
+        if (budget.UpdateFinalizedBudget(((*it2).second), NULL, strError, NULL)) {
             LogPrint(BCLog::MNBUDGET,"CBudgetManager::CheckOrphanVotes - Proposal/Budget is known, activating and removing orphan vote\n");
             mapOrphanFinalizedBudgetVotes.erase(it2++);
         } else {
@@ -923,7 +924,7 @@ CAmount CBudgetManager::GetTotalBudget(int nHeight)
     CAmount nSubsidy = 0;
     return nSubsidy;
 }
-void CBudgetManager::NewBlock()
+void CBudgetManager::NewBlock(CConnman* connman)
 {
     TRY_LOCK(cs, fBudgetNewBlock);
     if (!fBudgetNewBlock) return;
@@ -948,7 +949,7 @@ void CBudgetManager::NewBlock()
         LOCK(cs_vNodes);
         for (CNode* pnode: vNodes)
             if (pnode->nVersion >= ActiveProtocol())
-                Sync(pnode, 0, true);
+                Sync(pnode, 0, connman, true);
 
         MarkSynced();
     }
@@ -1035,7 +1036,7 @@ void CBudgetManager::NewBlock()
     LogPrint(BCLog::MNBUDGET,"CBudgetManager::NewBlock - PASSED\n");
 }
 
-void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void CBudgetManager::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman)
 {
     // lite mode is not supported
     if (fLiteMode) return;
@@ -1058,7 +1059,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
             }
         }
 
-        Sync(pfrom, nProp);
+        Sync(pfrom, nProp, connman);
         LogPrint(BCLog::MNBUDGET, "mnvs - Sent Masternode votes to peer %i\n", pfrom->GetId());
     }
 
@@ -1111,7 +1112,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         CMasternode* pmn = mnodeman.Find(vote.vin);
         if (pmn == nullptr) {
             LogPrint(BCLog::MNBUDGET,"mvote - unknown masternode - vin: %s\n", vote.vin.prevout.hash.ToString());
-            mnodeman.AskForMN(pfrom, vote.vin);
+            mnodeman.AskForMN(pfrom, vote.vin, connman);
             return;
         }
 
@@ -1123,12 +1124,12 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
                 Misbehaving(pfrom->GetId(), 20);
             }
             // it could just be a non-synced masternode
-            mnodeman.AskForMN(pfrom, vote.vin);
+            mnodeman.AskForMN(pfrom, vote.vin, connman);
             return;
         }
 
         std::string strError = "";
-        if (UpdateProposal(vote, pfrom, strError)) {
+        if (UpdateProposal(vote, pfrom, strError, connman)) {
             vote.Relay();
             masternodeSync.AddedBudgetItem(vote.GetHash());
         }
@@ -1186,7 +1187,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         CMasternode* pmn = mnodeman.Find(vote.vin);
         if (pmn == nullptr) {
             LogPrint(BCLog::MNBUDGET, "fbvote - unknown masternode - vin: %s\n", vote.vin.prevout.hash.ToString());
-            mnodeman.AskForMN(pfrom, vote.vin);
+            mnodeman.AskForMN(pfrom, vote.vin, connman);
             return;
         }
 
@@ -1197,12 +1198,12 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
                 Misbehaving(pfrom->GetId(), 20);
             }
             // it could just be a non-synced masternode
-            mnodeman.AskForMN(pfrom, vote.vin);
+            mnodeman.AskForMN(pfrom, vote.vin, connman);
             return;
         }
 
         std::string strError = "";
-        if (UpdateFinalizedBudget(vote, pfrom, strError)) {
+        if (UpdateFinalizedBudget(vote, pfrom, strError, connman)) {
             vote.Relay();
             masternodeSync.AddedBudgetItem(vote.GetHash());
 
@@ -1294,7 +1295,7 @@ void CBudgetManager::MarkSynced()
 }
 
 
-void CBudgetManager::Sync(CNode* pfrom, uint256 nProp, bool fPartial)
+void CBudgetManager::Sync(CNode* pfrom, uint256 nProp, CConnman* connman, bool fPartial)
 {
     LOCK(cs);
 
@@ -1332,7 +1333,7 @@ void CBudgetManager::Sync(CNode* pfrom, uint256 nProp, bool fPartial)
         ++it1;
     }
 
-    pfrom->PushMessage(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_BUDGET_PROP, nInvCount);
+    connman->PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_BUDGET_PROP, nInvCount));
 
     LogPrint(BCLog::MNBUDGET, "CBudgetManager::Sync - sent %d items\n", nInvCount);
 
@@ -1360,11 +1361,11 @@ void CBudgetManager::Sync(CNode* pfrom, uint256 nProp, bool fPartial)
         ++it3;
     }
 
-    pfrom->PushMessage(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_BUDGET_FIN, nInvCount);
+    connman->PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_BUDGET_FIN, nInvCount));
     LogPrint(BCLog::MNBUDGET, "CBudgetManager::Sync - sent %d items\n", nInvCount);
 }
 
-bool CBudgetManager::UpdateProposal(CBudgetVote& vote, CNode* pfrom, std::string& strError)
+bool CBudgetManager::UpdateProposal(CBudgetVote& vote, CNode* pfrom, std::string& strError, CConnman* connman)
 {
     LOCK(cs);
 
@@ -1378,7 +1379,7 @@ bool CBudgetManager::UpdateProposal(CBudgetVote& vote, CNode* pfrom, std::string
             mapOrphanMasternodeBudgetVotes[vote.nProposalHash] = vote;
 
             if (!askedForSourceProposalOrBudget.count(vote.nProposalHash)) {
-                pfrom->PushMessage(NetMsgType::MNBUDGETSYNC, vote.nProposalHash);
+                connman->PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::MNBUDGETSYNC, vote.nProposalHash));
                 askedForSourceProposalOrBudget[vote.nProposalHash] = GetTime();
             }
         }
@@ -1391,7 +1392,7 @@ bool CBudgetManager::UpdateProposal(CBudgetVote& vote, CNode* pfrom, std::string
     return mapProposals[vote.nProposalHash].AddOrUpdateVote(vote, strError);
 }
 
-bool CBudgetManager::UpdateFinalizedBudget(CFinalizedBudgetVote& vote, CNode* pfrom, std::string& strError)
+bool CBudgetManager::UpdateFinalizedBudget(CFinalizedBudgetVote& vote, CNode* pfrom, std::string& strError, CConnman* connman)
 {
     LOCK(cs);
 
@@ -1405,7 +1406,7 @@ bool CBudgetManager::UpdateFinalizedBudget(CFinalizedBudgetVote& vote, CNode* pf
             mapOrphanFinalizedBudgetVotes[vote.nBudgetHash] = vote;
 
             if (!askedForSourceProposalOrBudget.count(vote.nBudgetHash)) {
-                pfrom->PushMessage(NetMsgType::MNBUDGETSYNC, vote.nBudgetHash);
+                connman->PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::MNBUDGETSYNC, vote.nBudgetHash));
                 askedForSourceProposalOrBudget[vote.nBudgetHash] = GetTime();
             }
         }
@@ -2186,7 +2187,7 @@ void CFinalizedBudget::SubmitVote()
     }
 
     std::string strError = "";
-    if (budget.UpdateFinalizedBudget(vote, NULL, strError)) {
+    if (budget.UpdateFinalizedBudget(vote, NULL, strError, NULL)) {
         LogPrint(BCLog::MNBUDGET,"CFinalizedBudget::SubmitVote  - new finalized budget vote - %s\n", vote.GetHash().ToString());
 
         budget.mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));

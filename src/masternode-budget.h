@@ -218,11 +218,11 @@ public:
 
     void ResetSync();
     void MarkSynced();
-    void Sync(CNode* node, uint256 nProp, bool fPartial = false);
+    void Sync(CNode* node, uint256 nProp, CConnman* connman, bool fPartial = false);
 
     void Calculate();
-    void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
-    void NewBlock();
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman);
+    void NewBlock(CConnman* connman);
     CBudgetProposal* FindProposal(const std::string& strProposalName);
     CBudgetProposal* FindProposal(uint256 nHash);
     CFinalizedBudget* FindFinalizedBudget(uint256 nHash);
@@ -237,8 +237,8 @@ public:
     bool AddFinalizedBudget(CFinalizedBudget& finalizedBudget);
     void SubmitFinalBudget();
 
-    bool UpdateProposal(CBudgetVote& vote, CNode* pfrom, std::string& strError);
-    bool UpdateFinalizedBudget(CFinalizedBudgetVote& vote, CNode* pfrom, std::string& strError);
+    bool UpdateProposal(CBudgetVote& vote, CNode* pfrom, std::string& strError, CConnman* connman);
+    bool UpdateFinalizedBudget(CFinalizedBudgetVote& vote, CNode* pfrom, std::string& strError, CConnman* connman);
     bool PropExists(uint256 nHash);
     TrxValidationStatus IsTransactionValid(const CTransaction& txNew, int nBlockHeight);
     std::string GetRequiredPaymentsString(int nBlockHeight);

@@ -52,12 +52,14 @@ class CBloomFilter;
 class CInv;
 class CConnman;
 class CScriptCheck;
+class CBlockPolicyEstimator;
 class CTxMemPool;
 class CValidationInterface;
 class CValidationState;
 
 struct CBlockTemplate;
 struct CNodeStateStats;
+struct LockPoints;
 
 /** Default for accepting alerts from the P2P network. */
 static const bool DEFAULT_ALERTS = true;
@@ -162,6 +164,7 @@ struct BlockHasher {
 
 extern CScript COINBASE_FLAGS;
 extern CCriticalSection cs_main;
+extern CBlockPolicyEstimator feeEstimator;
 extern CTxMemPool mempool;
 typedef boost::unordered_map<uint256, CBlockIndex*, BlockHasher> BlockMap;
 extern BlockMap mapBlockIndex;
@@ -178,7 +181,10 @@ extern bool fTxIndex;
 extern bool fIsBareMultisigStd;
 extern bool fCheckBlockIndex;
 extern unsigned int nCoinCacheSize;
+/** A fee rate smaller than this is considered zero fee (for relaying, mining and transaction creation) */
 extern CFeeRate minRelayTxFee;
+/** Absolute maximum transaction fee (in satoshis) used by wallet and mempool (rejects high fee in sendrawtransaction) */
+extern CAmount maxTxFee;
 extern bool fAlerts;
 extern bool fVerifyingBlocks;
 
@@ -285,6 +291,10 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCou
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock, bool fProofOfStake);
 
 bool ActivateBestChain(CValidationState& state, const CBlock* pblock = nullptr, bool fAlreadyChecked = false);
+
+/** Guess verification progress (as a fraction between 0.0=genesis and 1.0=current tip). */
+double GuessVerificationProgress(const ChainTxData& data, const CBlockIndex* pindex);
+
 CAmount GetBlockValue(int nHeight);
 
 /** Create a new block index entry for a given block hash */
@@ -373,6 +383,23 @@ public:
 };
 
 /**
+ * Test whether the LockPoints height and time are still valid on the current chain
+ */
+bool TestLockPointValidity(const LockPoints* lp) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+
+/**
+ * Check if transaction will be BIP 68 final in the next block to be created.
+ *
+ * Simulates calling SequenceLocks() with data from the tip of the current active chain.
+ * Optionally stores in LockPoints the resulting height and time calculated and the hash
+ * of the block needed for calculation or skips the calculation and uses the LockPoints
+ * passed in for evaluation.
+ * The LockPoints should not be considered valid if CheckSequenceLocks returns false.
+ *
+ * See consensus/consensus.h for flag definitions.
+ */
+bool CheckSequenceLocks(const CTxMemPool& pool, const CTransaction& tx, int flags, LockPoints* lp = nullptr, bool useExistingLockPoints = false) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+/**
  * Closure representing one script verification
  * Note that this stores references to the spending transaction
  */
@@ -392,7 +419,7 @@ public:
   CScriptCheck(): ptxTo(nullptr), nIn(0), nFlags(0), cacheStore(false), error(SCRIPT_ERR_UNKNOWN_ERROR) {}
   CScriptCheck(const CTxOut& outIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, bool cacheIn, PrecomputedTransactionData* txdataIn) :
       m_tx_out(outIn), ptxTo(&txToIn), nIn(nInIn), nFlags(nFlagsIn), cacheStore(cacheIn), error(SCRIPT_ERR_UNKNOWN_ERROR), txdata(txdataIn) { }
-  CScriptCheck(const CCoins& txFromIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, bool cacheIn) : scriptPubKey(txFromIn.vout[txToIn.vin[nInIn].prevout.n].scriptPubKey){}
+  CScriptCheck(const CTxOut& txFromIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, bool cacheIn) : scriptPubKey(txFromIn.scriptPubKey){}
 
   bool operator()();
 
@@ -490,6 +517,13 @@ extern std::unique_ptr<CZerocoinDB> zerocoinDB;
 
 /** Global variable that points to the spork database (protected by cs_main) */
 extern std::unique_ptr<CSporkDB> pSporkDB;
+
+/**
+ * Return the spend height, which is one more than the inputs.GetBestBlock().
+ * While checking, GetBestBlock() refers to the parent block. (protected by cs_main)
+ * This is also true for mempool checks.
+ */
+int GetSpendHeight(const CCoinsViewCache& inputs);
 
 struct CBlockTemplate {
     CBlock block;

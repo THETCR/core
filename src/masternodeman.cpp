@@ -6,6 +6,7 @@
 #include "masternodeman.h"
 #include "consensus/validation.h"
 #include <net_processing.h>
+#include <netmessagemaker.h>
 #include "clientversion.h"
 #include "activemasternode.h"
 #include "addrman.h"
@@ -219,7 +220,7 @@ bool CMasternodeMan::Add(CMasternode& mn)
     return false;
 }
 
-void CMasternodeMan::AskForMN(CNode* pnode, CTxIn& vin)
+void CMasternodeMan::AskForMN(CNode* pnode, CTxIn& vin, CConnman* connman)
 {
     std::map<COutPoint, int64_t>::iterator i = mWeAskedForMasternodeListEntry.find(vin.prevout);
     if (i != mWeAskedForMasternodeListEntry.end()) {
@@ -230,7 +231,7 @@ void CMasternodeMan::AskForMN(CNode* pnode, CTxIn& vin)
     // ask for the mnb info once from the node that sent mnp
 
     LogPrint(BCLog::MASTERNODE, "CMasternodeMan::AskForMN - Asking node for missing entry, vin: %s\n", vin.prevout.hash.ToString());
-    pnode->PushMessage(NetMsgType::DSEG, vin);
+    connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::DSEG, vin));
     int64_t askAgain = GetTime() + MASTERNODE_MIN_MNP_SECONDS;
     mWeAskedForMasternodeListEntry[vin.prevout] = askAgain;
 }
@@ -402,7 +403,8 @@ void CMasternodeMan::CountNetworks(int protocolVersion, int& ipv4, int& ipv6, in
         std::string strHost;
         int port;
         SplitHostPort(mn.addr.ToString(), port, strHost);
-        CNetAddr node = CNetAddr(strHost, false);
+        CNetAddr node = CNetAddr(mn.addr);
+//        CNetAddr node = CNetAddr(strHost, false);
         int nNetwork = node.GetNetwork();
         switch (nNetwork) {
             case 1 :
@@ -418,7 +420,7 @@ void CMasternodeMan::CountNetworks(int protocolVersion, int& ipv4, int& ipv6, in
     }
 }
 
-void CMasternodeMan::DsegUpdate(CNode* pnode)
+void CMasternodeMan::DsegUpdate(CNode* pnode, CConnman* connman)
 {
     LOCK(cs);
 
@@ -434,7 +436,7 @@ void CMasternodeMan::DsegUpdate(CNode* pnode)
         }
     }
 
-    pnode->PushMessage(NetMsgType::DSEG, CTxIn());
+    connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::DSEG, CTxIn()));
     int64_t askAgain = GetTime() + MASTERNODES_DSEG_SECONDS;
     mWeAskedForMasternodeList[pnode->addr] = askAgain;
 }
@@ -726,11 +728,11 @@ void CMasternodeMan::ProcessMasternodeConnections()
     }
 }
 
-void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman)
 {
     if (fLiteMode) return; //disable all Obfuscation/Masternode related functionality
     if (!masternodeSync.IsBlockchainSynced()) return;
-
+    const CNetMsgMaker msgMaker(pfrom->GetSendVersion());
     LOCK(cs_process_message);
 
     if (strCommand == NetMsgType::MNANNOUNCE) { //Masternode Broadcast
@@ -798,7 +800,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
 
         // something significant is broken or mn is unknown,
         // we might have to ask for a masternode entry once
-        AskForMN(pfrom, mnp.vin);
+        AskForMN(pfrom, mnp.vin, connman);
 
     } else if (strCommand == NetMsgType::DSEG) { //Get Masternode list or specific entry
 
@@ -849,7 +851,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         }
 
         if (vin == CTxIn()) {
-            pfrom->PushMessage(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_LIST, nInvCount);
+            connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_LIST, nInvCount));
             LogPrint(BCLog::MASTERNODE, "dseg - Sent %d Masternode entries to peer %i\n", nInvCount, pfrom->GetId());
         }
     }
@@ -960,7 +962,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
                         if (!lockNodes) return;
                         for (CNode* pnode: vNodes)
                             if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto())
-                                pnode->PushMessage("dsee", vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage);
+                                connman->PushMessage(pnode, msgMaker.Make("dsee", vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage));
                     }
                 }
             }
@@ -1049,7 +1051,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
                 if (!lockNodes) return;
                 for (CNode* pnode: vNodes)
                     if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto())
-                        pnode->PushMessage("dsee", vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage);
+                        connman->PushMessage(pnode, msgMaker.Make("dsee", vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage));
             }
         } else {
             LogPrint(BCLog::MASTERNODE,"dsee - Rejected Masternode entry %s\n", vin.prevout.hash.ToString());
@@ -1119,7 +1121,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
                     LogPrint(BCLog::MASTERNODE, "dseep - relaying %s \n", vin.prevout.hash.ToString());
                     for (CNode* pnode: vNodes)
                         if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto())
-                            pnode->PushMessage("dseep", vin, vchSig, sigTime, stop);
+                            connman->PushMessage(pnode, msgMaker.Make("dseep", vin, vchSig, sigTime, stop));
                 }
             }
             return;
@@ -1127,7 +1129,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
 
         LogPrint(BCLog::MASTERNODE, "dseep - Couldn't find Masternode entry %s peer=%i\n", vin.prevout.hash.ToString(), pfrom->GetId());
 
-        AskForMN(pfrom, vin);
+        AskForMN(pfrom, vin, connman);
     }
 
     /*

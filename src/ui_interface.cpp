@@ -57,7 +57,7 @@ void CClientUIInterface::NotifyNumConnectionsChanged(int newNumConnections) { re
 void CClientUIInterface::NotifyNetworkActiveChanged(bool networkActive) { return g_ui_signals.NotifyNetworkActiveChanged(networkActive); }
 std::string CClientUIInterface::Translate(const char* psz) { return g_ui_signals.Translate(psz); }
 void CClientUIInterface::NotifyAlertChanged(const uint256& hash, ChangeType status) { return g_ui_signals.NotifyAlertChanged(hash, status); }
-void CClientUIInterface::LoadWallet(CWallet* wallet) { return g_ui_signals.LoadWallet(wallet); }
+void CClientUIInterface::LoadWallet(std::unique_ptr<interfaces::Wallet>& wallet) { return g_ui_signals.LoadWallet(wallet); }
 void CClientUIInterface::ShowProgress(const std::string& title, int nProgress) { return g_ui_signals.ShowProgress(title, nProgress); }
 void CClientUIInterface::NotifyBlockTip(bool b, const CBlockIndex* i) { return g_ui_signals.NotifyBlockTip(b, i); }
 void CClientUIInterface::NotifyHeaderTip(bool b, const CBlockIndex* i) { return g_ui_signals.NotifyHeaderTip(b, i); }

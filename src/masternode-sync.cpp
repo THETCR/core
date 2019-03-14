@@ -14,6 +14,7 @@
 #include "ui_interface.h"
 #include <util/system.h>
 #include "addrman.h"
+#include "netmessagemaker.h"
 // clang-format on
 
 class CMasternodeSync;
@@ -180,7 +181,7 @@ std::string CMasternodeSync::GetSyncStatus()
     return "";
 }
 
-void CMasternodeSync::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void CMasternodeSync::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman)
 {
     if (strCommand == NetMsgType::SYNCSTATUSCOUNT) { //Sync status count
         int nItemID;
@@ -230,7 +231,7 @@ void CMasternodeSync::ClearFulfilledRequest()
     }
 }
 
-void CMasternodeSync::Process()
+void CMasternodeSync::Process(CConnman* connman)
 {
     static int tick = 0;
 
@@ -265,21 +266,21 @@ void CMasternodeSync::Process()
         RequestedMasternodeAssets = MASTERNODE_SYNC_FINISHED;
         return;
     }
-
+    const CNetMsgMaker msgMaker(INIT_PROTO_VERSION);
     TRY_LOCK(cs_vNodes, lockRecv);
     if (!lockRecv) return;
 
     for (CNode* pnode: vNodes) {
         if (Params().NetworkID() == CBaseChainParams::REGTEST) {
             if (RequestedMasternodeAttempt <= 2) {
-                pnode->PushMessage(NetMsgType::GETSPORKS); //get current network sporks
+                connman->PushMessage(pnode, msgMaker.Make(NetMsgType::GETSPORKS)); //get current network sporks
             } else if (RequestedMasternodeAttempt < 4) {
-                mnodeman.DsegUpdate(pnode);
+                mnodeman.DsegUpdate(pnode, connman);
             } else if (RequestedMasternodeAttempt < 6) {
                 int nMnCount = mnodeman.CountEnabled();
-                pnode->PushMessage(NetMsgType::MASTERNODEPAYMENTSYNC, nMnCount); //sync payees
+                connman->PushMessage(pnode, msgMaker.Make(NetMsgType::MASTERNODEPAYMENTSYNC, nMnCount)); //sync payees
                 uint256 n = 0;
-                pnode->PushMessage(NetMsgType::MNBUDGETSYNC, n); //sync masternode votes
+                connman->PushMessage(pnode, msgMaker.Make(NetMsgType::MNBUDGETSYNC, n)); //sync masternode votes
             } else {
                 RequestedMasternodeAssets = MASTERNODE_SYNC_FINISHED;
             }
@@ -292,7 +293,7 @@ void CMasternodeSync::Process()
             if (pnode->HasFulfilledRequest("getspork")) continue;
             pnode->FulfilledRequest("getspork");
 
-            pnode->PushMessage(NetMsgType::GETSPORKS); //get current network sporks
+            connman->PushMessage(pnode, msgMaker.Make(NetMsgType::GETSPORKS)); //get current network sporks
             if (RequestedMasternodeAttempt >= 2) GetNextAsset();
             RequestedMasternodeAttempt++;
 
@@ -327,7 +328,7 @@ void CMasternodeSync::Process()
 
                 if (RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD * 3) return;
 
-                mnodeman.DsegUpdate(pnode);
+                mnodeman.DsegUpdate(pnode, connman);
                 RequestedMasternodeAttempt++;
                 return;
             }
@@ -362,7 +363,7 @@ void CMasternodeSync::Process()
                 if (pindexPrev == NULL) return;
 
                 int nMnCount = mnodeman.CountEnabled();
-                pnode->PushMessage(NetMsgType::MASTERNODEPAYMENTSYNC, nMnCount); //sync payees
+                connman->PushMessage(pnode, msgMaker.Make(NetMsgType::MASTERNODEPAYMENTSYNC, nMnCount)); //sync payees
                 RequestedMasternodeAttempt++;
 
                 return;
@@ -399,7 +400,7 @@ void CMasternodeSync::Process()
                 if (RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD * 3) return;
 
                 uint256 n = 0;
-                pnode->PushMessage(NetMsgType::MNBUDGETSYNC, n); //sync masternode votes
+                connman->PushMessage(pnode, msgMaker.Make(NetMsgType::MNBUDGETSYNC, n)); //sync masternode votes
                 RequestedMasternodeAttempt++;
 
                 return;

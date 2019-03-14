@@ -99,7 +99,7 @@ public:
     bool Add(CMasternode& mn);
 
     /// Ask (source) node for mnb
-    void AskForMN(CNode* pnode, CTxIn& vin);
+    void AskForMN(CNode* pnode, CTxIn& vin, CConnman* connman);
 
     /// Check all Masternodes
     void Check();
@@ -114,7 +114,7 @@ public:
 
     void CountNetworks(int protocolVersion, int& ipv4, int& ipv6, int& onion);
 
-    void DsegUpdate(CNode* pnode);
+    void DsegUpdate(CNode* pnode, CConnman* connman);
 
     /// Find an entry
     CMasternode* Find(const CScript& payee);
@@ -142,7 +142,7 @@ public:
 
     void ProcessMasternodeConnections();
 
-    void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman);
 
     /// Return the number of (unique) Masternodes
     int size() { return vMasternodes.size(); }

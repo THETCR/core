@@ -42,6 +42,7 @@ LIBBITCOINCONSENSUS=libwisprconsensus.la
 endif
 if ENABLE_WALLET
 LIBBITCOIN_WALLET=libbitcoin_wallet.a
+LIBBITCOIN_WALLET_TOOL=libbitcoin_wallet_tool.a
 endif
 
 LIBBITCOIN_CRYPTO= $(LIBBITCOIN_CRYPTO_BASE)
@@ -72,6 +73,7 @@ EXTRA_LIBRARIES += \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_CLI) \
   $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_WALLET_TOOL) \
   $(LIBBITCOIN_ZMQ)
 
 lib_LTLIBRARIES = $(LIBBITCOINCONSENSUS)
@@ -108,6 +110,7 @@ BITCOIN_CORE_H = \
   bech32.h \
   bip38.h \
   bloom.h \
+  blockencodings.h \
   blocksignature.h \
   chain.h \
   chainparams.h \
@@ -146,6 +149,9 @@ BITCOIN_CORE_H = \
   indirectmap.h \
   kernel.h \
   swifttx.h \
+  interfaces/chain.h \
+  interfaces/node.h \
+  interfaces/wallet.h \
   key.h \
   key_io.h \
   keystore.h \
@@ -170,9 +176,12 @@ BITCOIN_CORE_H = \
   netbase.h \
   netmessagemaker.h \
   noui.h \
+  optional.h \
+  outputtype.h \
   policy/feerate.h \
   policy/fees.h \
   policy/policy.h \
+  policy/rbf.h \
   pow.h \
   protocol.h \
   random.h \
@@ -216,14 +225,19 @@ BITCOIN_CORE_H = \
   util/moneystr.h \
   util/time.h \
   validationinterface.h \
+  wallet/rpcwallet.h \
   wallet/wallet.h \
   wallet/walletdb.h \
+  wallet/wallettool.h \
+  wallet/walletutil.h \
+  wallet/coinselection.h \
   zwspchain.h \
   wallet/zwsptracker.h \
   wallet/zwspwallet.h \
   genwit.h \
   concurrentqueue.h \
   lightzwspthread.h \
+  warnings.h \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h \
   zmq/zmqnotificationinterface.h \
@@ -244,12 +258,15 @@ libbitcoin_server_a_SOURCES = \
   addrman.cpp \
   alert.cpp \
   bloom.cpp \
+  blockencodings.cpp \
   blocksignature.cpp \
   chain.cpp \
   checkpoints.cpp \
   consensus/tx_verify.cpp \
   httprpc.cpp \
   httpserver.cpp \
+  interfaces/chain.cpp \
+  interfaces/node.cpp \
   init.cpp \
   leveldbwrapper.cpp \
   main.cpp \
@@ -258,8 +275,10 @@ libbitcoin_server_a_SOURCES = \
   net.cpp \
   net_processing.cpp \
   noui.cpp \
+  outputtype.cpp \
   policy/fees.cpp \
   policy/policy.cpp \
+  policy/rbf.cpp \
   pow.cpp \
   rest.cpp \
   rpc/blockchain.cpp \
@@ -298,14 +317,18 @@ endif
 libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_wallet_a_SOURCES = \
+  interfaces/wallet.cpp \
   activemasternode.cpp \
   bip38.cpp \
   wallet/coincontrol.cpp \
   denomination_functions.cpp \
   obfuscation.cpp \
   obfuscation-relay.cpp \
-  wallet/db.cpp \
   wallet/crypter.cpp \
+  wallet/db.cpp \
+  wallet/feebumper.cpp \
+  wallet/fees.cpp \
+  wallet/init.cpp \
   swifttx.cpp \
   masternode.cpp \
   masternode-budget.cpp \
@@ -323,9 +346,17 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/walletdb.cpp \
   wallet/zwspwallet.cpp \
   wallet/zwsptracker.cpp \
+  wallet/walletutil.cpp \
+  wallet/coinselection.cpp \
   stakeinput.cpp \
   genwit.cpp \
   lightzwspthread.cpp \
+  $(BITCOIN_CORE_H)
+
+libbitcoin_wallet_tool_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+libbitcoin_wallet_tool_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_wallet_tool_a_SOURCES = \
+  wallet/wallettool.cpp \
   $(BITCOIN_CORE_H)
 
 # crypto primitives library
@@ -472,6 +503,7 @@ libbitcoin_common_a_SOURCES = \
   script/standard.cpp \
   spork.cpp \
   sporkdb.cpp \
+  warnings.cpp \
   $(BITCOIN_CORE_H)
 
 # util: shared between all executables.
@@ -580,6 +612,35 @@ wispr_tx_LDADD = \
   $(LIBSECP256K1)
 
 wispr_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
+#
+
+# wispr-wallet binary #
+wispr_wallet_SOURCES = wispr-wallet.cpp
+wispr_wallet_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+wispr_wallet_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+wispr_wallet_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+
+if TARGET_WINDOWS
+wispr_wallet_SOURCES += bitcoin-wallet-res.rc
+endif
+
+wispr_wallet_LDADD = \
+  $(LIBBITCOIN_WALLET_TOOL) \
+  $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_SERVER) \
+  $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_ZEROCOIN) \
+  $(LIBBITCOIN_CONSENSUS) \
+  $(LIBBITCOIN_UTIL) \
+  $(LIBBITCOIN_CRYPTO) \
+  $(LIBBITCOIN_ZMQ) \
+  $(LIBLEVELDB) \
+  $(LIBLEVELDB_SSE42) \
+  $(LIBMEMENV) \
+  $(LIBSECP256K1) \
+  $(LIBUNIVALUE)
+
+wispr_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS)
 #
 
 # bitcoinconsensus library #

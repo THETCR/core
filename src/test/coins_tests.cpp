@@ -2,14 +2,26 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "coins.h"
-#include "random.h"
-#include "uint256.h"
+#include <attributes.h>
+#include <coins.h>
+#include <consensus/validation.h>
+#include <script/standard.h>
+#include <test/test_wispr.h>
+#include <uint256.h>
+#include <undo.h>
+#include <util/strencodings.h>
+#include <main.h>
+
+#include <map>
+#include <vector>
 
 #include <vector>
 #include <map>
 
 #include <boost/test/unit_test.hpp>
+
+int ApplyTxInUndo(Coin&& undo, CCoinsViewCache& view, const COutPoint& out);
+void UpdateCoins(const CTransaction& tx, CCoinsViewCache& inputs, CTxUndo &txundo, int nHeight);
 
 namespace
 {

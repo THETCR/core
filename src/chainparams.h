@@ -27,6 +27,19 @@ struct SeedSpec6 {
   uint8_t addr[16];
   uint16_t port;
 };
+
+/**
+ * Holds various statistics on transactions within a chain. Used to estimate
+ * verification progress during chain sync.
+ *
+ * See also: CChainParams::TxData, GuessVerificationProgress.
+ */
+struct ChainTxData {
+    int64_t nTime;    //!< UNIX timestamp of last known number of transactions
+    int64_t nTxCount; //!< total number of transactions between genesis and that timestamp
+    double dTxRate;   //!< estimated number of transactions per second after that timestamp
+};
+
 /**
  * CChainParams defines various tweakable parameters of a given instance of the
  * WISPR system. There are three: the main network on which people trade goods
@@ -117,9 +130,7 @@ public:
     bool MineBlocksOnDemand() const { return fMineBlocksOnDemand; }
     /** In the future use NetworkIDString() for RPC fields */
     bool TestnetToBeDeprecatedFieldRPC() const { return fTestnetToBeDeprecatedFieldRPC; }
-    /** Return the BIP70 network std::string (main, test or regtest) */
-    std::string NetworkIDString() const { return strNetworkID; }
-    const std::vector<CDNSSeedData>& DNSSeeds() const { return vSeeds; }
+    const std::vector<std::string>& DNSSeeds() const { return vSeeds; }
     const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
     const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
     virtual const Checkpoints::CCheckpointData& Checkpoints() const = 0;
@@ -131,8 +142,11 @@ public:
     int64_t StartMasternodePayments() const { return consensus.nStartMasternodePayments; }
     int64_t Budget_Fee_Confirmations() const { return consensus.nBudget_Fee_Confirmations; }
 
+    /** Return the BIP70 network string (main, test or regtest) */
+    std::string NetworkIDString() const { return strNetworkID; }
     std::string NetworkID() const { return strNetworkID; }
-
+    /** Return true if the fallback fee is by default enabled for this network */
+    bool IsFallbackFeeEnabled() const { return m_fallback_fee_enabled; }
     /** Zerocoin **/
     std::string Zerocoin_Modulus() const { return consensus.zerocoinModulus; }
     libzerocoin::ZerocoinParams* Zerocoin_Params(bool useModulusV1) const;
@@ -151,6 +165,7 @@ public:
     bool PivProtocolsStartHeightEqualOrGreaterThen(int nHeight) const { return nHeight >= consensus.nNewProtocolStartHeight; }
     bool PivProtocolsStartHeightSmallerThen(int nHeight) const { return nHeight < consensus.nNewProtocolStartHeight; }
     const std::string& Bech32HRP() const { return bech32_hrp; }
+    const ChainTxData& TxData() const { return chainTxData; }
 protected:
     CChainParams() {}
 
@@ -160,7 +175,7 @@ protected:
     std::vector<unsigned char> vAlertPubKey;
     int nDefaultPort;
     int nMinerThreads;
-    std::vector<CDNSSeedData> vSeeds;
+    std::vector<std::string> vSeeds;
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
     std::string strNetworkID;
     CBlock genesis;
@@ -173,6 +188,8 @@ protected:
     bool fTestnetToBeDeprecatedFieldRPC;
     bool fHeadersFirstSyncingActive;
     std::string bech32_hrp;
+    ChainTxData chainTxData;
+    bool m_fallback_fee_enabled;
 };
 
 /**

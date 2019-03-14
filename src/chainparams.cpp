@@ -205,6 +205,9 @@ public:
         consensus.nZerocoinRequiredStakeDepth = 200; //The required confirmations for a zwsp to be stakable
 
         consensus.nBudget_Fee_Confirmations = 6; // Number of confirmations for the finalization fee
+
+        /* disable fallback fee on mainnet */
+        m_fallback_fee_enabled = false;
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const
@@ -306,6 +309,9 @@ public:
         consensus.nStartMasternodePayments = consensus.nNewProtocolStartTime;
         consensus.nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
         // here because we only have a 8 block finalization window on testnet
+
+        /* enable fallback fee on testnet */
+        m_fallback_fee_enabled = true;
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {
@@ -362,6 +368,8 @@ public:
         fTestnetToBeDeprecatedFieldRPC = false;
         bech32_hrp = "wrt";
 
+        /* enable fallback fee on regtest */
+        m_fallback_fee_enabled = true;
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {
@@ -386,6 +394,9 @@ public:
         fDefaultConsistencyChecks = true;
         consensus.fAllowMinDifficultyBlocks = false;
         fMineBlocksOnDemand = true;
+
+        /* enable fallback fee on unittest */
+        m_fallback_fee_enabled = true;
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const

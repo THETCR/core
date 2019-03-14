@@ -41,7 +41,7 @@ int nCompleteTXLocks;
 //         Send "txvote", CTransaction, Signature, Approve
 //step 3.) Top 1 masternode, waits for SWIFTTX_SIGNATURES_REQUIRED messages. Upon success, sends "txlock'
 
-void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void ProcessMessageSwiftTX(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman)
 {
     if (fLiteMode) return; //disable all obfuscation/masternode related functionality
     if (!IsSporkActive(SPORK_2_SWIFTTX)) return;
@@ -149,7 +149,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
 
         mapTxLockVote.insert(std::make_pair(ctx.GetHash(), ctx));
 
-        if (ProcessConsensusVote(pfrom, ctx)) {
+        if (ProcessConsensusVote(pfrom, ctx, connman)) {
             //Spam/Dos protection
             /*
                 Masternodes will sometimes propagate votes before the transaction is known to the client.
@@ -308,7 +308,7 @@ void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight)
 }
 
 //received a consensus vote
-bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx)
+bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx, CConnman* connman)
 {
     int n = mnodeman.GetMasternodeRank(ctx.vinMasternode, ctx.nBlockHeight, MIN_SWIFTTX_PROTO_VERSION);
 
@@ -319,7 +319,7 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx)
     if (n == -1) {
         //can be caused by past versions trying to vote with an invalid protocol
         LogPrint(BCLog::SWIFTX, "SwiftX::ProcessConsensusVote - Unknown Masternode\n");
-        mnodeman.AskForMN(pnode, ctx.vinMasternode);
+        mnodeman.AskForMN(pnode, ctx.vinMasternode, connman);
         return false;
     }
 
@@ -331,7 +331,7 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx)
     if (!ctx.SignatureValid()) {
         LogPrintf("SwiftX::ProcessConsensusVote - Signature invalid\n");
         // don't ban, it could just be a non-synced masternode
-        mnodeman.AskForMN(pnode, ctx.vinMasternode);
+        mnodeman.AskForMN(pnode, ctx.vinMasternode, connman);
         return false;
     }
 

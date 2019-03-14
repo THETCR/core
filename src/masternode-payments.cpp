@@ -16,6 +16,7 @@
 #include <util/system.h>
 #include "util/moneystr.h"
 #include <fs.h>
+#include <netmessagemaker.h>
 
 
 
@@ -357,7 +358,7 @@ int CMasternodePayments::GetMinMasternodePaymentsProto()
         return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT; // Also allow old peers as long as they are allowed to run
 }
 
-void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman)
 {
     if (!masternodeSync.IsBlockchainSynced()) return;
 
@@ -379,7 +380,7 @@ void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, std::st
         }
 
         pfrom->FulfilledRequest(NetMsgType::MASTERNODEPAYMENTSYNC);
-        masternodePayments.Sync(pfrom, nCountNeeded);
+        masternodePayments.Sync(pfrom, nCountNeeded, connman);
         LogPrint(BCLog::MNPAYMENTS, "mnget - Sent Masternode winners to peer %i\n", pfrom->GetId());
     } else if (strCommand == NetMsgType::MASTERNODEPAYMENTVOTE) { //Masternode Payments Declare Winner
         //this is required in litemodef
@@ -408,7 +409,7 @@ void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, std::st
         }
 
         std::string strError = "";
-        if (!winner.IsValid(pfrom, strError)) {
+        if (!winner.IsValid(pfrom, strError, connman)) {
             // if(strError != "") LogPrint(BCLog::MASTERNODE,"mnw - invalid message - %s\n", strError);
             return;
         }
@@ -424,7 +425,7 @@ void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, std::st
                 Misbehaving(pfrom->GetId(), 20);
             }
             // it could just be a non-synced masternode
-            mnodeman.AskForMN(pfrom, winner.vinMasternode);
+            mnodeman.AskForMN(pfrom, winner.vinMasternode, connman);
             return;
         }
 
@@ -662,14 +663,14 @@ void CMasternodePayments::CleanPaymentList()
     }
 }
 
-bool CMasternodePaymentWinner::IsValid(CNode* pnode, std::string& strError)
+bool CMasternodePaymentWinner::IsValid(CNode* pnode, std::string& strError, CConnman* connman)
 {
     CMasternode* pmn = mnodeman.Find(vinMasternode);
 
     if (!pmn) {
         strError = strprintf("Unknown Masternode %s", vinMasternode.prevout.hash.ToString());
         LogPrint(BCLog::MASTERNODE,"CMasternodePaymentWinner::IsValid - %s\n", strError);
-        mnodeman.AskForMN(pnode, vinMasternode);
+        mnodeman.AskForMN(pnode, vinMasternode, connman);
         return false;
     }
 
@@ -791,7 +792,7 @@ bool CMasternodePaymentWinner::SignatureValid()
     return false;
 }
 
-void CMasternodePayments::Sync(CNode* node, int nCountNeeded)
+void CMasternodePayments::Sync(CNode* node, int nCountNeeded, CConnman* connman)
 {
     LOCK(cs_mapMasternodePayeeVotes);
 
@@ -815,7 +816,7 @@ void CMasternodePayments::Sync(CNode* node, int nCountNeeded)
         }
         ++it;
     }
-    node->PushMessage(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_MNW, nInvCount);
+    connman->PushMessage(node, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_MNW, nInvCount));
 }
 
 std::string CMasternodePayments::ToString() const

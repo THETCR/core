@@ -163,6 +163,7 @@ struct CExtKey {
   void Decode(const unsigned char code[BIP32_EXTKEY_SIZE]);
   bool Derive(CExtKey& out, unsigned int nChild) const;
   CExtPubKey Neuter() const;
+  void SetSeed(const unsigned char* seed, unsigned int nSeedLen);
   void SetMaster(const unsigned char* seed, unsigned int nSeedLen);
   template <typename Stream>
   void Serialize(Stream& s) const

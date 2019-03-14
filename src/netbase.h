@@ -1,6 +1,5 @@
-// Copyright (c) 2009-2013 The Bitcoin developers
-// Copyright (c) 2017 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2009-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_NETBASE_H
@@ -21,7 +20,7 @@
 extern int nConnectTimeout;
 extern bool fNameLookup;
 
-/** -timeout default */
+//! -timeout default
 static const int DEFAULT_CONNECT_TIMEOUT = 5000;
 //! -dns default
 static const int DEFAULT_NAME_LOOKUP = true;
@@ -30,7 +29,7 @@ class proxyType
 {
 public:
     proxyType(): randomize_credentials(false) {}
-    proxyType(const CService &proxy, bool randomize_credentials=false): proxy(proxy), randomize_credentials(randomize_credentials) {}
+    explicit proxyType(const CService &_proxy, bool _randomize_credentials=false): proxy(_proxy), randomize_credentials(_randomize_credentials) {}
 
     bool IsValid() const { return proxy.IsValid(); }
 
@@ -41,29 +40,32 @@ public:
 enum Network ParseNetwork(std::string net);
 std::string GetNetworkName(enum Network net);
 bool SetProxy(enum Network net, const proxyType &addrProxy);
-bool GetProxy(enum Network net, proxyType& proxyInfoOut);
-bool IsProxy(const CNetAddr& addr);
+bool GetProxy(enum Network net, proxyType &proxyInfoOut);
+bool IsProxy(const CNetAddr &addr);
 bool SetNameProxy(const proxyType &addrProxy);
 bool HaveNameProxy();
-bool LookupHost(const char* pszName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions = 0, bool fAllowLookup = true);
+bool GetNameProxy(proxyType &nameProxyOut);
+bool LookupHost(const char *pszName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions, bool fAllowLookup);
 bool LookupHost(const char *pszName, CNetAddr& addr, bool fAllowLookup);
-
-bool Lookup(const char* pszName, CService& addr, int portDefault = 0, bool fAllowLookup = true);
-bool Lookup(const char* pszName, std::vector<CService>& vAddr, int portDefault = 0, bool fAllowLookup = true, unsigned int nMaxSolutions = 0);
+bool Lookup(const char *pszName, CService& addr, int portDefault, bool fAllowLookup);
+bool Lookup(const char *pszName, std::vector<CService>& vAddr, int portDefault, bool fAllowLookup, unsigned int nMaxSolutions);
 CService LookupNumeric(const char *pszName, int portDefault = 0);
-bool LookupNumeric(const char* pszName, CService& addr, int portDefault = 0);
 bool LookupSubNet(const char *pszName, CSubNet& subnet);
-bool ConnectSocket(const CService& addr, SOCKET& hSocketRet, int nTimeout, bool* outProxyConnectionFailed = nullptr);
-bool ConnectSocketByName(CService& addr, SOCKET& hSocketRet, const char* pszDest, int portDefault, int nTimeout, bool* outProxyConnectionFailed = nullptr);
-/** Return readable error std::string for a network error code */
+SOCKET CreateSocket(const CService &addrConnect);
+bool ConnectSocketDirectly(const CService &addrConnect, const SOCKET& hSocketRet, int nTimeout, bool manual_connection);
+bool ConnectThroughProxy(const proxyType &proxy, const std::string& strDest, int port, const SOCKET& hSocketRet, int nTimeout, bool *outProxyConnectionFailed);
+/** Return readable error string for a network error code */
 std::string NetworkErrorString(int err);
 /** Close socket and set hSocket to INVALID_SOCKET */
 bool CloseSocket(SOCKET& hSocket);
 /** Disable or enable blocking-mode for a socket */
-bool SetSocketNonBlocking(SOCKET& hSocket, bool fNonBlocking);
+bool SetSocketNonBlocking(const SOCKET& hSocket, bool fNonBlocking);
+/** Set the TCP_NODELAY flag on a socket */
+bool SetSocketNoDelay(const SOCKET& hSocket);
 /**
  * Convert milliseconds to a struct timeval for e.g. select.
  */
 struct timeval MillisToTimeval(int64_t nTimeout);
+void InterruptSocks5(bool interrupt);
 
 #endif // BITCOIN_NETBASE_H

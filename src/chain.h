@@ -17,6 +17,28 @@
 
 #include <vector>
 
+/**
+ * Maximum amount of time that a block timestamp is allowed to exceed the
+ * current network-adjusted time before the block will be accepted.
+ */
+static constexpr int64_t MAX_FUTURE_BLOCK_TIME = 2 * 60 * 60;
+
+/**
+ * Timestamp window used as a grace period by code that compares external
+ * timestamps (such as timestamps passed to RPCs, or wallet key creation times)
+ * to block timestamps. This should be set at least as high as
+ * MAX_FUTURE_BLOCK_TIME.
+ */
+static constexpr int64_t TIMESTAMP_WINDOW = MAX_FUTURE_BLOCK_TIME;
+
+/**
+ * Maximum gap between node time and block time used
+ * for the "Catching up..." mode in GUI.
+ *
+ * Ref: https://github.com/bitcoin/bitcoin/pull/1026
+ */
+static constexpr int64_t MAX_BLOCK_TIME_GAP = 90 * 60;
+
 class CBlockFileInfo
 {
 public:
@@ -391,6 +413,15 @@ public:
         return *phashBlock;
     }
 
+    /**
+     * Check whether this block's and all previous blocks' transactions have been
+     * downloaded (and stored to disk) at some point.
+     *
+     * Does not imply the transactions are consensus-valid (ConnectTip might fail)
+     * Does not imply the transactions are still stored on disk. (IsBlockPruned might return true)
+     */
+    bool HaveTxsDownloaded() const { return nChainTx != 0; }
+
     int64_t GetBlockTime() const
     {
         return (int64_t)nTime;
@@ -530,8 +561,7 @@ public:
         hashNext = uint256();
     }
 
-    explicit CDiskBlockIndex(CBlockIndex* pindex) : CBlockIndex(*pindex)
-    {
+    explicit CDiskBlockIndex(const CBlockIndex* pindex) : CBlockIndex(*pindex) {
         hashPrev = (pprev ? pprev->GetBlockHash() : uint256());
     }
 
