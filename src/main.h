@@ -56,6 +56,7 @@ class CBlockPolicyEstimator;
 class CTxMemPool;
 class CValidationInterface;
 class CValidationState;
+class CTxUndo;
 
 struct CBlockTemplate;
 struct CNodeStateStats;
