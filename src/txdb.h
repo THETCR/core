@@ -23,7 +23,6 @@
 
 class CBlockIndex;
 class CDiskTxPos;
-class CCoins;
 class uint256;
 class CBigNum;
 
@@ -76,24 +75,23 @@ struct CDiskTxPos : public CDiskBlockPos {
   }
 };
 
-/** CCoinsView backed by the LevelDB coin database (chainstate/) */
+/** CCoinsView backed by the coin database (chainstate/) */
 class CCoinsViewDB final : public CCoinsView
 {
 protected:
     CLevelDBWrapper db;
-
 public:
     explicit CCoinsViewDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
 
-    bool GetCoins(const uint256& txid, CCoins& coins) const override;
-    bool HaveCoins(const uint256& txid) const override;
+    bool GetCoin(const COutPoint &outpoint, Coin &coin) const override;
+    bool HaveCoin(const COutPoint &outpoint) const override;
     uint256 GetBestBlock() const override;
     std::vector<uint256> GetHeadBlocks() const override;
-    bool BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock) override;
+    bool BatchWrite(CCoinsMap &mapCoins, const uint256 &hashBlock) override;
     CCoinsViewCursor *Cursor() const override;
 
     //! Attempt to update from an older database format. Returns whether an error occurred.
-//    bool Upgrade();
+    bool Upgrade();
     size_t EstimateSize() const override;
 };
 
@@ -101,22 +99,22 @@ public:
 class CCoinsViewDBCursor: public CCoinsViewCursor
 {
 public:
-  ~CCoinsViewDBCursor() {}
+    ~CCoinsViewDBCursor() {}
 
-  bool GetKey(uint256 &key) const override;
-  bool GetValue(CCoins &coins) const override;
-  unsigned int GetValueSize() const override;
+    bool GetKey(COutPoint &key) const override;
+    bool GetValue(Coin &coin) const override;
+    unsigned int GetValueSize() const override;
 
-  bool Valid() const override;
-  void Next() override;
+    bool Valid() const override;
+    void Next() override;
 
 private:
-  CCoinsViewDBCursor(CLevelDBIterator* pcursorIn, const uint256 &hashBlockIn):
-      CCoinsViewCursor(hashBlockIn), pcursor(pcursorIn) {}
-  boost::scoped_ptr<CLevelDBIterator> pcursor;
-  std::pair<char, uint256> keyTmp;
+    CCoinsViewDBCursor(CLevelDBIterator* pcursorIn, const uint256 &hashBlockIn):
+            CCoinsViewCursor(hashBlockIn), pcursor(pcursorIn) {}
+    std::unique_ptr<CLevelDBIterator> pcursor;
+    std::pair<char, COutPoint> keyTmp;
 
-  friend class CCoinsViewDB;
+    friend class CCoinsViewDB;
 };
 
 /** Access to the block database (blocks/index/) */
@@ -125,25 +123,21 @@ class CBlockTreeDB : public CLevelDBWrapper
 public:
     explicit CBlockTreeDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
 
-private:
-    CBlockTreeDB(const CBlockTreeDB&);
-    void operator=(const CBlockTreeDB&);
-
-public:
+    bool WriteBatchSync(const std::vector<std::pair<int, const CBlockFileInfo*> >& fileInfo, int nLastFile, const std::vector<const CBlockIndex*>& blockinfo);
     bool WriteBlockIndex(const CDiskBlockIndex& blockindex);
     bool ReadBlockFileInfo(int nFile, CBlockFileInfo& fileinfo);
     bool WriteBlockFileInfo(int nFile, const CBlockFileInfo& fileinfo);
     bool ReadLastBlockFile(int& nFile);
     bool WriteLastBlockFile(int nFile);
-    bool WriteReindexing(bool fReindex);
-    bool ReadReindexing(bool& fReindex);
+    bool WriteReindexing(bool fReindexing);
+    void ReadReindexing(bool &fReindexing);
     bool ReadTxIndex(const uint256& txid, CDiskTxPos& pos);
     bool WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& list);
     bool WriteFlag(const std::string& name, bool fValue);
     bool ReadFlag(const std::string& name, bool& fValue);
     bool WriteInt(const std::string& name, int nValue);
     bool ReadInt(const std::string& name, int& nValue);
-    bool LoadBlockIndexGuts(std::function<CBlockIndex*(const uint256&)> insertBlockIndex);
+    bool LoadBlockIndexGuts(const Consensus::Params& consensusParams, std::function<CBlockIndex*(const uint256&)> insertBlockIndex);
 };
 
 /** Zerocoin database (zerocoin/) */
