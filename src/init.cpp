@@ -1713,16 +1713,6 @@ bool AppInitMain()
         }
     }
 
-    if (gArgs.IsArgSet("-whitelist")) {
-        for (const std::string& net: gArgs.GetArgs("-whitelist")) {
-            CSubNet subnet;
-            LookupSubNet(net.c_str(), subnet);
-            if (!subnet.IsValid())
-                return InitError(strprintf(_("Invalid netmask specified in -whitelist: '%s'"), net));
-            connOptions.vWhitelistedRange.push_back(subnet);
-        }
-    }
-
     // Check for host lookup allowed before parsing any network related parameters
     fNameLookup = gArgs.GetBoolArg("-dns", DEFAULT_NAME_LOOKUP);
 
@@ -1809,7 +1799,7 @@ bool AppInitMain()
         }
     }
 
-    connOptions.vSeedNodes = gArgs.GetArgs("-seednode");
+//    connOptions.vSeedNodes = gArgs.GetArgs("-seednode");
 
 #if ENABLE_ZMQ
     g_zmq_notification_interface = CZMQNotificationInterface::Create();
@@ -2127,7 +2117,7 @@ bool AppInitMain()
         if (gArgs.GetBoolArg("-rescan", false))
             pindexRescan = chainActive.Genesis();
         else {
-            WalletBatch walletdb(strWalletFile);
+            WalletBatch walletdb(pwalletMain->GetDBHandle());
             CBlockLocator locator;
             if (walletdb.ReadBestBlock(locator))
                 pindexRescan = FindForkInGlobalIndex(chainActive, locator);
@@ -2138,7 +2128,7 @@ bool AppInitMain()
             uiInterface.InitMessage(_("Rescanning..."));
             LogPrintf("Rescanning last %i blocks (from block %i)...\n", chainActive.Height() - pindexRescan->nHeight, pindexRescan->nHeight);
             nStart = GetTimeMillis();
-            pwalletMain->ScanForWalletTransactions(pindexRescan, true);
+//            pwalletMain->ScanForWalletTransactions(pindexRescan, true);
             LogPrintf(" rescan      %15dms\n", GetTimeMillis() - nStart);
             pwalletMain->SetBestChain(chainActive.GetLocator());
 
@@ -2427,6 +2417,19 @@ bool AppInitMain()
     connOptions.nMaxOutboundTimeframe = nMaxOutboundTimeframe;
     connOptions.nMaxOutboundLimit = nMaxOutboundLimit;
     connOptions.m_peer_connect_timeout = peer_connect_timeout;
+
+
+    if (gArgs.IsArgSet("-whitelist")) {
+        for (const std::string& net: gArgs.GetArgs("-whitelist")) {
+            CSubNet subnet;
+            LookupSubNet(net.c_str(), subnet);
+            if (!subnet.IsValid())
+                return InitError(strprintf(_("Invalid netmask specified in -whitelist: '%s'"), net));
+            connOptions.vWhitelistedRange.push_back(subnet);
+        }
+    }
+
+    connOptions.vSeedNodes = gArgs.GetArgs("-seednode");
 
     std::string strNodeError;
     if (!g_connman->Start(scheduler, connOptions)) {
