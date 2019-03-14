@@ -19,6 +19,7 @@
 #include "checkpoints.h"
 #include "compat/sanity.h"
 #include "consensus/validation.h"
+#include <banman.h>
 #include <fs.h>
 #include "httpserver.h"
 #include "httprpc.h"
@@ -98,6 +99,7 @@ static const bool DEFAULT_STOPAFTERBLOCKIMPORT = false;
 static constexpr int DUMP_BANS_INTERVAL = 60 * 15;
 std::unique_ptr<CConnman> g_connman;
 std::unique_ptr<PeerLogicValidation> peerLogic;
+std::unique_ptr<BanMan> g_banman;
 
 // TODO Remove this after net.h backport
 int nFD;
@@ -237,7 +239,7 @@ void PrepareShutdown()
     StopHTTPServer();
 #ifdef ENABLE_WALLET
     if (pwalletMain)
-        bitdb.Flush(false);
+        pwalletMain->Flush(false);
     GenerateBitcoins(false, nullptr, 0);
 #endif
     StopMapPort();
@@ -250,17 +252,18 @@ void PrepareShutdown()
 
     peerLogic.reset();
     g_connman.reset();
+    g_banman.reset();
 
     DumpMasternodes();
     DumpBudgets();
     DumpMasternodePayments();
-    UnregisterNodeSignals(GetNodeSignals());
+//    UnregisterNodeSignals(GetNodeSignals());
 
     if (fFeeEstimatesInitialized) {
         fs::path est_path = GetDataDir() / FEE_ESTIMATES_FILENAME;
         CAutoFile est_fileout(fopen(est_path.string().c_str(), "wb"), SER_DISK, CLIENT_VERSION);
         if (!est_fileout.IsNull())
-            mempool.WriteFeeEstimates(est_fileout);
+            ::feeEstimator.Write(est_fileout);
         else
             LogPrintf("%s: Failed to write fee estimates to %s\n", __func__, est_path.string());
         fFeeEstimatesInitialized = false;
@@ -322,7 +325,7 @@ void Shutdown()
     // Shutdown part 2: Stop TOR thread and delete wallet instance
     StopTorControl();
     // Shutdown witness thread if it's enabled
-    if (nLocalServices == NODE_BLOOM_LIGHT_ZC) {
+    if (g_connman->GetLocalServices() == NODE_BLOOM_LIGHT_ZC) {
         lightWorker.StopLightZwspThread();
     }
 #ifdef ENABLE_WALLET
@@ -374,7 +377,7 @@ static void registerSignalHandler(int signal, void(*handler)(int))
 
 bool static Bind(const CService& addr, unsigned int flags)
 {
-    if (!(flags & BF_EXPLICIT) && IsLimited(addr))
+    if (!(flags & BF_EXPLICIT) && IsReachable(addr))
         return false;
     std::string strError;
     if (!BindListenPort(addr, strError, (flags & BF_WHITELIST) != 0)) {
@@ -1641,7 +1644,7 @@ bool AppInitMain()
             }
 
             // try again
-            if (!bitdb.Open(GetDataDir())) {
+            if (!pwalletMain->Open(GetDataDir())) {
                 // if it still fails, it probably means we can't even create the database env
                 std::string msg = strprintf(_("Error initializing wallet database environment %s!"), strDataDir);
                 return InitError(msg);
@@ -1672,11 +1675,13 @@ bool AppInitMain()
 #endif // ENABLE_WALLET
     // ********************************************************* Step 6: network initialization
 
+    assert(!g_banman);
+    g_banman = MakeUnique<BanMan>(GetDataDir() / "banlist.dat", &uiInterface, gArgs.GetArg("-bantime", DEFAULT_MISBEHAVING_BANTIME));
     assert(!g_connman);
     g_connman = std::unique_ptr<CConnman>(new CConnman(GetRand(std::numeric_limits<uint64_t>::max()), GetRand(std::numeric_limits<uint64_t>::max())));
-    peerLogic.reset(new PeerLogicValidation(g_connman.get()));
+    peerLogic.reset(new PeerLogicValidation(g_connman.get(), g_banman.get(), scheduler, gArgs.GetBoolArg("-enablebip61", DEFAULT_ENABLE_BIP61)));
     RegisterValidationInterface(peerLogic.get());
-    RegisterNodeSignals(GetNodeSignals());
+//    RegisterNodeSignals(GetNodeSignals());
 
     // sanitize comments per BIP-0014, format user agent and check total size
     std::vector<std::string> uacomments;

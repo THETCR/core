@@ -71,7 +71,6 @@ private:
  */
 class CConnman;
 class CNode;
-class PeerLogicValidation;
 
 struct TestingSetup: public BasicTestingSetup {
     boost::thread_group threadGroup;
