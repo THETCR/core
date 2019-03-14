@@ -34,6 +34,7 @@
 #include "spork.h"
 #include "invalid.h"
 #include "zwspchain.h"
+#include "undo.h"
 
 
 #include <boost/thread.hpp>
@@ -199,7 +200,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         // This vector will be sorted into a priority queue:
         std::vector<TxPriority> vecPriority;
         vecPriority.reserve(mempool.mapTx.size());
-        for (map<uint256, CTxMemPoolEntry>::iterator mi = mempool.mapTx.begin();
+        for (auto mi = mempool.mapTx.begin();
              mi != mempool.mapTx.end(); ++mi) {
             const CTransaction& tx = mi->second.GetTx();
             if (tx.IsCoinBase() || tx.IsCoinStake() || !IsFinalTx(tx, nHeight)){
@@ -243,7 +244,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 }
 
                 // Read prev transaction
-                if (!view.HaveCoins(txin.prevout.hash)) {
+                if (!view.HaveCoin(txin.prevout)) {
                     // This should never happen; all transactions in the memory
                     // pool should connect to either transactions in the chain
                     // or other transactions in the memory pool.
@@ -275,13 +276,13 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                     break;
                 }
 
-                const CCoins* coins = view.AccessCoins(txin.prevout.hash);
-                assert(coins);
+                const Coin coin = view.AccessCoin(txin.prevout);
+                assert(!coin.IsSpent());
 
-                CAmount nValueIn = coins->vout[txin.prevout.n].nValue;
+                CAmount nValueIn = coin.out.nValue;
                 nTotalIn += nValueIn;
 
-                int nConf = nHeight - coins->nHeight;
+                int nConf = nHeight - coin.nHeight;
 
                 // zWSP spends can have very large priority, use non-overflowing safe functions
                 dPriority = double_safe_addition(dPriority, ((double)nValueIn * nConf));
@@ -294,7 +295,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             dPriority = tx.ComputePriority(dPriority, nTxSize);
 
             uint256 hash = tx.GetHash();
-            mempool.ApplyDeltas(hash, dPriority, nTotalIn);
+            mempool.ApplyDelta(hash, nTotalIn);
 
             CFeeRate feeRate(nTotalIn - tx.GetValueOut(), nTxSize);
 
@@ -340,7 +341,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             const uint256& hash = tx.GetHash();
             double dPriorityDelta = 0;
             CAmount nFeeDelta = 0;
-            mempool.ApplyDeltas(hash, dPriorityDelta, nFeeDelta);
+            mempool.ApplyDelta(hash, nFeeDelta);
             if (!tx.IsZerocoinSpend() && fSortedByFee && (dPriorityDelta <= 0) && (nFeeDelta <= 0) && (feeRate < ::minRelayTxFee) && (nBlockSize + nTxSize >= nBlockMinSize))
                 continue;
 
