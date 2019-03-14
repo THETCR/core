@@ -180,16 +180,16 @@ class CCoinsViewErrorCatcher : public CCoinsViewBacked
 {
 public:
     CCoinsViewErrorCatcher(CCoinsView* view) : CCoinsViewBacked(view) {}
-    bool GetCoins(const uint256& txid, CCoins& coins) const
+    bool GetCoin(const COutPoint &outpoint, Coin &coin) const override
     {
         try {
-            return CCoinsViewBacked::GetCoins(txid, coins);
-        } catch (const std::runtime_error& e) {
+            return CCoinsViewBacked::GetCoin(outpoint, coin);
+        } catch(const std::runtime_error& e) {
             uiInterface.ThreadSafeMessageBox(_("Error reading from database, shutting down."), "", CClientUIInterface::MSG_ERROR);
             LogPrintf("Error reading from database: %s\n", e.what());
             // Starting the shutdown sequence and returning false to the caller would be
             // interpreted as 'entry not found' (as opposed to unable to read data), and
-            // could lead to invalid interpration. Just exit immediately, as we can't
+            // could lead to invalid interpretation. Just exit immediately, as we can't
             // continue anyway, and all writes should be atomic.
             abort();
         }
@@ -283,7 +283,7 @@ void PrepareShutdown()
     }
 #ifdef ENABLE_WALLET
     if (pwalletMain)
-        bitdb.Flush(true);
+        pwalletMain->Flush(true);
 #endif
 
 #if ENABLE_ZMQ
@@ -1093,15 +1093,15 @@ void InitLogging()
     LogPrintf(PACKAGE_NAME " version %s\n", version_string);
 }
 
-//namespace { // Variables internal to initialization process only
-//
-//    int nMaxConnections;
-//    int nUserMaxConnections;
+namespace { // Variables internal to initialization process only
+
+    int nMaxConnections;
+    int nUserMaxConnections;
 //    int nFD;
-//    ServiceFlags nLocalServices = ServiceFlags(NODE_NETWORK | NODE_NETWORK_LIMITED);
-//    int64_t peer_connect_timeout;
-//
-//} // namespace
+    ServiceFlags nLocalServices = ServiceFlags(NODE_NETWORK | NODE_NETWORK_LIMITED);
+    int64_t peer_connect_timeout;
+
+} // namespace
 
 [[noreturn]] static void new_handler_terminate()
 {
@@ -1650,13 +1650,13 @@ bool AppInitMain()
 
         if (gArgs.GetBoolArg("-salvagewallet", false)) {
             // Recover readable keypairs:
-            if (!CWalletDB::Recover(bitdb, strWalletFile, true))
+            if (!WalletBatch::Recover(bitdb, strWalletFile, true))
                 return false;
         }
 
         if (fs::exists(GetDataDir() / strWalletFile)) {
-            CDBEnv::VerifyResult r = bitdb.Verify(strWalletFile, CWalletDB::Recover);
-            if (r == CDBEnv::RECOVER_OK) {
+            BerkeleyEnvironment::VerifyResult r = bitdb.Verify(strWalletFile, WalletBatch::Recover);
+            if (r == BerkeleyEnvironment::VerifyResult::RECOVER_OK) {
                 std::string msg = strprintf(_("Warning: wallet.dat corrupt, data salvaged!"
                                               " Original wallet.dat saved as wallet.{timestamp}.bak in %s; if"
                                               " your balance or transactions are incorrect you should"
@@ -1664,7 +1664,7 @@ bool AppInitMain()
                                             strDataDir);
                 InitWarning(msg);
             }
-            if (r == CDBEnv::RECOVER_FAIL)
+            if (r == BerkeleyEnvironment::VerifyResult::RECOVER_FAIL)
                 return InitError(_("wallet.dat corrupt, salvage failed"));
         }
 
@@ -1673,7 +1673,7 @@ bool AppInitMain()
     // ********************************************************* Step 6: network initialization
 
     assert(!g_connman);
-    g_connman = std::unique_ptr<CConnman>(new CConnman());
+    g_connman = std::unique_ptr<CConnman>(new CConnman(GetRand(std::numeric_limits<uint64_t>::max()), GetRand(std::numeric_limits<uint64_t>::max())));
     peerLogic.reset(new PeerLogicValidation(g_connman.get()));
     RegisterValidationInterface(peerLogic.get());
     RegisterNodeSignals(GetNodeSignals());
@@ -1704,16 +1704,17 @@ bool AppInitMain()
         for (int n = 0; n < NET_MAX; n++) {
             enum Network net = (enum Network)n;
             if (!nets.count(net))
-                SetLimited(net);
+                SetReachable(net, false);
         }
     }
 
     if (gArgs.IsArgSet("-whitelist")) {
         for (const std::string& net: gArgs.GetArgs("-whitelist")) {
-            CSubNet subnet(net);
+            CSubNet subnet;
+            LookupSubNet(net.c_str(), subnet);
             if (!subnet.IsValid())
                 return InitError(strprintf(_("Invalid netmask specified in -whitelist: '%s'"), net));
-            CNode::AddWhitelistedRange(subnet);
+            connOptions.vWhitelistedRange.push_back(subnet);
         }
     }
 
@@ -1724,7 +1725,7 @@ bool AppInitMain()
     // -proxy sets a proxy for all outgoing network traffic
     // -noproxy (or -proxy=0) as well as the empty std::string can be used to not set a proxy, this is the default
     std::string proxyArg = gArgs.GetArg("-proxy", "");
-    SetLimited(NET_TOR);
+    SetReachable(NET_ONION, false);
     if (proxyArg != "" && proxyArg != "0") {
         CService proxyAddr;
         if (!Lookup(proxyArg.c_str(), proxyAddr, 9050, fNameLookup)) {
@@ -1737,9 +1738,9 @@ bool AppInitMain()
 
         SetProxy(NET_IPV4, addrProxy);
         SetProxy(NET_IPV6, addrProxy);
-        SetProxy(NET_TOR, addrProxy);
+        SetProxy(NET_ONION, addrProxy);
         SetNameProxy(addrProxy);
-        SetLimited(NET_TOR, false); // by default, -proxy sets onion as reachable, unless -noonion later
+        SetReachable(NET_ONION, true); // by default, -proxy sets onion as reachable, unless -noonion later
     }
 
     // -onion can be used to set only a proxy for .onion, or override normal proxy for .onion addresses
@@ -1748,7 +1749,7 @@ bool AppInitMain()
     std::string onionArg = gArgs.GetArg("-onion", "");
     if (onionArg != "") {
         if (onionArg == "0") { // Handle -noonion/-onion=0
-            SetLimited(NET_TOR); // set onions as unreachable
+            SetReachable(NET_ONION, false);
         } else {
             CService onionProxy;
             if (!Lookup(onionArg.c_str(), onionProxy, 9050, fNameLookup)) {
@@ -1757,8 +1758,8 @@ bool AppInitMain()
             proxyType addrOnion = proxyType(onionProxy, proxyRandomize);
             if (!addrOnion.IsValid())
                 return InitError(strprintf(_("Invalid -onion address or hostname: '%s'"), onionArg));
-            SetProxy(NET_TOR, addrOnion);
-            SetLimited(NET_TOR, false);
+            SetProxy(NET_ONION, addrOnion);
+            SetReachable(NET_ONION, true);
         }
     }
 
@@ -1794,16 +1795,16 @@ bool AppInitMain()
     }
 
     if (gArgs.IsArgSet("-externalip")) {
-        for (string strAddr: gArgs.GetArgs("-externalip")) {
-            CService addrLocal(strAddr, GetListenPort(), fNameLookup);
-            if (!addrLocal.IsValid())
-                return InitError(strprintf(_("Cannot resolve -externalip address: '%s'"), strAddr));
-            AddLocal(CService(strAddr, GetListenPort(), fNameLookup), LOCAL_MANUAL);
+        for (const std::string& strAddr : gArgs.GetArgs("-externalip")) {
+            CService addrLocal;
+            if (Lookup(strAddr.c_str(), addrLocal, GetListenPort(), fNameLookup) && addrLocal.IsValid())
+                AddLocal(addrLocal, LOCAL_MANUAL);
+            else
+                return InitError(ResolveErrMsg("externalip", strAddr));
         }
     }
 
-    for (string strDest: gArgs.GetArgs("-seednode"))
-        AddOneShot(strDest);
+    connOptions.vSeedNodes = gArgs.GetArgs("-seednode");
 
 #if ENABLE_ZMQ
     g_zmq_notification_interface = CZMQNotificationInterface::Create();
@@ -1812,7 +1813,12 @@ bool AppInitMain()
         RegisterValidationInterface(g_zmq_notification_interface);
     }
 #endif
+    uint64_t nMaxOutboundLimit = 0; //unlimited unless -maxuploadtarget is set
+    uint64_t nMaxOutboundTimeframe = MAX_UPLOAD_TIMEFRAME;
 
+    if (gArgs.IsArgSet("-maxuploadtarget")) {
+        nMaxOutboundLimit = gArgs.GetArg("-maxuploadtarget", DEFAULT_MAX_UPLOAD_TARGET)*1024*1024;
+    }
     // ********************************************************* Step 7: load block chain
 
     //WISPR: Load Accumulator Checkpoints according to network (main/test/regtest)
@@ -2019,7 +2025,7 @@ bool AppInitMain()
     CAutoFile est_filein(fopen(est_path.string().c_str(), "rb"), SER_DISK, CLIENT_VERSION);
     // Allowed to fail as this file IS missing on first startup.
     if (!est_filein.IsNull())
-        mempool.ReadFeeEstimates(est_filein);
+        ::feeEstimator.Read(est_filein);
     fFeeEstimatesInitialized = true;
 
 // ********************************************************* Step 8: load wallet
@@ -2037,7 +2043,7 @@ bool AppInitMain()
 
             pwalletMain = new CWallet(strWalletFile);
             DBErrors nZapWalletRet = pwalletMain->ZapWalletTx(vWtx);
-            if (nZapWalletRet != DB_LOAD_OK) {
+            if (nZapWalletRet != DBErrors::LOAD_OK) {
                 uiInterface.InitMessage(_("Error loading wallet.dat: Wallet corrupted"));
                 return false;
             }
@@ -2053,16 +2059,16 @@ bool AppInitMain()
         bool fFirstRun = true;
         pwalletMain = new CWallet(strWalletFile);
         DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
-        if (nLoadWalletRet != DB_LOAD_OK) {
-            if (nLoadWalletRet == DB_CORRUPT)
+        if (nLoadWalletRet != DBErrors::LOAD_OK) {
+            if (nLoadWalletRet == DBErrors::CORRUPT)
                 strErrors << _("Error loading wallet.dat: Wallet corrupted") << "\n";
-            else if (nLoadWalletRet == DB_NONCRITICAL_ERROR) {
+            else if (nLoadWalletRet == DBErrors::NONCRITICAL_ERROR) {
                 std::string msg(_("Warning: error reading wallet.dat! All keys read correctly, but transaction data"
                                   " or address book entries might be missing or incorrect."));
                 InitWarning(msg);
-            } else if (nLoadWalletRet == DB_TOO_NEW)
+            } else if (nLoadWalletRet == DBErrors::TOO_NEW)
                 strErrors << _("Error loading wallet.dat: Wallet requires newer version of WISPR Core") << "\n";
-            else if (nLoadWalletRet == DB_NEED_REWRITE) {
+            else if (nLoadWalletRet == DBErrors::NEED_REWRITE) {
                 strErrors << _("Wallet needed to be rewritten: restart WISPR Core to complete") << "\n";
                 LogPrintf("%s", strErrors.str());
                 return InitError(strErrors.str());
@@ -2116,7 +2122,7 @@ bool AppInitMain()
         if (gArgs.GetBoolArg("-rescan", false))
             pindexRescan = chainActive.Genesis();
         else {
-            CWalletDB walletdb(strWalletFile);
+            WalletBatch walletdb(strWalletFile);
             CBlockLocator locator;
             if (walletdb.ReadBestBlock(locator))
                 pindexRescan = FindForkInGlobalIndex(chainActive, locator);
@@ -2130,7 +2136,6 @@ bool AppInitMain()
             pwalletMain->ScanForWalletTransactions(pindexRescan, true);
             LogPrintf(" rescan      %15dms\n", GetTimeMillis() - nStart);
             pwalletMain->SetBestChain(chainActive.GetLocator());
-            nWalletDBUpdated++;
 
             // Restore wallet transaction metadata after -zapwallettxes=1
             if (gArgs.GetBoolArg("-zapwallettxes", false) && gArgs.GetArg("-zapwallettxes", "1") != "2") {
@@ -2372,9 +2377,15 @@ bool AppInitMain()
     if (!strErrors.str().empty())
         return InitError(strErrors.str());
 
+    int chain_active_height;
+
     //// debug print
-    LogPrintf("mapBlockIndex.size() = %u\n", mapBlockIndex.size());
-    LogPrintf("chainActive.Height() = %d\n", chainActive.Height());
+    {
+        LOCK(cs_main);
+        LogPrintf("mapBlockIndex.size() = %u\n", mapBlockIndex.size());
+        chain_active_height = chainActive.Height();
+    }
+    LogPrintf("nBestHeight = %d\n", chain_active_height);
 #ifdef ENABLE_WALLET
     LogPrintf("setKeyPool.size() = %u\n", pwalletMain ? pwalletMain->setKeyPool.size() : 0);
     LogPrintf("mapWallet.size() = %u\n", pwalletMain ? pwalletMain->mapWallet.size() : 0);
@@ -2391,8 +2402,26 @@ bool AppInitMain()
         StartMapPort();
     }
 
+    CConnman::Options connOptions;
+    connOptions.nLocalServices = nLocalServices;
+    connOptions.nMaxConnections = nMaxConnections;
+    connOptions.nMaxOutbound = std::min(MAX_OUTBOUND_CONNECTIONS, connOptions.nMaxConnections);
+    connOptions.nMaxAddnode = MAX_ADDNODE_CONNECTIONS;
+    connOptions.nMaxFeeler = 1;
+    connOptions.nBestHeight = chain_active_height;
+    connOptions.uiInterface = &uiInterface;
+    connOptions.m_banman = g_banman.get();
+    connOptions.m_msgproc = peerLogic.get();
+    connOptions.nSendBufferMaxSize = 1000*gArgs.GetArg("-maxsendbuffer", DEFAULT_MAXSENDBUFFER);
+    connOptions.nReceiveFloodSize = 1000*gArgs.GetArg("-maxreceivebuffer", DEFAULT_MAXRECEIVEBUFFER);
+    connOptions.m_added_nodes = gArgs.GetArgs("-addnode");
+
+    connOptions.nMaxOutboundTimeframe = nMaxOutboundTimeframe;
+    connOptions.nMaxOutboundLimit = nMaxOutboundLimit;
+    connOptions.m_peer_connect_timeout = peer_connect_timeout;
+
     std::string strNodeError;
-    if (!g_connman->Start(scheduler, strNodeError)) {
+    if (!g_connman->Start(scheduler, connOptions)) {
         return InitError(strNodeError);
     }
 

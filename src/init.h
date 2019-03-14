@@ -15,6 +15,18 @@ class CScheduler;
 class CWallet;
 class CzWSPWallet;
 
+namespace interfaces {
+    class Chain;
+    class ChainClient;
+} // namespace interfaces
+
+//! Pointers to interfaces used during init and destroyed on shutdown.
+struct InitInterfaces
+{
+    std::unique_ptr<interfaces::Chain> chain;
+    std::vector<std::unique_ptr<interfaces::ChainClient>> chain_clients;
+};
+
 namespace boost
 {
 class thread_group;
