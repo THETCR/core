@@ -11,6 +11,7 @@
 #include <policy/fees.h>
 #include <primitives/transaction.h>
 #include <wallet/wallet.h>
+
 #include <boost/optional.hpp>
 
 /** Coin Control Features. */
@@ -25,7 +26,7 @@ public:
     //! Minimum absolute fee (not per kilobyte)
     CAmount nMinimumTotalFee;
   //! Override the default change type if set, ignored if destChange is set
-//  boost::optional<OutputType> m_change_type;
+  boost::optional<OutputType> m_change_type;
   //! If false, allows unselected inputs, but requires all selected inputs be used
   bool fAllowOtherInputs;
   //! Includes watch only addresses which are solvable
@@ -41,7 +42,7 @@ public:
   //! Avoid partial use of funds sent to a given address
   bool m_avoid_partial_spends;
   //! Fee estimation mode to control arguments to estimateSmartFee
-//  FeeEstimateMode m_fee_mode;
+  FeeEstimateMode m_fee_mode;
 
   CCoinControl()
   {
@@ -61,6 +62,11 @@ public:
         return (setSelected.count(outpt) > 0);
     }
 
+    bool IsSelected(const COutPoint& output) const
+    {
+        return (setSelected.count(output) > 0);
+    }
+
     void Select(const COutPoint& output)
     {
         setSelected.insert(output);
@@ -76,7 +82,7 @@ public:
         setSelected.clear();
     }
 
-    void ListSelected(std::vector<COutPoint>& vOutpoints)
+    void ListSelected(std::vector<COutPoint>& vOutpoints) const
     {
         vOutpoints.assign(setSelected.begin(), setSelected.end());
     }

@@ -18,7 +18,7 @@ void CCoinControl::SetNull()
     fSplitBlock = false;
     nSplitBlock = 1;
     destChange = CNoDestination();
-//    m_change_type.reset();
+    m_change_type.reset();
     fAllowOtherInputs = false;
     fAllowWatchOnly = false;
     m_avoid_partial_spends = gArgs.GetBoolArg("-avoidpartialspends", DEFAULT_AVOIDPARTIALSPENDS);
@@ -27,6 +27,6 @@ void CCoinControl::SetNull()
     fOverrideFeeRate = false;
     m_confirm_target.reset();
     m_signal_bip125_rbf.reset();
-//    m_fee_mode = FeeEstimateMode::UNSET;
+    m_fee_mode = FeeEstimateMode::UNSET;
 }
 

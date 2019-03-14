@@ -19,6 +19,7 @@
 #include "timedata.h"
 #include <util/system.h>
 #include <util/moneystr.h>
+#include <wallet/rpcwallet.h>
 #include <wallet/wallet.h>
 #include <wallet/walletdb.h>
 #include "zwspchain.h"

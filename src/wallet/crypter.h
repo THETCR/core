@@ -118,48 +118,50 @@ class CCryptoKeyStore : public CBasicKeyStore
 {
 private:
 
-  CKeyingMaterial vMasterKey GUARDED_BY(cs_KeyStore);
+    CKeyingMaterial vMasterKey GUARDED_BY(cs_KeyStore);
 
-  //! if fUseCrypto is true, mapKeys must be empty
-  //! if fUseCrypto is false, vMasterKey must be empty
-  std::atomic<bool> fUseCrypto;
+    //! if fUseCrypto is true, mapKeys must be empty
+    //! if fUseCrypto is false, vMasterKey must be empty
+    std::atomic<bool> fUseCrypto;
 
-  //! keeps track of whether Unlock has run a thorough check before
-  bool fDecryptionThoroughlyChecked;
+    //! keeps track of whether Unlock has run a thorough check before
+    bool fDecryptionThoroughlyChecked;
 
 protected:
-  using CryptedKeyMap = std::map<CKeyID, std::pair<CPubKey, std::vector<unsigned char>>>;
+    using CryptedKeyMap = std::map<CKeyID, std::pair<CPubKey, std::vector<unsigned char>>>;
 
-  bool SetCrypted();
+    bool SetCrypted();
 
-  //! will encrypt previously unencrypted keys
-  bool EncryptKeys(CKeyingMaterial& vMasterKeyIn);
+    //! will encrypt previously unencrypted keys
+    bool EncryptKeys(CKeyingMaterial& vMasterKeyIn);
 
-  bool Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no_keys = false);
-  CryptedKeyMap mapCryptedKeys GUARDED_BY(cs_KeyStore);
+    bool Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no_keys = false);
+    CryptedKeyMap mapCryptedKeys GUARDED_BY(cs_KeyStore);
 
 public:
-  CCryptoKeyStore() : fUseCrypto(false), fDecryptionThoroughlyChecked(false)
-  {
-  }
+    CCryptoKeyStore() : fUseCrypto(false), fDecryptionThoroughlyChecked(false)
+    {
+    }
 
-  bool IsCrypted() const { return fUseCrypto; }
-  bool IsLocked() const;
-  bool Lock();
+    bool IsCrypted() const { return fUseCrypto; }
+    bool IsLocked() const;
+    bool Lock();
 
-  virtual bool AddCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
-  bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey) override;
-  bool HaveKey(const CKeyID &address) const override;
-  bool GetKey(const CKeyID &address, CKey& keyOut) const override;
-  bool GetPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const override;
-  std::set<CKeyID> GetKeys() const override;
-  bool GetDeterministicSeed(const uint256& hashSeed, uint256& seed);
-  bool AddDeterministicSeed(const uint256& seed);
-  /**
-   * Wallet status (encrypted, locked) changed.
-   * Note: Called without locks held.
-   */
-  boost::signals2::signal<void (CCryptoKeyStore* wallet)> NotifyStatusChanged;
+    virtual bool AddCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
+    bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey) override;
+    bool HaveKey(const CKeyID &address) const override;
+    bool GetKey(const CKeyID &address, CKey& keyOut) const override;
+    bool GetPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const override;
+    std::set<CKeyID> GetKeys() const override;
+
+    /**
+     * Wallet status (encrypted, locked) changed.
+     * Note: Called without locks held.
+     */
+    boost::signals2::signal<void (CCryptoKeyStore* wallet)> NotifyStatusChanged;
+
+    bool GetDeterministicSeed(const uint256& hashSeed, uint256& seed);
+    bool AddDeterministicSeed(const uint256& seed);
 };
 
 #endif // BITCOIN_CRYPTER_H
