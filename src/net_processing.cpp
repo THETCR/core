@@ -607,16 +607,12 @@ PeerLogicValidation::PeerLogicValidation(CConnman* connmanIn, BanMan* banman, CS
     scheduler.scheduleEvery(std::bind(&PeerLogicValidation::CheckForStaleTipAndEvictPeers, this, consensusParams), EXTRA_PEER_CHECK_INTERVAL * 1000);
 }
 
-void PeerLogicValidation::InitializeNode(CNode *pnode) {
-    CAddress addr = pnode->addr;
-    std::string addrName = pnode->GetAddrName();
-    NodeId nodeid = pnode->GetId();
-    {
-        LOCK(cs_main);
-        mapNodeState.emplace_hint(mapNodeState.end(), std::piecewise_construct, std::forward_as_tuple(nodeid), std::forward_as_tuple(addr, std::move(addrName)));
-    }
-    if(!pnode->fInbound)
-        PushNodeVersion(pnode, connman, GetTime());
+void PeerLogicValidation::InitializeNode(NodeId nodeid, const CNode* pnode)
+{
+    LOCK(cs_main);
+    CNodeState& state = mapNodeState.insert(std::make_pair(nodeid, CNodeState())).first->second;
+    state.name = pnode->GetAddrName();
+    state.address = pnode->addr;
 }
 
 void PeerLogicValidation::FinalizeNode(NodeId nodeid, bool& fUpdateConnectionTime)
