@@ -1310,7 +1310,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         {
             LOCK(cs_mapAlerts);
             for (std::pair<const uint256, CAlert> & item: mapAlerts)
-                item.second.RelayTo(pfrom);
+                item.second.RelayTo(pfrom, connman);
         }
 
         pfrom->fSuccessfullyConnected = true;
@@ -2005,7 +2005,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 pfrom->setKnown.insert(alertHash);
                 {
                     connman->ForEachNode([&](CNode* pnode) {
-                            alert.RelayTo(pnode);
+                            alert.RelayTo(pnode, connman);
                     });
                 }
             } else {
