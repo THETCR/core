@@ -484,41 +484,39 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
     std::vector<unsigned char> bitmap;
     std::vector<CCoin> outs;
     std::string bitmapStringRepresentation;
-    boost::dynamic_bitset<unsigned char> hits(vOutPoints.size());
+    std::vector<bool> hits;
+    bitmap.resize((vOutPoints.size() + 7) / 8);
     {
+        auto process_utxos = [&vOutPoints, &outs, &hits](const CCoinsView& view, const CTxMemPool& mempool) {
+            for (const COutPoint& vOutPoint : vOutPoints) {
+                Coin coin;
+                bool hit = !mempool.isSpent(vOutPoint) && view.GetCoin(vOutPoint, coin);
+                hits.push_back(hit);
+                if (hit) outs.emplace_back(std::move(coin));
+            }
+        };
         LOCK2(cs_main, mempool.cs);
 
         CCoinsView viewDummy;
         CCoinsViewCache view(&viewDummy);
 
-        CCoinsViewCache& viewChain = *pcoinsTip;
-        CCoinsViewMemPool viewMempool(&viewChain, mempool);
+        if (fCheckMemPool) {
+            // use db+mempool as cache backend in case user likes to query mempool
+            LOCK2(cs_main, mempool.cs);
+            CCoinsViewCache& viewChain = *pcoinsTip;
+            CCoinsViewMemPool viewMempool(&viewChain, mempool);
+            process_utxos(viewMempool, mempool);
+        } else {
+            LOCK(cs_main);  // no need to lock mempool!
+            process_utxos(*pcoinsTip, CTxMemPool());
+        }
 
-        if (fCheckMemPool)
-            view.SetBackend(viewMempool); // switch cache backend to db+mempool in case user likes to query mempool
-
-        for (size_t i = 0; i < vOutPoints.size(); i++) {
-            CCoins coins;
-            uint256 hash = vOutPoints[i].hash;
-            if (view.GetCoins(hash, coins)) {
-                mempool.pruneSpent(hash, coins);
-                if (coins.IsAvailable(vOutPoints[i].n)) {
-                    hits[i] = true;
-                    // Safe to index into vout here because IsAvailable checked if it's off the end of the array, or if
-                    // n is valid but points to an already spent output (IsNull).
-                    CCoin coin;
-                    coin.nTxVer = coins.nVersion;
-                    coin.nHeight = coins.nHeight;
-                    coin.out = coins.vout.at(vOutPoints[i].n);
-                    assert(!coin.out.IsNull());
-                    outs.push_back(coin);
-                }
-            }
-
-            bitmapStringRepresentation.append(hits[i] ? "1" : "0"); // form a binary std::string representation (human-readable for json output)
+        for (size_t i = 0; i < hits.size(); ++i) {
+            const bool hit = hits[i];
+            bitmapStringRepresentation.append(hit ? "1" : "0"); // form a binary string representation (human-readable for json output)
+            bitmap[i / 8] |= ((uint8_t)hit) << (i % 8);
         }
     }
-    boost::to_block_range(hits, std::back_inserter(bitmap));
 
     switch (rf) {
     case RF_BINARY: {
