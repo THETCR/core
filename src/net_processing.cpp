@@ -1225,6 +1225,10 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         uint64_t nNonce = 1;
         uint64_t nServiceInt;
         ServiceFlags nServices;
+        std::string strSubVer;
+        std::string cleanSubVer;
+        int nStartingHeight = -1;
+        bool fRelay = true;
 
         vRecv >> nVersion >> nServiceInt >> nTime >> addrMe;
         nSendVersion = std::min(nVersion, PROTOCOL_VERSION);
@@ -1245,7 +1249,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             pfrom->cleanSubVer = SanitizeString(pfrom->strSubVer);
         }
         if (!vRecv.empty())
-            vRecv >> pfrom->nStartingHeight;
+            vRecv >> nStartingHeight;
         if (!vRecv.empty())
             vRecv >> pfrom->fRelayTxes; // set to true after we get the first filter* message
         else
@@ -1257,6 +1261,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             pfrom->fDisconnect = true;
             return true;
         }
+        pfrom->nStartingHeight = nStartingHeight;
 
         pfrom->SetAddrLocal(addrMe);
         if (pfrom->fInbound && addrMe.IsRoutable()) {
