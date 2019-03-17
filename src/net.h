@@ -492,7 +492,7 @@ public:
 //    virtual int GetHeight() = 0;
     virtual bool ProcessMessages(CNode* pnode, std::atomic<bool>& interrupt) = 0;
     virtual bool SendMessages(CNode* pnode) = 0;
-    virtual void InitializeNode(NodeId nodeid, CNode* pnode) = 0;
+    virtual void InitializeNode(CNode* pnode) = 0;
     virtual void FinalizeNode(NodeId id, bool& update_connection_time) = 0;
 
 protected:
