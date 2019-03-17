@@ -108,7 +108,6 @@ public:
                     int64_t _nTime, unsigned int _entryHeight,
                     bool spendsCoinbase,
                     int64_t nSigOpsCost, LockPoints lp);
-
     const CTransaction& GetTx() const { return *this->tx; }
     CTransactionRef GetSharedTx() const { return this->tx; }
     const CAmount& GetFee() const { return nFee; }
@@ -535,8 +534,8 @@ public:
      * transactions during reorgs.
      */
     mutable RecursiveMutex cs;
-//    indexed_transaction_set mapTx GUARDED_BY(cs);
-    std::map<uint256, CTxMemPoolEntry> mapTx GUARDED_BY(cs);
+    indexed_transaction_set mapTx GUARDED_BY(cs);
+//    std::map<uint256, CTxMemPoolEntry> mapTx GUARDED_BY(cs);
 
     using txiter = indexed_transaction_set::nth_index<0>::type::const_iterator;
     std::vector<std::pair<uint256, txiter> > vTxHashes; //!< All tx witness hashes/entries in mapTx, in random order

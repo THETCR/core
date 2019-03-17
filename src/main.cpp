@@ -1452,6 +1452,13 @@ void UpdateCoins(const CTransaction& tx, CValidationState& state, CCoinsViewCach
     AddCoins(inputs, tx, nHeight);
 }
 
+void UpdateCoins(const CTransaction& tx, CCoinsViewCache& inputs, int nHeight)
+{
+    CTxUndo txundo;
+    CValidationState state;
+    UpdateCoins(tx, state, inputs, txundo, nHeight);
+}
+
 bool CScriptCheck::operator()() {
     const CScript &scriptSig = ptxTo->vin[nIn].scriptSig;
 //    const CScriptWitness *witness = &ptxTo->vin[nIn].scriptWitness;
