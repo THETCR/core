@@ -607,7 +607,7 @@ PeerLogicValidation::PeerLogicValidation(CConnman* connmanIn, BanMan* banman, CS
     scheduler.scheduleEvery(std::bind(&PeerLogicValidation::CheckForStaleTipAndEvictPeers, this, consensusParams), EXTRA_PEER_CHECK_INTERVAL * 1000);
 }
 
-void PeerLogicValidation::InitializeNode(const CNode* pnode)
+void PeerLogicValidation::InitializeNode(CNode* pnode)
 {
     NodeId nodeid = pnode->GetId();
     LOCK(cs_main);
