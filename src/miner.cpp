@@ -200,9 +200,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         // This vector will be sorted into a priority queue:
         std::vector<TxPriority> vecPriority;
         vecPriority.reserve(mempool.mapTx.size());
-        for (auto mi = mempool.mapTx.begin();
-             mi != mempool.mapTx.end(); ++mi) {
-            const CTransaction& tx = mi->second.GetTx();
+        for (const CTxMemPoolEntry& e : mempool.mapTx) {
+            const CTransaction& tx = e.GetTx();
             if (tx.IsCoinBase() || tx.IsCoinStake() || !IsFinalTx(tx, nHeight)){
                 continue;
             }
@@ -265,7 +264,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                     }
                     mapDependers[txin.prevout.hash].push_back(porphan);
                     porphan->setDependsOn.insert(txin.prevout.hash);
-                    nTotalIn += mempool.mapTx[txin.prevout.hash].GetTx().vout[txin.prevout.n].nValue;
+                    nTotalIn += mempool.mapTx.find(txin.prevout.hash)->GetTx().vout[txin.prevout.n].nValue;
                     continue;
                 }
 
@@ -303,7 +302,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 porphan->dPriority = dPriority;
                 porphan->feeRate = feeRate;
             } else
-                vecPriority.push_back(TxPriority(dPriority, feeRate, &mi->second.GetTx()));
+                vecPriority.push_back(TxPriority(dPriority, feeRate, &e.GetTx()));
         }
 
         // Collect transactions into block
