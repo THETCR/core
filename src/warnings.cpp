@@ -46,8 +46,8 @@ std::string GetWarnings(const std::string& strFor)
     LOCK(cs_warnings);
 
     if (!CLIENT_VERSION_IS_RELEASE) {
-        strStatusBar = "This is a pre-release test build - use at your own risk - do not use for mining or merchant applications";
-        strGUI = _("This is a pre-release test build - use at your own risk - do not use for mining or merchant applications");
+        strStatusBar = "This is a pre-release test build - use at your own risk - do not use for staking or merchant applications";
+        strGUI = _("This is a pre-release test build - use at your own risk - do not use for staking or merchant applications");
     }
 
     // Misc warnings like out of disk space and clock is wrong
@@ -67,6 +67,18 @@ std::string GetWarnings(const std::string& strFor)
         strStatusBar = "Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.";
         strGUI += (strGUI.empty() ? "" : uiAlertSeperator) + _("Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.");
     }
+
+    // Alerts
+//    {
+//        LOCK(cs_mapAlerts);
+//        for (std::pair<const uint256, CAlert> & item: mapAlerts) {
+//            const CAlert& alert = item.second;
+//            if (alert.AppliesToMe() && alert.nPriority > nPriority) {
+//                nPriority = alert.nPriority;
+//                strStatusBar = alert.strStatusBar;
+//            }
+//        }
+//    }
 
     if (strFor == "gui")
         return strGUI;

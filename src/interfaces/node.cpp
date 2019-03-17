@@ -74,11 +74,12 @@ public:
         return AppInitBasicSetup() && AppInitParameterInteraction() && AppInitSanityChecks() &&
                AppInitLockDataDirectory();
     }
-    bool appInitMain() override { return AppInitMain(m_interfaces); }
+    bool appInitMain() override { return AppInitMain(); }
     void appShutdown() override
     {
         Interrupt();
-        Shutdown(m_interfaces);
+//        Shutdown(m_interfaces);
+        Shutdown();
     }
     void startShutdown() override { StartShutdown(); }
     bool shutdownRequested() override { return ShutdownRequested(); }

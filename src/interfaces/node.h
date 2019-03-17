@@ -17,6 +17,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <ui_interface.h>
 
 class BanMan;
 class CCoinControl;
@@ -214,7 +215,7 @@ public:
     virtual std::unique_ptr<Handler> handleQuestion(QuestionFn fn) = 0;
 
     //! Register handler for progress messages.
-    using ShowProgressFn = std::function<void(const std::string& title, int progress, bool resume_possible)>;
+    using ShowProgressFn = std::function<void(const std::string& title, int progress)>;
     virtual std::unique_ptr<Handler> handleShowProgress(ShowProgressFn fn) = 0;
 
     //! Register handler for load wallet messages.
@@ -230,7 +231,7 @@ public:
     virtual std::unique_ptr<Handler> handleNotifyNetworkActiveChanged(NotifyNetworkActiveChangedFn fn) = 0;
 
     //! Register handler for notify alert messages.
-    using NotifyAlertChangedFn = std::function<void()>;
+    using NotifyAlertChangedFn = std::function<void(const uint256& hash, ChangeType status)>;
     virtual std::unique_ptr<Handler> handleNotifyAlertChanged(NotifyAlertChangedFn fn) = 0;
 
     //! Register handler for ban list messages.
