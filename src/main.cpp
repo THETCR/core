@@ -3944,7 +3944,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const CBlock* pblock, bool
 
     if (!fLiteMode) {
         if (masternodeSync.RequestedMasternodeAssets > MASTERNODE_SYNC_LIST) {
-            obfuScationPool.NewBlock();
+            obfuScationPool.NewBlock(g_connman.get());
             masternodePayments.ProcessBlock(chainActive.Height() + 10);
             budget.NewBlock(g_connman.get());
         }
