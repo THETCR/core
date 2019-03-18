@@ -218,7 +218,7 @@ public:
      */
     bool Sign();
 
-    bool Relay();
+    bool Relay(CConnman* connman);
 
     /// Is this Obfuscation expired?
     bool IsExpired()
@@ -440,21 +440,21 @@ public:
     bool IsCompatibleWithEntries(std::vector<CTxOut>& vout);
 
     /// Is this amount compatible with other client in the pool?
-    bool IsCompatibleWithSession(CAmount nAmount, CTransaction txCollateral, int& errorID);
+    bool IsCompatibleWithSession(CAmount nAmount, CTransaction txCollateral, int& errorID, CConnman* connman);
 
     /// Passively run Obfuscation in the background according to the configuration in settings (only for QT)
-    bool DoAutomaticDenominating(bool fDryRun = false);
+    bool DoAutomaticDenominating(CConnman* connman, bool fDryRun = false);
     bool PrepareObfuscationDenominate();
 
     /// Check for process in Obfuscation
-    void Check();
-    void CheckFinalTransaction();
+    void Check(CConnman* connman);
+    void CheckFinalTransaction(CConnman* connman);
     /// Charge fees to bad actors (Charge clients a fee if they're abusive)
     void ChargeFees();
     /// Rarely charge fees to pay miners
     void ChargeRandomFees();
-    void CheckTimeout();
-    void CheckForCompleteQueue();
+    void CheckTimeout(CConnman* connman);
+    void CheckForCompleteQueue(CConnman* connman);
     /// Check to make sure a signature matches an input in the pool
     bool SignatureValid(const CScript& newSig, const CTxIn& newVin);
     /// If the collateral is valid given by a client
@@ -466,18 +466,18 @@ public:
     /// Check that all inputs are signed. (Are all inputs signed?)
     bool SignaturesComplete();
     /// As a client, send a transaction to a Masternode to start the denomination process
-    void SendObfuscationDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, CAmount amount);
+    void SendObfuscationDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, CAmount amount, CConnman* connman);
     /// Get Masternode updates about the progress of Obfuscation
-    bool StatusUpdate(int newState, int newEntriesCount, int newAccepted, int& errorID, int newSessionID = 0);
+    bool StatusUpdate(int newState, int newEntriesCount, int newAccepted, int& errorID, CConnman* connman, int newSessionID = 0);
 
     /// As a client, check and sign the final transaction
-    bool SignFinalTransaction(CTransaction& finalTransactionNew, CNode* node);
+    bool SignFinalTransaction(CTransaction& finalTransactionNew, CNode* node, CConnman* connman);
 
     /// Get the last valid block hash for a given modulus
     bool GetLastValidBlockHash(uint256& hash, int mod = 1, int nBlockHeight = 0);
     /// Process a new block
-    void NewBlock();
-    void CompletedTransaction(bool error, int errorID);
+    void NewBlock(CConnman* connman);
+    void CompletedTransaction(bool error, int errorID, CConnman* connman);
     void ClearLastMessage();
     /// Used for liquidity providers
     bool SendRandomPaymentToSelf();
@@ -502,12 +502,12 @@ public:
     // Relay Obfuscation Messages
     //
 
-    void RelayFinalTransaction(const int sessionID, const CTransaction& txNew);
+    void RelayFinalTransaction(const int sessionID, const CTransaction& txNew, CConnman* connman);
     void RelaySignaturesAnon(std::vector<CTxIn>& vin);
     void RelayInAnon(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout);
-    void RelayIn(const std::vector<CTxDSIn>& vin, const CAmount& nAmount, const CTransaction& txCollateral, const std::vector<CTxDSOut>& vout);
-    void RelayStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const int errorID = MSG_NOERR);
-    void RelayCompletedTransaction(const int sessionID, const bool error, const int errorID);
+    void RelayIn(const std::vector<CTxDSIn>& vin, const CAmount& nAmount, const CTransaction& txCollateral, const std::vector<CTxDSOut>& vout, CConnman* connman);
+    void RelayStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, CConnman* connman, const int errorID = MSG_NOERR);
+    void RelayCompletedTransaction(const int sessionID, const bool error, const int errorID, CConnman* connman);
 };
 
 void ThreadCheckObfuScationPool();

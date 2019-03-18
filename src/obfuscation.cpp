@@ -94,7 +94,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, const std::string
             }
         }
 
-        if (!IsCompatibleWithSession(nDenom, txCollateral, errorID)) {
+        if (!IsCompatibleWithSession(nDenom, txCollateral, errorID, connman)) {
             LogPrintf("dsa -- not compatible with existing transactions! \n");
             connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::DSSTATUSUPDATE, sessionID, GetState(), GetEntriesCount(), MASTERNODE_REJECTED, errorID));
             return;
@@ -154,7 +154,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, const std::string
 
             LogPrint(BCLog::OBFUSCATION, "dsq - new Obfuscation queue object - %s\n", addr.ToString());
             vecObfuscationQueue.push_back(dsq);
-            dsq.Relay();
+            dsq.Relay(connman);
             dsq.time = GetTime();
         }
 
@@ -277,9 +277,9 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, const std::string
 
         if (AddEntry(in, nAmount, txCollateral, out, errorID)) {
             connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::DSSTATUSUPDATE, sessionID, GetState(), GetEntriesCount(), MASTERNODE_ACCEPTED, errorID));
-            Check();
+            Check(connman);
 
-            RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET);
+            RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET, connman);
         } else {
             connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::DSSTATUSUPDATE, sessionID, GetState(), GetEntriesCount(), MASTERNODE_REJECTED, errorID));
         }
@@ -309,7 +309,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, const std::string
             return;
         }
 
-        StatusUpdate(state, entriesCount, accepted, errorID, sessionIDMessage);
+        StatusUpdate(state, entriesCount, accepted, errorID, connman, sessionIDMessage);
 
     } else if (strCommand == NetMsgType::DSSIGNFINALTX) { //Obfuscation Sign Final Tx
 
@@ -330,8 +330,8 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, const std::string
         }
 
         if (success) {
-            obfuScationPool.Check();
-            RelayStatus(obfuScationPool.sessionID, obfuScationPool.GetState(), obfuScationPool.GetEntriesCount(), MASTERNODE_RESET);
+            obfuScationPool.Check(connman);
+            RelayStatus(obfuScationPool.sessionID, obfuScationPool.GetState(), obfuScationPool.GetEntriesCount(), MASTERNODE_RESET, connman);
         }
     } else if (strCommand == NetMsgType::DSFINALTX) { //Obfuscation Final tx
         if (pfrom->nVersion < ActiveProtocol()) {
@@ -355,7 +355,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, const std::string
         }
 
         //check to see if input is spent already? (and probably not confirmed)
-        SignFinalTransaction(txNew, pfrom);
+        SignFinalTransaction(txNew, pfrom, connman);
 
     } else if (strCommand == NetMsgType::DSCOMPLETE) { //Obfuscation Complete
 
@@ -379,7 +379,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, const std::string
             return;
         }
 
-        obfuScationPool.CompletedTransaction(error, errorID);
+        obfuScationPool.CompletedTransaction(error, errorID, connman);
     }
 }
 
@@ -521,7 +521,7 @@ std::string CObfuscationPool::GetStatus()
 //
 // Check the Obfuscation progress and send client updates if a Masternode
 //
-void CObfuscationPool::Check()
+void CObfuscationPool::Check(CConnman* connman)
 {
     if (fMasterNode) LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() - entries count %lu\n", entries.size());
     //printf("CObfuscationPool::Check() %d - %d - %d\n", state, anonTx.CountEntries(), GetTimeMillis()-lastTimeChanged);
@@ -562,7 +562,7 @@ void CObfuscationPool::Check()
             finalTransaction = txNew;
 
             // request signatures from clients
-            RelayFinalTransaction(sessionID, finalTransaction);
+            RelayFinalTransaction(sessionID, finalTransaction, connman);
         }
     }
 
@@ -571,7 +571,7 @@ void CObfuscationPool::Check()
         LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() -- SIGNING\n");
         UpdateState(POOL_STATUS_TRANSMISSION);
 
-        CheckFinalTransaction();
+        CheckFinalTransaction(connman);
     }
 
     // reset if we're here for 10 seconds
@@ -579,11 +579,11 @@ void CObfuscationPool::Check()
         LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() -- timeout, RESETTING\n");
         UnlockCoins();
         SetNull();
-        if (fMasterNode) RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET);
+        if (fMasterNode) RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET, connman);
     }
 }
 
-void CObfuscationPool::CheckFinalTransaction()
+void CObfuscationPool::CheckFinalTransaction(CConnman* connman)
 {
     if (!fMasterNode) return; // check and relay final tx only on masternode
 
@@ -600,7 +600,7 @@ void CObfuscationPool::CheckFinalTransaction()
 
             // not much we can do in this case
             UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
-            RelayCompletedTransaction(sessionID, true, ERR_INVALID_TX);
+            RelayCompletedTransaction(sessionID, true, ERR_INVALID_TX, connman);
             return;
         }
 
@@ -644,7 +644,7 @@ void CObfuscationPool::CheckFinalTransaction()
         RelayInv(inv);
 
         // Tell the clients it was successful
-        RelayCompletedTransaction(sessionID, false, MSG_SUCCESS);
+        RelayCompletedTransaction(sessionID, false, MSG_SUCCESS, connman);
 
         // Randomly charge clients
         ChargeRandomFees();
@@ -652,7 +652,7 @@ void CObfuscationPool::CheckFinalTransaction()
         // Reset
         LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() -- COMPLETED -- RESETTING\n");
         SetNull();
-        RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET);
+        RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET, connman);
     }
 }
 
@@ -807,7 +807,7 @@ void CObfuscationPool::ChargeRandomFees()
 //
 // Check for various timeouts (queue objects, Obfuscation, etc)
 //
-void CObfuscationPool::CheckTimeout()
+void CObfuscationPool::CheckTimeout(CConnman* connman)
 {
     if (!fEnableZeromint && !fMasterNode) return;
 
@@ -816,15 +816,15 @@ void CObfuscationPool::CheckTimeout()
         switch (state) {
         case POOL_STATUS_TRANSMISSION:
             LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() -- Session complete -- Running Check()\n");
-            Check();
+            Check(connman);
             break;
         case POOL_STATUS_ERROR:
             LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() -- Pool error -- Running Check()\n");
-            Check();
+            Check(connman);
             break;
         case POOL_STATUS_SUCCESS:
             LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::CheckTimeout() -- Pool success -- Running Check()\n");
-            Check();
+            Check(connman);
             break;
         }
     }
@@ -858,7 +858,7 @@ void CObfuscationPool::CheckTimeout()
                     SetNull();
                 }
                 if (fMasterNode) {
-                    RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET);
+                    RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET, connman);
                 }
             } else
                 ++it2;
@@ -892,7 +892,7 @@ void CObfuscationPool::CheckTimeout()
 //
 // Check for complete queue
 //
-void CObfuscationPool::CheckForCompleteQueue()
+void CObfuscationPool::CheckForCompleteQueue(CConnman* connman)
 {
     if (!fEnableZeromint && !fMasterNode) return;
 
@@ -910,7 +910,7 @@ void CObfuscationPool::CheckForCompleteQueue()
         dsq.time = GetTime();
         dsq.ready = true;
         dsq.Sign();
-        dsq.Relay();
+        dsq.Relay(connman);
     }
 }
 
@@ -1120,7 +1120,7 @@ bool CObfuscationPool::SignaturesComplete()
 // Execute a Obfuscation denomination via a Masternode.
 // This is only ran from clients
 //
-void CObfuscationPool::SendObfuscationDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, CAmount amount)
+void CObfuscationPool::SendObfuscationDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, CAmount amount, CConnman* connman)
 {
     if (fMasterNode) {
         LogPrintf("CObfuscationPool::SendObfuscationDenominate() - Obfuscation from a Masternode is not supported currently.\n");
@@ -1206,8 +1206,8 @@ void CObfuscationPool::SendObfuscationDenominate(std::vector<CTxIn>& vin, std::v
     e.Add(vin, amount, txCollateral, vout);
     entries.push_back(e);
 
-    RelayIn(entries[0].sev, entries[0].amount, txCollateral, entries[0].vout);
-    Check();
+    RelayIn(entries[0].sev, entries[0].amount, txCollateral, entries[0].vout, connman);
+    Check(connman);
 }
 
 // Incoming message from Masternode updating the progress of Obfuscation
@@ -1215,7 +1215,7 @@ void CObfuscationPool::SendObfuscationDenominate(std::vector<CTxIn>& vin, std::v
 //                  0 means transaction was not accepted
 //                  1 means transaction was accepted
 
-bool CObfuscationPool::StatusUpdate(int newState, int newEntriesCount, int newAccepted, int& errorID, int newSessionID)
+bool CObfuscationPool::StatusUpdate(int newState, int newEntriesCount, int newAccepted, int& errorID, CConnman* connman, int newSessionID)
 {
     if (fMasterNode) return false;
     if (state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) return false;
@@ -1250,7 +1250,7 @@ bool CObfuscationPool::StatusUpdate(int newState, int newEntriesCount, int newAc
             LogPrintf("CObfuscationPool::StatusUpdate - entry not accepted by Masternode \n");
             UnlockCoins();
             UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
-            DoAutomaticDenominating(); //try another Masternode
+            DoAutomaticDenominating(connman); //try another Masternode
         }
         if (sessionFoundMasternode) return true;
     }
@@ -1263,7 +1263,7 @@ bool CObfuscationPool::StatusUpdate(int newState, int newEntriesCount, int newAc
 // check it to make sure it's what we want, then sign it if we agree.
 // If we refuse to sign, it's possible we'll be charged collateral
 //
-bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, CNode* node)
+bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, CNode* node, CConnman* connman)
 {
     if (fMasterNode) return false;
 
@@ -1333,14 +1333,15 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
     }
 
     // push all of our signatures to the Masternode
-    if (sigs.size() > 0 && node != NULL)
-        node->PushMessage(NetMsgType::DSSIGNFINALTX, sigs);
-
+    if (sigs.size() > 0 && node != NULL){
+        CNetMsgMaker msgMaker(node->GetSendVersion());
+        connman->PushMessage(node, msgMaker.Make(NetMsgType::DSSIGNFINALTX, sigs));
+    }
 
     return true;
 }
 
-void CObfuscationPool::NewBlock()
+void CObfuscationPool::NewBlock(CConnman* connman)
 {
     LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::NewBlock \n");
 
@@ -1348,11 +1349,11 @@ void CObfuscationPool::NewBlock()
     if (GetTime() - lastNewBlock < 10) return;
     lastNewBlock = GetTime();
 
-    obfuScationPool.CheckTimeout();
+    obfuScationPool.CheckTimeout(connman);
 }
 
 // Obfuscation transaction was completed (failed or successful)
-void CObfuscationPool::CompletedTransaction(bool error, int errorID)
+void CObfuscationPool::CompletedTransaction(bool error, int errorID, CConnman* connman)
 {
     if (fMasterNode) return;
 
@@ -1360,7 +1361,7 @@ void CObfuscationPool::CompletedTransaction(bool error, int errorID)
         LogPrintf("CompletedTransaction -- error \n");
         UpdateState(POOL_STATUS_ERROR);
 
-        Check();
+        Check(connman);
         UnlockCoins();
         SetNull();
     } else {
@@ -1386,7 +1387,7 @@ void CObfuscationPool::ClearLastMessage()
 //
 // This does NOT run by default for daemons, only for QT.
 //
-bool CObfuscationPool::DoAutomaticDenominating(bool fDryRun)
+bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
 {
     return false;  // Disabled until Obfuscation is completely removed
 
@@ -1580,13 +1581,13 @@ bool CObfuscationPool::DoAutomaticDenominating(bool fDryRun)
                 lastTimeChanged = GetTimeMillis();
 
                 // connect to Masternode and submit the queue request
-                CNode* pnode = ConnectNode((CAddress)addr, NULL, true);
+                CNode* pnode = connman->ConnectNode((CAddress)addr, NULL, false, true);
                 if (pnode != NULL) {
                     pSubmittedToMasternode = pmn;
                     vecMasternodesUsed.push_back(dsq.vin);
                     sessionDenom = dsq.nDenom;
-
-                    pnode->PushMessage(NetMsgType::DSACCEPT, sessionDenom, txCollateral);
+                    CNetMsgMaker msgMaker(pnode->GetSendVersion());
+                    connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSACCEPT, sessionDenom, txCollateral));
                     LogPrintf("DoAutomaticDenominating --- connected (from queue), sending dsa for %d - %s\n", sessionDenom, pnode->addr.ToString());
                     strAutoDenomResult = _("Mixing in progress...");
                     dsq.time = 0; //remove node
@@ -1622,7 +1623,7 @@ bool CObfuscationPool::DoAutomaticDenominating(bool fDryRun)
 
             lastTimeChanged = GetTimeMillis();
             LogPrintf("DoAutomaticDenominating --- attempt %d connection to Masternode %s\n", i, pmn->addr.ToString());
-            CNode* pnode = ConnectNode((CAddress)pmn->addr, nullptr, true);
+            CNode* pnode = connman->ConnectNode((CAddress)pmn->addr, nullptr, false, true);
             if (pnode != nullptr) {
                 pSubmittedToMasternode = pmn;
                 vecMasternodesUsed.push_back(pmn->vin);
@@ -1632,8 +1633,8 @@ bool CObfuscationPool::DoAutomaticDenominating(bool fDryRun)
                 // try to get a single random denom out of vecAmounts
                 while (sessionDenom == 0)
                     sessionDenom = GetDenominationsByAmounts(vecAmounts);
-
-                pnode->PushMessage(NetMsgType::DSACCEPT, sessionDenom, txCollateral);
+                CNetMsgMaker msgMaker(pnode->GetSendVersion());
+                connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSACCEPT, sessionDenom, txCollateral));
                 LogPrintf("DoAutomaticDenominating --- connected, sending dsa for %d\n", sessionDenom);
                 strAutoDenomResult = _("Mixing in progress...");
                 return true;
@@ -1864,7 +1865,7 @@ bool CObfuscationPool::IsCompatibleWithEntries(std::vector<CTxOut>& vout)
     return true;
 }
 
-bool CObfuscationPool::IsCompatibleWithSession(int64_t nDenom, CTransaction txCollateral, int& errorID)
+bool CObfuscationPool::IsCompatibleWithSession(int64_t nDenom, CTransaction txCollateral, int& errorID, CConnman* connman)
 {
     if (nDenom == 0) return false;
 
@@ -1891,7 +1892,7 @@ bool CObfuscationPool::IsCompatibleWithSession(int64_t nDenom, CTransaction txCo
             dsq.vin = activeMasternode.vin;
             dsq.time = GetTime();
             dsq.Sign();
-            dsq.Relay();
+            dsq.Relay(connman);
         }
 
         UpdateState(POOL_STATUS_QUEUE);
@@ -2216,12 +2217,13 @@ bool CObfuscationQueue::Sign()
     return true;
 }
 
-bool CObfuscationQueue::Relay()
+bool CObfuscationQueue::Relay(CConnman* connman)
 {
     LOCK(cs_vNodes);
     for (CNode* pnode: vNodes) {
         // always relay to everyone
-        pnode->PushMessage(NetMsgType::DSQUEUE, (*this));
+        CNetMsgMaker msgMaker(pnode->GetSendVersion());
+        connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSQUEUE, (*this)));
     }
 
     return true;
@@ -2246,15 +2248,16 @@ bool CObfuscationQueue::CheckSignature()
 }
 
 
-void CObfuscationPool::RelayFinalTransaction(const int sessionID, const CTransaction& txNew)
+void CObfuscationPool::RelayFinalTransaction(const int sessionID, const CTransaction& txNew, CConnman* connman)
 {
     LOCK(cs_vNodes);
     for (CNode* pnode: vNodes) {
-        pnode->PushMessage(NetMsgType::DSFINALTX, sessionID, txNew);
+        CNetMsgMaker msgMaker(pnode->GetSendVersion());
+        connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSFINALTX, sessionID, txNew));
     }
 }
 
-void CObfuscationPool::RelayIn(const std::vector<CTxDSIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxDSOut>& vout)
+void CObfuscationPool::RelayIn(const std::vector<CTxDSIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxDSOut>& vout, CConnman* connman)
 {
     if (!pSubmittedToMasternode) return;
 
@@ -2267,25 +2270,30 @@ void CObfuscationPool::RelayIn(const std::vector<CTxDSIn>& vin, const int64_t& n
     for (CTxDSOut out: vout)
         vout2.push_back(out);
 
-    CNode* pnode = FindNode(pSubmittedToMasternode->addr);
+    CNode* pnode = connman->FindNode(pSubmittedToMasternode->addr);
     if (pnode != nullptr) {
+        CNetMsgMaker msgMaker(pnode->GetSendVersion());
         LogPrintf("RelayIn - found master, relaying message - %s \n", pnode->addr.ToString());
-        pnode->PushMessage(NetMsgType::DSVIN, vin2, nAmount, txCollateral, vout2);
+        connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSVIN, vin2, nAmount, txCollateral, vout2));
     }
 }
 
-void CObfuscationPool::RelayStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const int errorID)
+void CObfuscationPool::RelayStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, CConnman* connman, const int errorID)
 {
     LOCK(cs_vNodes);
-    for (CNode* pnode: vNodes)
-        pnode->PushMessage(NetMsgType::DSSTATUSUPDATE, sessionID, newState, newEntriesCount, newAccepted, errorID);
+    for (CNode* pnode: vNodes){
+        CNetMsgMaker msgMaker(pnode->GetSendVersion());
+        connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSSTATUSUPDATE, sessionID, newState, newEntriesCount, newAccepted, errorID));
+    }
 }
 
-void CObfuscationPool::RelayCompletedTransaction(const int sessionID, const bool error, const int errorID)
+void CObfuscationPool::RelayCompletedTransaction(const int sessionID, const bool error, const int errorID, CConnman* connman)
 {
     LOCK(cs_vNodes);
-    for (CNode* pnode: vNodes)
-        pnode->PushMessage(NetMsgType::DSCOMPLETE, sessionID, error, errorID);
+    for (CNode* pnode: vNodes){
+        CNetMsgMaker msgMaker(pnode->GetSendVersion());
+        connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSCOMPLETE, sessionID, error, errorID));
+    }
 }
 
 //TODO: Rename/move to core
@@ -2303,7 +2311,7 @@ void ThreadCheckObfuScationPool()
         //LogPrintf("ThreadCheckObfuScationPool::check timeout\n");
 
         // try to sync from all available nodes, one step at a time
-        masternodeSync.Process();
+        masternodeSync.Process(g_connman.get());
 
         if (masternodeSync.IsBlockchainSynced()) {
             c++;
@@ -2321,11 +2329,11 @@ void ThreadCheckObfuScationPool()
 
             //if(c % MASTERNODES_DUMP_SECONDS == 0) DumpMasternodes();
 
-            obfuScationPool.CheckTimeout();
-            obfuScationPool.CheckForCompleteQueue();
+            obfuScationPool.CheckTimeout(g_connman.get());
+            obfuScationPool.CheckForCompleteQueue(g_connman.get());
 
             if (obfuScationPool.GetState() == POOL_STATUS_IDLE && c % 15 == 0) {
-                obfuScationPool.DoAutomaticDenominating();
+                obfuScationPool.DoAutomaticDenominating(g_connman.get());
             }
         }
     }

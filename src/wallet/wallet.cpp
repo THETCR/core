@@ -7411,7 +7411,7 @@ int CMerkleTx::GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const
 }
 
 
-bool CMerkleTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool ignoreFees)
+bool CWalletTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool ignoreFees)
 {
     CValidationState state;
     bool fAccepted = ::AcceptToMemoryPool(mempool, state, *tx, fLimitFree, NULL, fRejectInsaneFee, ignoreFees);

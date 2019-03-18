@@ -342,6 +342,13 @@ public:
         });
     }
 
+    //! TODO make private
+    CNode* FindNode(const CNetAddr& ip);
+    CNode* FindNode(const CSubNet& subNet);
+    CNode* FindNode(const std::string& addrName);
+    CNode* FindNode(const CService& addr);
+
+    CNode* ConnectNode(CAddress addrConnect, const char *pszDest, bool fCountFailure, bool manual_connection, bool obfuScationMaster = false);
 private:
     struct ListenSocket {
         SOCKET socket;
@@ -371,13 +378,7 @@ private:
 
     uint64_t CalculateKeyedNetGroup(const CAddress& ad) const;
 
-    CNode* FindNode(const CNetAddr& ip);
-    CNode* FindNode(const CSubNet& subNet);
-    CNode* FindNode(const std::string& addrName);
-    CNode* FindNode(const CService& addr);
-
     bool AttemptToEvictConnection();
-    CNode* ConnectNode(CAddress addrConnect, const char *pszDest, bool fCountFailure, bool manual_connection, bool obfuScationMaster = false);
     bool IsWhitelistedRange(const CNetAddr &addr);
 
     void DeleteNode(CNode* pnode);
