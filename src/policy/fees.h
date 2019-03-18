@@ -176,6 +176,7 @@ private:
      */
     static constexpr double MIN_BUCKET_FEERATE = 1000;
     static constexpr double MAX_BUCKET_FEERATE = 1e7;
+    static constexpr double INF_PRIORITY = 1e9 * MAX_MONEY;
 
     /** Spacing of FeeRate buckets
      * We have to lump transactions into buckets based on feerate, but we want to be able
@@ -226,6 +227,20 @@ public:
 
     /** Calculation of highest target that estimates are tracked for */
     unsigned int HighestTargetTracked(FeeEstimateHorizon horizon) const;
+
+    /** Return a priority estimate.
+ *  DEPRECATED
+ *  Returns -1
+ */
+    double estimatePriority(int confTarget);
+
+    /** Estimate priority needed to get be included in a block within
+     *  confTarget blocks.
+     *  DEPRECATED
+     *  Returns -1 unless mempool is currently limited then returns INF_PRIORITY
+     *  answerFoundAtTarget is set to confTarget
+     */
+    double estimateSmartPriority(int confTarget, int *answerFoundAtTarget, const CTxMemPool& pool);
 
 private:
     mutable CCriticalSection m_cs_fee_estimator;

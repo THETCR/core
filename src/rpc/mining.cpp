@@ -16,10 +16,12 @@
 #include "miner.h"
 #include "net.h"
 #include "pow.h"
+#include <policy/fees.h>
 #include "rpc/server.h"
 #include "shutdown.h"
 #include "txmempool.h"
 #include <util/system.h>
+#include <warnings.h>
 #ifdef ENABLE_WALLET
 #include <wallet/db.h>
 #include <wallet/wallet.h>
@@ -298,7 +300,7 @@ UniValue prioritisetransaction(const JSONRPCRequest& request)
     uint256 hash(ParseHashV(request.params[0].get_str(), "txid"));
     CAmount nAmount = request.params[2].get_int64();
 
-    mempool.PrioritiseTransaction(hash, request.params[0].get_str(), request.params[1].get_real(), nAmount);
+    mempool.PrioritiseTransaction(hash, nAmount);
     return true;
 }
 
@@ -703,7 +705,7 @@ UniValue estimatefee(const JSONRPCRequest& request)
     if (nBlocks < 1)
         nBlocks = 1;
 
-    CFeeRate feeRate = mempool.estimateFee(nBlocks);
+    CFeeRate feeRate = ::feeEstimator.estimateFee(nBlocks);
     if (feeRate == CFeeRate(0))
         return -1.0;
 
@@ -737,5 +739,5 @@ UniValue estimatepriority(const JSONRPCRequest& request)
     if (nBlocks < 1)
         nBlocks = 1;
 
-    return mempool.estimatePriority(nBlocks);
+    return ::feeEstimator.estimatePriority(nBlocks);
 }
