@@ -328,7 +328,7 @@ public:
         Variable intervals will result in privacy decrease.
     */
     int64_t PoissonNextSendInbound(int64_t now, int average_interval_seconds);
-    bool OpenMasternodeConnection(const CAddress& addrConnect);
+    void OpenMasternodeConnection(const CAddress& addrConnect);
     struct CAllNodes {
         bool operator() (const CNode*) const {return true;}
     };

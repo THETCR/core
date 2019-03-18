@@ -2779,8 +2779,8 @@ std::vector<CNode*> CConnman::CopyNodeVector()
 {
     return CopyNodeVector(AllNodes);
 }
-bool CConnman::OpenMasternodeConnection(const CAddress &addrConnect) {
-    return OpenNetworkConnection(addrConnect, false, NULL, NULL, false, false, false, true);
+void CConnman::OpenMasternodeConnection(const CAddress &addrConnect) {
+    return OpenNetworkConnection(addrConnect, false, nullptr, nullptr, false, false, true);
 }
 bool CConnman::ForNode(const CService& addr, std::function<bool(const CNode* pnode)> cond, std::function<bool(CNode* pnode)> func)
 {
