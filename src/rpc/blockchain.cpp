@@ -202,16 +202,15 @@ UniValue mempoolToJSON(bool fVerbose = false)
     if (fVerbose) {
         LOCK(mempool.cs);
         UniValue o(UniValue::VOBJ);
-        for (const std::pair<uint256, CTxMemPoolEntry> & entry: mempool.mapTx) {
-            const uint256& hash = entry.first;
-            const CTxMemPoolEntry& e = entry.second;
+        for (const CTxMemPoolEntry& e: mempool.mapTx) {
+            const uint256& hash = e.GetSharedTx()->GetHash();
             UniValue info(UniValue::VOBJ);
             info.pushKV("size", (int)e.GetTxSize());
             info.pushKV("fee", ValueFromAmount(e.GetFee()));
             info.pushKV("time", e.GetTime());
             info.pushKV("height", (int)e.GetHeight());
-            info.pushKV("startingpriority", e.GetPriority(e.GetHeight()));
-            info.pushKV("currentpriority", e.GetPriority(chainActive.Height()));
+//            info.pushKV("startingpriority", e.GetPriority(e.GetHeight()));
+//            info.pushKV("currentpriority", e.GetPriority(chainActive.Height()));
             const CTransaction& tx = e.GetTx();
             set<string> setDepends;
             for (const CTxIn& txin: tx.vin) {
@@ -402,61 +401,61 @@ struct CCoinsStats {
   CCoinsStats() : nHeight(0), hashBlock(0), nTransactions(0), nTransactionOutputs(0), nSerializedSize(0), hashSerialized(0), nTotalAmount(0) {}
 };
 
-//static void ApplyStats(CCoinsStats &stats, CHashWriter& ss, const uint256& hash, const std::map<uint32_t, CCoins>& outputs)
-//{
-//    assert(!outputs.empty());
-//    ss << hash;
-//    ss << VARINT(outputs.begin()->second.nHeight * 2 + outputs.begin()->second.fCoinBase ? 1u : 0u);
-//    stats.nTransactions++;
-//    for (const auto& output : outputs) {
-//        for(const auto& out: output.second.vout){
-//            ss << VARINT(output.first + 1);
-//            ss << out.scriptPubKey;
-//            ss << VARINT(out.nValue);
-//            stats.nTransactionOutputs++;
-//            stats.nTotalAmount += out.nValue;
-//        }
-//    }
-//    ss << VARINT(0u);
-//}
+static void ApplyStats(CCoinsStats &stats, CHashWriter& ss, const uint256& hash, const std::map<uint32_t, Coin>& outputs)
+{
+    assert(!outputs.empty());
+    ss << hash;
+    ss << VARINT(outputs.begin()->second.nHeight * 2 + outputs.begin()->second.fCoinBase ? 1u : 0u);
+    stats.nTransactions++;
+    for (const auto& output : outputs) {
+        ss << VARINT(output.first + 1);
+        ss << output.second.out.scriptPubKey;
+        ss << VARINT(output.second.out.nValue, VarIntMode::NONNEGATIVE_SIGNED);
+        stats.nTransactionOutputs++;
+        stats.nTotalAmount += output.second.out.nValue;
+//        stats.nBogoSize += 32 /* txid */ + 4 /* vout index */ + 4 /* height + coinbase */ + 8 /* amount */ +
+//                           2 /* scriptPubKey len */ + output.second.out.scriptPubKey.size() /* scriptPubKey */;
+    }
+    ss << VARINT(0u);
+}
+
 
 //! Calculate statistics about the unspent transaction output set
 static bool GetUTXOStats(CCoinsView *view, CCoinsStats &stats)
 {
-    boost::scoped_ptr<CCoinsViewCursor> pcursor(view->Cursor());
+    std::unique_ptr<CCoinsViewCursor> pcursor(view->Cursor());
+    assert(pcursor);
 
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
     stats.hashBlock = pcursor->GetBestBlock();
     {
         LOCK(cs_main);
-        stats.nHeight = mapBlockIndex.find(stats.hashBlock)->second->nHeight;
+        stats.nHeight = LookupBlockIndex(stats.hashBlock)->nHeight;
     }
     ss << stats.hashBlock;
-    CAmount nTotalAmount = 0;
+    uint256 prevkey;
+    std::map<uint32_t, Coin> outputs;
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
-        uint256 key;
-        CCoins coins;
-        if (pcursor->GetKey(key) && pcursor->GetValue(coins)) {
-            stats.nTransactions++;
-            for (unsigned int i=0; i<coins.vout.size(); i++) {
-                const CTxOut &out = coins.vout[i];
-                if (!out.IsNull()) {
-                    stats.nTransactionOutputs++;
-                    ss << VARINT(i+1, VarIntMode::DEFAULT);
-                    ss << out;
-                    nTotalAmount += out.nValue;
-                }
+        COutPoint key;
+        Coin coin;
+        if (pcursor->GetKey(key) && pcursor->GetValue(coin)) {
+            if (!outputs.empty() && key.hash != prevkey) {
+                ApplyStats(stats, ss, prevkey, outputs);
+                outputs.clear();
             }
-            stats.nSerializedSize += 32 + pcursor->GetValueSize();
-            ss << VARINT(0, VarIntMode::NONNEGATIVE_SIGNED);
+            prevkey = key.hash;
+            outputs[key.n] = std::move(coin);
         } else {
             return error("%s: unable to read value", __func__);
         }
         pcursor->Next();
     }
+    if (!outputs.empty()) {
+        ApplyStats(stats, ss, prevkey, outputs);
+    }
     stats.hashSerialized = ss.GetHash();
-    stats.nTotalAmount = nTotalAmount;
+//    stats.nDiskSize = view->EstimateSize();
     return true;
 }
 
@@ -598,37 +597,37 @@ UniValue gettxout(const JSONRPCRequest& request)
     std::string strHash = request.params[0].get_str();
     uint256 hash(strHash);
     int n = request.params[1].get_int();
+    COutPoint out(hash, n);
     bool fMempool = true;
     if (request.params.size() > 2)
         fMempool = request.params[2].get_bool();
 
-    CCoins coins;
+    Coin coin;
     if (fMempool) {
         LOCK(mempool.cs);
         CCoinsViewMemPool view(pcoinsTip.get(), mempool);
-        if (!view.GetCoins(hash, coins))
+        if (!view.GetCoin(out, coin) || mempool.isSpent(out)) {
             return NullUniValue;
-        mempool.pruneSpent(hash, coins); // TODO: this should be done by the CCoinsViewMemPool
+        }
     } else {
-        if (!pcoinsTip->GetCoins(hash, coins))
+        if (!pcoinsTip->GetCoin(out, coin)) {
             return NullUniValue;
+        }
     }
-    if (n < 0 || (unsigned int)n >= coins.vout.size() || coins.vout[n].IsNull())
-        return NullUniValue;
 
     BlockMap::iterator it = mapBlockIndex.find(pcoinsTip->GetBestBlock());
     CBlockIndex* pindex = it->second;
     ret.pushKV("bestblock", pindex->GetBlockHash().GetHex());
-    if ((unsigned int)coins.nHeight == MEMPOOL_HEIGHT)
+    if ((unsigned int)coin.nHeight == MEMPOOL_HEIGHT)
         ret.pushKV("confirmations", 0);
     else
-        ret.pushKV("confirmations", pindex->nHeight - coins.nHeight + 1);
-    ret.pushKV("value", ValueFromAmount(coins.vout[n].nValue));
+        ret.pushKV("confirmations", pindex->nHeight - coin.nHeight + 1);
+    ret.pushKV("value", ValueFromAmount(coin.out.nValue));
     UniValue o(UniValue::VOBJ);
-    ScriptPubKeyToJSON(coins.vout[n].scriptPubKey, o, true);
+    ScriptPubKeyToJSON(coin.out.scriptPubKey, o, true);
     ret.pushKV("scriptPubKey", o);
-    ret.pushKV("version", coins.nVersion);
-    ret.pushKV("coinbase", coins.fCoinBase);
+    ret.pushKV("version", 0);
+    ret.pushKV("coinbase", coin.fCoinBase);
 
     return ret;
 }
