@@ -438,7 +438,7 @@ UniValue mnbudgetvote(const JSONRPCRequest& request)
             }
 
             std::string strError = "";
-            if (budget.UpdateProposal(vote, NULL, strError)) {
+            if (budget.UpdateProposal(vote, NULL, strError, g_connman.get())) {
                 success++;
                 budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
                 vote.Relay();
@@ -505,7 +505,7 @@ UniValue mnbudgetvote(const JSONRPCRequest& request)
             }
 
             std::string strError = "";
-            if (budget.UpdateProposal(vote, NULL, strError)) {
+            if (budget.UpdateProposal(vote, NULL, strError, g_connman.get())) {
                 budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
                 vote.Relay();
                 success++;
@@ -580,7 +580,7 @@ UniValue mnbudgetvote(const JSONRPCRequest& request)
             }
 
             std::string strError = "";
-            if(budget.UpdateProposal(vote, NULL, strError)) {
+            if(budget.UpdateProposal(vote, NULL, strError, g_connman.get())) {
                 budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
                 vote.Relay();
                 success++;
@@ -858,7 +858,7 @@ UniValue mnbudgetrawvote(const JSONRPCRequest& request)
     }
 
     std::string strError = "";
-    if (budget.UpdateProposal(vote, NULL, strError)) {
+    if (budget.UpdateProposal(vote, NULL, strError, g_connman.get())) {
         budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
         vote.Relay();
         return "Voted successfully";
@@ -937,7 +937,7 @@ UniValue mnfinalbudget(const JSONRPCRequest& request)
             }
 
             std::string strError = "";
-            if (budget.UpdateFinalizedBudget(vote, NULL, strError)) {
+            if (budget.UpdateFinalizedBudget(vote, NULL, strError, g_connman.get())) {
                 budget.mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
                 vote.Relay();
                 success++;
@@ -982,7 +982,7 @@ UniValue mnfinalbudget(const JSONRPCRequest& request)
         }
 
         std::string strError = "";
-        if (budget.UpdateFinalizedBudget(vote, NULL, strError)) {
+        if (budget.UpdateFinalizedBudget(vote, NULL, strError, g_connman.get())) {
             budget.mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
             vote.Relay();
             return "success";
