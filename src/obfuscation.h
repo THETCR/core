@@ -407,7 +407,7 @@ public:
     }
 
     // Set the 'state' value, with some logging and capturing when the state changed
-    void UpdateState(unsigned int newState)
+    void UpdateState(unsigned int newState, CConnman* connman)
     {
         if (fMasterNode && (newState == POOL_STATUS_ERROR || newState == POOL_STATUS_SUCCESS)) {
             // LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::UpdateState() - Can't set state to ERROR or SUCCESS as a Masternode. \n");
@@ -418,7 +418,7 @@ public:
         if (state != newState) {
             lastTimeChanged = GetTimeMillis();
             if (fMasterNode) {
-                RelayStatus(obfuScationPool.sessionID, obfuScationPool.GetState(), obfuScationPool.GetEntriesCount(), MASTERNODE_RESET);
+                RelayStatus(obfuScationPool.sessionID, obfuScationPool.GetState(), obfuScationPool.GetEntriesCount(), MASTERNODE_RESET, connman);
             }
         }
         state = newState;

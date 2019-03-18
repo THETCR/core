@@ -532,14 +532,14 @@ void CObfuscationPool::Check(CConnman* connman)
         // If entries is full, then move on to the next phase
         if (state == POOL_STATUS_ACCEPTING_ENTRIES && (int)entries.size() >= GetMaxPoolTransactions()) {
             LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() -- TRYING TRANSACTION \n");
-            UpdateState(POOL_STATUS_FINALIZE_TRANSACTION);
+            UpdateState(POOL_STATUS_FINALIZE_TRANSACTION, connman);
         }
     }
 
     // create the finalized transaction for distribution to the clients
     if (state == POOL_STATUS_FINALIZE_TRANSACTION) {
         LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() -- FINALIZE TRANSACTIONS\n");
-        UpdateState(POOL_STATUS_SIGNING);
+        UpdateState(POOL_STATUS_SIGNING, connman);
 
         if (fMasterNode) {
             CMutableTransaction txNew;
@@ -569,7 +569,7 @@ void CObfuscationPool::Check(CConnman* connman)
     // If we have all of the signatures, try to compile the transaction
     if (fMasterNode && state == POOL_STATUS_SIGNING && SignaturesComplete()) {
         LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Check() -- SIGNING\n");
-        UpdateState(POOL_STATUS_TRANSMISSION);
+        UpdateState(POOL_STATUS_TRANSMISSION, connman);
 
         CheckFinalTransaction(connman);
     }
@@ -599,7 +599,7 @@ void CObfuscationPool::CheckFinalTransaction(CConnman* connman)
             SetNull();
 
             // not much we can do in this case
-            UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
+            UpdateState(POOL_STATUS_ACCEPTING_ENTRIES, connman);
             RelayCompletedTransaction(sessionID, true, ERR_INVALID_TX, connman);
             return;
         }
@@ -874,7 +874,7 @@ void CObfuscationPool::CheckTimeout(CConnman* connman)
         UnlockCoins();
         SetNull();
 
-        UpdateState(POOL_STATUS_ERROR);
+        UpdateState(POOL_STATUS_ERROR, connman);
         lastMessage = _("Session timed out.");
     }
 
@@ -884,7 +884,7 @@ void CObfuscationPool::CheckTimeout(CConnman* connman)
         UnlockCoins();
         SetNull();
 
-        UpdateState(POOL_STATUS_ERROR);
+        UpdateState(POOL_STATUS_ERROR, connman);
         lastMessage = _("Signing timed out.");
     }
 }
@@ -902,7 +902,7 @@ void CObfuscationPool::CheckForCompleteQueue(CConnman* connman)
     // which is the active state right before merging the transaction
     //
     if (state == POOL_STATUS_QUEUE && sessionUsers == GetMaxPoolTransactions()) {
-        UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
+        UpdateState(POOL_STATUS_ACCEPTING_ENTRIES, connman);
 
         CObfuscationQueue dsq;
         dsq.nDenom = sessionDenom;
@@ -1159,7 +1159,7 @@ void CObfuscationPool::SendObfuscationDenominate(std::vector<CTxIn>& vin, std::v
         return;
     }
 
-    UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
+    UpdateState(POOL_STATUS_ACCEPTING_ENTRIES, connman);
 
     LogPrintf("CObfuscationPool::SendObfuscationDenominate() - Added transaction to pool.\n");
 
@@ -1220,7 +1220,7 @@ bool CObfuscationPool::StatusUpdate(int newState, int newEntriesCount, int newAc
     if (fMasterNode) return false;
     if (state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) return false;
 
-    UpdateState(newState);
+    UpdateState(newState, connman);
     entriesCount = newEntriesCount;
 
     if (errorID != MSG_NOERR) strAutoDenomResult = _("Masternode:") + " " + GetMessageByID(errorID);
@@ -1229,7 +1229,7 @@ bool CObfuscationPool::StatusUpdate(int newState, int newEntriesCount, int newAc
         lastEntryAccepted = newAccepted;
         countEntriesAccepted += newAccepted;
         if (newAccepted == 0) {
-            UpdateState(POOL_STATUS_ERROR);
+            UpdateState(POOL_STATUS_ERROR, connman);
             lastMessage = GetMessageByID(errorID);
         }
 
@@ -1245,11 +1245,11 @@ bool CObfuscationPool::StatusUpdate(int newState, int newEntriesCount, int newAc
             LogPrintf("CObfuscationPool::StatusUpdate - entry accepted! \n");
             sessionFoundMasternode = true;
             //wait for other users. Masternode will report when ready
-            UpdateState(POOL_STATUS_QUEUE);
+            UpdateState(POOL_STATUS_QUEUE, connman);
         } else if (newAccepted == 0 && sessionID == 0 && !sessionFoundMasternode) {
             LogPrintf("CObfuscationPool::StatusUpdate - entry not accepted by Masternode \n");
             UnlockCoins();
-            UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
+            UpdateState(POOL_STATUS_ACCEPTING_ENTRIES, connman);
             DoAutomaticDenominating(connman); //try another Masternode
         }
         if (sessionFoundMasternode) return true;
@@ -1359,14 +1359,14 @@ void CObfuscationPool::CompletedTransaction(bool error, int errorID, CConnman* c
 
     if (error) {
         LogPrintf("CompletedTransaction -- error \n");
-        UpdateState(POOL_STATUS_ERROR);
+        UpdateState(POOL_STATUS_ERROR, connman);
 
         Check(connman);
         UnlockCoins();
         SetNull();
     } else {
         LogPrintf("CompletedTransaction -- success \n");
-        UpdateState(POOL_STATUS_SUCCESS);
+        UpdateState(POOL_STATUS_SUCCESS, connman);
 
         UnlockCoins();
         SetNull();
@@ -1502,7 +1502,7 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
         SetNull();
 
         int nUseQueue = rand() % 100;
-        UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
+        UpdateState(POOL_STATUS_ACCEPTING_ENTRIES, connman);
 
         if (pwalletMain->GetDenominatedBalance(true) > 0) { //get denominated unconfirmed inputs
             LogPrintf("DoAutomaticDenominating -- Found unconfirmed denominated outputs, will wait till they confirm to continue.\n");
@@ -1895,7 +1895,7 @@ bool CObfuscationPool::IsCompatibleWithSession(int64_t nDenom, CTransaction txCo
             dsq.Relay(connman);
         }
 
-        UpdateState(POOL_STATUS_QUEUE);
+        UpdateState(POOL_STATUS_QUEUE, connman);
         vecSessionCollateral.push_back(txCollateral);
         return true;
     }
