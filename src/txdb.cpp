@@ -45,14 +45,14 @@ struct CoinEntry {
   void Serialize(Stream &s) const {
       s << key;
       s << outpoint->hash;
-      s << VARINT(outpoint->n, VarIntMode::NONNEGATIVE_SIGNED);
+      s << VARINT(outpoint->n);
   }
 
   template<typename Stream>
   void Unserialize(Stream& s) {
       s >> key;
       s >> outpoint->hash;
-      s >> VARINT(outpoint->n, VarIntMode::NONNEGATIVE_SIGNED);
+      s >> VARINT(outpoint->n);
   }
 };
 
