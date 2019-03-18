@@ -210,6 +210,7 @@ public:
     bool CheckIncomingNonce(uint64_t nonce);
 
     bool ForNode(NodeId id, std::function<bool(CNode* pnode)> func);
+    bool ForNode(const CService& addr, std::function<bool(const CNode* pnode)> cond, std::function<bool(CNode* pnode)> func);
 
     void PushMessage(CNode* pnode, CSerializedNetMsg&& msg);
 
@@ -327,6 +328,19 @@ public:
         Variable intervals will result in privacy decrease.
     */
     int64_t PoissonNextSendInbound(int64_t now, int average_interval_seconds);
+    bool OpenMasternodeConnection(const CAddress& addrConnect);
+    struct CAllNodes {
+        bool operator() (const CNode*) const {return true;}
+    };
+    std::vector<CNode*> CopyNodeVector(std::function<bool(const CNode* pnode)> cond);
+    std::vector<CNode*> CopyNodeVector();
+    constexpr static const CAllNodes AllNodes{};
+    bool IsConnected(const CService& addr, std::function<bool(const CNode* pnode)> cond)
+    {
+        return ForNode(addr, cond, [](CNode* pnode){
+            return true;
+        });
+    }
 
 private:
     struct ListenSocket {

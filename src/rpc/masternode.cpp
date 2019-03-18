@@ -5,6 +5,7 @@
 
 #include "activemasternode.h"
 #include <wallet/db.h>
+#include "netbase.h"
 #include "main.h"
 #include "masternode-budget.h"
 #include "masternode-payments.h"
@@ -268,9 +269,13 @@ UniValue listmasternodes(const JSONRPCRequest& request)
             std::string strHost;
             int port;
             SplitHostPort(mn->addr.ToString(), port, strHost);
-            CNetAddr node = CNetAddr(strHost, false);
-            std::string strNetwork = GetNetworkName(node.GetNetwork());
+            CService node;
+//            CNetAddr node = CNetAddr(strHost, false);
+            if (!Lookup(strHost.c_str(), node, 0, false)){
+                continue;
+            }
 
+            std::string strNetwork = GetNetworkName(node.GetNetwork());
             obj.pushKV("rank", (strStatus == "ENABLED" ? s.first : 0));
             obj.pushKV("network", strNetwork);
             obj.pushKV("txhash", strTxHash);
@@ -305,15 +310,16 @@ UniValue masternodeconnect(const JSONRPCRequest& request)
 
     std::string strAddress = request.params[0].get_str();
 
-    CService addr = CService(strAddress);
+    CService addr;
+    if (!Lookup(strAddress.c_str(), addr, 0, false))
+        throw JSONRPCError(RPC_INTERNAL_ERROR, strprintf("Incorrect masternode address %s", strAddress));
 
-    CNode* pnode = ConnectNode((CAddress)addr, nullptr, false);
-    if (pnode) {
-        pnode->Release();
-        return NullUniValue;
-    } else {
-        throw runtime_error("error connecting\n");
-    }
+    // TODO: Pass CConnman instance somehow and don't use global variable.
+    g_connman->OpenMasternodeConnection(CAddress(addr, NODE_NETWORK));
+    if (!g_connman->IsConnected(CAddress(addr, NODE_NETWORK), CConnman::AllNodes))
+        throw JSONRPCError(RPC_INTERNAL_ERROR, strprintf("Couldn't connect to masternode %s", strAddress));
+
+    return "successfully connected";
 }
 
 UniValue getmasternodecount (const JSONRPCRequest& request)

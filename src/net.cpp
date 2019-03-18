@@ -75,6 +75,7 @@ enum BindFlags {
 static const uint64_t SELECT_TIMEOUT_MILLISECONDS = 50;
 
 const std::string NET_MESSAGE_COMMAND_OTHER = "*other*";
+constexpr const CConnman::CAllNodes CConnman::AllNodes;
 
 static const uint64_t RANDOMIZER_ID_NETGROUP = 0x6c0edd8036ef4036ULL; // SHA256("netgroup")[0:8]
 static const uint64_t RANDOMIZER_ID_LOCALHOSTNONCE = 0xd93e69e2bbfa5735ULL; // SHA256("localhostnonce")[0:8]
@@ -2759,6 +2760,40 @@ uint64_t CConnman::CalculateKeyedNetGroup(const CAddress& ad) const
     return GetDeterministicRandomizer(RANDOMIZER_ID_NETGROUP).Write(vchNetGroup.data(), vchNetGroup.size()).Finalize();
 }
 
+//!WISPR
+std::vector<CNode*> CConnman::CopyNodeVector(std::function<bool(const CNode* pnode)> cond)
+{
+    std::vector<CNode*> vecNodesCopy;
+    LOCK(cs_vNodes);
+    for(size_t i = 0; i < vNodes.size(); ++i) {
+        CNode* pnode = vNodes[i];
+        if (!cond(pnode))
+            continue;
+        pnode->AddRef();
+        vecNodesCopy.push_back(pnode);
+    }
+    return vecNodesCopy;
+}
+
+std::vector<CNode*> CConnman::CopyNodeVector()
+{
+    return CopyNodeVector(AllNodes);
+}
+bool CConnman::OpenMasternodeConnection(const CAddress &addrConnect) {
+    return OpenNetworkConnection(addrConnect, false, NULL, NULL, false, false, false, true);
+}
+bool CConnman::ForNode(const CService& addr, std::function<bool(const CNode* pnode)> cond, std::function<bool(CNode* pnode)> func)
+{
+    CNode* found = nullptr;
+    LOCK(cs_vNodes);
+    for (auto&& pnode : vNodes) {
+        if((CService)pnode->addr == addr) {
+            found = pnode;
+            break;
+        }
+    }
+    return found != nullptr && cond(found) && func(found);
+}
 //!OLD
 void AddressCurrentlyConnected(const CService& addr)
 {
