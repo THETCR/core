@@ -269,9 +269,9 @@ UniValue listmasternodes(const JSONRPCRequest& request)
             std::string strHost;
             int port;
             SplitHostPort(mn->addr.ToString(), port, strHost);
-            CService node;
+            CNetAddr node;
 //            CNetAddr node = CNetAddr(strHost, false);
-            if (!Lookup(strHost.c_str(), node, 0, false)){
+            if (!LookupHost(strHost.c_str(), node, false)){
                 continue;
             }
 
