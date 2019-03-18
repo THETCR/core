@@ -40,6 +40,9 @@ public:
     explicit CNetAddr(const struct in_addr& ipv4Addr);
     void SetIP(const CNetAddr& ip);
 
+    //!OLD
+    explicit CNetAddr(const char* pszIp, bool fAllowLookup = false);
+    explicit CNetAddr(const std::string& strIp, bool fAllowLookup = false);
 private:
     /**
      * Set raw IPv4 or IPv6 address (in network byte order)
@@ -163,6 +166,12 @@ public:
 
     CService(const struct in6_addr& ipv6Addr, unsigned short port);
     explicit CService(const struct sockaddr_in6& addr);
+
+    //!OLD
+    explicit CService(const char* pszIpPort, int portDefault, bool fAllowLookup = false);
+    explicit CService(const char* pszIpPort, bool fAllowLookup = false);
+    explicit CService(const std::string& strIpPort, int portDefault, bool fAllowLookup = false);
+    explicit CService(const std::string& strIpPort, bool fAllowLookup = false);
 
     ADD_SERIALIZE_METHODS;
 

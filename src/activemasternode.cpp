@@ -8,6 +8,8 @@
 #include "masternode.h"
 #include "masternodeconfig.h"
 #include "masternodeman.h"
+#include "netbase.h"
+#include "netmessagemaker.h"
 #include "protocol.h"
 #include "spork.h"
 #include <wallet/wallet.h>
@@ -66,7 +68,7 @@ void CActiveMasternode::ManageStatus()
                 return;
             }
         } else {
-            service = CService(strMasterNodeAddr);
+            Lookup(strMasterNodeAddr.c_str(), service, Params().GetDefaultPort(), true);
         }
 
         // The service needs the correct default port to work properly
@@ -75,13 +77,14 @@ void CActiveMasternode::ManageStatus()
 
         LogPrintf("CActiveMasternode::ManageStatus() - Checking inbound connection to '%s'\n", service.ToString());
 
-        CNode* pnode = ConnectNode((CAddress)service, nullptr, false);
-        if (!pnode) {
+        SOCKET hSocket;
+        bool fConnected = ConnectSocket(service, hSocket, nConnectTimeout) && IsSelectableSocket(hSocket);
+        CloseSocket(hSocket);
+        if (!fConnected) {
             notCapableReason = "Could not connect to " + service.ToString();
             LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason);
             return;
         }
-        pnode->Release();
 
         // Choose coins to use
         CPubKey pubKeyCollateralAddress;
@@ -221,7 +224,7 @@ bool CActiveMasternode::SendMasternodePing(std::string& errorMessage)
         LogPrint(BCLog::MASTERNODE, "dseep - relaying from active mn, %s \n", vin.ToString().c_str());
         LOCK(cs_vNodes);
         for (CNode* pnode: vNodes)
-        pnode->PushMessage("dseep", vin, vchMasterNodeSignature, masterNodeSignatureTime, false);
+            g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dseep", vin, vchMasterNodeSignature, masterNodeSignatureTime, false));
 
         /*
          * END OF "REMOVE"
@@ -264,8 +267,8 @@ bool CActiveMasternode::CreateBroadcast(std::string strService, std::string strK
         return false;
     }
 
-    CService service = CService(strService);
-
+    CService service;
+    Lookup(strService.c_str(), service, Params().GetDefaultPort(), true);
     // The service needs the correct default port to work properly
     if(!CMasternodeBroadcast::CheckDefaultPort(strService, errorMessage, "CActiveMasternode::CreateBroadcast()"))
         return false;
@@ -329,7 +332,7 @@ bool CActiveMasternode::CreateBroadcast(CTxIn vin, CService service, CKey keyCol
 
     LOCK(cs_vNodes);
     for (CNode* pnode: vNodes)
-    pnode->PushMessage("dsee", vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION, donationAddress, donationPercantage);
+    g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dsee", vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION, donationAddress, donationPercantage));
 
     /*
      * END OF "REMOVE"

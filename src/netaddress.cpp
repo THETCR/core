@@ -7,6 +7,7 @@
 #include <hash.h>
 #include <util/strencodings.h>
 #include <tinyformat.h>
+#include <netbase.h>
 
 static const unsigned char pchIPv4[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff };
 static const unsigned char pchOnionCat[] = {0xFD,0x87,0xD8,0x7E,0xEB,0x43};
@@ -718,4 +719,54 @@ bool operator==(const CSubNet& a, const CSubNet& b)
 bool operator<(const CSubNet& a, const CSubNet& b)
 {
     return (a.network < b.network || (a.network == b.network && memcmp(a.netmask, b.netmask, 16) < 0));
+}
+
+//!OLD
+CNetAddr::CNetAddr(const char* pszIp, bool fAllowLookup)
+{
+    memset(ip, 0, sizeof(ip));
+    std::vector<CNetAddr> vIP;
+    if (LookupHost(pszIp, vIP, 1, fAllowLookup))
+        *this = vIP[0];
+}
+
+CNetAddr::CNetAddr(const std::string& strIp, bool fAllowLookup)
+{
+    memset(ip, 0, sizeof(ip));
+    std::vector<CNetAddr> vIP;
+    if (LookupHost(strIp.c_str(), vIP, 1, fAllowLookup))
+        *this = vIP[0];
+}
+
+//!OLD
+CService::CService(const char* pszIpPort, bool fAllowLookup)
+{
+    port = 0;
+    CService ip;
+    if (Lookup(pszIpPort, ip, 0, fAllowLookup))
+        *this = ip;
+}
+
+CService::CService(const char* pszIpPort, int portDefault, bool fAllowLookup)
+{
+    port = 0;
+    CService ip;
+    if (Lookup(pszIpPort, ip, portDefault, fAllowLookup))
+        *this = ip;
+}
+
+CService::CService(const std::string& strIpPort, bool fAllowLookup)
+{
+    port = 0;
+    CService ip;
+    if (Lookup(strIpPort.c_str(), ip, 0, fAllowLookup))
+        *this = ip;
+}
+
+CService::CService(const std::string& strIpPort, int portDefault, bool fAllowLookup)
+{
+    port = 0;
+    CService ip;
+    if (Lookup(strIpPort.c_str(), ip, portDefault, fAllowLookup))
+        *this = ip;
 }
