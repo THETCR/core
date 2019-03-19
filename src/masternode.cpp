@@ -841,5 +841,5 @@ bool CMasternodePing::CheckAndUpdate(int& nDos, bool fRequireEnabled, bool fChec
 void CMasternodePing::Relay()
 {
     CInv inv(MSG_MASTERNODE_PING, GetHash());
-    RelayInv(inv);
+    RelayInv(inv, g_connman.get());
 }
