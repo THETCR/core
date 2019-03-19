@@ -8393,3 +8393,19 @@ void CWallet::setZWallet(CzWSPWallet* zwallet)
     zwalletMain = zwallet;
     zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(strWalletFile, m_chain, m_location, WalletDatabase::Create(m_location.GetPath())));
 }
+
+//!OLD
+void CWallet::SyncTransaction(const CTransaction& tx, const CBlock* pblock)
+{
+    LOCK2(cs_main, cs_wallet);
+    if (!AddToWalletIfInvolvingMe(tx, pblock, true))
+        return; // Not one of ours
+
+    // If a transaction changes 'conflicted' state, that changes the balance
+    // available of the outputs it spends. So force those to be
+    // recomputed, also:
+    for (const CTxIn& txin: tx.vin) {
+        if (!tx.IsZerocoinSpend() && mapWallet.count(txin.prevout.hash))
+            mapWallet[txin.prevout.hash].MarkDirty();
+    }
+}
