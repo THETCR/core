@@ -52,7 +52,8 @@ void EnsureWalletIsUnlocked(bool fAllowAnonOnly)
 
 void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
 {
-    int confirms = wtx.GetDepthInMainChain(false);
+    auto locked_chain = pwalletMain->chain().lock();
+    int confirms = wtx.GetDepthInMainChain(*locked_chain, false);
     int confirmsTotal = GetIXConfirmations(wtx.tx->GetHash()) + confirms;
     entry.pushKV("confirmations", confirmsTotal);
     entry.pushKV("bcconfirmations", confirms);
@@ -126,7 +127,7 @@ UniValue getnewaddress(const JSONRPCRequest& request)
 
 CBitcoinAddress GetAccountAddress(string strAccount, bool bForceNew = false)
 {
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
 
     CAccount account;
     walletdb.ReadAccount(strAccount, account);
@@ -477,10 +478,11 @@ UniValue listaddressgroupings(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("listaddressgroupings", "") + HelpExampleRpc("listaddressgroupings", ""));
 
+    auto locked_chain = pwalletMain->chain().lock();
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     UniValue jsonGroupings(UniValue::VARR);
-    map<CTxDestination, CAmount> balances = pwalletMain->GetAddressBalances();
+    map<CTxDestination, CAmount> balances = pwalletMain->GetAddressBalances(*locked_chain);
     for (set<CTxDestination> grouping: pwalletMain->GetAddressGroupings()) {
         UniValue jsonGrouping(UniValue::VARR);
         for (CTxDestination address: grouping) {
@@ -577,6 +579,7 @@ UniValue getreceivedbyaddress(const JSONRPCRequest& request)
             "\nAs a json rpc call\n" +
             HelpExampleRpc("getreceivedbyaddress", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\", 6"));
 
+    auto locked_chain = pwalletMain->chain().lock();
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     // wispr address
@@ -601,7 +604,7 @@ UniValue getreceivedbyaddress(const JSONRPCRequest& request)
 
         for (const CTxOut& txout: wtx.tx->vout)
             if (txout.scriptPubKey == scriptPubKey)
-                if (wtx.GetDepthInMainChain() >= nMinDepth)
+                if (wtx.GetDepthInMainChain(*locked_chain) >= nMinDepth)
                     nAmount += txout.nValue;
     }
 
@@ -633,6 +636,7 @@ UniValue getreceivedbyaccount(const JSONRPCRequest& request)
             "\nAs a json rpc call\n" +
             HelpExampleRpc("getreceivedbyaccount", "\"tabby\", 6"));
 
+    auto locked_chain = pwalletMain->chain().lock();
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     // Minimum confirmations
@@ -654,7 +658,7 @@ UniValue getreceivedbyaccount(const JSONRPCRequest& request)
         for (const CTxOut& txout: wtx.tx->vout) {
             CTxDestination address;
             if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*pwalletMain, address) && setAddress.count(address))
-                if (wtx.GetDepthInMainChain() >= nMinDepth)
+                if (wtx.GetDepthInMainChain(*locked_chain) >= nMinDepth)
                     nAmount += txout.nValue;
         }
     }
@@ -663,20 +667,20 @@ UniValue getreceivedbyaccount(const JSONRPCRequest& request)
 }
 
 
-CAmount GetAccountBalance(CWalletDB& walletdb, const std::string& strAccount, int nMinDepth, const isminefilter& filter)
+CAmount GetAccountBalance(WalletBatch& walletdb, const std::string& strAccount, int nMinDepth, const isminefilter& filter)
 {
     CAmount nBalance = 0;
-
+    auto locked_chain = pwalletMain->chain().lock();
     // Tally wallet transactions
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it) {
         const CWalletTx& wtx = (*it).second;
-        if (!CheckFinalTx(*wtx.tx) || wtx.GetBlocksToMaturity() > 0 || wtx.GetDepthInMainChain() < 0)
+        if (!CheckFinalTx(*wtx.tx) || wtx.GetBlocksToMaturity(*locked_chain) > 0 || wtx.GetDepthInMainChain(*locked_chain) < 0)
             continue;
 
         CAmount nReceived, nSent, nFee;
         wtx.GetAccountAmounts(strAccount, nReceived, nSent, nFee, filter);
 
-        if (nReceived != 0 && wtx.GetDepthInMainChain() >= nMinDepth)
+        if (nReceived != 0 && wtx.GetDepthInMainChain(*locked_chain) >= nMinDepth)
             nBalance += nReceived;
         nBalance -= nSent + nFee;
     }
@@ -689,7 +693,7 @@ CAmount GetAccountBalance(CWalletDB& walletdb, const std::string& strAccount, in
 
 CAmount GetAccountBalance(const std::string& strAccount, int nMinDepth, const isminefilter& filter)
 {
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     return GetAccountBalance(walletdb, strAccount, nMinDepth, filter);
 }
 
@@ -724,6 +728,7 @@ UniValue getbalance(const JSONRPCRequest& request)
             "\nAs a json rpc call\n" +
             HelpExampleRpc("getbalance", "\"tabby\", 6"));
 
+    auto locked_chain = pwalletMain->chain().lock();
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     if (request.params.size() == 0)
@@ -744,15 +749,15 @@ UniValue getbalance(const JSONRPCRequest& request)
         CAmount nBalance = 0;
         for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it) {
             const CWalletTx& wtx = (*it).second;
-            if (!CheckFinalTx(*wtx.tx) || wtx.GetBlocksToMaturity() > 0 || wtx.GetDepthInMainChain() < 0)
+            if (!CheckFinalTx(*wtx.tx) || wtx.GetBlocksToMaturity(*locked_chain) > 0 || wtx.GetDepthInMainChain(*locked_chain) < 0)
                 continue;
 
             CAmount allFee;
             std::string strSentAccount;
             std::list<COutputEntry> listReceived;
             std::list<COutputEntry> listSent;
-            wtx.GetAmounts(listReceived, listSent, allFee, strSentAccount, filter);
-            if (wtx.GetDepthInMainChain() >= nMinDepth) {
+            wtx.GetAmounts(listReceived, listSent, allFee, filter);
+            if (wtx.GetDepthInMainChain(*locked_chain) >= nMinDepth) {
                 for (const COutputEntry& r: listReceived)
                     nBalance += r.amount;
             }
@@ -820,7 +825,7 @@ UniValue movecmd(const JSONRPCRequest& request)
     if (request.params.size() > 4)
         strComment = request.params[4].get_str();
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     if (!walletdb.TxnBegin())
         throw JSONRPCError(RPC_DATABASE_ERROR, "database error");
 
@@ -834,7 +839,7 @@ UniValue movecmd(const JSONRPCRequest& request)
     debit.nTime = nNow;
     debit.strOtherAccount = strTo;
     debit.strComment = strComment;
-    pwalletMain->AddAccountingEntry(debit, walletdb);
+//    pwalletMain->AddAccountingEntry(debit, walletdb);
 
     // Credit
     CAccountingEntry credit;
@@ -844,7 +849,7 @@ UniValue movecmd(const JSONRPCRequest& request)
     credit.nTime = nNow;
     credit.strOtherAccount = strFrom;
     credit.strComment = strComment;
-    pwalletMain->AddAccountingEntry(credit, walletdb);
+//    pwalletMain->AddAccountingEntry(credit, walletdb);
 
     if (!walletdb.TxnCommit())
         throw JSONRPCError(RPC_DATABASE_ERROR, "database error");
@@ -1063,6 +1068,7 @@ struct tallyitem {
 UniValue ListReceived(const UniValue& params, bool fByAccounts)
 {
     // Minimum confirmations
+    auto locked_chain = pwalletMain->chain().lock();
     int nMinDepth = 1;
     if (params.size() > 0)
         nMinDepth = params[0].get_int();
@@ -1085,8 +1091,8 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
         if (wtx.tx->IsCoinBase() || !CheckFinalTx(*wtx.tx))
             continue;
 
-        int nDepth = wtx.GetDepthInMainChain();
-        int nBCDepth = wtx.GetDepthInMainChain(false);
+        int nDepth = wtx.GetDepthInMainChain(*locked_chain);
+        int nBCDepth = wtx.GetDepthInMainChain(*locked_chain, false);
         if (nDepth < nMinDepth)
             continue;
 
@@ -1249,12 +1255,13 @@ static void MaybePushAddress(UniValue & entry, const CTxDestination &dest)
 
 void ListTransactions(const CWalletTx& wtx, const std::string& strAccount, int nMinDepth, bool fLong, UniValue& ret, const isminefilter& filter)
 {
+    auto locked_chain = pwalletMain->chain().lock();
     CAmount nFee;
     std::string strSentAccount;
     std::list<COutputEntry> listReceived;
     std::list<COutputEntry> listSent;
 
-    wtx.GetAmounts(listReceived, listSent, nFee, strSentAccount, filter);
+    wtx.GetAmounts(listReceived, listSent, nFee, filter);
 
     bool fAllAccounts = (strAccount == std::string("*"));
     bool involvesWatchonly = wtx.IsFromMe(ISMINE_WATCH_ONLY);
@@ -1279,7 +1286,7 @@ void ListTransactions(const CWalletTx& wtx, const std::string& strAccount, int n
     }
 
     // Received
-    if (listReceived.size() > 0 && wtx.GetDepthInMainChain() >= nMinDepth) {
+    if (listReceived.size() > 0 && wtx.GetDepthInMainChain(*locked_chain) >= nMinDepth) {
         for (const COutputEntry& r: listReceived) {
             std::string account;
             if (pwalletMain->mapAddressBook.count(r.destination))
@@ -1291,9 +1298,9 @@ void ListTransactions(const CWalletTx& wtx, const std::string& strAccount, int n
                 entry.pushKV("account", account);
                 MaybePushAddress(entry, r.destination);
                 if (wtx.tx->IsCoinBase()) {
-                    if (wtx.GetDepthInMainChain() < 1)
+                    if (wtx.GetDepthInMainChain(*locked_chain) < 1)
                         entry.pushKV("category", "orphan");
-                    else if (wtx.GetBlocksToMaturity() > 0)
+                    else if (wtx.GetBlocksToMaturity(*locked_chain) > 0)
                         entry.pushKV("category", "immature");
                     else
                         entry.pushKV("category", "generate");
@@ -1412,15 +1419,11 @@ UniValue listtransactions(const JSONRPCRequest& request)
     const CWallet::TxItems & txOrdered = pwalletMain->wtxOrdered;
 
     // iterate backwards until we have nCount items to return:
-    for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
-        CWalletTx* const pwtx = (*it).second.first;
-        if (pwtx != 0)
-            ListTransactions(*pwtx, strAccount, 0, true, ret, filter);
-        CAccountingEntry* const pacentry = (*it).second.second;
-        if (pacentry != 0)
-            AcentryToJSON(*pacentry, strAccount, ret);
-
-        if ((int)ret.size() >= (nCount + nFrom)) break;
+    for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it)
+    {
+        CWalletTx *const pwtx = (*it).second;
+        ListTransactions(*pwtx, strAccount, 0, true, ret, filter);
+        if ((int)ret.size() >= (nCount+nFrom)) break;
     }
     // ret is newest to oldest
 
@@ -1475,6 +1478,7 @@ UniValue listaccounts(const JSONRPCRequest& request)
             "\nAs json rpc call\n" +
             HelpExampleRpc("listaccounts", "6"));
 
+    auto locked_chain = pwalletMain->chain().lock();
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     int nMinDepth = 1;
@@ -1497,10 +1501,10 @@ UniValue listaccounts(const JSONRPCRequest& request)
         std::string strSentAccount;
         std::list<COutputEntry> listReceived;
         std::list<COutputEntry> listSent;
-        int nDepth = wtx.GetDepthInMainChain();
-        if (wtx.GetBlocksToMaturity() > 0 || nDepth < 0)
+        int nDepth = wtx.GetDepthInMainChain(*locked_chain);
+        if (wtx.GetBlocksToMaturity(*locked_chain) > 0 || nDepth < 0)
             continue;
-        wtx.GetAmounts(listReceived, listSent, nFee, strSentAccount, includeWatchonly);
+        wtx.GetAmounts(listReceived, listSent, nFee, includeWatchonly);
         mapAccountBalances[strSentAccount] -= nFee;
         for (const COutputEntry& s: listSent)
             mapAccountBalances[strSentAccount] -= s.amount;
@@ -1565,6 +1569,7 @@ UniValue listsinceblock(const JSONRPCRequest& request)
             HelpExampleCli("listsinceblock", "\"000000000000000bacf66f7497b7dc45ef753ee9a7d38571037cdb1a57f663ad\" 6") +
             HelpExampleRpc("listsinceblock", "\"000000000000000bacf66f7497b7dc45ef753ee9a7d38571037cdb1a57f663ad\", 6"));
 
+    auto locked_chain = pwalletMain->chain().lock();
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     CBlockIndex* pindex = nullptr;
@@ -1598,7 +1603,7 @@ UniValue listsinceblock(const JSONRPCRequest& request)
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); it++) {
         CWalletTx tx = (*it).second;
 
-        if (depth == -1 || tx.GetDepthInMainChain(false) < depth)
+        if (depth == -1 || tx.GetDepthInMainChain(*locked_chain, false) < depth)
             ListTransactions(tx, "*", 0, true, transactions, filter);
     }
 
@@ -1652,6 +1657,7 @@ UniValue gettransaction(const JSONRPCRequest& request)
             HelpExampleCli("gettransaction", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\" true") +
             HelpExampleRpc("gettransaction", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\""));
 
+    auto locked_chain = pwalletMain->chain().lock();
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     uint256 hash;
@@ -1667,7 +1673,7 @@ UniValue gettransaction(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid or non-wallet transaction id");
     const CWalletTx& wtx = pwalletMain->mapWallet[hash];
 
-    CAmount nCredit = wtx.GetCredit(filter);
+    CAmount nCredit = wtx.GetCredit(*locked_chain, filter);
     CAmount nDebit = wtx.GetDebit(filter);
     CAmount nNet = nCredit - nDebit;
     CAmount nFee = (wtx.IsFromMe(filter) ? wtx.tx->GetValueOut() - nDebit : 0);
@@ -1705,7 +1711,7 @@ UniValue backupwallet(const JSONRPCRequest& request)
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     std::string strDest = request.params[0].get_str();
-    if (!BackupWallet(*pwalletMain, strDest))
+    if (!pwalletMain->BackupWallet(strDest))
         throw JSONRPCError(RPC_WALLET_ERROR, "Error: Wallet backup failed!");
 
     return NullUniValue;
@@ -2226,7 +2232,7 @@ UniValue setstakesplitthreshold(const JSONRPCRequest& request)
     if (nStakeSplitThreshold > 999999)
         throw runtime_error("Value out of range, max allowed is 999999");
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     LOCK(pwalletMain->cs_wallet);
     {
         bool fFileBacked = pwalletMain->fFileBacked;
@@ -2280,7 +2286,7 @@ UniValue autocombinerewards(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("autocombinerewards", "true 500") + HelpExampleRpc("autocombinerewards", "true 500"));
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     CAmount nThreshold = 0;
 
     if (fEnable)
@@ -2362,7 +2368,7 @@ unsigned int sumMultiSend()
 
 UniValue multisend(const JSONRPCRequest& request)
 {
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     bool fFileBacked;
     //MultiSend Commands
     if (request.params.size() == 1) {
@@ -2608,7 +2614,7 @@ UniValue listmintedzerocoins(const JSONRPCRequest& request)
 
     EnsureWalletIsUnlocked(true);
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     set<CMintMeta> setMints = pwalletMain->zwspTracker->ListMints(true, fMatureOnly, true);
 
     int nBestHeight = chainActive.Height();
@@ -2661,7 +2667,7 @@ UniValue listzerocoinamounts(const JSONRPCRequest& request)
 
     EnsureWalletIsUnlocked(true);
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     set<CMintMeta> setMints = pwalletMain->zwspTracker->ListMints(true, true, true);
 
     std::map<libzerocoin::CoinDenomination, CAmount> spread;
@@ -2702,7 +2708,7 @@ UniValue listspentzerocoins(const JSONRPCRequest& request)
 
     EnsureWalletIsUnlocked(true);
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     std::list<CBigNum> listPubCoin = walletdb.ListSpentCoinsSerial();
 
     UniValue jsonList(UniValue::VARR);
@@ -3066,7 +3072,7 @@ UniValue resetmintzerocoin(const JSONRPCRequest& request)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     CzWSPTracker* zwspTracker = pwalletMain->zwspTracker.get();
     set<CMintMeta> setMints = zwspTracker->ListMints(false, false, true);
     std::vector<CMintMeta> vMintsToFind(setMints.begin(), setMints.end());
@@ -3119,7 +3125,7 @@ UniValue resetspentzerocoin(const JSONRPCRequest& request)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     CzWSPTracker* zwspTracker = pwalletMain->zwspTracker.get();
     set<CMintMeta> setMints = zwspTracker->ListMints(false, false, false);
     std::list<CZerocoinSpend> listSpends = walletdb.ListSpentCoins();
@@ -3186,7 +3192,7 @@ UniValue getarchivedzerocoin(const JSONRPCRequest& request)
 
     EnsureWalletIsUnlocked();
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     std::list<CZerocoinMint> listMints = walletdb.ListArchivedZerocoins();
     std::list<CDeterministicMint> listDMints = walletdb.ListArchivedDeterministicMints();
 
@@ -3250,7 +3256,7 @@ UniValue exportzerocoins(const JSONRPCRequest& request)
 
     EnsureWalletIsUnlocked();
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
 
     bool fIncludeSpent = request.params[0].get_bool();
     libzerocoin::CoinDenomination denomination = libzerocoin::ZQ_ERROR;
@@ -3321,7 +3327,7 @@ UniValue importzerocoins(const JSONRPCRequest& request)
 
     RPCTypeCheck(request.params, {UniValue::VARR, UniValue::VOBJ});
     UniValue arrMints = request.params[0].get_array();
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
 
     int count = 0;
     CAmount nValue = 0;
@@ -3566,7 +3572,7 @@ UniValue dzwspstate(const JSONRPCRequest& request) {
 void static SearchThread(CzWSPWallet* zwallet, int nCountStart, int nCountEnd)
 {
     LogPrintf("%s: start=%d end=%d\n", __func__, nCountStart, nCountEnd);
-    CWalletDB walletDB(pwalletMain->strWalletFile);
+    WalletBatch walletDB(pwalletMain->GetDBHandle());
     try {
         uint256 seedMaster = zwallet->GetMasterSeed();
         uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
