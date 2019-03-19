@@ -1052,7 +1052,7 @@ void RPCConsole::unbanSelectedNode()
         return;
 
     // Get selected ban addresses
-    QList<QModelIndex> nodes = GUIUtil::getEntryData(ui->banlistWidget, BanTableModel::Address);
+    QList<QModelIndex> nodes = GUIUtil::getEntryData(ui->banlistWidget, 0, BanTableModel::Address);
     for(int i = 0; i < nodes.count(); i++)
     {
         // Get currently selected ban address
