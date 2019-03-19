@@ -25,7 +25,7 @@ public:
 private:
     TransactionDesc() {}
 
-    static QString FormatTxStatus(const CWalletTx& wtx);
+    static QString FormatTxStatus(CWallet* wallet, const CWalletTx& wtx);
 };
 
 #endif // BITCOIN_QT_TRANSACTIONDESC_H
