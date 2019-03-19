@@ -173,7 +173,7 @@ private:
   friend void ::UnregisterAllValidationInterfaces();
   friend void ::CallFunctionInValidationInterfaceQueue(std::function<void ()> func);
 
-//  void MempoolEntryRemoved(CTransactionRef tx, MemPoolRemovalReason reason);
+  void MempoolEntryRemoved(CTransactionRef tx, MemPoolRemovalReason reason);
 
 public:
   /** Register a CScheduler to give callbacks which should run in the background (may only be called once) */

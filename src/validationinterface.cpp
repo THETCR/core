@@ -101,16 +101,16 @@ size_t CMainSignals::CallbacksPending() {
     return m_internals->m_schedulerClient.CallbacksPending();
 }
 
-//void CMainSignals::RegisterWithMempoolSignals(CTxMemPool& pool) {
-//    g_connNotifyEntryRemoved.emplace(std::piecewise_construct,
-//                                     std::forward_as_tuple(&pool),
-//                                     std::forward_as_tuple(pool.NotifyEntryRemoved.connect(std::bind(&CMainSignals::MempoolEntryRemoved, this, std::placeholders::_1, std::placeholders::_2)))
-//    );
-//}
-//
-//void CMainSignals::UnregisterWithMempoolSignals(CTxMemPool& pool) {
-//    g_connNotifyEntryRemoved.erase(&pool);
-//}
+void CMainSignals::RegisterWithMempoolSignals(CTxMemPool& pool) {
+    g_connNotifyEntryRemoved.emplace(std::piecewise_construct,
+                                     std::forward_as_tuple(&pool),
+                                     std::forward_as_tuple(pool.NotifyEntryRemoved.connect(std::bind(&CMainSignals::MempoolEntryRemoved, this, std::placeholders::_1, std::placeholders::_2)))
+    );
+}
+
+void CMainSignals::UnregisterWithMempoolSignals(CTxMemPool& pool) {
+    g_connNotifyEntryRemoved.erase(&pool);
+}
 
 CMainSignals& GetMainSignals()
 {
