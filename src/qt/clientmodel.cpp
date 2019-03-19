@@ -14,6 +14,8 @@
 #include "chainparams.h"
 #include "checkpoints.h"
 #include "clientversion.h"
+#include <interfaces/handler.h>
+#include <interfaces/node.h>
 #include "main.h"
 #include "masternode-sync.h"
 #include "masternodeman.h"
@@ -21,6 +23,7 @@
 #include "netbase.h"
 #include "ui_interface.h"
 #include <util/system.h>
+#include <warnings.h>
 
 #include <stdint.h>
 
@@ -31,7 +34,8 @@
 static const int64_t nClientStartupTime = GetTime();
 static int64_t nLastHeaderTipUpdateNotification = 0;
 static int64_t nLastBlockTipUpdateNotification = 0;
-ClientModel::ClientModel(OptionsModel* optionsModel, QObject* parent) : QObject(parent),
+ClientModel::ClientModel(interfaces::Node& node, OptionsModel* optionsModel, QObject* parent) : QObject(parent),
+                                                                        m_node(node),
                                                                         optionsModel(optionsModel),
                                                                         peerTableModel(0),
                                                                         banTableModel(0),
@@ -41,7 +45,7 @@ ClientModel::ClientModel(OptionsModel* optionsModel, QObject* parent) : QObject(
                                                                         numBlocksAtStartup(-1), pollTimer(0)
 {
     peerTableModel = new PeerTableModel(this);
-    banTableModel = new BanTableModel(this);
+    banTableModel = new BanTableModel(m_node, this);
     pollTimer = new QTimer(this);
     connect(pollTimer, SIGNAL(timeout()), this, SLOT(updateTimer()));
     pollTimer->start(MODEL_UPDATE_DELAY);
@@ -96,12 +100,12 @@ int ClientModel::getNumBlocksAtStartup()
 
 quint64 ClientModel::getTotalBytesRecv() const
 {
-    return CNode::GetTotalBytesRecv();
+    return m_node.getTotalBytesRecv();
 }
 
 quint64 ClientModel::getTotalBytesSent() const
 {
-    return CNode::GetTotalBytesSent();
+    return m_node.getTotalBytesSent();
 }
 
 QDateTime ClientModel::getLastBlockDate() const

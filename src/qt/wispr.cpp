@@ -31,11 +31,14 @@
 #include <init.h>
 #include <masternodeconfig.h>
 
+#include <interfaces/handler.h>
+#include <interfaces/node.h>
 #include <noui.h>
 #include <rpc/server.h>
 #include <ui_interface.h>
 #include <uint256.h>
 #include <util/system.h>
+#include <warnings.h>
 
 #include "shutdown.h"
 #include <fs.h>
@@ -191,7 +194,7 @@ class BitcoinApplication : public QApplication
 {
     Q_OBJECT
 public:
-    explicit BitcoinApplication(int& argc, char** argv);
+    explicit BitcoinApplication(interfaces::Node& node, int& argc, char** argv);
     ~BitcoinApplication();
 
 #ifdef ENABLE_WALLET
@@ -232,6 +235,7 @@ Q_SIGNALS:
 
 private:
     QThread* coreThread;
+    interfaces::Node& m_node;
     OptionsModel* optionsModel;
     ClientModel* clientModel;
     BitcoinGUI* window;
@@ -284,7 +288,6 @@ void BitcoinCore::restart(QStringList args)
             PrepareShutdown();
             qDebug() << __func__ << ": Shutdown finished";
             Q_EMIT shutdownResult(1);
-            CExplicitNetCleanup::callCleanup();
             QProcess::startDetached(QApplication::applicationFilePath(), args);
             qDebug() << __func__ << ": Restart initiated...";
             QApplication::quit();
@@ -311,8 +314,9 @@ void BitcoinCore::shutdown()
     }
 }
 
-BitcoinApplication::BitcoinApplication(int& argc, char** argv) : QApplication(argc, argv),
+BitcoinApplication::BitcoinApplication(interfaces::Node& node, int& argc, char** argv) : QApplication(argc, argv),
                                                                  coreThread(0),
+                                                                 m_node(node),
                                                                  optionsModel(nullptr),
                                                                  clientModel(nullptr),
                                                                  window(nullptr),
@@ -469,7 +473,7 @@ void BitcoinApplication::initializeResult(int retval)
         paymentServer->setOptionsModel(optionsModel);
 #endif
 
-        clientModel = new ClientModel(optionsModel);
+        clientModel = new ClientModel(m_node, optionsModel);
         window->setClientModel(clientModel);
 
 #ifdef ENABLE_WALLET
@@ -545,17 +549,28 @@ static void SetupUIArgs()
 #ifndef BITCOIN_QT_TEST
 int main(int argc, char* argv[])
 {
+#ifdef WIN32
+    util::WinCmdLineArgs winArgs;
+    std::tie(argc, argv) = winArgs.get();
+#endif
     SetupEnvironment();
 
     /// 1. Parse command-line options. These take precedence over anything else.
     // Command-line options take precedence:
+
+    std::unique_ptr<interfaces::Node> node = interfaces::MakeNode();
+
+    // Subscribe to global signals from core
+    std::unique_ptr<interfaces::Handler> handler_message_box = node->handleMessageBox(noui_ThreadSafeMessageBox);
+    std::unique_ptr<interfaces::Handler> handler_question = node->handleQuestion(noui_ThreadSafeQuestion);
+    std::unique_ptr<interfaces::Handler> handler_init_message = node->handleInitMessage(noui_InitMessage);
 // Do not refer to data directory yet, this can be overridden by Intro::pickDataDirectory
 
 /// 2. Basic Qt initialization (not dependent on parameters or configuration)
     Q_INIT_RESOURCE(wispr_locale);
     Q_INIT_RESOURCE(wispr);
 
-    BitcoinApplication app(argc, argv);
+    BitcoinApplication app(*node, argc, argv);
 #if QT_VERSION > 0x050100
     // Generate high-dpi pixmaps
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);

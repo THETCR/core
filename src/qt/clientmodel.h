@@ -19,6 +19,11 @@ class TransactionTableModel;
 class CWallet;
 class CBlockIndex;
 
+namespace interfaces {
+    class Handler;
+    class Node;
+}
+
 QT_BEGIN_NAMESPACE
 class QDateTime;
 class QTimer;
@@ -44,7 +49,7 @@ class ClientModel : public QObject
     Q_OBJECT
 
 public:
-    explicit ClientModel(OptionsModel* optionsModel, QObject* parent = 0);
+    explicit ClientModel(interfaces::Node& node, OptionsModel* optionsModel, QObject* parent = 0);
     ~ClientModel();
 
     OptionsModel* getOptionsModel();
@@ -79,6 +84,7 @@ public:
     bool getTorInfo(std::string& ip_port) const;
 
 private:
+    interfaces::Node& m_node;
     OptionsModel* optionsModel;
     PeerTableModel* peerTableModel;
     BanTableModel *banTableModel;
