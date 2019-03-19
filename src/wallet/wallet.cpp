@@ -8398,7 +8398,12 @@ void CWallet::setZWallet(CzWSPWallet* zwallet)
 void CWallet::SyncTransaction(const CTransaction& tx, const CBlock* pblock)
 {
     LOCK2(cs_main, cs_wallet);
-    if (!AddToWalletIfInvolvingMe(tx, pblock, true))
+    int posInBlock = 0;
+    for (; posInBlock < (int)pblock->vtx.size(); posInBlock++){
+        if (pblock->vtx[posInBlock] == MakeTransactionRef(tx))
+            break;
+    }
+    if (!AddToWalletIfInvolvingMe(MakeTransactionRef(tx), pblock->GetHash(), posInBlock, true))
         return; // Not one of ours
 
     // If a transaction changes 'conflicted' state, that changes the balance
