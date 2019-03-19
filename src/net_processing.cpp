@@ -742,6 +742,15 @@ void Misbehaving(NodeId pnode, int howmuch)
         LogPrintf("%s: %s peer=%d (%d -> %d)\n", __func__, state->name, pnode, state->nMisbehavior-howmuch, state->nMisbehavior);
 }
 
+// This function is used for testing the stale tip eviction logic, see
+// denialofservice_tests.cpp
+void UpdateLastBlockAnnounceTime(NodeId node, int64_t time_in_seconds)
+{
+    LOCK(cs_main);
+    CNodeState *state = State(node);
+    if (state) state->m_last_block_announcement = time_in_seconds;
+}
+
 // Returns true for outbound peers, excluding manual connections, feelers, and
 // one-shots
 static bool IsOutboundDisconnectionCandidate(const CNode *node)
