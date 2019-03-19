@@ -86,6 +86,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     pblocktree.reset(new CBlockTreeDB(1 << 20, true));
     pcoinsdbview.reset(new CCoinsViewDB(1 << 23, true));
     pcoinsTip.reset(new CCoinsViewCache(pcoinsdbview.get()));
+    std::cout << "InitBlockIndex\n";
     InitBlockIndex(chainparams);
     {
         CValidationState state;
@@ -95,11 +96,13 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     }
 #ifdef ENABLE_WALLET
     bool fFirstRun;
+    std::cout << "CWallet\n";
     pwalletMain = new CWallet("wallet.dat");
     pwalletMain->LoadWallet(fFirstRun);
     RegisterValidationInterface(pwalletMain);
 #endif
     nScriptCheckThreads = 3;
+    std::cout << "ThreadScriptCheck\n";
     for (int i=0; i < nScriptCheckThreads-1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
     g_banman = MakeUnique<BanMan>(GetDataDir() / "banlist.dat", nullptr, DEFAULT_MISBEHAVING_BANTIME);
