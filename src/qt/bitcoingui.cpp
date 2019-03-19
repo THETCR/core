@@ -30,6 +30,8 @@
 #include "macdockiconhandler.h"
 #endif
 
+#include <interfaces/handler.h>
+#include <interfaces/node.h>
 #include "masternodelist.h"
 #include "ui_interface.h"
 #include <util/system.h>
@@ -70,7 +72,8 @@ const std::string BitcoinGUI::DEFAULT_UIPLATFORM =
 
 const QString BitcoinGUI::DEFAULT_WALLET = "~Default";
 
-BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* networkStyle, QWidget* parent) : QMainWindow(parent),
+BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *platformStyle, const NetworkStyle* networkStyle, QWidget* parent) : QMainWindow(parent),
+                                                                            m_node(node),
                                                                             clientModel(0),
                                                                             walletFrame(0),
                                                                             unitDisplayControl(0),
@@ -146,7 +149,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 #endif
     setWindowTitle(windowTitle);
 
-    rpcConsole = new RPCConsole(enableWallet ? this : 0);
+    rpcConsole = new RPCConsole(node, enableWallet ? this : 0);
 #ifdef ENABLE_WALLET
     if (enableWallet) {
         /** Create wallet frame*/

@@ -14,6 +14,8 @@
 
 #include "chainparams.h"
 #include "main.h"
+#include <interfaces/node.h>
+#include <netbase.h>
 #include "rpc/client.h"
 #include "rpc/server.h"
 #include <util/system.h>
@@ -256,8 +258,9 @@ void RPCExecutor::request(const QString& command)
     }
 }
 
-RPCConsole::RPCConsole(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+RPCConsole::RPCConsole(interfaces::Node& node, QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
                                           ui(new Ui::RPCConsole),
+                                          m_node(node),
                                           clientModel(0),
                                           historyPtr(0),
                                           cachedNodeid(-1),
@@ -1004,12 +1007,15 @@ void RPCConsole::showBanTableContextMenu(const QPoint& point)
 
 void RPCConsole::disconnectSelectedNode()
 {
-    // Get currently selected peer address
-    QString strNode = GUIUtil::getEntryData(ui->peerWidget, 0, PeerTableModel::Address);
-    // Find the node, disconnect it and clear the selected node
-    if (CNode *bannedNode = FindNode(strNode.toStdString())) {
-        bannedNode->CloseSocketDisconnect();
-        clearSelectedNode();
+    // Get selected peer addresses
+    QList<QModelIndex> nodes = GUIUtil::getEntryData(ui->peerWidget, PeerTableModel::NetNodeId);
+    for(int i = 0; i < nodes.count(); i++)
+    {
+        // Get currently selected peer address
+        NodeId id = nodes.at(i).data().toLongLong();
+        // Find the node, disconnect it and clear the selected node
+        if(m_node.disconnect(id))
+            clearSelectedNode();
     }
 }
 
@@ -1018,20 +1024,26 @@ void RPCConsole::banSelectedNode(int bantime)
     if (!clientModel)
         return;
 
-    // Get currently selected peer address
-    QString strNode = GUIUtil::getEntryData(ui->peerWidget, 0, PeerTableModel::Address);
-    // Find possible nodes, ban it and clear the selected node
-    if (FindNode(strNode.toStdString())) {
-        std::string nStr = strNode.toStdString();
-        std::string addr;
-        int port = 0;
-        SplitHostPort(nStr, port, addr);
+    // Get selected peer addresses
+    QList<QModelIndex> nodes = GUIUtil::getEntryData(ui->peerWidget, PeerTableModel::NetNodeId);
+    for(int i = 0; i < nodes.count(); i++)
+    {
+        // Get currently selected peer address
+        NodeId id = nodes.at(i).data().toLongLong();
 
-        CNode::Ban(CNetAddr(addr), BanReasonManuallyAdded, bantime);
+        // Get currently selected peer address
+        int detailNodeRow = clientModel->getPeerTableModel()->getRowByNodeId(id);
+        if (detailNodeRow < 0) return;
 
-        clearSelectedNode();
-        clientModel->getBanTableModel()->refresh();
+        // Find possible nodes, ban it and clear the selected node
+        const CNodeCombinedStats *stats = clientModel->getPeerTableModel()->getNodeStats(detailNodeRow);
+        if (stats) {
+            m_node.ban(stats->nodeStats.addr, BanReasonManuallyAdded, bantime);
+            m_node.disconnect(stats->nodeStats.addr);
+        }
     }
+    clearSelectedNode();
+    clientModel->getBanTableModel()->refresh();
 }
 
 void RPCConsole::unbanSelectedNode()
@@ -1039,14 +1051,19 @@ void RPCConsole::unbanSelectedNode()
     if (!clientModel)
         return;
 
-    // Get currently selected ban address
-    QString strNode = GUIUtil::getEntryData(ui->banlistWidget, 0, BanTableModel::Address);
-    CSubNet possibleSubnet(strNode.toStdString());
-
-    if (possibleSubnet.IsValid())
+    // Get selected ban addresses
+    QList<QModelIndex> nodes = GUIUtil::getEntryData(ui->banlistWidget, BanTableModel::Address);
+    for(int i = 0; i < nodes.count(); i++)
     {
-        CNode::Unban(possibleSubnet);
-        clientModel->getBanTableModel()->refresh();
+        // Get currently selected ban address
+        QString strNode = nodes.at(i).data().toString();
+        CSubNet possibleSubnet;
+
+        LookupSubNet(strNode.toStdString().c_str(), possibleSubnet);
+        if (possibleSubnet.IsValid() && m_node.unban(possibleSubnet))
+        {
+            clientModel->getBanTableModel()->refresh();
+        }
     }
 }
 

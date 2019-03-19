@@ -35,6 +35,11 @@ class MasternodeList;
 
 class CWallet;
 
+namespace interfaces {
+    class Handler;
+    class Node;
+}
+
 QT_BEGIN_NAMESPACE
 class QAction;
 class QProgressBar;
@@ -53,7 +58,7 @@ public:
     static const std::string DEFAULT_UIPLATFORM;
     static const QString DEFAULT_WALLET;
 
-    explicit BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* networkStyle, QWidget* parent = 0);
+    explicit BitcoinGUI(interfaces::Node& node, const PlatformStyle *platformStyle, const NetworkStyle* networkStyle, QWidget* parent = 0);
     ~BitcoinGUI();
 
     /** Set the client model.
@@ -81,6 +86,7 @@ protected:
     bool eventFilter(QObject* object, QEvent* event);
 
 private:
+    interfaces::Node& m_node;
     ClientModel* clientModel;
     WalletFrame* walletFrame;
 

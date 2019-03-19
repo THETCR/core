@@ -17,6 +17,10 @@
 class ClientModel;
 class RPCTimerInterface;
 
+namespace interfaces {
+    class Node;
+}
+
 namespace Ui
 {
 class RPCConsole;
@@ -33,7 +37,7 @@ class RPCConsole : public QDialog
     Q_OBJECT
 
 public:
-    explicit RPCConsole(QWidget* parent);
+    explicit RPCConsole(interfaces::Node& node, QWidget* parent);
     ~RPCConsole();
 
     void setClientModel(ClientModel* model);
@@ -145,6 +149,7 @@ private:
         BANTIME_COLUMN_WIDTH = 250
     };
 
+    interfaces::Node& m_node;
     Ui::RPCConsole* ui;
     ClientModel* clientModel;
     QStringList history;
