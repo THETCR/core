@@ -3226,7 +3226,7 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
                     return false;
                 }
 
-                nFeeNeeded = GetMinimumFee(*this, nBytes, coin_control, &feeCalc);
+                nFeeNeeded = ::GetMinimumFee(*this, nBytes, coin_control, &feeCalc);
                 if (feeCalc.reason == FeeReason::FALLBACK && !m_allow_fallback_fee) {
                     // eventually allow a fallback fee
                     strFailReason = _("Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.");
@@ -3254,7 +3254,7 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
                     // change output. Only try this once.
                     if (nChangePosInOut == -1 && nSubtractFeeFromAmount == 0 && pick_new_inputs) {
                         unsigned int tx_size_with_change = nBytes + coin_selection_params.change_output_size + 2; // Add 2 as a buffer in case increasing # of outputs changes compact size
-                        CAmount fee_needed_with_change = GetMinimumFee(*this, tx_size_with_change, coin_control, nullptr);
+                        CAmount fee_needed_with_change = ::GetMinimumFee(*this, tx_size_with_change, coin_control, nullptr);
                         CAmount minimum_value_for_change = GetDustThreshold(change_prototype_txout, discard_rate);
                         if (nFeeRet >= fee_needed_with_change + minimum_value_for_change) {
                             pick_new_inputs = false;
@@ -6516,7 +6516,7 @@ bool CWallet::CreateTransaction(const std::vector<std::pair<CScript, CAmount> >&
                         break;
                 }
                 FeeCalculation feeCalc;
-                CAmount nFeeNeeded =  max(nFeePay, GetMinimumFee(*this, nBytes, *coinControl, &feeCalc));
+                CAmount nFeeNeeded =  max(nFeePay, ::GetMinimumFee(*this, nBytes, *coinControl, &feeCalc));
 //                CAmount nFeeNeeded = max(nFeePay, GetMinimumFee(nBytes, nTxConfirmTarget, mempool));
 
                 // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
@@ -6774,28 +6774,28 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std:
 //    return true;
 //}
 
-//CAmount CWallet::GetMinimumFee(unsigned int nTxBytes, unsigned int nConfirmTarget, const CTxMemPool& pool)
-//{
-//    // payTxFee is user-set "I want to pay this much"
-//    CAmount nFeeNeeded = payTxFee.GetFee(nTxBytes);
-//    // user selected total at least (default=true)
-//    if (fPayAtLeastCustomFee && nFeeNeeded > 0 && nFeeNeeded < payTxFee.GetFeePerK())
-//        nFeeNeeded = payTxFee.GetFeePerK();
-//    // User didn't set: use -txconfirmtarget to estimate...
-//    if (nFeeNeeded == 0)
-//        nFeeNeeded = pool.estimateFee(nConfirmTarget).GetFee(nTxBytes);
-//    // ... unless we don't have enough mempool data, in which case fall
-//    // back to a hard-coded fee
-//    if (nFeeNeeded == 0)
-//        nFeeNeeded = minTxFee.GetFee(nTxBytes);
-//    // prevent user from paying a non-sense fee (like 1 satoshi): 0 < fee < minRelayFee
-//    if (nFeeNeeded < ::minRelayTxFee.GetFee(nTxBytes))
-//        nFeeNeeded = ::minRelayTxFee.GetFee(nTxBytes);
-//    // But always obey the maximum
-//    if (nFeeNeeded > maxTxFee)
-//        nFeeNeeded = maxTxFee;
-//    return nFeeNeeded;
-//}
+CAmount CWallet::GetMinimumFee(unsigned int nTxBytes, unsigned int nConfirmTarget, const CTxMemPool& pool)
+{
+    // payTxFee is user-set "I want to pay this much"
+    CAmount nFeeNeeded = payTxFee.GetFee(nTxBytes);
+    // user selected total at least (default=true)
+    if (fPayAtLeastCustomFee && nFeeNeeded > 0 && nFeeNeeded < payTxFee.GetFeePerK())
+        nFeeNeeded = payTxFee.GetFeePerK();
+    // User didn't set: use -txconfirmtarget to estimate...
+    if (nFeeNeeded == 0)
+        nFeeNeeded = ::feeEstimator.estimateFee(nConfirmTarget).GetFee(nTxBytes);
+    // ... unless we don't have enough mempool data, in which case fall
+    // back to a hard-coded fee
+    if (nFeeNeeded == 0)
+        nFeeNeeded = minTxFee.GetFee(nTxBytes);
+    // prevent user from paying a non-sense fee (like 1 satoshi): 0 < fee < minRelayFee
+    if (nFeeNeeded < ::minRelayTxFee.GetFee(nTxBytes))
+        nFeeNeeded = ::minRelayTxFee.GetFee(nTxBytes);
+    // But always obey the maximum
+    if (nFeeNeeded > maxTxFee)
+        nFeeNeeded = maxTxFee;
+    return nFeeNeeded;
+}
 
 CAmount CWallet::GetTotalValue(std::vector<CTxIn> vCoins)
 {
