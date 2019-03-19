@@ -95,6 +95,6 @@ class CTransaction;
 //void RelayTransaction(const CTransaction& tx);
 void RelayTransaction(const CTransaction& tx, CConnman* connman);
 void RelayTransactionLockReq(const CTransaction& tx, CConnman* connman, bool relayToAll = false);
-void RelayInv(CInv& inv);
+void RelayInv(CInv& inv, CConnman* connman);
 
 #endif // BITCOIN_NET_PROCESSING_H

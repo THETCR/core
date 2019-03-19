@@ -641,7 +641,7 @@ void CObfuscationPool::CheckFinalTransaction(CConnman* connman)
         }
 
         CInv inv(MSG_DSTX, txNew.tx->GetHash());
-        RelayInv(inv);
+        RelayInv(inv, connman);
 
         // Tell the clients it was successful
         RelayCompletedTransaction(sessionID, false, MSG_SUCCESS, connman);
