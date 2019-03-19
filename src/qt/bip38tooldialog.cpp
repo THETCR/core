@@ -235,7 +235,7 @@ void Bip38ToolDialog::on_importAddressButton_DEC_clicked()
             return;
         }
         WalletRescanReserver reserver(pwalletMain);
-
+        reserver.reserve();
         // whenever a key is imported, we need to scan the whole chain
         pwalletMain->UpdateTimeFirstKey(1); // 0 would be considered 'no value'
         pwalletMain->ScanForWalletTransactions(chainActive.Genesis()->GetBlockHash(), {}, reserver, true);
