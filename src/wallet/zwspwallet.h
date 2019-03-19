@@ -6,10 +6,13 @@
 #define WISPR_ZWSPWALLET_H
 
 #include <map>
+#include <interfaces/chain.h>
 #include "libzerocoin/Coin.h"
 #include "mintpool.h"
 #include "uint256.h"
 #include "primitives/zerocoin.h"
+#include "walletutil.h"
+#include "walletdb.h"
 
 class CDeterministicMint;
 
@@ -20,10 +23,15 @@ private:
     uint32_t nCountLastUsed;
     std::string strWalletFile;
     CMintPool mintPool;
+    /** Interface for accessing chain state. */
+    interfaces::Chain& m_chain;
 
+    /** Wallet location which includes wallet name (see WalletLocation). */
+    WalletLocation m_location;
+    /** Internal database handle. */
+    std::unique_ptr<WalletDatabase> database;
 public:
-    CzWSPWallet(std::string strWalletFile);
-
+    CzWSPWallet(std::string strWalletFile, interfaces::Chain& chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database);
     void AddToMintPool(const std::pair<uint256, uint32_t>& pMint, bool fVerbose);
     bool SetMasterSeed(const uint256& seedMaster, bool fResetCount = false);
     uint256 GetMasterSeed() { return seedMaster; }

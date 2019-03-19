@@ -1155,7 +1155,7 @@ public:
     void setZWallet(CzWSPWallet* zwallet)
     {
         zwalletMain = zwallet;
-        zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(strWalletFile));
+        zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(strWalletFile, m_chain, m_location, *database));
     }
 
     CzWSPWallet* getZWallet() { return zwalletMain; }

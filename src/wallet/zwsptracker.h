@@ -6,7 +6,10 @@
 #define WISPR_ZWSPTRACKER_H
 
 #include "primitives/zerocoin.h"
+#include "walletutil.h"
+#include "walletdb.h"
 #include <list>
+#include <interfaces/chain.h>
 
 class CDeterministicMint;
 class CzWSPWallet;
@@ -19,8 +22,15 @@ private:
     std::map<uint256, CMintMeta> mapSerialHashes;
     std::map<uint256, uint256> mapPendingSpends; //serialhash, txid of spend
     bool UpdateStatusInternal(const std::set<uint256>& setMempool, CMintMeta& mint);
+    /** Interface for accessing chain state. */
+    interfaces::Chain& m_chain;
+
+    /** Wallet location which includes wallet name (see WalletLocation). */
+    WalletLocation m_location;
+    /** Internal database handle. */
+    std::unique_ptr<WalletDatabase> database;
 public:
-    CzWSPTracker(std::string strWalletFile);
+    CzWSPTracker(std::string strWalletFile, interfaces::Chain& chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database);
     ~CzWSPTracker();
     void Add(const CDeterministicMint& dMint, bool isNew = false, bool isArchived = false, CzWSPWallet* zWSPWallet = nullptr);
     void Add(const CZerocoinMint& mint, bool isNew = false, bool isArchived = false);
