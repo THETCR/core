@@ -4552,6 +4552,51 @@ bool InitBlockIndex(const CChainParams& chainparams)
     return true;
 }
 
+/** Store block on disk. If dbp is non-nullptr, the file is known to already reside on disk */
+static CDiskBlockPos SaveBlockToDisk(const CBlock& block, int nHeight, const CChainParams& chainparams, const FlatFilePos* dbp) {
+    unsigned int nBlockSize = ::GetSerializeSize(block, CLIENT_VERSION);
+    CDiskBlockPos blockPos;
+    if (dbp != nullptr)
+        blockPos = *dbp;
+    if (!FindBlockPos(blockPos, nBlockSize+8, nHeight, block.GetBlockTime(), dbp != nullptr)) {
+        error("%s: FindBlockPos failed", __func__);
+        return CDiskBlockPos();
+    }
+    if (dbp == nullptr) {
+        if (!WriteBlockToDisk(block, blockPos)) {
+            AbortNode("Failed to write block");
+            return CDiskBlockPos();
+        }
+    }
+    return blockPos;
+}
+
+bool LoadGenesisBlock(const CChainParams& chainparams)
+{
+    LOCK(cs_main);
+
+    // Check whether we're already initialized by checking for genesis in
+    // mapBlockIndex. Note that we can't use chainActive here, since it is
+    // set based on the coins db, not the block index db, which is the only
+    // thing loaded at this point.
+    if (mapBlockIndex.count(chainparams.GenesisBlock().GetHash()))
+        return true;
+
+    try {
+        const CBlock& block = chainparams.GenesisBlock();
+        CDiskBlockPos blockPos = SaveBlockToDisk(block, 0, chainparams, nullptr);
+        if (blockPos.IsNull())
+            return error("%s: writing genesis block to disk failed", __func__);
+        CBlockIndex *pindex = AddToBlockIndex(block);
+        CValidationState state;
+        ReceivedBlockTransactions(block, state, pindex, blockPos);
+//        ReceivedBlockTransactions(block, pindex, blockPos, chainparams.GetConsensus());
+    } catch (const std::runtime_error& e) {
+        return error("%s: failed to write genesis block: %s", __func__, e.what());
+    }
+
+    return true;
+}
 
 bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskBlockPos* dbp)
 {
