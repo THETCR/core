@@ -125,6 +125,7 @@ public:
         pchMessageStart[3] = 0x77;
         vAlertPubKey=ParseHex("0411f84b889c61c1842ec84a15e3093d7dd99d955ab797b24c984cdcfe3aca23f04ec06bd840e8093aaf83488c039027ecc4ad704261245be30289be166f667c61");
         nDefaultPort = 17000;
+        nPruneAfterHeight = 600000;
         nMinerThreads = 0;
 
         /**
@@ -252,6 +253,7 @@ public:
         pchMessageStart[3] = 0x78;
         vAlertPubKey=ParseHex("04b20dd657f5e4fe0cf9aebb956498c383bac98a079c1003df02c2f121574cd280b8900248a8c6a43074b356e670ef83ec1aadfec60602df7c2366bae732372bba");
         nDefaultPort = 17002;
+        nPruneAfterHeight = 100000;
         nMinerThreads = 0;
 
         const char* pszTimestamp = "I would rather be without a state than without a voice";
@@ -353,6 +355,7 @@ public:
 
         consensus.hashGenesisBlock = genesis.GetHash();
         nDefaultPort = 17004;
+        nPruneAfterHeight = 100000;
 //        printf("Req net\n");
 //        printf("genesis = %s\n", genesis.ToString().c_str());
         assert(consensus.hashGenesisBlock == uint256("0302157c185ae0018bb60f0c506087be772aa2015150f994cc1a6db55e8e23bd"));
@@ -387,6 +390,7 @@ public:
     {
         strNetworkID = "unittest";
         nDefaultPort = 17005;
+        nPruneAfterHeight = 100000;
         vFixedSeeds.clear(); //! Unit test mode doesn't have any fixed seeds.
         vSeeds.clear();      //! Unit test mode doesn't have any DNS seeds.
 
