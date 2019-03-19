@@ -9,7 +9,6 @@
 #include "main.h"
 #include "txdb.h"
 #include "txmempool.h"
-#include <wallet/walletdb.h>
 #include <wallet/zwspwallet.h>
 #include "accumulators.h"
 
