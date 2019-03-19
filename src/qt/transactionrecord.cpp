@@ -35,8 +35,9 @@ bool TransactionRecord::showTransaction(const CWalletTx& wtx)
 QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* wallet, const CWalletTx& wtx)
 {
     QList<TransactionRecord> parts;
-    int64_t nTime = wtx.GetComputedTxTime();
-    CAmount nCredit = wtx.GetCredit(ISMINE_ALL);
+    auto locked_chain = wallet->chain().lock();
+    int64_t nTime = wtx.GetComputedTxTime(*locked_chain);
+    CAmount nCredit = wtx.GetCredit(*locked_chain, ISMINE_ALL);
     CAmount nDebit = wtx.GetDebit(ISMINE_ALL);
     CAmount nNet = nCredit - nDebit;
     uint256 hash = wtx.tx->GetHash();
@@ -324,8 +325,9 @@ bool IsZWSPType(TransactionRecord::Type type)
     }
 }
 
-void TransactionRecord::updateStatus(const CWalletTx& wtx)
+void TransactionRecord::updateStatus(const CWallet* wallet, const CWalletTx& wtx)
 {
+    auto locked_chain = wallet->chain().lock();
     AssertLockHeld(cs_main);
     // Determine transaction status
 
@@ -342,12 +344,12 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
         wtx.nTimeReceived,
         idx);
     //status.countsForBalance = wtx.IsTrusted() && !(wtx.GetBlocksToMaturity() > 0);
-    status.depth = wtx.GetDepthInMainChain();
+    status.depth = wtx.GetDepthInMainChain(*locked_chain);
 
     //Determine the depth of the block
-    int nBlocksToMaturity = wtx.GetBlocksToMaturity();
+    int nBlocksToMaturity = wtx.GetBlocksToMaturity(*locked_chain);
 
-    status.countsForBalance = wtx.IsTrusted() && !(nBlocksToMaturity > 0);
+    status.countsForBalance = wtx.IsTrusted(*locked_chain) && !(nBlocksToMaturity > 0);
     status.cur_num_blocks = chainActive.Height();
     status.cur_num_ix_locks = nCompleteTXLocks;
 

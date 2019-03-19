@@ -184,7 +184,7 @@ public:
                     std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(rec->hash);
 
                     if (mi != wallet->mapWallet.end()) {
-                        rec->updateStatus(mi->second);
+                        rec->updateStatus(wallet, mi->second);
                     }
                 }
             }
