@@ -620,16 +620,16 @@ wispr_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 #
 
 # wispr-wallet binary #
-libbitcoin_wallet_SOURCES = wispr-wallet.cpp
-libbitcoin_wallet_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-libbitcoin_wallet_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libbitcoin_wallet_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+wispr_wallet_SOURCES = wispr-wallet.cpp
+wispr_wallet_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+wispr_wallet_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+wispr_wallet_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-libbitcoin_wallet_SOURCES += wispr-wallet-res.rc
+wispr_wallet_SOURCES += wispr-wallet-res.rc
 endif
 
-libbitcoin_wallet_LDADD = \
+wispr_wallet_LDADD = \
   $(LIBBITCOIN_WALLET_TOOL) \
   $(LIBBITCOIN_WALLET) \
   $(LIBBITCOIN_SERVER) \
@@ -645,7 +645,7 @@ libbitcoin_wallet_LDADD = \
   $(LIBSECP256K1) \
   $(LIBUNIVALUE)
 
-libbitcoin_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS)
+wispr_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS)
 #
 
 # bitcoinconsensus library #
