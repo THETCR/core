@@ -641,7 +641,7 @@ public:
 
     // RelayWalletTransaction may only be called if fBroadcastTransactions!
     bool RelayWalletTransaction(interfaces::Chain::Lock& locked_chain, std::string strCommand = "tx");
-    void RelayWalletTransaction(std::string strCommand = "tx");
+    bool RelayWalletTransaction(std::string strCommand = "tx");
 
     /** Pass this transaction to the mempool. Fails if absolute fee exceeds absurd fee. */
     bool AcceptToMemoryPool(interfaces::Chain::Lock& locked_chain, CValidationState& state);

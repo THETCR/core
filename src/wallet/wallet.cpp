@@ -2124,18 +2124,23 @@ bool CWalletTx::RelayWalletTransaction(interfaces::Chain::Lock& locked_chain, st
                 mapTxLockReq.insert(std::make_pair(GetHash(), (CTransaction) * tx));
                 CreateNewLock(((CTransaction) * tx));
                 RelayTransactionLockReq((CTransaction) * tx,  g_connman.get(), true);
+                return true;
             } else {
                 RelayTransaction((CTransaction) * tx, g_connman.get());
-            }
-            if (pwallet->chain().p2pEnabled()) {
-                pwallet->chain().relayTransaction(GetHash());
                 return true;
             }
+//            if (pwallet->chain().p2pEnabled()) {
+//                pwallet->chain().relayTransaction(GetHash());
+//                return true;
+//            }
         }
     }
     return false;
 }
-
+bool CWalletTx::RelayWalletTransaction(std::string strCommand)
+{
+    return RelayWalletTransaction(*pwallet->chain().lock(), strCommand);
+}
 std::set<uint256> CWalletTx::GetConflicts() const
 {
     std::set<uint256> result;
