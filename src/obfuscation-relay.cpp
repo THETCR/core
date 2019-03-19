@@ -4,6 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "obfuscation-relay.h"
+#include "netmessagemaker.h"
 
 CObfuScationRelay::CObfuScationRelay()
 {
@@ -103,10 +104,11 @@ void CObfuScationRelay::RelayThroughNode(int nRank)
 
     if (pmn != nullptr) {
         //printf("RelayThroughNode %s\n", pmn->addr.ToString().c_str());
-        CNode* pnode = ConnectNode((CAddress)pmn->addr, nullptr, false);
+        CNode* pnode = g_connman->ConnectNode((CAddress)pmn->addr, nullptr, false, false);
         if (pnode) {
             //printf("Connected\n");
-            pnode->PushMessage("dsr", (*this));
+            const CNetMsgMaker msgMaker(pnode->GetSendVersion());
+            g_connman->PushMessage(pnode, msgMaker.Make("dsr", (*this)));
             pnode->Release();
             return;
         }
