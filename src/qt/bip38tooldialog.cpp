@@ -234,10 +234,11 @@ void Bip38ToolDialog::on_importAddressButton_DEC_clicked()
             ui->statusLabel_DEC->setText(tr("Error Adding Key To Wallet"));
             return;
         }
+        WalletRescanReserver reserver(pwalletMain);
 
         // whenever a key is imported, we need to scan the whole chain
-        pwalletMain->nTimeFirstKey = 1; // 0 would be considered 'no value'
-        pwalletMain->ScanForWalletTransactions(chainActive.Genesis(), true);
+        pwalletMain->UpdateTimeFirstKey(1); // 0 would be considered 'no value'
+        pwalletMain->ScanForWalletTransactions(chainActive.Genesis()->GetBlockHash(), {}, reserver, true);
     }
 
     ui->statusLabel_DEC->setStyleSheet("QLabel { color: green; }");
