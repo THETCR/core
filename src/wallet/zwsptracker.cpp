@@ -321,7 +321,7 @@ void CzWSPTracker::Add(const CZerocoinMint& mint, bool isNew, bool isArchived)
     mapSerialHashes[meta.hashSerial] = meta;
 
     if (isNew)
-        CWalletDB(strWalletFile).WriteZerocoinMint(mint);
+        WalletBatch(*database).WriteZerocoinMint(mint);
 }
 
 void CzWSPTracker::SetPubcoinUsed(const uint256& hashPubcoin, const uint256& txid)

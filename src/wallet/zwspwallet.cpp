@@ -328,8 +328,14 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
         CWalletTx wtx(pwalletMain, txSpend);
         CBlockIndex* pindex = chainActive[nHeightTx];
         CBlock block;
-        if (ReadBlockFromDisk(block, pindex))
-            wtx.SetMerkleBranch(block);
+        if (ReadBlockFromDisk(block, pindex)){
+            int posInBlock = 0;
+            for (; posInBlock < (int)block.vtx.size(); posInBlock++){
+                if (block.vtx[posInBlock] == MakeTransactionRef(txSpend))
+                    break;
+            }
+            wtx.SetMerkleBranch(block.GetHash(), posInBlock);
+        }
 
         wtx.nTimeReceived = pindex->nTime;
         pwalletMain->AddToWallet(wtx);
