@@ -4,9 +4,17 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+
+#if defined(HAVE_CONFIG_H)
+#include <config/wispr-config.h>
+#endif
+
 #include "splashscreen.h"
 
 #include "clientversion.h"
+#include <interfaces/handler.h>
+#include <interfaces/node.h>
+#include <interfaces/wallet.h>
 #include "networkstyle.h"
 #include "ui_interface.h"
 #include <util/system.h>
@@ -22,7 +30,7 @@
 #include <QDesktopWidget>
 #include <QPainter>
 
-SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle* networkStyle) : QWidget(0, f), curAlignment(0)
+SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const NetworkStyle* networkStyle) : QWidget(0, f), curAlignment(0), m_node(node)
 {
     // set reference point, paddings
     int paddingLeft = 14;
@@ -123,9 +131,10 @@ static void ShowProgress(SplashScreen* splash, const std::string& title, int nPr
 }
 
 #ifdef ENABLE_WALLET
-static void ConnectWallet(SplashScreen* splash, CWallet* wallet)
+void SplashScreen::ConnectWallet(std::unique_ptr<interfaces::Wallet> wallet)
 {
-    wallet->ShowProgress.connect(boost::bind(ShowProgress, splash, _1, _2));
+    m_connected_wallet_handlers.emplace_back(wallet->handleShowProgress(std::bind(ShowProgress, this, std::placeholders::_1, std::placeholders::_2)));
+    m_connected_wallets.emplace_back(std::move(wallet));
 }
 #endif
 
@@ -135,7 +144,7 @@ void SplashScreen::subscribeToCoreSignals()
     uiInterface.InitMessage_connect(boost::bind(InitMessage, this, _1));
     uiInterface.ShowProgress_connect(boost::bind(ShowProgress, this, _1, _2));
 #ifdef ENABLE_WALLET
-    uiInterface.LoadWallet_connect(boost::bind(ConnectWallet, this, _1));
+    m_handler_load_wallet = m_node.handleLoadWallet([this](std::unique_ptr<interfaces::Wallet> wallet) { ConnectWallet(std::move(wallet)); });
 #endif
 }
 
