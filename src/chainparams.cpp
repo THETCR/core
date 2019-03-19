@@ -159,8 +159,8 @@ public:
         assert(consensus.hashGenesisBlock == uint256("0x0000ec93e0a3fe0aafa3be7dafe1290f5fca039a4037dd5174bc3dd7a35d67f0"));
         assert(genesis.hashMerkleRoot == uint256("0xbcd0064f46daed0b3c1ccff16656a0da04b5509924118b7c13d21c81d62ec521"));
 
-        vSeeds.push_back(CDNSSeedData("wispr.tech", "dnsseed.wispr.tech"));     // Primary DNS Seeder for wispr
-        vSeeds.push_back(CDNSSeedData("wispr-seeds.nl", "main.wispr-seeds.nl"));     // Secondary DNS Seeder for wispr
+        vSeeds.emplace_back("dnsseed.wispr.tech");     // Primary DNS Seeder for wispr
+        vSeeds.emplace_back("main.wispr-seeds.nl");     // Secondary DNS Seeder for wispr
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 73);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 135);
@@ -281,8 +281,8 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("wispr.tech", "testnet-seed.wispr.tech"));     // Primary DNS Seeder for testnet wispr
-        vSeeds.push_back(CDNSSeedData("wispr-seeds.nl", "test.wispr-seeds.nl"));     // Secondary DNS Seeder for testnet wispr
+        vSeeds.emplace_back("testnet-seed.wispr.tech");     // Primary DNS Seeder for testnet wispr
+        vSeeds.emplace_back("test.wispr-seeds.nl");     // Secondary DNS Seeder for testnet wispr
 
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 110);
