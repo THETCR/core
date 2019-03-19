@@ -719,7 +719,7 @@ BOOST_FIXTURE_TEST_SUITE(coins_tests, BasicTestingSetup)
         try {
             CTxOut output;
             output.nValue = modify_value;
-            test.cache.AddCoin(OUTPOINT, Coin(std::move(output), 1, coinbase), coinbase, false);
+            test.cache.AddCoin(OUTPOINT, Coin(std::move(output), 1, coinbase, false), coinbase);
             test.cache.SelfTest();
             GetCoinsMapEntry(test.cache.map(), result_value, result_flags);
         } catch (std::logic_error&) {
