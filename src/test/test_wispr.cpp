@@ -5,6 +5,7 @@
 
 #include <test/test_wispr.h>
 
+#include <banman.h>
 #include <chainparams.h>
 #include <consensus/consensus.h>
 #include <consensus/params.h>
@@ -46,9 +47,9 @@ BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
     fCheckBlockIndex = true;
     SelectParams(chainName);
     noui_connect();
-#ifdef ENABLE_WALLET
-    bitdb.MakeMock();
-#endif
+//#ifdef ENABLE_WALLET
+//    pwalletMain->MakeMock();
+//#endif
 }
 
 BasicTestingSetup::~BasicTestingSetup()
@@ -99,14 +100,15 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     nScriptCheckThreads = 3;
     for (int i=0; i < nScriptCheckThreads-1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
+    g_banman = MakeUnique<BanMan>(GetDataDir() / "banlist.dat", nullptr, DEFAULT_MISBEHAVING_BANTIME);
     g_connman = MakeUnique<CConnman>(); // Deterministic randomness for tests.
     connman = g_connman.get();
-    RegisterNodeSignals(GetNodeSignals());
+//    RegisterNodeSignals(GetNodeSignals());
 }
 
 TestingSetup::~TestingSetup()
 {
-    UnregisterNodeSignals(GetNodeSignals());
+//    UnregisterNodeSignals(GetNodeSignals());
     threadGroup.interrupt_all();
     threadGroup.join_all();
     GetMainSignals().FlushBackgroundCallbacks();
@@ -122,6 +124,6 @@ TestingSetup::~TestingSetup()
     pcoinsdbview.reset();
     pblocktree.reset();
 #ifdef ENABLE_WALLET
-    bitdb.Flush(true);
+    pwalletMain->Flush(true);
 #endif
 }
