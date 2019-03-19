@@ -27,7 +27,8 @@
 
 #include <base58.h>
 #include <kernel.h>
-
+#include <wallet/zwspwallet.h>
+#include <wallet/zwsptracker.h>
 
 #include <algorithm>
 #include <atomic>
@@ -40,8 +41,6 @@
 #include <utility>
 #include <vector>
 
-class CzWSPWallet;
-class CzWSPTracker;
 extern CWallet* pwalletMain;
 extern CzWSPWallet* zwalletMain;
 

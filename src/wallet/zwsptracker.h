@@ -13,6 +13,7 @@
 
 class CDeterministicMint;
 class CzWSPWallet;
+using WalletDatabase;
 
 class CzWSPTracker
 {
