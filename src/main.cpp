@@ -2553,7 +2553,7 @@ bool static FlushStateToDisk(const CChainParams& chainparams, CValidationState &
                     }
                 }
                 // Finally remove any pruned files
-                if (fFlushForPrune)
+//                if (fFlushForPrune)
 //                    UnlinkPrunedFiles(setFilesToPrune);
                 nLastWrite = nNow;
             }
