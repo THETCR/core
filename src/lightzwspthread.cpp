@@ -8,6 +8,7 @@
 #include "lightzwspthread.h"
 #include <logging.h>
 #include "main.h"
+#include "netmessagemaker.h"
 
 /****** Thread ********/
 void CLightWorker::ThreadLightZWSPSimplified() {
@@ -85,10 +86,10 @@ void CLightWorker::ThreadLightZWSPSimplified() {
                         }
                         ss << heightStop;
                         if (genWit.getPfrom()) {
-                            LogPrintf("%s pushing message to %s \n", "pivx-light-thread", genWit.getPfrom()->addrName);
-                            genWit.getPfrom()->PushMessage(NetMsgType::PUBCOINS, ss);
+                            LogPrintf("%s pushing message to %s \n", "pivx-light-thread", genWit.getPfrom()->GetAddrName());
+                            g_connman->PushMessage(genWit.getPfrom(), CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::PUBCOINS, ss));
                         } else
-                            LogPrintf("%s NOT pushing message to %s \n", "pivx-light-thread", genWit.getPfrom()->addrName);
+                            LogPrintf("%s NOT pushing message to %s \n", "pivx-light-thread", genWit.getPfrom()->GetAddrName());
                     }
                 } else {
                     // Rejects only the failed height
