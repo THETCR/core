@@ -6,13 +6,14 @@
 #define WISPR_ZWSPTRACKER_H
 
 #include "primitives/zerocoin.h"
-#include "walletutil.h"
-#include "walletdb.h"
+#include <wallet/walletdb.h>
+#include <wallet/walletutil.h>
 #include <list>
 #include <interfaces/chain.h>
 
 class CDeterministicMint;
 class CzWSPWallet;
+class WalletDatabase;
 
 class CzWSPTracker
 {
