@@ -1008,7 +1008,7 @@ void RPCConsole::showBanTableContextMenu(const QPoint& point)
 void RPCConsole::disconnectSelectedNode()
 {
     // Get selected peer addresses
-    QList<QModelIndex> nodes = GUIUtil::getEntryData(ui->peerWidget, PeerTableModel::Address);
+    QList<QModelIndex> nodes = GUIUtil::getEntryData(ui->peerWidget, 0, PeerTableModel::Address);
     for(int i = 0; i < nodes.count(); i++)
     {
         // Get currently selected peer address
@@ -1025,7 +1025,7 @@ void RPCConsole::banSelectedNode(int bantime)
         return;
 
     // Get selected peer addresses
-    QList<QModelIndex> nodes = GUIUtil::getEntryData(ui->peerWidget, PeerTableModel::Address);
+    QList<QModelIndex> nodes = GUIUtil::getEntryData(ui->peerWidget, 0, PeerTableModel::Address);
     for(int i = 0; i < nodes.count(); i++)
     {
         // Get currently selected peer address
