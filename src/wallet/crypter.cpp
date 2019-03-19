@@ -213,7 +213,7 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no
         fDecryptionThoroughlyChecked = true;
 
         uint256 hashSeed;
-        if (CWalletDB(pwalletMain->strWalletFile).ReadCurrentSeedHash(hashSeed)) {
+        if (WalletBatch(pwalletMain->GetDBHandle()).ReadCurrentSeedHash(hashSeed)) {
 
             uint256 nSeed;
             if (!GetDeterministicSeed(hashSeed, nSeed)) {
@@ -351,7 +351,7 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
 
 bool CCryptoKeyStore::AddDeterministicSeed(const uint256& seed)
 {
-    CWalletDB db(pwalletMain->strWalletFile);
+    WalletBatch db(pwalletMain->GetDBHandle());
     std::string strErr;
     uint256 hashSeed = Hash(seed.begin(), seed.end());
 
@@ -386,7 +386,7 @@ bool CCryptoKeyStore::AddDeterministicSeed(const uint256& seed)
 bool CCryptoKeyStore::GetDeterministicSeed(const uint256& hashSeed, uint256& seedOut)
 {
 
-    CWalletDB db(pwalletMain->strWalletFile);
+    WalletBatch db(pwalletMain->GetDBHandle());
     std::string strErr;
     if (IsCrypted()) {
         if(!IsLocked()) { //if we have password
