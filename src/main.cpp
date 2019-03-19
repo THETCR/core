@@ -4318,9 +4318,11 @@ bool InitBlockIndex(const CChainParams& chainparams)
         try {
             CValidationState state;
 
+            std::cout << "AddGenesisBlock\n";
             if (!AddGenesisBlock(chainparams, chainparams.GenesisBlock(), state))
                 return false;
 
+            std::cout << "FlushStateToDisk\n";
             // Force a chainstate write so that when we VerifyDB in a moment, it doesnt check stale data
             return FlushStateToDisk(chainparams, state, FlushStateMode::ALWAYS);
         } catch (std::runtime_error& e) {
