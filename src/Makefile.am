@@ -151,6 +151,7 @@ BITCOIN_CORE_H = \
   kernel.h \
   swifttx.h \
   interfaces/chain.h \
+  interfaces/handler.h \
   interfaces/node.h \
   interfaces/wallet.h \
   key.h \
@@ -270,7 +271,6 @@ libbitcoin_server_a_SOURCES = \
   interfaces/chain.cpp \
   interfaces/handler.cpp \
   interfaces/node.cpp \
-  interfaces/wallet.h \
   init.cpp \
   leveldbwrapper.cpp \
   main.cpp \
