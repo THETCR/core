@@ -70,20 +70,20 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    CPubKey demoPubkey = pwalletMain->GenerateNewKey();
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
+    CPubKey demoPubkey = pwalletMain->GenerateNewKey(walletdb);
     CBitcoinAddress demoAddress = CBitcoinAddress(CTxDestination(demoPubkey.GetID()));
     UniValue retValue;
     std::string strAccount = "walletDemoAccount";
     std::string strPurpose = "receive";
     BOOST_CHECK_NO_THROW({ /*Initialize Wallet with an account */
-        CWalletDB walletdb(pwalletMain->strWalletFile);
+        WalletBatch walletdb(pwalletMain->GetDBHandle());
         CAccount account;
         account.vchPubKey = demoPubkey;
         pwalletMain->SetAddressBook(account.vchPubKey.GetID(), strAccount, strPurpose);
         walletdb.WriteAccount(strAccount, account);
     });
-
-    CPubKey setaccountDemoPubkey = pwalletMain->GenerateNewKey();
+    CPubKey setaccountDemoPubkey = pwalletMain->GenerateNewKey(walletdb);
     CBitcoinAddress setaccountDemoAddress = CBitcoinAddress(CTxDestination(setaccountDemoPubkey.GetID()));
 
     /*********************************
