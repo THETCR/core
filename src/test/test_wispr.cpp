@@ -98,6 +98,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     if (!ActivateBestChain(state)) {
         throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
     }
+    std::cout << "ENABLE_WALLET\n";
 #ifdef ENABLE_WALLET
     bool fFirstRun;
     std::cout << "CWallet\n";
