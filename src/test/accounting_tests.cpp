@@ -16,12 +16,12 @@ extern CWallet* pwalletMain;
 BOOST_AUTO_TEST_SUITE(accounting_tests)
 
 static void
-GetResults(CWalletDB& walletdb, std::map<CAmount, CAccountingEntry>& results)
+GetResults(WalletBatch& walletdb, std::map<CAmount, CAccountingEntry>& results)
 {
     std::list<CAccountingEntry> aes;
 
     results.clear();
-    BOOST_CHECK(walletdb.ReorderTransactions(pwalletMain) == DB_LOAD_OK);
+    BOOST_CHECK(pwalletMain->ReorderTransactions() == DBErrors::LOAD_OK);
     walletdb.ListAccountCreditDebit("", aes);
     for(CAccountingEntry& ae: aes)
     {
@@ -31,7 +31,7 @@ GetResults(CWalletDB& walletdb, std::map<CAmount, CAccountingEntry>& results)
 
 BOOST_AUTO_TEST_CASE(acc_orderupgrade)
 {
-    CWalletDB walletdb(pwalletMain->strWalletFile);
+    WalletBatch walletdb(pwalletMain->GetDBHandle());
     std::vector<CWalletTx*> vpwtx;
     CWalletTx wtx;
     CAccountingEntry ae;
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
     ae.nTime = 1333333333;
     ae.strOtherAccount = "b";
     ae.strComment = "";
-    pwalletMain->AddAccountingEntry(ae, walletdb);
+//    pwalletMain->AddAccountingEntry(ae, walletdb);
 
     wtx.mapValue["comment"] = "z";
     pwalletMain->AddToWallet(wtx);
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
 
     ae.nTime = 1333333336;
     ae.strOtherAccount = "c";
-    pwalletMain->AddAccountingEntry(ae, walletdb);
+//    pwalletMain->AddAccountingEntry(ae, walletdb);
 
     GetResults(walletdb, results);
 
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
     ae.nTime = 1333333330;
     ae.strOtherAccount = "d";
     ae.nOrderPos = pwalletMain->IncOrderPosNext();
-    pwalletMain->AddAccountingEntry(ae, walletdb);
+//    pwalletMain->AddAccountingEntry(ae, walletdb);
 
     GetResults(walletdb, results);
 
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
     ae.nTime = 1333333334;
     ae.strOtherAccount = "e";
     ae.nOrderPos = -1;
-    pwalletMain->AddAccountingEntry(ae, walletdb);
+//    pwalletMain->AddAccountingEntry(ae, walletdb);
 
     GetResults(walletdb, results);
 
