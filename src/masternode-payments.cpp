@@ -771,7 +771,7 @@ bool CMasternodePayments::ProcessBlock(int nBlockHeight)
 void CMasternodePaymentWinner::Relay()
 {
     CInv inv(MSG_MASTERNODE_WINNER, GetHash());
-    RelayInv(inv);
+    RelayInv(inv, g_connman.get());
 }
 
 bool CMasternodePaymentWinner::SignatureValid()

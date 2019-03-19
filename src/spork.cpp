@@ -242,7 +242,7 @@ bool CSporkManager::UpdateSpork(int nSporkID, int64_t nValue)
 void CSporkManager::Relay(CSporkMessage& msg)
 {
     CInv inv(MSG_SPORK, msg.GetHash());
-    RelayInv(inv);
+    RelayInv(inv, g_connman.get());
 }
 
 bool CSporkManager::SetPrivKey(std::string strPrivKey)
