@@ -1098,6 +1098,9 @@ void CTxMemPool::getTransactions(std::set<uint256>& setTxid)
     setTxid.clear();
 
     LOCK(cs);
-    for (map<uint256, CTxMemPoolEntry>::iterator mi = mapTx.begin(); mi != mapTx.end(); ++mi)
-        setTxid.insert((*mi).first);
+    for (const CTxMemPoolEntry& e: mempool.mapTx) {
+        setTxid.insert(e.GetSharedTx()->GetHash());
+    }
+//        for (map<uint256, CTxMemPoolEntry>::iterator mi = mapTx.begin(); mi != mapTx.end(); ++mi)
+//        setTxid.insert((*mi).first);
 }
