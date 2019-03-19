@@ -656,7 +656,7 @@ bool CMasternodeBroadcast::CheckInputsAndAdd(int& nDoS)
 void CMasternodeBroadcast::Relay()
 {
     CInv inv(MSG_MASTERNODE_ANNOUNCE, GetHash());
-    RelayInv(inv);
+    RelayInv(inv, g_connman.get());
 }
 
 bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
