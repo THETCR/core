@@ -380,8 +380,20 @@ bool MultisigDialog::createMultisigTransaction(std::vector<CTxIn> vUserIn, std::
 {
     try{
         //attempt to access the given inputs
-        CCoinsViewCache view = getInputsCoinsViewCache(vUserIn);
+        CCoinsView viewDummy;
+        CCoinsViewCache view(&viewDummy);
+        {
+            LOCK(mempool.cs);
+            CCoinsViewCache& viewChain = *pcoinsTip;
+            CCoinsViewMemPool viewMempool(&viewChain, mempool);
+            view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
 
+            for(const CTxIn& txin : vUserIn) {
+                view.AccessCoin(txin.prevout); // this is certainly allowed to fail
+            }
+
+            view.SetBackend(viewDummy); // switch back to avoid locking mempool for too long
+        }
         //retrieve total input val and change dest
         CAmount totalIn = 0;
         std::vector<CAmount> vInputVals;
@@ -389,11 +401,11 @@ bool MultisigDialog::createMultisigTransaction(std::vector<CTxIn> vUserIn, std::
         bool fFirst = true;
 
         for(CTxIn in : vUserIn){
-            const CCoins* coins = view.AccessCoins(in.prevout.hash);
-            if(!coins->IsAvailable(in.prevout.n) || coins == NULL){
+            const Coin& coin = view.AccessCoin(in.prevout);
+            if(!coin.IsAvailable(in.prevout.n) || coin.IsSpent()){
                 continue;
             }
-            CTxOut prevout = coins->vout[in.prevout.n];
+            CTxOut prevout = coin.out;
             CScript privKey = prevout.scriptPubKey;
 
             vInputVals.push_back(prevout.nValue);
@@ -439,13 +451,13 @@ bool MultisigDialog::createMultisigTransaction(std::vector<CTxIn> vUserIn, std::
         tx.vin = vUserIn;
         tx.vout = vUserOut;
 
-        const CCoins* coins = view.AccessCoins(tx.vin[0].prevout.hash);
+        const Coin& coin = view.AccessCoin(tx.vin[0].prevout);
 
-        if(coins == NULL || !coins->IsAvailable(tx.vin[0].prevout.n)){
+        if(coin.IsSpent() || !coin.IsAvailable(tx.vin[0].prevout.n)){
             throw runtime_error("Coins unavailable (unconfirmed/spent)");
         }
 
-        CScript prevPubKey = coins->vout[tx.vin[0].prevout.n].scriptPubKey;
+        CScript prevPubKey = coin.out.scriptPubKey;
 
         //get payment destination
         CTxDestination address;
@@ -564,26 +576,25 @@ QString MultisigDialog::buildMultisigTxStatusString(bool fComplete, const CMutab
 }
 
 
-CCoinsViewCache MultisigDialog::getInputsCoinsViewCache(const std::vector<CTxIn>& vin)
-{
-    CCoinsView viewDummy;
-    CCoinsViewCache view(&viewDummy);
-    {
-        LOCK(mempool.cs);
-        CCoinsViewCache& viewChain = *pcoinsTip;
-        CCoinsViewMemPool viewMempool(&viewChain, mempool);
-        view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
-
-        for(const CTxIn& txin : vin) {
-            const uint256& prevHash = txin.prevout.hash;
-            view.AccessCoins(prevHash); // this is certainly allowed to fail
-        }
-
-        view.SetBackend(viewDummy); // switch back to avoid locking mempool for too long
-    }
-
-    return view;
-}
+//CCoinsViewCache MultisigDialog::getInputsCoinsViewCache(const std::vector<CTxIn>& vin)
+//{
+//    CCoinsView viewDummy;
+//    CCoinsViewCache view(&viewDummy);
+//    {
+//        LOCK(mempool.cs);
+//        CCoinsViewCache& viewChain = *pcoinsTip;
+//        CCoinsViewMemPool viewMempool(&viewChain, mempool);
+//        view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
+//
+//        for(const CTxIn& txin : vin) {
+//            view.AccessCoin(txin.prevout); // this is certainly allowed to fail
+//        }
+//
+//        view.SetBackend(viewDummy); // switch back to avoid locking mempool for too long
+//    }
+//
+//    return view;
+//}
 
 
 bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, std::string& errorOut, QVBoxLayout* keyList)

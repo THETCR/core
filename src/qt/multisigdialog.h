@@ -44,7 +44,7 @@ private:
 
     QFrame* createAddress(int labelNumber);
     QFrame* createInput(int labelNumber);
-    CCoinsViewCache getInputsCoinsViewCache(const std::vector<CTxIn>& vin);
+//    CCoinsViewCache getInputsCoinsViewCache(const std::vector<CTxIn>& vin);
     QString buildMultisigTxStatusString(bool fComplete, const CMutableTransaction& tx);
     bool createRedeemScript(int m, std::vector<std::string> keys, CScript& redeemRet, std::string& errorRet);
     bool createMultisigTransaction(std::vector<CTxIn> vUserIn, std::vector<CTxOut> vUserOut, std::string& feeStringRet, std::string& errorRet);
