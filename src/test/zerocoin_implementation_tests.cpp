@@ -518,9 +518,10 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
                 uint256 seedMaster("3a1947364362e2e7c073b386869c89c905c0cf462448ffd6c2021bd03ce689f6");
 
                 std::string strWalletFile = "unittestwallet.dat";
-                CWalletDB walletdb(strWalletFile, "cr+");
 
                 CWallet wallet(strWalletFile);
+                WalletBatch walletdb(wallet.GetDBHandle(), "cr+");
+
                 CzWSPWallet zWallet(wallet.strWalletFile, wallet.chain(), wallet.GetLocation(), WalletDatabase::Create(wallet.GetLocation().GetPath()));
                 zWallet.SetMasterSeed(seedMaster);
                 wallet.setZWallet(&zWallet);
