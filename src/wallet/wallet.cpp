@@ -8381,3 +8381,10 @@ bool CWallet::DatabaseMint(CDeterministicMint& dMint)
     zwspTracker->Add(dMint, true);
     return true;
 }
+
+//!WISPR
+void CWallet::setZWallet(CzWSPWallet* zwallet)
+{
+    zwalletMain = zwallet;
+    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(strWalletFile, m_chain, m_location, WalletDatabase::Create(m_location.GetPath())));
+}

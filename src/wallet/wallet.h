@@ -1152,11 +1152,7 @@ public:
         return nZeromintPercentage;
     }
 
-    void setZWallet(CzWSPWallet* zwallet)
-    {
-        zwalletMain = zwallet;
-        zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(strWalletFile, m_chain, m_location, *database));
-    }
+    void setZWallet(CzWSPWallet* zwallet);
 
     CzWSPWallet* getZWallet() { return zwalletMain; }
 
