@@ -13,6 +13,8 @@
 
 #include <list>
 
+using WalletDatabase = BerkeleyDatabase;
+
 class CDeterministicMint;
 class CzWSPWallet;
 
