@@ -113,7 +113,7 @@ void CLightWorker::rejectWork(CGenWit& wit, int blockHeight, uint32_t errorNumbe
         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
         ss << wit.getRequestNum();
         ss << errorNumber;
-        wit.getPfrom()->PushMessage(NetMsgType::PUBCOINS, ss);
+        g_connman->PushMessage(wit.getPfrom(), CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::PUBCOINS, ss));
     } else {
         requestsQueue.push(wit);
     }
