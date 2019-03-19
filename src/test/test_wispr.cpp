@@ -89,6 +89,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     std::cout << "InitBlockIndex\n";
     InitBlockIndex(chainparams);
     {
+        std::cout << "ActivateBestChain\n";
         CValidationState state;
         if (!ActivateBestChain(state)) {
             throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
