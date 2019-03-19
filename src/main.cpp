@@ -3482,6 +3482,13 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
     return true;
 }
 
+bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params)
+{
+    LOCK(cs_main);
+//    return (VersionBitsState(pindexPrev, params, Consensus::DEPLOYMENT_SEGWIT, versionbitscache) == ThresholdState::ACTIVE);
+      return false;
+}
+
 bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
 {
     uint256 hashProof = block.GetPoWHash();
