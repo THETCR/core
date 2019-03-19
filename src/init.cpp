@@ -375,18 +375,18 @@ static void registerSignalHandler(int signal, void(*handler)(int))
 }
 #endif
 
-bool static Bind(const CService& addr, unsigned int flags)
-{
-    if (!(flags & BF_EXPLICIT) && IsReachable(addr))
-        return false;
-    std::string strError;
-    if (!g_connman->BindListenPort(addr, strError, (flags & BF_WHITELIST) != 0)) {
-        if (flags & BF_REPORT_ERROR)
-            return InitError(strError);
-        return false;
-    }
-    return true;
-}
+//bool static Bind(const CService& addr, unsigned int flags)
+//{
+//    if (!(flags & BF_EXPLICIT) && IsReachable(addr))
+//        return false;
+//    std::string strError;
+//    if (!g_connman->BindListenPort(addr, strError, (flags & BF_WHITELIST) != 0)) {
+//        if (flags & BF_REPORT_ERROR)
+//            return InitError(strError);
+//        return false;
+//    }
+//    return true;
+//}
 
 static void OnRPCStopped()
 {
@@ -1762,32 +1762,32 @@ bool AppInitMain()
     fListen = gArgs.GetBoolArg("-listen", DEFAULT_LISTEN);
     fDiscover = gArgs.GetBoolArg("-discover", true);
 
-    bool fBound = false;
-    if (fListen) {
-        if (gArgs.IsArgSet("-bind") || gArgs.IsArgSet("-whitebind")) {
-            for (std::string strBind: gArgs.GetArgs("-bind")) {
-                CService addrBind;
-                if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false))
-                    return InitError(strprintf(_("Cannot resolve -bind address: '%s'"), strBind));
-                fBound |= Bind(addrBind, (BF_EXPLICIT | BF_REPORT_ERROR));
-            }
-            for (std::string strBind: gArgs.GetArgs("-whitebind")) {
-                CService addrBind;
-                if (!Lookup(strBind.c_str(), addrBind, 0, false))
-                    return InitError(strprintf(_("Cannot resolve -whitebind address: '%s'"), strBind));
-                if (addrBind.GetPort() == 0)
-                    return InitError(strprintf(_("Need to specify a port with -whitebind: '%s'"), strBind));
-                fBound |= Bind(addrBind, (BF_EXPLICIT | BF_REPORT_ERROR | BF_WHITELIST));
-            }
-        } else {
-            struct in_addr inaddr_any;
-            inaddr_any.s_addr = INADDR_ANY;
-            fBound |= Bind(CService((in6_addr)IN6ADDR_ANY_INIT, GetListenPort()), BF_NONE);
-            fBound |= Bind(CService(inaddr_any, GetListenPort()), !fBound ? BF_REPORT_ERROR : BF_NONE);
-        }
-        if (!fBound)
-            return InitError(_("Failed to listen on any port. Use -listen=0 if you want this."));
-    }
+//    bool fBound = false;
+//    if (fListen) {
+//        if (gArgs.IsArgSet("-bind") || gArgs.IsArgSet("-whitebind")) {
+//            for (std::string strBind: gArgs.GetArgs("-bind")) {
+//                CService addrBind;
+//                if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false))
+//                    return InitError(strprintf(_("Cannot resolve -bind address: '%s'"), strBind));
+//                fBound |= Bind(addrBind, (BF_EXPLICIT | BF_REPORT_ERROR));
+//            }
+//            for (std::string strBind: gArgs.GetArgs("-whitebind")) {
+//                CService addrBind;
+//                if (!Lookup(strBind.c_str(), addrBind, 0, false))
+//                    return InitError(strprintf(_("Cannot resolve -whitebind address: '%s'"), strBind));
+//                if (addrBind.GetPort() == 0)
+//                    return InitError(strprintf(_("Need to specify a port with -whitebind: '%s'"), strBind));
+//                fBound |= Bind(addrBind, (BF_EXPLICIT | BF_REPORT_ERROR | BF_WHITELIST));
+//            }
+//        } else {
+//            struct in_addr inaddr_any;
+//            inaddr_any.s_addr = INADDR_ANY;
+//            fBound |= Bind(CService((in6_addr)IN6ADDR_ANY_INIT, GetListenPort()), BF_NONE);
+//            fBound |= Bind(CService(inaddr_any, GetListenPort()), !fBound ? BF_REPORT_ERROR : BF_NONE);
+//        }
+//        if (!fBound)
+//            return InitError(_("Failed to listen on any port. Use -listen=0 if you want this."));
+//    }
 
     if (gArgs.IsArgSet("-externalip")) {
         for (const std::string& strAddr : gArgs.GetArgs("-externalip")) {
@@ -2418,7 +2418,23 @@ bool AppInitMain()
     connOptions.nMaxOutboundLimit = nMaxOutboundLimit;
     connOptions.m_peer_connect_timeout = peer_connect_timeout;
 
-
+    for (const std::string& strBind : gArgs.GetArgs("-bind")) {
+        CService addrBind;
+        if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false)) {
+            return InitError(ResolveErrMsg("bind", strBind));
+        }
+        connOptions.vBinds.push_back(addrBind);
+    }
+    for (const std::string& strBind : gArgs.GetArgs("-whitebind")) {
+        CService addrBind;
+        if (!Lookup(strBind.c_str(), addrBind, 0, false)) {
+            return InitError(ResolveErrMsg("whitebind", strBind));
+        }
+        if (addrBind.GetPort() == 0) {
+            return InitError(strprintf(_("Need to specify a port with -whitebind: '%s'"), strBind));
+        }
+        connOptions.vWhiteBinds.push_back(addrBind);
+    }
     if (gArgs.IsArgSet("-whitelist")) {
         for (const std::string& net: gArgs.GetArgs("-whitelist")) {
             CSubNet subnet;
@@ -2430,7 +2446,14 @@ bool AppInitMain()
     }
 
     connOptions.vSeedNodes = gArgs.GetArgs("-seednode");
-
+    // Initiate outbound connections unless connect=0
+    connOptions.m_use_addrman_outgoing = !gArgs.IsArgSet("-connect");
+    if (!connOptions.m_use_addrman_outgoing) {
+        const auto connect = gArgs.GetArgs("-connect");
+        if (connect.size() != 1 || connect[0] != "0") {
+            connOptions.m_specified_outgoing = connect;
+        }
+    }
     std::string strNodeError;
     if (!g_connman->Start(scheduler, connOptions)) {
         return InitError(strNodeError);
