@@ -758,7 +758,7 @@ void SendCoinsDialog::updateSmartFeeLabel()
         return;
 
     int nBlocksToConfirm = (int)25 - (int)std::max(0, std::min(24, ui->sliderSmartFee->value()));
-    CFeeRate feeRate = mempool.estimateFee(nBlocksToConfirm);
+    CFeeRate feeRate = ::feeEstimator.estimateFee(nBlocksToConfirm);
     // if SwiftX checked, display it in the label
     if (ui->checkSwiftTX->isChecked())
     {
