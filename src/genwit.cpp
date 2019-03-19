@@ -61,7 +61,7 @@ const CBigNum &CGenWit::getAccWitValue() const {
 }
 
 const std::string CGenWit::toString() const {
-    return "From: " + pfrom->addrName + ",\n" +
+    return "From: " + pfrom->GetAddrName() + ",\n" +
            "Height: " + std::to_string(startingHeight) + ",\n" +
            "accWit: " + accWitValue.GetHex();
 }
