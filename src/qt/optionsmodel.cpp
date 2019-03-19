@@ -16,6 +16,7 @@
 #include "amount.h"
 #include "main.h"
 #include "net.h"
+#include "netbase.h"
 #include "txdb.h" // for -dbcache defaults
 #include <util/system.h>
 
@@ -477,7 +478,7 @@ void OptionsModel::setStakeSplitThreshold(int value)
 
     nStakeSplitThreshold = value;
     if (pwalletMain && pwalletMain->nStakeSplitThreshold != nStakeSplitThreshold) {
-        CWalletDB walletdb(pwalletMain->strWalletFile);
+        WalletBatch walletdb(pwalletMain->GetDBHandle());
         LOCK(pwalletMain->cs_wallet);
         {
             pwalletMain->nStakeSplitThreshold = nStakeSplitThreshold;
