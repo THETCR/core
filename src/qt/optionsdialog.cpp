@@ -313,10 +313,10 @@ void OptionsDialog::updateHideOrphans(bool fHide)
 void OptionsDialog::doProxyIpChecks(QValidatedLineEdit* pUiProxyIp, QLineEdit* pUiProxyPort)
 {
     const std::string strAddrProxy = pUiProxyIp->text().toStdString();
-    CService addrProxy;
+    CService addrProxy(LookupNumeric(strAddrProxy.c_str(), DEFAULT_GUI_PROXY_PORT));
 
     // Check for a valid IPv4 / IPv6 address
-    if (!(fProxyIpValid = LookupNumeric(strAddrProxy.c_str(), DEFAULT_GUI_PROXY_PORT))) {
+    if (!(fProxyIpValid = addrProxy.IsValid())) {
         disableOkButton();
         pUiProxyIp->setValid(false);
         ui->statusLabel->setStyleSheet("QLabel { color: red; }");
