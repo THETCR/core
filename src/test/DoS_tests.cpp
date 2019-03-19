@@ -39,7 +39,7 @@ struct CConnmanTest : public CConnman {
 };
 
 // Tests these internal-to-net_processing.cpp methods:
-extern bool AddOrphanTx(const CTransactionRef& tx, NodeId peer);
+extern bool AddOrphanTx(const CTransaction& tx, NodeId peer);
 extern void EraseOrphansFor(NodeId peer);
 extern unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans);
 //extern void Misbehaving(NodeId nodeid, int howmuch, const std::string& message="");
@@ -383,7 +383,7 @@ BOOST_FIXTURE_TEST_SUITE(denialofservice_tests, TestingSetup)
             tx.vout[0].nValue = 1*CENT;
             tx.vout[0].scriptPubKey = GetScriptForDestination(key.GetPubKey().GetID());
 
-            AddOrphanTx(MakeTransactionRef(tx), i);
+            AddOrphanTx(tx, i);
         }
 
         // ... and 50 that depend on other orphans:
@@ -400,7 +400,7 @@ BOOST_FIXTURE_TEST_SUITE(denialofservice_tests, TestingSetup)
             tx.vout[0].scriptPubKey = GetScriptForDestination(key.GetPubKey().GetID());
             BOOST_CHECK(SignSignature(keystore, *txPrev, tx, 0, SIGHASH_ALL));
 
-            AddOrphanTx(MakeTransactionRef(tx), i);
+            AddOrphanTx(tx, i);
         }
 
         // This really-big orphan should be ignored:
@@ -424,7 +424,7 @@ BOOST_FIXTURE_TEST_SUITE(denialofservice_tests, TestingSetup)
             for (unsigned int j = 1; j < tx.vin.size(); j++)
                 tx.vin[j].scriptSig = tx.vin[0].scriptSig;
 
-            BOOST_CHECK(!AddOrphanTx(MakeTransactionRef(tx), i));
+            BOOST_CHECK(!AddOrphanTx(tx, i));
         }
 
         LOCK2(cs_main, g_cs_orphans);
