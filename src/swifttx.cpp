@@ -87,9 +87,9 @@ void ProcessMessageSwiftTX(CNode* pfrom, const std::string& strCommand, CDataStr
             fAccepted = AcceptToMemoryPool(mempool, state, tx, true, &fMissingInputs);
         }
         if (fAccepted) {
-            RelayInv(inv);
+            RelayInv(inv, connman);
 
-            DoConsensusVote(tx, nBlockHeight);
+            DoConsensusVote(tx, nBlockHeight, connman);
 
             mapTxLockReq.insert(std::make_pair(tx.GetHash(), tx));
 
@@ -171,7 +171,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, const std::string& strCommand, CDataStr
                     mapUnknownVotes[ctx.vinMasternode.prevout.hash] = GetTime() + (60 * 10);
                 }
             }
-            RelayInv(inv);
+            RelayInv(inv, connman);
         }
 
         if (mapTxLockReq.count(ctx.txHash) && GetTransactionLockSignatures(ctx.txHash) == SWIFTTX_SIGNATURES_REQUIRED) {
@@ -267,7 +267,7 @@ int64_t CreateNewLock(CTransaction tx)
 }
 
 // check if we need to vote on this transaction
-void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight)
+void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight, CConnman* connman)
 {
     if (!fMasterNode) return;
 
@@ -304,7 +304,7 @@ void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight)
     mapTxLockVote[ctx.GetHash()] = ctx;
 
     CInv inv(MSG_TXLOCK_VOTE, ctx.GetHash());
-    RelayInv(inv);
+    RelayInv(inv, connman);
 }
 
 //received a consensus vote
