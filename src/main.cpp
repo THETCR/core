@@ -3054,6 +3054,7 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                 }
                 bool fInvalidFound = false;
                 std::shared_ptr<const CBlock> nullBlockPtr;
+                std::cout << "ActivateBestChainStep\n";
                 if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked)){
                     return false;
                 }
@@ -3071,9 +3072,11 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
             // Notify external listeners about the new tip.
                 // Enqueue while holding cs_main to ensure that UpdatedBlockTip is called in the order in which blocks are connected
                 if (pindexFork != pindexNewTip) {
+                    std::cout << "UpdatedBlockTip\n";
                     // Notify ValidationInterface subscribers
                     GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
 
+                    std::cout << "NotifyBlockTip\n";
                     // Always notify the UI if a new block tip was connected
                     uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
                 }
