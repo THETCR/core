@@ -293,7 +293,7 @@ void CzWSPTracker::Add(const CDeterministicMint& dMint, bool isNew, bool isArchi
     meta.isArchived = isArchived;
     meta.isDeterministic = true;
     if (! iszWSPWalletInitialized)
-        zWSPWallet = new CzWSPWallet(strWalletFile, m_chain, m_location, *database);
+        zWSPWallet = new CzWSPWallet(strWalletFile, m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
     meta.isSeedCorrect = zWSPWallet->CheckSeed(dMint);
     if (! iszWSPWalletInitialized)
         delete zWSPWallet;
@@ -448,7 +448,7 @@ std::set<CMintMeta> CzWSPTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, 
 
         std::list<CDeterministicMint> listDeterministicDB = walletdb.ListDeterministicMints();
 
-        CzWSPWallet* zWSPWallet = new CzWSPWallet(strWalletFile, m_chain, m_location, *database);
+        CzWSPWallet* zWSPWallet = new CzWSPWallet(strWalletFile, m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
         for (auto& dMint : listDeterministicDB) {
             Add(dMint, false, false, zWSPWallet);
         }

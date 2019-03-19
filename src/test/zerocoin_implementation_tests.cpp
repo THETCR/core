@@ -521,7 +521,7 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
                 CWalletDB walletdb(strWalletFile, "cr+");
 
                 CWallet wallet(strWalletFile);
-                CzWSPWallet zWallet(wallet.strWalletFile, wallet.chain(), wallet.GetLocation(), wallet.GetDBHandle());
+                CzWSPWallet zWallet(wallet.strWalletFile, wallet.chain(), wallet.GetLocation(), WalletDatabase::Create(wallet.GetLocation().GetPath()));
                 zWallet.SetMasterSeed(seedMaster);
                 wallet.setZWallet(&zWallet);
 

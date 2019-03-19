@@ -2108,7 +2108,7 @@ bool AppInitMain()
 
         LogPrintf("%s", strErrors.str());
         LogPrintf(" wallet      %15dms\n", GetTimeMillis() - nStart);
-        zwalletMain = new CzWSPWallet(pwalletMain->strWalletFile, pwalletMain->chain(), pwalletMain->GetLocation(), pwalletMain->GetDBHandle());
+        zwalletMain = new CzWSPWallet(pwalletMain->strWalletFile, pwalletMain->chain(), pwalletMain->GetLocation(), WalletDatabase::Create(pwalletMain->GetLocation().GetPath()));
         pwalletMain->setZWallet(zwalletMain);
 
         RegisterValidationInterface(pwalletMain);
