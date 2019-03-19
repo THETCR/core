@@ -498,7 +498,7 @@ bool WalletModel::changePassphrase(const SecureString& oldPass, const SecureStri
 bool WalletModel::backupWallet(const QString& filename)
 {
     //attempt regular backup
-    if(!BackupWallet(*wallet, filename.toLocal8Bit().data())) {
+    if(!wallet->BackupWallet(filename.toLocal8Bit().data())) {
         return error("ERROR: Failed to backup wallet!");
     }
 
@@ -686,12 +686,13 @@ bool WalletModel::getPubKey(const CKeyID& address, CPubKey& vchPubKeyOut) const
 // returns a list of COutputs from COutPoints
 void WalletModel::getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs)
 {
+    auto locked_chain = wallet->chain().lock();
     LOCK2(cs_main, wallet->cs_wallet);
     for (const COutPoint& outpoint: vOutpoints) {
         if (!wallet->mapWallet.count(outpoint.hash)) continue;
-        int nDepth = wallet->mapWallet[outpoint.hash].GetDepthInMainChain();
+        int nDepth = wallet->mapWallet[outpoint.hash].GetDepthInMainChain(*locked_chain);
         if (nDepth < 0) continue;
-        COutput out(&wallet->mapWallet[outpoint.hash], outpoint.n, nDepth, true);
+        COutput out(&wallet->mapWallet[outpoint.hash], outpoint.n, nDepth, true, true, true);
         vOutputs.push_back(out);
     }
 }
@@ -699,7 +700,8 @@ void WalletModel::getOutputs(const std::vector<COutPoint>& vOutpoints, std::vect
 bool WalletModel::isSpent(const COutPoint& outpoint) const
 {
     LOCK2(cs_main, wallet->cs_wallet);
-    return wallet->IsSpent(outpoint.hash, outpoint.n);
+    auto locked_chain = wallet->chain().lock();
+    return wallet->IsSpent(*locked_chain, outpoint.hash, outpoint.n);
 }
 
 // AvailableCoins + LockedCoins grouped by wallet address (put change in one group with wallet address)
@@ -707,6 +709,7 @@ void WalletModel::listCoins(std::map<QString, std::vector<COutput> >& mapCoins) 
 {
     std::vector<COutput> vCoins;
     wallet->AvailableCoins(vCoins);
+    auto locked_chain = wallet->chain().lock();
 
     LOCK2(cs_main, wallet->cs_wallet); // ListLockedCoins, mapWallet
     std::vector<COutPoint> vLockedCoins;
@@ -715,9 +718,9 @@ void WalletModel::listCoins(std::map<QString, std::vector<COutput> >& mapCoins) 
     // add locked coins
     for (const COutPoint& outpoint: vLockedCoins) {
         if (!wallet->mapWallet.count(outpoint.hash)) continue;
-        int nDepth = wallet->mapWallet[outpoint.hash].GetDepthInMainChain();
+        int nDepth = wallet->mapWallet[outpoint.hash].GetDepthInMainChain(*locked_chain);
         if (nDepth < 0) continue;
-        COutput out(&wallet->mapWallet[outpoint.hash], outpoint.n, nDepth, true);
+        COutput out(&wallet->mapWallet[outpoint.hash], outpoint.n, nDepth, true, true, true);
         if (outpoint.n < out.tx->tx->vout.size() && wallet->IsMine(out.tx->tx->vout[outpoint.n]) == ISMINE_SPENDABLE)
             vCoins.push_back(out);
     }
@@ -727,7 +730,7 @@ void WalletModel::listCoins(std::map<QString, std::vector<COutput> >& mapCoins) 
 
         while (wallet->IsChange(cout.tx->tx->vout[cout.i]) && cout.tx->tx->vin.size() > 0 && wallet->IsMine(cout.tx->tx->vin[0])) {
             if (!wallet->mapWallet.count(cout.tx->tx->vin[0].prevout.hash)) break;
-            cout = COutput(&wallet->mapWallet[cout.tx->tx->vin[0].prevout.hash], cout.tx->tx->vin[0].prevout.n, 0, true);
+            cout = COutput(&wallet->mapWallet[cout.tx->tx->vin[0].prevout.hash], cout.tx->tx->vin[0].prevout.n, 0, true, true, true);
         }
 
         CTxDestination address;
