@@ -321,6 +321,7 @@ endif
 libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_wallet_a_SOURCES = \
+  interfaces/handler.cpp \
   interfaces/wallet.cpp \
   activemasternode.cpp \
   bip38.cpp \
