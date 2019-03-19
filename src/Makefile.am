@@ -326,6 +326,7 @@ libbitcoin_wallet_a_SOURCES = \
   activemasternode.cpp \
   bip38.cpp \
   wallet/coincontrol.cpp \
+  outputtype.cpp \
   denomination_functions.cpp \
   obfuscation.cpp \
   obfuscation-relay.cpp \

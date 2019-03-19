@@ -9,6 +9,7 @@
 #include "clientversion.h"
 #include "main.h"
 #include "masternode-sync.h"
+#include <outputtype.h>
 #include <core_io.h>
 #include "net.h"
 #include "netbase.h"

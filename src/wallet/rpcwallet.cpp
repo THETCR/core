@@ -3686,3 +3686,9 @@ UniValue createautomintaddress(const JSONRPCRequest& request)
     CBitcoinAddress address = pwalletMain->GenerateNewAutoMintKey();
     return address.ToString();
 }
+
+//void RegisterWalletRPCCommands(CRPCTable &t)
+//{
+//    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
+//        t.appendCommand(commands[vcidx].name, &commands[vcidx]);
+//}
