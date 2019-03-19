@@ -1998,7 +1998,7 @@ CWallet::ScanResult CWallet::ScanForWalletTransactions(const uint256& start_bloc
                     for (auto& m : listMints) {
                         if (IsMyMint(m.GetValue())) {
                             LogPrint(BCLog::ZERO, "%s: found mint\n", __func__);
-                            pwalletMain->UpdateMint(m.GetValue(), block_height, m.GetTxHash(), m.GetDenomination());
+                            pwalletMain->UpdateMint(m.GetValue(), block_height.get(), m.GetTxHash(), m.GetDenomination());
 
                             // Add the transaction to the wallet
                             size_t posInBlock = 0;
@@ -2123,9 +2123,9 @@ bool CWalletTx::RelayWalletTransaction(interfaces::Chain::Lock& locked_chain, st
             if (strCommand == NetMsgType::TXLOCKREQUEST) {
                 mapTxLockReq.insert(std::make_pair(GetHash(), (CTransaction) * tx));
                 CreateNewLock(((CTransaction) * tx));
-                RelayTransactionLockReq((CTransaction) * tx, true);
+                RelayTransactionLockReq((CTransaction) * tx,  g_connman.get(), true);
             } else {
-                RelayTransaction((CTransaction) * tx);
+                RelayTransaction((CTransaction) * tx, g_connman.get());
             }
             if (pwallet->chain().p2pEnabled()) {
                 pwallet->chain().relayTransaction(GetHash());
@@ -6501,7 +6501,7 @@ bool CWallet::CreateTransaction(const std::vector<std::pair<CScript, CAmount> >&
                 // Can we complete this as a free transaction?
                 if (fSendFreeTransactions && nBytes <= MAX_FREE_TRANSACTION_CREATE_SIZE) {
                     // Not enough fee: enough priority?
-                    double dPriorityNeeded = mempool.estimatePriority(nTxConfirmTarget);
+                    double dPriorityNeeded = ::feeEstimator.estimatePriority(nTxConfirmTarget);
                     // Not enough mempool history to estimate: use hard-coded AllowFree.
                     if (dPriorityNeeded <= 0 && AllowFree(dPriority))
                         break;
@@ -6935,7 +6935,7 @@ string CWallet::PrepareObfuscationDenominate(int minRounds, int maxRounds)
     std::random_shuffle(vOut.begin(), vOut.end());
 
     // We also do not care about full amount as long as we have right denominations, just pass what we found
-    obfuScationPool.SendObfuscationDenominate(vCoinsResult, vOut, nValueIn - nValueLeft);
+    obfuScationPool.SendObfuscationDenominate(vCoinsResult, vOut, nValueIn - nValueLeft, g_connman.get());
 
     return "";
 }

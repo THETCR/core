@@ -95,7 +95,7 @@ protected:
    *
    * Called on a background thread.
    */
-//  virtual void TransactionAddedToMempool(const CTransactionRef &ptxn) {}
+  virtual void TransactionAddedToMempool(const CTransactionRef &ptxn) {}
   /**
    * Notifies listeners of a transaction leaving mempool.
    *
@@ -106,7 +106,7 @@ protected:
    *
    * Called on a background thread.
    */
-//  virtual void TransactionRemovedFromMempool(const CTransactionRef &ptx) {}
+  virtual void TransactionRemovedFromMempool(const CTransactionRef &ptx) {}
   /**
    * Notifies listeners of a block being connected.
    * Provides a vector of transactions evicted from the mempool as a result.
@@ -186,12 +186,12 @@ public:
   size_t CallbacksPending();
 
   /** Register with mempool to call TransactionRemovedFromMempool callbacks */
-//  void RegisterWithMempoolSignals(CTxMemPool& pool);
+  void RegisterWithMempoolSignals(CTxMemPool& pool);
   /** Unregister with mempool */
-//  void UnregisterWithMempoolSignals(CTxMemPool& pool);
+  void UnregisterWithMempoolSignals(CTxMemPool& pool);
 
   void UpdatedBlockTip(const CBlockIndex *, const CBlockIndex *, bool fInitialDownload);
-//  void TransactionAddedToMempool(const CTransactionRef &);
+  void TransactionAddedToMempool(const CTransactionRef &);
   void BlockConnected(const std::shared_ptr<const CBlock> &, const CBlockIndex *pindex, const std::shared_ptr<const std::vector<CTransactionRef>> &);
   void BlockDisconnected(const std::shared_ptr<const CBlock> &);
   void ChainStateFlushed(const CBlockLocator &);
