@@ -1700,7 +1700,7 @@ CBudgetProposalBroadcast::CBudgetProposalBroadcast(std::string strProposalNameIn
 void CBudgetProposalBroadcast::Relay()
 {
     CInv inv(MSG_BUDGET_PROPOSAL, GetHash());
-    RelayInv(inv);
+    RelayInv(inv, g_connman.get());
 }
 
 CBudgetVote::CBudgetVote()
@@ -1726,7 +1726,7 @@ CBudgetVote::CBudgetVote(CTxIn vinIn, uint256 nProposalHashIn, int nVoteIn)
 void CBudgetVote::Relay()
 {
     CInv inv(MSG_BUDGET_VOTE, GetHash());
-    RelayInv(inv);
+    RelayInv(inv, g_connman.get());
 }
 
 bool CBudgetVote::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
@@ -2230,7 +2230,7 @@ CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(std::string strBudgetNameIn
 void CFinalizedBudgetBroadcast::Relay()
 {
     CInv inv(MSG_BUDGET_FINALIZED, GetHash());
-    RelayInv(inv);
+    RelayInv(inv, g_connman.get());
 }
 
 CFinalizedBudgetVote::CFinalizedBudgetVote()
@@ -2256,7 +2256,7 @@ CFinalizedBudgetVote::CFinalizedBudgetVote(CTxIn vinIn, uint256 nBudgetHashIn)
 void CFinalizedBudgetVote::Relay()
 {
     CInv inv(MSG_BUDGET_FINALIZED_VOTE, GetHash());
-    RelayInv(inv);
+    RelayInv(inv, g_connman.get());
 }
 
 bool CFinalizedBudgetVote::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
