@@ -2711,12 +2711,9 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     LogPrint(BCLog::BENCH, "  - Load block from disk: %.2fms [%.2fs]\n", (nTime2 - nTime1) * 0.001, nTimeReadFromDisk * 0.000001);
     {
         CInv inv(MSG_BLOCK, pindexNew->GetBlockHash());
-        std::cout << "ConnectBlock\n";
         CCoinsViewCache view(pcoinsTip.get());
         bool rv = ConnectBlock(*pblock, state, pindexNew, view, false, fAlreadyChecked);
-        std::cout << "BlockChecked\n";
         GetMainSignals().BlockChecked(*pblock, state);
-        std::cout << "BlockChecked done\n";
         if (!rv) {
             if (state.IsInvalid())
                 InvalidBlockFound(pindexNew, state);
@@ -2737,7 +2734,6 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
         flushMode = FlushStateMode::ALWAYS;
 
     // Write the chain state to disk, if necessary.
-    std::cout << "Connect tip flush state to disk\n";
     if (!FlushStateToDisk(chainparams, state, FlushStateMode::IF_NEEDED))
         return false;
     int64_t nTime5 = GetTimeMicros();
@@ -2935,11 +2931,9 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
     if (pblock == nullptr)
         fAlreadyChecked = false;
     bool fInvalidFound = false;
-    std::cout << "pindexOldTip\n";
     const CBlockIndex* pindexOldTip = chainActive.Tip();
     const CBlockIndex* pindexFork = chainActive.FindFork(pindexMostWork);
     // Disconnect active blocks which are no longer in the best chain.
-    std::cout << "DisconnectTip\n";
     while (chainActive.Tip() && chainActive.Tip() != pindexFork) {
         if (!DisconnectTip(state))
             return false;
@@ -2949,7 +2943,6 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
     std::vector<CBlockIndex*> vpindexToConnect;
     bool fContinue = true;
     int nHeight = pindexFork ? pindexFork->nHeight : -1;
-    std::cout << "pindexMostWork\n";
     while (fContinue && nHeight != pindexMostWork->nHeight) {
         // Don't iterate the entire list of potential improvements toward the best tip, as we likely only need
         // a few blocks along the way.
@@ -2964,11 +2957,8 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
         nHeight = nTargetHeight;
 
         // Connect new blocks.
-        std::cout << "Connect\n";
         for (CBlockIndex* pindexConnect: reverse_iterate(vpindexToConnect)) {
-            std::cout << "ConnectTip\n";
             if (!ConnectTip(state, pindexConnect, pindexConnect == pindexMostWork ? pblock : NULL, fAlreadyChecked)) {
-                std::cout << "state\n";
                 if (state.IsInvalid()) {
                     // The block violates a consensus rule.
                     if (!state.CorruptionPossible())
@@ -2982,7 +2972,6 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
                     return false;
                 }
             } else {
-                std::cout << "PruneBlockIndexCandidates\n";
                 PruneBlockIndexCandidates();
                 if (!pindexOldTip || chainActive.Tip()->nChainWork > pindexOldTip->nChainWork) {
                     // We're in a better position than we were. Return temporarily to release the lock.
@@ -2993,7 +2982,6 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
         }
     }
 
-    std::cout << "Callbacks\n";
     // Callbacks/notifications for a new best chain.
     if (fInvalidFound)
         CheckForkWarningConditionsOnNewFork(vpindexToConnect.back());
@@ -3068,11 +3056,9 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
                 }
                 bool fInvalidFound = false;
                 std::shared_ptr<const CBlock> nullBlockPtr;
-                std::cout << "ActivateBestChainStep\n";
                 if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked)){
                     return false;
                 }
-                std::cout << "blocks_connected\n";
                 blocks_connected = true;
                 if (fInvalidFound) {
                     // Wipe cache, we may need another branch now.
@@ -3087,11 +3073,9 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
             // Notify external listeners about the new tip.
                 // Enqueue while holding cs_main to ensure that UpdatedBlockTip is called in the order in which blocks are connected
                 if (pindexFork != pindexNewTip) {
-                    std::cout << "UpdatedBlockTip\n";
                     // Notify ValidationInterface subscribers
                     GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
 
-                    std::cout << "NotifyBlockTip\n";
                     // Always notify the UI if a new block tip was connected
                     uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
                 }
@@ -4555,11 +4539,9 @@ bool InitBlockIndex(const CChainParams& chainparams)
         try {
             CValidationState state;
 
-            std::cout << "AddGenesisBlock\n";
             if (!AddGenesisBlock(chainparams, chainparams.GenesisBlock(), state))
                 return false;
 
-            std::cout << "FlushStateToDisk\n";
             // Force a chainstate write so that when we VerifyDB in a moment, it doesnt check stale data
             return FlushStateToDisk(chainparams, state, FlushStateMode::ALWAYS);
         } catch (std::runtime_error& e) {

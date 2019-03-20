@@ -38,7 +38,6 @@ extern bool fPrintToConsole;
 BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
         : m_path_root(fs::temp_directory_path() / "test_wispr" / strprintf("%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(1 << 30))))
 {
-    std::cout << "SHA256AutoDetect\n";
     SHA256AutoDetect();
     ECC_Start();
     SetupEnvironment();
@@ -48,9 +47,9 @@ BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
     fCheckBlockIndex = true;
     SelectParams(chainName);
     noui_connect();
-//#ifdef ENABLE_WALLET
-//    pwalletMain->MakeMock();
-//#endif
+#ifdef ENABLE_WALLET
+    WalletDatabase::CreateMock();
+#endif
 }
 
 BasicTestingSetup::~BasicTestingSetup()
@@ -69,12 +68,10 @@ fs::path BasicTestingSetup::SetDataDir(const std::string& name)
 
 TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(chainName)
 {
-    std::cout << "SetDataDir\n";
     SetDataDir("tempdir");
     const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
-    std::cout << "ClearDataDirCache\n";
 //    RegisterAllCoreRPCCommands(tableRPC);
     ClearDatadirCache();
     // We have to run a scheduler thread to prevent ActivateBestChain
@@ -86,32 +83,25 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     pblocktree.reset(new CBlockTreeDB(1 << 20, true));
     pcoinsdbview.reset(new CCoinsViewDB(1 << 23, true));
     pcoinsTip.reset(new CCoinsViewCache(pcoinsdbview.get()));
-    std::cout << "LoadGenesisBlock\n";
     if (!LoadGenesisBlock(chainparams)) {
         throw std::runtime_error("LoadGenesisBlock failed.");
     }
 //    InitBlockIndex(chainparams);
 //    {
 //    }
-    std::cout << "ActivateBestChain\n";
     CValidationState state;
     if (!ActivateBestChain(state)) {
         throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
     }
-    std::cout << "ENABLE_WALLET\n";
 #ifdef ENABLE_WALLET
     bool fFirstRun;
-    std::cout << "CWallet\n";
     std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
     pwalletMain = new CWallet(*m_chain, WalletLocation(), WalletDatabase::CreateMock());
 //    pwalletMain = new CWallet("wallet.dat", *m_chain, WalletLocation(), WalletDatabase::CreateMock());
-    std::cout << "LoadWallet\n";
     pwalletMain->LoadWallet(fFirstRun);
-    std::cout << "RegisterValidationInterface\n";
     RegisterValidationInterface(pwalletMain);
 #endif
     nScriptCheckThreads = 3;
-    std::cout << "ThreadScriptCheck\n";
     for (int i=0; i < nScriptCheckThreads-1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
     g_banman = MakeUnique<BanMan>(GetDataDir() / "banlist.dat", nullptr, DEFAULT_MISBEHAVING_BANTIME);

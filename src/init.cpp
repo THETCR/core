@@ -396,7 +396,6 @@ static void OnRPCStopped()
 
 void SetupServerArgs()
 {
-    std::cout << "SetupServerArgs\n";
     SetupHelpOptions(gArgs);
     gArgs.AddArg("-help-debug", "Print help message with debugging options and exit", false, OptionsCategory::DEBUG_TEST); // server-only for now
 
@@ -951,7 +950,6 @@ void ThreadImport(std::vector<fs::path> vImportFiles)
  */
 static bool InitSanityCheck()
 {
-    std::cout << "InitSanityCheck\n";
     if(!ECC_InitSanityCheck()) {
         InitError("Elliptic curve cryptography sanity check failure. Aborting.");
         return false;
@@ -970,7 +968,6 @@ static bool InitSanityCheck()
 
 static bool AppInitServers()
 {
-    std::cout << "AppInitServers\n";
     RPCServer::OnStopped(&OnRPCStopped);
 //    RPCServer::OnPreCommand(&OnRPCPreCommand);
     if (!InitHTTPServer())
