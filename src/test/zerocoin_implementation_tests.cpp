@@ -519,7 +519,8 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
 
                 std::string strWalletFile = "unittestwallet.dat";
 
-                CWallet wallet(strWalletFile);
+            std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
+            CWallet wallet(*m_chain, WalletLocation(), WalletDatabase::CreateMock());
                 WalletBatch walletdb(wallet.GetDBHandle(), "cr+");
 
                 CzWSPWallet zWallet(wallet.strWalletFile, wallet.chain(), wallet.GetLocation(), WalletDatabase::Create(wallet.GetLocation().GetPath()));
