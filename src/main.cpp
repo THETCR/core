@@ -2711,8 +2711,11 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     LogPrint(BCLog::BENCH, "  - Load block from disk: %.2fms [%.2fs]\n", (nTime2 - nTime1) * 0.001, nTimeReadFromDisk * 0.000001);
     {
         CInv inv(MSG_BLOCK, pindexNew->GetBlockHash());
+        std::cout << "ConnectBlock\n";
         bool rv = ConnectBlock(*pblock, state, pindexNew, view, false, fAlreadyChecked);
+        std::cout << "BlockChecked\n";
         GetMainSignals().BlockChecked(*pblock, state);
+        std::cout << "BlockChecked done\n";
         if (!rv) {
             if (state.IsInvalid())
                 InvalidBlockFound(pindexNew, state);
@@ -2749,13 +2752,13 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     UpdateTip(pindexNew);
     // Tell wallet about transactions that went from mempool
     // to conflicted:
-//    for (const auto& tx: txConflicted) {
-//        SyncWithWallets(tx, NULL);
-//    }
+    for (const auto& tx: txConflicted) {
+        SyncWithWallets(tx, NULL);
+    }
     // ... and about transactions that got confirmed:
-//    for (const auto& tx: pblock->vtx) {
-//        SyncWithWallets(*tx, pblock);
-//    }
+    for (const auto& tx: pblock->vtx) {
+        SyncWithWallets(*tx, pblock);
+    }
 
     int64_t nTime6 = GetTimeMicros();
     nTimePostConnect += nTime6 - nTime5;
