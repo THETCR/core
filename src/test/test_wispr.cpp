@@ -103,7 +103,9 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     bool fFirstRun;
     std::cout << "CWallet\n";
     pwalletMain = new CWallet("wallet.dat");
+    std::cout << "LoadWallet\n";
     pwalletMain->LoadWallet(fFirstRun);
+    std::cout << "RegisterValidationInterface\n";
     RegisterValidationInterface(pwalletMain);
 #endif
     nScriptCheckThreads = 3;
