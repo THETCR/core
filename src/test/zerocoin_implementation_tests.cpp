@@ -513,51 +513,52 @@ BOOST_AUTO_TEST_CASE(test_checkpoints)
         }
 
 BOOST_AUTO_TEST_CASE(deterministic_tests)
-        {
-                SelectParams(CBaseChainParams::UNITTEST);
-                uint256 seedMaster("3a1947364362e2e7c073b386869c89c905c0cf462448ffd6c2021bd03ce689f6");
+{
+  SelectParams(CBaseChainParams::UNITTEST);
+  uint256 seedMaster("3a1947364362e2e7c073b386869c89c905c0cf462448ffd6c2021bd03ce689f6");
 
-                std::string strWalletFile = "unittestwallet.dat";
+  std::string strWalletFile = "unittestwallet.dat";
 
-            std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
-            WalletLocation m_location = WalletLocation("unittestwallet.dat");
-            BOOST_TEST_PASSPOINT();
-            CWallet wallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
-            BOOST_TEST_PASSPOINT();
-                WalletBatch walletdb(wallet.GetDBHandle(), "cr+");
-                BOOST_TEST_PASSPOINT();
-                CzWSPWallet zWallet(wallet.strWalletFile, wallet.chain(), wallet.GetLocation(), wallet.GetDBHandle());
-            BOOST_TEST_PASSPOINT();
-            zWallet.SetMasterSeed(seedMaster);
-                wallet.setZWallet(&zWallet);
+  std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
+  WalletLocation m_location = WalletLocation("unittestwallet.dat");
+  BOOST_TEST_PASSPOINT();
+  CWallet wallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
+  BOOST_TEST_PASSPOINT();
+  WalletBatch walletdb(wallet.GetDBHandle(), "cr+");
+  BOOST_TEST_PASSPOINT();
+  CzWSPWallet zWallet(wallet.strWalletFile, wallet.chain(), wallet.GetLocation(), wallet.GetDBHandle());
+  BOOST_TEST_PASSPOINT();
+  zWallet.SetMasterSeed(seedMaster);
+  wallet.setZWallet(&zWallet);
 
-                int64_t nTimeStart = GetTimeMillis();
-                CoinDenomination denom = CoinDenomination::ZQ_FIFTY;
+  int64_t nTimeStart = GetTimeMillis();
+  CoinDenomination denom = CoinDenomination::ZQ_FIFTY;
 
-                std::vector<PrivateCoin> vCoins;
-                int nTests = 50;
-                for (int i = 0; i < nTests; i++) {
-            PrivateCoin coin(Params().Zerocoin_Params(false), denom, false);
-            CDeterministicMint dMint;
-            zWallet.GenerateDeterministicZWSP(denom, coin, dMint);
-            vCoins.emplace_back(coin);
-        }
+  std::vector<PrivateCoin> vCoins;
+  int nTests = 50;
+  for (int i = 0; i < nTests; i++) {
+      PrivateCoin coin(Params().Zerocoin_Params(false), denom, false);
+      CDeterministicMint dMint;
+      zWallet.GenerateDeterministicZWSP(denom, coin, dMint);
+      vCoins.emplace_back(coin);
+  }
 
-                int64_t nTotalTime = GetTimeMillis() - nTimeStart;
-                std::cout << "Total time:" << nTotalTime << "ms. Per Deterministic Mint:" << (nTotalTime/nTests) << "ms" << endl;
+  int64_t nTotalTime = GetTimeMillis() - nTimeStart;
+  std::cout << "Total time:" << nTotalTime << "ms. Per Deterministic Mint:" << (nTotalTime/nTests) << "ms" << endl;
 
-                std::cout << "Checking that mints are valid" << endl;
-                CDataStream ss(SER_GETHASH, 0);
-                for (PrivateCoin& coin : vCoins) {
-            BOOST_CHECK_MESSAGE(coin.IsValid(), "Generated Mint is not valid");
-            ss << coin.getPublicCoin().getValue();
-        }
-
-                std::cout << "Checking that mints are deterministic: sha256 checksum=";
-                uint256 hash = Hash(ss.begin(), ss.end());
-                std::cout << hash.GetHex() << endl;
-                BOOST_CHECK_MESSAGE(hash == uint256("c90c225f2cbdee5ef053b1f9f70053dd83724c58126d0e1b8425b88091d1f73f"), "minting determinism isn't as expected");
-        }
+  std::cout << "Checking that mints are valid" << endl;
+  CDataStream ss(SER_GETHASH, 0);
+  for (PrivateCoin& coin : vCoins) {
+     BOOST_CHECK_MESSAGE(coin.IsValid(), "Generated Mint is not valid");
+     ss << coin.getPublicCoin().getValue();
+  }
+  BOOST_TEST_PASSPOINT();
+  std::cout << "Checking that mints are deterministic: sha256 checksum=";
+  uint256 hash = Hash(ss.begin(), ss.end());
+  std::cout << hash.GetHex() << endl;
+  BOOST_TEST_PASSPOINT();
+  BOOST_CHECK_MESSAGE(hash == uint256("c90c225f2cbdee5ef053b1f9f70053dd83724c58126d0e1b8425b88091d1f73f"), "minting determinism isn't as expected");
+}
 
 
 BOOST_AUTO_TEST_SUITE_END()
