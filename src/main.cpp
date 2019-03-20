@@ -2690,8 +2690,8 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
 {
     const CChainParams& chainparams = Params();
     assert(pindexNew->pprev == chainActive.Tip());
-    mempool.check(pcoinsTip.get());
-    CCoinsViewCache view(pcoinsTip.get());
+//    mempool.check(pcoinsTip.get());
+//    CCoinsViewCache view(pcoinsTip.get());
 
     if (pblock == nullptr)
         fAlreadyChecked = false;
@@ -2712,6 +2712,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     {
         CInv inv(MSG_BLOCK, pindexNew->GetBlockHash());
         std::cout << "ConnectBlock\n";
+        CCoinsViewCache view(pcoinsTip.get());
         bool rv = ConnectBlock(*pblock, state, pindexNew, view, false, fAlreadyChecked);
         std::cout << "BlockChecked\n";
         GetMainSignals().BlockChecked(*pblock, state);
