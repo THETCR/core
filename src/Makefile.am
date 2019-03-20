@@ -272,6 +272,7 @@ libbitcoin_server_a_SOURCES = \
   chain.cpp \
   checkpoints.cpp \
   consensus/tx_verify.cpp \
+  genwit.cpp \
   httprpc.cpp \
   httpserver.cpp \
   interfaces/chain.cpp \
