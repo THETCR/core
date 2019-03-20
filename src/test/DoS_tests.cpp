@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
             BOOST_CHECK(!AddOrphanTx(tx, i));
         }
 
-        LOCK2(cs_main, g_cs_orphans);
+        LOCK(cs_main);
         // Test EraseOrphansFor:
         for (NodeId i = 0; i < 3; i++)
         {
