@@ -76,6 +76,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
     BOOST_AUTO_TEST_CASE(outbound_slow_chain_eviction)
     {
         auto connman = MakeUnique<CConnman>(0x1337, 0x1337);
+        CScheduler scheduler;
         auto peerLogic = MakeUnique<PeerLogicValidation>(connman.get(), nullptr, scheduler, false);
 
         // Mock an outbound peer
@@ -146,6 +147,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
     BOOST_AUTO_TEST_CASE(stale_tip_peer_management)
     {
         auto connman = MakeUnique<CConnmanTest>(0x1337, 0x1337);
+        CScheduler scheduler;
         auto peerLogic = MakeUnique<PeerLogicValidation>(connman.get(), nullptr, scheduler, false);
 
         const Consensus::Params& consensusParams = Params().GetConsensus();
@@ -219,6 +221,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
     {
         auto banman = MakeUnique<BanMan>(GetDataDir() / "banlist.dat", nullptr, DEFAULT_MISBEHAVING_BANTIME);
         auto connman = MakeUnique<CConnman>(0x1337, 0x1337);
+        CScheduler scheduler;
         auto peerLogic = MakeUnique<PeerLogicValidation>(connman.get(), banman.get(), scheduler, false);
 
         banman->ClearBanned();
@@ -274,6 +277,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
     {
         auto banman = MakeUnique<BanMan>(GetDataDir() / "banlist.dat", nullptr, DEFAULT_MISBEHAVING_BANTIME);
         auto connman = MakeUnique<CConnman>(0x1337, 0x1337);
+        CScheduler scheduler;
         auto peerLogic = MakeUnique<PeerLogicValidation>(connman.get(), banman.get(), scheduler, false);
 
         banman->ClearBanned();
@@ -321,6 +325,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
     {
         auto banman = MakeUnique<BanMan>(GetDataDir() / "banlist.dat", nullptr, DEFAULT_MISBEHAVING_BANTIME);
         auto connman = MakeUnique<CConnman>(0x1337, 0x1337);
+        CScheduler scheduler;
         auto peerLogic = MakeUnique<PeerLogicValidation>(connman.get(), banman.get(), scheduler, false);
 
         banman->ClearBanned();

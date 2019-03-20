@@ -75,7 +75,7 @@ class CNode;
 struct TestingSetup: public BasicTestingSetup {
     boost::thread_group threadGroup;
     CScheduler scheduler;
-    CConnman* connman;
+//    CConnman* connman;
 
     explicit TestingSetup(const std::string& chainName = CBaseChainParams::UNITTEST);
     ~TestingSetup();
