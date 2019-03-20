@@ -35,6 +35,12 @@ FastRandomContext g_insecure_rand_ctx;
 
 extern bool fPrintToConsole;
 
+std::ostream& operator<<(std::ostream& os, const uint256& num)
+{
+    os << num.ToString();
+    return os;
+}
+
 BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
         : m_path_root(fs::temp_directory_path() / "test_wispr" / strprintf("%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(1 << 30))))
 {
