@@ -557,9 +557,9 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
   uint256 hash = Hash(ss.begin(), ss.end());
   std::cout << hash.GetHex() << endl;
   BOOST_TEST_PASSPOINT();
-  std:cout << "BOOST_CHECK_MESSAGE\n";
+  std::cout << "BOOST_CHECK_MESSAGE\n";
   BOOST_CHECK_MESSAGE(hash == uint256("c90c225f2cbdee5ef053b1f9f70053dd83724c58126d0e1b8425b88091d1f73f"), "minting determinism isn't as expected");
-  std:cout << "BOOST_CHECK_MESSAGE passed\n";
+  std::cout << "BOOST_CHECK_MESSAGE passed\n";
 }
 
 
