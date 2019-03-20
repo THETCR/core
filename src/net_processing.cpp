@@ -53,6 +53,7 @@ using namespace std;
 struct COrphanTx {
   CTransaction tx;
   NodeId fromPeer;
+  int64_t nTimeExpire;
 };
 CCriticalSection g_cs_orphans;
 

@@ -45,7 +45,7 @@ extern unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans);
 //extern void Misbehaving(NodeId nodeid, int howmuch, const std::string& message="");
 
 struct COrphanTx {
-    CTransactionRef tx;
+    CTransaction tx;
     NodeId fromPeer;
     int64_t nTimeExpire;
 };
@@ -359,7 +359,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
         peerLogic->FinalizeNode(dummyNode.GetId(), dummy);
     }
 
-    static CTransactionRef RandomOrphan()
+    static CTransaction RandomOrphan()
     {
         std::map<uint256, COrphanTx>::iterator it;
         LOCK(cs_main);
@@ -394,16 +394,16 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
         // ... and 50 that depend on other orphans:
         for (int i = 0; i < 50; i++)
         {
-            CTransactionRef txPrev = RandomOrphan();
+            CTransaction txPrev = RandomOrphan();
 
             CMutableTransaction tx;
             tx.vin.resize(1);
             tx.vin[0].prevout.n = 0;
-            tx.vin[0].prevout.hash = txPrev->GetHash();
+            tx.vin[0].prevout.hash = txPrev.GetHash();
             tx.vout.resize(1);
             tx.vout[0].nValue = 1*CENT;
             tx.vout[0].scriptPubKey = GetScriptForDestination(key.GetPubKey().GetID());
-            BOOST_CHECK(SignSignature(keystore, *txPrev, tx, 0, SIGHASH_ALL));
+            BOOST_CHECK(SignSignature(keystore, txPrev, tx, 0, SIGHASH_ALL));
 
             AddOrphanTx(tx, i);
         }
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
         // This really-big orphan should be ignored:
         for (int i = 0; i < 10; i++)
         {
-            CTransactionRef txPrev = RandomOrphan();
+            CTransaction txPrev = RandomOrphan();
 
             CMutableTransaction tx;
             tx.vout.resize(1);
@@ -421,9 +421,9 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
             for (unsigned int j = 0; j < tx.vin.size(); j++)
             {
                 tx.vin[j].prevout.n = j;
-                tx.vin[j].prevout.hash = txPrev->GetHash();
+                tx.vin[j].prevout.hash = txPrev.GetHash();
             }
-            BOOST_CHECK(SignSignature(keystore, *txPrev, tx, 0, SIGHASH_ALL));
+            BOOST_CHECK(SignSignature(keystore, txPrev, tx, 0, SIGHASH_ALL));
             // Re-use same signature for other inputs
             // (they don't have to be valid for this test)
             for (unsigned int j = 1; j < tx.vin.size(); j++)
