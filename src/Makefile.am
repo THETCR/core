@@ -252,6 +252,7 @@ BITCOIN_CORE_H = \
   zmq/zmqpublishnotifier.h \
   zmq/zmqrpc.h
 
+
 obj/build.h: FORCE
 	@$(MKDIR_P) $(builddir)/obj
 	@$(top_srcdir)/share/genbuild.sh "$(abs_top_builddir)/src/obj/build.h" \
@@ -280,6 +281,7 @@ libbitcoin_server_a_SOURCES = \
   interfaces/node.cpp \
   init.cpp \
   leveldbwrapper.cpp \
+  lightzwspthread.cpp \
   main.cpp \
   merkleblock.cpp \
   miner.cpp \
