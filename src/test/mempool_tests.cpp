@@ -12,7 +12,7 @@
 #include <list>
 #include <vector>
 
-BOOST_FIXTURE_TEST_SUITE(mempool_tests, TestingSetup)
+BOOST_AUTO_TEST_SUITE(mempool_tests)
 
     BOOST_AUTO_TEST_CASE(MempoolRemoveTest)
     {
