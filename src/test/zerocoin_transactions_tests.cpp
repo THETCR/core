@@ -17,9 +17,9 @@ using namespace libzerocoin;
 
 
 BOOST_AUTO_TEST_SUITE(zerocoin_transactions_tests)
-std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
-WalletLocation m_location = WalletLocation("unlocked.dat");
-static CWallet cWallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
+//std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
+//WalletLocation m_location = WalletLocation("unlocked.dat");
+static CWallet cWallet("unlocked.dat");
 
 BOOST_AUTO_TEST_CASE(zerocoin_spend_test)
 {
