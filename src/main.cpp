@@ -2733,6 +2733,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
         flushMode = FlushStateMode::ALWAYS;
 
     // Write the chain state to disk, if necessary.
+    std::cout << "Connect tip flush state to disk\n";
     if (!FlushStateToDisk(chainparams, state, FlushStateMode::IF_NEEDED))
         return false;
     int64_t nTime5 = GetTimeMicros();
@@ -2744,16 +2745,17 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     mempool.removeForBlock(pblock->vtx, pindexNew->nHeight);
     mempool.check(pcoinsTip.get());
     // Update chainActive & related variables.
+    chainActive.SetTip(pindexNew);
     UpdateTip(pindexNew);
     // Tell wallet about transactions that went from mempool
     // to conflicted:
-    for (const auto& tx: txConflicted) {
-        SyncWithWallets(tx, NULL);
-    }
+//    for (const auto& tx: txConflicted) {
+//        SyncWithWallets(tx, NULL);
+//    }
     // ... and about transactions that got confirmed:
-    for (const auto& tx: pblock->vtx) {
-        SyncWithWallets(*tx, pblock);
-    }
+//    for (const auto& tx: pblock->vtx) {
+//        SyncWithWallets(*tx, pblock);
+//    }
 
     int64_t nTime6 = GetTimeMicros();
     nTimePostConnect += nTime6 - nTime5;
