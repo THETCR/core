@@ -521,11 +521,14 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
 
             std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
             WalletLocation m_location = WalletLocation("unittestwallet.dat");
+            BOOST_TEST_PASSPOINT();
             CWallet wallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
+            BOOST_TEST_PASSPOINT();
                 WalletBatch walletdb(wallet.GetDBHandle(), "cr+");
-
+                BOOST_TEST_PASSPOINT();
                 CzWSPWallet zWallet(wallet.strWalletFile, wallet.chain(), wallet.GetLocation(), WalletDatabase::Create(wallet.GetLocation().GetPath()));
-                zWallet.SetMasterSeed(seedMaster);
+            BOOST_TEST_PASSPOINT();
+            zWallet.SetMasterSeed(seedMaster);
                 wallet.setZWallet(&zWallet);
 
                 int64_t nTimeStart = GetTimeMillis();
