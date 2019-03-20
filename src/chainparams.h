@@ -16,6 +16,7 @@
 #include "protocol.h"
 
 #include "libzerocoin/Params.h"
+#include <memory>
 #include <vector>
 
 struct CDNSSeedData {

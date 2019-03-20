@@ -9,6 +9,7 @@
 #include "libzerocoin/Params.h"
 #include "chainparams.h"
 #include "consensus/merkle.h"
+#include <tinyformat.h>
 #include <util/system.h>
 #include "util/strencodings.h"
 
