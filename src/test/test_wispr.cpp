@@ -126,6 +126,9 @@ TestingSetup::~TestingSetup()
     g_connman.reset();
     UnloadBlockIndex();
 #ifdef ENABLE_WALLET
+    pwalletMain->Flush(true);
+#endif
+#ifdef ENABLE_WALLET
     UnregisterValidationInterface(pwalletMain);
     delete pwalletMain;
     pwalletMain = nullptr;
@@ -133,9 +136,6 @@ TestingSetup::~TestingSetup()
     pcoinsTip.reset();
     pcoinsdbview.reset();
     pblocktree.reset();
-#ifdef ENABLE_WALLET
-    pwalletMain->Flush(true);
-#endif
 }
 
 TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
