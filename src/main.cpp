@@ -2960,7 +2960,9 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
         // Connect new blocks.
         std::cout << "Connect\n";
         for (CBlockIndex* pindexConnect: reverse_iterate(vpindexToConnect)) {
+            std::cout << "ConnectTip\n";
             if (!ConnectTip(state, pindexConnect, pindexConnect == pindexMostWork ? pblock : NULL, fAlreadyChecked)) {
+                std::cout << "state\n";
                 if (state.IsInvalid()) {
                     // The block violates a consensus rule.
                     if (!state.CorruptionPossible())
