@@ -49,8 +49,8 @@ struct COrphanTx {
     NodeId fromPeer;
     int64_t nTimeExpire;
 };
-extern CCriticalSection g_cs_orphans;
-extern std::map<uint256, COrphanTx> mapOrphanTransactions GUARDED_BY(g_cs_orphans);
+//extern CCriticalSection g_cs_orphans;
+extern std::map<uint256, COrphanTx> mapOrphanTransactions GUARDED_BY(cs_main);
 
 static CService ip(uint32_t i)
 {
@@ -362,7 +362,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
     static CTransactionRef RandomOrphan()
     {
         std::map<uint256, COrphanTx>::iterator it;
-        LOCK2(cs_main, g_cs_orphans);
+        LOCK(cs_main);
         it = mapOrphanTransactions.lower_bound(InsecureRand256());
         if (it == mapOrphanTransactions.end())
             it = mapOrphanTransactions.begin();
