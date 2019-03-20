@@ -14,7 +14,7 @@
 
 using namespace std;
 
-CzWSPTracker::CzWSPTracker(std::string strWalletFile, interfaces::Chain& chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database) : m_chain(chain), m_location(location), database(std::move(database))
+CzWSPTracker::CzWSPTracker(std::string strWalletFile, interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database) : m_chain(chain), m_location(location), database(database)
 {
     this->strWalletFile = strWalletFile;
     mapSerialHashes.clear();
@@ -42,10 +42,10 @@ bool CzWSPTracker::Archive(CMintMeta& meta)
     if (mapSerialHashes.count(meta.hashSerial))
         mapSerialHashes.at(meta.hashSerial).isArchived = true;
 
-    WalletBatch walletdb(*database);
+    WalletBatch walletdb(database);
     CZerocoinMint mint;
     if (walletdb.ReadZerocoinMint(meta.hashPubcoin, mint)) {
-        if (!WalletBatch(*database).ArchiveMintOrphan(mint))
+        if (!WalletBatch(database).ArchiveMintOrphan(mint))
             return error("%s: failed to archive zerocoinmint", __func__);
     } else {
         //failed to read mint from DB, try reading deterministic
@@ -62,7 +62,7 @@ bool CzWSPTracker::Archive(CMintMeta& meta)
 
 bool CzWSPTracker::UnArchive(const uint256& hashPubcoin, bool isDeterministic)
 {
-    WalletBatch walletdb(*database);
+    WalletBatch walletdb(database);
     if (isDeterministic) {
         CDeterministicMint dMint;
         if (!walletdb.UnarchiveDeterministicMint(hashPubcoin, dMint))
@@ -231,12 +231,12 @@ bool CzWSPTracker::UpdateZerocoinMint(const CZerocoinMint& mint)
     mapSerialHashes.at(hashSerial) = meta;
 
     //Write to db
-    return WalletBatch(*database).WriteZerocoinMint(mint);
+    return WalletBatch(database).WriteZerocoinMint(mint);
 }
 
 bool CzWSPTracker::UpdateState(const CMintMeta& meta)
 {
-    WalletBatch walletdb(*database);
+    WalletBatch walletdb(database);
 
     if (meta.isDeterministic) {
         CDeterministicMint dMint;
@@ -292,14 +292,14 @@ void CzWSPTracker::Add(const CDeterministicMint& dMint, bool isNew, bool isArchi
     meta.isArchived = isArchived;
     meta.isDeterministic = true;
     if (! iszWSPWalletInitialized)
-        zWSPWallet = new CzWSPWallet(strWalletFile, m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
+        zWSPWallet = new CzWSPWallet(strWalletFile, m_chain, m_location, database);
     meta.isSeedCorrect = zWSPWallet->CheckSeed(dMint);
     if (! iszWSPWalletInitialized)
         delete zWSPWallet;
     mapSerialHashes[meta.hashSerial] = meta;
 
     if (isNew)
-        WalletBatch(*database).WriteDeterministicMint(dMint);
+        WalletBatch(database).WriteDeterministicMint(dMint);
 }
 
 void CzWSPTracker::Add(const CZerocoinMint& mint, bool isNew, bool isArchived)
@@ -320,7 +320,7 @@ void CzWSPTracker::Add(const CZerocoinMint& mint, bool isNew, bool isArchived)
     mapSerialHashes[meta.hashSerial] = meta;
 
     if (isNew)
-        WalletBatch(*database).WriteZerocoinMint(mint);
+        WalletBatch(database).WriteZerocoinMint(mint);
 }
 
 void CzWSPTracker::SetPubcoinUsed(const uint256& hashPubcoin, const uint256& txid)
@@ -438,7 +438,7 @@ bool CzWSPTracker::UpdateStatusInternal(const std::set<uint256>& setMempool, CMi
 
 std::set<CMintMeta> CzWSPTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, bool fUpdateStatus, bool fWrongSeed)
 {
-    WalletBatch walletdb(*database);
+    WalletBatch walletdb(database);
     if (fUpdateStatus) {
         std::list<CZerocoinMint> listMintsDB = walletdb.ListMintedCoins();
         for (auto& mint : listMintsDB)
@@ -447,7 +447,7 @@ std::set<CMintMeta> CzWSPTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, 
 
         std::list<CDeterministicMint> listDeterministicDB = walletdb.ListDeterministicMints();
 
-        CzWSPWallet* zWSPWallet = new CzWSPWallet(strWalletFile, m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
+        CzWSPWallet* zWSPWallet = new CzWSPWallet(strWalletFile, m_chain, m_location, database);
         for (auto& dMint : listDeterministicDB) {
             Add(dMint, false, false, zWSPWallet);
         }

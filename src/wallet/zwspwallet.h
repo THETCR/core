@@ -29,9 +29,9 @@ private:
     /** Wallet location which includes wallet name (see WalletLocation). */
     WalletLocation m_location;
     /** Internal database handle. */
-    std::unique_ptr<WalletDatabase> database;
+    WalletDatabase& database;
 public:
-    CzWSPWallet(std::string strWalletFile, interfaces::Chain& chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database);
+    CzWSPWallet(std::string strWalletFile, interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database);
     void AddToMintPool(const std::pair<uint256, uint32_t>& pMint, bool fVerbose);
     bool SetMasterSeed(const uint256& seedMaster, bool fResetCount = false);
     uint256 GetMasterSeed() { return seedMaster; }

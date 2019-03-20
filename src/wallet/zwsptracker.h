@@ -32,9 +32,9 @@ private:
     /** Wallet location which includes wallet name (see WalletLocation). */
     WalletLocation m_location;
     /** Internal database handle. */
-    std::unique_ptr<WalletDatabase> database;
+    WalletDatabase& database;
 public:
-    CzWSPTracker(std::string strWalletFile, interfaces::Chain& chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database);
+    CzWSPTracker(std::string strWalletFile, interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database);
     ~CzWSPTracker();
     void Add(const CDeterministicMint& dMint, bool isNew = false, bool isArchived = false, CzWSPWallet* zWSPWallet = nullptr);
     void Add(const CZerocoinMint& mint, bool isNew = false, bool isArchived = false);
