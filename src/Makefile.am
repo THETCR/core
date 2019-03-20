@@ -311,6 +311,7 @@ libbitcoin_server_a_SOURCES = \
   ui_interface.cpp \
   validationinterface.cpp \
   wallet/rpcwallet.cpp \
+  wallet/rpcdump.cpp \
   zwspchain.cpp \
   $(BITCOIN_CORE_H)
 
