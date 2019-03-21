@@ -619,7 +619,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
         view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
 
         for (const CTxIn& txin: mergedTx.vin) {
-            const uint256& prevHash = txin.prevout.hash;
+//            const uint256& prevHash = txin.prevout.hash;
             Coin coin;
             view.AccessCoin(txin.prevout); // this is certainly allowed to fail
         }
