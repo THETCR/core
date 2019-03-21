@@ -281,9 +281,13 @@ UniValue listunspent(const JSONRPCRequest& request)
     std::vector<COutput> vecOutputs;
     assert(pwalletMain != nullptr);
     std::cout << "RawTransaction lock\n";
-    auto locked_chain = pwalletMain->chain().lock();
-    std::cout << "AvailableCoins\n";
-    pwalletMain->AvailableCoins(vecOutputs, false, nullptr, false, ALL_COINS, false, nWatchonlyConfig);
+    {
+        auto locked_chain = pwalletMain->chain().lock();
+        LOCK(pwalletMain->cs_wallet);
+        std::cout << "AvailableCoins\n";
+        pwalletMain->AvailableCoins(*locked_chain, vecOutputs, false, nullptr, ALL_COINS, false, nWatchonlyConfig);
+    }
+
     std::cout << "vecOutputs\n";
     for (const COutput& out: vecOutputs) {
         if (out.nDepth < nMinDepth || out.nDepth > nMaxDepth)
