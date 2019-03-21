@@ -2792,7 +2792,7 @@ void PeerLogicValidation::BlockConnected(const std::shared_ptr<const CBlock>& pb
             if (itByPrev == mapOrphanTransactionsByPrev.end()) continue;
             for (auto mi = itByPrev->second.begin(); mi != itByPrev->second.end(); ++mi) {
                 const uint256 &orphanHash = *mi;
-                const CTransaction &orphanTx = mapOrphanTransactions[orphanHash].tx;
+//                const CTransaction &orphanTx = mapOrphanTransactions[orphanHash].tx;
 //                const uint256& orphanHash = orphanTx.GetHash();
                 vOrphanErase.push_back(orphanHash);
             }
@@ -2804,6 +2804,7 @@ void PeerLogicValidation::BlockConnected(const std::shared_ptr<const CBlock>& pb
         int nErased = 0;
         for (const uint256& orphanHash : vOrphanErase) {
 //            nErased += EraseOrphanTx(orphanHash);
+            EraseOrphanTx(orphanHash);
             nErased++;
         }
         LogPrint(BCLog::MEMPOOL, "Erased %d orphan tx included or conflicted by block\n", nErased);
