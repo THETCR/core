@@ -42,8 +42,11 @@ BOOST_AUTO_TEST_CASE(rpc_addmultisig)
     BOOST_CHECK(address.IsValid() && address.IsScript());
 
     BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(1, address1Hex, address2Hex)));
+    std::cout << "address set string\n";
     address.SetString(v.get_str());
+    std::cout << "address is valid\n";
     BOOST_CHECK(address.IsValid() && address.IsScript());
+    std::cout << "addmultisig\n";
     BOOST_TEST_PASSPOINT();
     BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(2, address1Hex, address2Hex)));
     BOOST_TEST_PASSPOINT();
