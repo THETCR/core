@@ -1419,16 +1419,6 @@ bool AppInitMain()
     // ********************************************************* Step 4: application initialization: dir lock, daemonize, pidfile, debug log
 
     // Initialize elliptic curve code
-    std::string sha256_algo = SHA256AutoDetect();
-    LogPrintf("Using the '%s' SHA256 implementation\n", sha256_algo);
-    RandomInit();
-    ECC_Start();
-    globalVerifyHandle.reset(new ECCVerifyHandle());
-
-    // Sanity check
-    if (!InitSanityCheck())
-        return InitError(_("Initialization sanity check failed. WISPR Core is shutting down."));
-
     std::string strDataDir = GetDataDir().string();
 #ifdef ENABLE_WALLET
     std::string strWalletFile = gArgs.GetArg("-wallet", "wallet.dat");
@@ -1437,7 +1427,7 @@ bool AppInitMain()
         return InitError(strprintf(_("Wallet %s resides outside data directory %s"), strWalletFile, strDataDir));
 #endif
     // Make sure only a single WISPR process is using the data directory.
-    LockDataDirectory(true);
+//    LockDataDirectory(true);
 
     if (!CreatePidFile()) {
         // Detailed error printed inside CreatePidFile().
