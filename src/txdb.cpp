@@ -66,10 +66,10 @@ struct CoinEntry {
 //        batch.Write(std::make_pair('c', hash), coins);
 //}
 
-void static BatchWriteHashBestChain(CLevelDBBatch& batch, const uint256& hash)
-{
-    batch.Write('B', hash);
-}
+//void static BatchWriteHashBestChain(CLevelDBBatch& batch, const uint256& hash)
+//{
+//    batch.Write('B', hash);
+//}
 
 CCoinsViewDB::CCoinsViewDB(size_t nCacheSize, bool fMemory, bool fWipe) : db(GetDataDir() / "chainstate", nCacheSize, fMemory, fWipe, true)
 {
