@@ -53,9 +53,6 @@ BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
     fCheckBlockIndex = true;
     SelectParams(chainName);
     noui_connect();
-#ifdef ENABLE_WALLET
-    WalletDatabase::CreateMock();
-#endif
 }
 
 BasicTestingSetup::~BasicTestingSetup()
@@ -125,6 +122,7 @@ TestingSetup::~TestingSetup()
     g_connman.reset();
     UnloadBlockIndex();
 #ifdef ENABLE_WALLET
+    std::cout << "flush\n";
     pwalletMain->Flush(true);
 #endif
 #ifdef ENABLE_WALLET
