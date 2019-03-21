@@ -129,12 +129,12 @@ UniValue getrawtransaction(const JSONRPCRequest& request)
             "or there is an unspent output in the utxo for this transaction. To make it always work,\n"
             "you need to maintain a transaction index, using the -txindex command line option.\n"
             "\nReturn the raw transaction data.\n"
-            "\nIf verbose=0, returns a std::string that is serialized, hex-encoded data for 'txid'.\n"
+            "\nIf verbose=0, returns a string that is serialized, hex-encoded data for 'txid'.\n"
             "If verbose is non-zero, returns an Object with information about 'txid'.\n"
 
             "\nArguments:\n"
             "1. \"txid\"      (string, required) The transaction id\n"
-            "2. verbose       (numeric, optional, default=0) If 0, return a std::string, other return a json object\n"
+            "2. verbose       (numeric, optional, default=0) If 0, return a string, other return a json object\n"
 
             "\nResult (if verbose is not set or set to 0):\n"
             "\"data\"      (string) The serialized, hex-encoded data for 'txid'\n"
@@ -166,7 +166,7 @@ UniValue getrawtransaction(const JSONRPCRequest& request)
             "         \"hex\" : \"hex\",          (string) the hex\n"
             "         \"reqSigs\" : n,            (numeric) The required sigs\n"
             "         \"type\" : \"pubkeyhash\",  (string) The type, eg 'pubkeyhash'\n"
-            "         \"addresses\" : [           (json array of std::string)\n"
+            "         \"addresses\" : [           (json array of string)\n"
             "           \"wispraddress\"        (string) wispr address\n"
             "           ,...\n"
             "         ]\n"
@@ -357,7 +357,7 @@ UniValue createrawtransaction(const JSONRPCRequest& request)
             "    }\n"
 
             "\nResult:\n"
-            "\"transaction\"            (string) hex std::string of the transaction\n"
+            "\"transaction\"            (string) hex string of the transaction\n"
 
             "\nExamples\n" +
             HelpExampleCli("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\" \"{\\\"address\\\":0.01}\"") + HelpExampleRpc("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\", \"{\\\"address\\\":0.01}\""));
@@ -416,7 +416,7 @@ UniValue decoderawtransaction(const JSONRPCRequest& request)
             "\nReturn a JSON object representing the serialized, hex-encoded transaction.\n"
 
             "\nArguments:\n"
-            "1. \"hex\"      (string, required) The transaction hex std::string\n"
+            "1. \"hex\"      (string, required) The transaction hex string\n"
 
             "\nResult:\n"
             "{\n"
@@ -444,7 +444,7 @@ UniValue decoderawtransaction(const JSONRPCRequest& request)
             "         \"hex\" : \"hex\",          (string) the hex\n"
             "         \"reqSigs\" : n,            (numeric) The required sigs\n"
             "         \"type\" : \"pubkeyhash\",  (string) The type, eg 'pubkeyhash'\n"
-            "         \"addresses\" : [           (json array of std::string)\n"
+            "         \"addresses\" : [           (json array of string)\n"
             "           \"12tvKAXCxZjSmdNbao16dKXC8tRWfcF5oc\"   (string) wispr address\n"
             "           ,...\n"
             "         ]\n"
@@ -487,7 +487,7 @@ UniValue decodescript(const JSONRPCRequest& request)
             "  \"hex\":\"hex\",   (string) hex encoded public key\n"
             "  \"type\":\"type\", (string) The output type\n"
             "  \"reqSigs\": n,    (numeric) The required signatures\n"
-            "  \"addresses\": [   (json array of std::string)\n"
+            "  \"addresses\": [   (json array of string)\n"
             "     \"address\"     (string) wispr address\n"
             "     ,...\n"
             "  ],\n"
@@ -541,7 +541,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
 #endif
 
             "\nArguments:\n"
-            "1. \"hexstring\"     (string, required) The transaction hex std::string\n"
+            "1. \"hexstring\"     (string, required) The transaction hex string\n"
             "2. \"prevtxs\"       (string, optional) An json array of previous dependent transaction outputs\n"
             "     [               (json array of json objects, or 'null' if none provided)\n"
             "       {\n"
@@ -553,7 +553,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
             "       ,...\n"
             "    ]\n"
             "3. \"privatekeys\"     (string, optional) A json array of base58-encoded private keys for signing\n"
-            "    [                  (json array of std::strings, or 'null' if none provided)\n"
+            "    [                  (json array of strings, or 'null' if none provided)\n"
             "      \"privatekey\"   (string) private key in base58-encoding\n"
             "      ,...\n"
             "    ]\n"
@@ -778,7 +778,7 @@ UniValue sendrawtransaction(const JSONRPCRequest& request)
             "\nAlso see createrawtransaction and signrawtransaction calls.\n"
 
             "\nArguments:\n"
-            "1. \"hexstring\"    (string, required) The hex std::string of the raw transaction)\n"
+            "1. \"hexstring\"    (string, required) The hex string of the raw transaction)\n"
             "2. allowhighfees    (boolean, optional, default=false) Allow high fees\n"
             "3. swiftx           (boolean, optional, default=false) Use SwiftX to send this transaction\n"
 
@@ -795,7 +795,7 @@ UniValue sendrawtransaction(const JSONRPCRequest& request)
     LOCK(cs_main);
     RPCTypeCheck(request.params, boost::assign::list_of(UniValue::VSTR)(UniValue::VBOOL));
 
-    // parse hex std::string from parameter
+    // parse hex string from parameter
     CMutableTransaction tx;
     if (!DecodeHexTx(tx, request.params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
