@@ -1367,7 +1367,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         LogPrintf("dropmessagestest DROPPING RECV MESSAGE\n");
         return true;
     }
-    const CNetMsgMaker msgMaker(pfrom->GetSendVersion());
+    const CNetMsgMaker msgMaker(INIT_PROTO_VERSION);
     if (strCommand == NetMsgType::VERSION) {
         // Each connection can only send one version message
         if (pfrom->nVersion != 0) {
