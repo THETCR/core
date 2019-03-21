@@ -2540,7 +2540,7 @@ CAmount CWallet::GetAvailableBalance(const CCoinControl* coinControl) const
     return balance;
 }
 
-void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<COutput> &vCoins, bool fOnlySafe, const CCoinControl *coinControl, const CAmount &nMinimumAmount, const CAmount &nMaximumAmount, const CAmount &nMinimumSumAmount, const uint64_t nMaximumCount, const int nMinDepth, const int nMaxDepth) const
+void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<COutput> &vCoins, bool fOnlySafe, const CCoinControl *coinControl, const CAmount &nMinimumAmount, const CAmount &nMaximumAmount, const CAmount &nMinimumSumAmount, const uint64_t nMaximumCount, const int nMinDepth, const int nMaxDepth, AvailableCoinsType nCoinType, bool fUseIX, int nWatchonlyConfig) const
 {
     AssertLockHeld(cs_main);
     AssertLockHeld(cs_wallet);
@@ -2564,8 +2564,8 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
         if (nDepth < 0)
             continue;
 
-//        if (fUseIX && nDepth < 6)
-//            continue;
+        if (fUseIX && nDepth < 6)
+            continue;
         // We should not consider coins which aren't at least in our mempool
         // It's possible for these to be conflicted via ancestors which we may never be able to detect
         if (nDepth == 0 && !pcoin->InMempool())
@@ -2612,26 +2612,26 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
             continue;
 
         for (unsigned int i = 0; i < pcoin->tx->vout.size(); i++) {
-//            bool found = false;
-//            if (nCoinType == ONLY_DENOMINATED) {
-//                found = IsDenominatedAmount(pcoin->tx->vout[i].nValue);
-//            } else if (nCoinType == ONLY_NOT10000IFMN) {
-//                found = !(fMasterNode && pcoin->tx->vout[i].nValue == 125000 * COIN);
-//            } else if (nCoinType == ONLY_NONDENOMINATED_NOT10000IFMN) {
-//                if (IsCollateralAmount(pcoin->tx->vout[i].nValue)) continue; // do not use collateral amounts
-//                found = !IsDenominatedAmount(pcoin->tx->vout[i].nValue);
-//                if (found && fMasterNode) found = pcoin->tx->vout[i].nValue != 125000 * COIN; // do not use Hot MN funds
-//            } else if (nCoinType == ONLY_125000) {
-//                found = pcoin->tx->vout[i].nValue == 125000 * COIN;
-//            } else {
-//                found = true;
-//            }
-//            if (!found) continue;
-//
-//            if (nCoinType == STAKABLE_COINS) {
-//                if (pcoin->tx->vout[i].IsZerocoinMint())
-//                    continue;
-//            }
+            bool found = false;
+            if (nCoinType == ONLY_DENOMINATED) {
+                found = IsDenominatedAmount(pcoin->tx->vout[i].nValue);
+            } else if (nCoinType == ONLY_NOT10000IFMN) {
+                found = !(fMasterNode && pcoin->tx->vout[i].nValue == 125000 * COIN);
+            } else if (nCoinType == ONLY_NONDENOMINATED_NOT10000IFMN) {
+                if (IsCollateralAmount(pcoin->tx->vout[i].nValue)) continue; // do not use collateral amounts
+                found = !IsDenominatedAmount(pcoin->tx->vout[i].nValue);
+                if (found && fMasterNode) found = pcoin->tx->vout[i].nValue != 125000 * COIN; // do not use Hot MN funds
+            } else if (nCoinType == ONLY_125000) {
+                found = pcoin->tx->vout[i].nValue == 125000 * COIN;
+            } else {
+                found = true;
+            }
+            if (!found) continue;
+
+            if (nCoinType == STAKABLE_COINS) {
+                if (pcoin->tx->vout[i].IsZerocoinMint())
+                    continue;
+            }
             if (pcoin->tx->vout[i].nValue < nMinimumAmount || pcoin->tx->vout[i].nValue > nMaximumAmount)
                 continue;
 
@@ -2649,9 +2649,9 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
             if (mine == ISMINE_NO) {
                 continue;
             }
-//            if ((mine == ISMINE_MULTISIG || mine == ISMINE_SPENDABLE) && nWatchonlyConfig == 2){
-//                continue;
-//            }
+            if ((mine == ISMINE_MULTISIG || mine == ISMINE_SPENDABLE) && nWatchonlyConfig == 2){
+                continue;
+            }
             bool solvable = IsSolvable(*this, pcoin->tx->vout[i].scriptPubKey);
             bool spendable = ((mine & ISMINE_SPENDABLE) != ISMINE_NO) || ((mine & ISMINE_MULTISIG) != ISMINE_NO) || (((mine & ISMINE_WATCH_ONLY) != ISMINE_NO) && (coinControl && coinControl->fAllowWatchOnly && solvable));
 
