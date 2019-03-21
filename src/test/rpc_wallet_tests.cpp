@@ -18,7 +18,7 @@
 extern JSONRPCRequest createArgs(int nRequired, const char* address1 = nullptr, const char* address2 = nullptr);
 extern UniValue CallRPC(string args);
 
-extern CWallet* pwalletMain;
+//extern CWallet* pwalletMain;
 
 BOOST_AUTO_TEST_SUITE(rpc_wallet_tests)
 
@@ -42,9 +42,7 @@ BOOST_AUTO_TEST_CASE(rpc_addmultisig)
     BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(1, address1Hex, address2Hex)));
     address.SetString(v.get_str());
     BOOST_CHECK(address.IsValid() && address.IsScript());
-    BOOST_TEST_PASSPOINT();
     BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(2, address1Hex, address2Hex)));
-    BOOST_TEST_PASSPOINT();
     address.SetString(v.get_str());
     BOOST_CHECK(address.IsValid() && address.IsScript());
 
