@@ -1090,18 +1090,8 @@ public:
     /** Construct wallet with specified name and database implementation. */
     CWallet(interfaces::Chain& chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database) : m_chain(chain), m_location(location), database(std::move(database))
     {
-    }
-
-    CWallet() : m_chain(*interfaces::MakeChain())
-    {
         SetNull();
-    }
-
-    CWallet(std::string strWalletFileIn) : m_chain(*interfaces::MakeChain())
-    {
-        SetNull();
-
-        strWalletFile = strWalletFileIn;
+        strWalletFile = location.GetName();
         fFileBacked = true;
     }
 
