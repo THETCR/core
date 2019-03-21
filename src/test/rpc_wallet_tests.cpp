@@ -108,12 +108,19 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     /*********************************
      * 			listunspent
      *********************************/
+    std::cout << "listunspent 1\n";
     BOOST_CHECK_NO_THROW(CallRPC("listunspent"));
+    std::cout << "listunspent 2\n";
     BOOST_CHECK_THROW(CallRPC("listunspent string"), runtime_error);
+    std::cout << "listunspent 3\n";
     BOOST_CHECK_THROW(CallRPC("listunspent 0 string"), runtime_error);
+    std::cout << "listunspent 4\n";
     BOOST_CHECK_THROW(CallRPC("listunspent 0 1 not_array"), runtime_error);
+    std::cout << "listunspent 5\n";
     BOOST_CHECK_THROW(CallRPC("listunspent 0 1 [] extra"), runtime_error);
+    std::cout << "listunspent 6\n";
     BOOST_CHECK_NO_THROW(r = CallRPC("listunspent 0 1 []"));
+    std::cout << "listunspent 7\n";
     BOOST_CHECK(r.get_array().empty());
 
     std::cout << "listreceivedbyaddress rpc\n";
