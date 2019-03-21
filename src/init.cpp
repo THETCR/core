@@ -715,7 +715,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-maxtxfee=<amt>", strprintf(_("Maximum total fees to use in a single wallet transaction, setting too low may abort large transactions (default: %s)"),
                                                             FormatMoney(maxTxFee)));
     strUsage += HelpMessageOpt("-upgradewallet", _("Upgrade wallet to latest format") + " " + _("on startup"));
-    strUsage += HelpMessageOpt("-wallet=<file>", _("Specify wallet file (within data directory)") + " " + strprintf(_("(default: %s)"), "wallet.dat"));
+    strUsage += HelpMessageOpt("-wallet=<file>", _("Specify wallet file (within data directory)") + " " + strprintf(_("(default: %s)"), "wallets"));
     strUsage += HelpMessageOpt("-walletnotify=<cmd>", _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)"));
     if (mode == HMM_BITCOIN_QT)
         strUsage += HelpMessageOpt("-windowtitle=<name>", _("Wallet window title"));
@@ -1421,10 +1421,10 @@ bool AppInitMain()
     // Initialize elliptic curve code
     std::string strDataDir = GetDataDir().string();
 #ifdef ENABLE_WALLET
-    std::string strWalletFile = gArgs.GetArg("-wallet", "wallet.dat");
+    std::string strWalletFile = gArgs.GetArg("-wallet", "wallets");
     // Wallet file must be a plain filename without a directory
-    if (strWalletFile != fs::basename(strWalletFile) + fs::extension(strWalletFile))
-        return InitError(strprintf(_("Wallet %s resides outside data directory %s"), strWalletFile, strDataDir));
+//    if (strWalletFile != fs::basename(strWalletFile) + fs::extension(strWalletFile))
+//        return InitError(strprintf(_("Wallet %s resides outside data directory %s"), strWalletFile, strDataDir));
 #endif
     // Make sure only a single WISPR process is using the data directory.
 //    LockDataDirectory(true);
@@ -2023,7 +2023,7 @@ bool AppInitMain()
         if (gArgs.GetBoolArg("-zapwallettxes", false)) {
             uiInterface.InitMessage(_("Zapping all transactions from wallet..."));
             auto chain = interfaces::MakeChain();
-            WalletLocation location;
+            WalletLocation location(strWalletFile);
             pwalletMain = new CWallet(*chain, location, WalletDatabase::Create(location.GetPath()));
             DBErrors nZapWalletRet = pwalletMain->ZapWalletTx(vWtx);
             if (nZapWalletRet != DBErrors::LOAD_OK) {
@@ -2041,7 +2041,7 @@ bool AppInitMain()
         nStart = GetTimeMillis();
         bool fFirstRun = true;
         auto chain = interfaces::MakeChain();
-        WalletLocation location;
+        WalletLocation location(strWalletFile);
         pwalletMain = new CWallet(*chain, location, WalletDatabase::Create(location.GetPath()));
         DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
         if (nLoadWalletRet != DBErrors::LOAD_OK) {
