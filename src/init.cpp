@@ -2033,7 +2033,7 @@ bool AppInitMain()
         if (gArgs.GetBoolArg("-zapwallettxes", false)) {
             uiInterface.InitMessage(_("Zapping all transactions from wallet..."));
             auto chain = interfaces::MakeChain();
-            WalletLocation location(strWalletFile);
+            WalletLocation location;
             pwalletMain = new CWallet(*chain, location, WalletDatabase::Create(location.GetPath()));
             DBErrors nZapWalletRet = pwalletMain->ZapWalletTx(vWtx);
             if (nZapWalletRet != DBErrors::LOAD_OK) {
@@ -2051,7 +2051,7 @@ bool AppInitMain()
         nStart = GetTimeMillis();
         bool fFirstRun = true;
         auto chain = interfaces::MakeChain();
-        WalletLocation location(strWalletFile);
+        WalletLocation location;
         pwalletMain = new CWallet(*chain, location, WalletDatabase::Create(location.GetPath()));
         DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
         if (nLoadWalletRet != DBErrors::LOAD_OK) {
