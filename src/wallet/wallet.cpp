@@ -827,8 +827,9 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
     if (fImporting || fReindex) return false;
 
     // Find possible candidates
+    auto locked_chain = pwalletMain->chain().lock();
     std::vector<COutput> vPossibleCoins;
-    AvailableCoins(vPossibleCoins, true, NULL, false, ONLY_125000);
+    AvailableCoins(*locked_chain, vPossibleCoins, true, nullptr, ONLY_125000);
     if (vPossibleCoins.empty()) {
         LogPrintf("CWallet::GetMasternodeVinAndKeys -- Could not locate any valid masternode vin\n");
         return false;
@@ -2540,7 +2541,7 @@ CAmount CWallet::GetAvailableBalance(const CCoinControl* coinControl) const
     return balance;
 }
 
-void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<COutput> &vCoins, bool fOnlySafe, const CCoinControl *coinControl, const CAmount &nMinimumAmount, const CAmount &nMaximumAmount, const CAmount &nMinimumSumAmount, const uint64_t nMaximumCount, const int nMinDepth, const int nMaxDepth, AvailableCoinsType nCoinType, bool fUseIX, int nWatchonlyConfig) const
+void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<COutput> &vCoins, bool fOnlySafe, const CCoinControl *coinControl, AvailableCoinsType nCoinType, bool fUseIX, int nWatchonlyConfig, const CAmount &nMinimumAmount, const CAmount &nMaximumAmount, const CAmount &nMinimumSumAmount, const uint64_t nMaximumCount, const int nMinDepth, const int nMaxDepth) const
 {
     AssertLockHeld(cs_main);
     AssertLockHeld(cs_wallet);
@@ -2638,7 +2639,7 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
             if (coinControl && coinControl->HasSelected() && !coinControl->fAllowOtherInputs && !coinControl->IsSelected(COutPoint(entry.first, i)))
                 continue;
 
-            if (IsLockedCoin(entry.first, i))
+            if (IsLockedCoin(entry.first, i) && nCoinType != ONLY_125000)
                 continue;
 
             if (IsSpent(locked_chain, wtxid, i))
@@ -2652,6 +2653,7 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
             if ((mine == ISMINE_MULTISIG || mine == ISMINE_SPENDABLE) && nWatchonlyConfig == 2){
                 continue;
             }
+
             bool solvable = IsSolvable(*this, pcoin->tx->vout[i].scriptPubKey);
             bool spendable = ((mine & ISMINE_SPENDABLE) != ISMINE_NO) || ((mine & ISMINE_MULTISIG) != ISMINE_NO) || (((mine & ISMINE_WATCH_ONLY) != ISMINE_NO) && (coinControl && coinControl->fAllowWatchOnly && solvable));
 
@@ -5543,106 +5545,107 @@ CAmount CWallet::GetLockedWatchOnlyBalance() const
 /**
  * populate vCoins with vector of available COutputs.
  */
-void CWallet::AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed, const CCoinControl* coinControl, bool fIncludeZeroValue, AvailableCoinsType nCoinType, bool fUseIX, int nWatchonlyConfig) const
-{
-//    AssertLockHeld(cs_wallet);
-    std::cout << "AvailableCoins lock\n";
-    auto locked_chain = chain().lock();
-    std::cout << "chain locked\n";
-    LOCK2(cs_main, cs_wallet);
-    vCoins.clear();
-
-    {
-        std::cout << "AvailableCoins for mapwallet\n";
-        for (auto it = mapWallet.begin(); it != mapWallet.end(); ++it) {
-            const uint256& wtxid = it->first;
-            const CWalletTx* pcoin = &(*it).second;
-
-            std::cout << "AvailableCoins checkfinal\n";
-            if (!CheckFinalTx(*pcoin->tx))
-                continue;
-
-            std::cout << "AvailableCoins IsTrusted\n";
-            if (fOnlyConfirmed && !pcoin->IsTrusted(*locked_chain))
-                continue;
-
-            std::cout << "AvailableCoins IsCoinStake\n";
-            if ((pcoin->tx->IsCoinBase() || pcoin->tx->IsCoinStake()) && pcoin->GetBlocksToMaturity(*locked_chain) > 0)
-                continue;
-
-            std::cout << "AvailableCoins GetDepthInMainChain\n";
-            int nDepth = pcoin->GetDepthInMainChain(*locked_chain, false);
-            // do not use IX for inputs that have less then 6 blockchain confirmations
-            if (fUseIX && nDepth < 6)
-                continue;
-
-            std::cout << "AvailableCoins InMempool\n";
-            // We should not consider coins which aren't at least in our mempool
-            // It's possible for these to be conflicted via ancestors which we may never be able to detect
-            if (nDepth == 0 && !pcoin->InMempool())
-                continue;
-
-            std::cout << "AvailableCoins nCoinType\n";
-            for (unsigned int i = 0; i < pcoin->tx->vout.size(); i++) {
-                bool found = false;
-                if (nCoinType == ONLY_DENOMINATED) {
-                    found = IsDenominatedAmount(pcoin->tx->vout[i].nValue);
-                } else if (nCoinType == ONLY_NOT10000IFMN) {
-                    found = !(fMasterNode && pcoin->tx->vout[i].nValue == 125000 * COIN);
-                } else if (nCoinType == ONLY_NONDENOMINATED_NOT10000IFMN) {
-                    if (IsCollateralAmount(pcoin->tx->vout[i].nValue)) continue; // do not use collateral amounts
-                    found = !IsDenominatedAmount(pcoin->tx->vout[i].nValue);
-                    if (found && fMasterNode) found = pcoin->tx->vout[i].nValue != 125000 * COIN; // do not use Hot MN funds
-                } else if (nCoinType == ONLY_125000) {
-                    found = pcoin->tx->vout[i].nValue == 125000 * COIN;
-                } else {
-                    found = true;
-                }
-                if (!found) continue;
-
-                if (nCoinType == STAKABLE_COINS) {
-                    if (pcoin->tx->vout[i].IsZerocoinMint())
-                        continue;
-                }
-
-                isminetype mine = IsMine(pcoin->tx->vout[i]);
-                if (IsSpent(*locked_chain, wtxid, i))
-                    continue;
-                if (mine == ISMINE_NO)
-                    continue;
-
-                if ((mine == ISMINE_MULTISIG || mine == ISMINE_SPENDABLE) && nWatchonlyConfig == 2)
-                    continue;
-
-                if (mine == ISMINE_WATCH_ONLY && nWatchonlyConfig == 1)
-                    continue;
-
-                if (IsLockedCoin((*it).first, i) && nCoinType != ONLY_125000)
-                    continue;
-                if (pcoin->tx->vout[i].nValue <= 0 && !fIncludeZeroValue)
-                    continue;
-                if (coinControl && coinControl->HasSelected() && !coinControl->fAllowOtherInputs && !coinControl->IsSelected((*it).first, i))
-                    continue;
-
-                bool fIsSpendable = false;
-                if ((mine & ISMINE_SPENDABLE) != ISMINE_NO)
-                    fIsSpendable = true;
-                if ((mine & ISMINE_MULTISIG) != ISMINE_NO)
-                    fIsSpendable = true;
-
-                bool solvable = IsSolvable(*this, pcoin->tx->vout[i].scriptPubKey);
-                bool safeTx = pcoin->IsTrusted(*locked_chain);
-
-                vCoins.emplace_back(COutput(pcoin, i, nDepth, fIsSpendable, solvable, safeTx, (coinControl && coinControl->fAllowWatchOnly)));
-            }
-        }
-    }
-}
+//void CWallet::AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed, const CCoinControl* coinControl, bool fIncludeZeroValue, AvailableCoinsType nCoinType, bool fUseIX, int nWatchonlyConfig) const
+//{
+////    AssertLockHeld(cs_wallet);
+//    std::cout << "AvailableCoins lock\n";
+//    auto locked_chain = chain().lock();
+//    std::cout << "chain locked\n";
+//    LOCK2(cs_main, cs_wallet);
+//    vCoins.clear();
+//
+//    {
+//        std::cout << "AvailableCoins for mapwallet\n";
+//        for (auto it = mapWallet.begin(); it != mapWallet.end(); ++it) {
+//            const uint256& wtxid = it->first;
+//            const CWalletTx* pcoin = &(*it).second;
+//
+//            std::cout << "AvailableCoins checkfinal\n";
+//            if (!CheckFinalTx(*pcoin->tx))
+//                continue;
+//
+//            std::cout << "AvailableCoins IsTrusted\n";
+//            if (fOnlyConfirmed && !pcoin->IsTrusted(*locked_chain))
+//                continue;
+//
+//            std::cout << "AvailableCoins IsCoinStake\n";
+//            if ((pcoin->tx->IsCoinBase() || pcoin->tx->IsCoinStake()) && pcoin->GetBlocksToMaturity(*locked_chain) > 0)
+//                continue;
+//
+//            std::cout << "AvailableCoins GetDepthInMainChain\n";
+//            int nDepth = pcoin->GetDepthInMainChain(*locked_chain, false);
+//            // do not use IX for inputs that have less then 6 blockchain confirmations
+//            if (fUseIX && nDepth < 6)
+//                continue;
+//
+//            std::cout << "AvailableCoins InMempool\n";
+//            // We should not consider coins which aren't at least in our mempool
+//            // It's possible for these to be conflicted via ancestors which we may never be able to detect
+//            if (nDepth == 0 && !pcoin->InMempool())
+//                continue;
+//
+//            std::cout << "AvailableCoins nCoinType\n";
+//            for (unsigned int i = 0; i < pcoin->tx->vout.size(); i++) {
+//                bool found = false;
+//                if (nCoinType == ONLY_DENOMINATED) {
+//                    found = IsDenominatedAmount(pcoin->tx->vout[i].nValue);
+//                } else if (nCoinType == ONLY_NOT10000IFMN) {
+//                    found = !(fMasterNode && pcoin->tx->vout[i].nValue == 125000 * COIN);
+//                } else if (nCoinType == ONLY_NONDENOMINATED_NOT10000IFMN) {
+//                    if (IsCollateralAmount(pcoin->tx->vout[i].nValue)) continue; // do not use collateral amounts
+//                    found = !IsDenominatedAmount(pcoin->tx->vout[i].nValue);
+//                    if (found && fMasterNode) found = pcoin->tx->vout[i].nValue != 125000 * COIN; // do not use Hot MN funds
+//                } else if (nCoinType == ONLY_125000) {
+//                    found = pcoin->tx->vout[i].nValue == 125000 * COIN;
+//                } else {
+//                    found = true;
+//                }
+//                if (!found) continue;
+//
+//                if (nCoinType == STAKABLE_COINS) {
+//                    if (pcoin->tx->vout[i].IsZerocoinMint())
+//                        continue;
+//                }
+//
+//                isminetype mine = IsMine(pcoin->tx->vout[i]);
+//                if (IsSpent(*locked_chain, wtxid, i))
+//                    continue;
+//                if (mine == ISMINE_NO)
+//                    continue;
+//
+//                if ((mine == ISMINE_MULTISIG || mine == ISMINE_SPENDABLE) && nWatchonlyConfig == 2)
+//                    continue;
+//
+//                if (mine == ISMINE_WATCH_ONLY && nWatchonlyConfig == 1)
+//                    continue;
+//
+//                if (IsLockedCoin((*it).first, i) && nCoinType != ONLY_125000)
+//                    continue;
+//                if (pcoin->tx->vout[i].nValue <= 0 && !fIncludeZeroValue)
+//                    continue;
+//                if (coinControl && coinControl->HasSelected() && !coinControl->fAllowOtherInputs && !coinControl->IsSelected((*it).first, i))
+//                    continue;
+//
+//                bool fIsSpendable = false;
+//                if ((mine & ISMINE_SPENDABLE) != ISMINE_NO)
+//                    fIsSpendable = true;
+//                if ((mine & ISMINE_MULTISIG) != ISMINE_NO)
+//                    fIsSpendable = true;
+//
+//                bool solvable = IsSolvable(*this, pcoin->tx->vout[i].scriptPubKey);
+//                bool safeTx = pcoin->IsTrusted(*locked_chain);
+//
+//                vCoins.emplace_back(COutput(pcoin, i, nDepth, fIsSpendable, solvable, safeTx, (coinControl && coinControl->fAllowWatchOnly)));
+//            }
+//        }
+//    }
+//}
 
 map<CBitcoinAddress, std::vector<COutput> > CWallet::AvailableCoinsByAddress(bool fConfirmed, CAmount maxCoinValue)
 {
     std::vector<COutput> vCoins;
-    AvailableCoins(vCoins, fConfirmed);
+    auto locked_chain = chain().lock();
+    AvailableCoins(*locked_chain, vCoins, fConfirmed);
 
     map<CBitcoinAddress, std::vector<COutput> > mapCoins;
     for (COutput out: vCoins) {
@@ -5722,7 +5725,7 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
     LOCK(cs_main);
     //Add WSP
     std::vector<COutput> vCoins;
-    AvailableCoins(vCoins, true, NULL, false, STAKABLE_COINS);
+    AvailableCoins(*locked_chain, vCoins, true, nullptr, STAKABLE_COINS);
     CAmount nAmountSelected = 0;
     if (gArgs.GetBoolArg("-wspstake", true)) {
         for (const COutput &out : vCoins) {
@@ -5803,7 +5806,7 @@ bool CWallet::MintableCoins()
             return false;
 
         std::vector<COutput> vCoins;
-        AvailableCoins(vCoins, true);
+        AvailableCoins(*locked_chain, vCoins, true);
 
         for (const COutput& out : vCoins) {
             int64_t nTxTime = out.tx->GetTxTime();
@@ -5944,8 +5947,9 @@ bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*
 {
     // Note: this function should never be used for "always free" tx types like dstx
 
+    auto locked_chain = chain().lock();
     std::vector<COutput> vCoins;
-    AvailableCoins(vCoins, true, coinControl, false, coin_type, useIX);
+    AvailableCoins(*locked_chain, vCoins, true, coinControl, coin_type, useIX);
 
     // coin control -> return all selected outputs (we want all selected to go into the transaction for sure)
     if (coinControl && coinControl->HasSelected()) {
@@ -6004,9 +6008,10 @@ bool CWallet::SelectCoinsByDenominations(int nDenom, CAmount nValueMin, CAmount 
     vCoinsRet.clear();
     nValueRet = 0;
 
+    auto locked_chain = chain().lock();
     vCoinsRet2.clear();
     std::vector<COutput> vCoins;
-    AvailableCoins(vCoins, true, NULL, false, ONLY_DENOMINATED);
+    AvailableCoins(*locked_chain, vCoins, true, nullptr, ONLY_DENOMINATED);
 
     std::random_shuffle(vCoins.rbegin(), vCoins.rend());
 
@@ -6111,8 +6116,9 @@ bool CWallet::SelectCoinsDark(CAmount nValueMin, CAmount nValueMax, std::vector<
     setCoinsRet.clear();
     nValueRet = 0;
 
+    auto locked_chain = chain().lock();
     std::vector<COutput> vCoins;
-    AvailableCoins(vCoins, true, coinControl, false, nObfuscationRoundsMin < 0 ? ONLY_NONDENOMINATED_NOT10000IFMN : ONLY_DENOMINATED);
+    AvailableCoins(*locked_chain, vCoins, true, coinControl, nObfuscationRoundsMin < 0 ? ONLY_NONDENOMINATED_NOT10000IFMN : ONLY_DENOMINATED);
 
     set<pair<const CWalletTx*, unsigned int> > setCoinsRet2;
 
@@ -6150,8 +6156,9 @@ bool CWallet::SelectCoinsCollateral(std::vector<CTxIn>& setCoinsRet, CAmount& nV
 {
     std::vector<COutput> vCoins;
 
+    auto locked_chain = chain().lock();
     //LogPrintf(" selecting coins for collateral\n");
-    AvailableCoins(vCoins);
+    AvailableCoins(*locked_chain, vCoins);
 
     //LogPrintf("found coins %d\n", (int)vCoins.size());
 
@@ -6207,7 +6214,8 @@ int CWallet::CountInputsWithAmount(CAmount nInputAmount)
 bool CWallet::HasCollateralInputs(bool fOnlyConfirmed) const
 {
     std::vector<COutput> vCoins;
-    AvailableCoins(vCoins, fOnlyConfirmed);
+    auto locked_chain = chain().lock();
+    AvailableCoins(*locked_chain, vCoins, fOnlyConfirmed);
 
     int nFound = 0;
     for (const COutput& out: vCoins)
@@ -7330,7 +7338,7 @@ bool CWallet::MultiSend()
     }
 
     std::vector<COutput> vCoins;
-    AvailableCoins(vCoins);
+    AvailableCoins(*locked_chain, vCoins);
     bool stakeSent = false;
     bool mnSent = false;
     for (const COutput& out : vCoins) {

@@ -62,9 +62,10 @@ WalletModel::~WalletModel()
 CAmount WalletModel::getBalance(const CCoinControl* coinControl) const
 {
     if (coinControl) {
+        auto locked_chain = wallet->chain().lock();
         CAmount nBalance = 0;
         std::vector<COutput> vCoins;
-        wallet->AvailableCoins(vCoins, true, coinControl);
+        wallet->AvailableCoins(*locked_chain, vCoins, true, coinControl);
         for (const COutput& out: vCoins)
             if (out.fSpendable)
                 nBalance += out.tx->tx->vout[out.i].nValue;
@@ -708,9 +709,8 @@ bool WalletModel::isSpent(const COutPoint& outpoint) const
 void WalletModel::listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const
 {
     std::vector<COutput> vCoins;
-    wallet->AvailableCoins(vCoins);
     auto locked_chain = wallet->chain().lock();
-
+    wallet->AvailableCoins(*locked_chain, vCoins);
     LOCK2(cs_main, wallet->cs_wallet); // ListLockedCoins, mapWallet
     std::vector<COutPoint> vLockedCoins;
     wallet->ListLockedCoins(vLockedCoins);
