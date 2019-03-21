@@ -5545,13 +5545,14 @@ CAmount CWallet::GetLockedWatchOnlyBalance() const
  */
 void CWallet::AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed, const CCoinControl* coinControl, bool fIncludeZeroValue, AvailableCoinsType nCoinType, bool fUseIX, int nWatchonlyConfig) const
 {
-    AssertLockHeld(cs_wallet);
+//    AssertLockHeld(cs_wallet);
+    std::cout << "AvailableCoins lock\n";
+    auto locked_chain = chain().lock();
+    std::cout << "chain locked\n";
+    LOCK2(cs_main, cs_wallet);
     vCoins.clear();
 
     {
-        std::cout << "AvailableCoins lock\n";
-        auto locked_chain = chain().lock();
-        std::cout << "chain locked\n";
         std::cout << "AvailableCoins for mapwallet\n";
         for (auto it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const uint256& wtxid = it->first;
