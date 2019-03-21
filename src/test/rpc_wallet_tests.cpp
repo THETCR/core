@@ -48,18 +48,18 @@ BOOST_AUTO_TEST_CASE(rpc_addmultisig)
     address.SetString(v.get_str());
     BOOST_CHECK(address.IsValid() && address.IsScript());
 
-    BOOST_CHECK_THROW(addmultisig(createArgs(0)), runtime_error);
-    BOOST_CHECK_THROW(addmultisig(createArgs(1)), runtime_error);
-    BOOST_CHECK_THROW(addmultisig(createArgs(2, address1Hex)), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(0)), std::runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(1)), std::runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(2, address1Hex)), std::runtime_error);
 
-    BOOST_CHECK_THROW(addmultisig(createArgs(1, "")), runtime_error);
-    BOOST_CHECK_THROW(addmultisig(createArgs(1, "NotAValidPubkey")), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(1, "")), std::runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(1, "NotAValidPubkey")), std::runtime_error);
 
     std::string short1(address1Hex, address1Hex + sizeof(address1Hex) - 2); // last byte missing
-    BOOST_CHECK_THROW(addmultisig(createArgs(2, short1.c_str())), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(2, short1.c_str())), std::runtime_error);
 
     std::string short2(address1Hex + 1, address1Hex + sizeof(address1Hex)); // first byte missing
-    BOOST_CHECK_THROW(addmultisig(createArgs(2, short2.c_str())), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(2, short2.c_str())), std::runtime_error);
     std::cout << "addmultisig finished\n";
 }
 
@@ -99,10 +99,10 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
      *********************************/
     BOOST_CHECK_NO_THROW(CallRPC("setaccount " + setaccountDemoAddress.ToString() + " nullaccount"));
     /* WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmDW is not owned by the test wallet. */
-    BOOST_CHECK_THROW(CallRPC("setaccount WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmDW nullaccount"), runtime_error);
-    BOOST_CHECK_THROW(CallRPC("setaccount"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("setaccount WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmDW nullaccount"), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC("setaccount"), std::runtime_error);
     /* WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmD (33 chars) is an illegal address (should be 34 chars) */
-    BOOST_CHECK_THROW(CallRPC("setaccount WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmD nullaccount"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("setaccount WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmD nullaccount"), std::runtime_error);
 
     std::cout << "listunspent rpc\n";
     /*********************************
@@ -111,13 +111,13 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     std::cout << "listunspent 1\n";
     BOOST_CHECK_NO_THROW(CallRPC("listunspent"));
     std::cout << "listunspent 2\n";
-    BOOST_CHECK_THROW(CallRPC("listunspent string"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listunspent string"), std::runtime_error);
     std::cout << "listunspent 3\n";
-    BOOST_CHECK_THROW(CallRPC("listunspent 0 string"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listunspent 0 string"), std::runtime_error);
     std::cout << "listunspent 4\n";
-    BOOST_CHECK_THROW(CallRPC("listunspent 0 1 not_array"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listunspent 0 1 not_array"), std::runtime_error);
     std::cout << "listunspent 5\n";
-    BOOST_CHECK_THROW(CallRPC("listunspent 0 1 [] extra"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listunspent 0 1 [] extra"), std::runtime_error);
     std::cout << "listunspent 6\n";
     BOOST_CHECK_NO_THROW(r = CallRPC("listunspent 0 1 []"));
     std::cout << "listunspent 7\n";
@@ -129,10 +129,10 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
      *********************************/
     BOOST_CHECK_NO_THROW(CallRPC("listreceivedbyaddress"));
     BOOST_CHECK_NO_THROW(CallRPC("listreceivedbyaddress 0"));
-    BOOST_CHECK_THROW(CallRPC("listreceivedbyaddress not_int"), runtime_error);
-    BOOST_CHECK_THROW(CallRPC("listreceivedbyaddress 0 not_bool"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listreceivedbyaddress not_int"), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listreceivedbyaddress 0 not_bool"), std::runtime_error);
     BOOST_CHECK_NO_THROW(CallRPC("listreceivedbyaddress 0 true"));
-    BOOST_CHECK_THROW(CallRPC("listreceivedbyaddress 0 true extra"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listreceivedbyaddress 0 true extra"), std::runtime_error);
 
     std::cout << "listreceivedbyaccount rpc\n";
     /*********************************
@@ -140,10 +140,10 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
      *********************************/
     BOOST_CHECK_NO_THROW(CallRPC("listreceivedbyaccount"));
     BOOST_CHECK_NO_THROW(CallRPC("listreceivedbyaccount 0"));
-    BOOST_CHECK_THROW(CallRPC("listreceivedbyaccount not_int"), runtime_error);
-    BOOST_CHECK_THROW(CallRPC("listreceivedbyaccount 0 not_bool"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listreceivedbyaccount not_int"), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listreceivedbyaccount 0 not_bool"), std::runtime_error);
     BOOST_CHECK_NO_THROW(CallRPC("listreceivedbyaccount 0 true"));
-    BOOST_CHECK_THROW(CallRPC("listreceivedbyaccount 0 true extra"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("listreceivedbyaccount 0 true extra"), std::runtime_error);
     std::cout << "getrawchangeaddress rpc\n";
     /*********************************
      * 		getrawchangeaddress
@@ -167,22 +167,22 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     /*********************************
      * 			getaccount
      *********************************/
-    BOOST_CHECK_THROW(CallRPC("getaccount"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("getaccount"), std::runtime_error);
     BOOST_CHECK_NO_THROW(CallRPC("getaccount " + demoAddress.ToString()));
     std::cout << "verifymessage rpc\n";
     /*********************************
      * 	signmessage + verifymessage
      *********************************/
     BOOST_CHECK_NO_THROW(retValue = CallRPC("signmessage " + demoAddress.ToString() + " mymessage"));
-    BOOST_CHECK_THROW(CallRPC("signmessage"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("signmessage"), std::runtime_error);
     /* Should throw error because this address is not loaded in the wallet */
-    BOOST_CHECK_THROW(CallRPC("signmessage WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmDW mymessage"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("signmessage WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmDW mymessage"), std::runtime_error);
 
     /* missing arguments */
-    BOOST_CHECK_THROW(CallRPC("verifymessage " + demoAddress.ToString()), runtime_error);
-    BOOST_CHECK_THROW(CallRPC("verifymessage " + demoAddress.ToString() + " " + retValue.get_str()), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("verifymessage " + demoAddress.ToString()), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC("verifymessage " + demoAddress.ToString() + " " + retValue.get_str()), std::runtime_error);
     /* Illegal address */
-    BOOST_CHECK_THROW(CallRPC("verifymessage WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmD " + retValue.get_str() + " mymessage"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("verifymessage WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmD " + retValue.get_str() + " mymessage"), std::runtime_error);
     /* wrong address */
     BOOST_CHECK(CallRPC("verifymessage WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmDW " + retValue.get_str() + " mymessage").get_bool() == false);
     /* Correct address and signature but wrong message */
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     /*********************************
      * 		getaddressesbyaccount
      *********************************/
-    BOOST_CHECK_THROW(CallRPC("getaddressesbyaccount"), runtime_error);
+    BOOST_CHECK_THROW(CallRPC("getaddressesbyaccount"), std::runtime_error);
     BOOST_CHECK_NO_THROW(retValue = CallRPC("getaddressesbyaccount " + strAccount));
     UniValue arr = retValue.get_array();
     BOOST_CHECK(arr.size() > 0);
