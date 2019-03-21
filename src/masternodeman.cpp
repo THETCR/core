@@ -732,7 +732,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
 {
     if (fLiteMode) return; //disable all Obfuscation/Masternode related functionality
     if (!masternodeSync.IsBlockchainSynced()) return;
-    const CNetMsgMaker msgMaker(PROTOCOL_VERSION);
+    const CNetMsgMaker msgMaker(pfrom->GetSendVersion());
     LOCK(cs_process_message);
 
     if (strCommand == NetMsgType::MNANNOUNCE) { //Masternode Broadcast

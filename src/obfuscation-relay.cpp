@@ -107,7 +107,7 @@ void CObfuScationRelay::RelayThroughNode(int nRank)
         CNode* pnode = g_connman->ConnectNode((CAddress)pmn->addr, nullptr, false, false);
         if (pnode) {
             //printf("Connected\n");
-            const CNetMsgMaker msgMaker(PROTOCOL_VERSION);
+            const CNetMsgMaker msgMaker(pnode->GetSendVersion());
             g_connman->PushMessage(pnode, msgMaker.Make("dsr", (*this)));
             pnode->Release();
             return;

@@ -49,7 +49,7 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, const std::string
     if (fLiteMode) return; //disable all Obfuscation/Masternode related functionality
     if (!masternodeSync.IsBlockchainSynced()) return;
 
-    const CNetMsgMaker msgMaker(PROTOCOL_VERSION);
+    const CNetMsgMaker msgMaker(pfrom->GetSendVersion());
     if (strCommand == NetMsgType::DSACCEPT) { //Obfuscation Accept Into Pool
 
         int errorID;
@@ -1334,7 +1334,7 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
 
     // push all of our signatures to the Masternode
     if (sigs.size() > 0 && node != NULL){
-        CNetMsgMaker msgMaker(PROTOCOL_VERSION);
+        CNetMsgMaker msgMaker(node->GetSendVersion());
         connman->PushMessage(node, msgMaker.Make(NetMsgType::DSSIGNFINALTX, sigs));
     }
 
@@ -1586,7 +1586,7 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
                     pSubmittedToMasternode = pmn;
                     vecMasternodesUsed.push_back(dsq.vin);
                     sessionDenom = dsq.nDenom;
-                    CNetMsgMaker msgMaker(PROTOCOL_VERSION);
+                    CNetMsgMaker msgMaker(pnode->GetSendVersion());
                     connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSACCEPT, sessionDenom, txCollateral));
                     LogPrintf("DoAutomaticDenominating --- connected (from queue), sending dsa for %d - %s\n", sessionDenom, pnode->addr.ToString());
                     strAutoDenomResult = _("Mixing in progress...");

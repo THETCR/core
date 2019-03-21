@@ -1367,7 +1367,6 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         LogPrintf("dropmessagestest DROPPING RECV MESSAGE\n");
         return true;
     }
-    const CNetMsgMaker msgMaker(INIT_PROTO_VERSION);
     if (strCommand == NetMsgType::VERSION) {
         // Each connection can only send one version message
         if (pfrom->nVersion != 0)
@@ -1388,7 +1387,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
         if (fMissingSporks || !fRequestedSporksIDB){
             LogPrintf("asking peer for sporks\n");
-            connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETSPORKS));
+            connman->PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::GETSPORKS));
             fRequestedSporksIDB = true;
         }
 
@@ -1560,21 +1559,23 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
     }
 
 
-    else if (pfrom->nVersion == 0) {
+    if (pfrom->nVersion == 0) {
         // Must have a version message before anything else
         LOCK(cs_main);
         Misbehaving(pfrom->GetId(), 1);
         return false;
     }
 
-
-    else if (strCommand == NetMsgType::VERACK) {
+    // At this point, the outgoing message serialization version can't change.
+    const CNetMsgMaker msgMaker(pfrom->GetSendVersion());
+    if (strCommand == NetMsgType::VERACK) {
         pfrom->SetRecvVersion(std::min(pfrom->nVersion.load(), PROTOCOL_VERSION));
 
         // Mark this node as currently connected, so we update its timestamp later.
         if (!pfrom->fInbound) {
             LOCK(cs_main);
             State(pfrom->GetId())->fCurrentlyConnected = true;
+            return true;
         }
     }
 
@@ -2346,7 +2347,6 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 bool PeerLogicValidation::ProcessMessages(CNode* pfrom, std::atomic<bool>& interruptMsgProc)
 {
     const CChainParams& chainparams = Params();
-    const CNetMsgMaker msgMaker(pfrom->GetSendVersion());
     //if (fDebug)
     //    LogPrintf("ProcessMessages(%u messages)\n", pfrom->vRecvMsg.size());
 
@@ -2422,7 +2422,7 @@ bool PeerLogicValidation::ProcessMessages(CNode* pfrom, std::atomic<bool>& inter
             fRet = ProcessMessage(pfrom, strCommand, vRecv, msg.nTime, chainparams, connman, interruptMsgProc, false);
             boost::this_thread::interruption_point();
         } catch (std::ios_base::failure& e) {
-            connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::REJECT, strCommand, REJECT_MALFORMED, std::string("error parsing message")));
+            connman->PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::REJECT, strCommand, REJECT_MALFORMED, std::string("error parsing message")));
             if (strstr(e.what(), "end of data")) {
                 // Allow exceptions from under-length message on vRecv
                 LogPrintf("ProcessMessages(%s, %u bytes): Exception '%s' caught, normally caused by a message being shorter than its stated length\n", SanitizeString(strCommand), nMessageSize, e.what());
