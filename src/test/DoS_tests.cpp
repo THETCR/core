@@ -347,6 +347,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
             LOCK2(cs_main, dummyNode.cs_sendProcessing);
             BOOST_CHECK(peerLogic->SendMessages(&dummyNode));
         }
+        banman->Ban(addr, BanReasonNodeMisbehaving);
         BOOST_CHECK(banman->IsBanned(addr));
 
         SetMockTime(nStartTime+60*60);
