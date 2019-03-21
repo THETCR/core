@@ -99,7 +99,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
 #ifdef ENABLE_WALLET
     bool fFirstRun;
     std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
-    pwalletMain = new CWallet(*m_chain, WalletLocation(), WalletDatabase::CreateMock());
+    pwalletMain = new CWallet(*m_chain, WalletLocation("wallet.dat"), WalletDatabase::CreateMock());
 //    pwalletMain = new CWallet("wallet.dat", *m_chain, WalletLocation(), WalletDatabase::CreateMock());
     pwalletMain->LoadWallet(fFirstRun);
     RegisterValidationInterface(pwalletMain);
