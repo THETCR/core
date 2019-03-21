@@ -60,20 +60,21 @@ BOOST_AUTO_TEST_CASE(rpc_addmultisig)
 
     std::string short2(address1Hex + 1, address1Hex + sizeof(address1Hex)); // first byte missing
     BOOST_CHECK_THROW(addmultisig(createArgs(2, short2.c_str())), runtime_error);
+    std::cout << "addmultisig finished\n";
 }
 
 BOOST_AUTO_TEST_CASE(rpc_wallet)
 {
     // Test RPC calls for various wallet statistics
     UniValue r;
-    BOOST_TEST_PASSPOINT();
+    std::cout << "lock\n";
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    BOOST_TEST_PASSPOINT();
+    std::cout << "walletdb\n";
     WalletBatch walletdb(pwalletMain->GetDBHandle());
-    BOOST_TEST_PASSPOINT();
+    std::cout << "GenerateNewKey\n";
     CPubKey demoPubkey = pwalletMain->GenerateNewKey(walletdb);
-    BOOST_TEST_PASSPOINT();
+    std::cout << "CBitcoinAddress\n";
     CBitcoinAddress demoAddress = CBitcoinAddress(CTxDestination(demoPubkey.GetID()));
     UniValue retValue;
     std::string strAccount = "walletDemoAccount";
