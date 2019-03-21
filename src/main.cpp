@@ -74,6 +74,9 @@ using namespace libzerocoin;
 #error "WISPR cannot be compiled without assertions."
 #endif
 
+#define MICRO 0.000001
+#define MILLI 0.001
+
 /**
  * Global state
  */
@@ -122,6 +125,7 @@ CFeeRate minRelayTxFee = CFeeRate(10000);
 
 CBlockPolicyEstimator feeEstimator;
 CTxMemPool mempool(&feeEstimator);
+std::atomic_bool g_is_mempool_loaded{false};
 
 /***/
 CLightWorker lightWorker;
@@ -5028,6 +5032,138 @@ bool CBlockUndo::ReadFromDisk(const CDiskBlockPos& pos, const uint256& hashBlock
 std::string CBlockFileInfo::ToString() const
 {
     return strprintf("CBlockFileInfo(blocks=%u, size=%u, heights=%u...%u, time=%s...%s)", nBlocks, nSize, nHeightFirst, nHeightLast, DateTimeStrFormat("%Y-%m-%d", nTimeFirst), DateTimeStrFormat("%Y-%m-%d", nTimeLast));
+}
+
+static const uint64_t MEMPOOL_DUMP_VERSION = 1;
+
+//bool LoadMempool()
+//{
+//    const CChainParams& chainparams = Params();
+//    int64_t nExpiryTimeout = gArgs.GetArg("-mempoolexpiry", DEFAULT_MEMPOOL_EXPIRY) * 60 * 60;
+//    FILE* filestr = fsbridge::fopen(GetDataDir() / "mempool.dat", "rb");
+//    CAutoFile file(filestr, SER_DISK, CLIENT_VERSION);
+//    if (file.IsNull()) {
+//        LogPrintf("Failed to open mempool file from disk. Continuing anyway.\n");
+//        return false;
+//    }
+//
+//    int64_t count = 0;
+//    int64_t expired = 0;
+//    int64_t failed = 0;
+//    int64_t already_there = 0;
+//    int64_t nNow = GetTime();
+//
+//    try {
+//        uint64_t version;
+//        file >> version;
+//        if (version != MEMPOOL_DUMP_VERSION) {
+//            return false;
+//        }
+//        uint64_t num;
+//        file >> num;
+//        while (num--) {
+//            CTransactionRef tx;
+//            int64_t nTime;
+//            int64_t nFeeDelta;
+//            file >> tx;
+//            file >> nTime;
+//            file >> nFeeDelta;
+//
+//            CAmount amountdelta = nFeeDelta;
+//            if (amountdelta) {
+//                mempool.PrioritiseTransaction(tx->GetHash(), amountdelta);
+//            }
+//            CValidationState state;
+//            if (nTime + nExpiryTimeout > nNow) {
+//                LOCK(cs_main);
+//                AcceptToMemoryPoolWithTime(chainparams, mempool, state, tx, nullptr /* pfMissingInputs */, nTime,
+//                                           nullptr /* plTxnReplaced */, false /* bypass_limits */, 0 /* nAbsurdFee */,
+//                                           false /* test_accept */);
+//                if (state.IsValid()) {
+//                    ++count;
+//                } else {
+//                    // mempool may contain the transaction already, e.g. from
+//                    // wallet(s) having loaded it while we were processing
+//                    // mempool transactions; consider these as valid, instead of
+//                    // failed, but mark them as 'already there'
+//                    if (mempool.exists(tx->GetHash())) {
+//                        ++already_there;
+//                    } else {
+//                        ++failed;
+//                    }
+//                }
+//            } else {
+//                ++expired;
+//            }
+//            if (ShutdownRequested())
+//                return false;
+//        }
+//        std::map<uint256, CAmount> mapDeltas;
+//        file >> mapDeltas;
+//
+//        for (const auto& i : mapDeltas) {
+//            mempool.PrioritiseTransaction(i.first, i.second);
+//        }
+//    } catch (const std::exception& e) {
+//        LogPrintf("Failed to deserialize mempool data on disk: %s. Continuing anyway.\n", e.what());
+//        return false;
+//    }
+//
+//    LogPrintf("Imported mempool transactions from disk: %i succeeded, %i failed, %i expired, %i already there\n", count, failed, expired, already_there);
+//    return true;
+//}
+
+bool DumpMempool()
+{
+    int64_t start = GetTimeMicros();
+
+    std::map<uint256, CAmount> mapDeltas;
+    std::vector<TxMempoolInfo> vinfo;
+
+    static Mutex dump_mutex;
+    LOCK(dump_mutex);
+
+    {
+        LOCK(mempool.cs);
+        for (const auto &i : mempool.mapDeltas) {
+            mapDeltas[i.first] = i.second;
+        }
+        vinfo = mempool.infoAll();
+    }
+
+    int64_t mid = GetTimeMicros();
+
+    try {
+        FILE* filestr = fsbridge::fopen(GetDataDir() / "mempool.dat.new", "wb");
+        if (!filestr) {
+            return false;
+        }
+
+        CAutoFile file(filestr, SER_DISK, CLIENT_VERSION);
+
+        uint64_t version = MEMPOOL_DUMP_VERSION;
+        file << version;
+
+        file << (uint64_t)vinfo.size();
+        for (const auto& i : vinfo) {
+            file << *(i.tx);
+            file << (int64_t)i.nTime;
+            file << (int64_t)i.nFeeDelta;
+            mapDeltas.erase(i.tx->GetHash());
+        }
+
+        file << mapDeltas;
+        if (!FileCommit(file.Get()))
+            throw std::runtime_error("FileCommit failed");
+        file.fclose();
+        RenameOver(GetDataDir() / "mempool.dat.new", GetDataDir() / "mempool.dat");
+        int64_t last = GetTimeMicros();
+        LogPrintf("Dumped mempool: %gs to copy, %gs to dump\n", (mid-start)*MICRO, (last-mid)*MICRO);
+    } catch (const std::exception& e) {
+        LogPrintf("Failed to dump mempool: %s. Continuing anyway.\n", e.what());
+        return false;
+    }
+    return true;
 }
 
 //! Guess how far we are in the verification process at the given block index
