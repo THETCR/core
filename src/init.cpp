@@ -2032,8 +2032,9 @@ bool AppInitMain()
 
         if (gArgs.GetBoolArg("-zapwallettxes", false)) {
             uiInterface.InitMessage(_("Zapping all transactions from wallet..."));
-
-            pwalletMain = new CWallet(strWalletFile);
+            auto chain = interfaces::MakeChain();
+            WalletLocation location(strWalletFile);
+            pwalletMain = new CWallet(*chain, location, WalletDatabase::Create(location.GetPath()));
             DBErrors nZapWalletRet = pwalletMain->ZapWalletTx(vWtx);
             if (nZapWalletRet != DBErrors::LOAD_OK) {
                 uiInterface.InitMessage(_("Error loading wallet.dat: Wallet corrupted"));
@@ -2049,7 +2050,9 @@ bool AppInitMain()
 
         nStart = GetTimeMillis();
         bool fFirstRun = true;
-        pwalletMain = new CWallet(strWalletFile);
+        auto chain = interfaces::MakeChain();
+        WalletLocation location(strWalletFile);
+        pwalletMain = new CWallet(*chain, location, WalletDatabase::Create(location.GetPath()));
         DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
         if (nLoadWalletRet != DBErrors::LOAD_OK) {
             if (nLoadWalletRet == DBErrors::CORRUPT)
