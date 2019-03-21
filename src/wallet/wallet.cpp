@@ -5524,31 +5524,38 @@ void CWallet::AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed, 
     vCoins.clear();
 
     {
+        std::cout << "AvailableCoins lock\n";
         auto locked_chain = chain().lock();
         LOCK2(cs_main, cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const uint256& wtxid = it->first;
             const CWalletTx* pcoin = &(*it).second;
 
+            std::cout << "AvailableCoins checkfinal\n";
             if (!CheckFinalTx(*pcoin->tx))
                 continue;
 
+            std::cout << "AvailableCoins IsTrusted\n";
             if (fOnlyConfirmed && !pcoin->IsTrusted(*locked_chain))
                 continue;
 
+            std::cout << "AvailableCoins IsCoinStake\n";
             if ((pcoin->tx->IsCoinBase() || pcoin->tx->IsCoinStake()) && pcoin->GetBlocksToMaturity(*locked_chain) > 0)
                 continue;
 
+            std::cout << "AvailableCoins GetDepthInMainChain\n";
             int nDepth = pcoin->GetDepthInMainChain(*locked_chain, false);
             // do not use IX for inputs that have less then 6 blockchain confirmations
             if (fUseIX && nDepth < 6)
                 continue;
 
+            std::cout << "AvailableCoins InMempool\n";
             // We should not consider coins which aren't at least in our mempool
             // It's possible for these to be conflicted via ancestors which we may never be able to detect
             if (nDepth == 0 && !pcoin->InMempool())
                 continue;
 
+            std::cout << "AvailableCoins nCoinType\n";
             for (unsigned int i = 0; i < pcoin->tx->vout.size(); i++) {
                 bool found = false;
                 if (nCoinType == ONLY_DENOMINATED) {
@@ -5599,7 +5606,7 @@ void CWallet::AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed, 
                 bool solvable = IsSolvable(*this, pcoin->tx->vout[i].scriptPubKey);
                 bool safeTx = pcoin->IsTrusted(*locked_chain);
 
-                vCoins.emplace_back(COutput(pcoin, i, nDepth, fIsSpendable, solvable, safeTx));
+                vCoins.emplace_back(COutput(pcoin, i, nDepth, fIsSpendable, solvable, safeTx, (coinControl && coinControl->fAllowWatchOnly)));
             }
         }
     }
