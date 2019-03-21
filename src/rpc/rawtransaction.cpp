@@ -37,6 +37,7 @@
 #include <wallet/wallet.h>
 #endif
 
+#include <memory>
 #include <numeric>
 #include <stdint.h>
 

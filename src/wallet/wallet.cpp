@@ -827,7 +827,7 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
     if (fImporting || fReindex) return false;
 
     // Find possible candidates
-    auto locked_chain = pwalletMain->chain().lock();
+    auto locked_chain = chain().lock();
     std::vector<COutput> vPossibleCoins;
     AvailableCoins(*locked_chain, vPossibleCoins, true, nullptr, ONLY_125000);
     if (vPossibleCoins.empty()) {

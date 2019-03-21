@@ -20,7 +20,7 @@
 extern JSONRPCRequest createArgs(int nRequired, const char* address1 = nullptr, const char* address2 = nullptr);
 extern UniValue CallRPC(string args);
 
-//extern CWallet* pwalletMain;
+extern CWallet* pwalletMain;
 
 BOOST_AUTO_TEST_SUITE(rpc_wallet_tests)
 
