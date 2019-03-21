@@ -211,7 +211,7 @@ UniValue getrawtransaction(const JSONRPCRequest& request)
 UniValue listunspent(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 4)
-        throw runtime_error(
+        throw std::runtime_error(
             "listunspent ( minconf maxconf  [\"address\",...] )\n"
             "\nReturns array of unspent transaction outputs\n"
             "with between minconf and maxconf (inclusive) confirmations.\n"
@@ -281,7 +281,9 @@ UniValue listunspent(const JSONRPCRequest& request)
     std::vector<COutput> vecOutputs;
     assert(pwalletMain != nullptr);
     LOCK2(cs_main, pwalletMain->cs_wallet);
+    std::cout << "AvailableCoins\n";
     pwalletMain->AvailableCoins(vecOutputs, false, NULL, false, ALL_COINS, false, nWatchonlyConfig);
+    std::cout << "vecOutputs\n";
     for (const COutput& out: vecOutputs) {
         if (out.nDepth < nMinDepth || out.nDepth > nMaxDepth)
             continue;
@@ -301,6 +303,7 @@ UniValue listunspent(const JSONRPCRequest& request)
         entry.pushKV("txid", out.tx->tx->GetHash().GetHex());
         entry.pushKV("vout", out.i);
         CTxDestination address;
+        std::cout << "entry address\n";
         if (ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, address)) {
             entry.pushKV("address", CBitcoinAddress(address).ToString());
             if (pwalletMain->mapAddressBook.count(address))
@@ -308,6 +311,7 @@ UniValue listunspent(const JSONRPCRequest& request)
         }
         entry.pushKV("scriptPubKey", HexStr(pk.begin(), pk.end()));
         if (pk.IsPayToScriptHash()) {
+            std::cout << "entry IsPayToScriptHash\n";
             CTxDestination address;
             if (ExtractDestination(pk, address)) {
                 const CScriptID& hash = boost::get<CScriptID>(address);
