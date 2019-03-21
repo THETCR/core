@@ -14,6 +14,9 @@
 #include <txdb.h>
 #include <txmempool.h>
 
+#include <interfaces/chain.h>
+#include <interfaces/wallet.h>
+
 #include <memory>
 #include <type_traits>
 
@@ -76,6 +79,7 @@ struct TestingSetup: public BasicTestingSetup {
     boost::thread_group threadGroup;
     CScheduler scheduler;
 //    CConnman* connman;
+    std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
 
     explicit TestingSetup(const std::string& chainName = CBaseChainParams::UNITTEST);
     ~TestingSetup();
