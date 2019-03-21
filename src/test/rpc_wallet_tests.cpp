@@ -81,9 +81,11 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     std::string strPurpose = "receive";
     BOOST_TEST_PASSPOINT();
     BOOST_CHECK_NO_THROW({ /*Initialize Wallet with an account */
+        std::cout << "walletdb\n";
         WalletBatch walletdb(pwalletMain->GetDBHandle());
         CAccount account;
         account.vchPubKey = demoPubkey;
+        std::cout << "walletdb\n";
         pwalletMain->SetAddressBook(account.vchPubKey.GetID(), strAccount, strPurpose);
         walletdb.WriteAccount(strAccount, account);
     });
@@ -91,6 +93,7 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     CPubKey setaccountDemoPubkey = pwalletMain->GenerateNewKey(walletdb);
     CBitcoinAddress setaccountDemoAddress = CBitcoinAddress(CTxDestination(setaccountDemoPubkey.GetID()));
 
+    std::cout << "setaccount rpc\n";
     /*********************************
      * 			setaccount
      *********************************/
