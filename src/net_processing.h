@@ -90,7 +90,7 @@ struct CNodeStateStats {
 bool GetNodeStateStats(NodeId nodeid, CNodeStateStats &stats);
 
 //!OLD
-void Misbehaving(NodeId nodeid, int howmuch) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+void Misbehaving(NodeId nodeid, int howmuch, const std::string& message="") EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 class CTransaction;
 //void RelayTransaction(const CTransaction& tx);
 void RelayTransaction(const CTransaction& tx, CConnman* connman);

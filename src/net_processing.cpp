@@ -724,7 +724,7 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
 }
 
 // Requires cs_main.
-void Misbehaving(NodeId pnode, int howmuch)
+void Misbehaving(NodeId pnode, int howmuch, const std::string& message) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
     if (howmuch == 0)
         return;
@@ -2624,7 +2624,7 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
         }
 
         CNodeState& state = *State(pto->GetId());
-        int64_t banTime = pto->nVersion < 70914 ? 60*15 : 24*60*60;
+        int64_t banTime = pto->nVersion < 70915 ? 60*15 : 24*60*60;
         if (state.fShouldBan) {
             if (pto->fWhitelisted)
                 LogPrintf("Warning: not punishing whitelisted peer %s!\n", pto->addr.ToString());
