@@ -17,7 +17,7 @@
 #include <wallet/fees.h>
 #include "txmempool.h"
 #include "policy/policy.h"
-#include "main.h"
+#include <main.h>
 #include "obfuscation.h"
 #include <wallet/wallet.h>
 #include "multisigdialog.h"

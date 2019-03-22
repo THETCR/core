@@ -14,7 +14,7 @@
 #include "base58.h"
 #include <wallet/db.h>
 #include "keystore.h"
-#include "main.h"
+#include <main.h>
 #include "spork.h"
 #include "sync.h"
 #include "ui_interface.h"

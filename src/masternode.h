@@ -9,7 +9,7 @@
 #include "base58.h"
 #include "key.h"
 #include "net.h"
-#include "main.h"
+#include <main.h>
 #include "sync.h"
 #include "timedata.h"
 #include <util/system.h>

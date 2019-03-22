@@ -15,7 +15,7 @@
 #include "consensus/consensus.h"
 #include "consensus/tx_verify.h"
 #include <wallet/db.h>
-#include "main.h"
+#include <main.h>
 #include "script/script.h"
 #include "timedata.h"
 #include <util/system.h>

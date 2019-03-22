@@ -9,7 +9,7 @@
 #include <wallet/db.h>
 #include "primitives/block.h"
 #include "kernel.h"
-#include "main.h"
+#include <main.h>
 #include "spork.h"
 #include "script/interpreter.h"
 #include "timedata.h"

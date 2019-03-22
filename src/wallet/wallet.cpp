@@ -21,6 +21,7 @@
 #include <key_io.h>
 #include <keystore.h>
 #include <main.h>
+#include <miner.h>
 #include <masternode-budget.h>
 #include <net.h>
 #include <net_processing.h>
@@ -4553,10 +4554,10 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
     // Try to top up keypool. No-op if the wallet is locked.
     walletInstance->TopUpKeyPool();
-
+    CzWSPWallet* zwalletMain = new CzWSPWallet(pwalletMain->strWalletFile, pwalletMain->chain(), pwalletMain->GetLocation(), pwalletMain->GetDBHandle());
+    walletInstance->setZWallet(zwalletMain);
     auto locked_chain = chain.lock();
     LOCK(walletInstance->cs_wallet);
-
     int rescan_height = 0;
     if (!gArgs.GetBoolArg("-rescan", false))
     {
@@ -4640,6 +4641,18 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
             }
         }
     }
+//Inititalize zWSPWallet
+    chain.initMessage(_("Syncing zWSP wallet..."));
+
+    pwalletMain->InitAutoConvertAddresses();
+
+    bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
+    pwalletMain->setZWspAutoBackups(fEnableZWspBackups);
+
+    //Load zerocoin mint hashes to memory
+    walletInstance->zwspTracker->Init();
+    zwalletMain->LoadMintPoolFromDB();
+    zwalletMain->SyncWithChain();
 
     chain.loadWallet(interfaces::MakeWallet(walletInstance));
 
@@ -4659,6 +4672,8 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
 void CWallet::postInitProcess()
 {
+    // Generate coins in the background
+    GenerateBitcoins(gArgs.GetBoolArg("-gen", false), this, gArgs.GetArg("-genproclimit", 1));
     // Add wallet transactions that aren't already in a block to mempool
     // Do this here as mempool requires genesis block to be loaded
     ReacceptWalletTransactions();

@@ -13,7 +13,7 @@
 #include "concurrentqueue.h"
 #include "chainparams.h"
 
-extern CChain chainActive;
+extern CChain& chainActive;
 // Max amount of computation for a single request
 const int COMP_MAX_AMOUNT = 60 * 24 * 60;
 

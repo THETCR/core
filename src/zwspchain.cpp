@@ -5,7 +5,7 @@
 
 #include "consensus/params.h"
 #include "consensus/validation.h"
-#include "main.h"
+#include <main.h>
 #include "zwspchain.h"
 #include "invalid.h"
 #include "txdb.h"

@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "blocksignature.h"
-#include "main.h"
+#include <main.h>
 #include "zwspchain.h"
 
 typedef std::vector<unsigned char> valtype;

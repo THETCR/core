@@ -12,7 +12,7 @@
 #include "consensus/params.h"
 #include "consensus/validation.h"
 #include "core_io.h"
-#include "main.h"
+#include <main.h>
 #include "miner.h"
 #include "net.h"
 #include "pow.h"
@@ -472,7 +472,7 @@ UniValue getblocktemplate(const JSONRPCRequest& request)
 
             std::unique_lock<std::mutex> lock(csBestBlock);
             while (chainActive.Tip()->GetBlockHash() == hashWatchedChain && IsRPCRunning()) {
-                if (cvBlockChange.wait_until(lock, checktxtime) == std::cv_status::timeout)
+                if (g_best_block_cv.wait_until(lock, checktxtime) == std::cv_status::timeout)
                 {
                     // Timeout: Check transactions for update
                     if (mempool.GetTransactionsUpdated() != nTransactionsUpdatedLastLP)

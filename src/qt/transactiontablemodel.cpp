@@ -14,7 +14,7 @@
 #include "transactionrecord.h"
 #include "walletmodel.h"
 
-#include "main.h"
+#include <main.h>
 #include "sync.h"
 #include "uint256.h"
 #include <util/system.h>

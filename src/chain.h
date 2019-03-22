@@ -11,6 +11,7 @@
 #include <consensus/params.h>
 #include <primitives/block.h>
 #include <tinyformat.h>
+#include <flatfile.h>
 #include <uint256.h>
 #include <util/system.h>
 #include "libzerocoin/Denominations.h"
@@ -97,48 +98,6 @@ public:
   }
 };
 
-struct CDiskBlockPos {
-    int nFile;
-    unsigned int nPos;
-
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
-    {
-        READWRITE(VARINT(nFile, VarIntMode::NONNEGATIVE_SIGNED));
-        READWRITE(VARINT(nPos));
-    }
-
-    CDiskBlockPos()
-    {
-        SetNull();
-    }
-
-    CDiskBlockPos(int nFileIn, unsigned int nPosIn)
-    {
-        nFile = nFileIn;
-        nPos = nPosIn;
-    }
-
-    friend bool operator==(const CDiskBlockPos& a, const CDiskBlockPos& b)
-    {
-        return (a.nFile == b.nFile && a.nPos == b.nPos);
-    }
-
-    friend bool operator!=(const CDiskBlockPos& a, const CDiskBlockPos& b)
-    {
-        return !(a == b);
-    }
-
-    void SetNull()
-    {
-        nFile = -1;
-        nPos = 0;
-    }
-    bool IsNull() const { return (nFile == -1); }
-};
-
 enum BlockStatus {
     //! Unused.
             BLOCK_VALID_UNKNOWN = 0,
@@ -176,6 +135,9 @@ enum BlockStatus {
     BLOCK_FAILED_VALID = 32, //! stage after last reached validness failed
     BLOCK_FAILED_CHILD = 64, //! descends from failed block
     BLOCK_FAILED_MASK = BLOCK_FAILED_VALID | BLOCK_FAILED_CHILD,
+
+    BLOCK_OPT_WITNESS       =   128, //!< block data in blk*.data was received with a witness-enforcing client
+
 };
 
 /** The block chain is a tree shaped structure starting with the
@@ -360,9 +322,9 @@ public:
     }
 
 
-    CDiskBlockPos GetBlockPos() const
+    FlatFilePos GetBlockPos() const
     {
-        CDiskBlockPos ret;
+        FlatFilePos ret;
         if (nStatus & BLOCK_HAVE_DATA) {
             ret.nFile = nFile;
             ret.nPos = nDataPos;
@@ -370,9 +332,9 @@ public:
         return ret;
     }
 
-    CDiskBlockPos GetUndoPos() const
+    FlatFilePos GetUndoPos() const
     {
-        CDiskBlockPos ret;
+        FlatFilePos ret;
         if (nStatus & BLOCK_HAVE_UNDO) {
             ret.nFile = nFile;
             ret.nPos = nUndoPos;

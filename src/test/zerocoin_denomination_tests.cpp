@@ -6,7 +6,7 @@
 #include "chainparams.h"
 #include <wallet/coincontrol.h>
 #include "denomination_functions.h"
-#include "main.h"
+#include <main.h>
 #include "txdb.h"
 #include <wallet/wallet.h>
 #include <wallet/walletdb.h>

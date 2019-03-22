@@ -47,32 +47,29 @@ static const int64_t nMaxCoinsDBCache = 8;
 
 class CCoinsViewDBCursor;
 
-struct CDiskTxPos : public CDiskBlockPos {
-  unsigned int nTxOffset; // after header
+struct CDiskTxPos : public FlatFilePos
+{
+    unsigned int nTxOffset; // after header
 
-  ADD_SERIALIZE_METHODS;
+    ADD_SERIALIZE_METHODS;
 
-  template <typename Stream, typename Operation>
-  inline void SerializationOp(Stream& s, Operation ser_action)
-  {
-      READWRITE(*(CDiskBlockPos*)this);
-      READWRITE(VARINT(nTxOffset));
-  }
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action) {
+        READWRITEAS(FlatFilePos, *this);
+        READWRITE(VARINT(nTxOffset));
+    }
 
-  CDiskTxPos(const CDiskBlockPos& blockIn, unsigned int nTxOffsetIn) : CDiskBlockPos(blockIn.nFile, blockIn.nPos), nTxOffset(nTxOffsetIn)
-  {
-  }
+    CDiskTxPos(const FlatFilePos &blockIn, unsigned int nTxOffsetIn) : FlatFilePos(blockIn.nFile, blockIn.nPos), nTxOffset(nTxOffsetIn) {
+    }
 
-  CDiskTxPos()
-  {
-      SetNull();
-  }
+    CDiskTxPos() {
+        SetNull();
+    }
 
-  void SetNull()
-  {
-      CDiskBlockPos::SetNull();
-      nTxOffset = 0;
-  }
+    void SetNull() {
+        FlatFilePos::SetNull();
+        nTxOffset = 0;
+    }
 };
 
 /** CCoinsView backed by the coin database (chainstate/) */

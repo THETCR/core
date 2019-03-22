@@ -11,7 +11,7 @@
 #include <qt/qvalidatedlineedit.h>
 #include "walletmodel.h"
 
-#include "main.h"
+#include <main.h>
 #include "policy/policy.h"
 #include "primitives/transaction.h"
 #include "protocol.h"
