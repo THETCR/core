@@ -8,7 +8,7 @@
 
 #include <banman.h>
 #include "clientversion.h"
-#include <main.h>
+#include <validation.h>
 #include <core_io.h>
 #include <net.h>
 #include <net_processing.h>

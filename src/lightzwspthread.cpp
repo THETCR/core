@@ -7,7 +7,7 @@
 
 #include "lightzwspthread.h"
 #include <logging.h>
-#include <main.h>
+#include <validation.h>
 #include "netmessagemaker.h"
 
 /****** Thread ********/

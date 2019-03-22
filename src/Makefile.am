@@ -165,7 +165,7 @@ BITCOIN_CORE_H = \
   leveldbwrapper.h \
   limitedmap.h \
   logging.h \
-  main.h \
+  validation.h \
   masternode.h \
   masternode-payments.h \
   masternode-budget.h \
@@ -282,7 +282,7 @@ libbitcoin_server_a_SOURCES = \
   init.cpp \
   leveldbwrapper.cpp \
   lightzwspthread.cpp \
-  main.cpp \
+  validation.cpp \
   merkleblock.cpp \
   miner.cpp \
   net.cpp \

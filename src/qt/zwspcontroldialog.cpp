@@ -6,7 +6,7 @@
 #include <qt/forms/ui_zwspcontroldialog.h>
 
 #include "accumulators.h"
-#include <main.h>
+#include <validation.h>
 #include "walletmodel.h"
 
 using namespace std;

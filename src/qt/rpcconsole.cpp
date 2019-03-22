@@ -13,7 +13,7 @@
 #include "peertablemodel.h"
 
 #include "chainparams.h"
-#include <main.h>
+#include <validation.h>
 #include <interfaces/node.h>
 #include <netbase.h>
 #include "rpc/client.h"

@@ -21,7 +21,7 @@
 #include <ui_interface.h>
 #include <uint256.h>
 #include <util/system.h>
-#include <main.h>
+#include <validation.h>
 
 #include <memory>
 #include <utility>

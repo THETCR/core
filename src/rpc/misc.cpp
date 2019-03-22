@@ -7,7 +7,7 @@
 
 #include "base58.h"
 #include "clientversion.h"
-#include <main.h>
+#include <validation.h>
 #include "masternode-sync.h"
 #include <outputtype.h>
 #include <core_io.h>

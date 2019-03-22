@@ -9,7 +9,7 @@
 
 #include <primitives/block.h>
 #include <txmempool.h>
-#include <main.h>
+#include <validation.h>
 
 #include <stdint.h>
 #include <memory>

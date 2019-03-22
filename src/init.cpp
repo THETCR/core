@@ -29,7 +29,7 @@
 #include <index/txindex.h>
 #include "invalid.h"
 #include <key.h>
-#include <main.h>
+#include <validation.h>
 #include "masternode-budget.h"
 #include "masternode-payments.h"
 #include "masternodeconfig.h"

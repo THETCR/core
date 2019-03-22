@@ -10,7 +10,7 @@
 #include "chainparams.h"
 #include "consensus/params.h"
 #include "consensus/validation.h"
-#include <main.h>
+#include <validation.h>
 #include "txdb.h"
 #include "primitives/deterministicmint.h"
 #include "key.h"

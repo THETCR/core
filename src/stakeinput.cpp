@@ -5,7 +5,7 @@
 #include "accumulators.h"
 #include "chain.h"
 #include "primitives/deterministicmint.h"
-#include <main.h>
+#include <validation.h>
 #include "stakeinput.h"
 #include "streams.h"
 #include <wallet/wallet.h>

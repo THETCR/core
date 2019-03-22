@@ -23,7 +23,7 @@
 #include <script/standard.h>
 #include <uint256.h>
 #include <util/strencodings.h>
-#include <main.h>
+#include <validation.h>
 #include <validationinterface.h>
 
 #include <base58.h>

@@ -6,7 +6,7 @@
 #include <wallet/zwsptracker.h>
 #include <util/system.h>
 #include "sync.h"
-#include <main.h>
+#include <validation.h>
 #include "txdb.h"
 #include "txmempool.h"
 #include <wallet/zwspwallet.h>

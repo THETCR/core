@@ -20,7 +20,7 @@
 #include <key.h>
 #include <key_io.h>
 #include <keystore.h>
-#include <main.h>
+#include <validation.h>
 #include <miner.h>
 #include <masternode-budget.h>
 #include <net.h>

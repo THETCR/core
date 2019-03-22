@@ -11,7 +11,7 @@
 #include <outputtype.h>
 #include <util/system.h>
 #include <util/moneystr.h>
-#include <main.h>
+#include <validation.h>
 #include <walletinitinterface.h>
 #include <wallet/rpcwallet.h>
 #include <wallet/wallet.h>

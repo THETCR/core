@@ -13,7 +13,7 @@
 #include <script/sign.h>
 #include <serialize.h>
 #include <util/system.h>
-#include <main.h>
+#include <validation.h>
 
 #include <test/test_wispr.h>
 

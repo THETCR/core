@@ -90,7 +90,7 @@ HEADERS += src/activemasternode.h \
            src/keystore.h \
            src/leveldbwrapper.h \
            src/limitedmap.h \
-           src/main.h \
+           src/validation.h \
            src/masternode-budget.h \
            src/masternode-payments.h \
            src/masternode-sync.h \
@@ -376,7 +376,7 @@ SOURCES += src/activemasternode.cpp \
            src/key.cpp \
            src/keystore.cpp \
            src/leveldbwrapper.cpp \
-           src/main.cpp \
+           src/validation.cpp \
            src/masternode-budget.cpp \
            src/masternode-payments.cpp \
            src/masternode-sync.cpp \

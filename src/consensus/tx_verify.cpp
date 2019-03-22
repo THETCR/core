@@ -14,7 +14,7 @@
 #include <coins.h>
 #include <policy/policy.h>
 #include <chainparams.h>
-#include <main.h>
+#include <validation.h>
 #include "util/moneystr.h"
 
 bool IsFinalTx(const CTransaction &tx, int nBlockHeight, int64_t nBlockTime)

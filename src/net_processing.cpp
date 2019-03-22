@@ -12,7 +12,7 @@
 #include "chainparams.h"
 #include "consensus/validation.h"
 #include "hash.h"
-#include <main.h>
+#include <validation.h>
 #include "merkleblock.h"
 #include <netmessagemaker.h>
 #include "reverse_iterate.h"

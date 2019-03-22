@@ -10,7 +10,7 @@
 #include <uint256.h>
 #include <undo.h>
 #include <util/strencodings.h>
-#include <main.h>
+#include <validation.h>
 
 #include <map>
 #include <vector>

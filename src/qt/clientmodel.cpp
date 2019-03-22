@@ -16,7 +16,7 @@
 #include "clientversion.h"
 #include <interfaces/handler.h>
 #include <interfaces/node.h>
-#include <main.h>
+#include <validation.h>
 #include "masternode-sync.h"
 #include "masternodeman.h"
 #include "net.h"
