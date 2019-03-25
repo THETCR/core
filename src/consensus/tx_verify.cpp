@@ -14,6 +14,11 @@
 #include <coins.h>
 #include <util/moneystr.h>
 
+//!WISPR
+#include <policy/policy.h>
+#include <validation.h>
+#include <libzerocoin/bignum.h>
+
 bool IsFinalTx(const CTransaction &tx, int nBlockHeight, int64_t nBlockTime)
 {
     if (tx.nLockTime == 0)
