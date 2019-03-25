@@ -892,11 +892,17 @@ UniValue dumpwallet(const JSONRPCRequest& request)
 
 UniValue bip38encrypt(const JSONRPCRequest& request)
 {
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
     if (request.fHelp || request.params.size() != 2)
         throw runtime_error(
             "bip38encrypt \"wispraddress\" \"passphrase\"\n"
             "\nEncrypts a private key corresponding to 'wispraddress'.\n" +
-            HelpRequiringPassphrase() + "\n"
+            HelpRequiringPassphrase(pwallet) + "\n"
 
             "\nArguments:\n"
             "1. \"wispraddress\"   (string, required) The wispr address for the private key (you must hold the key already)\n"
@@ -909,9 +915,9 @@ UniValue bip38encrypt(const JSONRPCRequest& request)
             HelpExampleCli("bip38encrypt", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" \"mypasphrase\"") +
             HelpExampleRpc("bip38encrypt", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" \"mypasphrase\""));
 
-    LOCK2(cs_main, pwalletMain->cs_wallet);
+    LOCK2(cs_main, pwallet->cs_wallet);
 
-    EnsureWalletIsUnlocked();
+    EnsureWalletIsUnlocked(pwallet);
 
     std::string strAddress = request.params[0].get_str();
     std::string strPassphrase = request.params[1].get_str();
@@ -923,7 +929,7 @@ UniValue bip38encrypt(const JSONRPCRequest& request)
     if (!address.GetKeyID(keyID))
         throw JSONRPCError(RPC_TYPE_ERROR, "Address does not refer to a key");
     CKey vchSecret;
-    if (!pwalletMain->GetKey(keyID, vchSecret))
+    if (!pwallet->GetKey(keyID, vchSecret))
         throw JSONRPCError(RPC_WALLET_ERROR, "Private key for address " + strAddress + " is not known");
 
     uint256 privKey = vchSecret.GetPrivKey_256();
@@ -938,11 +944,17 @@ UniValue bip38encrypt(const JSONRPCRequest& request)
 
 UniValue bip38decrypt(const JSONRPCRequest& request)
 {
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
     if (request.fHelp || request.params.size() != 2)
         throw runtime_error(
             "bip38decrypt \"wispraddress\" \"passphrase\"\n"
             "\nDecrypts and then imports password protected private key.\n" +
-            HelpRequiringPassphrase() + "\n"
+            HelpRequiringPassphrase(pwallet) + "\n"
 
             "\nArguments:\n"
             "1. \"encryptedkey\"   (string, required) The encrypted private key\n"
@@ -955,9 +967,9 @@ UniValue bip38decrypt(const JSONRPCRequest& request)
             HelpExampleCli("bip38decrypt", "\"encryptedkey\" \"mypassphrase\"") +
             HelpExampleRpc("bip38decrypt", "\"encryptedkey\" \"mypassphrase\""));
 
-    LOCK2(cs_main, pwalletMain->cs_wallet);
+    LOCK2(cs_main, pwallet->cs_wallet);
 
-    EnsureWalletIsUnlocked();
+    EnsureWalletIsUnlocked(pwallet);
 
     /** Collect private key and passphrase **/
     std::string strKey = request.params[0].get_str();
@@ -982,27 +994,27 @@ UniValue bip38decrypt(const JSONRPCRequest& request)
     assert(key.VerifyPubKey(pubkey));
     result.pushKV("Address", CBitcoinAddress(pubkey.GetID()).ToString());
     CKeyID vchAddress = pubkey.GetID();
-    WalletRescanReserver reserver(pwalletMain);
+    WalletRescanReserver reserver(pwallet);
     if (!reserver.reserve()) {
         throw JSONRPCError(RPC_WALLET_ERROR, "Wallet is currently rescanning. Abort existing rescan or wait.");
     }
     {
-        pwalletMain->MarkDirty();
-        pwalletMain->SetAddressBook(vchAddress, "", "receive");
+        pwallet->MarkDirty();
+        pwallet->SetAddressBook(vchAddress, "", "receive");
 
         // Don't throw error in case a key is already there
-        if (pwalletMain->HaveKey(vchAddress))
+        if (pwallet->HaveKey(vchAddress))
             throw JSONRPCError(RPC_WALLET_ERROR, "Key already held by wallet");
 
-        pwalletMain->mapKeyMetadata[vchAddress].nCreateTime = 1;
+        pwallet->mapKeyMetadata[vchAddress].nCreateTime = 1;
 
-        if (!pwalletMain->AddKeyPubKey(key, pubkey))
+        if (!pwallet->AddKeyPubKey(key, pubkey))
             throw JSONRPCError(RPC_WALLET_ERROR, "Error adding key to wallet");
 
         // whenever a key is imported, we need to scan the whole chain
-        pwalletMain->UpdateTimeFirstKey(1); // 0 would be considered 'no value'
-//        pwalletMain->ScanForWalletTransactions(chainActive.Genesis(), true);
-        RescanWallet(*pwalletMain, reserver);
+        pwallet->UpdateTimeFirstKey(1); // 0 would be considered 'no value'
+//        pwallet->ScanForWalletTransactions(chainActive.Genesis(), true);
+        RescanWallet(*pwallet, reserver);
     }
 
     return result;
