@@ -33,7 +33,7 @@ bool CheckBlock(int nHeight, const uint256& hash, bool fMatchesCheckpoint)
     if (!fEnabled)
         return true;
 
-    const MapCheckpoints& checkpoints = *Params().Checkpoints().mapCheckpoints;
+    const MapCheckpoints& checkpoints = Params().Checkpoints().mapCheckpoints;
 
     MapCheckpoints::const_iterator i = checkpoints.find(nHeight);
     // If looking for an exact match, then return false
@@ -79,7 +79,7 @@ int GetTotalBlocksEstimate()
     if (!fEnabled)
         return 0;
 
-    const MapCheckpoints& checkpoints = *Params().Checkpoints().mapCheckpoints;
+    const MapCheckpoints& checkpoints = Params().Checkpoints().mapCheckpoints;
 
     return checkpoints.rbegin()->first;
 }

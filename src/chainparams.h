@@ -31,13 +31,13 @@ struct SeedSpec6 {
 
 typedef std::map<int, uint256> MapCheckpoints;
 
-struct CCheckpointData {
-//    MapCheckpoints mapCheckpoints;
-    const MapCheckpoints* mapCheckpoints;
-    int64_t nTimeLastCheckpoint;
-    int64_t nTransactionsLastCheckpoint;
-    double fTransactionsPerDay;
-};
+//struct CCheckpointData {
+////    MapCheckpoints mapCheckpoints;
+//    const MapCheckpoints* mapCheckpoints;
+//    int64_t nTimeLastCheckpoint;
+//    int64_t nTransactionsLastCheckpoint;
+//    double fTransactionsPerDay;
+//};
 
 
 /**
@@ -209,7 +209,7 @@ protected:
     bool fTestnetToBeDeprecatedFieldRPC;
     bool fHeadersFirstSyncingActive;
     std::string bech32_hrp;
-    CCheckpointData checkpointData;
+    Checkpoints::CCheckpointData checkpointData;
     ChainTxData chainTxData;
     bool m_fallback_fee_enabled;
 };
