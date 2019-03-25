@@ -37,24 +37,24 @@ int GetBudgetPaymentCycleBlocks()
 
 bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, std::string& strError, int64_t& nTime, int& nConf, bool fBudgetFinalization)
 {
-    CTransaction txCollateral;
+    CTransactionRef txCollateral;
     uint256 nBlockHash;
-    if (!GetTransaction(nTxCollateralHash, txCollateral, nBlockHash, true)) {
-        strError = strprintf("Can't find collateral tx %s", txCollateral.ToString());
+    if (!GetTransaction(nTxCollateralHash, txCollateral, Params().GetConsensus(), nBlockHash)) {
+        strError = strprintf("Can't find collateral tx %s", txCollateral->ToString());
         LogPrint(BCLog::MNBUDGET,"CBudgetProposalBroadcast::IsBudgetCollateralValid - %s\n", strError);
         return false;
     }
 
-    if (txCollateral.vout.size() < 1) return false;
-    if (txCollateral.nLockTime != 0) return false;
+    if (txCollateral->vout.size() < 1) return false;
+    if (txCollateral->nLockTime != 0) return false;
 
     CScript findScript;
     findScript << OP_RETURN << ToByteVector(nExpectedHash);
 
     bool foundOpReturn = false;
-    for (const CTxOut o: txCollateral.vout) {
+    for (const CTxOut o: txCollateral->vout) {
         if (!o.scriptPubKey.IsPayToPublicKeyHash() && !o.scriptPubKey.IsUnspendable()) {
-            strError = strprintf("Invalid Script %s", txCollateral.ToString());
+            strError = strprintf("Invalid Script %s", txCollateral->ToString());
             LogPrint(BCLog::MNBUDGET,"CBudgetProposalBroadcast::IsBudgetCollateralValid - %s\n", strError);
             return false;
         }
@@ -82,7 +82,7 @@ bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, s
         }
     }
     if (!foundOpReturn) {
-        strError = strprintf("Couldn't find opReturn %s in %s", nExpectedHash.ToString(), txCollateral.ToString());
+        strError = strprintf("Couldn't find opReturn %s in %s", nExpectedHash.ToString(), txCollateral->ToString());
         LogPrint(BCLog::MNBUDGET,"CBudgetProposalBroadcast::IsBudgetCollateralValid - %s\n", strError);
         return false;
     }
@@ -230,10 +230,10 @@ void CBudgetManager::SubmitFinalBudget()
     }
 
     int conf = GetIXConfirmations(txidCollateral);
-    CTransaction txCollateral;
+    CTransactionRef txCollateral;
     uint256 nBlockHash;
 
-    if (!GetTransaction(txidCollateral, txCollateral, nBlockHash, true)) {
+    if (!GetTransaction(txidCollateral, txCollateral, Params().GetConsensus() ,nBlockHash)) {
         LogPrint(BCLog::MNBUDGET,"CBudgetManager::SubmitFinalBudget - Can't find collateral tx %s", txidCollateral.ToString());
         return;
     }
@@ -563,7 +563,7 @@ void CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, CAmount nFees, b
         ++it;
     }
 
-    CAmount blockValue = GetBlockValue(pindexPrev->nHeight);
+    CAmount blockValue = GetBlockSubsidy(pindexPrev->nHeight, Params().GetConsensus());
 
     if (fProofOfStake) {
         if (nHighestCount > 0) {

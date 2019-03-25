@@ -19,6 +19,7 @@
 #include "validationinterface.h"
 #include "reverse_iterate.h"
 #include <wallet/wallet.h>
+#include <warnings.h>
 
 #ifdef ENABLE_WALLET
 extern CWallet* pwalletMain;
@@ -195,11 +196,11 @@ bool IsIXTXValid(const CTransaction& txCollateral)
         nValueOut += o.nValue;
 
     for (const CTxIn i: txCollateral.vin) {
-        CTransaction tx2;
+        CTransactionRef tx2;
         uint256 hash;
-        if (GetTransaction(i.prevout.hash, tx2, hash, true)) {
-            if (tx2.vout.size() > i.prevout.n) {
-                nValueIn += tx2.vout[i.prevout.n].nValue;
+        if (GetTransaction(i.prevout.hash, tx2, Params().GetConsensus(), hash)) {
+            if (tx2->vout.size() > i.prevout.n) {
+                nValueIn += tx2->vout[i.prevout.n].nValue;
             }
         } else {
             missingTx = true;
@@ -469,7 +470,7 @@ void CleanTransactionLocksList()
 
 int GetTransactionLockSignatures(uint256 txHash)
 {
-    if(fLargeWorkForkFound || fLargeWorkInvalidChainFound) return -2;
+    if(GetfLargeWorkForkFound() || GetfLargeWorkInvalidChainFound()) return -2;
     if (!IsSporkActive(SPORK_2_SWIFTTX)) return -1;
 
     std::map<uint256, CTransactionLock>::iterator it = mapTxLocks.find(txHash);
