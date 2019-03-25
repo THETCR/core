@@ -93,7 +93,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
 //    {
 //    }
     CValidationState state;
-    if (!ActivateBestChain(state)) {
+    if (!ActivateBestChain(state, chainparams)) {
         throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
     }
 #ifdef ENABLE_WALLET
@@ -101,7 +101,8 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     pwalletMain = new CWallet(*m_chain, WalletLocation(), WalletDatabase::CreateMock());
 //    pwalletMain = new CWallet("wallet.dat", *m_chain, WalletLocation(), WalletDatabase::CreateMock());
     pwalletMain->LoadWallet(fFirstRun);
-    RegisterValidationInterface(pwalletMain);
+//    RegisterValidationInterface(pwalletMain);
+//    pwalletMain->chain().handleNotifications(pwalletMain);
 #endif
     nScriptCheckThreads = 3;
     for (int i=0; i < nScriptCheckThreads-1; i++)
@@ -125,7 +126,7 @@ TestingSetup::~TestingSetup()
     pwalletMain->Flush(true);
 #endif
 #ifdef ENABLE_WALLET
-    UnregisterValidationInterface(pwalletMain);
+//    UnregisterValidationInterface(pwalletMain);
     delete pwalletMain;
     pwalletMain = nullptr;
 #endif
@@ -169,11 +170,11 @@ TestChain100Setup::CreateAndProcessBlock(const std::vector<CMutableTransaction>&
         IncrementExtraNonce(&block, chainActive.Tip(), extraNonce);
     }
 
-    while (!CheckProofOfWork(block.GetHash(), block.nBits)) ++block.nNonce;
+    while (!CheckProofOfWork(block.GetHash(), block.nBits, Params().GetConsensus())) ++block.nNonce;
 
     bool newBlock = false;
     std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(block);
-    ProcessNewBlock(chainparams, shared_pblock.get(), true, nullptr, &newBlock);
+    ProcessNewBlock(chainparams, shared_pblock, true, &newBlock);
 
     CBlock result = block;
     return result;
