@@ -156,10 +156,10 @@ static std::string TxToRow(const CTransaction& tx, const CScript& Highlight = CS
 
 CTxOut getPrevOut(const COutPoint& out)
 {
-    CTransaction tx;
+    CTransactionRef tx;
     uint256 hashBlock;
-    if (GetTransaction(out.hash, tx, hashBlock, true))
-        return tx.vout[out.n];
+    if (GetTransaction(out.hash, tx, Params().GetConsensus(), hashBlock))
+        return tx->vout[out.n];
     return CTxOut();
 }
 
@@ -199,7 +199,7 @@ std::string BlockToString(CBlockIndex* pBlock)
         return "";
 
     CBlock block;
-    ReadBlockFromDisk(block, pBlock);
+    ReadBlockFromDisk(block, pBlock, Params().GetConsensus());
 
     CAmount Fees = 0;
     CAmount OutVolume = 0;
@@ -509,10 +509,10 @@ bool BlockExplorer::switchTo(const QString& query)
     }
 
     // If the query is neither an integer nor a block hash, assume a transaction hash
-    CTransaction tx;
+    CTransactionRef tx;
     uint256 hashBlock = 0;
-    if (GetTransaction(hash, tx, hashBlock, true)) {
-        setContent(TxToString(hashBlock, tx));
+    if (GetTransaction(hash, tx, Params().GetConsensus(), hashBlock)) {
+        setContent(TxToString(hashBlock, *tx));
         return true;
     }
 
