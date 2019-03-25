@@ -105,7 +105,7 @@ public:
     CObfuScationEntry()
     {
         isSet = false;
-        collateral = CTransaction();
+        CTransaction(collateral);
         amount = 0;
     }
 

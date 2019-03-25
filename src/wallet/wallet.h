@@ -1564,7 +1564,7 @@ public:
     CAmount GetCredit(const CTransaction& tx, const isminefilter& filter) const;
     CAmount GetChange(const CTransaction& tx) const;
     void ChainStateFlushed(const CBlockLocator& loc) override;
-    void SetBestChain(const CBlockLocator& loc) override;
+    void SetBestChain(const CBlockLocator& loc);
 
     DBErrors LoadWallet(bool& fFirstRunRet);
     DBErrors ZapWalletTx(std::vector<CWalletTx>& vWtx);
@@ -1575,7 +1575,7 @@ public:
     bool DelAddressBook(const CTxDestination& address);
 //    bool UpdatedTransaction(const uint256& hashTx);
 
-    void Inventory(const uint256& hash) override
+    void Inventory(const uint256& hash)
     {
         {
             LOCK(cs_wallet);
