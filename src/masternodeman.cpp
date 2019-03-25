@@ -1013,8 +1013,8 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
             // verify that sig time is legit in past
             // should be at least not earlier than block when 1000 WISPR tx got MASTERNODE_MIN_CONFIRMATIONS
             uint256 hashBlock = 0;
-            CTransaction tx2;
-            GetTransaction(vin.prevout.hash, tx2, hashBlock, true);
+            CTransactionRef tx2;
+            GetTransaction(vin.prevout.hash, tx2, Params().GetConsensus(),hashBlock);
             BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
             if (mi != mapBlockIndex.end() && (*mi).second) {
                 CBlockIndex* pMNIndex = (*mi).second;                                                        // block for 10000 WSP tx -> 1 confirmation
