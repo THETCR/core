@@ -56,6 +56,7 @@ public:
         memset(pn, 0, sizeof(pn));
     }
 
+    inline int Compare(const base_uint& other) const { return memcmp(pn, other.data, sizeof(pn)); }
 
     base_uint& operator=(const base_uint& b)
     {

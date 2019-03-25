@@ -2298,6 +2298,8 @@ bool CConnman::Start(CScheduler& scheduler, const Options& connOptions)
     // Process messages
     threadMessageHandler = std::thread(&TraceThread<std::function<void()> >, "msghand", std::function<void()>(std::bind(&CConnman::ThreadMessageHandler, this)));
 
+    threadStakeMinter = std::thread(&TraceThread<std::function<void()> >, "minter", std::function<void()>(std::bind(&CConnman::ThreadStakeMinter, this)));
+
     // Dump network addresses
     scheduler.scheduleEvery(std::bind(&CConnman::DumpAddresses, this), DUMP_PEERS_INTERVAL * 1000);
 
@@ -2355,6 +2357,8 @@ void CConnman::Stop()
         threadDNSAddressSeed.join();
     if (threadSocketHandler.joinable())
         threadSocketHandler.join();
+    if (threadStakeMinter.joinable())
+        threadStakeMinter.join();
 
     if (fAddressesInitialized)
     {

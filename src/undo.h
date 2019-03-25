@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2013 The Bitcoin developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Copyright (c) 2016-2017 The PIVX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -7,10 +7,12 @@
 #ifndef BITCOIN_UNDO_H
 #define BITCOIN_UNDO_H
 
-#include "compressor.h"
-#include "primitives/transaction.h"
-#include "serialize.h"
-
+#include <coins.h>
+#include <compressor.h>
+#include <consensus/consensus.h>
+#include <primitives/transaction.h>
+#include <serialize.h>
+#include <version.h>
 
 /** Undo information for a CTxIn
  *
@@ -140,6 +142,20 @@ public:
         for (auto& prevout : vprevout) {
             ::Unserialize(s, TxInUndoDeserializer(&prevout));
         }
+    }
+};
+
+/** Undo information for a CBlock */
+class CBlockUndo
+{
+public:
+    std::vector<CTxUndo> vtxundo; // for all but the coinbase
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action) {
+        READWRITE(vtxundo);
     }
 };
 

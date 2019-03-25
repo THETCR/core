@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2017 The Bitcoin Core developers
+// Copyright (c) 2017-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -12,10 +12,7 @@
 // TODO remove the following dependencies
 #include <chain.h>
 #include <coins.h>
-#include <policy/policy.h>
-#include <chainparams.h>
-#include <validation.h>
-#include "util/moneystr.h"
+#include <util/moneystr.h>
 
 bool IsFinalTx(const CTransaction &tx, int nBlockHeight, int64_t nBlockTime)
 {
@@ -46,7 +43,7 @@ std::pair<int, int64_t> CalculateSequenceLocks(const CTransaction &tx, int flags
     // we would be doing a signed comparison and half the range of nVersion
     // wouldn't support BIP 68.
     bool fEnforceBIP68 = static_cast<uint32_t>(tx.nVersion) >= 2
-        && flags & LOCKTIME_VERIFY_SEQUENCE;
+                      && flags & LOCKTIME_VERIFY_SEQUENCE;
 
     // Do not enforce sequence numbers as a relative lock time
     // unless we have been instructed to
@@ -110,10 +107,12 @@ bool SequenceLocks(const CTransaction &tx, int flags, std::vector<int>* prevHeig
 unsigned int GetLegacySigOpCount(const CTransaction& tx)
 {
     unsigned int nSigOps = 0;
-    for (const CTxIn& txin: tx.vin) {
+    for (const auto& txin : tx.vin)
+    {
         nSigOps += txin.scriptSig.GetSigOpCount(false);
     }
-    for (const CTxOut& txout: tx.vout) {
+    for (const auto& txout : tx.vout)
+    {
         nSigOps += txout.scriptPubKey.GetSigOpCount(false);
     }
     return nSigOps;
@@ -140,20 +139,20 @@ int64_t GetTransactionSigOpCost(const CTransaction& tx, const CCoinsViewCache& i
 {
     int64_t nSigOps = GetLegacySigOpCount(tx) * WITNESS_SCALE_FACTOR;
 
-    if (tx.IsCoinBase())
+    if (tx.IsCoinBase()|| tx.IsCoinStake())
         return nSigOps;
 
     if (flags & SCRIPT_VERIFY_P2SH) {
         nSigOps += GetP2SHSigOpCount(tx, inputs) * WITNESS_SCALE_FACTOR;
     }
 
-    // TODO uncomment after implementing function and transaction witnesses
-
-    //    for (unsigned int i = 0; i < tx.vin.size(); i++)
-    //    {
-    //        const CTxOut &prevout = inputs.GetOutputFor(tx.vin[i]);
-    //        nSigOps += CountWitnessSigOps(tx.vin[i].scriptSig, prevout.scriptPubKey, &tx.vin[i].scriptWitness, flags);
-    //    }
+    for (unsigned int i = 0; i < tx.vin.size(); i++)
+    {
+        const Coin& coin = inputs.AccessCoin(tx.vin[i].prevout);
+        assert(!coin.IsSpent());
+        const CTxOut &prevout = coin.out;
+        nSigOps += CountWitnessSigOps(tx.vin[i].scriptSig, prevout.scriptPubKey, &tx.vin[i].scriptWitness, flags);
+    }
     return nSigOps;
 }
 
@@ -161,36 +160,30 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
 {
     // Basic checks that don't depend on any context
     if (tx.vin.empty())
-        return state.DoS(10, error("CheckTransaction() : vin empty"),
-                         REJECT_INVALID, "bad-txns-vin-empty");
+        return state.DoS(10, false, REJECT_INVALID, "bad-txns-vin-empty");
     if (tx.vout.empty())
-        return state.DoS(10, error("CheckTransaction() : vout empty"),
-                         REJECT_INVALID, "bad-txns-vout-empty");
-
-    // Size limits
+        return state.DoS(10, false, REJECT_INVALID, "bad-txns-vout-empty");
+    // Size limits (this doesn't take the witness into account, as that hasn't been checked for malleability)
     unsigned int nMaxSize = MAX_ZEROCOIN_TX_SIZE;
 
     if (::GetSerializeSize(tx, PROTOCOL_VERSION) > nMaxSize)
-        return state.DoS(100, error("CheckTransaction() : size limits failed"),
-                         REJECT_INVALID, "bad-txns-oversize");
+        return state.DoS(100, false, REJECT_INVALID, "bad-txns-oversize");
 
     // Check for negative or overflow output values
     CAmount nValueOut = 0;
     int nZCSpendCount = 0;
-    for (const CTxOut& txout: tx.vout) {
+    for (const auto& txout : tx.vout) {
         if (txout.IsEmpty() && !tx.IsCoinBase() && !tx.IsCoinStake())
             return state.DoS(100, error("CheckTransaction(): txout empty for user transaction"));
 
         if (txout.nValue < 0)
-            return state.DoS(100, error("CheckTransaction() : txout.nValue negative"),
-                             REJECT_INVALID, "bad-txns-vout-negative");
+            return state.DoS(100, false, REJECT_INVALID, "bad-txns-vout-negative");
         if (txout.nValue > Params().MaxMoneyOut())
-            return state.DoS(100, error("CheckTransaction() : txout.nValue too high"),
-                             REJECT_INVALID, "bad-txns-vout-toolarge");
+            return state.DoS(100, false, REJECT_INVALID, "bad-txns-vout-toolarge");
         nValueOut += txout.nValue;
         if (!MoneyRange(nValueOut))
-            return state.DoS(100, error("CheckTransaction() : txout total out of range"),
-                             REJECT_INVALID, "bad-txns-txouttotal-toolarge");
+            return state.DoS(100, false, REJECT_INVALID, "bad-txns-txouttotal-toolarge");
+
         if (fZerocoinActive && txout.IsZerocoinMint()) {
             if(!CheckZerocoinMint(tx.GetHash(), txout, state, true))
                 return state.DoS(100, error("CheckTransaction() : invalid zerocoin mint"));
@@ -218,13 +211,13 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
         }
     }
 
-    // Check for duplicate inputs
-    set<COutPoint> vInOutPoints;
-    set<CBigNum> vZerocoinSpendSerials;
-    for (const CTxIn& txin : tx.vin) {
+    // Check for duplicate inputs - note that this check is slow so we skip it in CheckBlock
+    std::set<COutPoint> vInOutPoints;
+    std::set<CBigNum> vZerocoinSpendSerials;
+    for (const auto& txin : tx.vin){
         if (vInOutPoints.count(txin.prevout))
-            return state.DoS(100, error("CheckTransaction() : duplicate inputs"),
-                             REJECT_INVALID, "bad-txns-inputs-duplicate");
+            return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputs-duplicate");
+
 
         //duplicate zcspend serials are checked in CheckZerocoinSpend()
         if (!txin.scriptSig.IsZerocoinSpend())
@@ -233,16 +226,14 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
 
     if (tx.IsCoinBase()) {
         if (tx.vin[0].scriptSig.size() < 2 || tx.vin[0].scriptSig.size() > 150)
-            return state.DoS(100, error("CheckTransaction() : coinbase script size=%d", tx.vin[0].scriptSig.size()),
-                             REJECT_INVALID, "bad-cb-length");
+            return state.DoS(100, false, REJECT_INVALID, "bad-cb-length");
     } else if (fZerocoinActive && tx.IsZerocoinSpend()) {
         if(tx.vin.size() < 1 || static_cast<int>(tx.vin.size()) > Params().Zerocoin_MaxSpendsPerTransaction())
             return state.DoS(10, error("CheckTransaction() : Zerocoin Spend has more than allowed txin's"), REJECT_INVALID, "bad-zerocoinspend");
     } else {
-        for (const CTxIn& txin: tx.vin)
+        for (const auto& txin : tx.vin)
             if (txin.prevout.IsNull() && (fZerocoinActive && !txin.scriptSig.IsZerocoinSpend()))
-                return state.DoS(10, error("CheckTransaction() : prevout is null"),
-                                 REJECT_INVALID, "bad-txns-prevout-null");
+                return state.DoS(10, false, REJECT_INVALID, "bad-txns-prevout-null");
     }
 
     return true;
@@ -265,8 +256,8 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
         // If prev is coinbase, check that it's matured
         if (coin.IsCoinBase() && nSpendHeight - coin.nHeight < COINBASE_MATURITY) {
             return state.Invalid(false,
-                                 REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
-                                 strprintf("tried to spend coinbase at depth %d", nSpendHeight - coin.nHeight));
+                REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
+                strprintf("tried to spend coinbase at depth %d", nSpendHeight - coin.nHeight));
         }
 
         // Check for negative or overflow input values
@@ -279,7 +270,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
     const CAmount value_out = tx.GetValueOut();
     if (nValueIn < value_out) {
         return state.DoS(100, false, REJECT_INVALID, "bad-txns-in-belowout", false,
-                         strprintf("value in (%s) < value out (%s)", FormatMoney(nValueIn), FormatMoney(value_out)));
+            strprintf("value in (%s) < value out (%s)", FormatMoney(nValueIn), FormatMoney(value_out)));
     }
 
     // Tally transaction fees

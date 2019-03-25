@@ -6,12 +6,9 @@
 
 #include <primitives/transaction.h>
 
-#include "hash.h"
-#include "tinyformat.h"
+#include <hash.h>
+#include <tinyformat.h>
 #include <util/strencodings.h>
-
-extern bool GetTransaction(const uint256 &hash, CTransaction &txOut, uint256 &hashBlock, bool fAllowSlow);
-
 
 std::string COutPoint::ToString() const
 {
@@ -25,7 +22,7 @@ std::string COutPoint::ToStringShort() const
 
 uint256 COutPoint::GetHash()
 {
-    return Hash(BEGIN(hash), END(hash), BEGIN(n), END(n));
+    return Hash(hash.begin(), hash.end(), BEGIN(n), END(n));
 }
 
 CTxIn::CTxIn(COutPoint prevoutIn, CScript scriptSigIn, uint32_t nSequenceIn)
@@ -42,7 +39,8 @@ CTxIn::CTxIn(uint256 hashPrevTx, uint32_t nOut, CScript scriptSigIn, uint32_t nS
     nSequence = nSequenceIn;
 }
 
-std::string CTxIn::ToString() const {
+std::string CTxIn::ToString() const
+{
     std::string str;
     str += "CTxIn(";
     str += prevout.ToString();
@@ -98,14 +96,15 @@ std::string CTxOut::ToString() const
 CMutableTransaction::CMutableTransaction() : nVersion(CTransaction::CURRENT_VERSION), nTime(0), nLockTime(0) {}
 CMutableTransaction::CMutableTransaction(const CTransaction& tx) : nVersion(tx.nVersion), nTime(tx.nTime), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime) {}
 
+
 std::string CMutableTransaction::ToString() const
 {
     std::string str;
     str += strprintf("CMutableTransaction(ver=%d, vin.size=%u, vout.size=%u, nLockTime=%u)\n",
-        nVersion,
-        vin.size(),
-        vout.size(),
-        nLockTime);
+                     nVersion,
+                     vin.size(),
+                     vout.size(),
+                     nLockTime);
     for (unsigned int i = 0; i < vin.size(); i++)
         str += "    " + vin[i].ToString() + "\n";
     for (unsigned int i = 0; i < vout.size(); i++)
@@ -135,25 +134,14 @@ uint256 CTransaction::ComputeWitnessHash() const
     }
     return SerializeHash(*this, SER_GETHASH, 0);
 }
-CTransaction::CTransaction() : hash(), nVersion(CTransaction::CURRENT_VERSION), nTime(0), vin(), vout(), nLockTime(0) { }
 
-CTransaction::CTransaction(const CMutableTransaction &tx) : nVersion(tx.nVersion), nTime(tx.nTime), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime) {
-    UpdateHash();
-}
-//CTransaction::CTransaction(CMutableTransaction& tx) : nVersion(tx.nVersion), nTime(tx.nTime), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime){
-//    UpdateHash();
-//}
+/* For backward compatibility, the hash is initialized to 0. TODO: remove the need for this default constructor entirely. */
+CTransaction::CTransaction() : nVersion(CTransaction::CURRENT_VERSION), nTime(0), vin(), vout(), nLockTime(0), hash{}, m_witness_hash{} { }
+CTransaction::CTransaction(const CMutableTransaction &tx) : nVersion(tx.nVersion), nTime(tx.nTime), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime), hash{ComputeHash()}, m_witness_hash{ComputeWitnessHash()} {}
+CTransaction::CTransaction(CMutableTransaction&& tx) : nVersion(tx.nVersion), nTime(tx.nTime), vin(std::move(tx.vin)), vout(std::move(tx.vout)), nLockTime(tx.nLockTime), hash{ComputeHash()}, m_witness_hash{ComputeWitnessHash()} {}
 
-CTransaction &CTransaction::operator=(const CTransaction &tx) {
-    *const_cast<int32_t *>(&nVersion) = tx.nVersion;
-    *const_cast<unsigned int *>(&nTime) = tx.nTime;
-    *const_cast<std::vector <CTxIn> *>(&vin) = tx.vin;
-    *const_cast<std::vector <CTxOut> *>(&vout) = tx.vout;
-    *const_cast<uint32_t *>(&nLockTime) = tx.nLockTime;
-    *const_cast<uint256 *>(&hash) = tx.hash;
-    *const_cast<uint256 *>(&m_witness_hash) = tx.m_witness_hash;
-    return *this;
-}
+
+
 
 bool CTransaction::IsCoinStake() const
 {
@@ -277,9 +265,11 @@ std::string CTransaction::ToString() const
                      vout.size(),
                      nLockTime,
                      nTime);
-    for (unsigned int i = 0; i < vin.size(); i++)
-        str += "    " + vin[i].ToString() + "\n";
-    for (unsigned int i = 0; i < vout.size(); i++)
-        str += "    " + vout[i].ToString() + "\n";
+    for (const auto& tx_in : vin)
+        str += "    " + tx_in.ToString() + "\n";
+    for (const auto& tx_in : vin)
+        str += "    " + tx_in.scriptWitness.ToString() + "\n";
+    for (const auto& tx_out : vout)
+        str += "    " + tx_out.ToString() + "\n";
     return str;
 }

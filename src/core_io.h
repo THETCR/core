@@ -16,6 +16,7 @@ class CBlockHeader;
 class CScript;
 class CTransaction;
 struct CMutableTransaction;
+struct PartiallySignedTransaction;
 class uint256;
 class UniValue;
 
@@ -38,7 +39,11 @@ uint256 ParseHashUV(const UniValue& v, const std::string& strName);
 bool ParseHashStr(const std::string& strHex, uint256& result);
 std::vector<unsigned char> ParseHexUV(const UniValue& v, const std::string& strName);
 
-//int ParseSighashString(const UniValue& sighash);
+//! Decode a base64ed PSBT into a PartiallySignedTransaction
+NODISCARD bool DecodeBase64PSBT(PartiallySignedTransaction& decoded_psbt, const std::string& base64_psbt, std::string& error);
+//! Decode a raw (binary blob) PSBT into a PartiallySignedTransaction
+NODISCARD bool DecodeRawPSBT(PartiallySignedTransaction& decoded_psbt, const std::string& raw_psbt, std::string& error);
+int ParseSighashString(const UniValue& sighash);
 
 // core_write.cpp
 UniValue ValueFromAmount(const CAmount& amount);

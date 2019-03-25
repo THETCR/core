@@ -236,7 +236,7 @@ bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, std::
         nRequiredRet = 1;
         CTxDestination address;
         if (!ExtractDestination(scriptPubKey, address))
-            return false;
+           return false;
         addressRet.push_back(address);
     }
 
@@ -248,47 +248,47 @@ namespace
 class CScriptVisitor : public boost::static_visitor<bool>
 {
 private:
-  CScript *script;
+    CScript *script;
 public:
-  explicit CScriptVisitor(CScript *scriptin) { script = scriptin; }
+    explicit CScriptVisitor(CScript *scriptin) { script = scriptin; }
 
-  bool operator()(const CNoDestination &dest) const {
-      script->clear();
-      return false;
-  }
+    bool operator()(const CNoDestination &dest) const {
+        script->clear();
+        return false;
+    }
 
-  bool operator()(const CKeyID &keyID) const {
-      script->clear();
-      *script << OP_DUP << OP_HASH160 << ToByteVector(keyID) << OP_EQUALVERIFY << OP_CHECKSIG;
-      return true;
-  }
+    bool operator()(const CKeyID &keyID) const {
+        script->clear();
+        *script << OP_DUP << OP_HASH160 << ToByteVector(keyID) << OP_EQUALVERIFY << OP_CHECKSIG;
+        return true;
+    }
 
-  bool operator()(const CScriptID &scriptID) const {
-      script->clear();
-      *script << OP_HASH160 << ToByteVector(scriptID) << OP_EQUAL;
-      return true;
-  }
+    bool operator()(const CScriptID &scriptID) const {
+        script->clear();
+        *script << OP_HASH160 << ToByteVector(scriptID) << OP_EQUAL;
+        return true;
+    }
 
-  bool operator()(const WitnessV0KeyHash& id) const
-  {
-      script->clear();
-      *script << OP_0 << ToByteVector(id);
-      return true;
-  }
+    bool operator()(const WitnessV0KeyHash& id) const
+    {
+        script->clear();
+        *script << OP_0 << ToByteVector(id);
+        return true;
+    }
 
-  bool operator()(const WitnessV0ScriptHash& id) const
-  {
-      script->clear();
-      *script << OP_0 << ToByteVector(id);
-      return true;
-  }
+    bool operator()(const WitnessV0ScriptHash& id) const
+    {
+        script->clear();
+        *script << OP_0 << ToByteVector(id);
+        return true;
+    }
 
-  bool operator()(const WitnessUnknown& id) const
-  {
-      script->clear();
-      *script << CScript::EncodeOP_N(id.version) << std::vector<unsigned char>(id.program, id.program + id.length);
-      return true;
-  }
+    bool operator()(const WitnessUnknown& id) const
+    {
+        script->clear();
+        *script << CScript::EncodeOP_N(id.version) << std::vector<unsigned char>(id.program, id.program + id.length);
+        return true;
+    }
 };
 } // namespace
 

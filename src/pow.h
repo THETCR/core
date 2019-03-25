@@ -8,6 +8,8 @@
 #ifndef BITCOIN_POW_H
 #define BITCOIN_POW_H
 
+#include <consensus/params.h>
+
 #include <stdint.h>
 
 class CBlockHeader;
@@ -23,11 +25,13 @@ enum DiffMode {
     DIFF_DGW = 3,     // Retarget using Dark Gravity Wave v3
 };
 
-unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock);
+unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params&);
+unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nFirstBlockTime, const Consensus::Params&);
+
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake);
 const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake);
 
 /** Check whether a block hash satisfies the proof-of-work requirement specified by nBits */
-bool CheckProofOfWork(uint256 hash, unsigned int nBits);
+bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&);
 
 #endif // BITCOIN_POW_H

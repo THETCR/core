@@ -198,7 +198,7 @@ bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreato
     bool solved = SignStep(provider, creator, fromPubKey, result, whichType, SigVersion::BASE, sigdata);
     bool P2SH = false;
     CScript subscript;
-//    sigdata.scriptWitness.stack.clear();
+    sigdata.scriptWitness.stack.clear();
 
     if (solved && whichType == TX_SCRIPTHASH)
     {
@@ -217,7 +217,7 @@ bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreato
         witnessscript << OP_DUP << OP_HASH160 << ToByteVector(result[0]) << OP_EQUALVERIFY << OP_CHECKSIG;
         txnouttype subType;
         solved = solved && SignStep(provider, creator, witnessscript, result, subType, SigVersion::WITNESS_V0, sigdata);
-//        sigdata.scriptWitness.stack = result;
+        sigdata.scriptWitness.stack = result;
         sigdata.witness = true;
         result.clear();
     }
@@ -228,7 +228,7 @@ bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreato
         txnouttype subType;
         solved = solved && SignStep(provider, creator, witnessscript, result, subType, SigVersion::WITNESS_V0, sigdata) && subType != TX_SCRIPTHASH && subType != TX_WITNESS_V0_SCRIPTHASH && subType != TX_WITNESS_V0_KEYHASH;
         result.push_back(std::vector<unsigned char>(witnessscript.begin(), witnessscript.end()));
-//        sigdata.scriptWitness.stack = result;
+        sigdata.scriptWitness.stack = result;
         sigdata.witness = true;
         result.clear();
     } else if (solved && whichType == TX_WITNESS_UNKNOWN) {
@@ -241,19 +241,19 @@ bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreato
     sigdata.scriptSig = PushAll(result);
 
     // Test solution
-    sigdata.complete = solved && VerifyScript(sigdata.scriptSig, fromPubKey, nullptr, STANDARD_SCRIPT_VERIFY_FLAGS, creator.Checker());
+    sigdata.complete = solved && VerifyScript(sigdata.scriptSig, fromPubKey, &sigdata.scriptWitness, STANDARD_SCRIPT_VERIFY_FLAGS, creator.Checker());
     return sigdata.complete;
 }
 
 class SignatureExtractorChecker final : public BaseSignatureChecker
 {
 private:
-  SignatureData& sigdata;
-  BaseSignatureChecker& checker;
+    SignatureData& sigdata;
+    BaseSignatureChecker& checker;
 
 public:
-  SignatureExtractorChecker(SignatureData& sigdata, BaseSignatureChecker& checker) : sigdata(sigdata), checker(checker) {}
-  bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const override;
+    SignatureExtractorChecker(SignatureData& sigdata, BaseSignatureChecker& checker) : sigdata(sigdata), checker(checker) {}
+    bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const override;
 };
 
 bool SignatureExtractorChecker::CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const
@@ -270,14 +270,14 @@ namespace
 {
 struct Stacks
 {
-  std::vector<valtype> script;
-  std::vector<valtype> witness;
+    std::vector<valtype> script;
+    std::vector<valtype> witness;
 
-  Stacks() = delete;
-  Stacks(const Stacks&) = delete;
-  explicit Stacks(const SignatureData& data) : witness(data.scriptWitness.stack) {
-      EvalScript(script, data.scriptSig, SCRIPT_VERIFY_STRICTENC, BaseSignatureChecker(), SigVersion::BASE);
-  }
+    Stacks() = delete;
+    Stacks(const Stacks&) = delete;
+    explicit Stacks(const SignatureData& data) : witness(data.scriptWitness.stack) {
+        EvalScript(script, data.scriptSig, SCRIPT_VERIFY_STRICTENC, BaseSignatureChecker(), SigVersion::BASE);
+    }
 };
 }
 
@@ -287,13 +287,13 @@ SignatureData DataFromTransaction(const CMutableTransaction& tx, unsigned int nI
     SignatureData data;
     assert(tx.vin.size() > nIn);
     data.scriptSig = tx.vin[nIn].scriptSig;
-//    data.scriptWitness = tx.vin[nIn].scriptWitness;
+    data.scriptWitness = tx.vin[nIn].scriptWitness;
     Stacks stack(data);
 
     // Get signatures
     MutableTransactionSignatureChecker tx_checker(&tx, nIn, txout.nValue);
     SignatureExtractorChecker extractor_checker(data, tx_checker);
-    if (VerifyScript(data.scriptSig, txout.scriptPubKey, nullptr, STANDARD_SCRIPT_VERIFY_FLAGS, extractor_checker)) {
+    if (VerifyScript(data.scriptSig, txout.scriptPubKey, &data.scriptWitness, STANDARD_SCRIPT_VERIFY_FLAGS, extractor_checker)) {
         data.complete = true;
         return data;
     }
@@ -350,7 +350,7 @@ SignatureData DataFromTransaction(const CMutableTransaction& tx, unsigned int nI
 void UpdateInput(CTxIn& input, const SignatureData& data)
 {
     input.scriptSig = data.scriptSig;
-//    input.scriptWitness = data.scriptWitness;
+    input.scriptWitness = data.scriptWitness;
 }
 
 void SignatureData::MergeSignatureData(SignatureData sigdata)
@@ -396,33 +396,33 @@ namespace {
 class DummySignatureChecker final : public BaseSignatureChecker
 {
 public:
-  DummySignatureChecker() {}
-  bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const override { return true; }
+    DummySignatureChecker() {}
+    bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const override { return true; }
 };
 const DummySignatureChecker DUMMY_CHECKER;
 
 class DummySignatureCreator final : public BaseSignatureCreator {
 private:
-  char m_r_len = 32;
-  char m_s_len = 32;
+    char m_r_len = 32;
+    char m_s_len = 32;
 public:
-  DummySignatureCreator(char r_len, char s_len) : m_r_len(r_len), m_s_len(s_len) {}
-  const BaseSignatureChecker& Checker() const override { return DUMMY_CHECKER; }
-  bool CreateSig(const SigningProvider& provider, std::vector<unsigned char>& vchSig, const CKeyID& keyid, const CScript& scriptCode, SigVersion sigversion) const override
-  {
-      // Create a dummy signature that is a valid DER-encoding
-      vchSig.assign(m_r_len + m_s_len + 7, '\000');
-      vchSig[0] = 0x30;
-      vchSig[1] = m_r_len + m_s_len + 4;
-      vchSig[2] = 0x02;
-      vchSig[3] = m_r_len;
-      vchSig[4] = 0x01;
-      vchSig[4 + m_r_len] = 0x02;
-      vchSig[5 + m_r_len] = m_s_len;
-      vchSig[6 + m_r_len] = 0x01;
-      vchSig[6 + m_r_len + m_s_len] = SIGHASH_ALL;
-      return true;
-  }
+    DummySignatureCreator(char r_len, char s_len) : m_r_len(r_len), m_s_len(s_len) {}
+    const BaseSignatureChecker& Checker() const override { return DUMMY_CHECKER; }
+    bool CreateSig(const SigningProvider& provider, std::vector<unsigned char>& vchSig, const CKeyID& keyid, const CScript& scriptCode, SigVersion sigversion) const override
+    {
+        // Create a dummy signature that is a valid DER-encoding
+        vchSig.assign(m_r_len + m_s_len + 7, '\000');
+        vchSig[0] = 0x30;
+        vchSig[1] = m_r_len + m_s_len + 4;
+        vchSig[2] = 0x02;
+        vchSig[3] = m_r_len;
+        vchSig[4] = 0x01;
+        vchSig[4 + m_r_len] = 0x02;
+        vchSig[5 + m_r_len] = m_s_len;
+        vchSig[6 + m_r_len] = 0x01;
+        vchSig[6 + m_r_len + m_s_len] = SIGHASH_ALL;
+        return true;
+    }
 };
 
 template<typename M, typename K, typename V>
@@ -451,10 +451,10 @@ bool IsSolvable(const SigningProvider& provider, const CScript& script)
     SignatureData sigs;
     // Make sure that STANDARD_SCRIPT_VERIFY_FLAGS includes SCRIPT_VERIFY_WITNESS_PUBKEYTYPE, the most
     // important property this function is designed to test for.
-//    static_assert(STANDARD_SCRIPT_VERIFY_FLAGS & SCRIPT_VERIFY_WITNESS_PUBKEYTYPE, "IsSolvable requires standard script flags to include WITNESS_PUBKEYTYPE");
+    static_assert(STANDARD_SCRIPT_VERIFY_FLAGS & SCRIPT_VERIFY_WITNESS_PUBKEYTYPE, "IsSolvable requires standard script flags to include WITNESS_PUBKEYTYPE");
     if (ProduceSignature(provider, DUMMY_SIGNATURE_CREATOR, script, sigs)) {
         // VerifyScript check is just defensive, and should never fail.
-        bool verified = VerifyScript(sigs.scriptSig, script, nullptr, STANDARD_SCRIPT_VERIFY_FLAGS, DUMMY_CHECKER);
+        bool verified = VerifyScript(sigs.scriptSig, script, &sigs.scriptWitness, STANDARD_SCRIPT_VERIFY_FLAGS, DUMMY_CHECKER);
         assert(verified);
         return true;
     }

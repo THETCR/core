@@ -102,7 +102,7 @@ void UpdateTime(CBlockHeader* pblock, const CBlockIndex* pindexPrev)
     // Updating time can change work required on testnet:
     if (Params().AllowMinDifficultyBlocks()) {
         if (pblock->nVersion > 7) {
-            pblock->nBits = GetNextWorkRequired(pindexPrev, pblock);
+            pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, Params().GetConsensus());
         } else {
             pblock->nBits = GetNextTargetRequired(pindexPrev, false);
         }
@@ -145,7 +145,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         boost::this_thread::interruption_point();
         pblock->nTime = GetAdjustedTime();
         CBlockIndex* pindexPrev = chainActive.Tip();
-        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock);
+        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, Params().GetConsensus());
         CMutableTransaction txCoinStake;
         int64_t nSearchTime = pblock->nTime; // search to current time
         bool fStakeFound = false;
@@ -190,6 +190,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
         CBlockIndex* pindexPrev = chainActive.Tip();
         const int nHeight = pindexPrev->nHeight + 1;
+        const int nBlockTime = pindexPrev->nTime;
         CCoinsViewCache view(pcoinsTip.get());
 
         // Priority order to process transactions
@@ -202,7 +203,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         vecPriority.reserve(mempool.mapTx.size());
         for (const CTxMemPoolEntry& e : mempool.mapTx) {
             const CTransaction& tx = e.GetTx();
-            if (tx.IsCoinBase() || tx.IsCoinStake() || !IsFinalTx(tx, nHeight)){
+            if (tx.IsCoinBase() || tx.IsCoinStake() || !IsFinalTx(tx, nHeight, nBlockTime)){
                 continue;
             }
             if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE) && tx.ContainsZerocoins()){
@@ -397,8 +398,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             if (!CheckInputs(tx, state, view, true, MANDATORY_SCRIPT_VERIFY_FLAGS, true))
                 continue;
 
-            CTxUndo txundo;
-            UpdateCoins(tx, view, txundo, nHeight);
+//            CTxUndo txundo;
+            UpdateCoins(tx, view, nHeight);
 
             // Added
             pblock->vtx.push_back(MakeTransactionRef(tx));
@@ -456,7 +457,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         pblock->hashPrevBlock = pindexPrev->GetBlockHash();
         if (!fProofOfStake)
             UpdateTime(pblock, pindexPrev);
-        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock);
+        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, Params().GetConsensus());
         pblock->nNonce = 0;
 
         //Calculate the accumulator checkpoint only if the previous cached checkpoint need to be updated
@@ -484,7 +485,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(*pblock->vtx[0]);
 
         CValidationState state;
-        if (!TestBlockValidity(state, *pblock, pindexPrev, false, false)) {
+        if (!TestBlockValidity(state, Params(), *pblock, pindexPrev, false, false)) {
             LogPrintf("CreateNewBlock() : TestBlockValidity failed\n");
             mempool.clear();
             return nullptr;
@@ -561,7 +562,9 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 
     // Process this block the same as if we had received it from another node
     CValidationState state;
-    if (!ProcessNewBlock(Params(), pblock, true, NULL, NULL)) {
+    bool new_block;
+    std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
+    if (!ProcessNewBlock(Params(), shared_pblock, true, &new_block)) {
         if (pblock->IsZerocoinStake())
             pwalletMain->zwspTracker->RemovePending(pblock->vtx[1]->GetHash());
         return error("WISPRMiner : ProcessNewBlock, block not accepted");

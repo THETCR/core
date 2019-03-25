@@ -23,7 +23,7 @@ UniValue ValueFromAmount(const CAmount& amount)
     int64_t quotient = n_abs / COIN;
     int64_t remainder = n_abs % COIN;
     return UniValue(UniValue::VNUM,
-                    strprintf("%s%d.%08d", sign ? "-" : "", quotient, remainder));
+            strprintf("%s%d.%08d", sign ? "-" : "", quotient, remainder));
 }
 
 std::string FormatScript(const CScript& script)
@@ -130,7 +130,7 @@ std::string ScriptToAsmStr(const CScript& script, const bool fAttemptSighashDeco
 
 std::string EncodeHexTx(const CTransaction& tx, const int serializeFlags)
 {
-    CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
+    CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION | serializeFlags);
     ssTx << tx;
     return HexStr(ssTx.begin(), ssTx.end());
 }
@@ -179,7 +179,11 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
 void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry, bool include_hex, int serialize_flags)
 {
     entry.pushKV("txid", tx.GetHash().GetHex());
+    entry.pushKV("hash", tx.GetWitnessHash().GetHex());
     entry.pushKV("version", tx.nVersion);
+    entry.pushKV("size", (int)::GetSerializeSize(tx, PROTOCOL_VERSION));
+    entry.pushKV("vsize", (GetTransactionWeight(tx) + WITNESS_SCALE_FACTOR - 1) / WITNESS_SCALE_FACTOR);
+    entry.pushKV("weight", GetTransactionWeight(tx));
     entry.pushKV("locktime", (int64_t)tx.nLockTime);
 
     UniValue vin(UniValue::VARR);
@@ -195,6 +199,13 @@ void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry,
             o.pushKV("asm", ScriptToAsmStr(txin.scriptSig, false));
             o.pushKV("hex", HexStr(txin.scriptSig.begin(), txin.scriptSig.end()));
             in.pushKV("scriptSig", o);
+            if (!tx.vin[i].scriptWitness.IsNull()) {
+                UniValue txinwitness(UniValue::VARR);
+                for (const auto& item : tx.vin[i].scriptWitness.stack) {
+                    txinwitness.push_back(HexStr(item.begin(), item.end()));
+                }
+                in.pushKV("txinwitness", txinwitness);
+            }
         }
         in.pushKV("sequence", (int64_t)txin.nSequence);
         vin.push_back(in);

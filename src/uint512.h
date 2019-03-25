@@ -5,11 +5,10 @@
 #ifndef WISPR_UINT512_H
 #define WISPR_UINT512_H
 
-#include "arith_uint256.h"
 #include "uint256.h"
 
 /** 512-bit unsigned big integer. */
-class uint512 : public base_blob<512>
+class uint512 : public base_uint<512>
 {
 public:
     uint512() {}

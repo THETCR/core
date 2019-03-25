@@ -29,6 +29,17 @@ struct SeedSpec6 {
   uint16_t port;
 };
 
+typedef std::map<int, uint256> MapCheckpoints;
+
+struct CCheckpointData {
+//    MapCheckpoints mapCheckpoints;
+    const MapCheckpoints* mapCheckpoints;
+    int64_t nTimeLastCheckpoint;
+    int64_t nTransactionsLastCheckpoint;
+    double fTransactionsPerDay;
+};
+
+
 /**
  * Holds various statistics on transactions within a chain. Used to estimate
  * verification progress during chain sync.
@@ -171,6 +182,7 @@ public:
     bool PivProtocolsStartHeightEqualOrGreaterThen(int nHeight) const { return nHeight >= consensus.nNewProtocolStartHeight; }
     bool PivProtocolsStartHeightSmallerThen(int nHeight) const { return nHeight < consensus.nNewProtocolStartHeight; }
     const std::string& Bech32HRP() const { return bech32_hrp; }
+//    const CCheckpointData& Checkpoints() const { return checkpointData; }
     const ChainTxData& TxData() const { return chainTxData; }
 protected:
     CChainParams() {}
@@ -197,6 +209,7 @@ protected:
     bool fTestnetToBeDeprecatedFieldRPC;
     bool fHeadersFirstSyncingActive;
     std::string bech32_hrp;
+    CCheckpointData checkpointData;
     ChainTxData chainTxData;
     bool m_fallback_fee_enabled;
 };

@@ -4,6 +4,7 @@
 
 #include <core_io.h>
 
+#include <psbt.h>
 #include <primitives/block.h>
 #include <primitives/transaction.h>
 #include <script/script.h>
@@ -112,18 +113,34 @@ static bool CheckTxScriptsSanity(const CMutableTransaction& tx)
 
 bool DecodeHexTx(CMutableTransaction& tx, const std::string& hex_tx, bool try_no_witness, bool try_witness)
 {
-    if (!IsHex(hex_tx))
+    if (!IsHex(hex_tx)) {
         return false;
+    }
 
     std::vector<unsigned char> txData(ParseHex(hex_tx));
-    CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS);
-    try {
-        ssData >> tx;
-        if (ssData.eof() && (!try_witness || CheckTxScriptsSanity(tx))) {
-            return true;
+
+    if (try_no_witness) {
+        CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS);
+        try {
+            ssData >> tx;
+            if (ssData.eof() && (!try_witness || CheckTxScriptsSanity(tx))) {
+                return true;
+            }
+        } catch (const std::exception&) {
+            // Fall through.
         }
-    } catch (const std::exception&) {
-        // Fall through.
+    }
+
+    if (try_witness) {
+        CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION);
+        try {
+            ssData >> tx;
+            if (ssData.empty()) {
+                return true;
+            }
+        } catch (const std::exception&) {
+            // Fall through.
+        }
     }
 
     return false;
@@ -160,6 +177,33 @@ bool DecodeHexBlk(CBlock& block, const std::string& strHexBlk)
     return true;
 }
 
+bool DecodeBase64PSBT(PartiallySignedTransaction& psbt, const std::string& base64_tx, std::string& error)
+{
+    bool invalid;
+    std::string tx_data = DecodeBase64(base64_tx, &invalid);
+    if (invalid) {
+        error = "invalid base64";
+        return false;
+    }
+    return DecodeRawPSBT(psbt, tx_data, error);
+}
+
+bool DecodeRawPSBT(PartiallySignedTransaction& psbt, const std::string& tx_data, std::string& error)
+{
+    CDataStream ss_data(tx_data.data(), tx_data.data() + tx_data.size(), SER_NETWORK, PROTOCOL_VERSION);
+    try {
+        ss_data >> psbt;
+        if (!ss_data.empty()) {
+            error = "extra data after PSBT";
+            return false;
+        }
+    } catch (const std::exception& e) {
+        error = e.what();
+        return false;
+    }
+    return true;
+}
+
 bool ParseHashStr(const std::string& strHex, uint256& result)
 {
     if ((strHex.size() != 64) || !IsHex(strHex))
@@ -193,25 +237,25 @@ uint256 ParseHashUV(const UniValue& v, const std::string& strName)
 //    return ParseHashStr(strHex, strName); // Note: ParseHashStr("") throws a runtime_error
 }
 
-//int ParseSighashString(const UniValue& sighash)
-//{
-//    int hash_type = SIGHASH_ALL;
-//    if (!sighash.isNull()) {
-//        static std::map<std::string, int> map_sighash_values = {
-//                {std::string("ALL"), int(SIGHASH_ALL)},
-//                {std::string("ALL|ANYONECANPAY"), int(SIGHASH_ALL|SIGHASH_ANYONECANPAY)},
-//                {std::string("NONE"), int(SIGHASH_NONE)},
-//                {std::string("NONE|ANYONECANPAY"), int(SIGHASH_NONE|SIGHASH_ANYONECANPAY)},
-//                {std::string("SINGLE"), int(SIGHASH_SINGLE)},
-//                {std::string("SINGLE|ANYONECANPAY"), int(SIGHASH_SINGLE|SIGHASH_ANYONECANPAY)},
-//        };
-//        std::string strHashType = sighash.get_str();
-//        const auto& it = map_sighash_values.find(strHashType);
-//        if (it != map_sighash_values.end()) {
-//            hash_type = it->second;
-//        } else {
-//            throw std::runtime_error(strHashType + " is not a valid sighash parameter.");
-//        }
-//    }
-//    return hash_type;
-//}
+int ParseSighashString(const UniValue& sighash)
+{
+    int hash_type = SIGHASH_ALL;
+    if (!sighash.isNull()) {
+        static std::map<std::string, int> map_sighash_values = {
+            {std::string("ALL"), int(SIGHASH_ALL)},
+            {std::string("ALL|ANYONECANPAY"), int(SIGHASH_ALL|SIGHASH_ANYONECANPAY)},
+            {std::string("NONE"), int(SIGHASH_NONE)},
+            {std::string("NONE|ANYONECANPAY"), int(SIGHASH_NONE|SIGHASH_ANYONECANPAY)},
+            {std::string("SINGLE"), int(SIGHASH_SINGLE)},
+            {std::string("SINGLE|ANYONECANPAY"), int(SIGHASH_SINGLE|SIGHASH_ANYONECANPAY)},
+        };
+        std::string strHashType = sighash.get_str();
+        const auto& it = map_sighash_values.find(strHashType);
+        if (it != map_sighash_values.end()) {
+            hash_type = it->second;
+        } else {
+            throw std::runtime_error(strHashType + " is not a valid sighash parameter.");
+        }
+    }
+    return hash_type;
+}

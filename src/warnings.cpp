@@ -10,9 +10,9 @@
 #include <validation.h>
 
 CCriticalSection cs_warnings;
-//std::string strMiscWarning GUARDED_BY(cs_warnings);
-//bool fLargeWorkForkFound GUARDED_BY(cs_warnings) = false;
-//bool fLargeWorkInvalidChainFound GUARDED_BY(cs_warnings) = false;
+std::string strMiscWarning GUARDED_BY(cs_warnings);
+bool fLargeWorkForkFound GUARDED_BY(cs_warnings) = false;
+bool fLargeWorkInvalidChainFound GUARDED_BY(cs_warnings) = false;
 
 void SetMiscWarning(const std::string& strWarning)
 {
@@ -36,6 +36,12 @@ void SetfLargeWorkInvalidChainFound(bool flag)
 {
     LOCK(cs_warnings);
     fLargeWorkInvalidChainFound = flag;
+}
+
+bool GetfLargeWorkInvalidChainFound()
+{
+    LOCK(cs_warnings);
+    return fLargeWorkInvalidChainFound;
 }
 
 std::string GetWarnings(const std::string& strFor)

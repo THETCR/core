@@ -84,18 +84,17 @@ int GetTotalBlocksEstimate()
     return checkpoints.rbegin()->first;
 }
 
-CBlockIndex* GetLastCheckpoint()
+CBlockIndex* GetLastCheckpoint(const CCheckpointData& data)
 {
-    if (!fEnabled)
-        return nullptr;
+    const MapCheckpoints& checkpoints = data.mapCheckpoints;
 
-    const MapCheckpoints& checkpoints = *Params().Checkpoints().mapCheckpoints;
-
-    for (const MapCheckpoints::value_type& i: reverse_iterate(checkpoints)) {
+    for (const MapCheckpoints::value_type& i : reverse_iterate(checkpoints))
+    {
         const uint256& hash = i.second;
-        BlockMap::const_iterator t = mapBlockIndex.find(hash);
-        if (t != mapBlockIndex.end())
-            return t->second;
+        CBlockIndex* pindex = LookupBlockIndex(hash);
+        if (pindex) {
+            return pindex;
+        }
     }
     return nullptr;
 }

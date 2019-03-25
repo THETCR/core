@@ -5,58 +5,18 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "pow.h"
+#include <pow.h>
 
-#include "chain.h"
+#include <chain.h>
+#include <primitives/block.h>
+#include <uint256.h>
+
 #include "chainparams.h"
-#include "primitives/block.h"
-#include "uint256.h"
 #include <util/system.h>
 
 #include <math.h>
-// ppcoin: find last block index up to pindex
-const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake)
-{
-    while (pindex && pindex->pprev && (pindex->IsProofOfStake() != fProofOfStake))
-        pindex = pindex->pprev;
-    return pindex;
-}
-unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake) {
-    uint256 bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit() : Params().ProofOfWorkLimit();
 
-    if (pindexLast == nullptr)
-        return bnTargetLimit.GetCompact(); // genesis block
-
-    const CBlockIndex *pindexPrev = GetLastBlockIndex(pindexLast, fProofOfStake);
-    if (pindexPrev->pprev == nullptr)
-        return bnTargetLimit.GetCompact(); // first block
-    const CBlockIndex *pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, fProofOfStake);
-    if (pindexPrevPrev->pprev == nullptr)
-        return bnTargetLimit.GetCompact(); // second block
-    int64_t nTargetTimespan = Params().TargetTimespanV1();
-    int64_t nTargetSpacing = Params().TargetSpacingV1();
-    int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
-
-    if (nActualSpacing < 0)
-        nActualSpacing = nTargetSpacing;
-    if (nActualSpacing > nTargetSpacing * 10)
-        nActualSpacing = nTargetSpacing * 10;
-
-    // ppcoin: target change every block
-    // ppcoin: retarget with exponential moving toward target spacing
-    uint256 bnNew;
-    bnNew.SetCompact(pindexPrev->nBits);
-    int64_t nInterval = nTargetTimespan / nTargetSpacing;
-    bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
-    bnNew /= ((nInterval + 1) * nTargetSpacing);
-
-    if (bnNew <= 0 || bnNew > bnTargetLimit)
-        bnNew = bnTargetLimit;
-
-    return bnNew.GetCompact();
-}
-
-unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock)
+unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
     /* current difficulty formula, wispr - DarkGravity v3, written by Evan Duffield - evan@dashpay.io */
     const CBlockIndex* BlockLastSolved = pindexLast;
@@ -148,7 +108,49 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
     return bnNew.GetCompact();
 }
 
-bool CheckProofOfWork(uint256 hash, unsigned int nBits)
+// ppcoin: find last block index up to pindex
+const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake)
+{
+    while (pindex && pindex->pprev && (pindex->IsProofOfStake() != fProofOfStake))
+        pindex = pindex->pprev;
+    return pindex;
+}
+unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake) {
+    uint256 bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit() : Params().ProofOfWorkLimit();
+
+    if (pindexLast == nullptr)
+        return bnTargetLimit.GetCompact(); // genesis block
+
+    const CBlockIndex *pindexPrev = GetLastBlockIndex(pindexLast, fProofOfStake);
+    if (pindexPrev->pprev == nullptr)
+        return bnTargetLimit.GetCompact(); // first block
+    const CBlockIndex *pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, fProofOfStake);
+    if (pindexPrevPrev->pprev == nullptr)
+        return bnTargetLimit.GetCompact(); // second block
+    int64_t nTargetTimespan = Params().TargetTimespanV1();
+    int64_t nTargetSpacing = Params().TargetSpacingV1();
+    int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
+
+    if (nActualSpacing < 0)
+        nActualSpacing = nTargetSpacing;
+    if (nActualSpacing > nTargetSpacing * 10)
+        nActualSpacing = nTargetSpacing * 10;
+
+    // ppcoin: target change every block
+    // ppcoin: retarget with exponential moving toward target spacing
+    uint256 bnNew;
+    bnNew.SetCompact(pindexPrev->nBits);
+    int64_t nInterval = nTargetTimespan / nTargetSpacing;
+    bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
+    bnNew /= ((nInterval + 1) * nTargetSpacing);
+
+    if (bnNew <= 0 || bnNew > bnTargetLimit)
+        bnNew = bnTargetLimit;
+
+    return bnNew.GetCompact();
+}
+
+bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params& params)
 {
     bool fNegative;
     bool fOverflow;
@@ -161,13 +163,14 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits)
         return true;
 
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
+
     // Check range
     if (fNegative || bnTarget == 0 || fOverflow || bnTarget > Params().ProofOfWorkLimit())
-        return error("CheckProofOfWork() : nBits below minimum work");
+        return false;
 
     // Check proof of work matches claimed amount
     if (hash > bnTarget)
-        return error("CheckProofOfWork() : hash doesn't match nBits, hash = %s", hash.ToString());
+        return false;
 
     return true;
 }

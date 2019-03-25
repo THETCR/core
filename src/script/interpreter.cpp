@@ -11,25 +11,24 @@
 #include <pubkey.h>
 #include <script/script.h>
 #include <uint256.h>
-#include <iostream>
 
 typedef std::vector<unsigned char> valtype;
 
 namespace {
 
-    inline bool set_success(ScriptError* ret)
-    {
-        if (ret)
-            *ret = SCRIPT_ERR_OK;
-        return true;
-    }
+inline bool set_success(ScriptError* ret)
+{
+    if (ret)
+        *ret = SCRIPT_ERR_OK;
+    return true;
+}
 
-    inline bool set_error(ScriptError* ret, const ScriptError serror)
-    {
-        if (ret)
-            *ret = serror;
-        return false;
-    }
+inline bool set_error(ScriptError* ret, const ScriptError serror)
+{
+    if (ret)
+        *ret = serror;
+    return false;
+}
 
 } // namespace
 

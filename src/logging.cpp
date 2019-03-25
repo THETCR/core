@@ -30,8 +30,6 @@ BCLog::Logger& LogInstance()
 }
 
 bool fLogIPs = DEFAULT_LOGIPS;
-bool fLogTimestamps = false;
-volatile bool fReopenDebugLog = false;
 
 static int FileWriteStr(const std::string &str, FILE *fp)
 {
@@ -98,46 +96,46 @@ bool BCLog::Logger::DefaultShrinkDebugFile() const
 
 struct CLogCategoryDesc
 {
-  BCLog::LogFlags flag;
-  std::string category;
+    BCLog::LogFlags flag;
+    std::string category;
 };
 
 const CLogCategoryDesc LogCategories[] =
-    {
-        {BCLog::NONE, "0"},
-        {BCLog::NONE, "none"},
-        {BCLog::NET, "net"},
-        {BCLog::TOR, "tor"},
-        {BCLog::MEMPOOL, "mempool"},
-        {BCLog::HTTP, "http"},
-        {BCLog::BENCH, "bench"},
-        {BCLog::ZMQ, "zmq"},
-        {BCLog::DB, "db"},
-        {BCLog::RPC, "rpc"},
-        {BCLog::ESTIMATEFEE, "estimatefee"},
-        {BCLog::ADDRMAN, "addrman"},
-        {BCLog::SELECTCOINS, "selectcoins"},
-        {BCLog::REINDEX, "reindex"},
-        {BCLog::CMPCTBLOCK, "cmpctblock"},
-        {BCLog::RAND, "rand"},
-        {BCLog::PRUNE, "prune"},
-        {BCLog::PROXY, "proxy"},
-        {BCLog::MEMPOOLREJ, "mempoolrej"},
-        {BCLog::LIBEVENT, "libevent"},
-        {BCLog::COINDB, "coindb"},
-        {BCLog::QT, "qt"},
-        {BCLog::LEVELDB, "leveldb"},
-        {BCLog::ALL, "1"},
-        {BCLog::ALL, "all"},
-        {BCLog::OBFUSCATION, "obfuscation"},
-        {BCLog::SWIFTX, "swiftx"},
-        {BCLog::MASTERNODE, "masternode"},
-        {BCLog::MNPAYMENTS, "mnpayments"},
-        {BCLog::ZERO, "zero"},
-        {BCLog::MNBUDGET, "mnbudget"},
-        {BCLog::ZWSP, "zwsp"},
-        {BCLog::ALERT, "alert"},
-    };
+{
+    {BCLog::NONE, "0"},
+    {BCLog::NONE, "none"},
+    {BCLog::NET, "net"},
+    {BCLog::TOR, "tor"},
+    {BCLog::MEMPOOL, "mempool"},
+    {BCLog::HTTP, "http"},
+    {BCLog::BENCH, "bench"},
+    {BCLog::ZMQ, "zmq"},
+    {BCLog::DB, "db"},
+    {BCLog::RPC, "rpc"},
+    {BCLog::ESTIMATEFEE, "estimatefee"},
+    {BCLog::ADDRMAN, "addrman"},
+    {BCLog::SELECTCOINS, "selectcoins"},
+    {BCLog::REINDEX, "reindex"},
+    {BCLog::CMPCTBLOCK, "cmpctblock"},
+    {BCLog::RAND, "rand"},
+    {BCLog::PRUNE, "prune"},
+    {BCLog::PROXY, "proxy"},
+    {BCLog::MEMPOOLREJ, "mempoolrej"},
+    {BCLog::LIBEVENT, "libevent"},
+    {BCLog::COINDB, "coindb"},
+    {BCLog::QT, "qt"},
+    {BCLog::LEVELDB, "leveldb"},
+    {BCLog::ALL, "1"},
+    {BCLog::OBFUSCATION, "obfuscation"},
+    {BCLog::SWIFTX, "swiftx"},
+    {BCLog::MASTERNODE, "masternode"},
+    {BCLog::MNPAYMENTS, "mnpayments"},
+    {BCLog::ZERO, "zero"},
+    {BCLog::MNBUDGET, "mnbudget"},
+    {BCLog::ZWSP, "zwsp"},
+    {BCLog::ALERT, "alert"},
+    {BCLog::ALL, "all"},
+};
 
 bool GetLogCategory(BCLog::LogFlags& flag, const std::string& str)
 {

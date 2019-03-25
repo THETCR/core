@@ -33,8 +33,8 @@ bool CheckBlock(int nHeight, const uint256& hash, bool fMatchesCheckpoint = fals
 //! Return conservative estimate of total number of blocks, 0 if unknown
 int GetTotalBlocksEstimate();
 
-//! Returns last CBlockIndex* in mapBlockIndex that is a checkpoint
-CBlockIndex* GetLastCheckpoint();
+//! Returns last CBlockIndex* that is a checkpoint
+CBlockIndex* GetLastCheckpoint(const CCheckpointData& data);
 
 double GuessVerificationProgress(CBlockIndex* pindex, bool fSigchecks = true);
 

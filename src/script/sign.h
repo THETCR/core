@@ -22,38 +22,38 @@ struct CMutableTransaction;
 
 struct KeyOriginInfo
 {
-  unsigned char fingerprint[4]; //!< First 32 bits of the Hash160 of the public key at the root of the path
-  std::vector<uint32_t> path;
+    unsigned char fingerprint[4]; //!< First 32 bits of the Hash160 of the public key at the root of the path
+    std::vector<uint32_t> path;
 
-  friend bool operator==(const KeyOriginInfo& a, const KeyOriginInfo& b)
-  {
-      return std::equal(std::begin(a.fingerprint), std::end(a.fingerprint), std::begin(b.fingerprint)) && a.path == b.path;
-  }
+    friend bool operator==(const KeyOriginInfo& a, const KeyOriginInfo& b)
+    {
+        return std::equal(std::begin(a.fingerprint), std::end(a.fingerprint), std::begin(b.fingerprint)) && a.path == b.path;
+    }
 
-  ADD_SERIALIZE_METHODS;
-  template <typename Stream, typename Operation>
-  inline void SerializationOp(Stream& s, Operation ser_action)
-  {
-      READWRITE(fingerprint);
-      READWRITE(path);
-  }
+    ADD_SERIALIZE_METHODS;
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action)
+    {
+        READWRITE(fingerprint);
+        READWRITE(path);
+    }
 
-  void clear()
-  {
-      memset(fingerprint, 0, 4);
-      path.clear();
-  }
+    void clear()
+    {
+        memset(fingerprint, 0, 4);
+        path.clear();
+    }
 };
 
 /** An interface to be implemented by keystores that support signing. */
 class SigningProvider
 {
 public:
-  virtual ~SigningProvider() {}
-  virtual bool GetCScript(const CScriptID &scriptid, CScript& script) const { return false; }
-  virtual bool GetPubKey(const CKeyID &address, CPubKey& pubkey) const { return false; }
-  virtual bool GetKey(const CKeyID &address, CKey& key) const { return false; }
-  virtual bool GetKeyOrigin(const CKeyID& keyid, KeyOriginInfo& info) const { return false; }
+    virtual ~SigningProvider() {}
+    virtual bool GetCScript(const CScriptID &scriptid, CScript& script) const { return false; }
+    virtual bool GetPubKey(const CKeyID &address, CPubKey& pubkey) const { return false; }
+    virtual bool GetKey(const CKeyID &address, CKey& key) const { return false; }
+    virtual bool GetKeyOrigin(const CKeyID& keyid, KeyOriginInfo& info) const { return false; }
 };
 
 extern const SigningProvider& DUMMY_SIGNING_PROVIDER;
@@ -61,29 +61,29 @@ extern const SigningProvider& DUMMY_SIGNING_PROVIDER;
 class HidingSigningProvider : public SigningProvider
 {
 private:
-  const bool m_hide_secret;
-  const bool m_hide_origin;
-  const SigningProvider* m_provider;
+    const bool m_hide_secret;
+    const bool m_hide_origin;
+    const SigningProvider* m_provider;
 
 public:
-  HidingSigningProvider(const SigningProvider* provider, bool hide_secret, bool hide_origin) : m_hide_secret(hide_secret), m_hide_origin(hide_origin), m_provider(provider) {}
-  bool GetCScript(const CScriptID& scriptid, CScript& script) const override;
-  bool GetPubKey(const CKeyID& keyid, CPubKey& pubkey) const override;
-  bool GetKey(const CKeyID& keyid, CKey& key) const override;
-  bool GetKeyOrigin(const CKeyID& keyid, KeyOriginInfo& info) const override;
+    HidingSigningProvider(const SigningProvider* provider, bool hide_secret, bool hide_origin) : m_hide_secret(hide_secret), m_hide_origin(hide_origin), m_provider(provider) {}
+    bool GetCScript(const CScriptID& scriptid, CScript& script) const override;
+    bool GetPubKey(const CKeyID& keyid, CPubKey& pubkey) const override;
+    bool GetKey(const CKeyID& keyid, CKey& key) const override;
+    bool GetKeyOrigin(const CKeyID& keyid, KeyOriginInfo& info) const override;
 };
 
 struct FlatSigningProvider final : public SigningProvider
 {
-  std::map<CScriptID, CScript> scripts;
-  std::map<CKeyID, CPubKey> pubkeys;
-  std::map<CKeyID, KeyOriginInfo> origins;
-  std::map<CKeyID, CKey> keys;
+    std::map<CScriptID, CScript> scripts;
+    std::map<CKeyID, CPubKey> pubkeys;
+    std::map<CKeyID, KeyOriginInfo> origins;
+    std::map<CKeyID, CKey> keys;
 
-  bool GetCScript(const CScriptID& scriptid, CScript& script) const override;
-  bool GetPubKey(const CKeyID& keyid, CPubKey& pubkey) const override;
-  bool GetKeyOrigin(const CKeyID& keyid, KeyOriginInfo& info) const override;
-  bool GetKey(const CKeyID& keyid, CKey& key) const override;
+    bool GetCScript(const CScriptID& scriptid, CScript& script) const override;
+    bool GetPubKey(const CKeyID& keyid, CPubKey& pubkey) const override;
+    bool GetKeyOrigin(const CKeyID& keyid, KeyOriginInfo& info) const override;
+    bool GetKey(const CKeyID& keyid, CKey& key) const override;
 };
 
 FlatSigningProvider Merge(const FlatSigningProvider& a, const FlatSigningProvider& b);
@@ -91,25 +91,25 @@ FlatSigningProvider Merge(const FlatSigningProvider& a, const FlatSigningProvide
 /** Interface for signature creators. */
 class BaseSignatureCreator {
 public:
-  virtual ~BaseSignatureCreator() {}
-  virtual const BaseSignatureChecker& Checker() const =0;
+    virtual ~BaseSignatureCreator() {}
+    virtual const BaseSignatureChecker& Checker() const =0;
 
-  /** Create a singular (non-script) signature. */
-  virtual bool CreateSig(const SigningProvider& provider, std::vector<unsigned char>& vchSig, const CKeyID& keyid, const CScript& scriptCode, SigVersion sigversion) const =0;
+    /** Create a singular (non-script) signature. */
+    virtual bool CreateSig(const SigningProvider& provider, std::vector<unsigned char>& vchSig, const CKeyID& keyid, const CScript& scriptCode, SigVersion sigversion) const =0;
 };
 
 /** A signature creator for transactions. */
 class MutableTransactionSignatureCreator : public BaseSignatureCreator {
-  const CMutableTransaction* txTo;
-  unsigned int nIn;
-  int nHashType;
-  CAmount amount;
-  const MutableTransactionSignatureChecker checker;
+    const CMutableTransaction* txTo;
+    unsigned int nIn;
+    int nHashType;
+    CAmount amount;
+    const MutableTransactionSignatureChecker checker;
 
 public:
-  MutableTransactionSignatureCreator(const CMutableTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn, int nHashTypeIn = SIGHASH_ALL);
-  const BaseSignatureChecker& Checker() const override { return checker; }
-  bool CreateSig(const SigningProvider& provider, std::vector<unsigned char>& vchSig, const CKeyID& keyid, const CScript& scriptCode, SigVersion sigversion) const override;
+    MutableTransactionSignatureCreator(const CMutableTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn, int nHashTypeIn = SIGHASH_ALL);
+    const BaseSignatureChecker& Checker() const override { return checker; }
+    bool CreateSig(const SigningProvider& provider, std::vector<unsigned char>& vchSig, const CKeyID& keyid, const CScript& scriptCode, SigVersion sigversion) const override;
 };
 
 /** A signature creator that just produces 71-byte empty signatures. */
@@ -123,22 +123,22 @@ typedef std::pair<CPubKey, std::vector<unsigned char>> SigPair;
 // The information contained here can be used to create a signature and is also filled by ProduceSignature
 // in order to construct final scriptSigs and scriptWitnesses.
 struct SignatureData {
-  bool complete = false; ///< Stores whether the scriptSig and scriptWitness are complete
-  bool witness = false; ///< Stores whether the input this SigData corresponds to is a witness input
-  CScript scriptSig; ///< The scriptSig of an input. Contains complete signatures or the traditional partial signatures format
-  CScript redeem_script; ///< The redeemScript (if any) for the input
-  CScript witness_script; ///< The witnessScript (if any) for the input. witnessScripts are used in P2WSH outputs.
-  CScriptWitness scriptWitness; ///< The scriptWitness of an input. Contains complete signatures or the traditional partial signatures format. scriptWitness is part of a transaction input per BIP 144.
-  std::map<CKeyID, SigPair> signatures; ///< BIP 174 style partial signatures for the input. May contain all signatures necessary for producing a final scriptSig or scriptWitness.
-  std::map<CKeyID, std::pair<CPubKey, KeyOriginInfo>> misc_pubkeys;
-  std::vector<CKeyID> missing_pubkeys; ///< KeyIDs of pubkeys which could not be found
-  std::vector<CKeyID> missing_sigs; ///< KeyIDs of pubkeys for signatures which could not be found
-  uint160 missing_redeem_script; ///< ScriptID of the missing redeemScript (if any)
-  uint256 missing_witness_script; ///< SHA256 of the missing witnessScript (if any)
+    bool complete = false; ///< Stores whether the scriptSig and scriptWitness are complete
+    bool witness = false; ///< Stores whether the input this SigData corresponds to is a witness input
+    CScript scriptSig; ///< The scriptSig of an input. Contains complete signatures or the traditional partial signatures format
+    CScript redeem_script; ///< The redeemScript (if any) for the input
+    CScript witness_script; ///< The witnessScript (if any) for the input. witnessScripts are used in P2WSH outputs.
+    CScriptWitness scriptWitness; ///< The scriptWitness of an input. Contains complete signatures or the traditional partial signatures format. scriptWitness is part of a transaction input per BIP 144.
+    std::map<CKeyID, SigPair> signatures; ///< BIP 174 style partial signatures for the input. May contain all signatures necessary for producing a final scriptSig or scriptWitness.
+    std::map<CKeyID, std::pair<CPubKey, KeyOriginInfo>> misc_pubkeys;
+    std::vector<CKeyID> missing_pubkeys; ///< KeyIDs of pubkeys which could not be found
+    std::vector<CKeyID> missing_sigs; ///< KeyIDs of pubkeys for signatures which could not be found
+    uint160 missing_redeem_script; ///< ScriptID of the missing redeemScript (if any)
+    uint256 missing_witness_script; ///< SHA256 of the missing witnessScript (if any)
 
-  SignatureData() {}
-  explicit SignatureData(const CScript& script) : scriptSig(script) {}
-  void MergeSignatureData(SignatureData sigdata);
+    SignatureData() {}
+    explicit SignatureData(const CScript& script) : scriptSig(script) {}
+    void MergeSignatureData(SignatureData sigdata);
 };
 
 // Takes a stream and multiple arguments and serializes them as if first serialized into a vector and then into the stream
@@ -174,7 +174,7 @@ void DeserializeHDKeypaths(Stream& s, const std::vector<unsigned char>& key, std
     // Read in the pubkey from key
     CPubKey pubkey(key.begin() + 1, key.end());
     if (!pubkey.IsFullyValid()) {
-        throw std::ios_base::failure("Invalid pubkey");
+       throw std::ios_base::failure("Invalid pubkey");
     }
     if (hd_keypaths.count(pubkey) > 0) {
         throw std::ios_base::failure("Duplicate Key, pubkey derivation path already provided");
@@ -199,21 +199,21 @@ void DeserializeHDKeypaths(Stream& s, const std::vector<unsigned char>& key, std
 }
 
 // Serialize HD keypaths to a stream from a map
-//template<typename Stream>
-//void SerializeHDKeypaths(Stream& s, const std::map<CPubKey, KeyOriginInfo>& hd_keypaths, uint8_t type)
-//{
-//    for (auto keypath_pair : hd_keypaths) {
-//        if (!keypath_pair.first.IsValid()) {
-//            throw std::ios_base::failure("Invalid CPubKey being serialized");
-//        }
-//        SerializeToVector(s, type, MakeSpan(keypath_pair.first));
-//        WriteCompactSize(s, (keypath_pair.second.path.size() + 1) * sizeof(uint32_t));
-//        s << keypath_pair.second.fingerprint;
-//        for (const auto& path : keypath_pair.second.path) {
-//            s << path;
-//        }
-//    }
-//}
+template<typename Stream>
+void SerializeHDKeypaths(Stream& s, const std::map<CPubKey, KeyOriginInfo>& hd_keypaths, uint8_t type)
+{
+    for (auto keypath_pair : hd_keypaths) {
+        if (!keypath_pair.first.IsValid()) {
+            throw std::ios_base::failure("Invalid CPubKey being serialized");
+        }
+        SerializeToVector(s, type, MakeSpan(keypath_pair.first));
+        WriteCompactSize(s, (keypath_pair.second.path.size() + 1) * sizeof(uint32_t));
+        s << keypath_pair.second.fingerprint;
+        for (const auto& path : keypath_pair.second.path) {
+            s << path;
+        }
+    }
+}
 
 /** Produce a script signature using a generic signature creator. */
 bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreator& creator, const CScript& scriptPubKey, SignatureData& sigdata);

@@ -5,8 +5,8 @@
 #include <ui_interface.h>
 #include <util/system.h>
 
-//#include <boost/signals2/last_value.hpp>
-//#include <boost/signals2/signal.hpp>
+#include <boost/signals2/last_value.hpp>
+#include <boost/signals2/signal.hpp>
 
 CClientUIInterface uiInterface;
 
@@ -16,7 +16,6 @@ struct UISignals {
     boost::signals2::signal<CClientUIInterface::InitMessageSig> InitMessage;
     boost::signals2::signal<CClientUIInterface::NotifyNumConnectionsChangedSig> NotifyNumConnectionsChanged;
     boost::signals2::signal<CClientUIInterface::NotifyNetworkActiveChangedSig> NotifyNetworkActiveChanged;
-    boost::signals2::signal<CClientUIInterface::TranslateSig, boost::signals2::last_value<std::string>> Translate;
     boost::signals2::signal<CClientUIInterface::NotifyAlertChangedSig> NotifyAlertChanged;
     boost::signals2::signal<CClientUIInterface::LoadWalletSig> LoadWallet;
     boost::signals2::signal<CClientUIInterface::ShowProgressSig> ShowProgress;
@@ -41,7 +40,6 @@ ADD_SIGNALS_IMPL_WRAPPER(ThreadSafeQuestion);
 ADD_SIGNALS_IMPL_WRAPPER(InitMessage);
 ADD_SIGNALS_IMPL_WRAPPER(NotifyNumConnectionsChanged);
 ADD_SIGNALS_IMPL_WRAPPER(NotifyNetworkActiveChanged);
-ADD_SIGNALS_IMPL_WRAPPER(Translate);
 ADD_SIGNALS_IMPL_WRAPPER(NotifyAlertChanged);
 ADD_SIGNALS_IMPL_WRAPPER(LoadWallet);
 ADD_SIGNALS_IMPL_WRAPPER(ShowProgress);
@@ -55,10 +53,9 @@ bool CClientUIInterface::ThreadSafeQuestion(const std::string& message, const st
 void CClientUIInterface::InitMessage(const std::string& message) { return g_ui_signals.InitMessage(message); }
 void CClientUIInterface::NotifyNumConnectionsChanged(int newNumConnections) { return g_ui_signals.NotifyNumConnectionsChanged(newNumConnections); }
 void CClientUIInterface::NotifyNetworkActiveChanged(bool networkActive) { return g_ui_signals.NotifyNetworkActiveChanged(networkActive); }
-std::string CClientUIInterface::Translate(const char* psz) { return g_ui_signals.Translate(psz); }
-void CClientUIInterface::NotifyAlertChanged(const uint256& hash, ChangeType status) { return g_ui_signals.NotifyAlertChanged(hash, status); }
+void CClientUIInterface::NotifyAlertChanged() { return g_ui_signals.NotifyAlertChanged(); }
 void CClientUIInterface::LoadWallet(std::unique_ptr<interfaces::Wallet>& wallet) { return g_ui_signals.LoadWallet(wallet); }
-void CClientUIInterface::ShowProgress(const std::string& title, int nProgress) { return g_ui_signals.ShowProgress(title, nProgress); }
+void CClientUIInterface::ShowProgress(const std::string& title, int nProgress, bool resume_possible) { return g_ui_signals.ShowProgress(title, nProgress, resume_possible); }
 void CClientUIInterface::NotifyBlockTip(bool b, const CBlockIndex* i) { return g_ui_signals.NotifyBlockTip(b, i); }
 void CClientUIInterface::NotifyHeaderTip(bool b, const CBlockIndex* i) { return g_ui_signals.NotifyHeaderTip(b, i); }
 void CClientUIInterface::NotifyBlockSize(int b, const uint256& i) { return g_ui_signals.NotifyBlockSize(b, i); }

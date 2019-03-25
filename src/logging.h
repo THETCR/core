@@ -21,100 +21,98 @@ static const bool DEFAULT_LOGIPS        = false;
 static const bool DEFAULT_LOGTIMESTAMPS = true;
 extern const char * const DEFAULT_DEBUGLOGFILE;
 
-extern bool fLogTimestamps;
-extern volatile bool fReopenDebugLog;
 extern bool fLogIPs;
 
 struct CLogCategoryActive
 {
-  std::string category;
-  bool active;
+    std::string category;
+    bool active;
 };
 
 namespace BCLog {
-enum LogFlags : uint32_t {
-  NONE        = 0,
-  NET         = (1 <<  0),
-  TOR         = (1 <<  1),
-  MEMPOOL     = (1 <<  2),
-  HTTP        = (1 <<  3),
-  BENCH       = (1 <<  4),
-  ZMQ         = (1 <<  5),
-  DB          = (1 <<  6),
-  RPC         = (1 <<  7),
-  ESTIMATEFEE = (1 <<  8),
-  ADDRMAN     = (1 <<  9),
-  SELECTCOINS = (1 << 10),
-  REINDEX     = (1 << 11),
-  CMPCTBLOCK  = (1 << 12),
-  RAND        = (1 << 13),
-  PRUNE       = (1 << 14),
-  PROXY       = (1 << 15),
-  MEMPOOLREJ  = (1 << 16),
-  LIBEVENT    = (1 << 17),
-  COINDB      = (1 << 18),
-  QT          = (1 << 19),
-  LEVELDB     = (1 << 20),
-  ALL         = ~(uint32_t)0,
-  OBFUSCATION = (1 << 21),
-  SWIFTX      = (1 << 22),
-  MASTERNODE  = (1 << 23),
-  MNPAYMENTS  = (1 << 24),
-  ZERO        = (1 << 25),
-  MNBUDGET    = (1 << 26),
-  ZWSP        = (1 << 27),
-  ALERT       = (1 << 28),
-};
+    enum LogFlags : uint32_t {
+        NONE        = 0,
+        NET         = (1 <<  0),
+        TOR         = (1 <<  1),
+        MEMPOOL     = (1 <<  2),
+        HTTP        = (1 <<  3),
+        BENCH       = (1 <<  4),
+        ZMQ         = (1 <<  5),
+        DB          = (1 <<  6),
+        RPC         = (1 <<  7),
+        ESTIMATEFEE = (1 <<  8),
+        ADDRMAN     = (1 <<  9),
+        SELECTCOINS = (1 << 10),
+        REINDEX     = (1 << 11),
+        CMPCTBLOCK  = (1 << 12),
+        RAND        = (1 << 13),
+        PRUNE       = (1 << 14),
+        PROXY       = (1 << 15),
+        MEMPOOLREJ  = (1 << 16),
+        LIBEVENT    = (1 << 17),
+        COINDB      = (1 << 18),
+        QT          = (1 << 19),
+        LEVELDB     = (1 << 20),
+        OBFUSCATION = (1 << 21),
+        SWIFTX      = (1 << 22),
+        MASTERNODE  = (1 << 23),
+        MNPAYMENTS  = (1 << 24),
+        ZERO        = (1 << 25),
+        MNBUDGET    = (1 << 26),
+        ZWSP        = (1 << 27),
+        ALERT       = (1 << 28),
+        ALL         = ~(uint32_t)0,
+    };
 
-class Logger
-{
-private:
-  FILE* m_fileout = nullptr;
-  std::mutex m_file_mutex;
-  std::list<std::string> m_msgs_before_open;
+    class Logger
+    {
+    private:
+        FILE* m_fileout = nullptr;
+        std::mutex m_file_mutex;
+        std::list<std::string> m_msgs_before_open;
 
-  /**
-   * m_started_new_line is a state variable that will suppress printing of
-   * the timestamp when multiple calls are made that don't end in a
-   * newline.
-   */
-  std::atomic_bool m_started_new_line{true};
+        /**
+         * m_started_new_line is a state variable that will suppress printing of
+         * the timestamp when multiple calls are made that don't end in a
+         * newline.
+         */
+        std::atomic_bool m_started_new_line{true};
 
-  /** Log categories bitfield. */
-  std::atomic<uint32_t> m_categories{0};
+        /** Log categories bitfield. */
+        std::atomic<uint32_t> m_categories{0};
 
-  std::string LogTimestampStr(const std::string& str);
+        std::string LogTimestampStr(const std::string& str);
 
-public:
-  bool m_print_to_console = false;
-  bool m_print_to_file = false;
+    public:
+        bool m_print_to_console = false;
+        bool m_print_to_file = false;
 
-  bool m_log_timestamps = DEFAULT_LOGTIMESTAMPS;
-  bool m_log_time_micros = DEFAULT_LOGTIMEMICROS;
+        bool m_log_timestamps = DEFAULT_LOGTIMESTAMPS;
+        bool m_log_time_micros = DEFAULT_LOGTIMEMICROS;
 
-  fs::path m_file_path;
-  std::atomic<bool> m_reopen_file{false};
+        fs::path m_file_path;
+        std::atomic<bool> m_reopen_file{false};
 
         /** Send a string to the log output */
-  void LogPrintStr(const std::string &str);
+        void LogPrintStr(const std::string &str);
 
-  /** Returns whether logs will be written to any output */
-  bool Enabled() const { return m_print_to_console || m_print_to_file; }
+        /** Returns whether logs will be written to any output */
+        bool Enabled() const { return m_print_to_console || m_print_to_file; }
 
-  bool OpenDebugLog();
-  void ShrinkDebugFile();
+        bool OpenDebugLog();
+        void ShrinkDebugFile();
 
-  uint32_t GetCategoryMask() const { return m_categories.load(); }
+        uint32_t GetCategoryMask() const { return m_categories.load(); }
 
-  void EnableCategory(LogFlags flag);
-  bool EnableCategory(const std::string& str);
-  void DisableCategory(LogFlags flag);
-  bool DisableCategory(const std::string& str);
+        void EnableCategory(LogFlags flag);
+        bool EnableCategory(const std::string& str);
+        void DisableCategory(LogFlags flag);
+        bool DisableCategory(const std::string& str);
 
-  bool WillLogCategory(LogFlags category) const;
+        bool WillLogCategory(LogFlags category) const;
 
-  bool DefaultShrinkDebugFile() const;
-};
+        bool DefaultShrinkDebugFile() const;
+    };
 
 } // namespace BCLog
 

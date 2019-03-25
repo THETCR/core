@@ -117,6 +117,7 @@ BITCOIN_CORE_H = \
   bip38.h \
   bloom.h \
   blockencodings.h \
+  blockfilter.h \
   blocksignature.h \
   chain.h \
   chainparams.h \
@@ -125,7 +126,6 @@ BITCOIN_CORE_H = \
   checkpoints.h \
   checkqueue.h \
   clientversion.h \
-  wallet/coincontrol.h \
   coins.h \
   compat.h \
   compat/assumptions.h \
@@ -135,24 +135,25 @@ BITCOIN_CORE_H = \
   compressor.h \
   consensus/consensus.h \
   consensus/tx_verify.h \
-  cuckoocache.h \
   primitives/deterministicmint.h \
   primitives/zerocoin.h \
   core_io.h \
   core_memusage.h \
-  wallet/crypter.h \
+  cuckoocache.h \
+  flatfile.h \
   denomination_functions.h \
   obfuscation.h \
   obfuscation-relay.h \
-  wallet/db.h \
   fs.h \
   httprpc.h \
   httpserver.h \
+  index/base.h \
+  index/txindex.h \
+  indirectmap.h \
   init.h \
   invalid.h \
   invalid_outpoints.json.h \
   invalid_serials.json.h \
-  indirectmap.h \
   kernel.h \
   swifttx.h \
   interfaces/chain.h \
@@ -165,7 +166,7 @@ BITCOIN_CORE_H = \
   leveldbwrapper.h \
   limitedmap.h \
   logging.h \
-  validation.h \
+  memusage.h \
   masternode.h \
   masternode-payments.h \
   masternode-budget.h \
@@ -176,12 +177,13 @@ BITCOIN_CORE_H = \
   miner.h \
   mintpool.h \
   mruset.h \
-  memusage.h \
   net.h \
   net_processing.h \
   netaddress.h \
   netbase.h \
   netmessagemaker.h \
+  node/coin.h \
+  node/transaction.h \
   noui.h \
   optional.h \
   outputtype.h \
@@ -191,12 +193,17 @@ BITCOIN_CORE_H = \
   policy/rbf.h \
   pow.h \
   protocol.h \
+  psbt.h \
   random.h \
   reverse_iterate.h \
   reverselock.h \
+  rpc/blockchain.h \
   rpc/client.h \
+  rpc/mining.h \
   rpc/protocol.h \
   rpc/server.h \
+  rpc/rawtransaction.h \
+  rpc/register.h \
   rpc/util.h \
   scheduler.h \
   script/descriptor.h \
@@ -226,13 +233,23 @@ BITCOIN_CORE_H = \
   ui_interface.h \
   undo.h \
   util/bip32.h \
+  util/bytevectorhash.h \
   util/system.h \
   util/strencodings.h \
   util/memory.h \
   util/moneystr.h \
   util/time.h \
+  validation.h \
   validationinterface.h \
+  versionbits.h \
+  versionbitsinfo.h \
   walletinitinterface.h \
+  wallet/coincontrol.h \
+  wallet/crypter.h \
+  wallet/db.h \
+  wallet/feebumper.h \
+  wallet/fees.h \
+  wallet/psbtwallet.h \
   wallet/rpcwallet.h \
   wallet/wallet.h \
   wallet/walletdb.h \
@@ -269,24 +286,29 @@ libbitcoin_server_a_SOURCES = \
   banman.cpp \
   bloom.cpp \
   blockencodings.cpp \
+  blockfilter.cpp \
   blocksignature.cpp \
   chain.cpp \
   checkpoints.cpp \
   consensus/tx_verify.cpp \
+  flatfile.cpp \
   genwit.cpp \
   httprpc.cpp \
   httpserver.cpp \
+  index/base.cpp \
+  index/txindex.cpp \
   interfaces/chain.cpp \
   interfaces/handler.cpp \
   interfaces/node.cpp \
   init.cpp \
   leveldbwrapper.cpp \
   lightzwspthread.cpp \
-  validation.cpp \
   merkleblock.cpp \
   miner.cpp \
   net.cpp \
   net_processing.cpp \
+  node/coin.cpp \
+  node/transaction.cpp \
   noui.cpp \
   outputtype.cpp \
   policy/fees.cpp \
@@ -311,11 +333,17 @@ libbitcoin_server_a_SOURCES = \
   txdb.cpp \
   txmempool.cpp \
   ui_interface.cpp \
+  validation.cpp \
   validationinterface.cpp \
+  versionbits.cpp \
   wallet/rpcwallet.cpp \
   wallet/rpcdump.cpp \
   zwspchain.cpp \
   $(BITCOIN_CORE_H)
+
+if !ENABLE_WALLET
+libbitcoin_server_a_SOURCES += dummywallet.cpp
+endif
 
 if ENABLE_ZMQ
 libbitcoin_zmq_a_CPPFLAGS = $(BITCOIN_INCLUDES) $(ZMQ_CFLAGS)
@@ -346,6 +374,7 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/feebumper.cpp \
   wallet/fees.cpp \
   wallet/init.cpp \
+  wallet/psbtwallet.cpp \
   swifttx.cpp \
   masternode.cpp \
   masternode-budget.cpp \
@@ -510,6 +539,7 @@ libbitcoin_common_a_SOURCES = \
   netaddress.cpp \
   netbase.cpp \
   policy/feerate.cpp \
+  psbt.cpp \
   protocol.cpp \
   scheduler.cpp \
   script/descriptor.cpp \
@@ -518,6 +548,7 @@ libbitcoin_common_a_SOURCES = \
   script/ismine.cpp \
   script/sign.cpp \
   script/standard.cpp \
+  versionbitsinfo.cpp \
   spork.cpp \
   sporkdb.cpp \
   warnings.cpp \
@@ -543,6 +574,7 @@ libbitcoin_util_a_SOURCES = \
   sync.cpp \
   threadinterrupt.cpp \
   util/bip32.cpp \
+  util/bytevectorhash.cpp \
   util/system.cpp \
   util/moneystr.cpp \
   util/strencodings.cpp \
@@ -576,6 +608,7 @@ endif
 wisprd_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_ZEROCOIN) \
