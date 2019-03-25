@@ -3,12 +3,13 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "peertablemodel.h"
+#include <qt/peertablemodel.h>
 
-#include "clientmodel.h"
-#include "guiconstants.h"
-#include "guiutil.h"
+#include <qt/clientmodel.h>
+#include <qt/guiconstants.h>
+#include <qt/guiutil.h>
 
+#include <interfaces/node.h>
 #include <validation.h> // for cs_main
 #include <sync.h>
 
@@ -16,10 +17,10 @@
 #include <QList>
 #include <QTimer>
 
-bool NodeLessThan::operator()(const CNodeCombinedStats& left, const CNodeCombinedStats& right) const
+bool NodeLessThan::operator()(const CNodeCombinedStats &left, const CNodeCombinedStats &right) const
 {
-    const CNodeStats* pLeft = &(left.nodeStats);
-    const CNodeStats* pRight = &(right.nodeStats);
+    const CNodeStats *pLeft = &(left.nodeStats);
+    const CNodeStats *pRight = &(right.nodeStats);
 
     if (order == Qt::DescendingOrder)
         std::swap(pLeft, pRight);
@@ -42,8 +43,8 @@ class PeerTablePriv
 public:
     /** Local cache of peer information */
     QList<CNodeCombinedStats> cachedNodeStats;
-    /** Column to sort nodes by */
-    int sortColumn;
+    /** Column to sort nodes by (default to unsorted) */
+    int sortColumn{-1};
     /** Order (ascending or descending) to sort nodes by */
     Qt::SortOrder sortOrder;
     /** Index of rows by node ID */
@@ -107,22 +108,29 @@ public:
     }
 };
 
-PeerTableModel::PeerTableModel(ClientModel* parent) : QAbstractTableModel(parent),
-                                                      clientModel(parent),
-                                                      timer(0)
+PeerTableModel::PeerTableModel(interfaces::Node& node, ClientModel *parent) :
+    QAbstractTableModel(parent),
+    m_node(node),
+    clientModel(parent),
+    timer(nullptr)
 {
     columns << tr("Address/Hostname") << tr("Version") << tr("Ping Time");
-    priv = new PeerTablePriv();
+    priv.reset(new PeerTablePriv());
     // default to unsorted
     priv->sortColumn = -1;
 
     // set up timer for auto refresh
-    timer = new QTimer();
-    connect(timer, SIGNAL(timeout()), SLOT(refresh()));
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &PeerTableModel::refresh);
     timer->setInterval(MODEL_UPDATE_DELAY);
 
     // load initial data
     refresh();
+}
+
+PeerTableModel::~PeerTableModel()
+{
+    // Intentionally left empty
 }
 
 void PeerTableModel::startAutoRefresh()

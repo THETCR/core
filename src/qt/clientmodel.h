@@ -10,6 +10,9 @@
 #include <QObject>
 #include <QDateTime>
 
+#include <atomic>
+#include <memory>
+
 class AddressTableModel;
 class BanTableModel;
 class OptionsModel;
@@ -20,8 +23,8 @@ class CWallet;
 class CBlockIndex;
 
 namespace interfaces {
-    class Handler;
-    class Node;
+class Handler;
+class Node;
 }
 
 QT_BEGIN_NAMESPACE
@@ -38,9 +41,9 @@ enum BlockSource {
 
 enum NumConnections {
     CONNECTIONS_NONE = 0,
-    CONNECTIONS_IN = (1U << 0),
-    CONNECTIONS_OUT = (1U << 1),
-    CONNECTIONS_ALL = (CONNECTIONS_IN | CONNECTIONS_OUT),
+    CONNECTIONS_IN   = (1U << 0),
+    CONNECTIONS_OUT  = (1U << 1),
+    CONNECTIONS_ALL  = (CONNECTIONS_IN | CONNECTIONS_OUT),
 };
 
 /** Model for WISPR network client. */
@@ -49,15 +52,18 @@ class ClientModel : public QObject
     Q_OBJECT
 
 public:
-    explicit ClientModel(interfaces::Node& node, OptionsModel* optionsModel, QObject* parent = 0);
+    explicit ClientModel(interfaces::Node& node, OptionsModel *optionsModel, QObject *parent = nullptr);
     ~ClientModel();
 
-    OptionsModel* getOptionsModel();
-    PeerTableModel* getPeerTableModel();
+    interfaces::Node& node() const { return m_node; }
+    OptionsModel *getOptionsModel();
+    PeerTableModel *getPeerTableModel();
     BanTableModel *getBanTableModel();
 
     //! Return number of connections, default is in- and outbound (total)
     int getNumConnections(unsigned int flags = CONNECTIONS_ALL) const;
+    int getHeaderTipHeight() const;
+    int64_t getHeaderTipTime() const;
     QString getMasternodeCountString() const;
     int getNumBlocks() const;
     int getNumBlocksAtStartup();
@@ -80,13 +86,26 @@ public:
     bool isReleaseVersion() const;
     QString clientName() const;
     QString formatClientStartupTime() const;
+    QString dataDir() const;
+    QString blocksDir() const;
 
     bool getTorInfo(std::string& ip_port) const;
 
+    // caches for the best header
+    mutable std::atomic<int> cachedBestHeaderHeight;
+    mutable std::atomic<int64_t> cachedBestHeaderTime;
+
 private:
     interfaces::Node& m_node;
-    OptionsModel* optionsModel;
-    PeerTableModel* peerTableModel;
+    std::unique_ptr<interfaces::Handler> m_handler_show_progress;
+    std::unique_ptr<interfaces::Handler> m_handler_notify_num_connections_changed;
+    std::unique_ptr<interfaces::Handler> m_handler_notify_network_active_changed;
+    std::unique_ptr<interfaces::Handler> m_handler_notify_alert_changed;
+    std::unique_ptr<interfaces::Handler> m_handler_banned_list_changed;
+    std::unique_ptr<interfaces::Handler> m_handler_notify_block_tip;
+    std::unique_ptr<interfaces::Handler> m_handler_notify_header_tip;
+    OptionsModel *optionsModel;
+    PeerTableModel *peerTableModel;
     BanTableModel *banTableModel;
 
     int cachedNumBlocks;
@@ -96,7 +115,7 @@ private:
 
     int numBlocksAtStartup;
 
-    QTimer* pollTimer;
+    QTimer *pollTimer;
     QTimer* pollMnTimer;
 
     void subscribeToCoreSignals();
@@ -106,7 +125,8 @@ Q_SIGNALS:
     void numConnectionsChanged(int count);
     void numBlocksChanged(int count, const QDateTime& blockDate, double nVerificationProgress, bool header);
     void strMasternodesChanged(const QString& strMasternodes);
-    void alertsChanged(const QString& warnings);
+    void networkActiveChanged(bool networkActive);
+    void alertsChanged(const QString &warnings);
     void bytesChanged(quint64 totalBytesIn, quint64 totalBytesOut);
 
     //! Fired when a message should be reported to the user
@@ -119,7 +139,8 @@ public Q_SLOTS:
     void updateTimer();
     void updateMnTimer();
     void updateNumConnections(int numConnections);
-    void updateAlert(const QString& hash, int status);
+    void updateNetworkActive(bool networkActive);
+    void updateAlert();
     void updateBanlist();
 };
 

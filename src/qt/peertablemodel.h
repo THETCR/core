@@ -9,11 +9,17 @@
 #include <net_processing.h> // For CNodeStateStats
 #include <net.h>
 
+#include <memory>
+
 #include <QAbstractTableModel>
 #include <QStringList>
 
 class ClientModel;
 class PeerTablePriv;
+
+namespace interfaces {
+class Node;
+}
 
 QT_BEGIN_NAMESPACE
 class QTimer;
@@ -28,8 +34,9 @@ struct CNodeCombinedStats {
 class NodeLessThan
 {
 public:
-    NodeLessThan(int nColumn, Qt::SortOrder fOrder) : column(nColumn), order(fOrder) {}
-    bool operator()(const CNodeCombinedStats& left, const CNodeCombinedStats& right) const;
+    NodeLessThan(int nColumn, Qt::SortOrder fOrder) :
+        column(nColumn), order(fOrder) {}
+    bool operator()(const CNodeCombinedStats &left, const CNodeCombinedStats &right) const;
 
 private:
     int column;
@@ -45,8 +52,9 @@ class PeerTableModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    explicit PeerTableModel(ClientModel* parent = 0);
-    const CNodeCombinedStats* getNodeStats(int idx);
+    explicit PeerTableModel(interfaces::Node& node, ClientModel *parent = nullptr);
+    ~PeerTableModel();
+    const CNodeCombinedStats *getNodeStats(int idx);
     int getRowByNodeId(NodeId nodeid);
     void startAutoRefresh();
     void stopAutoRefresh();
@@ -72,10 +80,11 @@ public Q_SLOTS:
     void refresh();
 
 private:
-    ClientModel* clientModel;
+    interfaces::Node& m_node;
+    ClientModel *clientModel;
     QStringList columns;
-    PeerTablePriv* priv;
-    QTimer* timer;
+    std::unique_ptr<PeerTablePriv> priv;
+    QTimer *timer;
 };
 
 #endif // BITCOIN_QT_PEERTABLEMODEL_H
