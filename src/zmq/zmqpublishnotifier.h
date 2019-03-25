@@ -31,13 +31,13 @@ public:
 class CZMQPublishHashBlockNotifier : public CZMQAbstractPublishNotifier
 {
 public:
-  bool NotifyBlock(const CBlockIndex *pindex) override;
+    bool NotifyBlock(const CBlockIndex *pindex) override;
 };
 
 class CZMQPublishHashTransactionNotifier : public CZMQAbstractPublishNotifier
 {
 public:
-  bool NotifyTransaction(const CTransaction &transaction) override;
+    bool NotifyTransaction(const CTransaction &transaction) override;
 };
 
 class CZMQPublishHashTransactionLockNotifier : public CZMQAbstractPublishNotifier

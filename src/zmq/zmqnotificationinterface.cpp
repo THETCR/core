@@ -15,7 +15,7 @@ void zmqError(const char *str)
     LogPrint(BCLog::ZMQ, "zmq: Error: %s, errno=%s\n", str, zmq_strerror(errno));
 }
 
-CZMQNotificationInterface::CZMQNotificationInterface() : pcontext(NULL)
+CZMQNotificationInterface::CZMQNotificationInterface() : pcontext(nullptr)
 {
 }
 
@@ -28,6 +28,7 @@ CZMQNotificationInterface::~CZMQNotificationInterface()
         delete *i;
     }
 }
+
 std::list<const CZMQAbstractNotifier*> CZMQNotificationInterface::GetActiveNotifiers() const
 {
     std::list<const CZMQAbstractNotifier*> result;
@@ -36,6 +37,7 @@ std::list<const CZMQAbstractNotifier*> CZMQNotificationInterface::GetActiveNotif
     }
     return result;
 }
+
 CZMQNotificationInterface* CZMQNotificationInterface::Create()
 {
     CZMQNotificationInterface* notificationInterface = nullptr;
@@ -64,7 +66,6 @@ CZMQNotificationInterface* CZMQNotificationInterface::Create()
         }
     }
 
-
     if (!notifiers.empty())
     {
         notificationInterface = new CZMQNotificationInterface();
@@ -83,10 +84,14 @@ CZMQNotificationInterface* CZMQNotificationInterface::Create()
 // Called at startup to conditionally set up ZMQ socket(s)
 bool CZMQNotificationInterface::Initialize()
 {
+    int major = 0, minor = 0, patch = 0;
+    zmq_version(&major, &minor, &patch);
+    LogPrint(BCLog::ZMQ, "zmq: version %d.%d.%d\n", major, minor, patch);
+
     LogPrint(BCLog::ZMQ, "zmq: Initialize notification interface\n");
     assert(!pcontext);
 
-    pcontext = zmq_init(1);
+    pcontext = zmq_ctx_new();
 
     if (!pcontext)
     {
@@ -100,11 +105,11 @@ bool CZMQNotificationInterface::Initialize()
         CZMQAbstractNotifier *notifier = *i;
         if (notifier->Initialize(pcontext))
         {
-            LogPrint(BCLog::ZMQ, "  Notifier %s ready (address = %s)\n", notifier->GetType(), notifier->GetAddress());
+            LogPrint(BCLog::ZMQ, "zmq: Notifier %s ready (address = %s)\n", notifier->GetType(), notifier->GetAddress());
         }
         else
         {
-            LogPrint(BCLog::ZMQ, "  Notifier %s failed (address = %s)\n", notifier->GetType(), notifier->GetAddress());
+            LogPrint(BCLog::ZMQ, "zmq: Notifier %s failed (address = %s)\n", notifier->GetType(), notifier->GetAddress());
             break;
         }
     }
@@ -126,12 +131,12 @@ void CZMQNotificationInterface::Shutdown()
         for (std::list<CZMQAbstractNotifier*>::iterator i=notifiers.begin(); i!=notifiers.end(); ++i)
         {
             CZMQAbstractNotifier *notifier = *i;
-            LogPrint(BCLog::ZMQ, "   Shutdown notifier %s at %s\n", notifier->GetType(), notifier->GetAddress());
+            LogPrint(BCLog::ZMQ, "zmq: Shutdown notifier %s at %s\n", notifier->GetType(), notifier->GetAddress());
             notifier->Shutdown();
         }
-        zmq_ctx_destroy(pcontext);
+        zmq_ctx_term(pcontext);
 
-        pcontext = 0;
+        pcontext = nullptr;
     }
 }
 
@@ -155,8 +160,12 @@ void CZMQNotificationInterface::UpdatedBlockTip(const CBlockIndex *pindexNew, co
     }
 }
 
-void CZMQNotificationInterface::SyncTransaction(const CTransaction &tx, const CBlock *pblock)
+void CZMQNotificationInterface::TransactionAddedToMempool(const CTransactionRef& ptx)
 {
+    // Used by BlockConnected and BlockDisconnected as well, because they're
+    // all the same external callback.
+    const CTransaction& tx = *ptx;
+
     for (std::list<CZMQAbstractNotifier*>::iterator i = notifiers.begin(); i!=notifiers.end(); )
     {
         CZMQAbstractNotifier *notifier = *i;
@@ -169,6 +178,22 @@ void CZMQNotificationInterface::SyncTransaction(const CTransaction &tx, const CB
             notifier->Shutdown();
             i = notifiers.erase(i);
         }
+    }
+}
+
+void CZMQNotificationInterface::BlockConnected(const std::shared_ptr<const CBlock>& pblock, const CBlockIndex* pindexConnected, const std::vector<CTransactionRef>& vtxConflicted)
+{
+    for (const CTransactionRef& ptx : pblock->vtx) {
+        // Do a normal notify for each transaction added in the block
+        TransactionAddedToMempool(ptx);
+    }
+}
+
+void CZMQNotificationInterface::BlockDisconnected(const std::shared_ptr<const CBlock>& pblock)
+{
+    for (const CTransactionRef& ptx : pblock->vtx) {
+        // Do a normal notify for each transaction removed in block disconnection
+        TransactionAddedToMempool(ptx);
     }
 }
 
@@ -188,4 +213,5 @@ void CZMQNotificationInterface::NotifyTransactionLock(const CTransaction &tx)
         }
     }
 }
+
 CZMQNotificationInterface* g_zmq_notification_interface = nullptr;
