@@ -49,7 +49,7 @@ extern CzWSPWallet* zwalletMain;
  * Settings
  */
 extern CFeeRate payTxFee;
-extern CAmount maxTxFee;
+//extern CAmount maxTxFee;
 extern unsigned int nTxConfirmTarget;
 extern bool bSpendZeroConfChange;
 extern bool bdisableSystemnotifications;
