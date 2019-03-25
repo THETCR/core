@@ -229,7 +229,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                 CoinDenomination denomination = CoinDenomination::ZQ_ERROR;
                 bool fFoundMint = false;
                 CBigNum bnValue = 0;
-                for (const CTxOut& out : tx.vout) {
+                for (const CTxOut& out : tx->vout) {
                     if (!out.scriptPubKey.IsZerocoinMint())
                         continue;
 
@@ -251,7 +251,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                 }
 
                 if (!fFoundMint || denomination == ZQ_ERROR) {
-                    LogPrintf("%s : failed to get mint %s from tx %s!\n", __func__, pMint.first.GetHex(), tx.GetHash().GetHex());
+                    LogPrintf("%s : failed to get mint %s from tx %s!\n", __func__, pMint.first.GetHex(), tx->GetHash().GetHex());
                     found = false;
                     break;
                 }

@@ -253,8 +253,8 @@ CDataStream CWspStake::GetUniqueness()
 CBlockIndex* CWspStake::GetIndexFrom()
 {
     uint256 hashBlock = 0;
-    CTransaction tx;
-    if (GetTransaction(txFrom.GetHash(), tx, hashBlock, true)) {
+    CTransactionRef tx;
+    if (GetTransaction(txFrom.GetHash(), tx, Params().GetConsensus(), hashBlock)) {
         // If the index is in the chain, then set it as the "index from"
         if (mapBlockIndex.count(hashBlock)) {
             CBlockIndex* pindex = mapBlockIndex.at(hashBlock);
