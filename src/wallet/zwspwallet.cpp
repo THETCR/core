@@ -217,8 +217,8 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                 found = true;
 
                 uint256 hashBlock;
-                CTransaction tx;
-                if (!GetTransaction(txHash, tx, hashBlock, true)) {
+                CTransactionRef tx;
+                if (!GetTransaction(txHash, tx, Params().GetConsensus(), hashBlock)) {
                     LogPrintf("%s : failed to get transaction for mint %s!\n", __func__, pMint.first.GetHex());
                     found = false;
                     nLastCountUsed = std::max(pMint.second, nLastCountUsed);
@@ -263,10 +263,10 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                 if (!setAddedTx.count(txHash)) {
                     CBlock block;
                     CWalletTx wtx(pwalletMain, tx);
-                    if (pindex && ReadBlockFromDisk(block, pindex)){
+                    if (pindex && ReadBlockFromDisk(block, pindex, Params().GetConsensus())){
                         int posInBlock = 0;
                         for (; posInBlock < (int)block.vtx.size(); posInBlock++){
-                            if (block.vtx[posInBlock] == MakeTransactionRef(tx))
+                            if (block.vtx[posInBlock] == tx)
                                 break;
                         }
                         wtx.SetMerkleBranch(block.GetHash(), posInBlock);
@@ -318,17 +318,17 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
     // Check if this is also already spent
     int nHeightTx;
     uint256 txidSpend;
-    CTransaction txSpend;
+    CTransactionRef txSpend;
     if (IsSerialInBlockchain(hashSerial, nHeightTx, txidSpend, txSpend)) {
         //Find transaction details and make a wallettx and add to wallet
         dMint.SetUsed(true);
         CWalletTx wtx(pwalletMain, txSpend);
         CBlockIndex* pindex = chainActive[nHeightTx];
         CBlock block;
-        if (ReadBlockFromDisk(block, pindex)){
+        if (ReadBlockFromDisk(block, pindex, Params().GetConsensus())){
             int posInBlock = 0;
             for (; posInBlock < (int)block.vtx.size(); posInBlock++){
-                if (block.vtx[posInBlock] == MakeTransactionRef(txSpend))
+                if (block.vtx[posInBlock] == txSpend)
                     break;
             }
             wtx.SetMerkleBranch(block.GetHash(), posInBlock);
