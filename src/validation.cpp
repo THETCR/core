@@ -5190,6 +5190,10 @@ bool CChainState::AcceptBlockHeader(const CBlockHeader& block, CValidationState&
     return true;
 }
 
+bool AcceptBlockHeader(const CBlockHeader& block, CValidationState& state, const CChainParams& chainparams, CBlockIndex** ppindex) {
+    return g_chainstate.AcceptBlockHeader(block, state, chainparams, ppindex);
+}
+
 // Exposed wrapper for AcceptBlockHeader
 bool ProcessNewBlockHeaders(const std::vector<CBlockHeader>& headers, CValidationState& state, const CChainParams& chainparams, const CBlockIndex** ppindex, CBlockHeader *first_invalid)
 {
