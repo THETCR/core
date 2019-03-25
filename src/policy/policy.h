@@ -106,6 +106,13 @@ bool IsStandardTx(const CTransaction& tx, std::string& reason);
  */
 bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs);
 
+/**
+ * Check if the transaction is over standard P2WSH resources limit:
+ * 3600bytes witnessScript size, 80bytes per witness stack element, 100 witness stack elements
+ * These limits are adequate for multi-signature up to n-of-100 using OP_CHECKSIG, OP_ADD, and OP_EQUAL,
+ */
+bool IsWitnessStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs);
+
 extern CFeeRate incrementalRelayFee;
 extern CFeeRate dustRelayFee;
 extern unsigned int nBytesPerSigOp;
