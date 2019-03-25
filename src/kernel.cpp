@@ -428,7 +428,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
     const CTxIn& txin = tx.vin[0];
 
     //Construct the stakeinput object
-    CTransaction txPrev;
+    CTransactionRef txPrev;
 
     if (tx.IsZerocoinSpend()) {
         libzerocoin::CoinSpend spend = TxInToZerocoinSpend(txin);
@@ -439,15 +439,15 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
     } else {
         // First try finding the previous transaction in database
         uint256 hashBlock;
-        if (!GetTransaction(txin.prevout.hash, txPrev, hashBlock, true))
+        if (!GetTransaction(txin.prevout.hash, txPrev, Params().GetConsensus(), hashBlock))
             return error("CheckProofOfStake() : INFO: read txPrev failed");
 
         //verify signature and script
-        if (!VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey, nullptr, SCRIPT_VERIFY_NONE, TransactionSignatureChecker(&tx, 0, 0)))
+        if (!VerifyScript(txin.scriptSig, txPrev->vout[txin.prevout.n].scriptPubKey, nullptr, SCRIPT_VERIFY_NONE, TransactionSignatureChecker(&tx, 0, 0)))
             return error("CheckProofOfStake() : VerifySignature failed on coinstake %s", tx.GetHash().ToString().c_str());
 
         CWspStake* wspInput = new CWspStake();
-        wspInput->SetInput(txPrev, txin.prevout.n);
+        wspInput->SetInput(*txPrev, txin.prevout.n);
         stake = std::unique_ptr<CStakeInput>(wspInput);
     }
 
@@ -457,7 +457,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
 
     // Read block header
     CBlock blockprev;
-    if (!ReadBlockFromDisk(blockprev, pindex->GetBlockPos()))
+    if (!ReadBlockFromDisk(blockprev, pindex->GetBlockPos(), Params().GetConsensus()))
         return error("CheckProofOfStake(): INFO: failed to find block");
 
     uint256 bnTargetPerCoinDay;
@@ -465,7 +465,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
     CBlockIndex* pindexOld = mapBlockIndex.at(block.hashPrevBlock);
     uint64_t nStakeModifier = 0;
     CValidationState state;
-    int64_t nValueIn = txPrev.vout[txin.prevout.n].nValue;
+    int64_t nValueIn = txPrev->vout[txin.prevout.n].nValue;
     unsigned int nBlockFromTime = blockprev.nTime;
     unsigned int nTxTime = block.nTime;
     if (block.nVersion > 7) {
@@ -477,7 +477,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
                          tx.GetHash().ToString(), hashProofOfStake.ToString());
         }
     } else {
-        if (!CheckStakeV1(txPrev.nTime, txin.prevout, tx.nTime, hashProofOfStake, nValueIn, pindexOld, block.nBits)) {
+        if (!CheckStakeV1(txPrev->nTime, txin.prevout, tx.nTime, hashProofOfStake, nValueIn, pindexOld, block.nBits)) {
             return error("CheckProofOfStake() : INFO: old bnStakeModifierV2 check kernel failed on coinstake %s, hashProof=%s \n",
                          tx.GetHash().ToString(), hashProofOfStake.ToString());
         }
