@@ -12,6 +12,10 @@
 
 #include <future>
 
+//!WISPR
+#include <swifttx.h>
+#include <net_processing.h>
+
 std::string TransactionErrorString(const TransactionError err)
 {
     switch (err) {
@@ -55,9 +59,9 @@ TransactionError BroadcastTransaction(const CTransactionRef tx, uint256& hashTx,
     if (!fHaveMempool && !fHaveChain) {
         // push to local node and sync with wallets
         if (fSwiftX) {
-            mapTxLockReq.insert(std::make_pair(tx.GetHash(), tx));
-            CreateNewLock(tx);
-            RelayTransactionLockReq(tx, g_connman.get(), true);
+            mapTxLockReq.insert(std::make_pair(tx->GetHash(), *tx));
+            CreateNewLock(*tx);
+            RelayTransactionLockReq(*tx, g_connman.get(), true);
         }
         // push to local node and sync with wallets
         CValidationState state;
