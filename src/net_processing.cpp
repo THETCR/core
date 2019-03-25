@@ -1978,7 +1978,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                     Misbehaving(pfrom->GetId(), 20);
                     return error("non-continuous headers sequence");
                 }
-                if (!AcceptBlockHeader(header, state, &pindexLast)) {
+                if (!AcceptBlockHeader(header, state, Params(), &pindexLast)) {
                     int nDoS;
                     if (state.IsInvalid(nDoS)) {
                         if (nDoS > 0)
