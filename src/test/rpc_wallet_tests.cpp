@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(rpc_addmultisig)
 {
     LOCK(pwalletMain->cs_wallet);
 
-    rpcfn_type addmultisig = tableRPC["addmultisigaddress"]->actor;
+//    rpcfn_type addmultisig = tableRPC["addmultisigaddress"]->actor;
 
     // old, 65-byte-long:
     const char address1Hex[] = "041431A18C7039660CD9E3612A2A47DC53B69CB38EA4AD743B7DF8245FD0438F8E7270415F1085B9DC4D7DA367C69F1245E27EE5552A481D6854184C80F0BB8456";
@@ -37,29 +37,39 @@ BOOST_AUTO_TEST_CASE(rpc_addmultisig)
 
     UniValue v;
     CBitcoinAddress address;
-    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(1, address1Hex)));
+    BOOST_CHECK_NO_THROW(v = CallRPC(string("addmultisig ")+createArgs(1, address1Hex).params.get_str()));
+//    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(1, address1Hex)));
     address.SetString(v.get_str());
     BOOST_CHECK(address.IsValid() && address.IsScript());
 
-    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(1, address1Hex, address2Hex)));
+    BOOST_CHECK_NO_THROW(v = CallRPC(string("addmultisig ")+createArgs(1, address1Hex, address2Hex).params.get_str()));
+//    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(1, address1Hex, address2Hex)));
     address.SetString(v.get_str());
     BOOST_CHECK(address.IsValid() && address.IsScript());
-    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(2, address1Hex, address2Hex)));
+    BOOST_CHECK_NO_THROW(v = CallRPC(string("addmultisig ")+createArgs(2, address1Hex, address2Hex).params.get_str()));
+//    BOOST_CHECK_NO_THROW(v = addmultisig(createArgs(2, address1Hex, address2Hex)));
     address.SetString(v.get_str());
     BOOST_CHECK(address.IsValid() && address.IsScript());
 
-    BOOST_CHECK_THROW(addmultisig(createArgs(0)), std::runtime_error);
-    BOOST_CHECK_THROW(addmultisig(createArgs(1)), std::runtime_error);
-    BOOST_CHECK_THROW(addmultisig(createArgs(2, address1Hex)), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC(string("addmultisig ")+createArgs(0).params.get_str()), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC(string("addmultisig ")+createArgs(1).params.get_str()), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC(string("addmultisig ")+createArgs(2, address1Hex).params.get_str()), std::runtime_error);
+//    BOOST_CHECK_THROW(addmultisig(createArgs(0)), std::runtime_error);
+//    BOOST_CHECK_THROW(addmultisig(createArgs(1)), std::runtime_error);
+//    BOOST_CHECK_THROW(addmultisig(createArgs(2, address1Hex)), std::runtime_error);
 
-    BOOST_CHECK_THROW(addmultisig(createArgs(1, "")), std::runtime_error);
-    BOOST_CHECK_THROW(addmultisig(createArgs(1, "NotAValidPubkey")), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC(string("addmultisig ")+createArgs(1, "").params.get_str()), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC(string("addmultisig ")+createArgs(1, "NotAValidPubkey").params.get_str()), std::runtime_error);
+//    BOOST_CHECK_THROW(addmultisig(createArgs(1, "")), std::runtime_error);
+//    BOOST_CHECK_THROW(addmultisig(createArgs(1, "NotAValidPubkey")), std::runtime_error);
 
     std::string short1(address1Hex, address1Hex + sizeof(address1Hex) - 2); // last byte missing
-    BOOST_CHECK_THROW(addmultisig(createArgs(2, short1.c_str())), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC(string("addmultisig ")+createArgs(2, short1.c_str()).params.get_str()), std::runtime_error);
+//    BOOST_CHECK_THROW(addmultisig(createArgs(2, short1.c_str())), std::runtime_error);
 
     std::string short2(address1Hex + 1, address1Hex + sizeof(address1Hex)); // first byte missing
-    BOOST_CHECK_THROW(addmultisig(createArgs(2, short2.c_str())), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC(string("addmultisig ")+createArgs(2, short2.c_str()).params.get_str()), std::runtime_error);
+//    BOOST_CHECK_THROW(addmultisig(createArgs(2, short2.c_str())), std::runtime_error);
     std::cout << "addmultisig finished\n";
 }
 
