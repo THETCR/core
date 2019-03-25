@@ -80,6 +80,11 @@ public:
         Interrupt();
         Shutdown(m_interfaces);
     }
+    void prepareShutdown() override
+    {
+        Interrupt();
+        PrepareShutdown(m_interfaces);
+    }
     void startShutdown() override { StartShutdown(); }
     bool shutdownRequested() override { return ShutdownRequested(); }
     void mapPort(bool use_upnp) override

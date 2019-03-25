@@ -86,6 +86,8 @@ public:
     //! Start shutdown.
     virtual void startShutdown() = 0;
 
+    virtual void prepareShutdown() = 0;
+
     //! Return whether shutdown was requested.
     virtual bool shutdownRequested() = 0;
 

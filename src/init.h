@@ -30,6 +30,7 @@ class thread_group;
 /** Interrupt threads */
 void Interrupt();
 void Shutdown(InitInterfaces& interfaces);
+void PrepareShutdown(InitInterfaces& interfaces);
 //!Initialize the logging infrastructure
 void InitLogging();
 //!Parameter interaction: change current parameters depending on various rules

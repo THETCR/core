@@ -169,7 +169,7 @@ class BitcoinCore : public QObject
 {
     Q_OBJECT
 public:
-    explicit BitcoinCore();
+    explicit BitcoinCore(interfaces::Node& node);
 
 public Q_SLOTS:
     void initialize();
@@ -187,6 +187,8 @@ private:
 
     /// Pass fatal exception message to UI thread
     void handleRunawayException(std::exception* e);
+
+    interfaces::Node& m_node;
 };
 
 /** Main WISPR application object */
@@ -252,7 +254,8 @@ private:
 
 #include "wispr.moc"
 
-BitcoinCore::BitcoinCore() : QObject()
+BitcoinCore::BitcoinCore(interfaces::Node& node) :
+    QObject(), m_node(node)
 {
 }
 
@@ -268,7 +271,7 @@ void BitcoinCore::initialize()
 
     try {
         qDebug() << __func__ << ": Running AppInit2 in thread";
-        int rv = AppInitMain();
+        bool rv = m_node.appInitMain();
         Q_EMIT initializeResult(rv);
     } catch (std::exception& e) {
         handleRunawayException(&e);
@@ -285,7 +288,7 @@ void BitcoinCore::restart(QStringList args)
             qDebug() << __func__ << ": Running Restart in thread";
             Interrupt();
             StartRestart();
-            PrepareShutdown();
+            m_node.prepareShutdown();
             qDebug() << __func__ << ": Shutdown finished";
             Q_EMIT shutdownResult(1);
             QProcess::startDetached(QApplication::applicationFilePath(), args);
@@ -304,7 +307,7 @@ void BitcoinCore::shutdown()
     try {
         qDebug() << __func__ << ": Running Shutdown in thread";
         Interrupt();
-        Shutdown();
+        m_node.appShutdown();
         qDebug() << __func__ << ": Shutdown finished";
         Q_EMIT shutdownResult(1);
     } catch (std::exception& e) {
