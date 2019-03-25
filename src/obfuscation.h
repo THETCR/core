@@ -105,7 +105,7 @@ public:
     CObfuScationEntry()
     {
         isSet = false;
-        CTransaction(collateral);
+        collateral = CTransaction();
         amount = 0;
     }
 
@@ -123,7 +123,7 @@ public:
             vout.push_back(out);
 
         amount = amountIn;
-        collateral(CMutableTransaction(collateralIn));
+        collateral = collateralIn;
         isSet = true;
         addedTime = GetTime();
 
