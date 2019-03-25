@@ -959,6 +959,8 @@ static const CRPCCommand commands[] =
     //!WISPR
     {"wispr", "mnsync", &mnsync,{}},
     {"wispr", "spork", &spork,{}},
+    { "control",            "getinfo",                &getinfo,                {} }, /* uses wallet if enabled */
+
 };
 // clang-format on
 

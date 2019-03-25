@@ -367,8 +367,6 @@ static const CRPCCommand vRPCCommands[] =
     { "control",            "stop",                   &stop,                   {"wait"}  },
     { "control",            "uptime",                 &uptime,                 {}  },
 
-    //!WISPR
-    { "control",            "getinfo",                &getinfo,                {} }, /* uses wallet if enabled */
 };
 // clang-format on
 
