@@ -273,7 +273,7 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
 
         //grab mints from this block
         CBlock block;
-        if(!ReadBlockFromDisk(block, pindex))
+        if(!ReadBlockFromDisk(block, pindex, Params().GetConsensus()))
             return error("%s: failed to read block from disk", __func__);
 
         std::list<PublicCoin> listPubcoins;
@@ -364,7 +364,7 @@ int ComputeAccumulatedCoins(int nHeightEnd, libzerocoin::CoinDenomination denom)
 list<PublicCoin> GetPubcoinFromBlock(const CBlockIndex* pindex){
     //grab mints from this block
     CBlock block;
-    if(!ReadBlockFromDisk(block, pindex))
+    if(!ReadBlockFromDisk(block, pindex, Params().GetConsensus()))
         throw GetPubcoinException("GetPubcoinFromBlock: failed to read block from disk while adding pubcoins to witness");
     std::list<libzerocoin::PublicCoin> listPubcoins;
     if(!BlockToPubcoinList(block, listPubcoins, true))
@@ -626,9 +626,9 @@ int SearchMintHeightOf(CBigNum value){
     if (!zerocoinDB->ReadCoinMint(value, txid))
         throw searchMintHeightException("searchForMintHeightOf:: failed to read mint from db");
 
-    CTransaction txMinted;
+    CTransactionRef txMinted;
     uint256 hashBlock;
-    if (!GetTransaction(txid, txMinted, hashBlock))
+    if (!GetTransaction(txid, txMinted, Params().GetConsensus(), hashBlock))
         throw searchMintHeightException("searchForMintHeightOf:: failed to read tx");
 
     int nHeightTest;
