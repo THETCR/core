@@ -1164,12 +1164,12 @@ void static ProcessGetData(CNode* pfrom, const CChainParams& chainparams, CConnm
 
                 if (!pushed && inv.type == MSG_TX) {
                     CTransactionRef ptx = mempool.get(inv.hash);
-                    CTransaction tx;
+//                    CTransaction tx;
                     if (ptx != nullptr) {
-                        tx(*ptx);
+//                        tx(*ptx);
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
-                        ss << tx;
+                        ss << ptx;
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::TX, ss));
                         pushed = true;
                     }
