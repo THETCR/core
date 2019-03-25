@@ -69,6 +69,31 @@ void WalletInit::AddWalletOptions() const
     gArgs.AddArg("-flushwallet", strprintf("Run a thread to flush wallet periodically (default: %u)", DEFAULT_FLUSHWALLET), true, OptionsCategory::WALLET_DEBUG_TEST);
     gArgs.AddArg("-privdb", strprintf("Sets the DB_PRIVATE flag in the wallet db environment (default: %u)", DEFAULT_WALLET_PRIVDB), true, OptionsCategory::WALLET_DEBUG_TEST);
     gArgs.AddArg("-walletrejectlongchains", strprintf("Wallet will not create transactions that violate mempool chain limits (default: %u)", DEFAULT_WALLET_REJECT_LONG_CHAINS), true, OptionsCategory::WALLET_DEBUG_TEST);
+
+//!WISPR
+    gArgs.AddArg("-backuppath=<dir|file>", _("Specify custom backup path to add a copy of any wallet backup. If set as dir, every backup generates a timestamped file. If set as file, will rewrite to that file every backup."), false, OptionsCategory::WALLET);
+    gArgs.AddArg("-createwalletbackups=<n>", _("Number of automatic wallet backups (default: 10)"), false, OptionsCategory::WALLET);
+    gArgs.AddArg("-custombackupthreshold=<n>", strprintf(_("Number of custom location backups to retain (default: %d)"), DEFAULT_CUSTOMBACKUPTHRESHOLD), false, OptionsCategory::WALLET);
+
+    gArgs.AddArg("-sendfreetransactions", strprintf(_("Send transactions as zero-fee transactions if possible (default: %u)"), 0), false, OptionsCategory::WALLET);
+    gArgs.AddArg("-disablesystemnotifications", strprintf(_("Disable OS notifications for incoming transactions (default: %u)"), 0), false, OptionsCategory::WALLET);
+    gArgs.AddArg("-maxtxfee=<amt>", strprintf(_("Maximum total fees to use in a single wallet transaction, setting too low may abort large transactions (default: %s)"),
+                                                            FormatMoney(maxTxFee)), false, OptionsCategory::WALLET);
+
+    gArgs.AddArg("-gen", strprintf(_("Generate coins (default: %u)"), 0), false, OptionsCategory::GENWIT);
+    gArgs.AddArg("-genproclimit=<n>", strprintf(_("Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)"), 1), false, OptionsCategory::GENWIT);
+    gArgs.AddArg("-staking=<n>", strprintf(_("Enable staking functionality (0-1, default: %u)"), 1), false, OptionsCategory::STAKING);
+    gArgs.AddArg("-wspstake=<n>", strprintf(_("Enable or disable staking functionality for WSP inputs (0-1, default: %u)"), 1), false, OptionsCategory::STAKING);
+    gArgs.AddArg("-zwspstake=<n>", strprintf(_("Enable or disable staking functionality for zWSP inputs (0-1, default: %u)"), 1), false, OptionsCategory::STAKING);
+    gArgs.AddArg("-reservebalance=<amt>", _("Keep the specified amount available for spending at all times (default: 0)"), false, OptionsCategory::STAKING);
+    gArgs.AddArg("-printstakemodifier", _("Display the stake modifier calculations in the debug.log file."), true, OptionsCategory::STAKING);
+    gArgs.AddArg("-printcoinstake", _("Display verbose coin stake messages in the debug.log file."), true, OptionsCategory::STAKING);
+    gArgs.AddArg("-enablezeromint=<n>", strprintf(_("Enable automatic Zerocoin minting (0-1, default: %u)"), 1), false, OptionsCategory::ZEROCOIN);
+    gArgs.AddArg("-enableautoconvertaddress=<n>", strprintf(_("Enable automatic Zerocoin minting from specific addresses (0-1, default: %u)"), DEFAULT_AUTOCONVERTADDRESS), false, OptionsCategory::ZEROCOIN);
+    gArgs.AddArg("-zeromintpercentage=<n>", strprintf(_("Percentage of automatically minted Zerocoin  (1-100, default: %u)"), 10), false, OptionsCategory::ZEROCOIN);
+    gArgs.AddArg("-preferredDenom=<n>", strprintf(_("Preferred Denomination for automatically minted Zerocoin  (1/5/10/50/100/500/1000/5000), 0 for no preference. default: %u)"), 0), false, OptionsCategory::ZEROCOIN);
+    gArgs.AddArg("-backupzwsp=<n>", strprintf(_("Enable automatic wallet backups triggered after each zWSP minting (0-1, default: %u)"), 1), false, OptionsCategory::ZEROCOIN);
+    gArgs.AddArg("-zwspbackuppath=<dir|file>", _("Specify custom backup path to add a copy of any automatic zWSP backup. If set as dir, every backup generates a timestamped file. If set as file, will rewrite to that file every backup. If backuppath is set as well, 4 backups will happen"), false, OptionsCategory::ZEROCOIN);
 }
 
 bool WalletInit::ParameterInteraction() const

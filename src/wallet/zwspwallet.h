@@ -50,6 +50,14 @@ public:
     void SeedToZWSP(const uint512& seed, CBigNum& bnValue, CBigNum& bnSerial, CBigNum& bnRandomness, CKey& key);
     bool CheckSeed(const CDeterministicMint& dMint);
 
+    /** Get database handle used by this wallet. Ideally this function would
+     * not be necessary.
+     */
+    WalletDatabase& GetDBHandle()
+    {
+        return database;
+    }
+
 private:
     uint512 GetZerocoinSeed(uint32_t n);
 };
