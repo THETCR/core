@@ -123,7 +123,7 @@ public:
             vout.push_back(out);
 
         amount = amountIn;
-        collateral = collateralIn;
+        collateral(collateralIn);
         isSet = true;
         addedTime = GetTime();
 
