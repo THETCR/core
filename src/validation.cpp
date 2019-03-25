@@ -384,7 +384,7 @@ enum class FlushStateMode {
 static bool FlushStateToDisk(const CChainParams& chainParams, CValidationState &state, FlushStateMode mode, int nManualPruneHeight=0);
 static void FindFilesToPruneManual(std::set<int>& setFilesToPrune, int nManualPruneHeight);
 static void FindFilesToPrune(std::set<int>& setFilesToPrune, uint64_t nPruneAfterHeight);
-bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck> *pvChecks = nullptr);
+//bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck> *pvChecks = nullptr);
 static FILE* OpenUndoFile(const FlatFilePos &pos, bool fReadOnly = false);
 static FlatFileSeq BlockFileSeq();
 static FlatFileSeq UndoFileSeq();
