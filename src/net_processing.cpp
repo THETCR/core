@@ -1115,7 +1115,7 @@ void static ProcessGetData(CNode* pfrom, const CChainParams& chainparams, CConnm
                 if (send && (mi->second->nStatus & BLOCK_HAVE_DATA)) {
                     // Send block from disk
                     CBlock block;
-                    if (!ReadBlockFromDisk(block, (*mi).second))
+                    if (!ReadBlockFromDisk(block, (*mi).second, Params().GetConsensus()))
                         assert(!"cannot load block from disk");
                     if (inv.type == MSG_BLOCK)
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::BLOCK, block));
@@ -2040,7 +2040,8 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                     mapBlockSource.emplace(hash, pfrom->GetId());
                 }
                 bool fNewBlock = false;
-                ProcessNewBlock(chainparams, &block, forceProcessing, NULL, &fNewBlock);
+                std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(block);
+                ProcessNewBlock(chainparams, shared_pblock, forceProcessing, &fNewBlock);
                 if (fNewBlock)
                     pfrom->nLastBlockTime = GetTime();
                 //disconnect this node if its old protocol version
@@ -2717,7 +2718,7 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
         // transactions become unconfirmed and spams other nodes.
         if (!fReindex && !fImporting && !IsInitialBlockDownload())
         {
-            GetMainSignals().Broadcast(nTimeBestReceived);
+            GetMainSignals().Broadcast(nTimeBestReceived, connman);
         }
 
         //
