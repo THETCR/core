@@ -45,7 +45,7 @@ static Checkpoints::MapCheckpoints mapCheckpoints =
                 (350000, uint256("ffb49991aa635992305029cb629037cf5d08e945d2027c79f4f737c11e7d680e")) // Block 350.000
                 (400000, uint256("cf86529d0243cb653da92cbbaddc7f0a4f275bcf557cc112d03c33b756af25d3")); // Block 400.000
 static const Checkpoints::CCheckpointData data = {
-        &mapCheckpoints,
+        mapCheckpoints,
         1540087953, // * UNIX timestamp of last checkpoint block (Done)
         815060,    // * total number of transactions between genesis and last checkpoint TODO: keep using correct number
         //   (the tx=... number in the SetBestChain debug.log lines)
@@ -56,7 +56,7 @@ static const Checkpoints::CCheckpointData data = {
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
         boost::assign::map_list_of(0, uint256("0x001"));
 static const Checkpoints::CCheckpointData dataTestnet = {
-        &mapCheckpointsTestnet,
+        mapCheckpointsTestnet,
         1512932225,
         0,
         450};
@@ -64,7 +64,7 @@ static const Checkpoints::CCheckpointData dataTestnet = {
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
         boost::assign::map_list_of(0, uint256("0x001"));
 static const Checkpoints::CCheckpointData dataRegtest = {
-        &mapCheckpointsRegtest,
+        mapCheckpointsRegtest,
         1411111111,
         0,
         100};
