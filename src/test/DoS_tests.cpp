@@ -389,7 +389,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
             tx.vout[0].nValue = 1*CENT;
             tx.vout[0].scriptPubKey = GetScriptForDestination(key.GetPubKey().GetID());
 
-            AddOrphanTx(tx, i);
+            AddOrphanTx(CTransaction(tx), i);
         }
 
         // ... and 50 that depend on other orphans:
@@ -406,7 +406,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
             tx.vout[0].scriptPubKey = GetScriptForDestination(key.GetPubKey().GetID());
             BOOST_CHECK(SignSignature(keystore, txPrev, tx, 0, SIGHASH_ALL));
 
-            AddOrphanTx(tx, i);
+            AddOrphanTx(CTransaction(tx), i);
         }
 
         // This really-big orphan should be ignored:
@@ -430,7 +430,7 @@ BOOST_AUTO_TEST_SUITE(denialofservice_tests)
             for (unsigned int j = 1; j < tx.vin.size(); j++)
                 tx.vin[j].scriptSig = tx.vin[0].scriptSig;
 
-            BOOST_CHECK(!AddOrphanTx(tx, i));
+            BOOST_CHECK(!AddOrphanTx(CTransaction(tx), i));
         }
 
         LOCK(cs_main);
