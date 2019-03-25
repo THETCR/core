@@ -140,9 +140,9 @@ void FindMints(std::vector<CMintMeta> vMintsToFind, std::vector<CMintMeta>& vMin
         }
 
         // make sure the txhash and block height meta data are correct for this mint
-        CTransaction tx;
+        CTransactionRef tx;
         uint256 hashBlock;
-        if (!GetTransaction(txHash, tx, hashBlock, true)) {
+        if (!GetTransaction(txHash, tx, Params().GetConsensus(), hashBlock)) {
             LogPrintf("%s : cannot find tx %s\n", __func__, txHash.GetHex());
             vMissingMints.push_back(meta);
             continue;
@@ -159,9 +159,9 @@ void FindMints(std::vector<CMintMeta> vMintsToFind, std::vector<CMintMeta>& vMin
         bool fSpent = zerocoinDB->ReadCoinSpend(meta.hashSerial, hashTxSpend);
 
         //if marked as spent, check that it actually made it into the chain
-        CTransaction txSpend;
+        CTransactionRef txSpend;
         uint256 hashBlockSpend;
-        if (fSpent && !GetTransaction(hashTxSpend, txSpend, hashBlockSpend, true)) {
+        if (fSpent && !GetTransaction(hashTxSpend, txSpend, Params().GetConsensus(), hashBlockSpend)) {
             LogPrintf("%s : cannot find spend tx %s\n", __func__, hashTxSpend.GetHex());
             meta.isUsed = false;
             vMintsToUpdate.push_back(meta);
@@ -180,7 +180,7 @@ void FindMints(std::vector<CMintMeta> vMintsToFind, std::vector<CMintMeta>& vMin
         }
 
         // is the denomination correct?
-        for (auto& out : tx.vout) {
+        for (auto& out : tx->vout) {
             if (!out.IsZerocoinMint())
                 continue;
             libzerocoin::PublicCoin pubcoin(Params().Zerocoin_Params(meta.nVersion < libzerocoin::PrivateCoin::PUBKEY_VERSION));
@@ -242,18 +242,18 @@ bool IsSerialInBlockchain(const CBigNum& bnSerial, int& nHeightTx)
 
 bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend)
 {
-    CTransaction tx;
+    CTransactionRef tx;
     return IsSerialInBlockchain(hashSerial, nHeightTx, txidSpend, tx);
 }
 
-bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend, CTransaction& tx)
+bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend, CTransactionRef& tx)
 {
     txidSpend = 0;
     // if not in zerocoinDB then its not in the blockchain
     if (!zerocoinDB->ReadCoinSpend(hashSerial, txidSpend))
         return false;
 
-    return IsTransactionInChain(txidSpend, nHeightTx, tx);
+    return IsTransactionInChain(txidSpend, nHeightTx, tx, Params().GetConsensus());
 }
 
 std::string ReindexZerocoinDB()
@@ -262,19 +262,19 @@ std::string ReindexZerocoinDB()
         return _("Failed to wipe zerocoinDB");
     }
 
-    uiInterface.ShowProgress(_("Reindexing zerocoin database..."), 0);
+    uiInterface.ShowProgress(_("Reindexing zerocoin database..."), 0, false);
 
     CBlockIndex* pindex = chainActive[Params().NEW_PROTOCOLS_STARTHEIGHT()];
     std::vector<std::pair<libzerocoin::CoinSpend, uint256> > vSpendInfo;
     std::vector<std::pair<libzerocoin::PublicCoin, uint256> > vMintInfo;
     while (pindex) {
-        uiInterface.ShowProgress(_("Reindexing zerocoin database..."), std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().NEW_PROTOCOLS_STARTHEIGHT()) / (double)(chainActive.Height() - Params().NEW_PROTOCOLS_STARTHEIGHT()) * 100))));
+        uiInterface.ShowProgress(_("Reindexing zerocoin database..."), std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().NEW_PROTOCOLS_STARTHEIGHT()) / (double)(chainActive.Height() - Params().NEW_PROTOCOLS_STARTHEIGHT()) * 100))), false);
 
         if (pindex->nHeight % 1000 == 0)
             LogPrintf("Reindexing zerocoin : block %d...\n", pindex->nHeight);
 
         CBlock block;
-        if (!ReadBlockFromDisk(block, pindex)) {
+        if (!ReadBlockFromDisk(block, pindex, Params().GetConsensus())) {
             return _("Reindexing zerocoin failed");
         }
 
@@ -322,13 +322,13 @@ std::string ReindexZerocoinDB()
 
         pindex = chainActive.Next(pindex);
     }
-    uiInterface.ShowProgress("", 100);
+    uiInterface.ShowProgress("", 100, false);
 
     // Final flush to disk in case any remaining information exists
     if ((!vSpendInfo.empty() && !zerocoinDB->WriteCoinSpendBatch(vSpendInfo)) || (!vMintInfo.empty() && !zerocoinDB->WriteCoinMintBatch(vMintInfo)))
         return _("Error writing zerocoinDB to disk");
 
-    uiInterface.ShowProgress("", 100);
+    uiInterface.ShowProgress("", 100, false);
 
     return "";
 }

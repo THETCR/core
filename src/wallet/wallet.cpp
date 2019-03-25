@@ -2021,7 +2021,7 @@ CWallet::ScanResult CWallet::ScanForWalletTransactions(const uint256& start_bloc
                             //Check if the mint was ever spent
                             int nHeightSpend = 0;
                             uint256 txidSpend;
-                            CTransaction txSpend;
+                            CTransactionRef txSpend;
                             if (IsSerialInBlockchain(GetSerialHash(m.GetSerialNumber()), nHeightSpend, txidSpend, txSpend)) {
                                 if (setAddedToWallet.count(txidSpend) || mapWallet.count(txidSpend))
                                     continue;
