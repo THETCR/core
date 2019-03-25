@@ -369,7 +369,7 @@ void MultisigDialog::on_createButton_clicked()
                                              "Please continue on to sign the tx from this wallet, to access the hex to send to other owners.", fee).c_str());
 
             ui->createButtonStatus->setText(status);
-            ui->transactionHex->setText(QString::fromStdString(EncodeHexTx(multisigTx)));
+            ui->transactionHex->setText(QString::fromStdString(EncodeHexTx(CTransaction(multisigTx))));
 
         }
     }catch(const runtime_error& e){
@@ -556,7 +556,7 @@ void MultisigDialog::on_signButton_clicked()
  */
 QString MultisigDialog::buildMultisigTxStatusString(bool fComplete, const CMutableTransaction& tx)
 {
-    std::string sTxHex = EncodeHexTx(tx);
+    std::string sTxHex = EncodeHexTx(CTransaction(tx));
 
     if(fComplete){
         ui->commitButton->setEnabled(true);
@@ -629,16 +629,16 @@ bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, std::string& errorO
 
             for(CTxIn& txin : tx.vin){
                 //get inputs
-                CTransaction txVin;
+                CTransactionRef txVin;
                 uint256 hashBlock;
-                if (!GetTransaction(txin.prevout.hash, txVin, hashBlock, true))
+                if (!GetTransaction(txin.prevout.hash, txVin, Params().GetConsensus(), hashBlock))
                     throw runtime_error("txin could not be found");
 
                 if (hashBlock == 0)
                     throw runtime_error("txin is unconfirmed");
 
                 //get pubkey from input
-                CScript prevPubKey = txVin.vout[txin.prevout.n].scriptPubKey;
+                CScript prevPubKey = txVin->vout[txin.prevout.n].scriptPubKey;
 
                 //get payment destination
                 CTxDestination address;
@@ -671,20 +671,20 @@ bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, std::string& errorO
         int nIn = 0;
         for(CTxIn& txin : tx.vin){
             //get inputs
-            CTransaction txVin;
+            CTransactionRef txVin;
             uint256 hashBlock;
-            if (!GetTransaction(txin.prevout.hash, txVin, hashBlock, true))
+            if (!GetTransaction(txin.prevout.hash, txVin,  Params().GetConsensus(), hashBlock))
                 throw runtime_error("txin could not be found");
 
             if (hashBlock == 0)
                 throw runtime_error("txin is unconfirmed");
 
             txin.scriptSig.clear();
-            CScript prevPubKey = txVin.vout[txin.prevout.n].scriptPubKey;
-            CAmount amount = txVin.vout[txin.prevout.n].nValue;
+            CScript prevPubKey = txVin->vout[txin.prevout.n].scriptPubKey;
+            CAmount amount = txVin->vout[txin.prevout.n].nValue;
 
             //sign what we can
-            SignSignature(keystore, CTransaction(txVin), tx, nIn, SIGHASH_ALL);
+            SignSignature(keystore, *txVin, tx, nIn, SIGHASH_ALL);
 
             //merge in any previous signatures
 //            txin.scriptSig = CombineSignatures(prevPubKey, tx, nIn, txin.scriptSig, oldVin[nIn].scriptSig);
@@ -709,9 +709,9 @@ bool MultisigDialog::isFullyVerified(CMutableTransaction& tx){
     try{
         int nIn = 0;
         for(CTxIn& txin : tx.vin){
-            CTransaction txVin;
+            CTransactionRef txVin;
             uint256 hashBlock;
-            if (!GetTransaction(txin.prevout.hash, txVin, hashBlock, true)){
+            if (!GetTransaction(txin.prevout.hash, txVin,  Params().GetConsensus(), hashBlock)){
                 throw runtime_error("txin could not be found");
             }
             if (hashBlock == 0){
@@ -719,8 +719,8 @@ bool MultisigDialog::isFullyVerified(CMutableTransaction& tx){
             }
 
             //get pubkey from this input as output in last tx
-            CScript prevPubKey = txVin.vout[txin.prevout.n].scriptPubKey;
-            CAmount amount = txVin.vout[txin.prevout.n].nValue;
+            CScript prevPubKey = txVin->vout[txin.prevout.n].scriptPubKey;
+            CAmount amount = txVin->vout[txin.prevout.n].nValue;
 
             if (!VerifyScript(txin.scriptSig, prevPubKey, nullptr, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&tx, nIn, amount))){
                 return false;
@@ -740,7 +740,7 @@ void MultisigDialog::commitMultisigTx()
     CMutableTransaction tx(multisigTx);
     try{
 #ifdef ENABLE_WALLET
-        CWalletTx wtx(pwalletMain, tx);
+        CWalletTx wtx(pwalletMain, CTransaction(tx));
         CReserveKey keyChange(pwalletMain);
         if (!pwalletMain->CommitTransaction(wtx, keyChange))
             throw runtime_error(std::string("Transaction rejected - Failed to commit"));
