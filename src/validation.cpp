@@ -1044,7 +1044,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         pool.addUnchecked(entry, setAncestors, validForFeeEstimation);
     }
 
-    SyncWithWallets(tx, nullptr);
+//    SyncWithWallets(tx, nullptr);
 
     //Track zerocoinspends and ensure that they are given priority to make it into the blockchain
     if (tx.IsZerocoinSpend())
