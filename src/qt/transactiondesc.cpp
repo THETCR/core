@@ -31,7 +31,7 @@ QString TransactionDesc::FormatTxStatus(CWallet* wallet, const CWalletTx& wtx)
 {
     auto locked_chain = wallet->chain().lock();
     AssertLockHeld(cs_main);
-    if (!IsFinalTx(*wtx.tx, chainActive.Height() + 1)) {
+    if (!IsFinalTx(*wtx.tx, chainActive.Height() + 1, chainActive.Tip()->nTime)) {
         if (wtx.tx->nLockTime < LOCKTIME_THRESHOLD)
             return tr("Open for %n more block(s)", "", wtx.tx->nLockTime - chainActive.Height());
         else
