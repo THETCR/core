@@ -316,8 +316,8 @@ BOOST_AUTO_TEST_CASE(test_Get)
                 t1.vout[0].nValue = 90*CENT;
                 t1.vout[0].scriptPubKey << OP_1;
 
-                BOOST_CHECK(AreInputsStandard(t1, coins));
-                BOOST_CHECK_EQUAL(coins.GetValueIn(t1), (50+21+22)*CENT);
+                BOOST_CHECK(AreInputsStandard(CTransaction(t1), coins));
+                BOOST_CHECK_EQUAL(coins.GetValueIn(CTransaction(t1)), (50+21+22)*CENT);
 
                 // Adding extra junk to the scriptSig should make it non-standard:
 //                t1.vin[0].scriptSig << OP_11;
