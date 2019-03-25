@@ -14,6 +14,7 @@
 #include "rpc/server.h"
 #include <util/moneystr.h>
 #include <wallet/wallet.h>
+#include <wallet/rpcwallet.h>
 
 #include <univalue.h>
 
@@ -44,169 +45,6 @@ UniValue getpoolinfo(const JSONRPCRequest& request)
     obj.pushKV("entries", obfuScationPool.GetEntriesCount());
     obj.pushKV("entries_accepted", obfuScationPool.GetCountEntriesAccepted());
     return obj;
-}
-
-// This command is retained for backwards compatibility, but is depreciated.
-// Future removal of this command is planned to keep things clean.
-UniValue masternode(const JSONRPCRequest& request)
-{
-    std::string strCommand;
-    if (request.params.size() >= 1)
-        strCommand = request.params[0].get_str();
-
-    if (request.fHelp ||
-        (strCommand != "start" && strCommand != "start-alias" && strCommand != "start-many" && strCommand != "start-all" && strCommand != "start-missing" &&
-            strCommand != "start-disabled" && strCommand != "list" && strCommand != "list-conf" && strCommand != "count" && strCommand != "enforce" &&
-            strCommand != "debug" && strCommand != "current" && strCommand != "winners" && strCommand != "genkey" && strCommand != "connect" &&
-            strCommand != "outputs" && strCommand != "status" && strCommand != "calcscore"))
-        throw runtime_error(
-            "masternode \"command\"...\n"
-            "\nSet of commands to execute masternode related actions\n"
-            "This command is depreciated, please see individual command documentation for future reference\n\n"
-
-            "\nArguments:\n"
-            "1. \"command\"        (string or set of std::strings, required) The command to execute\n"
-
-            "\nAvailable commands:\n"
-            "  count        - Print count information of all known masternodes\n"
-            "  current      - Print info on current masternode winner\n"
-            "  debug        - Print masternode status\n"
-            "  genkey       - Generate new masternodeprivkey\n"
-            "  outputs      - Print masternode compatible outputs\n"
-            "  start        - Start masternode configured in wispr.conf\n"
-            "  start-alias  - Start single masternode by assigned alias configured in masternode.conf\n"
-            "  start-<mode> - Start masternodes configured in masternode.conf (<mode>: 'all', 'missing', 'disabled')\n"
-            "  status       - Print masternode status information\n"
-            "  list         - Print list of all known masternodes (see masternodelist for more info)\n"
-            "  list-conf    - Print masternode.conf in JSON format\n"
-            "  winners      - Print list of masternode winners\n");
-
-    if (strCommand == "list") {
-            JSONRPCRequest newRequest = request;
-            newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-                   newRequest.params.push_back(request.params[i]);
-
-        }
-        return listmasternodes(newRequest);
-    }
-
-    if (strCommand == "connect") {
-            JSONRPCRequest newRequest = request;
-            newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-                   newRequest.params.push_back(request.params[i]);
-
-        }
-        return masternodeconnect(newRequest);
-    }
-
-    if (strCommand == "count") {
-            JSONRPCRequest newRequest = request;
-            newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-                   newRequest.params.push_back(request.params[i]);
-
-        }
-        return getmasternodecount(newRequest);
-    }
-
-    if (strCommand == "current") {
-            JSONRPCRequest newRequest = request;
-            newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-                   newRequest.params.push_back(request.params[i]);
-
-        }
-        return masternodecurrent(newRequest);
-    }
-
-    if (strCommand == "debug") {
-            JSONRPCRequest newRequest = request;
-         newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-                   newRequest.params.push_back(request.params[i]);
-
-        }
-        return masternodedebug(newRequest);
-    }
-
-    if (strCommand == "start" || strCommand == "start-alias" || strCommand == "start-many" || strCommand == "start-all" || strCommand == "start-missing" || strCommand == "start-disabled") {
-        return startmasternode(request);
-    }
-
-    if (strCommand == "genkey") {
-            JSONRPCRequest newRequest = request;
-            newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-                   newRequest.params.push_back(request.params[i]);
-
-        }
-        return createmasternodekey(newRequest);
-    }
-
-    if (strCommand == "list-conf") {
-            JSONRPCRequest newRequest = request;
-            newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-                   newRequest.params.push_back(request.params[i]);
-
-        }
-        return listmasternodeconf(newRequest);
-    }
-
-    if (strCommand == "outputs") {
-            JSONRPCRequest newRequest = request;
-            newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-                   newRequest.params.push_back(request.params[i]);
-
-        }
-        return getmasternodeoutputs(newRequest);
-    }
-
-    if (strCommand == "status") {
-            JSONRPCRequest newRequest = request;
-            newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-                   newRequest.params.push_back(request.params[i]);
-
-        }
-        return getmasternodestatus(newRequest);
-    }
-
-    if (strCommand == "winners") {
-            JSONRPCRequest newRequest = request;
-            newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-                   newRequest.params.push_back(request.params[i]);
-
-        }
-        return getmasternodewinners(newRequest);
-    }
-
-    if (strCommand == "calcscore") {
-            JSONRPCRequest newRequest = request;
-            newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-                   newRequest.params.push_back(request.params[i]);
-
-        }
-        return getmasternodescores(newRequest);
-    }
-
-    return NullUniValue;
 }
 
 UniValue listmasternodes(const JSONRPCRequest& request)
@@ -469,7 +307,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
 
     bool fLock = (request.params[1].get_str() == "true" ? true : false);
 
-    EnsureWalletIsUnlocked();
+    EnsureWalletIsUnlocked(pwalletMain);
 
     if (strCommand == "local") {
         if (!fMasterNode) throw runtime_error("you must set masternode=1 in the configuration\n");
@@ -919,7 +757,7 @@ UniValue createmasternodebroadcast(const JSONRPCRequest& request)
         throw runtime_error(
             "createmasternodebroadcast \"command\" ( \"alias\")\n"
             "\nCreates a masternode broadcast message for one or all masternodes configured in masternode.conf\n" +
-            HelpRequiringPassphrase() + "\n"
+            HelpRequiringPassphrase(pwalletMain) + "\n"
 
             "\nArguments:\n"
             "1. \"command\"      (string, required) \"alias\" for single masternode, \"all\" for all masternodes\n"
@@ -950,7 +788,7 @@ UniValue createmasternodebroadcast(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("createmasternodebroadcast", "alias mymn1") + HelpExampleRpc("createmasternodebroadcast", "alias mymn1"));
 
-    EnsureWalletIsUnlocked();
+    EnsureWalletIsUnlocked(pwalletMain);
 
     if (strCommand == "alias")
     {
@@ -1129,3 +967,196 @@ UniValue relaymasternodebroadcast(const JSONRPCRequest& request)
     return strprintf("Masternode broadcast sent (service %s, vin %s)", mnb.addr.ToString(), mnb.vin.ToString());
 }
 
+// This command is retained for backwards compatibility, but is depreciated.
+// Future removal of this command is planned to keep things clean.
+UniValue masternode(const JSONRPCRequest& request)
+{
+    std::string strCommand;
+    if (request.params.size() >= 1)
+        strCommand = request.params[0].get_str();
+
+    if (request.fHelp ||
+        (strCommand != "start" && strCommand != "start-alias" && strCommand != "start-many" && strCommand != "start-all" && strCommand != "start-missing" &&
+         strCommand != "start-disabled" && strCommand != "list" && strCommand != "list-conf" && strCommand != "count" && strCommand != "enforce" &&
+         strCommand != "debug" && strCommand != "current" && strCommand != "winners" && strCommand != "genkey" && strCommand != "connect" &&
+         strCommand != "outputs" && strCommand != "status" && strCommand != "calcscore"))
+        throw runtime_error(
+            "masternode \"command\"...\n"
+            "\nSet of commands to execute masternode related actions\n"
+            "This command is depreciated, please see individual command documentation for future reference\n\n"
+
+            "\nArguments:\n"
+            "1. \"command\"        (string or set of std::strings, required) The command to execute\n"
+
+            "\nAvailable commands:\n"
+            "  count        - Print count information of all known masternodes\n"
+            "  current      - Print info on current masternode winner\n"
+            "  debug        - Print masternode status\n"
+            "  genkey       - Generate new masternodeprivkey\n"
+            "  outputs      - Print masternode compatible outputs\n"
+            "  start        - Start masternode configured in wispr.conf\n"
+            "  start-alias  - Start single masternode by assigned alias configured in masternode.conf\n"
+            "  start-<mode> - Start masternodes configured in masternode.conf (<mode>: 'all', 'missing', 'disabled')\n"
+            "  status       - Print masternode status information\n"
+            "  list         - Print list of all known masternodes (see masternodelist for more info)\n"
+            "  list-conf    - Print masternode.conf in JSON format\n"
+            "  winners      - Print list of masternode winners\n");
+
+    if (strCommand == "list") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+
+        }
+        return listmasternodes(newRequest);
+    }
+
+    if (strCommand == "connect") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+
+        }
+        return masternodeconnect(newRequest);
+    }
+
+    if (strCommand == "count") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+
+        }
+        return getmasternodecount(newRequest);
+    }
+
+    if (strCommand == "current") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+
+        }
+        return masternodecurrent(newRequest);
+    }
+
+    if (strCommand == "debug") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+
+        }
+        return masternodedebug(newRequest);
+    }
+
+    if (strCommand == "start" || strCommand == "start-alias" || strCommand == "start-many" || strCommand == "start-all" || strCommand == "start-missing" || strCommand == "start-disabled") {
+        return startmasternode(request);
+    }
+
+    if (strCommand == "genkey") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+
+        }
+        return createmasternodekey(newRequest);
+    }
+
+    if (strCommand == "list-conf") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+
+        }
+        return listmasternodeconf(newRequest);
+    }
+
+    if (strCommand == "outputs") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+
+        }
+        return getmasternodeoutputs(newRequest);
+    }
+
+    if (strCommand == "status") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+
+        }
+        return getmasternodestatus(newRequest);
+    }
+
+    if (strCommand == "winners") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+
+        }
+        return getmasternodewinners(newRequest);
+    }
+
+    if (strCommand == "calcscore") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+
+        }
+        return getmasternodescores(newRequest);
+    }
+
+    return NullUniValue;
+}
+
+// clang-format off
+static const CRPCCommand commands[] =
+    { //  category              name                      actor (function)         argNames
+        //  --------------------- ------------------------  -----------------------  ----------
+        /* WISPR features */
+        {"wispr", "masternode", &masternode,{}},
+        {"wispr", "listmasternodes", &listmasternodes,{}},
+        {"wispr", "getmasternodecount", &getmasternodecount,{}},
+        {"wispr", "masternodeconnect", &masternodeconnect,{}},
+        {"wispr", "createmasternodebroadcast", &createmasternodebroadcast,{}},
+        {"wispr", "decodemasternodebroadcast", &decodemasternodebroadcast,{}},
+        {"wispr", "relaymasternodebroadcast", &relaymasternodebroadcast,{}},
+        {"wispr", "masternodecurrent", &masternodecurrent,{}},
+        {"wispr", "masternodedebug", &masternodedebug,{}},
+        {"wispr", "startmasternode", &startmasternode,{}},
+        {"wispr", "createmasternodekey", &createmasternodekey,{}},
+        {"wispr", "getmasternodeoutputs", &getmasternodeoutputs,{}},
+        {"wispr", "listmasternodeconf", &listmasternodeconf,{}},
+        {"wispr", "getmasternodestatus", &getmasternodestatus,{}},
+        {"wispr", "getmasternodewinners", &getmasternodewinners,{}},
+        {"wispr", "getmasternodescores", &getmasternodescores,{}},
+        {"wispr", "getpoolinfo", &getpoolinfo,{}},
+    };
+// clang-format on
+
+void RegisterMasternodeRPCCommands(CRPCTable &t)
+{
+    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
+        t.appendCommand(commands[vcidx].name, &commands[vcidx]);
+}

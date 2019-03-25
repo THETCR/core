@@ -1,24 +1,16 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "rpc/protocol.h"
+#include <rpc/protocol.h>
 
-#include "random.h"
-#include "tinyformat.h"
+#include <random.h>
+#include <tinyformat.h>
 #include <util/system.h>
-#include "util/strencodings.h"
-#include "util/time.h"
-#include "version.h"
-#include <fs.h>
-
-#include <stdint.h>
-#include <fstream>
-
-using namespace std;
+#include <util/strencodings.h>
+#include <util/time.h>
+#include <version.h>
 
 /**
  * JSON-RPC protocol.  Bitcoin speaks version 1.0 for maximum compatibility,
@@ -134,7 +126,7 @@ void DeleteAuthCookie()
     try {
         fs::remove(GetAuthCookieFile());
     } catch (const fs::filesystem_error& e) {
-        LogPrintf("%s: Unable to remove random auth cookie file: %s\n", __func__, e.what());
+        LogPrintf("%s: Unable to remove random auth cookie file: %s\n", __func__, fsbridge::get_filesystem_error_message(e));
     }
 }
 

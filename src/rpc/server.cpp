@@ -1,5 +1,5 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2009-2019 The Bitcoin Core developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2018 The PIVX developers
 // Distributed under the MIT software license, see the accompanying
@@ -7,7 +7,6 @@
 
 #include <rpc/server.h>
 
-#include "base58.h"
 #include <fs.h>
 #include <key_io.h>
 #include <random.h>
@@ -37,6 +36,7 @@ static std::string rpcWarmupStatus GUARDED_BY(cs_rpcWarmup) = "RPC server starte
 static RPCTimerInterface* timerInterface = nullptr;
 /* Map of name to timer. */
 static std::map<std::string, std::unique_ptr<RPCTimerBase> > deadlineTimers;
+static bool ExecuteCommand(const CRPCCommand& command, const JSONRPCRequest& request, UniValue& result, bool last_handler);
 
 struct RPCCommandExecutionInfo
 {
@@ -71,8 +71,6 @@ static struct CRPCSignals
 {
     boost::signals2::signal<void ()> Started;
     boost::signals2::signal<void ()> Stopped;
-//    boost::signals2::signal<void (const CRPCCommand&)> PreCommand;
-//    boost::signals2::signal<void (const CRPCCommand&)> PostCommand;
 } g_rpcSignals;
 
 void RPCServer::OnStarted(std::function<void ()> slot)
@@ -120,9 +118,9 @@ void RPCTypeCheckArgument(const UniValue& value, const UniValueType& typeExpecte
 }
 
 void RPCTypeCheckObj(const UniValue& o,
-                     const std::map<std::string, UniValueType>& typesExpected,
-                     bool fAllowNull,
-                     bool fStrict)
+    const std::map<std::string, UniValueType>& typesExpected,
+    bool fAllowNull,
+    bool fStrict)
 {
     for (const auto& t : typesExpected) {
         const UniValue& v = find_value(o, t.first);
@@ -131,7 +129,7 @@ void RPCTypeCheckObj(const UniValue& o,
 
         if (!(t.second.typeAny || v.type() == t.second.type || (fAllowNull && v.isNull()))) {
             std::string err = strprintf("Expected type %s for %s, got %s",
-                                        uvTypeName(t.second.type), t.first, uvTypeName(v.type()));
+                uvTypeName(t.second.type), t.first, uvTypeName(v.type()));
             throw JSONRPCError(RPC_TYPE_ERROR, err);
         }
     }
@@ -215,11 +213,11 @@ std::string CRPCTable::help(const std::string& strCommand, const JSONRPCRequest&
 {
     std::string strRet;
     std::string category;
-    std::set<rpcfn_type> setDone;
+    std::set<intptr_t> setDone;
     std::vector<std::pair<std::string, const CRPCCommand*> > vCommands;
 
     for (const auto& entry : mapCommands)
-        vCommands.push_back(make_pair(entry.second->category + entry.first, entry.second));
+        vCommands.push_back(make_pair(entry.second.front()->category + entry.first, entry.second.front()));
     sort(vCommands.begin(), vCommands.end());
 
     JSONRPCRequest jreq(helpreq);
@@ -235,9 +233,9 @@ std::string CRPCTable::help(const std::string& strCommand, const JSONRPCRequest&
         jreq.strMethod = strMethod;
         try
         {
-            rpcfn_type pfn = pcmd->actor;
-            if (setDone.insert(pfn).second)
-                (*pfn)(jreq);
+            UniValue unused_result;
+            if (setDone.insert(pcmd->unique_id).second)
+                pcmd->actor(jreq, unused_result, true /* last_handler */);
         }
         catch (const std::exception& e)
         {
@@ -269,16 +267,16 @@ UniValue help(const JSONRPCRequest& jsonRequest)
 {
     if (jsonRequest.fHelp || jsonRequest.params.size() > 1)
         throw std::runtime_error(
-                RPCHelpMan{"help",
-                           "\nList all commands, or get help for a specified command.\n",
-                           {
-                                   {"command", RPCArg::Type::STR, /* default */ "all commands", "The command to get help on"},
-                           },
-                           RPCResult{
-                                   "\"text\"     (string) The help text\n"
-                           },
-                           RPCExamples{""},
-                }.ToString()
+            RPCHelpMan{"help",
+                "\nList all commands, or get help for a specified command.\n",
+                {
+                    {"command", RPCArg::Type::STR, /* default */ "all commands", "The command to get help on"},
+                },
+                RPCResult{
+            "\"text\"     (string) The help text\n"
+                },
+                RPCExamples{""},
+            }.ToString()
         );
 
     std::string strCommand;
@@ -297,12 +295,12 @@ UniValue stop(const JSONRPCRequest& jsonRequest)
     // to the client (intended for testing)
     if (jsonRequest.fHelp || jsonRequest.params.size() > 1)
         throw std::runtime_error(
-                RPCHelpMan{"stop",
-                           "\nStop Wispr server.",
-                           {},
-                           RPCResults{},
-                           RPCExamples{""},
-                }.ToString());
+            RPCHelpMan{"stop",
+                "\nStop Wispr server.",
+                {},
+                RPCResults{},
+                RPCExamples{""},
+            }.ToString());
     // Event loop will exit after current HTTP requests have been handled, so
     // this reply will get back to the client.
     StartShutdown();
@@ -316,17 +314,17 @@ static UniValue uptime(const JSONRPCRequest& jsonRequest)
 {
     if (jsonRequest.fHelp || jsonRequest.params.size() > 0)
         throw std::runtime_error(
-                RPCHelpMan{"uptime",
-                           "\nReturns the total uptime of the server.\n",
-                           {},
-                           RPCResult{
-                                   "ttt        (numeric) The number of seconds that the server has been running\n"
-                           },
-                           RPCExamples{
-                                   HelpExampleCli("uptime", "")
-                                   + HelpExampleRpc("uptime", "")
-                           },
-                }.ToString());
+            RPCHelpMan{"uptime",
+                "\nReturns the total uptime of the server.\n",
+                            {},
+                            RPCResult{
+                        "ttt        (numeric) The number of seconds that the server has been running\n"
+                            },
+                RPCExamples{
+                    HelpExampleCli("uptime", "")
+                + HelpExampleRpc("uptime", "")
+                },
+            }.ToString());
 
     return GetTime() - GetStartupTime();
 }
@@ -335,12 +333,12 @@ static UniValue getrpcinfo(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 0) {
         throw std::runtime_error(
-                RPCHelpMan{"getrpcinfo",
-                           "\nReturns details of the RPC server.\n",
-                           {},
-                           RPCResults{},
-                           RPCExamples{""},
-                }.ToString()
+            RPCHelpMan{"getrpcinfo",
+                "\nReturns details of the RPC server.\n",
+                {},
+                RPCResults{},
+                RPCExamples{""},
+            }.ToString()
         );
     }
 
@@ -361,191 +359,16 @@ static UniValue getrpcinfo(const JSONRPCRequest& request)
 
 // clang-format off
 static const CRPCCommand vRPCCommands[] =
-    {
-        //  category              name                      actor (function)         argNames
-        //  --------------------- ------------------------  -----------------------  ----------
-        /* Overall control/query calls */
-        {"control", "getinfo", &getinfo, {} }, /* uses wallet if enabled */
-        { "control",            "getrpcinfo",             &getrpcinfo,             {}  },
-        {"control", "help", &help, {"command"} },
-        {"control", "stop", &stop, {"wait"} },
+{ //  category              name                      actor (function)         argNames
+  //  --------------------- ------------------------  -----------------------  ----------
+    /* Overall control/query calls */
+    { "control",            "getrpcinfo",             &getrpcinfo,             {}  },
+    { "control",            "help",                   &help,                   {"command"}  },
+    { "control",            "stop",                   &stop,                   {"wait"}  },
     { "control",            "uptime",                 &uptime,                 {}  },
 
-        /* P2P networking */
-    { "network",            "getconnectioncount",     &getconnectioncount,     {} },
-    { "network",            "ping",                   &ping,                   {} },
-    { "network",            "getpeerinfo",            &getpeerinfo,            {} },
-    { "network",            "addnode",                &addnode,                {"node","command"} },
-    { "network",            "disconnectnode",         &disconnectnode,         {"address"} },
-    { "network",            "getaddednodeinfo",       &getaddednodeinfo,       {"node"} },
-    { "network",            "getnettotals",           &getnettotals,           {} },
-    { "network",            "getnetworkinfo",         &getnetworkinfo,         {} },
-    { "network",            "setban",                 &setban,                 {"subnet", "command", "bantime", "absolute"} },
-    { "network",            "listbanned",             &listbanned,             {} },
-    { "network",            "clearbanned",            &clearbanned,            {} },
-        /* Block chain and UTXO */
-        {"blockchain", "findserial", &findserial, {}},
-        {"blockchain", "getaccumulatorvalues", &getaccumulatorvalues, {}},
-        {"blockchain", "getaccumulatorwitness", &getaccumulatorwitness, {}},
-        {"blockchain", "getmintsinblocks", &getmintsinblocks, {}},
-    { "blockchain",         "getblockchaininfo",      &getblockchaininfo,      {} },
-    { "blockchain",         "getbestblockhash",       &getbestblockhash,       {} },
-    { "blockchain",         "getblockcount",          &getblockcount,          {} },
-    { "blockchain",         "getblock",               &getblock,               {"blockhash","verbosity|verbose"} },
-    { "blockchain",         "getblockhash",           &getblockhash,           {"height"} },
-    { "blockchain",         "getblockheader",         &getblockheader,         {"blockhash","verbose"} },
-    { "blockchain",         "getchaintips",           &getchaintips,           {"count","branchlen"} },
-    { "blockchain",         "getdifficulty",          &getdifficulty,          {} },
-    { "blockchain",         "getmempoolinfo",         &getmempoolinfo,         {} },
-    { "blockchain",         "getrawmempool",          &getrawmempool,          {"verbose"} },
-    { "blockchain",         "gettxout",               &gettxout,               {"txid","n","include_mempool"} },
-    { "blockchain",         "gettxoutsetinfo",        &gettxoutsetinfo,        {} },
-    { "blockchain",         "verifychain",            &verifychain,            {"checklevel","nblocks"} },
-
-    /* Not shown in help */
-    { "hidden",             "invalidateblock",        &invalidateblock,        {"blockhash"} },
-    { "hidden",             "reconsiderblock",        &reconsiderblock,        {"blockhash"} },
-
-        /* Mining */
-    { "mining",             "getnetworkhashps",       &getnetworkhashps,       {"nblocks","height"} },
-    { "mining",             "getmininginfo",          &getmininginfo,          {} },
-    { "mining",             "prioritisetransaction",  &prioritisetransaction,  {"txid","priority_delta","fee_delta"} },
-    { "mining",             "getblocktemplate",       &getblocktemplate,       {"template_request"} },
-    { "mining",             "submitblock",            &submitblock,            {"hexdata","parameters"} },
-
-        {"mining", "reservebalance", &reservebalance,{}},
-
-#ifdef ENABLE_WALLET
-        /* Coin generation */
-        {"generating", "getgenerate", &getgenerate, {}},
-        {"generating", "gethashespersec", &gethashespersec, {}},
-        {"generating", "setgenerate", &setgenerate,{}},
-#endif
-
-        /* Raw transactions */
-    { "rawtransactions",    "getrawtransaction",      &getrawtransaction,      {"txid","verbose"} },
-    { "rawtransactions",    "createrawtransaction",   &createrawtransaction,   {"inputs","outputs","locktime"} },
-    { "rawtransactions",    "decoderawtransaction",   &decoderawtransaction,   {"hexstring"} },
-    { "rawtransactions",    "decodescript",           &decodescript,           {"hexstring"} },
-    { "rawtransactions",    "sendrawtransaction",     &sendrawtransaction,     {"hexstring","allowhighfees","instantsend","bypasslimits"} },
-    { "rawtransactions",    "signrawtransaction",     &signrawtransaction,     {"hexstring","prevtxs","privkeys","sighashtype"} }, /* uses wallet if enabled */
-
-
-        /* Utility functions */
-        {"util", "createmultisig", &createmultisig,{}},
-        {"util", "validateaddress", &validateaddress, {}}, /* uses wallet if enabled */
-        {"util", "verifymessage", &verifymessage, {}},
-    { "util",               "estimatefee",            &estimatefee,            {"nblocks"} },
-    { "util",               "estimatepriority",       &estimatepriority,       {"nblocks"} },
-
-        /* Not shown in help */
-        {"hidden", "setmocktime", &setmocktime, {}},
-
-        /* WISPR features */
-        {"wispr", "masternode", &masternode,{}},
-        {"wispr", "listmasternodes", &listmasternodes,{}},
-        {"wispr", "getmasternodecount", &getmasternodecount,{}},
-        {"wispr", "masternodeconnect", &masternodeconnect,{}},
-        {"wispr", "createmasternodebroadcast", &createmasternodebroadcast,{}},
-        {"wispr", "decodemasternodebroadcast", &decodemasternodebroadcast,{}},
-        {"wispr", "relaymasternodebroadcast", &relaymasternodebroadcast,{}},
-        {"wispr", "masternodecurrent", &masternodecurrent,{}},
-        {"wispr", "masternodedebug", &masternodedebug,{}},
-        {"wispr", "startmasternode", &startmasternode,{}},
-        {"wispr", "createmasternodekey", &createmasternodekey,{}},
-        {"wispr", "getmasternodeoutputs", &getmasternodeoutputs,{}},
-        {"wispr", "listmasternodeconf", &listmasternodeconf,{}},
-        {"wispr", "getmasternodestatus", &getmasternodestatus,{}},
-        {"wispr", "getmasternodewinners", &getmasternodewinners,{}},
-        {"wispr", "getmasternodescores", &getmasternodescores,{}},
-        {"wispr", "mnbudget", &mnbudget,{}},
-        {"wispr", "preparebudget", &preparebudget,{}},
-        {"wispr", "submitbudget", &submitbudget,{}},
-        {"wispr", "mnbudgetvote", &mnbudgetvote,{}},
-        {"wispr", "getbudgetvotes", &getbudgetvotes,{}},
-        {"wispr", "getnextsuperblock", &getnextsuperblock,{}},
-        {"wispr", "getbudgetprojection", &getbudgetprojection,{}},
-        {"wispr", "getbudgetinfo", &getbudgetinfo,{}},
-        {"wispr", "mnbudgetrawvote", &mnbudgetrawvote,{}},
-        {"wispr", "mnfinalbudget", &mnfinalbudget,{}},
-        {"wispr", "checkbudgets", &checkbudgets,{}},
-        {"wispr", "mnsync", &mnsync,{}},
-        {"wispr", "spork", &spork,{}},
-        {"wispr", "getpoolinfo", &getpoolinfo,{}},
-
-#ifdef ENABLE_WALLET
-        /* Wallet */
-        {"wallet", "addmultisigaddress", &addmultisigaddress, {}},
-        {"wallet", "autocombinerewards", &autocombinerewards, {}},
-        {"wallet", "backupwallet", &backupwallet, {}},
-        {"wallet", "enableautomintaddress", &enableautomintaddress, {}},
-        {"wallet", "createautomintaddress", &createautomintaddress, {}},
-        {"wallet", "dumpprivkey", &dumpprivkey, {}},
-        {"wallet", "dumpwallet", &dumpwallet, {}},
-        {"wallet", "bip38encrypt", &bip38encrypt, {}},
-        {"wallet", "bip38decrypt", &bip38decrypt, {}},
-        {"wallet", "encryptwallet", &encryptwallet, {}},
-        {"wallet", "getaccountaddress", &getaccountaddress, {}},
-        {"wallet", "getaccount", &getaccount, {}},
-        {"wallet", "getaddressesbyaccount", &getaddressesbyaccount, {}},
-        {"wallet", "getbalance", &getbalance, {}},
-        {"wallet", "getnewaddress", &getnewaddress, {}},
-        {"wallet", "getrawchangeaddress", &getrawchangeaddress, {}},
-        {"wallet", "getreceivedbyaccount", &getreceivedbyaccount, {}},
-        {"wallet", "getreceivedbyaddress", &getreceivedbyaddress, {}},
-        {"wallet", "getstakingstatus", &getstakingstatus, {}},
-        {"wallet", "getstakesplitthreshold", &getstakesplitthreshold, {}},
-        {"wallet", "gettransaction", &gettransaction, {}},
-        {"wallet", "getunconfirmedbalance", &getunconfirmedbalance, {}},
-        {"wallet", "getwalletinfo", &getwalletinfo, {}},
-        {"wallet", "importprivkey", &importprivkey, {}},
-        {"wallet", "importwallet", &importwallet, {}},
-        {"wallet", "importaddress", &importaddress, {}},
-        {"wallet", "keypoolrefill", &keypoolrefill, {}},
-        {"wallet", "listaccounts", &listaccounts, {}},
-        {"wallet", "listaddressgroupings", &listaddressgroupings, {}},
-        {"wallet", "listlockunspent", &listlockunspent, {}},
-        {"wallet", "listreceivedbyaccount", &listreceivedbyaccount, {}},
-        {"wallet", "listreceivedbyaddress", &listreceivedbyaddress, {}},
-        {"wallet", "listsinceblock", &listsinceblock, {}},
-        {"wallet", "listtransactions", &listtransactions, {}},
-        { "wallet",             "listunspent",                      &listunspent,                   {"minconf","maxconf","addresses","watchonlyconfig"} },
-        {"wallet", "lockunspent", &lockunspent, {}},
-        {"wallet", "move", &movecmd, {}},
-        {"wallet", "multisend", &multisend, {}},
-        {"wallet", "sendfrom", &sendfrom, {}},
-        {"wallet", "sendmany", &sendmany, {}},
-        {"wallet", "sendtoaddress", &sendtoaddress, {}},
-        {"wallet", "sendtoaddressix", &sendtoaddressix, {}},
-        {"wallet", "setaccount", &setaccount, {}},
-        {"wallet", "setstakesplitthreshold", &setstakesplitthreshold, {}},
-        {"wallet", "settxfee", &settxfee, {}},
-        {"wallet", "signmessage", &signmessage, {}},
-        {"wallet", "walletlock", &walletlock, {}},
-        {"wallet", "walletpassphrasechange", &walletpassphrasechange, {}},
-        {"wallet", "walletpassphrase", &walletpassphrase, {}},
-
-        {"zerocoin", "getzerocoinbalance", &getzerocoinbalance, {}},
-        {"zerocoin", "listmintedzerocoins", &listmintedzerocoins, {}},
-        {"zerocoin", "listspentzerocoins", &listspentzerocoins, {}},
-        {"zerocoin", "listzerocoinamounts", &listzerocoinamounts, {}},
-        {"zerocoin", "mintzerocoin", &mintzerocoin, {}},
-        {"zerocoin", "spendzerocoin", &spendzerocoin, {}},
-        {"zerocoin", "spendzerocoinmints", &spendzerocoinmints, {}},
-        {"zerocoin", "resetmintzerocoin", &resetmintzerocoin, {}},
-        {"zerocoin", "resetspentzerocoin", &resetspentzerocoin, {}},
-        {"zerocoin", "getarchivedzerocoin", &getarchivedzerocoin, {}},
-        {"zerocoin", "importzerocoins", &importzerocoins, {}},
-        {"zerocoin", "exportzerocoins", &exportzerocoins, {}},
-        {"zerocoin", "reconsiderzerocoins", &reconsiderzerocoins, {}},
-        {"zerocoin", "getspentzerocoinamount", &getspentzerocoinamount, {}},
-        {"zerocoin", "getzwspseed", &getzwspseed, {}},
-        {"zerocoin", "setzwspseed", &setzwspseed, {}},
-        {"zerocoin", "generatemintlist", &generatemintlist, {}},
-        {"zerocoin", "searchdzwsp", &searchdzwsp, {}},
-        {"zerocoin", "dzwspstate", &dzwspstate, {}}
-
-#endif // ENABLE_WALLET
+    //!WISPR
+    { "control",            "getinfo",                &getinfo,                {} }, /* uses wallet if enabled */
 };
 // clang-format on
 
@@ -557,16 +380,8 @@ CRPCTable::CRPCTable()
         const CRPCCommand *pcmd;
 
         pcmd = &vRPCCommands[vcidx];
-        mapCommands[pcmd->name] = pcmd;
+        mapCommands[pcmd->name].push_back(pcmd);
     }
-}
-
-const CRPCCommand *CRPCTable::operator[](const std::string &name) const
-{
-    std::map<std::string, const CRPCCommand*>::const_iterator it = mapCommands.find(name);
-    if (it == mapCommands.end())
-        return nullptr;
-    return (*it).second;
 }
 
 bool CRPCTable::appendCommand(const std::string& name, const CRPCCommand* pcmd)
@@ -574,13 +389,21 @@ bool CRPCTable::appendCommand(const std::string& name, const CRPCCommand* pcmd)
     if (IsRPCRunning())
         return false;
 
-    // don't allow overwriting for now
-    std::map<std::string, const CRPCCommand*>::const_iterator it = mapCommands.find(name);
-    if (it != mapCommands.end())
-        return false;
-
-    mapCommands[name] = pcmd;
+    mapCommands[name].push_back(pcmd);
     return true;
+}
+
+bool CRPCTable::removeCommand(const std::string& name, const CRPCCommand* pcmd)
+{
+    auto it = mapCommands.find(name);
+    if (it != mapCommands.end()) {
+        auto new_end = std::remove(it->second.begin(), it->second.end(), pcmd);
+        if (it->second.end() != new_end) {
+            it->second.erase(new_end, it->second.end());
+            return true;
+        }
+    }
+    return false;
 }
 
 void StartRPC()
@@ -650,7 +473,7 @@ void JSONRPCRequest::parse(const UniValue& valRequest)
     strMethod = valMethod.get_str();
     if (fLogIPs)
         LogPrint(BCLog::RPC, "ThreadRPCServer method=%s user=%s peeraddr=%s\n", SanitizeString(strMethod),
-                 this->authUser, this->peerAddr);
+            this->authUser, this->peerAddr);
     else
         LogPrint(BCLog::RPC, "ThreadRPCServer method=%s user=%s\n", SanitizeString(strMethod), this->authUser);
 
@@ -763,18 +586,28 @@ UniValue CRPCTable::execute(const JSONRPCRequest &request) const
     }
 
     // Find method
-    const CRPCCommand *pcmd = tableRPC[request.strMethod];
-    if (!pcmd)
-        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found");
+    auto it = mapCommands.find(request.strMethod);
+    if (it != mapCommands.end()) {
+        UniValue result;
+        for (const auto& command : it->second) {
+            if (ExecuteCommand(*command, request, result, &command == &it->second.back())) {
+                return result;
+            }
+        }
+    }
+    throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found");
+}
 
+static bool ExecuteCommand(const CRPCCommand& command, const JSONRPCRequest& request, UniValue& result, bool last_handler)
+{
     try
     {
         RPCCommandExecution execution(request.strMethod);
         // Execute, convert arguments to array if necessary
         if (request.params.isObject()) {
-            return pcmd->actor(transformNamedArguments(request, pcmd->argNames));
+            return command.actor(transformNamedArguments(request, command.argNames), result, last_handler);
         } else {
-            return pcmd->actor(request);
+            return command.actor(request, result, last_handler);
         }
     }
     catch (const std::exception& e)

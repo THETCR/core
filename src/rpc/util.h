@@ -5,6 +5,7 @@
 #ifndef BITCOIN_RPC_UTIL_H
 #define BITCOIN_RPC_UTIL_H
 
+#include <node/transaction.h>
 #include <pubkey.h>
 #include <rpc/protocol.h>
 #include <script/standard.h>
@@ -23,7 +24,7 @@ struct InitInterfaces;
 //! Pointers to interfaces that need to be accessible from RPC methods. Due to
 //! limitations of the RPC framework, there's currently no direct way to pass in
 //! state to RPC method implementations.
-//extern InitInterfaces* g_rpc_interfaces;
+extern InitInterfaces* g_rpc_interfaces;
 
 CPubKey HexToPubKey(const std::string& hex_in);
 CPubKey AddrToPubKey(CKeyStore* const keystore, const std::string& addr_in);
@@ -32,8 +33,13 @@ CScript CreateMultisigRedeemscript(const int required, const std::vector<CPubKey
 UniValue DescribeAddress(const CTxDestination& dest);
 
 //! Parse a confirm target option and raise an RPC error if it is invalid.
-//unsigned int ParseConfirmTarget(const UniValue& value);
+unsigned int ParseConfirmTarget(const UniValue& value, unsigned int max_target);
 
+RPCErrorCode RPCErrorFromTransactionError(TransactionError terr);
+UniValue JSONRPCTransactionError(TransactionError terr, const std::string& err_string = "");
+
+//! Parse a JSON range specified as int64, or [int64, int64]
+std::pair<int64_t, int64_t> ParseRange(const UniValue& value);
 
 struct RPCArg {
     enum class Type {
@@ -45,6 +51,7 @@ struct RPCArg {
         OBJ_USER_KEYS, //!< Special type where the user must set the keys e.g. to define multiple addresses; as opposed to e.g. an options object where the keys are predefined
         AMOUNT,        //!< Special type representing a floating point amount (can be either NUM or STR)
         STR_HEX,       //!< Special type that is a STR with only hex chars
+        RANGE,         //!< Special type that is a NUM or [NUM,NUM]
     };
 
     enum class Optional {

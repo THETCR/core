@@ -4,13 +4,11 @@
 
 #include <key_io.h>
 #include <keystore.h>
-#include <policy/fees.h>
 #include <rpc/util.h>
 #include <tinyformat.h>
 #include <util/strencodings.h>
-#include <validation.h>
 
-//InitInterfaces* g_rpc_interfaces = nullptr;
+InitInterfaces* g_rpc_interfaces = nullptr;
 
 // Converts a hex string to a public key if possible
 CPubKey HexToPubKey(const std::string& hex_in)
@@ -130,15 +128,42 @@ UniValue DescribeAddress(const CTxDestination& dest)
     return boost::apply_visitor(DescribeAddressVisitor(), dest);
 }
 
-//unsigned int ParseConfirmTarget(const UniValue& value)
-//{
-//    int target = value.get_int();
-//    unsigned int max_target = ::feeEstimator.HighestTargetTracked(FeeEstimateHorizon::LONG_HALFLIFE);
-//    if (target < 1 || (unsigned int)target > max_target) {
-//        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid conf_target, must be between %u - %u", 1, max_target));
-//    }
-//    return (unsigned int)target;
-//}
+unsigned int ParseConfirmTarget(const UniValue& value, unsigned int max_target)
+{
+    int target = value.get_int();
+    if (target < 1 || (unsigned int)target > max_target) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid conf_target, must be between %u - %u", 1, max_target));
+    }
+    return (unsigned int)target;
+}
+
+RPCErrorCode RPCErrorFromTransactionError(TransactionError terr)
+{
+    switch (terr) {
+        case TransactionError::MEMPOOL_REJECTED:
+            return RPC_TRANSACTION_REJECTED;
+        case TransactionError::ALREADY_IN_CHAIN:
+            return RPC_TRANSACTION_ALREADY_IN_CHAIN;
+        case TransactionError::P2P_DISABLED:
+            return RPC_CLIENT_P2P_DISABLED;
+        case TransactionError::INVALID_PSBT:
+        case TransactionError::PSBT_MISMATCH:
+            return RPC_INVALID_PARAMETER;
+        case TransactionError::SIGHASH_MISMATCH:
+            return RPC_DESERIALIZATION_ERROR;
+        default: break;
+    }
+    return RPC_TRANSACTION_ERROR;
+}
+
+UniValue JSONRPCTransactionError(TransactionError terr, const std::string& err_string)
+{
+    if (err_string.length() > 0) {
+        return JSONRPCError(RPCErrorFromTransactionError(terr), err_string);
+    } else {
+        return JSONRPCError(RPCErrorFromTransactionError(terr), TransactionErrorString(terr));
+    }
+}
 
 struct Section {
     Section(const std::string& left, const std::string& right)
@@ -172,6 +197,7 @@ struct Sections {
         case RPCArg::Type::STR:
         case RPCArg::Type::NUM:
         case RPCArg::Type::AMOUNT:
+        case RPCArg::Type::RANGE:
         case RPCArg::Type::BOOL: {
             if (outer_type == OuterType::NAMED_ARG) return; // Nothing more to do for non-recursive types on first recursion
             auto left = indent;
@@ -377,6 +403,10 @@ std::string RPCArg::ToDescriptionString() const
             ret += "numeric or string";
             break;
         }
+        case Type::RANGE: {
+            ret += "numeric or array";
+            break;
+        }
         case Type::BOOL: {
             ret += "boolean";
             break;
@@ -436,6 +466,8 @@ std::string RPCArg::ToStringObj(const bool oneline) const
         return res + "\"hex\"";
     case Type::NUM:
         return res + "n";
+    case Type::RANGE:
+        return res + "n or [n,n]";
     case Type::AMOUNT:
         return res + "amount";
     case Type::BOOL:
@@ -466,6 +498,7 @@ std::string RPCArg::ToString(const bool oneline) const
         return "\"" + m_name + "\"";
     }
     case Type::NUM:
+    case Type::RANGE:
     case Type::AMOUNT:
     case Type::BOOL: {
         return m_name;
@@ -494,4 +527,18 @@ std::string RPCArg::ToString(const bool oneline) const
         // no default case, so the compiler can warn about missing cases
     }
     assert(false);
+}
+
+std::pair<int64_t, int64_t> ParseRange(const UniValue& value)
+{
+    if (value.isNum()) {
+        return {0, value.get_int64()};
+    }
+    if (value.isArray() && value.size() == 2 && value[0].isNum() && value[1].isNum()) {
+        int64_t low = value[0].get_int64();
+        int64_t high = value[1].get_int64();
+        if (low > high) throw JSONRPCError(RPC_INVALID_PARAMETER, "Range specified as [begin,end] must not have begin after end");
+        return {low, high};
+    }
+    throw JSONRPCError(RPC_INVALID_PARAMETER, "Range must be specified as end or as [begin,end]");
 }

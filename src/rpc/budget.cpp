@@ -14,6 +14,7 @@
 #include "rpc/server.h"
 #include <util/moneystr.h>
 #include <wallet/wallet.h>
+#include <wallet/rpcwallet.h>
 
 #include <univalue.h>
 
@@ -49,116 +50,6 @@ void budgetToJSON(CBudgetProposal* pbudgetProposal, UniValue& bObj)
     bObj.pushKV("fValid", pbudgetProposal->fValid);
 }
 
-// This command is retained for backwards compatibility, but is depreciated.
-// Future removal of this command is planned to keep things clean.
-UniValue mnbudget(const JSONRPCRequest& request)
-{
-    std::string strCommand;
-    if (request.params.size() >= 1)
-        strCommand = request.params[0].get_str();
-
-    if (request.fHelp ||
-        (strCommand != "vote-alias" && strCommand != "vote-many" && strCommand != "prepare" && strCommand != "submit" && strCommand != "vote" && strCommand != "getvotes" && strCommand != "getinfo" && strCommand != "show" && strCommand != "projection" && strCommand != "check" && strCommand != "nextblock"))
-        throw runtime_error(
-            "mnbudget \"command\"... ( \"passphrase\" )\n"
-            "\nVote or show current budgets\n"
-            "This command is depreciated, please see individual command documentation for future reference\n\n"
-
-            "\nAvailable commands:\n"
-            "  prepare            - Prepare proposal for network by signing and creating tx\n"
-            "  submit             - Submit proposal for network\n"
-            "  vote-many          - Vote on a WISPR initiative\n"
-            "  vote-alias         - Vote on a WISPR initiative\n"
-            "  vote               - Vote on a WISPR initiative/budget\n"
-            "  getvotes           - Show current masternode budgets\n"
-            "  getinfo            - Show current masternode budgets\n"
-            "  show               - Show all budgets\n"
-            "  projection         - Show the projection of which proposals will be paid the next cycle\n"
-            "  check              - Scan proposals and remove invalid\n"
-            "  nextblock          - Get next superblock for budget system\n");
-
-    if (strCommand == "nextblock") {
-        JSONRPCRequest newRequest = request;
-        newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-            newRequest.params.push_back(request.params[i]);
-        }
-        return getnextsuperblock(newRequest);
-    }
-
-    if (strCommand == "prepare") {
-        JSONRPCRequest newRequest = request;
-        newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-            newRequest.params.push_back(request.params[i]);
-        }
-        return preparebudget(newRequest);
-    }
-
-    if (strCommand == "submit") {
-        JSONRPCRequest newRequest = request;
-        newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-            newRequest.params.push_back(request.params[i]);
-        }
-        return submitbudget(newRequest);
-    }
-
-    if (strCommand == "vote" || strCommand == "vote-many" || strCommand == "vote-alias") {
-        if (strCommand == "vote-alias")
-            throw runtime_error(
-                "vote-alias is not supported with this command\n"
-                "Please use mnbudgetvote instead.\n"
-            );
-        return mnbudgetvote(request);
-    }
-
-    if (strCommand == "projection") {
-        JSONRPCRequest newRequest = request;
-        newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-            newRequest.params.push_back(request.params[i]);
-        }
-        return getbudgetprojection(newRequest);
-    }
-
-    if (strCommand == "show" || strCommand == "getinfo") {
-        JSONRPCRequest newRequest = request;
-        newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-            newRequest.params.push_back(request.params[i]);
-        }
-        return getbudgetinfo(newRequest);
-    }
-
-    if (strCommand == "getvotes") {
-        JSONRPCRequest newRequest = request;
-        newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-            newRequest.params.push_back(request.params[i]);
-        }
-        return getbudgetvotes(newRequest);
-    }
-
-    if (strCommand == "check") {
-        JSONRPCRequest newRequest = request;
-        newRequest.params.setArray();
-        // forward params but skip command
-        for (unsigned int i = 1; i < request.params.size(); i++) {
-            newRequest.params.push_back(request.params[i]);
-        }
-        return checkbudgets(newRequest);
-    }
-
-    return NullUniValue;
-}
-
 UniValue preparebudget(const JSONRPCRequest& request)
 {
     int nBlockMin = 0;
@@ -186,7 +77,7 @@ UniValue preparebudget(const JSONRPCRequest& request)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    EnsureWalletIsUnlocked();
+    EnsureWalletIsUnlocked(pwalletMain);
 
     std::string strProposalName = SanitizeString(request.params[0].get_str());
     if (strProposalName.size() > 20)
@@ -1059,4 +950,138 @@ UniValue checkbudgets(const JSONRPCRequest& request)
     budget.CheckAndRemove();
 
     return NullUniValue;
+}
+
+// This command is retained for backwards compatibility, but is depreciated.
+// Future removal of this command is planned to keep things clean.
+UniValue mnbudget(const JSONRPCRequest& request)
+{
+    std::string strCommand;
+    if (request.params.size() >= 1)
+        strCommand = request.params[0].get_str();
+
+    if (request.fHelp ||
+        (strCommand != "vote-alias" && strCommand != "vote-many" && strCommand != "prepare" && strCommand != "submit" && strCommand != "vote" && strCommand != "getvotes" && strCommand != "getinfo" && strCommand != "show" && strCommand != "projection" && strCommand != "check" && strCommand != "nextblock"))
+        throw runtime_error(
+            "mnbudget \"command\"... ( \"passphrase\" )\n"
+            "\nVote or show current budgets\n"
+            "This command is depreciated, please see individual command documentation for future reference\n\n"
+
+            "\nAvailable commands:\n"
+            "  prepare            - Prepare proposal for network by signing and creating tx\n"
+            "  submit             - Submit proposal for network\n"
+            "  vote-many          - Vote on a WISPR initiative\n"
+            "  vote-alias         - Vote on a WISPR initiative\n"
+            "  vote               - Vote on a WISPR initiative/budget\n"
+            "  getvotes           - Show current masternode budgets\n"
+            "  getinfo            - Show current masternode budgets\n"
+            "  show               - Show all budgets\n"
+            "  projection         - Show the projection of which proposals will be paid the next cycle\n"
+            "  check              - Scan proposals and remove invalid\n"
+            "  nextblock          - Get next superblock for budget system\n");
+
+    if (strCommand == "nextblock") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+        }
+        return getnextsuperblock(newRequest);
+    }
+
+    if (strCommand == "prepare") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+        }
+        return preparebudget(newRequest);
+    }
+
+    if (strCommand == "submit") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+        }
+        return submitbudget(newRequest);
+    }
+
+    if (strCommand == "vote" || strCommand == "vote-many" || strCommand == "vote-alias") {
+        if (strCommand == "vote-alias")
+            throw runtime_error(
+                "vote-alias is not supported with this command\n"
+                "Please use mnbudgetvote instead.\n"
+            );
+        return mnbudgetvote(request);
+    }
+
+    if (strCommand == "projection") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+        }
+        return getbudgetprojection(newRequest);
+    }
+
+    if (strCommand == "show" || strCommand == "getinfo") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+        }
+        return getbudgetinfo(newRequest);
+    }
+
+    if (strCommand == "getvotes") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+        }
+        return getbudgetvotes(newRequest);
+    }
+
+    if (strCommand == "check") {
+        JSONRPCRequest newRequest = request;
+        newRequest.params.setArray();
+        // forward params but skip command
+        for (unsigned int i = 1; i < request.params.size(); i++) {
+            newRequest.params.push_back(request.params[i]);
+        }
+        return checkbudgets(newRequest);
+    }
+
+    return NullUniValue;
+}
+
+// clang-format off
+static const CRPCCommand commands[] =
+    { //  category              name                      actor (function)         argNames
+        //  --------------------- ------------------------  -----------------------  ----------
+        {"wispr", "mnbudget", &mnbudget,{}},
+        {"wispr", "preparebudget", &preparebudget,{}},
+        {"wispr", "submitbudget", &submitbudget,{}},
+        {"wispr", "mnbudgetvote", &mnbudgetvote,{}},
+        {"wispr", "getbudgetvotes", &getbudgetvotes,{}},
+        {"wispr", "getnextsuperblock", &getnextsuperblock,{}},
+        {"wispr", "getbudgetprojection", &getbudgetprojection,{}},
+        {"wispr", "getbudgetinfo", &getbudgetinfo,{}},
+        {"wispr", "mnbudgetrawvote", &mnbudgetrawvote,{}},
+        {"wispr", "mnfinalbudget", &mnfinalbudget,{}},
+        {"wispr", "checkbudgets", &checkbudgets,{}},
+    };
+// clang-format on
+
+void RegisterBudgetRPCCommands(CRPCTable &t)
+{
+    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
+        t.appendCommand(commands[vcidx].name, &commands[vcidx]);
 }
