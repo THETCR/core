@@ -232,11 +232,11 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, const std::string
 
                 LogPrint(BCLog::OBFUSCATION, "dsi -- tx in %s\n", i.ToString());
 
-                CTransaction tx2;
+                CTransactionRef tx2;
                 uint256 hash;
-                if (GetTransaction(i.prevout.hash, tx2, hash, true)) {
-                    if (tx2.vout.size() > i.prevout.n) {
-                        nValueIn += tx2.vout[i.prevout.n].nValue;
+                if (GetTransaction(i.prevout.hash, tx2, Params().GetConsensus(), hash)) {
+                    if (tx2->vout.size() > i.prevout.n) {
+                        nValueIn += tx2->vout[i.prevout.n].nValue;
                     }
                 } else {
                     missingTx = true;
@@ -562,7 +562,7 @@ void CObfuscationPool::Check(CConnman* connman)
             finalTransaction = txNew;
 
             // request signatures from clients
-            RelayFinalTransaction(sessionID, finalTransaction, connman);
+            RelayFinalTransaction(sessionID, CTransaction(finalTransaction), connman);
         }
     }
 
@@ -587,7 +587,7 @@ void CObfuscationPool::CheckFinalTransaction(CConnman* connman)
 {
     if (!fMasterNode) return; // check and relay final tx only on masternode
 
-    CWalletTx txNew = CWalletTx(pwalletMain, finalTransaction);
+    CWalletTx txNew = CWalletTx(pwalletMain, CTransaction(finalTransaction));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
     {
@@ -975,11 +975,11 @@ bool CObfuscationPool::IsCollateralValid(const CTransaction& txCollateral)
     }
 
     for (const CTxIn i: txCollateral.vin) {
-        CTransaction tx2;
+        CTransactionRef tx2;
         uint256 hash;
-        if (GetTransaction(i.prevout.hash, tx2, hash, true)) {
-            if (tx2.vout.size() > i.prevout.n) {
-                nValueIn += tx2.vout[i.prevout.n].nValue;
+        if (GetTransaction(i.prevout.hash, tx2, Params().GetConsensus(), hash)) {
+            if (tx2->vout.size() > i.prevout.n) {
+                nValueIn += tx2->vout[i.prevout.n].nValue;
             }
         } else {
             missingTx = true;
@@ -1151,7 +1151,7 @@ void CObfuscationPool::SendObfuscationDenominate(std::vector<CTxIn>& vin, std::v
         return;
     }
 
-    if (!CheckDiskSpace()) {
+    if (!CheckDiskSpace(GetDataDir())) {
         UnlockCoins();
         SetNull();
         fEnableZeromint = false;
@@ -1203,10 +1203,10 @@ void CObfuscationPool::SendObfuscationDenominate(std::vector<CTxIn>& vin, std::v
 
     // store our entry for later use
     CObfuScationEntry e;
-    e.Add(vin, amount, txCollateral, vout);
+    e.Add(vin, amount, CTransaction(txCollateral), vout);
     entries.push_back(e);
 
-    RelayIn(entries[0].sev, entries[0].amount, txCollateral, entries[0].vout, connman);
+    RelayIn(entries[0].sev, entries[0].amount, CTransaction(txCollateral), entries[0].vout, connman);
     Check(connman);
 }
 
@@ -1267,7 +1267,7 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
 {
     if (fMasterNode) return false;
 
-    finalTransaction = finalTransactionNew;
+    finalTransaction = CMutableTransaction(finalTransactionNew);
     LogPrintf("CObfuscationPool::SignFinalTransaction %s", finalTransaction.ToString());
 
     std::vector<CTxIn> sigs;
@@ -1519,7 +1519,7 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
                 return false;
             }
         } else {
-            if (!IsCollateralValid(txCollateral)) {
+            if (!IsCollateralValid(CTransaction(txCollateral))) {
                 LogPrintf("%s -- invalid collateral, recreating...\n", __func__);
                 if (!pwalletMain->CreateCollateralTransaction(txCollateral, strReason)) {
                     LogPrintf("%s -- create collateral error: %s\n", __func__, strReason);
@@ -2116,10 +2116,10 @@ bool CObfuScationSigner::IsVinAssociatedWithPubkey(CTxIn& vin, CPubKey& pubkey)
     CScript payee2;
     payee2 = GetScriptForDestination(pubkey.GetID());
 
-    CTransaction txVin;
+    CTransactionRef txVin;
     uint256 hash;
-    if (GetTransaction(vin.prevout.hash, txVin, hash, true)) {
-        for (CTxOut out: txVin.vout) {
+    if (GetTransaction(vin.prevout.hash, txVin, Params().GetConsensus(), hash)) {
+        for (CTxOut out: txVin->vout) {
             if (out.nValue == 125000 * COIN) {
                 if (out.scriptPubKey == payee2) return true;
             }
