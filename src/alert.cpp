@@ -203,11 +203,13 @@ bool CAlert::ProcessAlert(bool fThread)
             const CAlert& alert = (*mi).second;
             if (Cancels(alert)) {
                 LogPrint(BCLog::ALERT, "cancelling alert %d\n", alert.nID);
-                uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
+//                uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
+                uiInterface.NotifyAlertChanged();
                 mapAlerts.erase(mi++);
             } else if (!alert.IsInEffect()) {
                 LogPrint(BCLog::ALERT, "expiring alert %d\n", alert.nID);
-                uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
+                uiInterface.NotifyAlertChanged();
+//                uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
                 mapAlerts.erase(mi++);
             } else
                 mi++;
@@ -226,7 +228,8 @@ bool CAlert::ProcessAlert(bool fThread)
         mapAlerts.insert(std::make_pair(GetHash(), *this));
         // Notify UI and -alertnotify if it applies to me
         if (AppliesToMe()) {
-            uiInterface.NotifyAlertChanged(GetHash(), CT_NEW);
+            uiInterface.NotifyAlertChanged();
+//            uiInterface.NotifyAlertChanged(GetHash(), CT_NEW);
             Notify(strStatusBar, fThread);
         }
     }
