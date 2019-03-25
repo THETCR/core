@@ -171,7 +171,7 @@ void ReprocessBlocks(int nBlocks)
     }
 
     if (state.IsValid()) {
-        ActivateBestChain(state, Params().GetConsensus());
+        ActivateBestChain(state, Params());
     }
 }
 
