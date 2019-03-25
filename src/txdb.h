@@ -25,6 +25,7 @@ class CBlockIndex;
 class CCoinsViewDBCursor;
 class uint256;
 class CBigNum;
+struct CDiskTxPos;
 
 //! No need to periodic flush if at least this much space still available.
 static constexpr int MAX_BLOCK_COINSDB_USAGE = 10;
@@ -101,8 +102,8 @@ public:
     bool WriteLastBlockFile(int nFile);
     bool WriteReindexing(bool fReindexing);
     void ReadReindexing(bool &fReindexing);
-//    bool ReadTxIndex(const uint256& txid, CDiskTxPos& pos);
-//    bool WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& list);
+    bool ReadTxIndex(const uint256& txid, CDiskTxPos& pos);
+    bool WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& list);
     bool WriteFlag(const std::string& name, bool fValue);
     bool ReadFlag(const std::string& name, bool& fValue);
     bool WriteInt(const std::string& name, int nValue);
