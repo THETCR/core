@@ -29,47 +29,34 @@ static const char DB_TXINDEX = 't';
 static const char DB_BLOCK_INDEX = 'b';
 
 static const char DB_BEST_BLOCK = 'B';
+static const char DB_HEAD_BLOCKS = 'H';
 static const char DB_FLAG = 'F';
 static const char DB_REINDEX_FLAG = 'R';
 static const char DB_LAST_BLOCK = 'l';
-static const char DB_HEAD_BLOCKS = 'H';
 
 namespace {
 
 struct CoinEntry {
-  COutPoint* outpoint;
-  char key;
-  explicit CoinEntry(const COutPoint* ptr) : outpoint(const_cast<COutPoint*>(ptr)), key(DB_COIN)  {}
+    COutPoint* outpoint;
+    char key;
+    explicit CoinEntry(const COutPoint* ptr) : outpoint(const_cast<COutPoint*>(ptr)), key(DB_COIN)  {}
 
-  template<typename Stream>
-  void Serialize(Stream &s) const {
-      s << key;
-      s << outpoint->hash;
-      s << VARINT(outpoint->n);
-  }
+    template<typename Stream>
+    void Serialize(Stream &s) const {
+        s << key;
+        s << outpoint->hash;
+        s << VARINT(outpoint->n);
+    }
 
-  template<typename Stream>
-  void Unserialize(Stream& s) {
-      s >> key;
-      s >> outpoint->hash;
-      s >> VARINT(outpoint->n);
-  }
+    template<typename Stream>
+    void Unserialize(Stream& s) {
+        s >> key;
+        s >> outpoint->hash;
+        s >> VARINT(outpoint->n);
+    }
 };
 
 }
-
-//void static BatchWriteCoins(CLevelDBBatch& batch, const uint256& hash, const CCoins& coins)
-//{
-//    if (coins.IsPruned())
-//        batch.Erase(std::make_pair('c', hash));
-//    else
-//        batch.Write(std::make_pair('c', hash), coins);
-//}
-
-//void static BatchWriteHashBestChain(CLevelDBBatch& batch, const uint256& hash)
-//{
-//    batch.Write('B', hash);
-//}
 
 CCoinsViewDB::CCoinsViewDB(size_t nCacheSize, bool fMemory, bool fWipe) : db(GetDataDir() / "chainstate", nCacheSize, fMemory, fWipe, true)
 {
@@ -200,15 +187,22 @@ void CBlockTreeDB::ReadReindexing(bool &fReindexing) {
 bool CBlockTreeDB::ReadLastBlockFile(int &nFile) {
     return Read(DB_LAST_BLOCK, nFile);
 }
+
 CCoinsViewCursor *CCoinsViewDB::Cursor() const
 {
-    CCoinsViewDBCursor *i = new CCoinsViewDBCursor(const_cast<CLevelDBWrapper*>(&db)->NewIterator(), GetBestBlock());
+    CCoinsViewDBCursor *i = new CCoinsViewDBCursor(const_cast<CLevelDBWrapper&>(db).NewIterator(), GetBestBlock());
     /* It seems that there are no "const iterators" for LevelDB.  Since we
        only need read operations on it, use a const-cast to get around
        that restriction.  */
-    i->pcursor->Seek(DB_COINS);
+    i->pcursor->Seek(DB_COIN);
     // Cache key of first record
-    i->pcursor->GetKey(i->keyTmp);
+    if (i->pcursor->Valid()) {
+        CoinEntry entry(&i->keyTmp.second);
+        i->pcursor->GetKey(entry);
+        i->keyTmp.first = entry.key;
+    } else {
+        i->keyTmp.first = 0; // Make sure Valid() and GetKey() return false
+    }
     return i;
 }
 
@@ -234,17 +228,17 @@ unsigned int CCoinsViewDBCursor::GetValueSize() const
 
 bool CCoinsViewDBCursor::Valid() const
 {
-    return keyTmp.first == DB_COINS;
+    return keyTmp.first == DB_COIN;
 }
 
 void CCoinsViewDBCursor::Next()
 {
     pcursor->Next();
-    if (pcursor->Valid()) {
-        bool ok = pcursor->GetKey(keyTmp);
-        assert(ok); // If GetKey fails here something must be wrong with underlying database, we cannot handle that here
-    } else {
+    CoinEntry entry(&keyTmp.second);
+    if (!pcursor->Valid() || !pcursor->GetKey(entry)) {
         keyTmp.first = 0; // Invalidate cached key after last record so that Valid() and GetKey() return false
+    } else {
+        keyTmp.first = entry.key;
     }
 }
 
@@ -260,19 +254,19 @@ bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockF
     return WriteBatch(batch, true);
 }
 
-bool CBlockTreeDB::ReadTxIndex(const uint256& txid, CDiskTxPos& pos)
-{
-    return Read(std::make_pair('t', txid), pos);
-}
-
-bool CBlockTreeDB::WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& vect)
-{
-    CLevelDBBatch batch(*this);
-    for (auto it = vect.begin(); it != vect.end(); it++){
-        batch.Write(std::make_pair('t', it->first), it->second);
-    }
-    return WriteBatch(batch);
-}
+//bool CBlockTreeDB::ReadTxIndex(const uint256& txid, CDiskTxPos& pos)
+//{
+//    return Read(std::make_pair('t', txid), pos);
+//}
+//
+//bool CBlockTreeDB::WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& vect)
+//{
+//    CLevelDBBatch batch(*this);
+//    for (auto it = vect.begin(); it != vect.end(); it++){
+//        batch.Write(std::make_pair('t', it->first), it->second);
+//    }
+//    return WriteBatch(batch);
+//}
 
 bool CBlockTreeDB::WriteFlag(const std::string &name, bool fValue) {
     return Write(std::make_pair(DB_FLAG, name), fValue ? '1' : '0');
@@ -342,7 +336,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 pindexNew->hashProofOfStake = diskindex.hashProofOfStake;
 
                 if (pindexNew->IsProofOfWork()) {
-                    if (!CheckProofOfWork(pindexNew->GetBlockHeader().GetPoWHash(), pindexNew->nBits))
+                    if (!CheckProofOfWork(pindexNew->GetBlockHeader().GetPoWHash(), pindexNew->nBits, Params().GetConsensus()))
                         return error("LoadBlockIndex() : CheckProofOfWork failed: %s", pindexNew->ToString());
                 }
 
@@ -500,57 +494,57 @@ bool CZerocoinDB::EraseAccumulatorValue(const uint32_t& nChecksum)
 namespace {
 
 //! Legacy class to deserialize pre-pertxout database entries without reindex.
-    class CCoins
-    {
-    public:
-        //! whether transaction is a coinbase
-        bool fCoinBase;
-        bool fCoinStake;
+class CCoins
+{
+public:
+    //! whether transaction is a coinbase
+    bool fCoinBase;
+    bool fCoinStake;
 
-        //! unspent transaction outputs; spent outputs are .IsNull(); spent outputs at the end of the array are dropped
-        std::vector<CTxOut> vout;
+    //! unspent transaction outputs; spent outputs are .IsNull(); spent outputs at the end of the array are dropped
+    std::vector<CTxOut> vout;
 
-        //! at which height this transaction was included in the active block chain
-        int nHeight;
+    //! at which height this transaction was included in the active block chain
+    int nHeight;
 
-        //! empty constructor
-        CCoins() : fCoinBase(false), fCoinStake(false), vout(0), nHeight(0) { }
+    //! empty constructor
+    CCoins() : fCoinBase(false), fCoinStake(false), vout(0), nHeight(0) { }
 
-        template<typename Stream>
-        void Unserialize(Stream &s) {
-            unsigned int nCode = 0;
-            // version
-            unsigned int nVersionDummy;
-            ::Unserialize(s, VARINT(nVersionDummy));
-            // header code
-            ::Unserialize(s, VARINT(nCode));
-            fCoinBase = nCode & 1;
-            fCoinStake = (nCode & 2) != 0; //0010 coinstake
-            std::vector<bool> vAvail(2, false);
-            vAvail[0] = (nCode & 4) != 0; // 0100
-            vAvail[1] = (nCode & 8) != 0; // 1000
-            unsigned int nMaskCode = (nCode / 16) + ((nCode & 12) != 0 ? 0 : 1);
-            // spentness bitmask
-            while (nMaskCode > 0) {
-                unsigned char chAvail = 0;
-                ::Unserialize(s, chAvail);
-                for (unsigned int p = 0; p < 8; p++) {
-                    bool f = (chAvail & (1 << p)) != 0;
-                    vAvail.push_back(f);
-                }
-                if (chAvail != 0)
-                    nMaskCode--;
+    template<typename Stream>
+    void Unserialize(Stream &s) {
+    unsigned int nCode = 0;
+    // version
+    unsigned int nVersionDummy;
+    ::Unserialize(s, VARINT(nVersionDummy));
+    // header code
+    ::Unserialize(s, VARINT(nCode));
+    fCoinBase = nCode & 1;
+    fCoinStake = (nCode & 2) != 0; //0010 coinstake
+    std::vector<bool> vAvail(2, false);
+    vAvail[0] = (nCode & 4) != 0; // 0100
+    vAvail[1] = (nCode & 8) != 0; // 1000
+    unsigned int nMaskCode = (nCode / 16) + ((nCode & 12) != 0 ? 0 : 1);
+    // spentness bitmask
+    while (nMaskCode > 0) {
+            unsigned char chAvail = 0;
+            ::Unserialize(s, chAvail);
+            for (unsigned int p = 0; p < 8; p++) {
+                bool f = (chAvail & (1 << p)) != 0;
+                vAvail.push_back(f);
             }
-            // txouts themself
-            vout.assign(vAvail.size(), CTxOut());
-            for (unsigned int i = 0; i < vAvail.size(); i++) {
-                if (vAvail[i])
-                    ::Unserialize(s, CTxOutCompressor(vout[i]));
-            }
-            // coinbase height
-            ::Unserialize(s, VARINT(nHeight, VarIntMode::NONNEGATIVE_SIGNED));
+            if (chAvail != 0)
+                nMaskCode--;
         }
-    };
+        // txouts themself
+        vout.assign(vAvail.size(), CTxOut());
+        for (unsigned int i = 0; i < vAvail.size(); i++) {
+            if (vAvail[i])
+                ::Unserialize(s, CTxOutCompressor(vout[i]));
+        }
+        // coinbase height
+        ::Unserialize(s, VARINT(nHeight, VarIntMode::NONNEGATIVE_SIGNED));
+    }
+};
 
 }
 
@@ -568,7 +562,7 @@ bool CCoinsViewDB::Upgrade() {
     int64_t count = 0;
     LogPrintf("Upgrading utxo-set database...\n");
     LogPrintf("[0%%]..."); /* Continued */
-    uiInterface.ShowProgress(_("Upgrading UTXO database"), 0);
+    uiInterface.ShowProgress(_("Upgrading UTXO database"), 0, true);
     size_t batch_size = 1 << 24;
     CLevelDBBatch batch(db);
     int reportDone = 0;
@@ -583,7 +577,7 @@ bool CCoinsViewDB::Upgrade() {
             if (count++ % 256 == 0) {
                 uint32_t high = 0x100 * *key.second.begin() + *(key.second.begin() + 1);
                 int percentageDone = (int)(high * 100.0 / 65536.0 + 0.5);
-                uiInterface.ShowProgress(_("Upgrading UTXO database"), percentageDone);
+                uiInterface.ShowProgress(_("Upgrading UTXO database"), percentageDone, true);
                 if (reportDone < percentageDone/10) {
                     // report max. every 10% step
                     LogPrintf("[%d%%]...", percentageDone); /* Continued */
@@ -617,8 +611,7 @@ bool CCoinsViewDB::Upgrade() {
     }
     db.WriteBatch(batch);
     db.CompactRange({DB_COINS, uint256()}, key);
-    uiInterface.ShowProgress("", 100);
+    uiInterface.ShowProgress("", 100, false);
     LogPrintf("[%s].\n", ShutdownRequested() ? "CANCELLED" : "DONE");
     return !ShutdownRequested();
 }
-

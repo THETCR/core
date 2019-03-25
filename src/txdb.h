@@ -7,9 +7,9 @@
 #ifndef BITCOIN_TXDB_H
 #define BITCOIN_TXDB_H
 
-#include "coins.h"
+#include <coins.h>
 #include "leveldbwrapper.h"
-#include "chain.h"
+#include <chain.h>
 #include "libzerocoin/Coin.h"
 #include "libzerocoin/CoinSpend.h"
 #include "primitives/zerocoin.h"
@@ -22,7 +22,7 @@
 #include <vector>
 
 class CBlockIndex;
-class CDiskTxPos;
+class CCoinsViewDBCursor;
 class uint256;
 class CBigNum;
 
@@ -32,9 +32,9 @@ static constexpr int MAX_BLOCK_COINSDB_USAGE = 10;
 static const int64_t nDefaultDbCache = 450;
 //! -dbbatchsize default (bytes)
 static const int64_t nDefaultDbBatchSize = 16 << 20;
-//! max. -dbcache in (MiB)
-static const int64_t nMaxDbCache = sizeof(void*) > 4 ? 4096 : 1024;
-//! min. -dbcache in (MiB)
+//! max. -dbcache (MiB)
+static const int64_t nMaxDbCache = sizeof(void*) > 4 ? 16384 : 1024;
+//! min. -dbcache (MiB)
 static const int64_t nMinDbCache = 4;
 //! Max memory allocated to block tree DB specific cache, if no -txindex (MiB)
 static const int64_t nMaxBlockDBCache = 2;
@@ -44,8 +44,6 @@ static const int64_t nMaxBlockDBCache = 2;
 static const int64_t nMaxTxIndexCache = 1024;
 //! Max memory allocated to coin DB specific cache (MiB)
 static const int64_t nMaxCoinsDBCache = 8;
-
-class CCoinsViewDBCursor;
 
 /** CCoinsView backed by the coin database (chainstate/) */
 class CCoinsViewDB final : public CCoinsView
@@ -103,8 +101,8 @@ public:
     bool WriteLastBlockFile(int nFile);
     bool WriteReindexing(bool fReindexing);
     void ReadReindexing(bool &fReindexing);
-    bool ReadTxIndex(const uint256& txid, CDiskTxPos& pos);
-    bool WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& list);
+//    bool ReadTxIndex(const uint256& txid, CDiskTxPos& pos);
+//    bool WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& list);
     bool WriteFlag(const std::string& name, bool fValue);
     bool ReadFlag(const std::string& name, bool& fValue);
     bool WriteInt(const std::string& name, int nValue);
