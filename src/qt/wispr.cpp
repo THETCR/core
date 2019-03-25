@@ -417,7 +417,7 @@ void BitcoinApplication::startThread()
     if (coreThread)
         return;
     coreThread = new QThread(this);
-    BitcoinCore* executor = new BitcoinCore();
+    BitcoinCore* executor = new BitcoinCore(m_node);
     executor->moveToThread(coreThread);
 
     /*  communication to and from thread */
@@ -611,7 +611,7 @@ int main(int argc, char* argv[])
     // Now that QSettings are accessible, initialize translations
     QTranslator qtTranslatorBase, qtTranslator, translatorBase, translator;
     initTranslations(qtTranslatorBase, qtTranslator, translatorBase, translator);
-    uiInterface.Translate_connect(G_TRANSLATION_FUN);
+//    uiInterface.Translate_connect(G_TRANSLATION_FUN);
 
     // Show help message immediately after parsing command-line options (for "-lang") and setting locale,
     // but before showing splash screen.
