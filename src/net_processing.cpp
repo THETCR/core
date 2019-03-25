@@ -1166,7 +1166,7 @@ void static ProcessGetData(CNode* pfrom, const CChainParams& chainparams, CConnm
                     CTransactionRef ptx = mempool.get(inv.hash);
                     CTransaction tx;
                     if (ptx != nullptr) {
-                        tx = *ptx;
+                        tx(*ptx);
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << tx;
@@ -1805,7 +1805,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         } else if (strCommand == NetMsgType::DSTX){
             vRecv >> ptx >> vin >> vchSig >> sigTime;
         }
-        const CTransaction &tx = *ptx;
+        const CTransaction &tx(*ptx);
         if (strCommand == NetMsgType::DSTX){
             CMasternode *pmn = mnodeman.Find(vin);
             if (pmn != nullptr) {
@@ -2135,7 +2135,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             ptx = mempool.get(hash);
 //            bool fInMemPool = mempool.lookup(hash, tx);
             if (ptx == nullptr) continue; // another thread removed since queryHashes, maybe...
-            tx = *ptx;
+            tx(*ptx);
             if ((pfrom->pfilter && pfrom->pfilter->IsRelevantAndUpdate(tx)) ||
                 (!pfrom->pfilter))
                 vInv.push_back(inv);
@@ -2837,7 +2837,7 @@ void PeerLogicValidation::BlockConnected(const std::shared_ptr<const CBlock>& pb
     std::vector<uint256> vOrphanErase;
 
     for (const CTransactionRef& ptx : pblock->vtx) {
-        const CTransaction& tx = *ptx;
+        const CTransaction& tx(*ptx);
 
         // Which orphan pool entries must we evict?
         for (const auto& txin : tx.vin) {
