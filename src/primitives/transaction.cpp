@@ -273,3 +273,14 @@ std::string CTransaction::ToString() const
         str += "    " + tx_out.ToString() + "\n";
     return str;
 }
+
+// TODO Remove operator
+CTransaction &CTransaction::operator=(const CTransaction &tx) {
+    *const_cast<int32_t *>(&nVersion) = tx.nVersion;
+    *const_cast<unsigned int *>(&nTime) = tx.nTime;
+    *const_cast<std::vector <CTxIn> *>(&vin) = tx.vin;
+    *const_cast<std::vector <CTxOut> *>(&vout) = tx.vout;
+    *const_cast<uint32_t *>(&nLockTime) = tx.nLockTime;
+    *const_cast<uint256 *>(&hash) = tx.hash;
+    return *this;
+}

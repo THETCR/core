@@ -2135,7 +2135,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             ptx = mempool.get(hash);
 //            bool fInMemPool = mempool.lookup(hash, tx);
             if (ptx == nullptr) continue; // another thread removed since queryHashes, maybe...
-            tx(*ptx);
+            tx = CMutableTransaction(*ptx);
             if ((pfrom->pfilter && pfrom->pfilter->IsRelevantAndUpdate(tx)) ||
                 (!pfrom->pfilter))
                 vInv.push_back(inv);
