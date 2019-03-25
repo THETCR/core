@@ -150,7 +150,12 @@ enum class OptionsCategory {
   GUI,
   COMMANDS,
   REGISTER_COMMANDS,
+  GENWIT,
   MASTERNODES,
+  SPORK,
+  STAKING,
+  SWIFTTX,
+  ZEROCOIN,
 
   HIDDEN // Always the last option to avoid printing these in the help
 };
