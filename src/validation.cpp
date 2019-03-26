@@ -5289,7 +5289,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             if (Checkpoints::CheckBlock(pindexPrev->nHeight, block.hashPrevBlock, true)) {
                 LogPrintf("%s : Reconsidering block %s height %d\n", __func__, pindexPrev->GetBlockHash().GetHex(), pindexPrev->nHeight);
                 CValidationState statePrev;
-                ReconsiderBlock(statePrev, pindexPrev);
+                ResetBlockFailureFlags(pindexPrev);
                 if (statePrev.IsValid()) {
                     ::ActivateBestChain(statePrev, chainparams);
                     return true;

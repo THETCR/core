@@ -158,7 +158,7 @@ void ReprocessBlocks(int nBlocks)
                 LogPrintf("ReprocessBlocks - %s\n", (*it).first.ToString());
 
                 CValidationState state;
-                ReconsiderBlock(state, pindex);
+                ResetBlockFailureFlags(pindex);
             }
         }
         ++it;
