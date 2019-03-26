@@ -298,6 +298,7 @@ map<COutPoint, int> mapStakeSpent;
 map<unsigned int, unsigned int> mapHashedBlocks;
 bool fTxIndex = true;
 bool fAlerts = DEFAULT_ALERTS;
+bool fVerifyingBlocks = false;
 unsigned int nModifierInterval; // time to elapse before new modifier is computed
 unsigned int nStakeMinAge = 8 * 60 * 60;
 unsigned int nStakeMinAgeV2 = 60 * 60;
