@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(rpc_rawparams)
     BOOST_CHECK_THROW(CallRPC("decoderawtransaction DEADBEEF"), std::runtime_error);
     std::string rawtx = "0100000020fa905b01c300debee79c8061f8fa5e6b252435a26e3fe006dd13e19cf0a00757136c5c01010000004847304402200da2e47992271f1256d68f10df7113f3179b3eab11e8e38fa2d2b8bfb1a10bc0022052bce179d580f0150d67b686c891b2e6d863f1314404f27caba599dc14a92d0c01ffffffff020000000000000000000011c9d20c0000004341044815561eba60fd39e32b76f349ff8fcd9119f71d07e567eace3b125b0e6dd1e0e6508d29917b3329ae4aee4e0484984979a76692a33faa5644c1e4331e838115ac00000000";
     BOOST_CHECK_NO_THROW(r = CallRPC(std::string("decoderawtransaction ")+rawtx));
-    BOOST_CHECK_EQUAL(find_value(r.get_obj(), "size").get_int(), 193);
+    BOOST_CHECK_EQUAL(find_value(r.get_obj(), "size").get_int(), 212);
     BOOST_CHECK_EQUAL(find_value(r.get_obj(), "version").get_int(), 1);
     BOOST_CHECK_EQUAL(find_value(r.get_obj(), "locktime").get_int(), 0);
     BOOST_CHECK_THROW(CallRPC(std::string("decoderawtransaction ")+rawtx+" extra"), std::runtime_error);
@@ -140,10 +140,10 @@ BOOST_AUTO_TEST_CASE(rpc_rawsign)
     InitInterfaces interfaces;
     interfaces.chain = interfaces::MakeChain();
     g_rpc_interfaces = &interfaces;
-    r = CallRPC(string("signrawtransaction ")+notsigned+" "+prevout+" "+"[]");
+    r = CallRPC(std::string("signrawtransactionwithkey ")+notsigned+" [] "+prevout);
     BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == false);
-    r = CallRPC(string("signrawtransaction ")+notsigned+" "+prevout+" "+"["+privkey1+","+privkey2+"]");
-//    BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == true);
+    r = CallRPC(std::string("signrawtransactionwithkey ")+notsigned+" ["+privkey1+","+privkey2+"] "+prevout);
+    BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == true);
     g_rpc_interfaces = nullptr;
 }
 
