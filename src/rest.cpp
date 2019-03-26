@@ -4,18 +4,22 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "chain.h"
+#include <attributes.h>
+#include <chain.h>
+#include <chainparams.h>
 #include <core_io.h>
-#include "primitives/block.h"
-#include "primitives/transaction.h"
-#include <validation.h>
-#include "httpserver.h"
-#include "rpc/server.h"
-#include "streams.h"
-#include "sync.h"
-#include "txmempool.h"
+#include <httpserver.h>
+#include <index/txindex.h>
+#include <primitives/block.h>
+#include <primitives/transaction.h>
+#include <rpc/blockchain.h>
+#include <rpc/server.h>
+#include <streams.h>
+#include <sync.h>
+#include <txmempool.h>
 #include <util/strencodings.h>
-#include "version.h"
+#include <validation.h>
+#include <version.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/dynamic_bitset.hpp>
@@ -65,13 +69,6 @@ struct CCoin {
         READWRITE(out);
     }
 };
-
-extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry);
-extern UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool txDetails = false);
-extern UniValue mempoolInfoToJSON();
-extern UniValue mempoolToJSON(bool fVerbose = false);
-extern void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fIncludeHex);
-extern UniValue blockheaderToJSON(const CBlockIndex* blockindex);
 
 static bool RESTERR(HTTPRequest* req, enum HTTPStatusCode status, std::string message)
 {
@@ -129,7 +126,7 @@ static bool rest_headers(HTTPRequest* req,
     if (path.size() != 2)
         return RESTERR(req, HTTP_BAD_REQUEST, "No header count specified. Use /rest/headers/<count>/<hash>.<ext>.");
 
-    long count = strtol(path[0].c_str(), NULL, 10);
+    long count = strtol(path[0].c_str(), nullptr, 10);
     if (count < 1 || count > 2000)
         return RESTERR(req, HTTP_BAD_REQUEST, "Header count out of range: " + path[0]);
 
@@ -138,12 +135,13 @@ static bool rest_headers(HTTPRequest* req,
     if (!ParseHashStr(hashStr, hash))
         return RESTERR(req, HTTP_BAD_REQUEST, "Invalid hash: " + hashStr);
 
+    const CBlockIndex* tip = nullptr;
     std::vector<const CBlockIndex *> headers;
     headers.reserve(count);
     {
         LOCK(cs_main);
-        BlockMap::const_iterator it = mapBlockIndex.find(hash);
-        const CBlockIndex *pindex = (it != mapBlockIndex.end()) ? it->second : NULL;
+        tip = chainActive.Tip();
+        const CBlockIndex* pindex = LookupBlockIndex(hash);
         while (pindex != nullptr && chainActive.Contains(pindex)) {
             headers.push_back(pindex);
             if (headers.size() == (unsigned long)count)
@@ -173,8 +171,8 @@ static bool rest_headers(HTTPRequest* req,
     }
     case RF_JSON: {
         UniValue jsonHeaders(UniValue::VARR);
-        for(const CBlockIndex *pindex: headers) {
-            jsonHeaders.push_back(blockheaderToJSON(pindex));
+        for (const CBlockIndex *pindex : headers) {
+            jsonHeaders.push_back(blockheaderToJSON(tip, pindex));
         }
         std::string strJSON = jsonHeaders.write() + "\n";
         req->WriteHeader("Content-Type", "application/json");
@@ -206,10 +204,14 @@ static bool rest_block(HTTPRequest* req,
 
     CBlock block;
     CBlockIndex* pblockindex = nullptr;
+    CBlockIndex* tip = nullptr;
     {
         LOCK(cs_main);
-        if (mapBlockIndex.count(hash) == 0)
+        tip = chainActive.Tip();
+        pblockindex = LookupBlockIndex(hash);
+        if (!pblockindex) {
             return RESTERR(req, HTTP_NOT_FOUND, hashStr + " not found");
+        }
 
         pblockindex = mapBlockIndex[hash];
         if (!(pblockindex->nStatus & BLOCK_HAVE_DATA) && pblockindex->nTx > 0)
@@ -238,7 +240,7 @@ static bool rest_block(HTTPRequest* req,
     }
 
     case RF_JSON: {
-        UniValue objBlock = blockToJSON(block, pblockindex, showTxDetails);
+        UniValue objBlock = blockToJSON(block, tip, pblockindex, showTxDetails);
         std::string strJSON = objBlock.write() + "\n";
         req->WriteHeader("Content-Type", "application/json");
         req->WriteReply(HTTP_OK, strJSON);
@@ -263,6 +265,9 @@ static bool rest_block_notxdetails(HTTPRequest* req, const std::string& strURIPa
 {
     return rest_block(req, strURIPart, false);
 }
+
+// A bit of a hack - dependency on a function defined in rpc/blockchain.cpp
+UniValue getblockchaininfo(const JSONRPCRequest& request);
 
 static bool rest_chaininfo(HTTPRequest* req, const std::string& strURIPart)
 {
@@ -299,7 +304,7 @@ static bool rest_mempool_info(HTTPRequest* req, const std::string& strURIPart)
 
     switch (rf) {
     case RF_JSON: {
-        UniValue mempoolInfoObject = mempoolInfoToJSON();
+        UniValue mempoolInfoObject = MempoolInfoToJSON(::mempool);
 
         std::string strJSON = mempoolInfoObject.write() + "\n";
         req->WriteHeader("Content-Type", "application/json");
@@ -324,7 +329,7 @@ static bool rest_mempool_contents(HTTPRequest* req, const std::string& strURIPar
 
     switch (rf) {
     case RF_JSON: {
-        UniValue mempoolObject = mempoolToJSON(true);
+        UniValue mempoolObject = MempoolToJSON(::mempool, true);
 
         std::string strJSON = mempoolObject.write() + "\n";
         req->WriteHeader("Content-Type", "application/json");
@@ -352,6 +357,10 @@ static bool rest_tx(HTTPRequest* req, const std::string& strURIPart)
     if (!ParseHashStr(hashStr, hash))
         return RESTERR(req, HTTP_BAD_REQUEST, "Invalid hash: " + hashStr);
 
+    if (g_txindex) {
+        g_txindex->BlockUntilSyncedToCurrentChain();
+    }
+
     CTransactionRef tx;
     uint256 hashBlock = uint256();
     if (!GetTransaction(hash, tx, Params().GetConsensus(), hashBlock))
@@ -377,7 +386,7 @@ static bool rest_tx(HTTPRequest* req, const std::string& strURIPart)
 
     case RF_JSON: {
         UniValue objTx(UniValue::VOBJ);
-        TxToJSON(*tx, hashBlock, objTx);
+        TxToUniv(*tx, hashBlock, objTx);
         std::string strJSON = objTx.write() + "\n";
         req->WriteHeader("Content-Type", "application/json");
         req->WriteReply(HTTP_OK, strJSON);
