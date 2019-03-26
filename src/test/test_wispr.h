@@ -72,13 +72,11 @@ private:
 /** Testing setup that configures a complete environment.
  * Included are data directory, coins database, script check threads setup.
  */
-class CConnman;
 class CNode;
 
 struct TestingSetup: public BasicTestingSetup {
     boost::thread_group threadGroup;
     CScheduler scheduler;
-//    CConnman* connman;
     std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
 
     explicit TestingSetup(const std::string& chainName = CBaseChainParams::UNITTEST);
