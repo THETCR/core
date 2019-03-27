@@ -83,7 +83,7 @@ const std::string BitcoinGUI::DEFAULT_UIPLATFORM =
 
 const QString BitcoinGUI::DEFAULT_WALLET = "~Default";
 
-BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *platformStyle, const NetworkStyle* networkStyle, QWidget* parent) : QMainWindow(parent),
+BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformStyle, const NetworkStyle* networkStyle, QWidget* parent) : QMainWindow(parent),
                                                                             m_node(node),
                                                                             clientModel(0),
                                                                             walletFrame(0),
@@ -130,7 +130,7 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *platformStyl
                                                                             explorerWindow(0),
                                                                             prevBlocks(0),
                                                                             spinnerFrame(0),
-                                                                            platformStyle(platformStyle),
+                                                                            platformStyle(_platformStyle),
                                                                             m_network_style(networkStyle)
                                                                             {
     /* Open CSS when configured */
@@ -140,11 +140,8 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *platformStyl
 
     QString windowTitle = tr("WISPR Core") + " - ";
 #ifdef ENABLE_WALLET
-    /* if compiled with wallet support, -disablewallet can still disable the wallet */
-    enableWallet = !gArgs.GetBoolArg("-disablewallet", false);
-#else
-    enableWallet = false;
-#endif // ENABLE_WALLET
+    enableWallet = WalletModel::isWalletEnabled();
+#endif
     if (enableWallet) {
         windowTitle += tr("Wallet");
     } else {
@@ -161,11 +158,14 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *platformStyl
 #endif
     setWindowTitle(windowTitle);
 
-    rpcConsole = new RPCConsole(node, enableWallet ? this : 0);
+    rpcConsole = new RPCConsole(node, _platformStyle, nullptr);
+    helpMessageDialog = new HelpMessageDialog(node, this, false);
 #ifdef ENABLE_WALLET
-    if (enableWallet) {
-        /** Create wallet frame*/
-        walletFrame = new WalletFrame(this);
+    if(enableWallet)
+    {
+        /** Create wallet frame and make it the central widget */
+        walletFrame = new WalletFrame(_platformStyle, this);
+        setCentralWidget(walletFrame);
         explorerWindow = new BlockExplorer(this);
     } else
 #endif // ENABLE_WALLET
@@ -433,7 +433,7 @@ void BitcoinGUI::createActions()
     connect(receiveCoinsMenuAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
     connect(receiveCoinsMenuAction, &QAction::triggered, this, &BitcoinGUI::gotoReceiveCoinsPage);
     connect(privacyAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
-    connect(privacyAction, SIGNAL(triggered()), this, &BitcoinGUI::gotoPrivacyPage());
+    connect(privacyAction, &QAction::triggered, this, &BitcoinGUI::gotoPrivacyPage);
     connect(historyAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
     connect(historyAction, &QAction::triggered, this, &BitcoinGUI::gotoHistoryPage);
 #endif // ENABLE_WALLET

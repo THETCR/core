@@ -1,22 +1,27 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "utilitydialog.h"
+#if defined(HAVE_CONFIG_H)
+#include <config/wispr-config.h>
+#endif
+
+#include <qt/utilitydialog.h>
 
 #include <qt/forms/ui_helpmessagedialog.h>
 
-#include "bitcoingui.h"
-#include "clientmodel.h"
-#include "guiconstants.h"
-#include "intro.h"
-#include "guiutil.h"
+#include <qt/bitcoingui.h>
+#include <qt/clientmodel.h>
+#include <qt/guiconstants.h>
+#include <qt/intro.h>
+#include <qt/paymentrequestplus.h>
+#include <qt/guiutil.h>
 
-#include "clientversion.h"
-#include "init.h"
+#include <clientversion.h>
+#include <init.h>
+#include <interfaces/node.h>
 #include <util/system.h>
+#include <util/strencodings.h>
 
 #include <stdio.h>
 
@@ -28,46 +33,45 @@
 #include <QVBoxLayout>
 
 /** "Help message" or "About" dialog box */
-HelpMessageDialog::HelpMessageDialog(QWidget* parent, bool about) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
-                                                                    ui(new Ui::HelpMessageDialog)
+HelpMessageDialog::HelpMessageDialog(interfaces::Node& node, QWidget *parent, bool about) :
+    QDialog(parent),
+    ui(new Ui::HelpMessageDialog)
 {
     ui->setupUi(this);
-    GUIUtil::restoreWindowGeometry("nHelpMessageDialogWindow", this->size(), this);
 
-    QString version = tr("WISPR Core") + " " + tr("version") + " " + QString::fromStdString(FormatFullVersion());
-/* On x86 add a bit specifier to the version so that users can distinguish between
-     * 32 and 64 bit builds. On other architectures, 32/64 bit may be more ambigious.
+    QString version = tr(PACKAGE_NAME) + " " + tr("version") + " " + QString::fromStdString(FormatFullVersion());
+    /* On x86 add a bit specifier to the version so that users can distinguish between
+     * 32 and 64 bit builds. On other architectures, 32/64 bit may be more ambiguous.
      */
 #if defined(__x86_64__)
     version += " " + tr("(%1-bit)").arg(64);
-#elif defined(__i386__)
+#elif defined(__i386__ )
     version += " " + tr("(%1-bit)").arg(32);
 #endif
 
-    if (about) {
-        setWindowTitle(tr("About WISPR Core"));
+    if (about)
+    {
+        setWindowTitle(tr("About %1").arg(tr(PACKAGE_NAME)));
 
+        std::string licenseInfo = LicenseInfo();
         /// HTML-format the license message from the core
-        QString licenseInfo = QString::fromStdString(LicenseInfo());
-        QString licenseInfoHTML = licenseInfo;
-
+        QString licenseInfoHTML = QString::fromStdString(LicenseInfo());
         // Make URLs clickable
         QRegExp uri("<(.*)>", Qt::CaseSensitive, QRegExp::RegExp2);
         uri.setMinimal(true); // use non-greedy matching
         licenseInfoHTML.replace(uri, "<a href=\"\\1\">\\1</a>");
         // Replace newlines with HTML breaks
-        licenseInfoHTML.replace("\n\n", "<br><br>");
+        licenseInfoHTML.replace("\n", "<br>");
 
         ui->aboutMessage->setTextFormat(Qt::RichText);
         ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-        text = version + "\n" + licenseInfo;
+        text = version + "\n" + QString::fromStdString(FormatParagraph(licenseInfo));
         ui->aboutMessage->setText(version + "<br><br>" + licenseInfoHTML);
         ui->aboutMessage->setWordWrap(true);
         ui->helpMessage->setVisible(false);
     } else {
         setWindowTitle(tr("Command-line options"));
-        QString header = tr("Usage:") + "\n" +
-                         "  wispr-qt [" + tr("command-line options") + "]                     " + "\n";
+        QString header = "Usage:  wispr-qt [command-line options]                     \n";
         QTextCursor cursor(ui->helpMessage->document());
         cursor.insertText(version);
         cursor.insertBlock();
@@ -89,7 +93,7 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, bool about) : QDialog(pare
         QTextCharFormat bold;
         bold.setFontWeight(QFont::Bold);
 
-        for (const QString &line: coreOptions.split("\n")) {
+        for (const QString &line : coreOptions.split("\n")) {
             if (line.startsWith("  -"))
             {
                 cursor.currentTable()->appendRows(1);
@@ -111,12 +115,12 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, bool about) : QDialog(pare
 
         ui->helpMessage->moveCursor(QTextCursor::Start);
         ui->scrollArea->setVisible(false);
+        ui->aboutLogo->setVisible(false);
     }
 }
 
 HelpMessageDialog::~HelpMessageDialog()
 {
-    GUIUtil::saveWindowGeometry("nHelpMessageDialogWindow", this);
     delete ui;
 }
 
@@ -144,34 +148,33 @@ void HelpMessageDialog::on_okButton_accepted()
 
 
 /** "Shutdown" window */
-ShutdownWindow::ShutdownWindow(QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
+ShutdownWindow::ShutdownWindow(QWidget *parent, Qt::WindowFlags f):
+    QWidget(parent, f)
 {
-    QVBoxLayout* layout = new QVBoxLayout();
+    QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(new QLabel(
-        tr("WISPR Core is shutting down...") + "<br /><br />" +
+        tr("%1 is shutting down...").arg(tr(PACKAGE_NAME)) + "<br /><br />" +
         tr("Do not shut down the computer until this window disappears.")));
     setLayout(layout);
 }
 
-void ShutdownWindow::showShutdownWindow(BitcoinGUI* window)
+QWidget *ShutdownWindow::showShutdownWindow(BitcoinGUI *window)
 {
     if (!window)
-        return;
+        return nullptr;
 
     // Show a simple window indicating shutdown status
-    QWidget* shutdownWindow = new ShutdownWindow();
-    // We don't hold a direct pointer to the shutdown window after creation, so use
-    // Qt::WA_DeleteOnClose to make sure that the window will be deleted eventually.
-    shutdownWindow->setAttribute(Qt::WA_DeleteOnClose);
+    QWidget *shutdownWindow = new ShutdownWindow();
     shutdownWindow->setWindowTitle(window->windowTitle());
 
     // Center shutdown window at where main window was
     const QPoint global = window->mapToGlobal(window->rect().center());
     shutdownWindow->move(global.x() - shutdownWindow->width() / 2, global.y() - shutdownWindow->height() / 2);
     shutdownWindow->show();
+    return shutdownWindow;
 }
 
-void ShutdownWindow::closeEvent(QCloseEvent* event)
+void ShutdownWindow::closeEvent(QCloseEvent *event)
 {
     event->ignore();
 }

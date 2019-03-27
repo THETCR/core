@@ -93,7 +93,6 @@ public:
     void addWallet(WalletModel* walletModel);
     void removeWallet(WalletModel* walletModel);
     void removeAllWallets();
-    bool setCurrentWallet(const QString& name);
 #endif // ENABLE_WALLET
     bool enableWallet = false;
     bool fMultiSend = false;
