@@ -127,7 +127,7 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
     ui->bitcoinAtStartup->setToolTip(ui->bitcoinAtStartup->toolTip().arg(tr(PACKAGE_NAME)));
     ui->bitcoinAtStartup->setText(ui->bitcoinAtStartup->text().arg(tr(PACKAGE_NAME)));
 
-    ui->openConfButton->setToolTip(ui->openConfButton->toolTip().arg(tr(PACKAGE_NAME)));
+//    ui->openConfButton->setToolTip(ui->openConfButton->toolTip().arg(tr(PACKAGE_NAME)));
 
     ui->lang->setToolTip(ui->lang->toolTip().arg(tr(PACKAGE_NAME)));
     ui->lang->addItem(QString("(") + tr("default") + QString(")"), QVariant(""));
@@ -162,11 +162,11 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
 
     /* setup/change UI elements when proxy IPs are invalid/valid */
     ui->proxyIp->setCheckValidator(new ProxyAddressValidator(parent));
-    ui->proxyIpTor->setCheckValidator(new ProxyAddressValidator(parent));
+//    ui->proxyIpTor->setCheckValidator(new ProxyAddressValidator(parent));
     connect(ui->proxyIp, &QValidatedLineEdit::validationDidChange, this, &OptionsDialog::updateProxyValidationState);
-    connect(ui->proxyIpTor, &QValidatedLineEdit::validationDidChange, this, &OptionsDialog::updateProxyValidationState);
+//    connect(ui->proxyIpTor, &QValidatedLineEdit::validationDidChange, this, &OptionsDialog::updateProxyValidationState);
     connect(ui->proxyPort, &QLineEdit::textChanged, this, &OptionsDialog::updateProxyValidationState);
-    connect(ui->proxyPortTor, &QLineEdit::textChanged, this, &OptionsDialog::updateProxyValidationState);
+//    connect(ui->proxyPortTor, &QLineEdit::textChanged, this, &OptionsDialog::updateProxyValidationState);
 
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
 //        ui->hideTrayIcon->setChecked(true);
@@ -223,7 +223,7 @@ void OptionsDialog::setModel(OptionsModel *_model)
     /* Network */
     connect(ui->allowIncoming, &QCheckBox::clicked, this, &OptionsDialog::showRestartWarning);
     connect(ui->connectSocks, &QCheckBox::clicked, this, &OptionsDialog::showRestartWarning);
-    connect(ui->connectSocksTor, &QCheckBox::clicked, this, &OptionsDialog::showRestartWarning);
+//    connect(ui->connectSocksTor, &QCheckBox::clicked, this, &OptionsDialog::showRestartWarning);
     /* Display */
     connect(ui->digits, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->theme, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
@@ -272,9 +272,9 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->proxyIp, OptionsModel::ProxyIP);
     mapper->addMapping(ui->proxyPort, OptionsModel::ProxyPort);
 
-    mapper->addMapping(ui->connectSocksTor, OptionsModel::ProxyUseTor);
-    mapper->addMapping(ui->proxyIpTor, OptionsModel::ProxyIPTor);
-    mapper->addMapping(ui->proxyPortTor, OptionsModel::ProxyPortTor);
+//    mapper->addMapping(ui->connectSocksTor, OptionsModel::ProxyUseTor);
+//    mapper->addMapping(ui->proxyIpTor, OptionsModel::ProxyIPTor);
+//    mapper->addMapping(ui->proxyPortTor, OptionsModel::ProxyPortTor);
 
     /* Window */
 #ifndef Q_OS_MAC
