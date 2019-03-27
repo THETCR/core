@@ -605,10 +605,10 @@ bool RPCConsole::eventFilter(QObject* obj, QEvent *event)
             }
         }
     }
-    return QDialog::eventFilter(obj, event);
+    return QWidget::eventFilter(obj, event);
 }
 
-void RPCConsole::setClientModel(ClientModel* model)
+void RPCConsole::setClientModel(ClientModel *model)
 {
     clientModel = model;
     ui->trafficGraph->setClientModel(model);
