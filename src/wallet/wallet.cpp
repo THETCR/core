@@ -7764,7 +7764,7 @@ bool CWallet::MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, con
             if (!zwspTracker->UpdateState(meta))
                 LogPrintf("%s: failed to write zerocoinmint\n", __func__);
 
-            pwalletMain->NotifyZerocoinChanged(pwalletMain, zerocoinSelected.GetValue().GetHex(), "Used", CT_UPDATED);
+            pwalletMain->NotifyZerocoinChanged(zerocoinSelected.GetValue().GetHex(), "Used", CT_UPDATED);
             return false;
         }
 
@@ -8318,7 +8318,7 @@ bool CWallet::SpendZerocoin(CAmount nAmount, int nSecurityLevel, CWalletTx& wtxN
         for (CZerocoinMint mint : vMintsSelected) {
             uint256 hashPubcoin = GetPubCoinHash(mint.GetValue());
             zwspTracker->SetPubcoinNotUsed(hashPubcoin);
-            pwalletMain->NotifyZerocoinChanged(pwalletMain, mint.GetValue().GetHex(), "New", CT_UPDATED);
+            pwalletMain->NotifyZerocoinChanged(mint.GetValue().GetHex(), "New", CT_UPDATED);
         }
 
         //erase spends

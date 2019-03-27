@@ -3475,7 +3475,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             if (pwalletMain->IsMyZerocoinSpend(pSpend.first.getCoinSerialNumber())) {
                 LogPrintf("%s: %s detected zerocoinspend in transaction %s \n", __func__,
                           pSpend.first.getCoinSerialNumber().GetHex(), pSpend.second.GetHex());
-                pwalletMain->NotifyZerocoinChanged(pwalletMain, pSpend.first.getCoinSerialNumber().GetHex(), "Used",
+                pwalletMain->NotifyZerocoinChanged(pSpend.first.getCoinSerialNumber().GetHex(), "Used",
                                                    CT_UPDATED);
 
                 //Don't add the same tx multiple times
