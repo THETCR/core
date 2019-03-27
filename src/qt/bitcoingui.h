@@ -44,8 +44,6 @@ class HelpMessageDialog;
 class ModalOverlay;
 class MasternodeList;
 
-class CWallet;
-
 namespace interfaces {
 class Handler;
 class Node;

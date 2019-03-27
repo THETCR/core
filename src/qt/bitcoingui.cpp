@@ -124,14 +124,15 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *platformStyl
                                                                             showHelpMessageAction(0),
                                                                             multiSendAction(0),
                                                                             trayIcon(0),
-                                                                            trayIconMenu(0),
+                                                                            trayIconMenu{new QMenu()},
                                                                             notificator(0),
                                                                             rpcConsole(0),
                                                                             explorerWindow(0),
                                                                             prevBlocks(0),
                                                                             spinnerFrame(0),
-                                                                            platformStyle(platformStyle)
-{
+                                                                            platformStyle(platformStyle),
+                                                                            m_network_style(networkStyle)
+                                                                            {
     /* Open CSS when configured */
     this->setStyleSheet(GUIUtil::loadStyleSheet());
 
