@@ -3,12 +3,17 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "paymentservertests.h"
+#include <qt/test/paymentservertests.h>
 
 #include <qt/optionsmodel.h>
 #include "paymentrequestdata.h"
 
-#include "random.h"
+#include <amount.h>
+#include <chainparams.h>
+#include <interfaces/node.h>
+#include <random.h>
+#include <script/script.h>
+#include <script/standard.h>
 #include <util/system.h>
 #include <util/strencodings.h>
 
@@ -63,7 +68,8 @@ static SendCoinsRecipient handleRequest(PaymentServer* server, std::vector<unsig
 void PaymentServerTests::paymentServerTests()
 {
     SelectParams(CBaseChainParams::MAIN);
-    OptionsModel optionsModel;
+    auto node = interfaces::MakeNode();
+    OptionsModel optionsModel(*node);
     PaymentServer* server = new PaymentServer(NULL, false);
     X509_STORE* caStore = X509_STORE_new();
     X509_STORE_add_cert(caStore, parse_b64der_cert(caCert_BASE64));
