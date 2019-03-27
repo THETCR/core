@@ -1,6 +1,5 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Copyright (c) 2017 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_ADDRESSTABLEMODEL_H
@@ -99,7 +98,7 @@ private:
 public Q_SLOTS:
     /* Update address list from core.
      */
-    void updateEntry(const QString& address, const QString& label, bool isMine, const QString& purpose, int status);
+    void updateEntry(const QString &address, const QString &label, bool isMine, const QString &purpose, int status);
     void updateEntry(const QString &pubCoin, const QString &isUsed, int status);
     friend class AddressTablePriv;
 };

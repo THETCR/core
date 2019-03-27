@@ -1,7 +1,5 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2018 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <qt/addresstablemodel.h>
@@ -420,7 +418,7 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
         CPubKey newKey;
         if(!walletModel->wallet().getKeyFromPool(false /* internal */, newKey))
         {
-            WalletModel::UnlockContext ctx(walletModel->requestUnlock(FULLY_UNLOCK));
+            WalletModel::UnlockContext ctx(walletModel->requestUnlock(AskPassphraseDialog::Context::Unlock_Full));
             if(!ctx.isValid())
             {
                 // Unlock wallet failed or was cancelled
