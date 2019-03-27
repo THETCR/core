@@ -58,17 +58,17 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
     ui->proxyPort->setEnabled(false);
     ui->proxyPort->setValidator(new QIntValidator(1, 65535, this));
 
-//    ui->proxyIpTor->setEnabled(false);
-//    ui->proxyPortTor->setEnabled(false);
-//    ui->proxyPortTor->setValidator(new QIntValidator(1, 65535, this));
+    ui->proxyIpTor->setEnabled(false);
+    ui->proxyPortTor->setEnabled(false);
+    ui->proxyPortTor->setValidator(new QIntValidator(1, 65535, this));
 
     connect(ui->connectSocks, &QPushButton::toggled, ui->proxyIp, &QWidget::setEnabled);
     connect(ui->connectSocks, &QPushButton::toggled, ui->proxyPort, &QWidget::setEnabled);
     connect(ui->connectSocks, &QPushButton::toggled, this, &OptionsDialog::updateProxyValidationState);
 
-//    connect(ui->connectSocksTor, &QPushButton::toggled, ui->proxyIpTor, &QWidget::setEnabled);
-//    connect(ui->connectSocksTor, &QPushButton::toggled, ui->proxyPortTor, &QWidget::setEnabled);
-//    connect(ui->connectSocksTor, &QPushButton::toggled, this, &OptionsDialog::updateProxyValidationState);
+    connect(ui->connectSocksTor, &QPushButton::toggled, ui->proxyIpTor, &QWidget::setEnabled);
+    connect(ui->connectSocksTor, &QPushButton::toggled, ui->proxyPortTor, &QWidget::setEnabled);
+    connect(ui->connectSocksTor, &QPushButton::toggled, this, &OptionsDialog::updateProxyValidationState);
 
     /* Window elements init */
 #ifdef Q_OS_MAC
@@ -162,15 +162,15 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
 
     /* setup/change UI elements when proxy IPs are invalid/valid */
     ui->proxyIp->setCheckValidator(new ProxyAddressValidator(parent));
-//    ui->proxyIpTor->setCheckValidator(new ProxyAddressValidator(parent));
+    ui->proxyIpTor->setCheckValidator(new ProxyAddressValidator(parent));
     connect(ui->proxyIp, &QValidatedLineEdit::validationDidChange, this, &OptionsDialog::updateProxyValidationState);
-//    connect(ui->proxyIpTor, &QValidatedLineEdit::validationDidChange, this, &OptionsDialog::updateProxyValidationState);
+    connect(ui->proxyIpTor, &QValidatedLineEdit::validationDidChange, this, &OptionsDialog::updateProxyValidationState);
     connect(ui->proxyPort, &QLineEdit::textChanged, this, &OptionsDialog::updateProxyValidationState);
-//    connect(ui->proxyPortTor, &QLineEdit::textChanged, this, &OptionsDialog::updateProxyValidationState);
+    connect(ui->proxyPortTor, &QLineEdit::textChanged, this, &OptionsDialog::updateProxyValidationState);
 
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
-//        ui->hideTrayIcon->setChecked(true);
-//        ui->hideTrayIcon->setEnabled(false);
+        ui->hideTrayIcon->setChecked(true);
+        ui->hideTrayIcon->setEnabled(false);
         ui->minimizeToTray->setChecked(false);
         ui->minimizeToTray->setEnabled(false);
     }
@@ -272,14 +272,14 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->proxyIp, OptionsModel::ProxyIP);
     mapper->addMapping(ui->proxyPort, OptionsModel::ProxyPort);
 
-//    mapper->addMapping(ui->connectSocksTor, OptionsModel::ProxyUseTor);
-//    mapper->addMapping(ui->proxyIpTor, OptionsModel::ProxyIPTor);
-//    mapper->addMapping(ui->proxyPortTor, OptionsModel::ProxyPortTor);
+    mapper->addMapping(ui->connectSocksTor, OptionsModel::ProxyUseTor);
+    mapper->addMapping(ui->proxyIpTor, OptionsModel::ProxyIPTor);
+    mapper->addMapping(ui->proxyPortTor, OptionsModel::ProxyPortTor);
 
     /* Window */
 #ifndef Q_OS_MAC
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
-//        mapper->addMapping(ui->hideTrayIcon, OptionsModel::HideTrayIcon);
+        mapper->addMapping(ui->hideTrayIcon, OptionsModel::HideTrayIcon);
         mapper->addMapping(ui->minimizeToTray, OptionsModel::MinimizeToTray);
     }
     mapper->addMapping(ui->minimizeOnClose, OptionsModel::MinimizeOnClose);
