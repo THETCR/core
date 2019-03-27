@@ -699,7 +699,7 @@ void RPCConsole::setClientModel(ClientModel* model)
         QAction* unbanAction = new QAction(tr("&Unban Node"), this);
 
         // create ban table context menu
-        banTableContextMenu = new QMenu();
+        banTableContextMenu = new QMenu(this);
         banTableContextMenu->addAction(unbanAction);
 
         // ban table context menu signals
