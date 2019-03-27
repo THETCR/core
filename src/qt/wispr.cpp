@@ -222,11 +222,8 @@ BitcoinApplication::BitcoinApplication(interfaces::Node& node, int& argc, char**
                                                                  clientModel(nullptr),
                                                                  window(nullptr),
                                                                  pollShutdownTimer(nullptr),
-#ifdef ENABLE_WALLET
-                                                                 paymentServer(nullptr),
-                                                                 walletModel(nullptr),
-#endif
-                                                                 returnValue(0)
+                                                                 returnValue(0),
+                                                                 platformStyle(nullptr)
 {
     setQuitOnLastWindowClosed(false);
     // UI per-platform customization
