@@ -1758,6 +1758,13 @@ public:
     bool AddKeyOrigin(const CPubKey& pubkey, const KeyOriginInfo& info);
 
     friend struct WalletTestingSetup;
+
+    bool IsAnonymizeOnlyUnlocked(){
+        return fWalletUnlockAnonymizeOnly;
+    }
+    void SetAnonymizeOnlyUnlocked(bool fWalletUnlockAnonymizeOnlyIn){
+        fWalletUnlockAnonymizeOnly = fWalletUnlockAnonymizeOnlyIn;
+    }
 };
 
 /** A key allocated from the key pool. */
