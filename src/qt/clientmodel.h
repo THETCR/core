@@ -82,6 +82,7 @@ public:
     QString getStatusBarWarnings() const;
 
     QString formatFullVersion() const;
+    QString formatSubVersion() const;
     QString formatBuildDate() const;
     bool isReleaseVersion() const;
     QString clientName() const;
@@ -125,15 +126,16 @@ Q_SIGNALS:
     void numConnectionsChanged(int count);
     void numBlocksChanged(int count, const QDateTime& blockDate, double nVerificationProgress, bool header);
     void strMasternodesChanged(const QString& strMasternodes);
+    void mempoolSizeChanged(long count, size_t mempoolSizeInBytes);
     void networkActiveChanged(bool networkActive);
     void alertsChanged(const QString &warnings);
     void bytesChanged(quint64 totalBytesIn, quint64 totalBytesOut);
 
     //! Fired when a message should be reported to the user
-    void message(const QString& title, const QString& message, unsigned int style);
+    void message(const QString &title, const QString &message, unsigned int style);
 
     // Show progress dialog e.g. for verifychain
-    void showProgress(const QString& title, int nProgress);
+    void showProgress(const QString &title, int nProgress);
 
 public Q_SLOTS:
     void updateTimer();

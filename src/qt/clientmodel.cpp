@@ -189,7 +189,10 @@ void ClientModel::updateTimer()
         Q_EMIT numBlocksChanged(newNumBlocks, getLastBlockDate(), getVerificationProgress(NULL), false);
     }
 
-    Q_EMIT bytesChanged(getTotalBytesRecv(), getTotalBytesSent());
+    // no locking required at this point
+    // the following calls will acquire the required lock
+    Q_EMIT mempoolSizeChanged(m_node.getMempoolSize(), m_node.getMempoolDynamicUsage());
+    Q_EMIT bytesChanged(m_node.getTotalBytesRecv(), m_node.getTotalBytesSent());
 }
 
 void ClientModel::updateMnTimer()
