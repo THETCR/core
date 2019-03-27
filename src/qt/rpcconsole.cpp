@@ -945,12 +945,12 @@ void RPCConsole::clear(bool clearHistory)
                         true);
 }
 
-void RPCConsole::reject()
-{
-    // Ignore escape keypress if this is not a seperate window
-    if (windowType() != Qt::Widget)
-        QDialog::reject();
-}
+//void RPCConsole::reject()
+//{
+//    // Ignore escape keypress if this is not a seperate window
+//    if (windowType() != Qt::Widget)
+//        QWidget::reject();
+//}
 
 void RPCConsole::keyPressEvent(QKeyEvent *event)
 {

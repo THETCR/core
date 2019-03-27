@@ -109,7 +109,6 @@ public Q_SLOTS:
     void walletReindex();
     void walletResync();
 
-    void reject();
     /** Append the message to the message widget */
     void message(int category, const QString &msg) { message(category, msg, false); }
     void message(int category, const QString &message, bool html);
