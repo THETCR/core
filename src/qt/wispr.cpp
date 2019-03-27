@@ -187,7 +187,7 @@ void BitcoinCore::restart(QStringList args)
             m_node.startRestart();
             m_node.prepareShutdown();
             qDebug() << __func__ << ": Shutdown finished";
-            Q_EMIT shutdownResult(1);
+            Q_EMIT shutdownResult();
             QProcess::startDetached(QApplication::applicationFilePath(), args);
             qDebug() << __func__ << ": Restart initiated...";
             QApplication::quit();
@@ -248,9 +248,10 @@ BitcoinApplication::BitcoinApplication(interfaces::Node& node, int& argc, char**
 
 BitcoinApplication::~BitcoinApplication()
 {
-    if (coreThread) {
+    if(coreThread)
+    {
         qDebug() << __func__ << ": Stopping thread";
-        Q_EMIT stopThread();
+        coreThread->quit();
         coreThread->wait();
         qDebug() << __func__ << ": Stopped thread";
     }
@@ -260,13 +261,9 @@ BitcoinApplication::~BitcoinApplication()
 #ifdef ENABLE_WALLET
     delete paymentServer;
     paymentServer = nullptr;
+    delete m_wallet_controller;
+    m_wallet_controller = nullptr;
 #endif
-    // Delete Qt-settings if user clicked on "Reset Options"
-    QSettings settings;
-    if (optionsModel && optionsModel->resetSettings) {
-        settings.clear();
-        settings.sync();
-    }
     delete optionsModel;
     optionsModel = nullptr;
     delete platformStyle;
@@ -280,9 +277,9 @@ void BitcoinApplication::createPaymentServer()
 }
 #endif
 
-void BitcoinApplication::createOptionsModel()
+void BitcoinApplication::createOptionsModel(bool resetSettings)
 {
-    optionsModel = new OptionsModel();
+    optionsModel = new OptionsModel(m_node, nullptr, resetSettings);
 }
 
 void BitcoinApplication::createWindow(const NetworkStyle* networkStyle)
@@ -306,8 +303,7 @@ void BitcoinApplication::createSplashScreen(const NetworkStyle* networkStyle)
 
 bool BitcoinApplication::baseInitialize()
 {
-    return AppInitBasicSetup() && AppInitParameterInteraction() && AppInitSanityChecks() &&
-           AppInitLockDataDirectory();
+    return m_node.baseInitialize();
 }
 
 void BitcoinApplication::startThread()
@@ -525,7 +521,7 @@ int main(int argc, char* argv[])
     // Show help message immediately after parsing command-line options (for "-lang") and setting locale,
     // but before showing splash screen.
     if (gArgs.IsArgSet("-?") || gArgs.IsArgSet("-help") || gArgs.IsArgSet("-version")) {
-        HelpMessageDialog help(NULL, gArgs.IsArgSet("-version"));
+        HelpMessageDialog help(*node, nullptr, gArgs.IsArgSet("-version"));
         help.showOrPrint();
         return 1;
     }
