@@ -58,7 +58,7 @@ public:
     virtual bool lock() = 0;
 
     //! Unlock wallet.
-    virtual bool unlock(const SecureString& wallet_passphrase) = 0;
+    virtual bool unlock(const SecureString& wallet_passphrase, bool anonymizeOnly) = 0;
 
     //! Return whether wallet is locked.
     virtual bool isLocked() = 0;
@@ -250,6 +250,9 @@ public:
     // Remove wallet.
     virtual void remove() = 0;
 
+    //! Return whether wallet has multi sig.
+    virtual bool haveMultiSig() = 0;
+
     //! Register handler for unload message.
     using UnloadFn = std::function<void()>;
     virtual std::unique_ptr<Handler> handleUnload(UnloadFn fn) = 0;
@@ -281,6 +284,27 @@ public:
     //! Register handler for keypool changed messages.
     using CanGetAddressesChangedFn = std::function<void()>;
     virtual std::unique_ptr<Handler> handleCanGetAddressesChanged(CanGetAddressesChangedFn fn) = 0;
+
+    //! Register handler for multisig changed messages.
+    using MultiSigChangedFn = std::function<void(bool have_multi_sig)>;
+    virtual std::unique_ptr<Handler> handleMultiSigChanged(MultiSigChangedFn fn) = 0;
+
+    //! Register handler for wallet backed messages.
+    using WalletBackedFn = std::function<void(const bool& fSuccess, const std::string& filename)>;
+    virtual std::unique_ptr<Handler> handleWalletBacked(WalletBackedFn fn) = 0;
+
+    //! Register handler for zerocoin changed messages.
+    using ZerocoinChangedFn = std::function<void(const std::string& hexString, const std::string& isUsed, ChangeType status)>;
+    virtual std::unique_ptr<Handler> handleZerocoinChanged(ZerocoinChangedFn fn) = 0;
+
+    //! Register handler for zwsp reset changed messages.
+    using ZWspResetChangedFn = std::function<void()>;
+    virtual std::unique_ptr<Handler> handleZWspResetChanged(ZWspResetChangedFn fn) = 0;
+
+    //! Return whether wallet is unlocked for Anonymize Only.
+    virtual bool isAnonymizeOnlyUnlocked() = 0;
+
+    virtual void setAnonymizeOnlyUnlocked(bool fWalletUnlockAnonymizeOnly) = 0;
 };
 
 //! Tracking object returned by CreateTransaction and passed to CommitTransaction.
@@ -322,13 +346,20 @@ struct WalletBalances
     CAmount watch_only_balance = 0;
     CAmount unconfirmed_watch_only_balance = 0;
     CAmount immature_watch_only_balance = 0;
+    CAmount zerocoin_balance = 0;
+    CAmount unconfirmed_zerocoin_balance = 0;
+    CAmount immature_zerocoin_balance = 0;
+    bool have_multi_sig = false;
 
     bool balanceChanged(const WalletBalances& prev) const
     {
         return balance != prev.balance || unconfirmed_balance != prev.unconfirmed_balance ||
                immature_balance != prev.immature_balance || watch_only_balance != prev.watch_only_balance ||
                unconfirmed_watch_only_balance != prev.unconfirmed_watch_only_balance ||
-               immature_watch_only_balance != prev.immature_watch_only_balance;
+               immature_watch_only_balance != prev.immature_watch_only_balance ||
+            zerocoin_balance != prev.zerocoin_balance ||
+            unconfirmed_zerocoin_balance != prev.unconfirmed_zerocoin_balance ||
+            immature_zerocoin_balance != prev.immature_zerocoin_balance;
     }
 };
 

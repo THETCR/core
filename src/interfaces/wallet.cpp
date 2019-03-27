@@ -137,7 +137,7 @@ public:
     }
     bool isCrypted() override { return m_wallet->IsCrypted(); }
     bool lock() override { return m_wallet->Lock(); }
-    bool unlock(const SecureString& wallet_passphrase) override { return m_wallet->Unlock(wallet_passphrase); }
+    bool unlock(const SecureString& wallet_passphrase, bool anonymizeOnly) override { return m_wallet->Unlock(wallet_passphrase, false, anonymizeOnly); }
     bool isLocked() override { return m_wallet->IsLocked(); }
     bool changeWalletPassphrase(const SecureString& old_wallet_passphrase,
         const SecureString& new_wallet_passphrase) override
@@ -363,6 +363,10 @@ public:
         result.unconfirmed_balance = m_wallet->GetUnconfirmedBalance();
         result.immature_balance = m_wallet->GetImmatureBalance();
         result.have_watch_only = m_wallet->HaveWatchOnly();
+        result.zerocoin_balance = m_wallet->GetZerocoinBalance(false);
+        result.unconfirmed_zerocoin_balance = m_wallet->GetUnconfirmedZerocoinBalance();
+        result.immature_zerocoin_balance = m_wallet->GetImmatureZerocoinBalance();
+        result.have_multi_sig = m_wallet->HaveMultiSig();
         if (result.have_watch_only) {
             result.watch_only_balance = m_wallet->GetBalance(ISMINE_WATCH_ONLY);
             result.unconfirmed_watch_only_balance = m_wallet->GetUnconfirmedWatchOnlyBalance();
@@ -497,7 +501,31 @@ public:
     {
         return MakeHandler(m_wallet->NotifyCanGetAddressesChanged.connect(fn));
     }
+    std::unique_ptr<Handler> handleMultiSigChanged(MultiSigChangedFn fn) override
+    {
+        return MakeHandler(m_wallet->NotifyMultiSigChanged.connect(fn));
+    }
+    std::unique_ptr<Handler> handleWalletBacked(WalletBackedFn fn) override
+    {
+        return MakeHandler(m_wallet->NotifyWalletBacked.connect(fn));
+    }
+    std::unique_ptr<Handler> handleZerocoinChanged(ZerocoinChangedFn fn) override
+    {
+        return MakeHandler(m_wallet->NotifyZerocoinChanged.connect(fn));
+    }
+    std::unique_ptr<Handler> handleZWspResetChanged(ZWspResetChangedFn fn) override
+    {
+        return MakeHandler(m_wallet->NotifyzWSPReset.connect(fn));
+    }
+    bool isAnonymizeOnlyUnlocked() override
+    {
+        return m_wallet->IsAnonymizeOnlyUnlocked();
+    }
 
+    void setAnonymizeOnlyUnlocked(bool fWalletUnlockAnonymizeOnly) override
+    {
+        m_wallet->SetAnonymizeOnlyUnlocked(fWalletUnlockAnonymizeOnly);
+    }
     std::shared_ptr<CWallet> m_wallet;
 };
 

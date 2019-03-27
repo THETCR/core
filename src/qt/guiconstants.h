@@ -8,7 +8,7 @@
 #define BITCOIN_QT_GUICONSTANTS_H
 
 /* Milliseconds between model updates */
-static const int MODEL_UPDATE_DELAY = 1000;
+static const int MODEL_UPDATE_DELAY = 250;
 
 /* AskPassphraseDialog -- Maximum passphrase length */
 static const int MAX_PASSPHRASE_SIZE = 1024;
@@ -31,6 +31,8 @@ static const bool DEFAULT_SPLASHSCREEN = true;
 #define COLOR_TX_STATUS_OPENUNTILDATE QColor(64, 64, 255)
 /* Transaction list -- TX status decoration - offline */
 #define COLOR_TX_STATUS_OFFLINE QColor(192, 192, 192)
+/* Transaction list -- TX status decoration - danger, tx needs attention */
+#define COLOR_TX_STATUS_DANGER QColor(200, 100, 100)
 /* Transaction list -- TX status decoration - default color */
 #define COLOR_BLACK QColor(51, 51, 51)
 /* Transaction list -- TX status decoration - conflicted */
@@ -57,5 +59,9 @@ static const int MAX_URI_LENGTH = 255;
 #define QAPP_ORG_DOMAIN "wispr.tech"
 #define QAPP_APP_NAME_DEFAULT "WISPR-Qt"
 #define QAPP_APP_NAME_TESTNET "WISPR-Qt-testnet"
+#define QAPP_APP_NAME_REGTEST "WISPR-Qt-regtest"
+
+/* One gigabyte (GB) in bytes */
+static constexpr uint64_t GB_BYTES{1000000000};
 
 #endif // BITCOIN_QT_GUICONSTANTS_H
