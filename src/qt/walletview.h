@@ -6,7 +6,7 @@
 #ifndef BITCOIN_QT_WALLETVIEW_H
 #define BITCOIN_QT_WALLETVIEW_H
 
-#include "amount.h"
+#include <amount.h>
 #include "askpassphrasedialog.h"
 #include "masternodelist.h"
 
@@ -15,12 +15,14 @@
 class BitcoinGUI;
 class ClientModel;
 class OverviewPage;
+class PlatformStyle;
 class ReceiveCoinsDialog;
 class PrivacyDialog;
 class SendCoinsDialog;
 class SendCoinsRecipient;
 class TransactionView;
 class WalletModel;
+class AddressBookPage;
 class BlockExplorer;
 
 QT_BEGIN_NAMESPACE
@@ -40,39 +42,43 @@ class WalletView : public QStackedWidget
     Q_OBJECT
 
 public:
-    explicit WalletView(QWidget* parent);
+    explicit WalletView(const PlatformStyle *platformStyle, QWidget *parent);
     ~WalletView();
 
-    void setBitcoinGUI(BitcoinGUI* gui);
+    void setBitcoinGUI(BitcoinGUI *gui);
     /** Set the client model.
         The client model represents the part of the core that communicates with the P2P network, and is wallet-agnostic.
     */
-    void setClientModel(ClientModel* clientModel);
+    void setClientModel(ClientModel *clientModel);
+    WalletModel *getWalletModel() { return walletModel; }
     /** Set the wallet model.
         The wallet model represents a bitcoin wallet, and offers access to the list of transactions, address book and sending
         functionality.
     */
-    void setWalletModel(WalletModel* walletModel);
+    void setWalletModel(WalletModel *walletModel);
 
     bool handlePaymentRequest(const SendCoinsRecipient& recipient);
 
     void showOutOfSyncWarning(bool fShow);
 
 private:
-    ClientModel* clientModel;
-    WalletModel* walletModel;
+    ClientModel *clientModel;
+    WalletModel *walletModel;
 
-    OverviewPage* overviewPage;
-    QWidget* transactionsPage;
-    ReceiveCoinsDialog* receiveCoinsPage;
+    OverviewPage *overviewPage;
+    QWidget *transactionsPage;
+    ReceiveCoinsDialog *receiveCoinsPage;
     PrivacyDialog* privacyPage;
-    SendCoinsDialog* sendCoinsPage;
+    SendCoinsDialog *sendCoinsPage;
+    AddressBookPage *usedSendingAddressesPage;
+    AddressBookPage *usedReceivingAddressesPage;
     BlockExplorer* explorerWindow;
     MasternodeList* masternodeListPage;
 
-    TransactionView* transactionView;
+    TransactionView *transactionView;
 
-    QProgressDialog* progressDialog;
+    QProgressDialog *progressDialog;
+    const PlatformStyle *platformStyle;
     QLabel* transactionSum;
 
 public Q_SLOTS:
@@ -129,20 +135,27 @@ public Q_SLOTS:
     void updateEncryptionStatus();
 
     /** Show progress dialog e.g. for rescan */
-    void showProgress(const QString& title, int nProgress);
+    void showProgress(const QString &title, int nProgress);
 
     /** Update selected WSP amount from transactionview */
     void trxAmount(QString amount);
+
+    /** User has requested more information about the out of sync state */
+    void requestedSyncWarningInfo();
 
 Q_SIGNALS:
     /** Signal that we want to show the main window */
     void showNormalIfMinimized();
     /**  Fired when a message should be reported to the user */
-    void message(const QString& title, const QString& message, unsigned int style);
+    void message(const QString &title, const QString &message, unsigned int style);
     /** Encryption status of wallet changed */
-    void encryptionStatusChanged(int status);
+    void encryptionStatusChanged();
+    /** HD-Enabled status of wallet changed (only possible during startup) */
+    void hdEnabledStatusChanged();
     /** Notify that a new transaction appeared */
-    void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address);
+    void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString& label, const QString& walletName);
+    /** Notify that the out of sync warning icon has been pressed */
+    void outOfSyncWarningClicked();
 };
 
 #endif // BITCOIN_QT_WALLETVIEW_H

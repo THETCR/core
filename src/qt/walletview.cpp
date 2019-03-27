@@ -3,28 +3,32 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "walletview.h"
+#include <qt/walletview.h>
 
-#include "addressbookpage.h"
+#include <qt/addressbookpage.h>
+#include <qt/askpassphrasedialog.h>
+#include <qt/bitcoingui.h>
+#include <qt/clientmodel.h>
+#include <qt/guiutil.h>
+#include <qt/optionsmodel.h>
+#include <qt/overviewpage.h>
+#include <qt/platformstyle.h>
+#include <qt/receivecoinsdialog.h>
+#include <qt/sendcoinsdialog.h>
+#include <qt/signverifymessagedialog.h>
+#include <qt/transactiontablemodel.h>
+#include <qt/transactionview.h>
+#include <qt/walletmodel.h>
+
 #include "bip38tooldialog.h"
-#include "bitcoingui.h"
 #include "blockexplorer.h"
-#include "clientmodel.h"
-#include "guiutil.h"
 #include "masternodeconfig.h"
 #include "multisenddialog.h"
 #include "multisigdialog.h"
-#include "optionsmodel.h"
-#include "overviewpage.h"
-#include "receivecoinsdialog.h"
 #include "privacydialog.h"
-#include "sendcoinsdialog.h"
-#include "signverifymessagedialog.h"
-#include "transactiontablemodel.h"
-#include "transactionview.h"
-#include "walletmodel.h"
 
-#include "ui_interface.h"
+#include <interfaces/node.h>
+#include <ui_interface.h>
 
 #include <QAction>
 #include <QActionGroup>
@@ -36,10 +40,12 @@
 #include <QSettings>
 #include <QVBoxLayout>
 
-WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
-                                          clientModel(0),
-                                          walletModel(0)
-{   
+WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
+    QStackedWidget(parent),
+    clientModel(nullptr),
+    walletModel(nullptr),
+    platformStyle(_platformStyle)
+{
     // Create tabs
     overviewPage = new OverviewPage();
     explorerWindow = new BlockExplorer(this);
@@ -155,20 +161,29 @@ WalletView::~WalletView()
 {
 }
 
-void WalletView::setBitcoinGUI(BitcoinGUI* gui)
+void WalletView::setBitcoinGUI(BitcoinGUI *gui)
 {
-    if (gui) {
+    if (gui)
+    {
         // Clicking on a transaction on the overview page simply sends you to transaction history page
-        connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), gui, SLOT(gotoHistoryPage()));
+        connect(overviewPage, &OverviewPage::transactionClicked, gui, &BitcoinGUI::gotoHistoryPage);
+
+        // Navigate to transaction history page after send
+        connect(sendCoinsPage, &SendCoinsDialog::coinsSent, gui, &BitcoinGUI::gotoHistoryPage);
 
         // Receive and report messages
-        connect(this, SIGNAL(message(QString, QString, unsigned int)), gui, SLOT(message(QString, QString, unsigned int)));
+        connect(this, &WalletView::message, [gui](const QString &title, const QString &message, unsigned int style) {
+            gui->message(title, message, style);
+        });
 
         // Pass through encryption status changed signals
-        connect(this, SIGNAL(encryptionStatusChanged(int)), gui, SLOT(setEncryptionStatus(int)));
+        connect(this, &WalletView::encryptionStatusChanged, gui, &BitcoinGUI::updateWalletStatus);
 
         // Pass through transaction notifications
-        connect(this, SIGNAL(incomingTransaction(QString, int, CAmount, QString, QString)), gui, SLOT(incomingTransaction(QString, int, CAmount, QString, QString)));
+        connect(this, &WalletView::incomingTransaction, gui, &BitcoinGUI::incomingTransaction);
+
+        // Connect HD enabled state signal
+        connect(this, &WalletView::hdEnabledStatusChanged, gui, &BitcoinGUI::updateWalletStatus);
     }
 }
 
@@ -206,6 +221,9 @@ void WalletView::setWalletModel(WalletModel* walletModel)
         // Handle changes in encryption status
         connect(walletModel, SIGNAL(encryptionStatusChanged(int)), this, SIGNAL(encryptionStatusChanged(int)));
         updateEncryptionStatus();
+
+        // update HD status
+        Q_EMIT hdEnabledStatusChanged();
 
         // Balloon pop-up for new transaction
         connect(walletModel->getTransactionTableModel(), SIGNAL(rowsInserted(QModelIndex, int, int)),
