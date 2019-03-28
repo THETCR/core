@@ -32,6 +32,7 @@
 #include <wallet/wallet.h>
 #include <wallet/walletutil.h>
 #include <wallet/zwsptracker.h>
+#include <key_io.h>
 #include <zwspchain.h>
 
 #include <memory>
@@ -558,7 +559,7 @@ public:
 
     bool addressIsMine(const std::string &sAddress) override
     {
-        return IsMine(*m_wallet, sAddress);
+        return ::IsMine(*m_wallet, EncodeDestination(sAddress));
     }
     bool addressIsUsed(const std::string &sAddress) override
     {
