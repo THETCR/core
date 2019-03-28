@@ -559,7 +559,7 @@ public:
 
     bool addressIsMine(const std::string &sAddress) override
     {
-        return IsMine(*m_wallet, GetScriptForDestination(EncodeDestination(sAddress)));
+        return IsMine(*m_wallet, DecodeDestination(sAddress));
     }
     bool addressIsUsed(const std::string &sAddress) override
     {
