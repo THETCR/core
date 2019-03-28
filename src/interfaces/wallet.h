@@ -21,6 +21,8 @@
 #include <utility>
 #include <vector>
 
+#include <wallet/wallet.h>
+
 class CCoinControl;
 class CFeeRate;
 class CKey;
@@ -137,7 +139,8 @@ public:
         bool sign,
         int& change_pos,
         CAmount& fee,
-        std::string& fail_reason) = 0;
+        std::string& fail_reason, AvailableCoinsType coin_type = ALL_COINS,
+                                                               bool useIX = false) = 0;
 
     //! Return whether transaction can be abandoned.
     virtual bool transactionCanBeAbandoned(const uint256& txid) = 0;
@@ -327,7 +330,8 @@ public:
     //! Send pending transaction and commit to wallet.
     virtual bool commit(WalletValueMap value_map,
         WalletOrderForm order_form,
-        std::string& reject_reason) = 0;
+        std::string& reject_reason,
+        std::string strCommand = "tx") = 0;
 };
 
 //! Information about one wallet address.

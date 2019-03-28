@@ -237,14 +237,27 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
     }
 
     {
-        transaction.newPossibleKeyChange(m_wallet);
         CAmount nFeeRequired = 0;
         int nChangePosRet = -1;
         std::string strFailReason;
 
         auto& newTx = transaction.getWtx();
-        newTx = m_wallet->createTransaction(vecSend, coinControl, true /* sign */, nChangePosRet, nFeeRequired, strFailReason);
+
+        if (recipients[0].useSwiftTX && total > GetSporkValue(SPORK_5_MAX_VALUE) * COIN) {
+            Q_EMIT message(tr("Send Coins"), tr("SwiftX doesn't support sending values that high yet. Transactions are currently limited to %1 WSP.").arg(GetSporkValue(SPORK_5_MAX_VALUE)),
+                           CClientUIInterface::MSG_ERROR);
+            return TransactionCreationFailed;
+        }
+
+        newTx = m_wallet->createTransaction(vecSend, coinControl, true /* sign */, nChangePosRet, nFeeRequired, strFailReason, recipients[0].inputType, recipients[0].useSwiftTX);
         transaction.setTransactionFee(nFeeRequired);
+
+        if (recipients[0].useSwiftTX && newTx->get().GetValueOut() > GetSporkValue(SPORK_5_MAX_VALUE) * COIN) {
+            Q_EMIT message(tr("Send Coins"), tr("SwiftX doesn't support sending values that high yet. Transactions are currently limited to %1 WSP.").arg(GetSporkValue(SPORK_5_MAX_VALUE)),
+                           CClientUIInterface::MSG_ERROR);
+            return TransactionCreationFailed;
+        }
+
         if (fSubtractFeeFromAmount && newTx)
             transaction.reassignAmounts(nChangePosRet);
 
@@ -255,7 +268,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
                 return SendCoinsReturn(AmountWithFeeExceedsBalance);
             }
             Q_EMIT message(tr("Send Coins"), QString::fromStdString(strFailReason),
-                           CClientUIInterface::MSG_ERROR);
+                         CClientUIInterface::MSG_ERROR);
             return TransactionCreationFailed;
         }
 
@@ -267,40 +280,6 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
     }
 
     return SendCoinsReturn(OK);
-
-        CWalletTx* newTx = transaction.getTransaction();
-        CReserveKey* keyChange = transaction.getPossibleKeyChange();
-
-
-        if (recipients[0].useSwiftTX && total > GetSporkValue(SPORK_5_MAX_VALUE) * COIN) {
-            Q_EMIT message(tr("Send Coins"), tr("SwiftX doesn't support sending values that high yet. Transactions are currently limited to %1 WSP.").arg(GetSporkValue(SPORK_5_MAX_VALUE)),
-                CClientUIInterface::MSG_ERROR);
-            return TransactionCreationFailed;
-        }
-
-        bool fCreated = m_wallet->CreateTransaction(vecSend, *newTx, *keyChange, nFeeRequired, strFailReason, coinControl, recipients[0].inputType, recipients[0].useSwiftTX);
-        transaction.setTransactionFee(nFeeRequired);
-
-        if (recipients[0].useSwiftTX && newTx->tx->GetValueOut() > GetSporkValue(SPORK_5_MAX_VALUE) * COIN) {
-            Q_EMIT message(tr("Send Coins"), tr("SwiftX doesn't support sending values that high yet. Transactions are currently limited to %1 WSP.").arg(GetSporkValue(SPORK_5_MAX_VALUE)),
-                CClientUIInterface::MSG_ERROR);
-            return TransactionCreationFailed;
-        }
-
-        if (!fCreated) {
-            if ((total + nFeeRequired) > nBalance) {
-                return SendCoinsReturn(AmountWithFeeExceedsBalance);
-            }
-            Q_EMIT message(tr("Send Coins"), QString::fromStdString(strFailReason),
-                CClientUIInterface::MSG_ERROR);
-            return TransactionCreationFailed;
-        }
-
-        // reject insane fee
-        if (nFeeRequired > ::minRelayTxFee.GetFee(transaction.getTransactionSize()) * 10000)
-            return InsaneFee;
-
-    return SendCoinsReturn(OK);
 }
 
 WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction &transaction)
@@ -308,10 +287,10 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction &tran
     QByteArray transaction_array; /* store serialized transaction */
 
     {
+        QList<SendCoinsRecipient> recipients = transaction.getRecipients();
         std::vector<std::pair<std::string, std::string>> vOrderForm;
-        for (const SendCoinsRecipient &rcp : transaction.getRecipients())
+        for (const SendCoinsRecipient &rcp : recipients)
         {
-#ifdef ENABLE_BIP70
             if (rcp.paymentRequest.IsInitialized())
             {
                 // Make sure any payment requests involved are still valid.
@@ -325,14 +304,13 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction &tran
                 vOrderForm.emplace_back("PaymentRequest", std::move(value));
             }
             else
-#endif
             if (!rcp.message.isEmpty()) // Message from normal bitcoin:URI (bitcoin:123...?message=example)
                 vOrderForm.emplace_back("Message", rcp.message.toStdString());
         }
 
         auto& newTx = transaction.getWtx();
         std::string rejectReason;
-        if (!newTx->commit({} /* mapValue */, std::move(vOrderForm), rejectReason))
+        if (!newTx->commit({} /* mapValue */, std::move(vOrderForm), rejectReason, (recipients[0].useSwiftTX) ? NetMsgType::TXLOCKREQUEST : NetMsgType::TX))
             return SendCoinsReturn(TransactionCommitFailed, QString::fromStdString(rejectReason));
 
         CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
@@ -345,9 +323,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction &tran
     for (const SendCoinsRecipient &rcp : transaction.getRecipients())
     {
         // Don't touch the address book when we have a payment request
-#ifdef ENABLE_BIP70
         if (!rcp.paymentRequest.IsInitialized())
-#endif
         {
             std::string strAddress = rcp.address.toStdString();
             CTxDestination dest = DecodeDestination(strAddress);
@@ -356,7 +332,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction &tran
                 // Check if we have a new address or an updated label
                 std::string name;
                 if (!m_wallet->getAddress(
-                    dest, &name, /* is_mine= */ nullptr, /* purpose= */ nullptr))
+                     dest, &name, /* is_mine= */ nullptr, /* purpose= */ nullptr))
                 {
                     m_wallet->setAddressBook(dest, strLabel, "send");
                 }
