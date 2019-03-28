@@ -19,9 +19,10 @@
 
 #include <QClipboard>
 
-Bip38ToolDialog::Bip38ToolDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+Bip38ToolDialog::Bip38ToolDialog(const PlatformStyle *_platformStyle, QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
                                                     ui(new Ui::Bip38ToolDialog),
-                                                    model(0)
+                                                    model(nullptr),
+                                                    platformStyle(_platformStyle)
 {
     ui->setupUi(this);
 
@@ -75,7 +76,7 @@ void Bip38ToolDialog::showTab_DEC(bool fShow)
 void Bip38ToolDialog::on_addressBookButton_ENC_clicked()
 {
     if (model && model->getAddressTableModel()) {
-        AddressBookPage dlg(AddressBookPage::ForSelection, AddressBookPage::ReceivingTab, this);
+        AddressBookPage dlg(platformStyle, AddressBookPage::ForSelection, AddressBookPage::ReceivingTab, this);
         dlg.setModel(model->getAddressTableModel());
         if (dlg.exec()) {
             setAddress_ENC(dlg.getReturnValue());

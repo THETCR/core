@@ -155,7 +155,7 @@ void PrivacyDialog::on_addressBookButton_clicked()
     if (!walletModel || !walletModel->getOptionsModel())
         return;
 
-    AddressBookPage dlg(AddressBookPage::ForSelection, AddressBookPage::SendingTab, this);
+    AddressBookPage dlg(platformStyle, AddressBookPage::ForSelection, AddressBookPage::SendingTab, this);
     dlg.setModel(walletModel->getAddressTableModel());
     if (dlg.exec()) {
         ui->payTo->setText(dlg.getReturnValue());
@@ -581,7 +581,7 @@ void PrivacyDialog::coinControlUpdateLabels()
      // set pay amounts
     CoinControlDialog::payAmounts.clear();
 
-    if (CoinControlDialog::coinControl->HasSelected()) {
+    if (CoinControlDialog::coinControl()->HasSelected()) {
         // Actual coin control calculation
         CoinControlDialog::updateLabels(walletModel, this);
     } else {

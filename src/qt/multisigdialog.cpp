@@ -178,7 +178,7 @@ void MultisigDialog::addressBookButtonReceiving()
     if(!vle)return;
 
     if (model && model->getAddressTableModel()) {
-        AddressBookPage dlg(AddressBookPage::ForSelection, AddressBookPage::ReceivingTab, this);
+        AddressBookPage dlg(platformStyle, AddressBookPage::ForSelection, AddressBookPage::ReceivingTab, this);
         dlg.setModel(model->getAddressTableModel());
         if (dlg.exec()) {
             vle->setText(dlg.getReturnValue());
@@ -288,9 +288,9 @@ void MultisigDialog::on_createButton_clicked()
     std::vector<CTxOut> vUserOut;
     try{
         //Add inputs from Coin Control if any are selected
-        if (CoinControlDialog::coinControl->HasSelected()) {
+        if (CoinControlDialog::coinControl()->HasSelected()) {
             std::vector<COutPoint> vSelected;
-            CoinControlDialog::coinControl->ListSelected(vSelected);
+            CoinControlDialog::coinControl()->ListSelected(vSelected);
             for (auto outpoint : vSelected)
                 vUserIn.emplace_back(CTxIn(outpoint));
         }else{//check for raw inputs

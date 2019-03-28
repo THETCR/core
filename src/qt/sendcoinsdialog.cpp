@@ -71,11 +71,11 @@ SendCoinsDialog::SendCoinsDialog(QWidget* parent) : QDialog(parent, Qt::WindowSy
     bool useSwiftTX = settings.value("bUseSwiftTX").toBool();
     if (fLiteMode) {
         ui->checkSwiftTX->setVisible(false);
-        CoinControlDialog::coinControl->useObfuScation = false;
-        CoinControlDialog::coinControl->useSwiftTX = false;
+        CoinControlDialog::coinControl()->useObfuScation = false;
+        CoinControlDialog::coinControl()->useSwiftTX = false;
     } else {
         ui->checkSwiftTX->setChecked(useSwiftTX);
-        CoinControlDialog::coinControl->useSwiftTX = useSwiftTX;
+        CoinControlDialog::coinControl()->useSwiftTX = useSwiftTX;
     }
 
     connect(ui->checkSwiftTX, SIGNAL(stateChanged(int)), this, SLOT(updateSwiftTX()));
@@ -231,7 +231,7 @@ void SendCoinsDialog::on_sendButton_clicked()
         //UTXO splitter - address should be our own
         CBitcoinAddress address = entry->getValue().address.toStdString();
         if (!model->isMine(address) && ui->splitBlockCheckBox->checkState() == Qt::Checked) {
-            CoinControlDialog::coinControl->fSplitBlock = false;
+            CoinControlDialog::coinControl()->fSplitBlock = false;
             ui->splitBlockCheckBox->setCheckState(Qt::Unchecked);
             QMessageBox::warning(this, tr("Send Coins"),
                 tr("The split block tool does not work when sending to outside addresses. Try again."),
@@ -253,10 +253,10 @@ void SendCoinsDialog::on_sendButton_clicked()
     }
 
     //set split block in model
-    CoinControlDialog::coinControl->fSplitBlock = ui->splitBlockCheckBox->checkState() == Qt::Checked;
+    CoinControlDialog::coinControl()->fSplitBlock = ui->splitBlockCheckBox->checkState() == Qt::Checked;
 
     if (ui->entries->count() > 1 && ui->splitBlockCheckBox->checkState() == Qt::Checked) {
-        CoinControlDialog::coinControl->fSplitBlock = false;
+        CoinControlDialog::coinControl()->fSplitBlock = false;
         ui->splitBlockCheckBox->setCheckState(Qt::Unchecked);
         QMessageBox::warning(this, tr("Send Coins"),
             tr("The split block tool does not work with multiple addresses. Try again."),
@@ -264,8 +264,8 @@ void SendCoinsDialog::on_sendButton_clicked()
         return;
     }
 
-    if (CoinControlDialog::coinControl->fSplitBlock)
-        CoinControlDialog::coinControl->nSplitBlock = int(ui->splitBlockLineEdit->text().toInt());
+    if (CoinControlDialog::coinControl()->fSplitBlock)
+        CoinControlDialog::coinControl()->nSplitBlock = int(ui->splitBlockLineEdit->text().toInt());
 
     QString strFunds = "";
     QString strFee = "";
@@ -311,8 +311,8 @@ void SendCoinsDialog::on_sendButton_clicked()
             recipientElement = tr("%1 to %2").arg(amount, address);
         }
 
-        if (CoinControlDialog::coinControl->fSplitBlock) {
-            recipientElement.append(tr(" split into %1 outputs using the UTXO splitter.").arg(CoinControlDialog::coinControl->nSplitBlock));
+        if (CoinControlDialog::coinControl()->fSplitBlock) {
+            recipientElement.append(tr(" split into %1 outputs using the UTXO splitter.").arg(CoinControlDialog::coinControl()->nSplitBlock));
         }
 
         formatted.append(recipientElement);
@@ -421,7 +421,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee,
 
     if (sendStatus.status == WalletModel::OK) {
         accept();
-        CoinControlDialog::coinControl->UnSelectAll();
+        CoinControlDialog::coinControl()->UnSelectAll();
         coinControlUpdateLabels();
     }
     fNewRecipientAllowed = true;
@@ -588,7 +588,7 @@ void SendCoinsDialog::updateSwiftTX()
 
     QSettings settings;
     settings.setValue("bUseSwiftTX", useSwiftTX);
-    CoinControlDialog::coinControl->useSwiftTX = useSwiftTX;
+    CoinControlDialog::coinControl()->useSwiftTX = useSwiftTX;
 
     // If SwiftX activated
     if (useSwiftTX) {
@@ -782,7 +782,7 @@ void SendCoinsDialog::updateSmartFeeLabel()
 void SendCoinsDialog::splitBlockChecked(int state)
 {
     if (model) {
-        CoinControlDialog::coinControl->fSplitBlock = (state == Qt::Checked);
+        CoinControlDialog::coinControl()->fSplitBlock = (state == Qt::Checked);
         fSplitBlock = (state == Qt::Checked);
         ui->splitBlockLineEdit->setEnabled((state == Qt::Checked));
         ui->labelBlockSizeText->setEnabled((state == Qt::Checked));
@@ -869,7 +869,7 @@ void SendCoinsDialog::coinControlFeatureChanged(bool checked)
     ui->frameCoinControl->setVisible(checked);
 
     if (!checked && model) // coin control features disabled
-        CoinControlDialog::coinControl->SetNull();
+        CoinControlDialog::coinControl()->SetNull();
 
     if (checked)
         coinControlUpdateLabels();
@@ -888,7 +888,7 @@ void SendCoinsDialog::coinControlButtonClicked()
 void SendCoinsDialog::coinControlChangeChecked(int state)
 {
     if (state == Qt::Unchecked) {
-        CoinControlDialog::coinControl->destChange = CNoDestination();
+        CoinControlDialog::coinControl()->destChange = CNoDestination();
         ui->labelCoinControlChangeLabel->clear();
     } else
         // use this to re-validate an already entered address
@@ -902,7 +902,7 @@ void SendCoinsDialog::coinControlChangeEdited(const QString& text)
 {
     if (model && model->getAddressTableModel()) {
         // Default to no change address until verified
-        CoinControlDialog::coinControl->destChange = CNoDestination();
+        CoinControlDialog::coinControl()->destChange = CNoDestination();
         ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:red;}");
 
         CBitcoinAddress addr = CBitcoinAddress(text.toStdString());
@@ -932,7 +932,7 @@ void SendCoinsDialog::coinControlChangeEdited(const QString& text)
                 else
                     ui->labelCoinControlChangeLabel->setText(tr("(no label)"));
 
-                CoinControlDialog::coinControl->destChange = addr.Get();
+                CoinControlDialog::coinControl()->destChange = addr.Get();
             }
         }
     }
@@ -952,7 +952,7 @@ void SendCoinsDialog::coinControlUpdateLabels()
             CoinControlDialog::payAmounts.append(entry->getValue().amount);
     }
 
-    if (CoinControlDialog::coinControl->HasSelected()) {
+    if (CoinControlDialog::coinControl()->HasSelected()) {
         // actual coin control calculation
         CoinControlDialog::updateLabels(model, this);
 

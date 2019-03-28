@@ -135,7 +135,7 @@ QString ReceiveCoinsDialog::getAddress(QString label)
 {
     if (ui->reuseAddress->isChecked()) {
         /* Choose existing receiving address */
-        AddressBookPage dlg(AddressBookPage::ForSelection, AddressBookPage::ReceivingTab, this);
+        AddressBookPage dlg(platformStyle, AddressBookPage::ForSelection, AddressBookPage::ReceivingTab, this);
         dlg.setModel(model->getAddressTableModel());
         if (dlg.exec()) {
             return dlg.getReturnValue();
@@ -177,7 +177,7 @@ void ReceiveCoinsDialog::on_receivingAddressesButton_clicked()
 {
     if (!model)
         return;
-    AddressBookPage dlg(AddressBookPage::ForEditing, AddressBookPage::ReceivingTab, this);
+    AddressBookPage dlg(platformStyle, AddressBookPage::ForEditing, AddressBookPage::ReceivingTab, this);
     dlg.setModel(model->getAddressTableModel());
     dlg.exec();
 }
