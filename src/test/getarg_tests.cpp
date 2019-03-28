@@ -12,13 +12,13 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(getarg_tests)
+BOOST_FIXTURE_TEST_SUITE(getarg_tests, BasicTestingSetup)
 
 static void ResetArgs(const std::string& strArg)
 {
     std::vector<std::string> vecArg;
     if (strArg.size())
-        boost::split(vecArg, strArg, IsSpace, boost::token_compress_on);
+      boost::split(vecArg, strArg, IsSpace, boost::token_compress_on);
 
     // Insert dummy executable name:
     vecArg.insert(vecArg.begin(), "testbitcoin");

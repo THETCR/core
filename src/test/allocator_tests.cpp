@@ -9,40 +9,41 @@
 #include <test/test_wispr.h>
 
 #include <memory>
+
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(allocator_tests)
+BOOST_FIXTURE_TEST_SUITE(allocator_tests, BasicTestingSetup)
 
 /** Mock LockedPageAllocator for testing */
 class TestLockedPageAllocator: public LockedPageAllocator
 {
 public:
-  TestLockedPageAllocator(int count_in, int lockedcount_in): count(count_in), lockedcount(lockedcount_in) {}
-  void* AllocateLocked(size_t len, bool *lockingSuccess) override
-  {
-      *lockingSuccess = false;
-      if (count > 0) {
-          --count;
+    TestLockedPageAllocator(int count_in, int lockedcount_in): count(count_in), lockedcount(lockedcount_in) {}
+    void* AllocateLocked(size_t len, bool *lockingSuccess) override
+    {
+        *lockingSuccess = false;
+        if (count > 0) {
+            --count;
 
-          if (lockedcount > 0) {
-              --lockedcount;
-              *lockingSuccess = true;
-          }
+            if (lockedcount > 0) {
+                --lockedcount;
+                *lockingSuccess = true;
+            }
 
-          return reinterpret_cast<void*>(uint64_t{static_cast<uint64_t>(0x08000000) + (count << 24)}); // Fake address, do not actually use this memory
-      }
-      return nullptr;
-  }
-  void FreeLocked(void* addr, size_t len) override
-  {
-  }
-  size_t GetLimit() override
-  {
-      return std::numeric_limits<size_t>::max();
-  }
+            return reinterpret_cast<void*>(uint64_t{static_cast<uint64_t>(0x08000000) + (count << 24)}); // Fake address, do not actually use this memory
+        }
+        return nullptr;
+    }
+    void FreeLocked(void* addr, size_t len) override
+    {
+    }
+    size_t GetLimit() override
+    {
+        return std::numeric_limits<size_t>::max();
+    }
 private:
-  int count;
-  int lockedcount;
+    int count;
+    int lockedcount;
 };
 
 BOOST_AUTO_TEST_CASE(lockedpool_tests_mock)
@@ -117,6 +118,5 @@ BOOST_AUTO_TEST_CASE(lockedpool_tests_live)
     // Usage must be back to where it started
     BOOST_CHECK(pool.stats().used == initial.used);
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()

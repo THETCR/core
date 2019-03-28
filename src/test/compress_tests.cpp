@@ -4,7 +4,7 @@
 
 #include <compressor.h>
 #include <util/system.h>
-#include <test/test_wispr.h>
+#include <test/test_bitcoin.h>
 
 #include <stdint.h>
 
@@ -22,7 +22,7 @@
 // amounts 50 .. 21000000
 #define NUM_MULTIPLES_50BTC 420000
 
-BOOST_AUTO_TEST_SUITE(compress_tests)
+BOOST_FIXTURE_TEST_SUITE(compress_tests, BasicTestingSetup)
 
 bool static TestEncode(uint64_t in) {
     return in == DecompressAmount(CompressAmount(in));
@@ -34,7 +34,7 @@ bool static TestDecode(uint64_t in) {
 
 bool static TestPair(uint64_t dec, uint64_t enc) {
     return CompressAmount(dec) == enc &&
-        DecompressAmount(enc) == dec;
+           DecompressAmount(enc) == dec;
 }
 
 BOOST_AUTO_TEST_CASE(compress_amounts)

@@ -3,26 +3,26 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "base58.h"
-
-#include "data/base58_encode_decode.json.h"
+#include <test/data/base58_encode_decode.json.h>
 #include "data/base58_keys_invalid.json.h"
 #include "data/base58_keys_valid.json.h"
 
+#include <base58.h>
+#include <test/test_wispr.h>
 #include "key.h"
 #include "script/script.h"
 #include "uint256.h"
 #include <util/system.h>
 #include <util/strencodings.h>
 
+#include <univalue.h>
 
 #include <boost/test/unit_test.hpp>
 
-#include <univalue.h>
 
 extern UniValue read_json(const std::string& jsondata);
 
-BOOST_AUTO_TEST_SUITE(base58_tests)
+BOOST_FIXTURE_TEST_SUITE(base58_tests, BasicTestingSetup)
 
 // Goal: test low-level base58 encoding functionality
 BOOST_AUTO_TEST_CASE(base58_EncodeBase58)
