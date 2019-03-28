@@ -725,6 +725,12 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
         label->setVisible(nChange < 0);
 }
 
+CCoinControl* CoinControlDialog::coinControl()
+{
+    static CCoinControl coin_control;
+    return &coin_control;
+}
+
 void CoinControlDialog::updateView()
 {
     if (!model || !model->getOptionsModel() || !model->getAddressTableModel())
@@ -864,15 +870,16 @@ void CoinControlDialog::updateView()
             itemOutput->setText(COLUMN_VOUT_INDEX, QString::number(out.i));
 
             // disable locked coins
-            if (model->isLockedCoin(txhash, out.i)) {
+            COutPoint output(txhash, out.i);
+            if (model->wallet().isLockedCoin(output))
                 COutPoint outpt(txhash, out.i);
-                coinControl()->UnSelect(outpt); // just to be sure
+                coinControl()->UnSelect(output); // just to be sure
                 itemOutput->setDisabled(true);
                 itemOutput->setIcon(COLUMN_CHECKBOX, QIcon(":/icons/lock_closed"));
             }
 
             // set checkbox
-            if (coinControl()->IsSelected(txhash, out.i))
+            if (coinControl()->IsSelected(output))
                 itemOutput->setCheckState(COLUMN_CHECKBOX, Qt::Checked);
         }
 
