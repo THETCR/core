@@ -41,21 +41,14 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
     CAmount nNet = nCredit - nDebit;
     uint256 hash = wtx.tx->GetHash();
     std::map<std::string, std::string> mapValue = wtx.value_map;
-    bool fZSpendFromMe = false;
-
-    if (wtx.tx->IsZerocoinSpend()) {
-        // a zerocoin spend that was created by this wallet
-        libzerocoin::CoinSpend zcspend = TxInToZerocoinSpend(wtx.tx->vin[0]);
-        fZSpendFromMe = wallet->IsMyZerocoinSpend(zcspend.getCoinSerialNumber());
-    }
-
-    if (wtx.tx->IsCoinStake()) {
+    bool fZSpendFromMe = wtx.is_mine_zerocoin_spend;
+    if (wtx.is_coinstake) {
         TransactionRecord sub(hash, nTime);
         CTxDestination address;
         if (!wtx.tx->IsZerocoinSpend() && !ExtractDestination(wtx.tx->vout[1].scriptPubKey, address))
             return parts;
 
-        if (wtx.tx->IsZerocoinSpend() && (fZSpendFromMe || wallet->zwspTracker->HasMintTx(hash))) {
+        if (wtx.is_zerocoin_spend && (fZSpendFromMe || wtx.tracker_has_mint)) {
             //zWSP stake reward
             sub.involvesWatchAddress = false;
             sub.type = TransactionRecord::StakeZWSP;
@@ -66,7 +59,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
                     sub.credit += out.nValue;
             }
             sub.debit -= wtx.tx->vin[0].nSequence * COIN;
-        } else if (isminetype mine = wallet->IsMine(wtx.tx->vout[1])) {
+        } else if (isminetype mine = wtx.txout_is_mine[1]) {
             // WSP stake reward
             sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
             sub.type = TransactionRecord::StakeMint;
@@ -76,8 +69,8 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
             //Masternode reward
             CTxDestination destMN;
             int nIndexMN = wtx.tx->vout.size() - 1;
-            if (ExtractDestination(wtx.tx->vout[nIndexMN].scriptPubKey, destMN) && IsMine(*wallet, destMN)) {
-                isminetype mine = wallet->IsMine(wtx.tx->vout[nIndexMN]);
+            if (wtx.txout_address_is_mine[nIndexMN]) {
+                isminetype mine = wtx.txout_is_mine[nIndexMN];
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                 sub.type = TransactionRecord::MNReward;
                 sub.address = CBitcoinAddress(destMN).ToString();
@@ -89,14 +82,15 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
     } else if (wtx.tx->IsZerocoinSpend()) {
         //zerocoin spend outputs
         bool fFeeAssigned = false;
-        for (const CTxOut& txout : wtx.tx->vout) {
+        for (unsigned int i = 0; i < wtx.tx->vout.size(); i++) {
+            const CTxOut& txout = wtx.tx->vout[i];
             // change that was reminted as zerocoins
             if (txout.IsZerocoinMint()) {
                 // do not display record if this isn't from our wallet
                 if (!fZSpendFromMe)
                     continue;
 
-                isminetype mine = wallet->IsMine(txout);
+                isminetype mine = wtx.txout_is_mine[i];
                 TransactionRecord sub(hash, nTime);
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                 sub.type = TransactionRecord::ZerocoinSpend_Change_zWsp;
@@ -116,7 +110,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
                 strAddress = CBitcoinAddress(address).ToString();
 
             // a zerocoinspend that was sent to an address held by this wallet
-            isminetype mine = wallet->IsMine(txout);
+            isminetype mine = wtx.txout_is_mine[i];
             if (mine) {
                 TransactionRecord sub(hash, nTime);
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
@@ -191,12 +185,13 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
         int nFromMe = 0;
         bool involvesWatchAddress = false;
         isminetype fAllFromMe = ISMINE_SPENDABLE;
-        for (const CTxIn& txin: wtx.tx->vin) {
-            if (wallet->IsMine(txin)) {
-                fAllFromMeDenom = fAllFromMeDenom && wallet->IsDenominated(txin);
+        for (unsigned int i = 0; i < wtx.tx->vin.size(); i++) {
+            const CTxIn& txin = wtx.tx->vin[i];
+            if (wtx.txin_is_mine[i]) {
+                fAllFromMeDenom = fAllFromMeDenom && wtx.txin_is_denominated[i];
                 nFromMe++;
             }
-            isminetype mine = wallet->IsMine(txin);
+            isminetype mine = wtx.txin_is_mine[i];
             if (mine & ISMINE_WATCH_ONLY) involvesWatchAddress = true;
             if (fAllFromMe > mine) fAllFromMe = mine;
         }
@@ -204,12 +199,13 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
         isminetype fAllToMe = ISMINE_SPENDABLE;
         bool fAllToMeDenom = true;
         int nToMe = 0;
-        for (const CTxOut& txout: wtx.tx->vout) {
-            if (wallet->IsMine(txout)) {
-                fAllToMeDenom = fAllToMeDenom && wallet->IsDenominatedAmount(txout.nValue);
+        for (unsigned int i = 0; i < wtx.tx->vout.size(); i++) {
+            const CTxOut& txout = wtx.tx->vout[i];
+            if (wtx.txout_is_mine[i]) {
+                fAllToMeDenom = fAllToMeDenom && wtx.txout_is_denominated_amount[i];
                 nToMe++;
             }
-            isminetype mine = wallet->IsMine(txout);
+            isminetype mine = wtx.txout_is_mine[i];
             if (mine & ISMINE_WATCH_ONLY) involvesWatchAddress = true;
             if (fAllToMe > mine) fAllToMe = mine;
         }
@@ -242,8 +238,8 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
                     const CTxOut& txout = wtx.tx->vout[nOut];
                     sub.idx = parts.size();
 
-                    if (wallet->IsCollateralAmount(txout.nValue)) sub.type = TransactionRecord::ObfuscationMakeCollaterals;
-                    if (wallet->IsDenominatedAmount(txout.nValue)) sub.type = TransactionRecord::ObfuscationCreateDenominations;
+                    if (wtx.txout_is_collateral_amount[nOut]) sub.type = TransactionRecord::ObfuscationMakeCollaterals;
+                    if (wtx.txout_is_denominated_amount[nOut]) sub.type = TransactionRecord::ObfuscationCreateDenominations;
                     if (nDebit - wtx.tx->GetValueOut() == OBFUSCATION_COLLATERAL) sub.type = TransactionRecord::ObfuscationCollateralPayment;
                 }
             }
@@ -372,7 +368,7 @@ void TransactionRecord::updateStatus(const interfaces::WalletTxStatus& wtx, int 
 
             if (wtx.is_in_main_chain){
                 // Check if the block was requested by anyone
-                if (GetAdjustedTime() - wtx.time_received > 2 * 60 && wtx.GetRequestCount() == 0)
+                if (GetAdjustedTime() - wtx.time_received > 2 * 60 && wtx.request_count == 0)
                     status.status = TransactionStatus::MaturesWarning;
             } else {
                 status.status = TransactionStatus::NotAccepted;

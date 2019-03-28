@@ -217,7 +217,6 @@ public:
     bool isMine(const std::string &sAddress);
     bool isUsed(const std::string &sAddress);
     void getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs);
-    bool isSpent(const COutPoint& outpoint) const;
     void listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const;
 
     bool isLockedCoin(COutPoint& output) const;

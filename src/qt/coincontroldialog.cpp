@@ -500,18 +500,19 @@ void CoinControlDialog::updateDialogLabels()
     }
 
     std::vector<COutPoint> vCoinControl;
-    std::vector<COutput> vOutputs;
     coinControl()->ListSelected(vCoinControl);
-    model->getOutputs(vCoinControl, vOutputs);
 
     CAmount nAmount = 0;
     unsigned int nQuantity = 0;
-    for (const COutput& out : vOutputs) {
+    size_t i = 0;
+    for (const auto& out : model->wallet().getCoins(vCoinControl)) {
+        if (out.depth_in_main_chain < 0) continue;
+
         // unselect already spent, very unlikely scenario, this could happen
         // when selected are spent elsewhere, like rpc or another computer
-        uint256 txhash = out.tx->tx->GetHash();
-        COutPoint outpt(txhash, out.i);
-        if(model->isSpent(outpt)) {
+        const COutPoint& outpt = vCoinControl[i++];
+        if (out.is_spent)
+        {
             coinControl()->UnSelect(outpt);
             continue;
         }
@@ -520,7 +521,7 @@ void CoinControlDialog::updateDialogLabels()
         nQuantity++;
 
         // Amount
-        nAmount += out.tx->tx->vout[out.i].nValue;
+        nAmount += out.txout.nValue;
     }
     MultisigDialog* multisigDialog = (MultisigDialog*)this->parentWidget();
 
@@ -560,16 +561,17 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
     bool fAllowFree = false;
 
     std::vector<COutPoint> vCoinControl;
-    std::vector<COutput> vOutputs;
     coinControl()->ListSelected(vCoinControl);
-    model->getOutputs(vCoinControl, vOutputs);
 
-    for (const COutput& out: vOutputs) {
+    size_t i = 0;
+    for (const auto& out : model->wallet().getCoins(vCoinControl)) {
+        if (out.depth_in_main_chain < 0) continue;
+
         // unselect already spent, very unlikely scenario, this could happen
         // when selected are spent elsewhere, like rpc or another computer
-        uint256 txhash = out.tx->tx->GetHash();
-        COutPoint outpt(txhash, out.i);
-        if (model->isSpent(outpt)) {
+        const COutPoint& outpt = vCoinControl[i++];
+        if (out.is_spent)
+        {
             coinControl()->UnSelect(outpt);
             continue;
         }
@@ -578,17 +580,17 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
         nQuantity++;
 
         // Amount
-        nAmount += out.tx->tx->vout[out.i].nValue;
+        nAmount += out.txout.nValue;
 
         // Priority
-        dPriorityInputs += (double)out.tx->tx->vout[out.i].nValue * (out.nDepth + 1);
+        dPriorityInputs += (double)out.txout.nValue * (out.depth_in_main_chain + 1);
 
         // Bytes
         CTxDestination address;
-        if (ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, address)) {
+        if (ExtractDestination(out.txout.scriptPubKey, address)) {
             CPubKey pubkey;
             CKeyID* keyid = boost::get<CKeyID>(&address);
-            if (keyid && model->getPubKey(*keyid, pubkey)) {
+            if (keyid && model->wallet().getPubKey(*keyid, pubkey)) {
                 nBytesInputs += (pubkey.IsCompressed() ? 148 : 180);
                 if (!pubkey.IsCompressed())
                     nQuantityUncompressed++;
@@ -747,18 +749,16 @@ void CoinControlDialog::updateView()
     int nDisplayUnit = model->getOptionsModel()->getDisplayUnit();
     double mempoolEstimatePriority = ::feeEstimator.estimatePriority(nTxConfirmTarget);
 
-    map<QString, std::vector<COutput>> mapCoins;
-    model->listCoins(mapCoins);
-
-    for (std::pair<QString, std::vector<COutput>> coins: mapCoins) {
-        CCoinControlWidgetItem* itemWalletAddress = new CCoinControlWidgetItem();
+    for (const auto& coins : model->wallet().listCoins()) {
+        CCoinControlWidgetItem *itemWalletAddress = new CCoinControlWidgetItem();
         itemWalletAddress->setCheckState(COLUMN_CHECKBOX, Qt::Unchecked);
-        QString sWalletAddress = coins.first;
+        QString sWalletAddress = QString::fromStdString(EncodeDestination(coins.first));
         QString sWalletLabel = model->getAddressTableModel()->labelForAddress(sWalletAddress);
         if (sWalletLabel.isEmpty())
             sWalletLabel = tr("(no label)");
 
-        if (treeMode) {
+        if (treeMode)
+        {
             // wallet address
             ui->treeWidget->addTopLevelItem(itemWalletAddress);
 
@@ -778,31 +778,30 @@ void CoinControlDialog::updateView()
         double dPrioritySum = 0;
         int nChildren = 0;
         int nInputSum = 0;
-        for(const COutput& out: coins.second) {
-            isminetype mine = pwalletMain->IsMine(out.tx->tx->vout[out.i]);
+        for (const auto& outpair : coins.second) {
+            const COutPoint& output = std::get<0>(outpair);
+            const interfaces::WalletTxOut& out = std::get<1>(outpair);
+            isminetype mine = pwalletMain->IsMine(out.txout);
             bool fMultiSigUTXO = (mine & ISMINE_MULTISIG);
             // when multisig is enabled, it will only display outputs from multisig addresses
             if (fMultisigEnabled && !fMultiSigUTXO)
                 continue;
             int nInputSize = 0;
-            nSum += out.tx->tx->vout[out.i].nValue;
+            nSum += out.txout.nValue;
             nChildren++;
 
-            CCoinControlWidgetItem* itemOutput;
-            if (treeMode)
-                itemOutput = new CCoinControlWidgetItem(itemWalletAddress);
-            else
-                itemOutput = new CCoinControlWidgetItem(ui->treeWidget);
+            CCoinControlWidgetItem *itemOutput;
+            if (treeMode)    itemOutput = new CCoinControlWidgetItem(itemWalletAddress);
+            else             itemOutput = new CCoinControlWidgetItem(ui->treeWidget);
             itemOutput->setFlags(flgCheckbox);
-            itemOutput->setCheckState(COLUMN_CHECKBOX, Qt::Unchecked);
+            itemOutput->setCheckState(COLUMN_CHECKBOX,Qt::Unchecked);
 
             //MultiSig
             if (fMultiSigUTXO) {
                 itemOutput->setText(COLUMN_TYPE, "MultiSig");
 
                 if (!fMultisigEnabled) {
-                    COutPoint outpt(out.tx->tx->GetHash(), out.i);
-                    coinControl()->UnSelect(outpt); // just to be sure
+                    coinControl()->UnSelect(output); // just to be sure
                     itemOutput->setDisabled(true);
                     itemOutput->setIcon(COLUMN_CHECKBOX, QIcon(":/icons/lock_closed"));
                 }
@@ -813,8 +812,8 @@ void CoinControlDialog::updateView()
             // address
             CTxDestination outputAddress;
             QString sAddress = "";
-            if (ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, outputAddress)) {
-                sAddress = QString::fromStdString(CBitcoinAddress(outputAddress).ToString());
+            if (ExtractDestination(out.txout.scriptPubKey, outputAddress)) {
+                sAddress = QString::fromStdString(EncodeDestination(outputAddress));
 
                 // if listMode or change => show WISPR address. In tree mode, address is not shown again for direct wallet address outputs
                 if (!treeMode || (!(sAddress == sWalletAddress)))
@@ -824,7 +823,7 @@ void CoinControlDialog::updateView()
 
                 CPubKey pubkey;
                 CKeyID* keyid = boost::get<CKeyID>(&outputAddress);
-                if (keyid && model->getPubKey(*keyid, pubkey) && !pubkey.IsCompressed())
+                if (keyid && model->wallet().getPubKey(*keyid, pubkey) && !pubkey.IsCompressed())
                     nInputSize = 29; // 29 = 180 - 151 (public key is 180 bytes, priority free area is 151 bytes)
             }
 
@@ -842,40 +841,39 @@ void CoinControlDialog::updateView()
             }
 
             // amount
-            itemOutput->setText(COLUMN_AMOUNT, BitcoinUnits::format(nDisplayUnit, out.tx->tx->vout[out.i].nValue));
-            itemOutput->setToolTip(COLUMN_AMOUNT, BitcoinUnits::format(nDisplayUnit, out.tx->tx->vout[out.i].nValue));
-            itemOutput->setData(COLUMN_AMOUNT, Qt::UserRole, QVariant((qlonglong) out.tx->tx->vout[out.i].nValue));
+            itemOutput->setText(COLUMN_AMOUNT, BitcoinUnits::format(nDisplayUnit, out.txout.nValue));
+            itemOutput->setToolTip(COLUMN_AMOUNT, BitcoinUnits::format(nDisplayUnit, out.txout.nValue));
+            itemOutput->setData(COLUMN_AMOUNT, Qt::UserRole, QVariant((qlonglong) out.txout.nValue));
 
             // date
-            itemOutput->setText(COLUMN_DATE, GUIUtil::dateTimeStr(out.tx->GetTxTime()));
-            itemOutput->setToolTip(COLUMN_DATE, GUIUtil::dateTimeStr(out.tx->GetTxTime()));
-            itemOutput->setData(COLUMN_DATE, Qt::UserRole, QVariant((qlonglong) out.tx->GetTxTime()));
+            itemOutput->setText(COLUMN_DATE, GUIUtil::dateTimeStr(out.time));
+            itemOutput->setToolTip(COLUMN_DATE, GUIUtil::dateTimeStr(out.time));
+            itemOutput->setData(COLUMN_DATE, Qt::UserRole, QVariant((qlonglong) out.time));
 
             // confirmations
-            itemOutput->setText(COLUMN_CONFIRMATIONS, QString::number(out.nDepth));
-            itemOutput->setData(COLUMN_CONFIRMATIONS, Qt::UserRole, QVariant((qlonglong) out.nDepth));
+            itemOutput->setText(COLUMN_CONFIRMATIONS, QString::number(out.depth_in_main_chain));
+            itemOutput->setData(COLUMN_CONFIRMATIONS, Qt::UserRole, QVariant((qlonglong) out.depth_in_main_chain));
 
             // priority
-            double dPriority = ((double)out.tx->tx->vout[out.i].nValue / (nInputSize + 78)) * (out.nDepth + 1); // 78 = 2 * 34 + 10
+            double dPriority = ((double)out.txout.nValue / (nInputSize + 78)) * (out.depth_in_main_chain + 1); // 78 = 2 * 34 + 10
             itemOutput->setText(COLUMN_PRIORITY, CoinControlDialog::getPriorityLabel(dPriority, mempoolEstimatePriority));
             itemOutput->setData(COLUMN_PRIORITY, Qt::UserRole, QVariant((qlonglong) dPriority));
-            dPrioritySum += (double)out.tx->tx->vout[out.i].nValue * (out.nDepth + 1);
+            dPrioritySum += (double)out.txout.nValue * (out.depth_in_main_chain + 1);
             nInputSum += nInputSize;
 
             // transaction hash
-            uint256 txhash = out.tx->tx->GetHash();
+            uint256 txhash = output.hash;
             itemOutput->setText(COLUMN_TXHASH, QString::fromStdString(txhash.GetHex()));
 
             // vout index
-            itemOutput->setText(COLUMN_VOUT_INDEX, QString::number(out.i));
+            itemOutput->setText(COLUMN_VOUT_INDEX, QString::number(output.n));
 
-            // disable locked coins
-            COutPoint output(txhash, out.i);
-            if (model->wallet().isLockedCoin(output)){
-                COutPoint outpt(txhash, out.i);
+             // disable locked coins
+            if (model->wallet().isLockedCoin(output))
+            {
                 coinControl()->UnSelect(output); // just to be sure
                 itemOutput->setDisabled(true);
-                itemOutput->setIcon(COLUMN_CHECKBOX, QIcon(":/icons/lock_closed"));
+                itemOutput->setIcon(COLUMN_CHECKBOX, platformStyle->SingleColorIcon(":/icons/lock_closed"));
             }
 
             // set checkbox
@@ -896,7 +894,8 @@ void CoinControlDialog::updateView()
     }
 
     // expand all partially selected
-    if (treeMode) {
+    if (treeMode)
+    {
         for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++)
             if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) == Qt::PartiallyChecked)
                 ui->treeWidget->topLevelItem(i)->setExpanded(true);

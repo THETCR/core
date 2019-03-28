@@ -308,6 +308,11 @@ public:
     virtual bool isAnonymizeOnlyUnlocked() = 0;
 
     virtual void setAnonymizeOnlyUnlocked(bool fWalletUnlockAnonymizeOnly) = 0;
+
+    //! Return whether an address belongs to wallet.
+    virtual bool addressIsMine(const std::string &sAddress) = 0;
+    virtual bool addressIsUsed(const std::string &sAddress) = 0;
+
 };
 
 //! Tracking object returned by CreateTransaction and passed to CommitTransaction.
@@ -371,15 +376,23 @@ struct WalletTx
 {
     CTransactionRef tx;
     std::vector<isminetype> txin_is_mine;
+    std::vector<bool> txin_is_denominated;
     std::vector<isminetype> txout_is_mine;
     std::vector<CTxDestination> txout_address;
     std::vector<isminetype> txout_address_is_mine;
+    std::vector<bool> txout_is_collateral_amount;
+    std::vector<bool> txout_is_denominated_amount;
     CAmount credit;
     CAmount debit;
     CAmount change;
     int64_t time;
     std::map<std::string, std::string> value_map;
     bool is_coinbase;
+    bool is_coinstake;
+    bool is_zerocoin_spend;
+    bool is_zerocoin_mint;
+    bool is_mine_zerocoin_spend;
+    bool tracker_has_mint;
 };
 
 //! Updated transaction status.
@@ -395,6 +408,8 @@ struct WalletTxStatus
     bool is_abandoned;
     bool is_coinbase;
     bool is_in_main_chain;
+    bool is_coinstake;
+    int request_count;
 };
 
 //! Wallet transaction output.

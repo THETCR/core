@@ -661,7 +661,7 @@ WalletModel::UnlockContext WalletModel::requestUnlock(AskPassphraseDialog::Conte
     bool was_locked = getEncryptionStatus() == Locked;
 
     if (!was_locked && isAnonymizeOnlyUnlocked()) {
-        wallet->setWalletLocked(true);
+        setWalletLocked(was_locked);
         m_wallet->setAnonymizeOnlyUnlocked(false);
         was_locked = getEncryptionStatus() == Locked;
     }
@@ -700,64 +700,9 @@ void WalletModel::UnlockContext::CopyFrom(const UnlockContext& rhs)
 
 bool WalletModel::getPubKey(const CKeyID& address, CPubKey& vchPubKeyOut) const
 {
-    return m_wallet->GetPubKey(address, vchPubKeyOut);
+    return wallet().getPubKey(address, vchPubKeyOut);
 }
 
-// returns a list of COutputs from COutPoints
-void WalletModel::getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs)
-{
-    auto locked_chain = m_wallet->chain().lock();
-    LOCK2(cs_main, m_wallet->cs_wallet);
-    for (const COutPoint& outpoint: vOutpoints) {
-        if (!m_wallet->mapWallet.count(outpoint.hash)) continue;
-        int nDepth = m_wallet->mapWallet[outpoint.hash].GetDepthInMainChain(*locked_chain);
-        if (nDepth < 0) continue;
-        COutput out(&m_wallet->mapWallet[outpoint.hash], outpoint.n, nDepth, true, true, true);
-        vOutputs.push_back(out);
-    }
-}
-
-bool WalletModel::isSpent(const COutPoint& outpoint) const
-{
-    LOCK2(cs_main, m_wallet->cs_wallet);
-    auto locked_chain = m_wallet->chain().lock();
-    return m_wallet->IsSpent(*locked_chain, outpoint.hash, outpoint.n);
-}
-
-// AvailableCoins + LockedCoins grouped by wallet address (put change in one group with wallet address)
-void WalletModel::listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const
-{
-    std::vector<COutput> vCoins;
-    auto locked_chain = m_wallet->chain().lock();
-    m_wallet->availableCoins(*locked_chain, vCoins);
-    LOCK2(cs_main, m_wallet->cs_wallet); // ListLockedCoins, mapWallet
-    std::vector<COutPoint> vLockedCoins;
-    m_wallet->listLockedCoins(vLockedCoins);
-
-    // add locked coins
-    for (const COutPoint& outpoint: vLockedCoins) {
-        if (!m_wallet->mapWallet.count(outpoint.hash)) continue;
-        int nDepth = m_wallet->mapWallet[outpoint.hash].GetDepthInMainChain(*locked_chain);
-        if (nDepth < 0) continue;
-        COutput out(&m_wallet->mapWallet[outpoint.hash], outpoint.n, nDepth, true, true, true);
-        if (outpoint.n < out.tx->tx->vout.size() && m_wallet->IsMine(out.tx->tx->vout[outpoint.n]) == ISMINE_SPENDABLE)
-            vCoins.push_back(out);
-    }
-
-    for (const COutput& out: vCoins) {
-        COutput cout = out;
-
-        while (m_wallet->IsChange(cout.tx->tx->vout[cout.i]) && cout.tx->tx->vin.size() > 0 && m_wallet->IsMine(cout.tx->tx->vin[0])) {
-            if (!m_wallet->mapWallet.count(cout.tx->tx->vin[0].prevout.hash)) break;
-            cout = COutput(&m_wallet->mapWallet[cout.tx->tx->vin[0].prevout.hash], cout.tx->tx->vin[0].prevout.n, 0, true, true, true);
-        }
-
-        CTxDestination address;
-        if (!out.fSpendable || !ExtractDestination(cout.tx->tx->vout[cout.i].scriptPubKey, address))
-            continue;
-        mapCoins[QString::fromStdString(CBitcoinAddress(address).ToString())].push_back(out);
-    }
-}
 
 bool WalletModel::isLockedCoin(COutPoint& output) const
 {
@@ -898,10 +843,10 @@ bool WalletModel::isMultiwallet()
 
 bool WalletModel::isMine(const std::string &sAddress)
 {
-    return IsMine(*wallet, DecodeDestination(sAddress));
+    return m_wallet->addressIsMine(sAddress);
 }
 
 bool WalletModel::isUsed(const std::string &sAddress)
 {
-    return m_wallet->isUsed(sAddress);
+    return m_wallet->addressIsUsed(sAddress);
 }

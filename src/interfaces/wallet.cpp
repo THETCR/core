@@ -31,6 +31,8 @@
 #include <wallet/rpcwallet.h>
 #include <wallet/wallet.h>
 #include <wallet/walletutil.h>
+#include <wallet/zwsptracker.h>
+#include <zwspchain.h>
 
 #include <memory>
 #include <string>
@@ -72,25 +74,45 @@ WalletTx MakeWalletTx(interfaces::Chain::Lock& locked_chain, CWallet& wallet, co
     WalletTx result;
     result.tx = wtx.tx;
     result.txin_is_mine.reserve(wtx.tx->vin.size());
+    result.txin_is_denominated.reserve(wtx.tx->vin.size());
     for (const auto& txin : wtx.tx->vin) {
         result.txin_is_mine.emplace_back(wallet.IsMine(txin));
+        result.txin_is_denominated.emplace_back(wallet.IsDenominated(txin));
     }
     result.txout_is_mine.reserve(wtx.tx->vout.size());
     result.txout_address.reserve(wtx.tx->vout.size());
     result.txout_address_is_mine.reserve(wtx.tx->vout.size());
+    result.txout_is_collateral_amount.reserve(wtx.tx->vout.size());
+    result.txout_is_denominated_amount.reserve(wtx.tx->vout.size());
     for (const auto& txout : wtx.tx->vout) {
         result.txout_is_mine.emplace_back(wallet.IsMine(txout));
         result.txout_address.emplace_back();
         result.txout_address_is_mine.emplace_back(ExtractDestination(txout.scriptPubKey, result.txout_address.back()) ?
                                                       IsMine(wallet, result.txout_address.back()) :
                                                       ISMINE_NO);
+        result.txout_is_collateral_amount.emplace_back(wallet.IsCollateralAmount(txout.nValue));
+        result.txout_is_denominated_amount.emplace_back(wallet.IsDenominatedAmount(txout.nValue));
+
     }
+    bool fZSpendFromMe = false;
+
+    if (wtx.tx->IsZerocoinSpend()) {
+        // a zerocoin spend that was created by this wallet
+        libzerocoin::CoinSpend zcspend = TxInToZerocoinSpend(wtx.tx->vin[0]);
+        fZSpendFromMe = wallet.IsMyZerocoinSpend(zcspend.getCoinSerialNumber());
+    }
+    uint256 hash = wtx.tx->GetHash();
     result.credit = wtx.GetCredit(locked_chain, ISMINE_ALL);
     result.debit = wtx.GetDebit(ISMINE_ALL);
     result.change = wtx.GetChange();
     result.time = wtx.GetTxTime();
     result.value_map = wtx.mapValue;
     result.is_coinbase = wtx.IsCoinBase();
+    result.is_coinstake = wtx.IsCoinStake();
+    result.is_zerocoin_spend = wtx.IsZerocoinSpend();
+    result.is_zerocoin_mint = wtx.IsZerocoinMint();
+    result.is_mine_zerocoin_spend = fZSpendFromMe;
+    result.tracker_has_mint = wallet.zwspTracker->HasMintTx(hash);
     return result;
 }
 
@@ -108,6 +130,8 @@ WalletTxStatus MakeWalletTxStatus(interfaces::Chain::Lock& locked_chain, const C
     result.is_abandoned = wtx.isAbandoned();
     result.is_coinbase = wtx.IsCoinBase();
     result.is_in_main_chain = wtx.IsInMainChain(locked_chain);
+    result.is_coinstake = wtx.IsCoinStake();
+    result.request_count = wtx.GetRequestCount();
     return result;
 }
 
@@ -530,6 +554,15 @@ public:
     void setAnonymizeOnlyUnlocked(bool fWalletUnlockAnonymizeOnly) override
     {
         m_wallet->SetAnonymizeOnlyUnlocked(fWalletUnlockAnonymizeOnly);
+    }
+
+    bool addressIsMine(const std::string &sAddress) override
+    {
+        return IsMine(*m_wallet, sAddress);
+    }
+    bool addressIsUsed(const std::string &sAddress) override
+    {
+        return m_wallet->IsUsed(sAddress);
     }
     std::shared_ptr<CWallet> m_wallet;
 };
