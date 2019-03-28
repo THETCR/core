@@ -297,7 +297,7 @@ void SendCoinsDialog::on_sendButton_clicked()
 
     QString strFunds = "";
     QString strFee = "";
-    recipients[0].inputType = ALL_COINS;
+    recipients[0].inputType = AvailableCoinsType::ALL_COINS;
 
     if (ui->checkSwiftTX->isChecked()) {
         recipients[0].useSwiftTX = true;
