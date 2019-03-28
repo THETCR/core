@@ -21,7 +21,6 @@ class CzWSPWallet
 private:
     uint256 seedMaster;
     uint32_t nCountLastUsed;
-    std::string strWalletFile;
     CMintPool mintPool;
     /** Interface for accessing chain state. */
     interfaces::Chain& m_chain;

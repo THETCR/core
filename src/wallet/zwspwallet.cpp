@@ -16,7 +16,6 @@ using namespace libzerocoin;
 
 CzWSPWallet::CzWSPWallet(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database) : m_chain(chain), m_location(location), database(database)
 {
-    this->strWalletFile = location.GetName();
     WalletBatch walletdb(database);
 
     uint256 hashSeed;

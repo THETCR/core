@@ -22,7 +22,6 @@ class CzWSPTracker
 {
 private:
     bool fInitialized;
-    std::string strWalletFile;
     std::map<uint256, CMintMeta> mapSerialHashes;
     std::map<uint256, uint256> mapPendingSpends; //serialhash, txid of spend
     bool UpdateStatusInternal(const std::set<uint256>& setMempool, CMintMeta& mint);
@@ -34,7 +33,7 @@ private:
     /** Internal database handle. */
     WalletDatabase& database;
 public:
-    CzWSPTracker(std::string strWalletFile, interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database);
+    CzWSPTracker(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database);
     ~CzWSPTracker();
     void Add(const CDeterministicMint& dMint, bool isNew = false, bool isArchived = false, CzWSPWallet* zWSPWallet = nullptr);
     void Add(const CZerocoinMint& mint, bool isNew = false, bool isArchived = false);

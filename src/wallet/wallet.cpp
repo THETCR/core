@@ -8448,7 +8448,7 @@ bool CWallet::DatabaseMint(CDeterministicMint& dMint)
 void CWallet::setZWallet(CzWSPWallet* zwallet)
 {
     zwalletMain = zwallet;
-    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(strWalletFile, m_chain, GetLocation(), GetDBHandle()));
+    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(m_chain, GetLocation(), GetDBHandle()));
 }
 
 //!OLD
