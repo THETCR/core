@@ -61,6 +61,7 @@ namespace BCLog {
         MNBUDGET    = (1 << 26),
         ZWSP        = (1 << 27),
         ALERT       = (1 << 28),
+        POS         = (1 << 29),
         ALL         = ~(uint32_t)0,
     };
 
