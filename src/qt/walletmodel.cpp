@@ -350,63 +350,63 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction &tran
     return SendCoinsReturn(OK);
 }
 
-WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction& transaction)
-{
-    QByteArray transaction_array; /* store serialized transaction */
-
-    if (isAnonymizeOnlyUnlocked()) {
-        return AnonymizeOnlyUnlocked;
-    }
-
-    {
-        LOCK2(cs_main, m_wallet->cs_wallet);
-        CWalletTx* newTx = transaction.getTransaction();
-        QList<SendCoinsRecipient> recipients = transaction.getRecipients();
-
-        // Store PaymentRequests in wtx.vOrderForm in wallet.
-        for (const SendCoinsRecipient& rcp: recipients) {
-            if (rcp.paymentRequest.IsInitialized()) {
-                std::string key("PaymentRequest");
-                std::string value;
-                rcp.paymentRequest.SerializeToString(&value);
-                newTx->vOrderForm.push_back(std::make_pair(key, value));
-            } else if (!rcp.message.isEmpty()) // Message from normal wispr:URI (wispr:XyZ...?message=example)
-            {
-                newTx->vOrderForm.push_back(std::make_pair("Message", rcp.message.toStdString()));
-            }
-        }
-
-        CReserveKey* keyChange = transaction.getPossibleKeyChange();
-
-        transaction.getRecipients();
-
-        if (!wallet->CommitTransaction(*newTx, *keyChange, (recipients[0].useSwiftTX) ? NetMsgType::TXLOCKREQUEST : NetMsgType::TX))
-            return TransactionCommitFailed;
-
-        CTransaction* t = (CTransaction*)newTx;
-        CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
-        ssTx << *t;
-        transaction_array.append(&(ssTx[0]), ssTx.size());
-    }
-
-    // Add addresses / update labels that we've sent to to the address book,
-    // and emit coinsSent signal for each recipient
-    for (const SendCoinsRecipient& rcp: transaction.getRecipients()) {
-        // Don't touch the address book when we have a payment request
-        if (!rcp.paymentRequest.IsInitialized()) {
-
-            std::string strAddress = rcp.address.toStdString();
-            CTxDestination dest = CBitcoinAddress(strAddress).Get();
-            std::string strLabel = rcp.label.toStdString();
-
-            updateAddressBookLabels(dest, strLabel, "send");
-        }
-        Q_EMIT coinsSent(wallet, rcp, transaction_array);
-    }
-    checkBalanceChanged(); // update balance immediately, otherwise there could be a short noticeable delay until pollBalanceChanged hits
-
-    return SendCoinsReturn(OK);
-}
+//WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction& transaction)
+//{
+//    QByteArray transaction_array; /* store serialized transaction */
+//
+//    if (isAnonymizeOnlyUnlocked()) {
+//        return AnonymizeOnlyUnlocked;
+//    }
+//
+//    {
+//        LOCK2(cs_main, m_wallet->cs_wallet);
+//        CWalletTx* newTx = transaction.getTransaction();
+//        QList<SendCoinsRecipient> recipients = transaction.getRecipients();
+//
+//        // Store PaymentRequests in wtx.vOrderForm in wallet.
+//        for (const SendCoinsRecipient& rcp: recipients) {
+//            if (rcp.paymentRequest.IsInitialized()) {
+//                std::string key("PaymentRequest");
+//                std::string value;
+//                rcp.paymentRequest.SerializeToString(&value);
+//                newTx->vOrderForm.push_back(std::make_pair(key, value));
+//            } else if (!rcp.message.isEmpty()) // Message from normal wispr:URI (wispr:XyZ...?message=example)
+//            {
+//                newTx->vOrderForm.push_back(std::make_pair("Message", rcp.message.toStdString()));
+//            }
+//        }
+//
+//        CReserveKey* keyChange = transaction.getPossibleKeyChange();
+//
+//        transaction.getRecipients();
+//
+//        if (!wallet->CommitTransaction(*newTx, *keyChange, (recipients[0].useSwiftTX) ? NetMsgType::TXLOCKREQUEST : NetMsgType::TX))
+//            return TransactionCommitFailed;
+//
+//        CTransaction* t = (CTransaction*)newTx;
+//        CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
+//        ssTx << *t;
+//        transaction_array.append(&(ssTx[0]), ssTx.size());
+//    }
+//
+//    // Add addresses / update labels that we've sent to to the address book,
+//    // and emit coinsSent signal for each recipient
+//    for (const SendCoinsRecipient& rcp: transaction.getRecipients()) {
+//        // Don't touch the address book when we have a payment request
+//        if (!rcp.paymentRequest.IsInitialized()) {
+//
+//            std::string strAddress = rcp.address.toStdString();
+//            CTxDestination dest = CBitcoinAddress(strAddress).Get();
+//            std::string strLabel = rcp.label.toStdString();
+//
+//            updateAddressBookLabels(dest, strLabel, "send");
+//        }
+//        Q_EMIT coinsSent(wallet, rcp, transaction_array);
+//    }
+//    checkBalanceChanged(); // update balance immediately, otherwise there could be a short noticeable delay until pollBalanceChanged hits
+//
+//    return SendCoinsReturn(OK);
+//}
 
 OptionsModel *WalletModel::getOptionsModel()
 {
@@ -485,7 +485,7 @@ bool WalletModel::changePassphrase(const SecureString &oldPass, const SecureStri
 bool WalletModel::backupWallet(const QString& filename)
 {
     //attempt regular backup
-    if(!m_wallet->BackupWallet(filename.toLocal8Bit().data())) {
+    if(!m_wallet->backupWallet(filename.toLocal8Bit().data())) {
         return error("ERROR: Failed to backup wallet!");
     }
 
@@ -766,7 +766,7 @@ bool WalletModel::bumpFee(uint256 hash, uint256& new_hash)
         return false;
     }
 
-    WalletModel::UnlockContext ctx(requestUnlock());
+    WalletModel::UnlockContext ctx(requestUnlock(AskPassphraseDialog::Context::Unlock_Full));
     if(!ctx.isValid())
     {
         return false;
