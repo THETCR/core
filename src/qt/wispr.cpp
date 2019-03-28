@@ -160,26 +160,26 @@ void BitcoinCore::initialize()
     }
 }
 
-//void BitcoinCore::restart(QStringList args)
-//{
-//    if (execute_restart) { // Only restart 1x, no matter how often a user clicks on a restart-button
-//        execute_restart = false;
-//        try {
-//            qDebug() << __func__ << ": Running Restart in thread";
-//            m_node.startRestart();
-//            m_node.prepareShutdown();
-//            qDebug() << __func__ << ": Shutdown finished";
-//            Q_EMIT shutdownResult();
-//            QProcess::startDetached(QApplication::applicationFilePath(), args);
-//            qDebug() << __func__ << ": Restart initiated...";
-//            QApplication::quit();
-//        } catch (std::exception& e) {
-//            handleRunawayException(&e);
-//        } catch (...) {
-//            handleRunawayException(NULL);
-//        }
-//    }
-//}
+void BitcoinCore::restart(QStringList args)
+{
+    if (execute_restart) { // Only restart 1x, no matter how often a user clicks on a restart-button
+        execute_restart = false;
+        try {
+            qDebug() << __func__ << ": Running Restart in thread";
+            m_node.startRestart();
+            m_node.prepareShutdown();
+            qDebug() << __func__ << ": Shutdown finished";
+            Q_EMIT shutdownResult();
+            QProcess::startDetached(QApplication::applicationFilePath(), args);
+            qDebug() << __func__ << ": Restart initiated...";
+            QApplication::quit();
+        } catch (std::exception& e) {
+            handleRunawayException(&e);
+        } catch (...) {
+            handleRunawayException(NULL);
+        }
+    }
+}
 
 void BitcoinCore::shutdown()
 {
@@ -296,7 +296,7 @@ void BitcoinApplication::startThread()
     connect(executor, &BitcoinCore::runawayException, this, &BitcoinApplication::handleRunawayException);
     connect(this, &BitcoinApplication::requestedInitialize, executor, &BitcoinCore::initialize);
     connect(this, &BitcoinApplication::requestedShutdown, executor, &BitcoinCore::shutdown);
-//    connect(this, &BitcoinApplication::requestedRestart, executor, &BitcoinCore::restart);
+    connect(this, &BitcoinApplication::requestedRestart, executor, &BitcoinCore::restart);
     /*  make sure executor object is deleted in its own thread */
     connect(coreThread, &QThread::finished, executor, &QObject::deleteLater);
 
