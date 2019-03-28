@@ -6,7 +6,7 @@
 #ifndef BITCOIN_QT_COINCONTROLDIALOG_H
 #define BITCOIN_QT_COINCONTROLDIALOG_H
 
-#include "amount.h"
+#include <amount.h>
 
 #include <QAbstractButton>
 #include <QAction>
@@ -17,15 +17,17 @@
 #include <QString>
 #include <QTreeWidgetItem>
 
+class PlatformStyle;
 class WalletModel;
 
 class MultisigDialog;
 class CCoinControl;
 
-namespace Ui
-{
-class CoinControlDialog;
+namespace Ui {
+    class CoinControlDialog;
 }
+
+#define ASYMP_UTF8 "\xE2\x89\x88"
 
 class CCoinControlWidgetItem : public QTreeWidgetItem
 {
@@ -37,15 +39,16 @@ public:
     bool operator<(const QTreeWidgetItem &other) const;
 };
 
+
 class CoinControlDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit CoinControlDialog(QWidget* parent = nullptr, bool fMultisigEnabled = false);
+    explicit CoinControlDialog(const PlatformStyle *platformStyle, QWidget *parent = nullptr, bool fMultisigEnabled = false);
     ~CoinControlDialog();
 
-    void setModel(WalletModel* model);
+    void setModel(WalletModel *model);
     void updateDialogLabels();
 
     // static because also called from sendcoinsdialog
@@ -53,27 +56,31 @@ public:
     static QString getPriorityLabel(double dPriority, double mempoolEstimatePriority);
 
     static QList<CAmount> payAmounts;
-    static CCoinControl* coinControl;
+    static CCoinControl *coinControl();
+    static bool fSubtractFeeFromAmount;
     static int nSplitBlockDummy;
 
 private:
-    Ui::CoinControlDialog* ui;
-    WalletModel* model;
+    Ui::CoinControlDialog *ui;
+    WalletModel *model;
     int sortColumn;
     Qt::SortOrder sortOrder;
     bool fMultisigEnabled;
 
-    QMenu* contextMenu;
-    QTreeWidgetItem* contextMenuItem;
-    QAction* copyTransactionHashAction;
-    QAction* lockAction;
-    QAction* unlockAction;
+    QMenu *contextMenu;
+    QTreeWidgetItem *contextMenuItem;
+    QAction *copyTransactionHashAction;
+    QAction *lockAction;
+    QAction *unlockAction;
+
+    const PlatformStyle *platformStyle;
 
     void sortView(int, Qt::SortOrder);
     void updateView();
 
-    enum {
-        COLUMN_CHECKBOX,
+    enum
+    {
+        COLUMN_CHECKBOX = 0,
         COLUMN_AMOUNT,
         COLUMN_LABEL,
         COLUMN_ADDRESS,
@@ -84,10 +91,17 @@ private:
         COLUMN_TXHASH,
         COLUMN_VOUT_INDEX,
     };
+
+    enum
+    {
+        TxHashRole = Qt::UserRole,
+        VOutRole
+    };
+
     friend class CCoinControlWidgetItem;
 
 private Q_SLOTS:
-    void showMenu(const QPoint&);
+    void showMenu(const QPoint &);
     void copyAmount();
     void copyLabel();
     void copyAddress();
