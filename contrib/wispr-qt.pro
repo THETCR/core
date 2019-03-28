@@ -337,7 +337,7 @@ FORMS += src/qt/forms/addressbookpage.ui \
          src/qt/forms/overviewpage.ui \
          src/qt/forms/receivecoinsdialog.ui \
          src/qt/forms/receiverequestdialog.ui \
-         src/qt/forms/rpcconsole.ui \
+         src/qt/forms/debugwindow.ui \
          src/qt/forms/sendcoinsdialog.ui \
          src/qt/forms/sendcoinsentry.ui \
          src/qt/forms/signverifymessagedialog.ui \
@@ -616,7 +616,7 @@ SOURCES += src/activemasternode.cpp \
            src/leveldb/helpers/memenv/memenv.cc \
            src/leveldb/helpers/memenv/memenv_test.cc \
            src/secp256k1/src/java/org_bitcoin_NativeSecp256k1.c
-RESOURCES += src/qt/wispr.qrc src/qt/wispr_locale.qrc
+RESOURCES += ../src/qt/wispr.qrc ../src/qt/wispr_locale.qrc
 
 TRANSLATIONS += src/qt/locale/wispr_bg.ts \
                 src/qt/locale/wispr_de.ts \
