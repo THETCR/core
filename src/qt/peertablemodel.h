@@ -1,6 +1,5 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Copyright (c) 2017 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_PEERTABLEMODEL_H
@@ -60,19 +59,22 @@ public:
     void stopAutoRefresh();
 
     enum ColumnIndex {
-        Address = 0,
-        Subversion = 1,
-        Ping = 2
+        NetNodeId = 0,
+        Address = 1,
+        Ping = 2,
+        Sent = 3,
+        Received = 4,
+        Subversion = 5
     };
 
     /** @name Methods overridden from QAbstractTableModel
         @{*/
-    int rowCount(const QModelIndex& parent) const;
-    int columnCount(const QModelIndex& parent) const;
-    QVariant data(const QModelIndex& index, int role) const;
+    int rowCount(const QModelIndex &parent) const;
+    int columnCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    QModelIndex index(int row, int column, const QModelIndex& parent) const;
-    Qt::ItemFlags flags(const QModelIndex& index) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
     void sort(int column, Qt::SortOrder order);
     /*@}*/
 

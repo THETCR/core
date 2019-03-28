@@ -1,44 +1,53 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "sendcoinsentry.h"
+#if defined(HAVE_CONFIG_H)
+#include <config/wispr-config.h>
+#endif
+
+#include <qt/sendcoinsentry.h>
 #include <qt/forms/ui_sendcoinsentry.h>
 
-#include "addressbookpage.h"
-#include "addresstablemodel.h"
-#include "guiutil.h"
-#include "optionsmodel.h"
-#include "walletmodel.h"
+#include <qt/addressbookpage.h>
+#include <qt/addresstablemodel.h>
+#include <qt/guiutil.h>
+#include <qt/optionsmodel.h>
+#include <qt/platformstyle.h>
 
 #include <QApplication>
 #include <QClipboard>
 
-SendCoinsEntry::SendCoinsEntry(QWidget* parent) : QStackedWidget(parent),
-                                                  ui(new Ui::SendCoinsEntry),
-                                                  model(nullptr)
+SendCoinsEntry::SendCoinsEntry(const PlatformStyle *_platformStyle, QWidget *parent) :
+    QStackedWidget(parent),
+    ui(new Ui::SendCoinsEntry),
+    model(nullptr),
+    platformStyle(_platformStyle)
 {
     ui->setupUi(this);
 
+    ui->addressBookButton->setIcon(platformStyle->SingleColorIcon(":/icons/address-book"));
+    ui->pasteButton->setIcon(platformStyle->SingleColorIcon(":/icons/editpaste"));
+    ui->deleteButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+    ui->deleteButton_is->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+    ui->deleteButton_s->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+
     setCurrentWidget(ui->SendCoins);
 
-#ifdef Q_OS_MAC
-    ui->payToLayout->setSpacing(4);
-#endif
+    if (platformStyle->getUseExtraSpacing())
+        ui->payToLayout->setSpacing(4);
     ui->addAsLabel->setPlaceholderText(tr("Enter a label for this address to add it to your address book"));
 
     // normal wispr address field
     GUIUtil::setupAddressWidget(ui->payTo, this);
     // just a label for displaying wispr address(es)
-    ui->payTo_is->setFont(GUIUtil::bitcoinAddressFont());
+    ui->payTo_is->setFont(GUIUtil::fixedPitchFont());
 
     // Connect signals
-    connect(ui->payAmount, SIGNAL(valueChanged()), this, SIGNAL(payAmountChanged()));
-    connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    connect(ui->deleteButton_is, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    connect(ui->deleteButton_s, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(ui->payAmount, &BitcoinAmountField::valueChanged, this, &SendCoinsEntry::payAmountChanged);
+    connect(ui->deleteButton, &QPushButton::clicked, this, &SendCoinsEntry::deleteClicked);
+    connect(ui->deleteButton_is, &QPushButton::clicked, this, &SendCoinsEntry::deleteClicked);
+    connect(ui->deleteButton_s, &QPushButton::clicked, this, &SendCoinsEntry::deleteClicked);
 }
 
 SendCoinsEntry::~SendCoinsEntry()
@@ -54,27 +63,28 @@ void SendCoinsEntry::on_pasteButton_clicked()
 
 void SendCoinsEntry::on_addressBookButton_clicked()
 {
-    if (!model)
+    if(!model)
         return;
     AddressBookPage dlg(platformStyle, AddressBookPage::ForSelection, AddressBookPage::SendingTab, this);
     dlg.setModel(model->getAddressTableModel());
-    if (dlg.exec()) {
+    if(dlg.exec())
+    {
         ui->payTo->setText(dlg.getReturnValue());
         ui->payAmount->setFocus();
     }
 }
 
-void SendCoinsEntry::on_payTo_textChanged(const QString& address)
+void SendCoinsEntry::on_payTo_textChanged(const QString &address)
 {
     updateLabel(address);
 }
 
-void SendCoinsEntry::setModel(WalletModel* model)
+void SendCoinsEntry::setModel(WalletModel *_model)
 {
-    this->model = model;
+    this->model = _model;
 
-    if (model && model->getOptionsModel())
-        connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
+    if (_model && _model->getOptionsModel())
+        connect(_model->getOptionsModel(), &OptionsModel::displayUnitChanged, this, &SendCoinsEntry::updateDisplayUnit);
 
     clear();
 }
@@ -101,12 +111,22 @@ void SendCoinsEntry::clear()
     updateDisplayUnit();
 }
 
+void SendCoinsEntry::checkSubtractFeeFromAmount()
+{
+    ui->checkboxSubtractFeeFromAmount->setChecked(true);
+}
+
 void SendCoinsEntry::deleteClicked()
 {
     Q_EMIT removeEntry(this);
 }
 
-bool SendCoinsEntry::validate()
+void SendCoinsEntry::useAvailableBalanceClicked()
+{
+    Q_EMIT useAvailableBalance(this);
+}
+
+bool SendCoinsEntry::validate(interfaces::Node& node)
 {
     if (!model)
         return false;
@@ -118,23 +138,26 @@ bool SendCoinsEntry::validate()
     if (recipient.paymentRequest.IsInitialized())
         return retval;
 
-    if (!model->validateAddress(ui->payTo->text())) {
+    if (!model->validateAddress(ui->payTo->text()))
+    {
         ui->payTo->setValid(false);
         retval = false;
     }
 
-    if (!ui->payAmount->validate()) {
+    if (!ui->payAmount->validate())
+    {
         retval = false;
     }
 
     // Sending a zero amount is invalid
-    if (ui->payAmount->value(0) <= 0) {
+    if (ui->payAmount->value(nullptr) <= 0)
+    {
         ui->payAmount->setValid(false);
         retval = false;
     }
 
     // Reject dust outputs:
-    if (retval && GUIUtil::isDust(ui->payTo->text(), ui->payAmount->value())) {
+    if (retval && GUIUtil::isDust(node, ui->payTo->text(), ui->payAmount->value())) {
         ui->payAmount->setValid(false);
         retval = false;
     }
@@ -198,16 +221,21 @@ void SendCoinsEntry::setValue(const SendCoinsRecipient& value)
 
         ui->addAsLabel->clear();
         ui->payTo->setText(recipient.address); // this may set a label from addressbook
-        if (!recipient.label.isEmpty())        // if a label had been set from the addressbook, dont overwrite with an empty label
+        if (!recipient.label.isEmpty()) // if a label had been set from the addressbook, don't overwrite with an empty label
             ui->addAsLabel->setText(recipient.label);
         ui->payAmount->setValue(recipient.amount);
     }
 }
 
-void SendCoinsEntry::setAddress(const QString& address)
+void SendCoinsEntry::setAddress(const QString &address)
 {
     ui->payTo->setText(address);
     ui->payAmount->setFocus();
+}
+
+void SendCoinsEntry::setAmount(const CAmount &amount)
+{
+    ui->payAmount->setValue(amount);
 }
 
 bool SendCoinsEntry::isClear()
@@ -222,7 +250,8 @@ void SendCoinsEntry::setFocus()
 
 void SendCoinsEntry::updateDisplayUnit()
 {
-    if (model && model->getOptionsModel()) {
+    if(model && model->getOptionsModel())
+    {
         // Update payAmount with the current unit
         ui->payAmount->setDisplayUnit(model->getOptionsModel()->getDisplayUnit());
         ui->payAmount_is->setDisplayUnit(model->getOptionsModel()->getDisplayUnit());
@@ -230,14 +259,15 @@ void SendCoinsEntry::updateDisplayUnit()
     }
 }
 
-bool SendCoinsEntry::updateLabel(const QString& address)
+bool SendCoinsEntry::updateLabel(const QString &address)
 {
-    if (!model)
+    if(!model)
         return false;
 
     // Fill in label from address book, if address has an associated label
     QString associatedLabel = model->getAddressTableModel()->labelForAddress(address);
-    if (!associatedLabel.isEmpty()) {
+    if(!associatedLabel.isEmpty())
+    {
         ui->addAsLabel->setText(associatedLabel);
         return true;
     }
