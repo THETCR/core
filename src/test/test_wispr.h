@@ -19,6 +19,11 @@
 
 #include <boost/thread.hpp>
 
+namespace interfaces {
+class Wallet;
+class Chain;
+} // namespace interfaces
+
 // Enable BOOST_CHECK_EQUAL for enum class types
 template <typename T>
 std::ostream& operator<<(typename std::enable_if<std::is_enum<T>::value, std::ostream>::type& stream, const T& e)
@@ -74,6 +79,7 @@ private:
 struct TestingSetup : public BasicTestingSetup {
     boost::thread_group threadGroup;
     CScheduler scheduler;
+    std::unique_ptr<interfaces::Chain> m_chain;
 
     explicit TestingSetup(const std::string& chainName = CBaseChainParams::UNITTEST);
     ~TestingSetup();
