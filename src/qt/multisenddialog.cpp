@@ -6,15 +6,17 @@
 #include <qt/forms/ui_multisenddialog.h>
 
 #include "addressbookpage.h"
+#include <qt/platformstyle.h>
 #include "addresstablemodel.h"
 #include "base58.h"
 #include "walletmodel.h"
 
 #include <QStyle>
 
-MultiSendDialog::MultiSendDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+MultiSendDialog::MultiSendDialog(const PlatformStyle *_platformStyle, QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
                                                     ui(new Ui::MultiSendDialog),
-                                                    model(nullptr)
+                                                    model(nullptr),
+                                                    platformStyle(_platformStyle)
 {
     ui->setupUi(this);
     updateCheckBoxes();

@@ -8,6 +8,7 @@
 #include "askpassphrasedialog.h"
 #include "primitives/transaction.h"
 #include "addressbookpage.h"
+#include <qt/platformstyle.h>
 #include "util/strencodings.h"
 #include "core_io.h"
 #include "script/script.h"
@@ -37,9 +38,10 @@
 #include <QString>
 
 
-MultisigDialog::MultisigDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+MultisigDialog::MultisigDialog(const PlatformStyle *_platformStyle, QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
                                                   ui(new Ui::MultisigDialog),
-                                                  model(nullptr)
+                                                  model(nullptr),
+                                                  platformStyle(_platformStyle)
 {
     ui->setupUi(this);
     multisigTx = CMutableTransaction();

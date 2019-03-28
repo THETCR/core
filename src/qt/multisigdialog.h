@@ -26,7 +26,7 @@ class MultisigDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit MultisigDialog(QWidget* parent);
+    explicit MultisigDialog(const PlatformStyle *platformStyle, QWidget* parent);
     ~MultisigDialog();
     void setModel(WalletModel* model);
     void updateCoinControl(CAmount nAmount, unsigned int nQuantity);
@@ -37,6 +37,7 @@ public Q_SLOTS:
 private:
     Ui::MultisigDialog* ui;
     WalletModel* model;
+    const PlatformStyle *platformStyle;
     CCoinControl* coinControl;
     bool isFirstPrivKey;
     bool isFirstRawTx;
