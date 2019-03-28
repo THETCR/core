@@ -1,7 +1,5 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2018 The PIVX developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -23,10 +21,6 @@
 #include <util/system.h>
 #include <util/strencodings.h>
 #include <warnings.h>
-#ifdef ENABLE_WALLET
-#include <wallet/wallet.h>
-#include <wallet/walletdb.h>
-#endif
 
 #include <stdint.h>
 #ifdef HAVE_MALLOC_INFO
@@ -39,146 +33,6 @@
 #include <masternode-sync.h>
 #include <spork.h>
 
-
-/**
- * @note Do not add or change anything in the information returned by this
- * method. `getinfo` exists for backwards-compatibility only. It combines
- * information from wildly different sources in the program, which is a mess,
- * and is thus planned to be deprecated eventually.
- *
- * Based on the source of the information, new information should be added to:
- * - `getblockchaininfo`,
- * - `getnetworkinfo` or
- * - `getwalletinfo`
- *
- * Or alternatively, create a specific query method for the information.
- **/
-UniValue getinfo(const JSONRPCRequest& request)
-{
-    if (request.fHelp || request.params.size() != 0)
-        throw runtime_error(
-            "getinfo\n"
-            "\nReturns an object containing various state info.\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"version\": xxxxx,           (numeric) the server version\n"
-            "  \"protocolversion\": xxxxx,   (numeric) the protocol version\n"
-            "  \"walletversion\": xxxxx,     (numeric) the wallet version\n"
-            "  \"balance\": xxxxxxx,         (numeric) the total wispr balance of the wallet (excluding zerocoins)\n"
-            "  \"zerocoinbalance\": xxxxxxx, (numeric) the total zerocoin balance of the wallet\n"
-            "  \"blocks\": xxxxxx,           (numeric) the current number of blocks processed in the server\n"
-            "  \"timeoffset\": xxxxx,        (numeric) the time offset\n"
-            "  \"connections\": xxxxx,       (numeric) the number of connections\n"
-            "  \"proxy\": \"host:port\",     (string, optional) the proxy used by the server\n"
-            "  \"difficulty\": xxxxxx,       (numeric) the current difficulty\n"
-            "  \"testnet\": true|false,      (boolean) if the server is using testnet or not\n"
-            "  \"moneysupply\" : \"supply\"       (numeric) The money supply when this block was added to the blockchain\n"
-            "  \"zWSPsupply\" :\n"
-            "  {\n"
-            "     \"1\" : n,            (numeric) supply of 1 zWSP denomination\n"
-            "     \"5\" : n,            (numeric) supply of 5 zWSP denomination\n"
-            "     \"10\" : n,           (numeric) supply of 10 zWSP denomination\n"
-            "     \"50\" : n,           (numeric) supply of 50 zWSP denomination\n"
-            "     \"100\" : n,          (numeric) supply of 100 zWSP denomination\n"
-            "     \"500\" : n,          (numeric) supply of 500 zWSP denomination\n"
-            "     \"1000\" : n,         (numeric) supply of 1000 zWSP denomination\n"
-            "     \"5000\" : n,         (numeric) supply of 5000 zWSP denomination\n"
-            "     \"total\" : n,        (numeric) The total supply of all zWSP denominations\n"
-            "  }\n"
-            "  \"keypoololdest\": xxxxxx,    (numeric) the timestamp (seconds since GMT epoch) of the oldest pre-generated key in the key pool\n"
-            "  \"keypoolsize\": xxxx,        (numeric) how many new keys are pre-generated\n"
-            "  \"unlocked_until\": ttt,      (numeric) the timestamp in seconds since epoch (midnight Jan 1 1970 GMT) that the wallet is unlocked for transfers, or 0 if the wallet is locked\n"
-            "  \"paytxfee\": x.xxxx,         (numeric) the transaction fee set in wispr/kb\n"
-            "  \"relayfee\": x.xxxx,         (numeric) minimum relay fee for non-free transactions in wispr/kb\n"
-            "  \"staking status\": true|false,  (boolean) if the wallet is staking or not\n"
-            "  \"errors\": \"...\"           (string) any error messages\n"
-            "}\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("getinfo", "") + HelpExampleRpc("getinfo", ""));
-
-#ifdef ENABLE_WALLET
-    LOCK2(cs_main, pwalletMain ? &pwalletMain->cs_wallet : NULL);
-#else
-    LOCK(cs_main);
-#endif
-
-    std::string services;
-    for (int i = 0; i < 8; i++) {
-        uint64_t check = 1 << i;
-        if (g_connman->GetLocalServices() & check) {
-            switch (check) {
-                case NODE_NETWORK:
-                    services+= "NETWORK/";
-                    break;
-                case NODE_BLOOM:
-                    services+= "BLOOM/";
-                    break;
-                case NODE_BLOOM_WITHOUT_MN:
-                case NODE_BLOOM_LIGHT_ZC:
-                    services+= "BLOOM_ZC/";
-                    break;
-                default:
-                    services+= "UNKNOWN/";
-            }
-        }
-    }
-
-    proxyType proxy;
-    GetProxy(NET_IPV4, proxy);
-
-    UniValue obj(UniValue::VOBJ);
-    obj.pushKV("version", CLIENT_VERSION);
-    obj.pushKV("protocolversion", PROTOCOL_VERSION);
-    obj.pushKV("services", services);
-#ifdef ENABLE_WALLET
-    if (pwalletMain) {
-        obj.pushKV("walletversion", pwalletMain->GetVersion());
-        obj.pushKV("balance", ValueFromAmount(pwalletMain->GetBalance()));
-        obj.pushKV("zerocoinbalance", ValueFromAmount(pwalletMain->GetZerocoinBalance(true)));
-    }
-#endif
-    obj.pushKV("blocks", (int)chainActive.Height());
-    obj.pushKV("timeoffset", GetTimeOffset());
-    obj.pushKV("connections", (int)vNodes.size());
-    obj.pushKV("proxy", (proxy.IsValid() ? proxy.proxy.ToStringIPPort() : std::string()));
-    obj.pushKV("difficulty", (double)GetDifficulty(chainActive.Tip()));
-    obj.pushKV("testnet", Params().TestnetToBeDeprecatedFieldRPC());
-
-    // During inital block verification chainActive.Tip() might be not yet initialized
-    if (chainActive.Tip() == nullptr) {
-        obj.pushKV("status", "Blockchain information not yet available");
-        return obj;
-    }
-
-    obj.pushKV("moneysupply",ValueFromAmount(chainActive.Tip()->nMoneySupply));
-    UniValue zwspObj(UniValue::VOBJ);
-    for (auto denom : libzerocoin::zerocoinDenomList) {
-        zwspObj.pushKV(to_string(denom), ValueFromAmount(chainActive.Tip()->mapZerocoinSupply.at(denom) * (denom*COIN)));
-    }
-    zwspObj.pushKV("total", ValueFromAmount(chainActive.Tip()->GetZerocoinSupply()));
-    obj.pushKV("zWSPsupply", zwspObj);
-
-#ifdef ENABLE_WALLET
-    if (pwalletMain) {
-        obj.pushKV("keypoololdest", pwalletMain->GetOldestKeyPoolTime());
-        obj.pushKV("keypoolsize", (int)pwalletMain->GetKeyPoolSize());
-    }
-    if (pwalletMain && pwalletMain->IsCrypted())
-        obj.pushKV("unlocked_until", pwalletMain->nRelockTime);
-    obj.pushKV("paytxfee", ValueFromAmount(payTxFee.GetFeePerK()));
-#endif
-    obj.pushKV("relayfee", ValueFromAmount(::minRelayTxFee.GetFeePerK()));
-    bool nStaking = false;
-    if (mapHashedBlocks.count(chainActive.Tip()->nHeight))
-        nStaking = true;
-    else if (mapHashedBlocks.count(chainActive.Tip()->nHeight - 1) && nLastCoinStakeSearchInterval)
-        nStaking = true;
-    obj.pushKV("staking status", (nStaking ? "Staking Active" : "Staking Not Active"));
-    obj.pushKV("errors", GetWarnings("statusbar"));
-    return obj;
-}
 
 static UniValue validateaddress(const JSONRPCRequest& request)
 {
@@ -223,66 +77,6 @@ static UniValue validateaddress(const JSONRPCRequest& request)
         ret.pushKVs(detail);
     }
     return ret;
-}
-
-/**
- * Used by addmultisigaddress / createmultisig:
- */
-CScript _createmultisig_redeemScript(const UniValue& params)
-{
-    int nRequired = params[0].get_int();
-    const UniValue& keys = params[1].get_array();
-
-    // Gather public keys
-    if (nRequired < 1)
-        throw runtime_error("a multisignature address must require at least one key to redeem");
-    if ((int)keys.size() < nRequired)
-        throw runtime_error(
-            strprintf("not enough keys supplied "
-                      "(got %u keys, but need at least %d to redeem)",
-                keys.size(), nRequired));
-    if (keys.size() > 16)
-        throw runtime_error("Number of addresses involved in the multisignature address creation > 16\nReduce the number");
-    std::vector<CPubKey> pubkeys;
-    pubkeys.resize(keys.size());
-    for (unsigned int i = 0; i < keys.size(); i++) {
-        const std::string& ks = keys[i].get_str();
-#ifdef ENABLE_WALLET
-        // Case 1: WISPR address and we have full public key:
-        CBitcoinAddress address(ks);
-        if (pwalletMain && address.IsValid()) {
-            CKeyID keyID;
-            if (!address.GetKeyID(keyID))
-                throw runtime_error(
-                    strprintf("%s does not refer to a key", ks));
-            CPubKey vchPubKey;
-            if (!pwalletMain->GetPubKey(keyID, vchPubKey))
-                throw runtime_error(
-                    strprintf("no full public key for address %s", ks));
-            if (!vchPubKey.IsFullyValid())
-                throw runtime_error(" Invalid public key: " + ks);
-            pubkeys[i] = vchPubKey;
-        }
-
-        // Case 2: hex public key
-        else
-#endif
-            if (IsHex(ks)) {
-            CPubKey vchPubKey(ParseHex(ks));
-            if (!vchPubKey.IsFullyValid())
-                throw runtime_error(" Invalid public key: " + ks);
-            pubkeys[i] = vchPubKey;
-        } else {
-            throw runtime_error(" Invalid public key: " + ks);
-        }
-    }
-    CScript result = GetScriptForMultisig(nRequired, pubkeys);
-
-    if (result.size() > MAX_SCRIPT_ELEMENT_SIZE)
-        throw runtime_error(
-            strprintf("redeemScript exceeds size limit: %d > %d", result.size(), MAX_SCRIPT_ELEMENT_SIZE));
-
-    return result;
 }
 
 static UniValue createmultisig(const JSONRPCRequest& request)
@@ -959,7 +753,6 @@ static const CRPCCommand commands[] =
     //!WISPR
     {"wispr", "mnsync", &mnsync,{}},
     {"wispr", "spork", &spork,{}},
-    { "control",            "getinfo",                &getinfo,                {} }, /* uses wallet if enabled */
 
 };
 // clang-format on

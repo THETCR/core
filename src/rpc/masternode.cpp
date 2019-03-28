@@ -261,6 +261,13 @@ UniValue masternodedebug (const JSONRPCRequest& request)
 
 UniValue startmasternode (const JSONRPCRequest& request)
 {
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
     std::string strCommand;
     if (request.params.size() >= 1) {
         strCommand = request.params[0].get_str();
@@ -307,7 +314,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
 
     bool fLock = (request.params[1].get_str() == "true" ? true : false);
 
-    EnsureWalletIsUnlocked(pwalletMain);
+    EnsureWalletIsUnlocked(pwallet);
 
     if (strCommand == "local") {
         if (!fMasterNode) throw runtime_error("you must set masternode=1 in the configuration\n");
@@ -316,7 +323,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
             activeMasternode.status = ACTIVE_MASTERNODE_INITIAL; // TODO: consider better way
             activeMasternode.ManageStatus();
             if (fLock)
-                pwalletMain->Lock();
+                pwallet->Lock();
         }
 
         return activeMasternode.GetStatus();
@@ -368,7 +375,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
             resultsObj.push_back(statusObj);
         }
         if (fLock)
-            pwalletMain->Lock();
+            pwallet->Lock();
 
         UniValue returnObj(UniValue::VOBJ);
         returnObj.pushKV("overall", strprintf("Successfully started %d masternodes, failed to start %d, total %d", successful, failed, successful + failed));
@@ -419,7 +426,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
         resultsObj.push_back(statusObj);
 
         if (fLock)
-            pwalletMain->Lock();
+            pwallet->Lock();
 
         UniValue returnObj(UniValue::VOBJ);
         returnObj.pushKV("overall", strprintf("Successfully started %d masternodes, failed to start %d, total %d", successful, failed, successful + failed));
@@ -750,6 +757,13 @@ bool DecodeHexMnb(CMasternodeBroadcast& mnb, std::string strHexMnb) {
 }
 UniValue createmasternodebroadcast(const JSONRPCRequest& request)
 {
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
     std::string strCommand;
     if (request.params.size() >= 1)
         strCommand = request.params[0].get_str();
@@ -757,7 +771,7 @@ UniValue createmasternodebroadcast(const JSONRPCRequest& request)
         throw runtime_error(
             "createmasternodebroadcast \"command\" ( \"alias\")\n"
             "\nCreates a masternode broadcast message for one or all masternodes configured in masternode.conf\n" +
-            HelpRequiringPassphrase(pwalletMain) + "\n"
+            HelpRequiringPassphrase(pwallet) + "\n"
 
             "\nArguments:\n"
             "1. \"command\"      (string, required) \"alias\" for single masternode, \"all\" for all masternodes\n"
@@ -788,7 +802,7 @@ UniValue createmasternodebroadcast(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("createmasternodebroadcast", "alias mymn1") + HelpExampleRpc("createmasternodebroadcast", "alias mymn1"));
 
-    EnsureWalletIsUnlocked(pwalletMain);
+    EnsureWalletIsUnlocked(pwallet);
 
     if (strCommand == "alias")
     {

@@ -493,8 +493,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         }
 
 //        if (pblock->IsZerocoinStake()) {
-//            CWalletTx wtx(pwalletMain, pblock->vtx[1]);
-//            pwalletMain->AddToWallet(wtx);
+//            CWalletTx wtx(pwallet, pblock->vtx[1]);
+//            pwallet->AddToWallet(wtx);
 //        }
     }
 
@@ -567,7 +567,7 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
     if (!ProcessNewBlock(Params(), shared_pblock, true, &new_block)) {
         if (pblock->IsZerocoinStake())
-            pwalletMain->zwspTracker->RemovePending(pblock->vtx[1]->GetHash());
+            wallet.zwspTracker->RemovePending(pblock->vtx[1]->GetHash());
         return error("WISPRMiner : ProcessNewBlock, block not accepted");
     }
 
