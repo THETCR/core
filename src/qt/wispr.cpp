@@ -452,7 +452,7 @@ static void SetupUIArgs()
 }
 
 #ifndef BITCOIN_QT_TEST
-int main(int argc, char* argv[])
+int GuiMain(int argc, char* argv[])
 {
 #ifdef WIN32
     util::WinCmdLineArgs winArgs;
