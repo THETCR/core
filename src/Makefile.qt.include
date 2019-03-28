@@ -121,7 +121,7 @@ QT_MOC_CPP = \
   qt/moc_walletframe.cpp \
   qt/moc_walletmodel.cpp \
   qt/moc_walletview.cpp \
-  qt/wispr.moc \
+  qt/moc_wispr.cpp \
   qt/moc_zwspcontroldialog.cpp
 
 BITCOIN_MM = \
@@ -130,6 +130,7 @@ BITCOIN_MM = \
   qt/macos_appnap.mm
 
 QT_MOC = \
+  qt/wispr.moc \
   qt/bitcoinamountfield.moc \
   qt/intro.moc \
   qt/overviewpage.moc \
