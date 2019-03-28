@@ -47,7 +47,7 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     platformStyle(_platformStyle)
 {
     // Create tabs
-    overviewPage = new OverviewPage();
+    overviewPage = new OverviewPage(platformStyle, this);
     explorerWindow = new BlockExplorer(this);
     transactionsPage = new QWidget(this);
 
@@ -121,9 +121,9 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     vbox->addLayout(hbox_buttons);
     transactionsPage->setLayout(vbox);
 
-    privacyPage = new PrivacyDialog();
-    receiveCoinsPage = new ReceiveCoinsDialog();
-    sendCoinsPage = new SendCoinsDialog();
+    privacyPage = new PrivacyDialog(platformStyle, this);
+    receiveCoinsPage = new ReceiveCoinsDialog(platformStyle, this);
+    sendCoinsPage = new SendCoinsDialog(platformStyle, this);
 
     addWidget(overviewPage);
     addWidget(transactionsPage);
@@ -258,8 +258,6 @@ void WalletView::processNewTransaction(const QModelIndex& parent, int start, int
 void WalletView::gotoOverviewPage()
 {
     setCurrentWidget(overviewPage);
-    // Refresh UI-elements in case coins were locked/unlocked in CoinControl
-    walletModel->emitBalanceChanged();
 }
 
 void WalletView::gotoHistoryPage()
@@ -289,8 +287,6 @@ void WalletView::gotoReceiveCoinsPage()
 void WalletView::gotoPrivacyPage()
 {
     setCurrentWidget(privacyPage);
-    // Refresh UI-elements in case coins were locked/unlocked in CoinControl
-    walletModel->emitBalanceChanged();
 }
 
 void WalletView::gotoSendCoinsPage(QString addr)
@@ -304,7 +300,7 @@ void WalletView::gotoSendCoinsPage(QString addr)
 void WalletView::gotoSignMessageTab(QString addr)
 {
     // calls show() in showTab_SM()
-    SignVerifyMessageDialog* signVerifyMessageDialog = new SignVerifyMessageDialog(this);
+    SignVerifyMessageDialog *signVerifyMessageDialog = new SignVerifyMessageDialog(platformStyle, this);
     signVerifyMessageDialog->setAttribute(Qt::WA_DeleteOnClose);
     signVerifyMessageDialog->setModel(walletModel);
     signVerifyMessageDialog->showTab_SM(true);
@@ -316,7 +312,7 @@ void WalletView::gotoSignMessageTab(QString addr)
 void WalletView::gotoVerifyMessageTab(QString addr)
 {
     // calls show() in showTab_VM()
-    SignVerifyMessageDialog* signVerifyMessageDialog = new SignVerifyMessageDialog(this);
+    SignVerifyMessageDialog *signVerifyMessageDialog = new SignVerifyMessageDialog(platformStyle, this);
     signVerifyMessageDialog->setAttribute(Qt::WA_DeleteOnClose);
     signVerifyMessageDialog->setModel(walletModel);
     signVerifyMessageDialog->showTab_VM(true);
@@ -327,7 +323,7 @@ void WalletView::gotoVerifyMessageTab(QString addr)
 
 void WalletView::gotoBip38Tool()
 {
-    Bip38ToolDialog* bip38ToolDialog = new Bip38ToolDialog(this);
+    Bip38ToolDialog* bip38ToolDialog = new Bip38ToolDialog(platformStyle, this);
     //bip38ToolDialog->setAttribute(Qt::WA_DeleteOnClose);
     bip38ToolDialog->setModel(walletModel);
     bip38ToolDialog->showTab_ENC(true);
@@ -335,14 +331,14 @@ void WalletView::gotoBip38Tool()
 
 void WalletView::gotoMultiSendDialog()
 {
-    MultiSendDialog* multiSendDialog = new MultiSendDialog(this);
+    MultiSendDialog* multiSendDialog = new MultiSendDialog(platformStyle, this);
     multiSendDialog->setModel(walletModel);
     multiSendDialog->show();
 }
 
 void WalletView::gotoMultisigDialog(int index)
 {
-    MultisigDialog* multisig = new MultisigDialog(this);
+    MultisigDialog* multisig = new MultisigDialog(platformStyle, this);
     multisig->setModel(walletModel);
     multisig->showTab(index);
 }
@@ -360,7 +356,7 @@ void WalletView::showOutOfSyncWarning(bool fShow)
 
 void WalletView::updateEncryptionStatus()
 {
-    Q_EMIT encryptionStatusChanged(walletModel->getEncryptionStatus());
+    Q_EMIT encryptionStatusChanged();
 }
 
 void WalletView::encryptWallet(bool status)
@@ -433,7 +429,7 @@ void WalletView::usedSendingAddresses()
 {
     if (!walletModel)
         return;
-    AddressBookPage* dlg = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::SendingTab, this);
+    AddressBookPage* dlg = new AddressBookPage(platformStyle, AddressBookPage::ForEditing, AddressBookPage::SendingTab, this);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->setModel(walletModel->getAddressTableModel());
     dlg->show();
@@ -443,7 +439,7 @@ void WalletView::usedReceivingAddresses()
 {
     if (!walletModel)
         return;
-    AddressBookPage* dlg = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::ReceivingTab, this);
+    AddressBookPage* dlg = new AddressBookPage(platformStyle, AddressBookPage::ForEditing, AddressBookPage::ReceivingTab, this);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->setModel(walletModel->getAddressTableModel());
     dlg->show();
@@ -463,12 +459,22 @@ void WalletView::showProgress(const QString& title, int nProgress)
             progressDialog->close();
             progressDialog->deleteLater();
         }
-    } else if (progressDialog)
-        progressDialog->setValue(nProgress);
+    } else if (progressDialog) {
+        if (progressDialog->wasCanceled()) {
+            getWalletModel()->wallet().abortRescan();
+        } else {
+            progressDialog->setValue(nProgress);
+        }
+    }
 }
 
 /** Update wallet with the sum of the selected transactions */
 void WalletView::trxAmount(QString amount)
 {
     transactionSum->setText(amount);
+}
+
+void WalletView::requestedSyncWarningInfo()
+{
+    Q_EMIT outOfSyncWarningClicked();
 }
