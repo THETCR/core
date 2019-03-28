@@ -124,6 +124,8 @@ file(GLOB SOURCE_FILES
         src/libzerocoin/*.cpp
         src/policy/*.cpp
         src/policy/*.h
+        src/pos/*.cpp
+        src/pos/*.h
         src/primitives/*.cpp
         src/primitives/*.h
         src/qt/*.cpp
