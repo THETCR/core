@@ -686,7 +686,7 @@ public:
     bool InMempool() const;
     bool IsTrusted(interfaces::Chain::Lock& locked_chain) const;
 
-    bool WriteToDisk();
+//    bool WriteToDisk();
 
     int64_t GetTxTime() const;
     int64_t GetComputedTxTime(interfaces::Chain::Lock& locked_chain) const;

@@ -11,7 +11,6 @@
 #include <consensus/params.h>
 #include <consensus/validation.h>
 #include <crypto/sha256.h>
-#include <validation.h>
 #include <miner.h>
 #include <net_processing.h>
 #include <noui.h>
@@ -21,20 +20,15 @@
 #include <script/sigcache.h>
 #include <streams.h>
 #include <ui_interface.h>
-#include <txdb.h>
-#include <util/system.h>
-#include <memory>
+#include <validation.h>
 
 #ifdef ENABLE_WALLET
-#include <wallet/db.h>
 #include <wallet/wallet.h>
 #endif
 
-
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
-FastRandomContext g_insecure_rand_ctx;
 
-extern bool fPrintToConsole;
+FastRandomContext g_insecure_rand_ctx;
 
 std::ostream& operator<<(std::ostream& os, const uint256& num)
 {
@@ -52,6 +46,9 @@ BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
     InitSignatureCache();
     InitScriptExecutionCache();
     fCheckBlockIndex = true;
+    // CreateAndProcessBlock() does not support building SegWit blocks, so don't activate in these tests.
+    // TODO: fix the code to support SegWit blocks.
+    gArgs.ForceSetArg("-vbparams", strprintf("segwit:0:%d", (int64_t)Consensus::BIP9Deployment::NO_TIMEOUT));
     SelectParams(chainName);
     noui_connect();
 }
@@ -76,8 +73,10 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
+
     RegisterAllCoreRPCCommands(tableRPC);
     ClearDatadirCache();
+
     // We have to run a scheduler thread to prevent ActivateBestChain
     // from blocking due to queue overrun.
     threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
@@ -90,47 +89,29 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     if (!LoadGenesisBlock(chainparams)) {
         throw std::runtime_error("LoadGenesisBlock failed.");
     }
-//    InitBlockIndex(chainparams);
-//    {
-//    }
+
     CValidationState state;
     if (!ActivateBestChain(state, chainparams)) {
         throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
     }
-#ifdef ENABLE_WALLET
-    bool fFirstRun;
-    pwalletMain = new CWallet(*m_chain, WalletLocation(), WalletDatabase::CreateMock());
-//    pwalletMain = new CWallet("wallet.dat", *m_chain, WalletLocation(), WalletDatabase::CreateMock());
-    pwalletMain->LoadWallet(fFirstRun);
-//    RegisterValidationInterface(pwalletMain);
-//    pwalletMain->chain().handleNotifications(pwalletMain);
-#endif
+
     nScriptCheckThreads = 3;
-    for (int i=0; i < nScriptCheckThreads-1; i++)
+    for (int i = 0; i < nScriptCheckThreads - 1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
+
     g_banman = MakeUnique<BanMan>(GetDataDir() / "banlist.dat", nullptr, DEFAULT_MISBEHAVING_BANTIME);
     g_connman = MakeUnique<CConnman>(0x1337, 0x1337); // Deterministic randomness for tests.
-//    RegisterNodeSignals(GetNodeSignals());
 }
 
 TestingSetup::~TestingSetup()
 {
-//    UnregisterNodeSignals(GetNodeSignals());
     threadGroup.interrupt_all();
     threadGroup.join_all();
     GetMainSignals().FlushBackgroundCallbacks();
     GetMainSignals().UnregisterBackgroundSignalScheduler();
     g_connman.reset();
+    g_banman.reset();
     UnloadBlockIndex();
-#ifdef ENABLE_WALLET
-    std::cout << "flush\n";
-    pwalletMain->Flush(true);
-#endif
-#ifdef ENABLE_WALLET
-//    UnregisterValidationInterface(pwalletMain);
-    delete pwalletMain;
-    pwalletMain = nullptr;
-#endif
     pcoinsTip.reset();
     pcoinsdbview.reset();
     pblocktree.reset();
@@ -171,11 +152,10 @@ TestChain100Setup::CreateAndProcessBlock(const std::vector<CMutableTransaction>&
         IncrementExtraNonce(&block, chainActive.Tip(), extraNonce);
     }
 
-    while (!CheckProofOfWork(block.GetHash(), block.nBits, Params().GetConsensus())) ++block.nNonce;
+    while (!CheckProofOfWork(block.GetHash(), block.nBits, chainparams.GetConsensus())) ++block.nNonce;
 
-    bool newBlock = false;
     std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(block);
-    ProcessNewBlock(chainparams, shared_pblock, true, &newBlock);
+    ProcessNewBlock(chainparams, shared_pblock, true, nullptr);
 
     CBlock result = block;
     return result;

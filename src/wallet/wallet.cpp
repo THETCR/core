@@ -2000,7 +2000,7 @@ CWallet::ScanResult CWallet::ScanForWalletTransactions(const uint256& start_bloc
                     for (auto& m : listMints) {
                         if (IsMyMint(m.GetValue())) {
                             LogPrint(BCLog::ZERO, "%s: found mint\n", __func__);
-                            pwalletMain->UpdateMint(m.GetValue(), block_height.get(), m.GetTxHash(), m.GetDenomination());
+                            UpdateMint(m.GetValue(), block_height.get(), m.GetTxHash(), m.GetDenomination());
 
                             // Add the transaction to the wallet
                             size_t posInBlock = 0;
@@ -2010,10 +2010,10 @@ CWallet::ScanResult CWallet::ScanForWalletTransactions(const uint256& start_bloc
                                 if (setAddedToWallet.count(txid) || mapWallet.count(txid))
                                     continue;
                                 if (txid == m.GetTxHash()) {
-                                    CWalletTx wtx(pwalletMain, tx);
+                                    CWalletTx wtx(this, tx);
                                     wtx.nTimeReceived = block.GetBlockTime();
                                     wtx.SetMerkleBranch(block_hash, posInBlock);
-                                    pwalletMain->AddToWallet(wtx);
+                                    AddToWallet(wtx);
                                     setAddedToWallet.insert(txid);
                                 }
                             }
@@ -2026,14 +2026,14 @@ CWallet::ScanResult CWallet::ScanForWalletTransactions(const uint256& start_bloc
                                 if (setAddedToWallet.count(txidSpend) || mapWallet.count(txidSpend))
                                     continue;
 
-                                CWalletTx wtx(pwalletMain, txSpend);
+                                CWalletTx wtx(this, txSpend);
                                 CBlockIndex* pindexSpend = chainActive[nHeightSpend];
                                 CBlock blockSpend;
                                 if (ReadBlockFromDisk(blockSpend, pindexSpend, Params().GetConsensus()))
                                     wtx.SetMerkleBranch(block_hash, posInBlock);
 
                                 wtx.nTimeReceived = pindexSpend->nTime;
-                                pwalletMain->AddToWallet(wtx);
+                                AddToWallet(wtx);
                                 setAddedToWallet.emplace(txidSpend);
                             }
                         }
@@ -4551,7 +4551,7 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
     // Try to top up keypool. No-op if the wallet is locked.
     walletInstance->TopUpKeyPool();
-    CzWSPWallet* zwalletMain = new CzWSPWallet(pwalletMain->strWalletFile, pwalletMain->chain(), pwalletMain->GetLocation(), pwalletMain->GetDBHandle());
+    CzWSPWallet* zwalletMain = new CzWSPWallet(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle());
     walletInstance->setZWallet(zwalletMain);
     auto locked_chain = chain.lock();
     LOCK(walletInstance->cs_wallet);
@@ -4642,10 +4642,10 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 //Inititalize zWSPWallet
     chain.initMessage(_("Syncing zWSP wallet..."));
 
-    pwalletMain->InitAutoConvertAddresses();
+    walletInstance->InitAutoConvertAddresses();
 
     bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
-    pwalletMain->setZWspAutoBackups(fEnableZWspBackups);
+    walletInstance->setZWspAutoBackups(fEnableZWspBackups);
 
     //Load zerocoin mint hashes to memory
     walletInstance->zwspTracker->Init();
@@ -4904,7 +4904,7 @@ int CWallet::GetRealInputObfuscationRounds(CTxIn in, int rounds) const
             return -4;
         }
 
-        if (pwalletMain->IsCollateralAmount(wtx->tx->vout[nout].nValue)) {
+        if (IsCollateralAmount(wtx->tx->vout[nout].nValue)) {
             mDenomWtxes[hash].vout[nout].nRounds = -3;
             LogPrint(BCLog::OBFUSCATION, "GetInputObfuscationRounds UPDATED   %s %3d %3d\n", hash.ToString(), nout, mDenomWtxes[hash].vout[nout].nRounds);
             return mDenomWtxes[hash].vout[nout].nRounds;
@@ -5304,10 +5304,10 @@ void CWalletTx::GetAccountAmounts(const std::string& strAccount, CAmount& nRecei
 }
 
 
-bool CWalletTx::WriteToDisk()
-{
-    return WalletBatch(pwalletMain->GetDBHandle()).WriteTx(*this);
-}
+//bool CWalletTx::WriteToDisk()
+//{
+//    return WalletBatch(pwallet->GetDBHandle()).WriteTx(*this);
+//}
 
 /** @} */ // end of mapWallet
 
@@ -6297,7 +6297,7 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
 bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, bool useIX)
 {
     // make our change address
-    CReserveKey reservekey(pwalletMain);
+    CReserveKey reservekey(this);
 
     CScript scriptChange;
     scriptChange << OP_RETURN << ToByteVector(hash);
@@ -6320,7 +6320,7 @@ bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, bool useI
 bool CWallet::GetBudgetFinalizationCollateralTX(CWalletTx& tx, uint256 hash, bool useIX)
 {
     // make our change address
-    CReserveKey reservekey(pwalletMain);
+    CReserveKey reservekey(this);
 
     CScript scriptChange;
     scriptChange << OP_RETURN << ToByteVector(hash);
@@ -7128,7 +7128,7 @@ void CWallet::CreateAutoMintTransaction(const CAmount& nMintAmount, CCoinControl
         CWalletTx wtx;
         std::vector<CDeterministicMint> vDMints;
         LogPrintf("%s: autominting request amount %s\n", __func__, FormatMoney(nMintAmount));
-        std::string strError = pwalletMain->MintZerocoin(nMintAmount, wtx, vDMints, coinControl);
+        std::string strError = MintZerocoin(nMintAmount, wtx, vDMints, coinControl);
 
         // Return if something went wrong during minting
         if (strError != ""){
@@ -7764,7 +7764,7 @@ bool CWallet::MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, con
             if (!zwspTracker->UpdateState(meta))
                 LogPrintf("%s: failed to write zerocoinmint\n", __func__);
 
-            pwalletMain->NotifyZerocoinChanged(zerocoinSelected.GetValue().GetHex(), "Used", CT_UPDATED);
+            NotifyZerocoinChanged(zerocoinSelected.GetValue().GetHex(), "Used", CT_UPDATED);
             return false;
         }
 
@@ -7800,7 +7800,7 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLevel,
     nStatus = ZWSP_TRX_CREATE;
 
     // If not already given pre-selected mints, then select mints from the wallet
-    WalletBatch walletdb(pwalletMain->GetDBHandle());
+    WalletBatch walletdb(GetDBHandle());
     set<CMintMeta> setMints;
     CAmount nValueSelected = 0;
     int nCoinsReturned = 0; // Number of coins returned in change from function below (for debug)
@@ -8020,7 +8020,7 @@ string CWallet::ResetMintZerocoin()
 {
     long updates = 0;
     long deletions = 0;
-    WalletBatch walletdb(pwalletMain->GetDBHandle());
+    WalletBatch walletdb(GetDBHandle());
 
     set<CMintMeta> setMints = zwspTracker->ListMints(false, false, true);
     std::vector<CMintMeta> vMintsToFind(setMints.begin(), setMints.end());
@@ -8052,7 +8052,7 @@ string CWallet::ResetMintZerocoin()
 string CWallet::ResetSpentZerocoin()
 {
     long removed = 0;
-    WalletBatch walletdb(pwalletMain->GetDBHandle());
+    WalletBatch walletdb(GetDBHandle());
 
     set<CMintMeta> setMints = zwspTracker->ListMints(false, false, true);
     std::list<CZerocoinSpend> listSpends = walletdb.ListSpentCoins();
@@ -8108,7 +8108,7 @@ bool IsMintInChain(const uint256& hashPubcoin, uint256& txid, int& nHeight)
 
 void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, std::list<CDeterministicMint>& listDMintsRestored)
 {
-    WalletBatch walletdb(pwalletMain->GetDBHandle());
+    WalletBatch walletdb(GetDBHandle());
     std::list<CZerocoinMint> listMints = walletdb.ListArchivedZerocoins();
     std::list<CDeterministicMint> listDMints = walletdb.ListArchivedDeterministicMints();
 
@@ -8276,7 +8276,7 @@ string CWallet::MintZerocoin(CAmount nValue, CWalletTx& wtxNew, std::vector<CDet
         return _("Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
     } else {
         //update mints with full transaction hash and then database them
-        WalletBatch walletdb(pwalletMain->GetDBHandle());
+        WalletBatch walletdb(GetDBHandle());
         for (CDeterministicMint dMint : vDMints) {
             dMint.SetTxHash(wtxNew.tx->GetHash());
             zwspTracker->Add(dMint, true);
@@ -8309,7 +8309,7 @@ bool CWallet::SpendZerocoin(CAmount nAmount, int nSecurityLevel, CWalletTx& wtxN
     if (fMintChange && fBackupMints)
         ZWspBackupWallet();
 
-    WalletBatch walletdb(pwalletMain->GetDBHandle());
+    WalletBatch walletdb(GetDBHandle());
     if (!CommitTransaction(wtxNew, reserveKey)) {
         LogPrintf("%s: failed to commit\n", __func__);
         nStatus = ZWSP_COMMIT_FAILED;
@@ -8318,7 +8318,7 @@ bool CWallet::SpendZerocoin(CAmount nAmount, int nSecurityLevel, CWalletTx& wtxN
         for (CZerocoinMint mint : vMintsSelected) {
             uint256 hashPubcoin = GetPubCoinHash(mint.GetValue());
             zwspTracker->SetPubcoinNotUsed(hashPubcoin);
-            pwalletMain->NotifyZerocoinChanged(mint.GetValue().GetHex(), "New", CT_UPDATED);
+            NotifyZerocoinChanged(mint.GetValue().GetHex(), "New", CT_UPDATED);
         }
 
         //erase spends

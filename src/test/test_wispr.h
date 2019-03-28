@@ -1,4 +1,4 @@
-// Copyright (c) 2015 The Bitcoin Core developers
+// Copyright (c) 2015-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -13,9 +13,6 @@
 #include <scheduler.h>
 #include <txdb.h>
 #include <txmempool.h>
-
-#include <interfaces/chain.h>
-#include <interfaces/wallet.h>
 
 #include <memory>
 #include <type_traits>
@@ -54,6 +51,8 @@ static inline uint64_t InsecureRandBits(int bits) { return g_insecure_rand_ctx.r
 static inline uint64_t InsecureRandRange(uint64_t range) { return g_insecure_rand_ctx.randrange(range); }
 static inline bool InsecureRandBool() { return g_insecure_rand_ctx.randbool(); }
 
+static constexpr CAmount CENT{1000000};
+
 /** Basic testing setup.
  * This just configures logging and chain parameters.
  */
@@ -72,12 +71,9 @@ private:
 /** Testing setup that configures a complete environment.
  * Included are data directory, coins database, script check threads setup.
  */
-class CNode;
-
-struct TestingSetup: public BasicTestingSetup {
+struct TestingSetup : public BasicTestingSetup {
     boost::thread_group threadGroup;
     CScheduler scheduler;
-    std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
 
     explicit TestingSetup(const std::string& chainName = CBaseChainParams::UNITTEST);
     ~TestingSetup();
@@ -118,8 +114,8 @@ struct TestMemPoolEntryHelper
     LockPoints lp;
 
     TestMemPoolEntryHelper() :
-            nFee(0), nTime(0), nHeight(1),
-            spendsCoinbase(false), sigOpCost(4) { }
+        nFee(0), nTime(0), nHeight(1),
+        spendsCoinbase(false), sigOpCost(4) { }
 
     CTxMemPoolEntry FromTx(const CMutableTransaction& tx);
     CTxMemPoolEntry FromTx(const CTransactionRef& tx);
@@ -136,4 +132,5 @@ CBlock getBlock13b8a();
 
 // define an implicit conversion here so that uint256 may be used directly in BOOST_CHECK_*
 std::ostream& operator<<(std::ostream& os, const uint256& num);
+
 #endif

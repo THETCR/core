@@ -31,7 +31,7 @@ private:
     /** Internal database handle. */
     WalletDatabase& database;
 public:
-    CzWSPWallet(std::string strWalletFile, interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database);
+    CzWSPWallet(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database);
     void AddToMintPool(const std::pair<uint256, uint32_t>& pMint, bool fVerbose);
     bool SetMasterSeed(const uint256& seedMaster, bool fResetCount = false);
     uint256 GetMasterSeed() { return seedMaster; }
