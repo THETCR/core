@@ -871,7 +871,7 @@ void CoinControlDialog::updateView()
 
             // disable locked coins
             COutPoint output(txhash, out.i);
-            if (model->wallet().isLockedCoin(output))
+            if (model->wallet().isLockedCoin(output)){
                 COutPoint outpt(txhash, out.i);
                 coinControl()->UnSelect(output); // just to be sure
                 itemOutput->setDisabled(true);
