@@ -7,6 +7,8 @@
 
 #include "guiutil.h"
 
+#include <interfaces/wallet.h>
+
 #include <QDialog>
 #include <QHeaderView>
 #include <QItemSelection>
@@ -16,6 +18,7 @@
 #include <QTimer>
 #include <QVariant>
 
+class PlatformStyle;
 class OptionsModel;
 class WalletModel;
 
@@ -41,7 +44,7 @@ public:
         MINIMUM_COLUMN_WIDTH = 130
     };
 
-    explicit PrivacyDialog(QWidget* parent = 0);
+    explicit PrivacyDialog(const PlatformStyle *platformStyle, QWidget* parent = nullptr);
     ~PrivacyDialog();
 
     void setModel(WalletModel* model);
@@ -49,9 +52,7 @@ public:
     void setZWspControlLabels(int64_t nAmount, int nQuantity);
 
 public Q_SLOTS:
-    void setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, 
-                    const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance,
-                    const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
+    void setBalance(const interfaces::WalletBalances& balances);
 protected:
     virtual void keyPressEvent(QKeyEvent* event);
 
@@ -60,16 +61,9 @@ private:
     QTimer* timer;
     GUIUtil::TableViewLastColumnResizingFixer* columnResizingFixer;
     WalletModel* walletModel;
+    interfaces::WalletBalances m_balances;
     QMenu* contextMenu;
-    CAmount currentBalance;
-    CAmount currentUnconfirmedBalance;
-    CAmount currentImmatureBalance;
-    CAmount currentZerocoinBalance;
-    CAmount currentUnconfirmedZerocoinBalance;
-    CAmount currentImmatureZerocoinBalance;
-    CAmount currentWatchOnlyBalance;
-    CAmount currentWatchUnconfBalance;
-    CAmount currentWatchImmatureBalance;
+    const PlatformStyle *platformStyle;
     
     int nSecurityLevel = 0;
     bool fMinimizeChange = false;

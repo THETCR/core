@@ -5,6 +5,7 @@
 #include "privacydialog.h"
 #include <qt/forms/ui_privacydialog.h>
 
+#include <qt/platformstyle.h>
 #include "addressbookpage.h"
 #include "addresstablemodel.h"
 #include "bitcoinunits.h"
@@ -25,10 +26,10 @@
 #include <primitives/deterministicmint.h>
 #include <accumulators.h>
 
-PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowCloseButtonHint),
+PrivacyDialog::PrivacyDialog(const PlatformStyle *_platformStyle, QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowCloseButtonHint),
                                                           ui(new Ui::PrivacyDialog),
                                                           walletModel(0),
-                                                          currentBalance(-1),
+                                                          platformStyle(_platformStyle),
                                                           fDenomsMinimized(true)
 {
     nDisplayUnit = 0; // just make sure it's not unitialized
@@ -126,20 +127,18 @@ PrivacyDialog::~PrivacyDialog()
     delete ui;
 }
 
-void PrivacyDialog::setModel(WalletModel* walletModel)
+void PrivacyDialog::setModel(WalletModel* model)
 {
-    this->walletModel = walletModel;
+    this->walletModel = model;
 
     if (walletModel && walletModel->getOptionsModel()) {
         // Keep up to date with wallet
-        setBalance(walletModel->getBalance(), walletModel->getUnconfirmedBalance(), walletModel->getImmatureBalance(),
-                   walletModel->getZerocoinBalance(), walletModel->getUnconfirmedZerocoinBalance(), walletModel->getImmatureZerocoinBalance(),
-                   walletModel->getWatchBalance(), walletModel->getWatchUnconfirmedBalance(), walletModel->getWatchImmatureBalance());
-
-        connect(walletModel, SIGNAL(balanceChanged(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)), this,
-                               SLOT(setBalance(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)));
-        connect(walletModel->getOptionsModel(), SIGNAL(zeromintEnableChanged(bool)), this, SLOT(updateAutomintStatus()));
-        connect(walletModel->getOptionsModel(), SIGNAL(zeromintPercentageChanged(int)), this, SLOT(updateAutomintStatus()));
+        interfaces::Wallet& wallet = model->wallet();
+        interfaces::WalletBalances balances = wallet.getBalances();
+        setBalance(balances);
+        connect(model, &WalletModel::balanceChanged, this, &PrivacyDialog::setBalance);
+        connect(model->getOptionsModel(), SIGNAL(zeromintEnableChanged(bool)), this, SLOT(updateAutomintStatus()));
+        connect(model->getOptionsModel(), SIGNAL(zeromintPercentageChanged(int)), this, SLOT(updateAutomintStatus()));
         ui->securityLevel->setValue(nSecurityLevel);
     }
 }
@@ -566,7 +565,7 @@ void PrivacyDialog::coinControlButtonClicked()
     if (!walletModel || !walletModel->getOptionsModel())
         return;
 
-    CoinControlDialog dlg;
+    CoinControlDialog dlg(platformStyle);
     dlg.setModel(walletModel);
     dlg.exec();
     coinControlUpdateLabels();
@@ -628,19 +627,19 @@ bool PrivacyDialog::updateLabel(const QString& address)
     return false;
 }
 
-void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance,
-                               const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance,
-                               const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance)
+void PrivacyDialog::setBalance(const interfaces::WalletBalances& balances)
+
 {
-    currentBalance = balance;
-    currentUnconfirmedBalance = unconfirmedBalance;
-    currentImmatureBalance = immatureBalance;
-    currentZerocoinBalance = zerocoinBalance;
-    currentUnconfirmedZerocoinBalance = unconfirmedZerocoinBalance;
-    currentImmatureZerocoinBalance = immatureZerocoinBalance;
-    currentWatchOnlyBalance = watchOnlyBalance;
-    currentWatchUnconfBalance = watchUnconfBalance;
-    currentWatchImmatureBalance = watchImmatureBalance;
+    m_balances = balances;
+    CAmount balance = balances.balance;
+    CAmount unconfirmedBalance = balances.unconfirmed_balance;
+    CAmount immatureBalance = balances.immature_balance;
+    CAmount zerocoinBalance = balances.zerocoin_balance;
+    CAmount unconfirmedZerocoinBalance = balances.unconfirmed_zerocoin_balance;
+    CAmount immatureZerocoinBalance = balances.immature_zerocoin_balance;
+    CAmount watchOnlyBalance = balances.watch_only_balance;
+    CAmount watchUnconfBalance = balances.unconfirmed_watch_only_balance;
+    CAmount watchImmatureBalance = balances.immature_watch_only_balance;
 
     std::map<libzerocoin::CoinDenomination, CAmount> mapDenomBalances;
     std::map<libzerocoin::CoinDenomination, int> mapUnconfirmed;
@@ -787,10 +786,9 @@ void PrivacyDialog::updateDisplayUnit()
 {
     if (walletModel && walletModel->getOptionsModel()) {
         nDisplayUnit = walletModel->getOptionsModel()->getDisplayUnit();
-        if (currentBalance != -1)
-            setBalance(currentBalance, currentUnconfirmedBalance, currentImmatureBalance,
-                       currentZerocoinBalance, currentUnconfirmedZerocoinBalance, currentImmatureZerocoinBalance,
-                       currentWatchOnlyBalance, currentWatchUnconfBalance, currentWatchImmatureBalance);
+        if (m_balances.balance != -1) {
+            setBalance(m_balances);
+        }
     }
 }
 

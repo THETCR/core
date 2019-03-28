@@ -172,6 +172,7 @@ void OverviewPage::getPercentage(CAmount nUnlockedBalance, CAmount nZerocoinBala
 
 void OverviewPage::setBalance(const interfaces::WalletBalances& balances)
 {
+    m_balances = balances;
     CAmount balance = balances.balance;
     CAmount unconfirmedBalance = balances.unconfirmed_balance;
     CAmount immatureBalance = balances.immature_balance;
