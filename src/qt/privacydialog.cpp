@@ -205,7 +205,7 @@ void PrivacyDialog::on_pushButtonMintzWSP_clicked()
 
     CWalletTx wtx;
     std::vector<CDeterministicMint> vMints;
-    std::string strError = pwalletMain->MintZerocoin(nAmount, wtx, vMints, CoinControlDialog::coinControl);
+    std::string strError = pwalletMain->MintZerocoin(nAmount, wtx, vMints, CoinControlDialog::coinControl());
 
     // Return if something went wrong during minting
     if (strError != ""){
@@ -236,9 +236,9 @@ void PrivacyDialog::on_pushButtonMintzWSP_clicked()
     ui->TEMintStatus->verticalScrollBar()->setValue(ui->TEMintStatus->verticalScrollBar()->maximum()); // Automatically scroll to end of text
 
     // Available balance isn't always updated, so force it.
-    setBalance(walletModel->getBalance(), walletModel->getUnconfirmedBalance(), walletModel->getImmatureBalance(),
-               walletModel->getZerocoinBalance(), walletModel->getUnconfirmedZerocoinBalance(), walletModel->getImmatureZerocoinBalance(),
-               walletModel->getWatchBalance(), walletModel->getWatchUnconfirmedBalance(), walletModel->getWatchImmatureBalance());
+    interfaces::Wallet& wallet = walletModel->wallet();
+    interfaces::WalletBalances balances = wallet.getBalances();
+    setBalance(balances);
     coinControlUpdateLabels();
 
     return;
