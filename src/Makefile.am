@@ -336,8 +336,6 @@ libbitcoin_server_a_SOURCES = \
   validation.cpp \
   validationinterface.cpp \
   versionbits.cpp \
-  wallet/rpcwallet.cpp \
-  wallet/rpcdump.cpp \
   zwspchain.cpp \
   $(BITCOIN_CORE_H)
 
@@ -542,8 +540,6 @@ libbitcoin_common_a_SOURCES = \
   protocol.cpp \
   scheduler.cpp \
   script/descriptor.cpp \
-  script/interpreter.cpp \
-  script/script.cpp \
   script/ismine.cpp \
   script/sign.cpp \
   script/standard.cpp \
@@ -620,7 +616,7 @@ wisprd_LDADD = \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
-wisprd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
+wisprd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
 
 # wispr-cli binary #
 wispr_cli_SOURCES = wispr-cli.cpp
@@ -638,7 +634,7 @@ wispr_cli_LDADD = \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CRYPTO)
 
-wispr_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
+wispr_cli_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
 # wispr-tx binary #
