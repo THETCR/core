@@ -355,6 +355,7 @@ libbitcoin_zmq_a_SOURCES = \
   zmq/zmqrpc.cpp
 endif
 
+
 # wallet: shared between wisprd and wispr-qt, but only linked
 # when wallet enabled
 libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
@@ -504,8 +505,6 @@ libwispr_consensus_a_SOURCES = \
   script/script.h \
   script/script_error.cpp \
   script/script_error.h \
-  support/cleanse.cpp \
-  support/cleanse.h \
   serialize.h \
   span.h \
   tinyformat.h \

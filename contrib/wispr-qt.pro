@@ -128,7 +128,6 @@ HEADERS += src/activemasternode.h \
            src/util/time.h \
            src/version.h \
            src/wallet.h \
-           src/wallet_ismine.h \
            src/walletdb.h \
            src/compat/sanity.h \
            src/config/wispr-config.h \
@@ -416,7 +415,6 @@ SOURCES += src/activemasternode.cpp \
            src/util/strencodings.cpp \
            src/util/time.cpp \
            src/wallet.cpp \
-           src/wallet_ismine.cpp \
            src/walletdb.cpp \
            src/compat/glibc_compat.cpp \
            src/compat/glibc_sanity.cpp \
