@@ -922,7 +922,7 @@ void MultisigDialog::on_addAddressButton_clicked()
 
 void MultisigDialog::on_pushButtonCoinControl_clicked()
 {
-    CoinControlDialog coinControlDialog(this, true);
+    CoinControlDialog coinControlDialog(platformStyle, this, true);
     coinControlDialog.setModel(model);
     coinControlDialog.exec();
 }
