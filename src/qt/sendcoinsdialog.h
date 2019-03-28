@@ -10,6 +10,7 @@
 #include <QDialog>
 #include <QMessageBox>
 #include <QString>
+#include <QTimer>
 
 static const int MAX_SEND_POPUP_ENTRIES = 10;
 

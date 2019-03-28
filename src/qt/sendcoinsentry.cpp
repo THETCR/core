@@ -113,7 +113,7 @@ void SendCoinsEntry::clear()
 
 void SendCoinsEntry::checkSubtractFeeFromAmount()
 {
-    ui->checkboxSubtractFeeFromAmount->setChecked(true);
+//    ui->checkboxSubtractFeeFromAmount->setChecked(true);
 }
 
 void SendCoinsEntry::deleteClicked()

@@ -34,6 +34,7 @@
 #include <QScrollBar>
 #include <QSettings>
 #include <QTextDocument>
+#include <util/moneystr.h>
 
 static const std::array<int, 9> confTargets = { {2, 4, 6, 12, 24, 48, 144, 504, 1008} };
 int getConfTargetForIndex(int index) {
@@ -133,7 +134,6 @@ SendCoinsDialog::SendCoinsDialog(const PlatformStyle *_platformStyle, QWidget *p
     ui->labelCoinControlChange->addAction(clipboardChangeAction);
 
     // init transaction fee section
-    QSettings settings;
     if (!settings.contains("fFeeSectionMinimized"))
         settings.setValue("fFeeSectionMinimized", true);
     if (!settings.contains("nFeeRadio") && settings.contains("nTransactionFee") && settings.value("nTransactionFee").toLongLong() > 0) // compatibility
@@ -268,7 +268,7 @@ void SendCoinsDialog::on_sendButton_clicked()
         }
 
         if (entry) {
-            if (entry->validate()) {
+            if(entry->validate(model->node())){
                 recipients.append(entry->getValue());
             } else {
                 valid = false;
@@ -478,7 +478,7 @@ void SendCoinsDialog::accept()
 
 SendCoinsEntry* SendCoinsDialog::addEntry()
 {
-    SendCoinsEntry* entry = new SendCoinsEntry(this);
+    SendCoinsEntry* entry = new SendCoinsEntry(platformStyle, this);
     entry->setModel(model);
     ui->entries->addWidget(entry);
     connect(entry, SIGNAL(removeEntry(SendCoinsEntry*)), this, SLOT(removeEntry(SendCoinsEntry*)));
@@ -660,7 +660,7 @@ void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn&
             msgParams.first = tr("Error: The wallet was unlocked only to anonymize coins.");
         break;
 
-    case WalletModel::InsaneFee:
+    case WalletModel::AbsurdFee:
         msgParams.first = tr("A fee %1 times higher than %2 per kB is considered an insanely high fee.").arg(10000).arg(BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), ::minRelayTxFee.GetFeePerK()));
         break;
     // included to prevent a compiler warning.
