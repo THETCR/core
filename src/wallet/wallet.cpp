@@ -6308,7 +6308,7 @@ bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, bool useI
     vecSend.push_back(std::make_pair(scriptChange, BUDGET_FEE_TX_OLD)); // Old 50 WSP collateral
 
     CCoinControl* coinControl = nullptr;
-    bool success = CreateTransaction(vecSend, tx, reservekey, nFeeRet, strFail, coinControl, ALL_COINS, useIX, (CAmount)0);
+    bool success = CreateTransaction(vecSend, tx, reservekey, nFeeRet, strFail, coinControl, AvailableCoinsType::ALL_COINS, useIX, (CAmount)0);
     if (!success) {
         LogPrintf("GetBudgetSystemCollateralTX: Error - %s\n", strFail);
         return false;
@@ -6331,7 +6331,7 @@ bool CWallet::GetBudgetFinalizationCollateralTX(CWalletTx& tx, uint256 hash, boo
     vecSend.push_back(std::make_pair(scriptChange, BUDGET_FEE_TX)); // New 5 WSP collateral
 
     CCoinControl* coinControl = nullptr;
-    bool success = CreateTransaction(vecSend, tx, reservekey, nFeeRet, strFail, coinControl, ALL_COINS, useIX, (CAmount)0);
+    bool success = CreateTransaction(vecSend, tx, reservekey, nFeeRet, strFail, coinControl, AvailableCoinsType::ALL_COINS, useIX, (CAmount)0);
     if (!success) {
         LogPrintf("GetBudgetSystemCollateralTX: Error - %s\n", strFail);
         return false;
@@ -7316,7 +7316,7 @@ void CWallet::AutoCombineDust()
         // 10% safety margin to avoid "Insufficient funds" errors
         vecSend[0].second = nTotalRewardsValue - (nTotalRewardsValue / 10);
 
-        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, strErr, coinControl, ALL_COINS, false, CAmount(0))) {
+        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, strErr, coinControl, AvailableCoinsType::ALL_COINS, false, CAmount(0))) {
             LogPrintf("AutoCombineDust createtransaction failed, reason: %s\n", strErr);
             continue;
         }
@@ -7409,7 +7409,7 @@ bool CWallet::MultiSend()
         //get the fee amount
         CWalletTx wtxdummy;
         std::string strErr;
-        CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, strErr, &cControl, ALL_COINS, false, CAmount(0));
+        CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, strErr, &cControl, AvailableCoinsType::ALL_COINS, false, CAmount(0));
         CAmount nLastSendAmount = vecSend[vecSend.size() - 1].second;
         if (nLastSendAmount < nFeeRet + 500) {
             LogPrintf("%s: fee of %d is too large to insert into last output\n", __func__, nFeeRet + 500);
@@ -7418,7 +7418,7 @@ bool CWallet::MultiSend()
         vecSend[vecSend.size() - 1].second = nLastSendAmount - nFeeRet - 500;
 
         // Create the transaction and commit it to the network
-        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, strErr, &cControl, ALL_COINS, false, CAmount(0))) {
+        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, strErr, &cControl, AvailableCoinsType::ALL_COINS, false, CAmount(0))) {
             LogPrintf("MultiSend createtransaction failed\n");
             return false;
         }

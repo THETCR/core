@@ -2199,7 +2199,7 @@ UniValue listunspent(const JSONRPCRequest& request)
         auto locked_chain = pwalletMain->chain().lock();
         LOCK(pwalletMain->cs_wallet);
         std::cout << "AvailableCoins\n";
-        pwalletMain->AvailableCoins(*locked_chain, vecOutputs, false, nullptr, ALL_COINS, false, nWatchonlyConfig);
+        pwalletMain->AvailableCoins(*locked_chain, vecOutputs, false, nullptr, AvailableCoinsType::ALL_COINS, false, nWatchonlyConfig);
     }
 
     std::cout << "vecOutputs\n";

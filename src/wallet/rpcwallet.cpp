@@ -342,7 +342,7 @@ static CTransactionRef SendMoney(interfaces::Chain::Lock& locked_chain, CWallet 
     CRecipient recipient = {scriptPubKey, nValue, fSubtractFeeFromAmount};
     vecSend.push_back(recipient);
     CTransactionRef tx;
-    if (!pwallet->CreateTransaction(locked_chain, vecSend, tx, reservekey, nFeeRequired, nChangePosRet, strError, coin_control, true, ALL_COINS, fUseIX, (CAmount)0)) {
+    if (!pwallet->CreateTransaction(locked_chain, vecSend, tx, reservekey, nFeeRequired, nChangePosRet, strError, coin_control, true, AvailableCoinsType::ALL_COINS, fUseIX, (CAmount)0)) {
         if (!fSubtractFeeFromAmount && nValue + nFeeRequired > curBalance)
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s", FormatMoney(nFeeRequired));
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
@@ -2870,7 +2870,7 @@ static UniValue listunspent(const JSONRPCRequest& request)
     {
         auto locked_chain = pwallet->chain().lock();
         LOCK(pwallet->cs_wallet);
-        pwallet->AvailableCoins(*locked_chain, vecOutputs, !include_unsafe, nullptr, ALL_COINS, false, nMinimumAmount, nMaximumAmount, nMinimumSumAmount, nMaximumCount, nMinDepth, nMaxDepth);
+        pwallet->AvailableCoins(*locked_chain, vecOutputs, !include_unsafe, nullptr, AvailableCoinsType::ALL_COINS, false, nMinimumAmount, nMaximumAmount, nMinimumSumAmount, nMaximumCount, nMinDepth, nMaxDepth);
     }
 
     LOCK(pwallet->cs_wallet);
