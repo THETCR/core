@@ -832,7 +832,7 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
     // Find possible candidates
     auto locked_chain = chain().lock();
     std::vector<COutput> vPossibleCoins;
-    AvailableCoins(*locked_chain, vPossibleCoins, true, nullptr, ONLY_125000);
+    AvailableCoins(*locked_chain, vPossibleCoins, true, nullptr, AvailableCoinsType::ONLY_125000);
     if (vPossibleCoins.empty()) {
         LogPrintf("CWallet::GetMasternodeVinAndKeys -- Could not locate any valid masternode vin\n");
         return false;
@@ -2610,22 +2610,22 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
 
         for (unsigned int i = 0; i < pcoin->tx->vout.size(); i++) {
             bool found = false;
-            if (nCoinType == ONLY_DENOMINATED) {
+            if (nCoinType == AvailableCoinsType::ONLY_DENOMINATED) {
                 found = IsDenominatedAmount(pcoin->tx->vout[i].nValue);
-            } else if (nCoinType == ONLY_NOT10000IFMN) {
+            } else if (nCoinType == AvailableCoinsType::ONLY_NOT10000IFMN) {
                 found = !(fMasterNode && pcoin->tx->vout[i].nValue == 125000 * COIN);
-            } else if (nCoinType == ONLY_NONDENOMINATED_NOT10000IFMN) {
+            } else if (nCoinType == AvailableCoinsType::ONLY_NONDENOMINATED_NOT10000IFMN) {
                 if (IsCollateralAmount(pcoin->tx->vout[i].nValue)) continue; // do not use collateral amounts
                 found = !IsDenominatedAmount(pcoin->tx->vout[i].nValue);
                 if (found && fMasterNode) found = pcoin->tx->vout[i].nValue != 125000 * COIN; // do not use Hot MN funds
-            } else if (nCoinType == ONLY_125000) {
+            } else if (nCoinType == AvailableCoinsType::ONLY_125000) {
                 found = pcoin->tx->vout[i].nValue == 125000 * COIN;
             } else {
                 found = true;
             }
             if (!found) continue;
 
-            if (nCoinType == STAKABLE_COINS) {
+            if (nCoinType == AvailableCoinsType::STAKABLE_COINS) {
                 if (pcoin->tx->vout[i].IsZerocoinMint())
                     continue;
             }
@@ -2635,7 +2635,7 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
             if (coinControl && coinControl->HasSelected() && !coinControl->fAllowOtherInputs && !coinControl->IsSelected(COutPoint(entry.first, i)))
                 continue;
 
-            if (IsLockedCoin(entry.first, i) && nCoinType != ONLY_125000)
+            if (IsLockedCoin(entry.first, i) && nCoinType != AvailableCoinsType::ONLY_125000)
                 continue;
 
             if (IsSpent(locked_chain, wtxid, i))
@@ -5738,7 +5738,7 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
     LOCK(cs_main);
     //Add WSP
     std::vector<COutput> vCoins;
-    AvailableCoins(*locked_chain, vCoins, true, nullptr, STAKABLE_COINS);
+    AvailableCoins(*locked_chain, vCoins, true, nullptr, AvailableCoinsType::STAKABLE_COINS);
     CAmount nAmountSelected = 0;
     if (gArgs.GetBoolArg("-wspstake", true)) {
         for (const COutput &out : vCoins) {
@@ -5970,7 +5970,7 @@ bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*
             if (!out.fSpendable)
                 continue;
 
-            if (coin_type == ONLY_DENOMINATED) {
+            if (coin_type == AvailableCoinsType::ONLY_DENOMINATED) {
                 CTxIn vin = CTxIn(out.tx->tx->GetHash(), out.i);
                 int rounds = GetInputObfuscationRounds(vin);
                 // make sure it's actually anonymized
@@ -5984,7 +5984,7 @@ bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*
     }
 
     //if we're doing only denominated, we need to round up to the nearest .1 WSP
-    if (coin_type == ONLY_DENOMINATED) {
+    if (coin_type == AvailableCoinsType::ONLY_DENOMINATED) {
         // Make outputs by looping through denominations, from large to small
         for (CAmount v: obfuScationDenominations) {
             for (const COutput& out: vCoins) {
@@ -6024,7 +6024,7 @@ bool CWallet::SelectCoinsByDenominations(int nDenom, CAmount nValueMin, CAmount 
     auto locked_chain = chain().lock();
     vCoinsRet2.clear();
     std::vector<COutput> vCoins;
-    AvailableCoins(*locked_chain, vCoins, true, nullptr, ONLY_DENOMINATED);
+    AvailableCoins(*locked_chain, vCoins, true, nullptr, AvailableCoinsType::ONLY_DENOMINATED);
 
     std::random_shuffle(vCoins.rbegin(), vCoins.rend());
 
@@ -6131,7 +6131,7 @@ bool CWallet::SelectCoinsDark(CAmount nValueMin, CAmount nValueMax, std::vector<
 
     auto locked_chain = chain().lock();
     std::vector<COutput> vCoins;
-    AvailableCoins(*locked_chain, vCoins, true, coinControl, nObfuscationRoundsMin < 0 ? ONLY_NONDENOMINATED_NOT10000IFMN : ONLY_DENOMINATED);
+    AvailableCoins(*locked_chain, vCoins, true, coinControl, nObfuscationRoundsMin < 0 ? AvailableCoinsType::ONLY_NONDENOMINATED_NOT10000IFMN : AvailableCoinsType::ONLY_DENOMINATED);
 
     set<pair<const CWalletTx*, unsigned int> > setCoinsRet2;
 
@@ -6434,11 +6434,11 @@ bool CWallet::CreateTransaction(const std::vector<std::pair<CScript, CAmount> >&
                 CAmount nValueIn = 0;
 
                 if (!SelectCoins(nTotalValue, setCoins, nValueIn, coinControl, coin_type, useIX)) {
-                    if (coin_type == ALL_COINS) {
+                    if (coin_type == AvailableCoinsType::ALL_COINS) {
                         strFailReason = _("Insufficient funds.");
-                    } else if (coin_type == ONLY_NOT10000IFMN) {
+                    } else if (coin_type == AvailableCoinsType::ONLY_NOT10000IFMN) {
                         strFailReason = _("Unable to locate enough funds for this transaction that are not equal 10000 WSP.");
-                    } else if (coin_type == ONLY_NONDENOMINATED_NOT10000IFMN) {
+                    } else if (coin_type == AvailableCoinsType::ONLY_NONDENOMINATED_NOT10000IFMN) {
                         strFailReason = _("Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 WSP.");
                     } else {
                         strFailReason = _("Unable to locate enough Obfuscation denominated funds for this transaction.");
@@ -6468,7 +6468,7 @@ bool CWallet::CreateTransaction(const std::vector<std::pair<CScript, CAmount> >&
                 CAmount nChange = nValueIn - nValue - nFeeRet;
 
                 //over pay for denominated transactions
-                if (coin_type == ONLY_DENOMINATED) {
+                if (coin_type == AvailableCoinsType::ONLY_DENOMINATED) {
                     nFeeRet += nChange;
                     nChange = 0;
                     wtxNew.mapValue["DS"] = "1";

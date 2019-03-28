@@ -266,7 +266,7 @@ public:
         bool sign,
         int& change_pos,
         CAmount& fee,
-        std::string& fail_reason, AvailableCoinsType coin_type = ALL_COINS,
+        std::string& fail_reason, AvailableCoinsType coin_type = AvailableCoinsType::ALL_COINS,
                                                        bool useIX = false) override
     {
         auto locked_chain = m_wallet->chain().lock();

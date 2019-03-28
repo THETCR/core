@@ -21,14 +21,13 @@
 #include <utility>
 #include <vector>
 
-#include <wallet/wallet.h>
-
 class CCoinControl;
 class CFeeRate;
 class CKey;
 class CWallet;
 enum class FeeReason;
 enum class OutputType;
+enum class AvailableCoinsType;
 struct CRecipient;
 
 namespace interfaces {
@@ -139,7 +138,7 @@ public:
         bool sign,
         int& change_pos,
         CAmount& fee,
-        std::string& fail_reason, AvailableCoinsType coin_type = ALL_COINS,
+        std::string& fail_reason, AvailableCoinsType coin_type,
                                                                bool useIX = false) = 0;
 
     //! Return whether transaction can be abandoned.

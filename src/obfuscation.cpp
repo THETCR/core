@@ -1700,7 +1700,7 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
     vecSend.push_back(std::make_pair(scriptChange, nPayment));
 
     CCoinControl* coinControl = nullptr;
-    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFail, coinControl, ONLY_DENOMINATED);
+    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFail, coinControl, AvailableCoinsType::ONLY_DENOMINATED);
     if (!success) {
         LogPrintf("SendRandomPaymentToSelf: Error - %s\n", strFail);
         return false;
@@ -1737,14 +1737,14 @@ bool CObfuscationPool::MakeCollateralAmounts()
 
     // try to use non-denominated and not mn-like funds
     bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekeyChange,
-        nFeeRet, strFail, &coinControl, ONLY_NONDENOMINATED_NOT10000IFMN);
+        nFeeRet, strFail, &coinControl, AvailableCoinsType::ONLY_NONDENOMINATED_NOT10000IFMN);
     if (!success) {
         // if we failed (most likeky not enough funds), try to use all coins instead -
         // MN-like funds should not be touched in any case and we can't mix denominated without collaterals anyway
         CCoinControl* coinControlNull = nullptr;
         LogPrintf("MakeCollateralAmounts: ONLY_NONDENOMINATED_NOT10000IFMN Error - %s\n", strFail);
         success = pwalletMain->CreateTransaction(vecSend, wtx, reservekeyChange,
-            nFeeRet, strFail, coinControlNull, ONLY_NOT10000IFMN);
+            nFeeRet, strFail, coinControlNull, AvailableCoinsType::ONLY_NOT10000IFMN);
         if (!success) {
             LogPrintf("MakeCollateralAmounts: ONLY_NOT10000IFMN Error - %s\n", strFail);
             reservekeyCollateral.ReturnKey();
@@ -1824,7 +1824,7 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
 
     CCoinControl* coinControl = nullptr;
     bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekeyChange,
-        nFeeRet, strFail, coinControl, ONLY_NONDENOMINATED_NOT10000IFMN);
+        nFeeRet, strFail, coinControl, AvailableCoinsType::ONLY_NONDENOMINATED_NOT10000IFMN);
     if (!success) {
         LogPrintf("CreateDenominated: Error - %s\n", strFail);
         // TODO: return reservekeyDenom here
