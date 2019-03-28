@@ -39,11 +39,6 @@ TEST_BITCOIN_H = \
 qt_test_test_wispr_qt_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
   $(QT_INCLUDES) $(QT_TEST_INCLUDES) $(PROTOBUF_CFLAGS)
 
-#  qt/test/apptests.cpp \
-#  qt/test/compattests.cpp \
-#  qt/test/rpcnestedtests.cpp \
-#  qt/test/util.cpp \
-
 qt_test_test_wispr_qt_SOURCES = \
   qt/test/test_main.cpp \
   qt/test/uritests.cpp \
@@ -54,10 +49,6 @@ if ENABLE_WALLET
 qt_test_test_wispr_qt_SOURCES += \
   qt/test/paymentservertests.cpp
 endif
-
-#  qt/test/addressbooktests.cpp \
-#  qt/test/wallettests.cpp \
-#  wallet/test/wallet_test_fixture.cpp \
 
 nodist_qt_test_test_wispr_qt_SOURCES = $(TEST_QT_MOC_CPP)
 
