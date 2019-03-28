@@ -152,15 +152,16 @@ bool WalletModel::validateAddress(const QString &address)
 
 void WalletModel::updateAddressBookLabels(const CTxDestination& dest, const std::string& strName, const std::string& strPurpose)
 {
-    LOCK(wallet->cs_wallet);
-
-    std::map<CTxDestination, CAddressBookData>::iterator mi = m_wallet->mapAddressBook.find(dest);
-
     // Check if we have a new address or an updated label
-    if (mi == m_wallet->mapAddressBook.end()) {
-        m_wallet->SetAddressBook(dest, strName, strPurpose);
-    } else if (mi->second.name != strName) {
-        m_wallet->SetAddressBook(dest, strName, ""); // "" means don't change purpose
+    std::string name;
+    if (!m_wallet->getAddress(
+        dest, &name, /* is_mine= */ nullptr, /* purpose= */ nullptr))
+    {
+        m_wallet->setAddressBook(dest, strName, "send");
+    }
+    else if (name != strName)
+    {
+        m_wallet->setAddressBook(dest, strName, ""); // "" means don't change purpose
     }
 }
 
@@ -298,7 +299,6 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
         // reject insane fee
         if (nFeeRequired > ::minRelayTxFee.GetFee(transaction.getTransactionSize()) * 10000)
             return InsaneFee;
-    }
 
     return SendCoinsReturn(OK);
 }
