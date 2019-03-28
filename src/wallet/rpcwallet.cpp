@@ -1993,7 +1993,7 @@ static UniValue walletpassphrase(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "passphrase can not be empty");
     }
 
-    if (!pwallet->Unlock(strWalletPass, anonymizeOnly)) {
+    if (!pwallet->Unlock(strWalletPass, false, anonymizeOnly)) {
         throw JSONRPCError(RPC_WALLET_PASSPHRASE_INCORRECT, "Error: The wallet passphrase entered was incorrect.");
     }
 
