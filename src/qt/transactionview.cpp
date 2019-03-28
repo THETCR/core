@@ -226,7 +226,7 @@ void TransactionView::setModel(WalletModel* model)
         // Note: it's a good idea to connect this signal AFTER the model is set
         connect(transactionView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(computeSum()));
 
-        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(transactionView, AMOUNT_MINIMUM_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH);
+        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(transactionView, AMOUNT_MINIMUM_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH, this);
 
         if (model->getOptionsModel()) {
             // Add third party transaction URLs to context menu
@@ -398,7 +398,7 @@ void TransactionView::exportClicked()
         // name, column, role
         writer.setModel(transactionProxyModel);
         writer.addColumn(tr("Confirmed"), 0, TransactionTableModel::ConfirmedRole);
-        if (model->haveWatchOnly())
+        if (model->wallet().haveWatchOnly())
             writer.addColumn(tr("Watch-only"), TransactionTableModel::Watchonly);
         writer.addColumn(tr("Date"), 0, TransactionTableModel::DateRole);
         writer.addColumn(tr("Type"), TransactionTableModel::Type, Qt::EditRole);
