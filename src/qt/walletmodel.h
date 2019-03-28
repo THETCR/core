@@ -292,7 +292,7 @@ Q_SIGNALS:
     void balanceChanged(const interfaces::WalletBalances& balances);
 
     // Encryption status of wallet changed
-    void encryptionStatusChanged(int status);
+    void encryptionStatusChanged();
 
     // Signal emitted when wallet needs to be unlocked
     // It is valid behaviour for listeners to keep the wallet locked after this signal;
