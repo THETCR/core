@@ -39,7 +39,7 @@ public:
 public Q_SLOTS:
     void initialize();
     void shutdown();
-    void restart(QStringList args);
+//    void restart(QStringList args);
 
 Q_SIGNALS:
     void initializeResult(bool success);
@@ -48,7 +48,7 @@ Q_SIGNALS:
 
 private:
     /// Flag indicating a restart
-    bool execute_restart;
+//    bool execute_restart;
 
     /// Pass fatal exception message to UI thread
     void handleRunawayException(const std::exception *e);
@@ -101,7 +101,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void requestedInitialize();
-    void requestedRestart(QStringList args);
+//    void requestedRestart(QStringList args);
 //    void startRestart();
     void requestedShutdown();
     void splashFinished();
