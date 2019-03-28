@@ -135,6 +135,8 @@ void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, cons
     }
 }
 
+#include <qt/wispr.moc>
+
 BitcoinCore::BitcoinCore(interfaces::Node& node) :
     QObject(), m_node(node)
 {

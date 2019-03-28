@@ -12,7 +12,6 @@
 #include <QApplication>
 #include <memory>
 #include <vector>
-#include <qt/wispr.moc>
 
 class BitcoinGUI;
 class ClientModel;
