@@ -6,12 +6,16 @@
 #ifndef BITCOIN_QT_TRANSACTIONVIEW_H
 #define BITCOIN_QT_TRANSACTIONVIEW_H
 
-#include "guiutil.h"
+#include <qt/guiutil.h>
 
+#include <uint256.h>
+
+#include <QWidget>
 #include <QKeyEvent>
 #include <QWidget>
 #include <QAction>
 
+class PlatformStyle;
 class TransactionFilterProxy;
 class WalletModel;
 
@@ -35,7 +39,7 @@ class TransactionView : public QWidget
     Q_OBJECT
 
 public:
-    explicit TransactionView(QWidget* parent = 0);
+    explicit TransactionView(const PlatformStyle *platformStyle, QWidget *parent = nullptr);
 
     void setModel(WalletModel* model);
 
@@ -76,6 +80,8 @@ private:
     QFrame* dateRangeWidget;
     QDateTimeEdit* dateFrom;
     QDateTimeEdit* dateTo;
+    QAction *abandonAction;
+    QAction *bumpFeeAction;
 
     QWidget* createDateRangeWidget();
 
