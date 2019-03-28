@@ -781,7 +781,7 @@ void CoinControlDialog::updateView()
         for (const auto& outpair : coins.second) {
             const COutPoint& output = std::get<0>(outpair);
             const interfaces::WalletTxOut& out = std::get<1>(outpair);
-            isminetype mine = pwalletMain->IsMine(out.txout);
+            isminetype mine = model->wallet().txoutIsMine(out.txout);
             bool fMultiSigUTXO = (mine & ISMINE_MULTISIG);
             // when multisig is enabled, it will only display outputs from multisig addresses
             if (fMultisigEnabled && !fMultiSigUTXO)

@@ -314,6 +314,10 @@ public:
     //! Return whether an address belongs to wallet.
     virtual bool addressIsMine(const std::string &sAddress) = 0;
     virtual bool addressIsUsed(const std::string &sAddress) = 0;
+    virtual bool isMultiSendEnabled() = 0;
+    virtual void setStakeSplitThreshold(int value) = 0;
+    virtual void listMints(bool fUnusedOnly = false, bool fMaturedOnly = false, bool fUpdateStatus = false, bool fWrongSeed = false) = 0;
+
 
 };
 

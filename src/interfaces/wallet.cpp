@@ -568,6 +568,32 @@ public:
     {
         return m_wallet->IsUsed(sAddress);
     }
+    bool isMultiSendEnabled() override
+    {
+        return m_wallet->fMultiSendMasternodeReward || m_wallet->fMultiSendStake;
+    }
+
+    /* Update StakeSplitThreshold's value in wallet */
+    void setStakeSplitThreshold(int value) override
+    {
+        // XXX: maybe it's worth to wrap related stuff with WALLET_ENABLE ?
+        uint64_t nStakeSplitThreshold;
+
+        nStakeSplitThreshold = value;
+        if (m_wallet && m_wallet->nStakeSplitThreshold != nStakeSplitThreshold) {
+            WalletBatch walletdb(m_wallet->GetDBHandle());
+            LOCK(m_wallet->cs_wallet);
+            {
+                m_wallet->nStakeSplitThreshold = nStakeSplitThreshold;
+                if (m_wallet->fFileBacked)
+                    walletdb.WriteStakeSplitThreshold(nStakeSplitThreshold);
+            }
+        }
+    }
+
+    void listMints(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus, bool fWrongSeed) override {
+        m_wallet->zwspTracker->ListMints(fUnusedOnly, fMaturedOnly, fUpdateStatus, fWrongSeed);
+    }
     std::shared_ptr<CWallet> m_wallet;
 };
 

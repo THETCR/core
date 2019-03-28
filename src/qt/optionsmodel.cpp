@@ -351,8 +351,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return settings.value("fShowMasternodesTab");
 #endif
         case StakeSplitThreshold:
-            if (pwalletMain)
-                return QVariant((int)pwalletMain->nStakeSplitThreshold);
+//            if (pwallet)
+//                return QVariant((int)pwallet->nStakeSplitThreshold);
             return settings.value("nStakeSplitThreshold");
         case DisplayUnit:
 
@@ -496,7 +496,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
 #endif
         case StakeSplitThreshold:
             settings.setValue("nStakeSplitThreshold", value.toInt());
-            setStakeSplitThreshold(value.toInt());
+//            setStakeSplitThreshold(value.toInt());
             break;
         case DisplayUnit:
             setDisplayUnit(value);
@@ -618,22 +618,10 @@ void OptionsModel::setDisplayUnit(const QVariant &value)
 }
 
 /* Update StakeSplitThreshold's value in wallet */
-void OptionsModel::setStakeSplitThreshold(int value)
-{
-    // XXX: maybe it's worth to wrap related stuff with WALLET_ENABLE ?
-    uint64_t nStakeSplitThreshold;
-
-    nStakeSplitThreshold = value;
-    if (pwalletMain && pwalletMain->nStakeSplitThreshold != nStakeSplitThreshold) {
-        WalletBatch walletdb(pwalletMain->GetDBHandle());
-        LOCK(pwalletMain->cs_wallet);
-        {
-            pwalletMain->nStakeSplitThreshold = nStakeSplitThreshold;
-            if (pwalletMain->fFileBacked)
-                walletdb.WriteStakeSplitThreshold(nStakeSplitThreshold);
-        }
-    }
-}
+//void OptionsModel::setStakeSplitThreshold(int value)
+//{
+//    walletModel->setStakeSplitThreshold;
+//}
 
 
 bool OptionsModel::getProxySettings(QNetworkProxy& proxy) const
