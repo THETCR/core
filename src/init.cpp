@@ -66,6 +66,9 @@
 
 #ifdef ENABLE_WALLET
 #include "accumulators.h"
+#include <wallet/db.h>
+#include <wallet/wallet.h>
+#include <wallet/walletdb.h>
 #endif
 
 #include <stdint.h>
@@ -1852,6 +1855,67 @@ bool AppInitMain(InitInterfaces& interfaces)
     } else {
         fHaveGenesis = true;
     }
+    std::ostringstream strErrors;
+    bool fFirstRun = true;
+    auto chain = interfaces::MakeChain();
+    WalletLocation location;
+    pwalletMain = new CWallet(*chain, location, WalletDatabase::Create(location.GetPath()));
+    DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
+    if (nLoadWalletRet != DBErrors::LOAD_OK) {
+        if (nLoadWalletRet == DBErrors::CORRUPT)
+            strErrors << _("Error loading wallet.dat: Wallet corrupted") << "\n";
+        else if (nLoadWalletRet == DBErrors::NONCRITICAL_ERROR) {
+            std::string msg(_("Warning: error reading wallet.dat! All keys read correctly, but transaction data"
+                              " or address book entries might be missing or incorrect."));
+            InitWarning(msg);
+        } else if (nLoadWalletRet == DBErrors::TOO_NEW)
+            strErrors << _("Error loading wallet.dat: Wallet requires newer version of WISPR Core") << "\n";
+        else if (nLoadWalletRet == DBErrors::NEED_REWRITE) {
+            strErrors << _("Wallet needed to be rewritten: restart WISPR Core to complete") << "\n";
+            LogPrintf("%s", strErrors.str());
+            return InitError(strErrors.str());
+        } else
+            strErrors << _("Error loading wallet.dat") << "\n";
+    }
+
+    if (gArgs.GetBoolArg("-upgradewallet", fFirstRun)) {
+        int nMaxVersion = gArgs.GetArg("-upgradewallet", 0);
+        if(nMaxVersion < FEATURE_LATEST){
+            nMaxVersion = FEATURE_LATEST;
+        }
+        if (nMaxVersion == 0) // the -upgradewallet without argument case
+        {
+            LogPrintf("Performing wallet upgrade to %i\n", FEATURE_LATEST);
+            nMaxVersion = CLIENT_VERSION;
+            // TODO Remove with version 0.6.1
+            if(nMaxVersion < FEATURE_LATEST){
+                nMaxVersion = FEATURE_LATEST;
+                LogPrintf("nMaxVersion: %d,  pwalletMain->GetVersion(): %d\n", nMaxVersion, pwalletMain->GetVersion());
+            }
+            pwalletMain->SetMinVersion(FEATURE_LATEST); // permanently upgrade the wallet immediately
+        } else
+            LogPrintf("Allowing wallet upgrade up to %i\n", nMaxVersion);
+        if (nMaxVersion < pwalletMain->GetVersion())
+            strErrors << _("Cannot downgrade wallet") << "\n";
+        pwalletMain->SetMaxVersion(nMaxVersion);
+    }
+
+    if (fFirstRun) {
+        // Create new keyUser and set as default key
+
+        CPubKey newDefaultKey;
+        if (pwalletMain->GetKeyFromPool(newDefaultKey)) {
+            pwalletMain->SetDefaultKey(newDefaultKey);
+            if (!pwalletMain->SetAddressBook(pwalletMain->vchDefaultKey.GetID(), "", "receive"))
+                strErrors << _("Cannot write default address") << "\n";
+        }
+
+        pwalletMain->SetBestChain(chainActive.GetLocator());
+    }
+
+    LogPrintf("%s", strErrors.str());
+    zwalletMain = new CzWSPWallet(pwalletMain->chain(), pwalletMain->GetLocation(), pwalletMain->GetDBHandle());
+    pwalletMain->setZWallet(zwalletMain);
 
     if (gArgs.IsArgSet("-blocknotify"))
         uiInterface.NotifyBlockTip_connect(BlockNotifyCallback);
