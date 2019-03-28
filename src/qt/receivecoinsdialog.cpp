@@ -326,7 +326,7 @@ void ReceiveCoinsDialog::copyAddress()
 
 void ReceiveCoinsDialog::receiveAddressUsed()
 {
-    if ((!ui->reuseAddress->isChecked()) && model && model->isUsed(CBitcoinAddress(address.toStdString()))) {
+    if ((!ui->reuseAddress->isChecked()) && model && model->isUsed(address.toStdString())) {
         address = getAddress();
         clear();
     }

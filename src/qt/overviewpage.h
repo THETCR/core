@@ -47,9 +47,9 @@ Q_SIGNALS:
 
 private:
     QTimer* timer;
-    Ui::OverviewPage* ui;
-    ClientModel* clientModel;
-    WalletModel* walletModel;
+    Ui::OverviewPage *ui;
+    ClientModel *clientModel;
+    WalletModel *walletModel;
     interfaces::WalletBalances m_balances;
     int nDisplayUnit;
     void getPercentage(CAmount nTotalBalance, CAmount nZerocoinBalance, QString& sWSPPercentage, QString& szWSPPercentage);

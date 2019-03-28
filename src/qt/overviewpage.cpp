@@ -20,6 +20,7 @@
 
 #include <QAbstractItemDelegate>
 #include <QPainter>
+#include <QPushButton>
 #include <QSettings>
 #include <QTimer>
 

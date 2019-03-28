@@ -20,6 +20,7 @@
 #include "askpassphrasedialog.h"
 
 #include <QClipboard>
+#include <QPushButton>
 #include <QSettings>
 #include <util/moneystr.h>
 #include <QtWidgets>
