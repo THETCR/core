@@ -130,7 +130,6 @@ BITCOIN_MM = \
   qt/macos_appnap.mm
 
 QT_MOC = \
-  qt/wispr.moc \
   qt/bitcoinamountfield.moc \
   qt/intro.moc \
   qt/overviewpage.moc \
