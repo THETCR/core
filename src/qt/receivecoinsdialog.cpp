@@ -150,7 +150,7 @@ QString ReceiveCoinsDialog::getAddress(QString label)
         }
     } else {
         /* Generate new receiving address */
-        return model->getAddressTableModel()->addRow(AddressTableModel::Receive, label, "");
+        return model->getAddressTableModel()->addRow(AddressTableModel::Receive, label, "", model->wallet().getDefaultAddressType());
     }
 }
 

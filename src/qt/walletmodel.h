@@ -153,6 +153,7 @@ public:
     TransactionTableModel *getTransactionTableModel();
     RecentRequestsTableModel *getRecentRequestsTableModel();
 
+    CAmount getLockedBalance() const;
     EncryptionStatus getEncryptionStatus() const;
     CKey generateNewKey() const; //for temporary paper wallet key generation
     bool setAddressBook(const CTxDestination& address, const std::string& strName, const std::string& strPurpose);

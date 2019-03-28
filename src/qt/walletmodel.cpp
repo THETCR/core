@@ -63,6 +63,11 @@ WalletModel::~WalletModel()
     unsubscribeFromCoreSignals();
 }
 
+CAmount WalletModel::getLockedBalance() const
+{
+    return m_wallet->getLockedCoins();
+}
+
 void WalletModel::updateStatus()
 {
     EncryptionStatus newEncryptionStatus = getEncryptionStatus();
