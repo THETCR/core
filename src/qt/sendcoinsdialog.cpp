@@ -710,6 +710,31 @@ void SendCoinsDialog::on_buttonMinimizeFee_clicked()
     minimizeFeeSection(true);
 }
 
+void SendCoinsDialog::useAvailableBalance(SendCoinsEntry* entry)
+{
+    // Get CCoinControl instance if CoinControl is enabled or create a new one.
+    CCoinControl coin_control;
+    if (model->getOptionsModel()->getCoinControlFeatures()) {
+        coin_control = *CoinControlDialog::coinControl();
+    }
+
+    // Calculate available amount to send.
+    CAmount amount = model->wallet().getAvailableBalance(coin_control);
+    for (int i = 0; i < ui->entries->count(); ++i) {
+        SendCoinsEntry* e = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(i)->widget());
+        if (e && !e->isHidden() && e != entry) {
+            amount -= e->getValue().amount;
+        }
+    }
+
+    if (amount > 0) {
+      entry->checkSubtractFeeFromAmount();
+      entry->setAmount(amount);
+    } else {
+      entry->setAmount(0);
+    }
+}
+
 void SendCoinsDialog::setMinimumFee()
 {
     ui->radioCustomPerKilobyte->setChecked(true);
@@ -765,6 +790,19 @@ void SendCoinsDialog::updateMinFeeLabel()
 {
     if (model && model->getOptionsModel())
         ui->checkBoxMinimumFee->setText(tr("Pay only the minimum fee of %1").arg(BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), CWallet::minTxFee.GetFeePerK()) + "/kB"));
+}
+
+void SendCoinsDialog::updateCoinControlState(CCoinControl& ctrl)
+{
+    if (ui->radioCustomFee->isChecked()) {
+        ctrl.m_feerate = CFeeRate(ui->customFee->value());
+    } else {
+        ctrl.m_feerate.reset();
+    }
+    // Avoid using global defaults when sending money from the GUI
+    // Either custom fee will be used or if not selected, the confirmation target from dropdown box
+    ctrl.m_confirm_target = getConfTargetForIndex(ui->confTargetSelector->currentIndex());
+    ctrl.m_signal_bip125_rbf = ui->optInRBF->isChecked();
 }
 
 void SendCoinsDialog::updateSmartFeeLabel()
@@ -976,5 +1014,47 @@ void SendCoinsDialog::coinControlUpdateLabels()
         ui->labelCoinControlAutomaticallySelected->show();
         ui->widgetCoinControl->hide();
         ui->labelCoinControlInsuffFunds->hide();
+    }
+}
+
+SendConfirmationDialog::SendConfirmationDialog(const QString &title, const QString &text, int _secDelay,
+    QWidget *parent) :
+    QMessageBox(QMessageBox::Question, title, text, QMessageBox::Yes | QMessageBox::Cancel, parent), secDelay(_secDelay)
+{
+    setDefaultButton(QMessageBox::Cancel);
+    yesButton = button(QMessageBox::Yes);
+    updateYesButton();
+    connect(&countDownTimer, &QTimer::timeout, this, &SendConfirmationDialog::countDown);
+}
+
+int SendConfirmationDialog::exec()
+{
+    updateYesButton();
+    countDownTimer.start(1000);
+    return QMessageBox::exec();
+}
+
+void SendConfirmationDialog::countDown()
+{
+    secDelay--;
+    updateYesButton();
+
+    if(secDelay <= 0)
+    {
+        countDownTimer.stop();
+    }
+}
+
+void SendConfirmationDialog::updateYesButton()
+{
+    if(secDelay > 0)
+    {
+        yesButton->setEnabled(false);
+        yesButton->setText(tr("Yes") + " (" + QString::number(secDelay) + ")");
+    }
+    else
+    {
+        yesButton->setEnabled(true);
+        yesButton->setText(tr("Yes"));
     }
 }
