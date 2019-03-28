@@ -373,7 +373,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee,
     WalletModelTransaction currentTransaction(recipients);
     WalletModel::SendCoinsReturn prepareStatus;
     if (model->getOptionsModel()->getCoinControlFeatures()) // coin control enabled
-        prepareStatus = model->prepareTransaction(currentTransaction, CoinControlDialog::coinControl());
+        prepareStatus = model->prepareTransaction(currentTransaction, *CoinControlDialog::coinControl());
     else
         prepareStatus = model->prepareTransaction(currentTransaction);
 
