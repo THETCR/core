@@ -247,7 +247,7 @@ void TransactionView::setModel(WalletModel* model)
         }
 
         // show/hide column Watch-only
-        updateWatchOnlyColumn(model->haveWatchOnly());
+        updateWatchOnlyColumn(model->wallet().haveWatchOnly());
 
         // Watch-only signal
         connect(model, SIGNAL(notifyWatchonlyChanged(bool)), this, SLOT(updateWatchOnlyColumn(bool)));

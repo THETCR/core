@@ -410,6 +410,8 @@ struct WalletTxStatus
     bool is_in_main_chain;
     bool is_coinstake;
     int request_count;
+    int lock_signatures;
+    bool is_lock_timed_out;
 };
 
 //! Wallet transaction output.

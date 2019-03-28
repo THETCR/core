@@ -133,6 +133,8 @@ WalletTxStatus MakeWalletTxStatus(interfaces::Chain::Lock& locked_chain, const C
     result.is_in_main_chain = wtx.IsInMainChain(locked_chain);
     result.is_coinstake = wtx.IsCoinStake();
     result.request_count = wtx.GetRequestCount();
+    result.lock_signatures = wtx.GetTransactionLockSignatures();
+    result.is_lock_timed_out = wtx.IsTransactionLockTimedOut();
     return result;
 }
 
