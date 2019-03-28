@@ -14,7 +14,7 @@
 #include <validation.h>
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bitcoin-config.h>
+#include <config/wispr-config.h>
 #endif
 #ifdef ENABLE_WALLET
 #include <wallet/db.h>
