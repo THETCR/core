@@ -14,7 +14,7 @@
 
 using namespace std;
 
-CzWSPTracker::CzWSPTracker(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database, std::shared_ptr<CWallet> pwallet) : m_chain(chain), m_location(location), database(database), pwallet(pwallet)
+CzWSPTracker::CzWSPTracker(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database, CWallet* pwallet) : m_chain(chain), m_location(location), database(database), pwallet(pwallet)
 {
     mapSerialHashes.clear();
     mapPendingSpends.clear();
