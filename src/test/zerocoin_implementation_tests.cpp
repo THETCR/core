@@ -518,20 +518,21 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
   SelectParams(CBaseChainParams::UNITTEST);
   uint256 seedMaster("3a1947364362e2e7c073b386869c89c905c0cf462448ffd6c2021bd03ce689f6");
 
-//  std::string strWalletFile = "unittestwallet.dat";
+  std::string strWalletFile = "unittestwallet.dat";
 //
-//  std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
-//  WalletLocation m_location = WalletLocation("unittestwallet.dat");
+  std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
+  WalletLocation m_location = WalletLocation("unittestwallet.dat");
   BOOST_TEST_PASSPOINT();
-//    std::shared_ptr<CWallet> pwallet(new CWallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath())));
-//    CWallet wallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
+    std::shared_ptr<CWallet> pwallet(new CWallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath())));
+    CWallet wallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
   BOOST_TEST_PASSPOINT();
-  WalletBatch walletdb(m_wallet.GetDBHandle(), "cr+");
+  WalletBatch walletdb(pwallet->GetDBHandle(), "cr+");
   BOOST_TEST_PASSPOINT();
-  CzWSPWallet zWallet(m_wallet.chain(), m_wallet.GetLocation(), m_wallet.GetDBHandle(), &m_wallet);
+  CzWSPWallet zWallet(pwallet->chain(), pwallet->GetLocation(), pwallet->GetDBHandle(), pwallet);
   BOOST_TEST_PASSPOINT();
   zWallet.SetMasterSeed(seedMaster);
-    m_wallet.setZWallet(&zWallet);
+    pwallet->setZWallet(&zWallet);
+    pwallet->zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(pwallet->chain(), pwallet->GetLocation(), pwallet->GetDBHandle(), pwallet));
 
   int64_t nTimeStart = GetTimeMillis();
   CoinDenomination denom = CoinDenomination::ZQ_FIFTY;

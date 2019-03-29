@@ -14,7 +14,7 @@
 
 using namespace libzerocoin;
 
-CzWSPWallet::CzWSPWallet(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database, CWallet* pwallet) : m_chain(chain), m_location(location), database(database), pwallet(pwallet)
+CzWSPWallet::CzWSPWallet(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database, std::shared_ptr<CWallet> pwallet) : m_chain(chain), m_location(location), database(database), pwallet(pwallet)
 {
     WalletBatch walletdb(database);
 

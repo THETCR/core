@@ -4557,8 +4557,10 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
     // Try to top up keypool. No-op if the wallet is locked.
     walletInstance->TopUpKeyPool();
-    CzWSPWallet* zwalletMain = new CzWSPWallet(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle(), *&walletInstance);
+    CzWSPWallet* zwalletMain = new CzWSPWallet(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle(), walletInstance);
     walletInstance->setZWallet(zwalletMain);
+    walletInstance->zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle(), walletInstance));
+
     auto locked_chain = chain.lock();
     LOCK(walletInstance->cs_wallet);
 
@@ -8454,7 +8456,7 @@ bool CWallet::DatabaseMint(CDeterministicMint& dMint)
 void CWallet::setZWallet(CzWSPWallet* zwallet)
 {
     zwalletMain = zwallet;
-    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(m_chain, GetLocation(), GetDBHandle(), this));
+//    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(m_chain, GetLocation(), GetDBHandle(), this));
 }
 
 //!OLD

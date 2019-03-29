@@ -21,8 +21,10 @@ WalletTestingSetup::WalletTestingSetup(const std::string& chainName):
     m_chain_client->registerRpcs();
 
     std::cout << "Create CzWSPWallet\n";
-    uint256 seedMaster("3a1947364362e2e7c073b386869c89c905c0cf462448ffd6c2021bd03ce689f6");
-    CzWSPWallet zWallet(m_wallet.chain(), m_wallet.GetLocation(), m_wallet.GetDBHandle(), &m_wallet);
-    zWallet.SetMasterSeed(seedMaster);
-    m_wallet.setZWallet(&zWallet);
+//    uint256 seedMaster("3a1947364362e2e7c073b386869c89c905c0cf462448ffd6c2021bd03ce689f6");
+//    CzWSPWallet zWallet(m_wallet.chain(), m_wallet.GetLocation(), m_wallet.GetDBHandle(), &m_wallet);
+//    zWallet.SetMasterSeed(seedMaster);
+//    m_wallet.setZWallet(&zWallet);
+//    m_wallet.zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(m_wallet.chain(), m_wallet.GetLocation(), m_wallet.GetDBHandle(), &m_wallet));
+
 }
