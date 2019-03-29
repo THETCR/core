@@ -587,7 +587,7 @@ void CObfuscationPool::CheckFinalTransaction(CConnman* connman)
 {
     if (!fMasterNode) return; // check and relay final tx only on masternode
 
-    CWalletTx txNew = CWalletTx(pwalletMain, CTransaction(finalTransaction));
+    CWalletTx txNew = CWalletTx(pwalletMain.get(), CTransaction(finalTransaction));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
     {
@@ -734,7 +734,7 @@ void CObfuscationPool::ChargeFees()
             if (!found && r > target) {
                 LogPrintf("CObfuscationPool::ChargeFees -- found uncooperative node (didn't send transaction). charging fees.\n");
 
-                CWalletTx wtxCollateral = CWalletTx(pwalletMain, txCollateral);
+                CWalletTx wtxCollateral = CWalletTx(pwalletMain.get(), txCollateral);
 
                 // Broadcast
                 if (!wtxCollateral.AcceptToMemoryPool(true)) {
@@ -754,7 +754,7 @@ void CObfuscationPool::ChargeFees()
                 if (!s.fHasSig && r > target) {
                     LogPrintf("CObfuscationPool::ChargeFees -- found uncooperative node (didn't sign). charging fees.\n");
 
-                    CWalletTx wtxCollateral = CWalletTx(pwalletMain, v.collateral);
+                    CWalletTx wtxCollateral = CWalletTx(pwalletMain.get(), v.collateral);
 
                     // Broadcast
                     if (!wtxCollateral.AcceptToMemoryPool(false)) {
@@ -791,7 +791,7 @@ void CObfuscationPool::ChargeRandomFees()
             if (r <= 10) {
                 LogPrintf("CObfuscationPool::ChargeRandomFees -- charging random fees. %u\n", i);
 
-                CWalletTx wtxCollateral = CWalletTx(pwalletMain, txCollateral);
+                CWalletTx wtxCollateral = CWalletTx(pwalletMain.get(), txCollateral);
 
                 // Broadcast
                 if (!wtxCollateral.AcceptToMemoryPool(true)) {
@@ -1724,9 +1724,9 @@ bool CObfuscationPool::MakeCollateralAmounts()
     coinControl.fAllowOtherInputs = false;
     coinControl.fAllowWatchOnly = false;
     // make our collateral address
-    CReserveKey reservekeyCollateral(pwalletMain);
+    CReserveKey reservekeyCollateral(pwalletMain.get());
     // make our change address
-    CReserveKey reservekeyChange(pwalletMain);
+    CReserveKey reservekeyChange(pwalletMain.get());
 
     CScript scriptCollateral;
     CPubKey vchPubKey;
@@ -1777,11 +1777,11 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
     CAmount nValueLeft = nTotalValue;
 
     // make our collateral address
-    CReserveKey reservekeyCollateral(pwalletMain);
+    CReserveKey reservekeyCollateral(pwalletMain.get());
     // make our change address
-    CReserveKey reservekeyChange(pwalletMain);
+    CReserveKey reservekeyChange(pwalletMain.get());
     // make our denom addresses
-    CReserveKey reservekeyDenom(pwalletMain);
+    CReserveKey reservekeyDenom(pwalletMain.get());
 
     CScript scriptCollateral;
     CPubKey vchPubKey;
