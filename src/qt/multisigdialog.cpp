@@ -667,7 +667,7 @@ bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, std::string& errorO
         }
 
         //choose between local wallet and provided
-        const CKeyStore& keystore = fGivenKeys ? privKeystore : model->wallet().getWisprWallet();
+        const CKeyStore& keystore = fGivenKeys ? privKeystore : *model->wallet().getWisprWallet();
 
         //attempt to sign each input from local wallet
         int nIn = 0;
