@@ -366,8 +366,7 @@ void Shutdown(InitInterfaces& interfaces)
     GetMainSignals().UnregisterBackgroundSignalScheduler();
     GetMainSignals().UnregisterWithMempoolSignals(mempool);
 #ifdef ENABLE_WALLET
-    delete pwalletMain;
-    pwalletMain = NULL;
+    pwalletMain.reset();
     delete zwalletMain;
     zwalletMain = NULL;
 #endif
@@ -1865,7 +1864,7 @@ bool AppInitMain(InitInterfaces& interfaces)
     bool fFirstRun = true;
     auto chain = interfaces::MakeChain();
     WalletLocation location;
-    pwalletMain = new CWallet(*chain, location, WalletDatabase::Create(location.GetPath()));
+    pwalletMain.reset(new CWallet(*chain, location, WalletDatabase::Create(location.GetPath()));
     DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
     if (nLoadWalletRet != DBErrors::LOAD_OK) {
         if (nLoadWalletRet == DBErrors::CORRUPT)

@@ -42,7 +42,7 @@
 #include <utility>
 #include <vector>
 
-extern CWallet* pwalletMain;
+extern std::unique_ptr<CWallet> pwalletMain;
 extern CzWSPWallet* zwalletMain;
 
 /**
