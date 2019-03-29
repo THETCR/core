@@ -403,7 +403,7 @@ Testb_RunAllTests()
 	std::cout << ggSuccessfulTests << " out of " << ggNumTests << " tests passed." << endl << endl;
 	delete gg_Params;
 }
-BOOST_AUTO_TEST_SUITE(benchmark_zerocoin)
+BOOST_FIXTURE_TEST_SUITE(benchmark_zerocoin, TestingSetup)
 
 BOOST_AUTO_TEST_CASE(benchmark_test)
 {
