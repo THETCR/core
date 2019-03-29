@@ -45,8 +45,8 @@ void MultiSendDialog::setAddress(const QString& address, QLineEdit* addrEdit)
 
 void MultiSendDialog::updateCheckBoxes()
 {
-    ui->multiSendStakeCheckBox->setChecked(pwalletMain->fMultiSendStake);
-    ui->multiSendMasternodeCheckBox->setChecked(pwalletMain->fMultiSendMasternodeReward);
+    ui->multiSendStakeCheckBox->setChecked(model->wallet().getWisprWallet()->fMultiSendStake);
+    ui->multiSendMasternodeCheckBox->setChecked(model->wallet().getWisprWallet()->fMultiSendMasternodeReward);
 }
 
 void MultiSendDialog::on_addressBookButton_clicked()
@@ -71,18 +71,18 @@ void MultiSendDialog::on_viewButton_clicked()
     std::pair<std::string, int> pMultiSend;
     std::string strMultiSendPrint;
     QString strStatus;
-    if (pwalletMain->isMultiSendEnabled()) {
-        if (pwalletMain->fMultiSendStake && pwalletMain->fMultiSendMasternodeReward)
+    if (model->wallet().getWisprWallet()->isMultiSendEnabled()) {
+        if (model->wallet().getWisprWallet()->fMultiSendStake && model->wallet().getWisprWallet()->fMultiSendMasternodeReward)
             strStatus += tr("MultiSend Active for Stakes and Masternode Rewards") + "\n";
-        else if (pwalletMain->fMultiSendStake)
+        else if (model->wallet().getWisprWallet()->fMultiSendStake)
             strStatus += tr("MultiSend Active for Stakes") + "\n";
-        else if (pwalletMain->fMultiSendMasternodeReward)
+        else if (model->wallet().getWisprWallet()->fMultiSendMasternodeReward)
             strStatus += tr("MultiSend Active for Masternode Rewards") + "\n";
     } else
         strStatus += tr("MultiSend Not Active") + "\n";
 
-    for (int i = 0; i < (int)pwalletMain->vMultiSend.size(); i++) {
-        pMultiSend = pwalletMain->vMultiSend[i];
+    for (int i = 0; i < (int)model->wallet().getWisprWallet()->vMultiSend.size(); i++) {
+        pMultiSend = model->wallet().getWisprWallet()->vMultiSend[i];
         if (model && model->getAddressTableModel()) {
             std::string associatedLabel;
             associatedLabel = model->getAddressTableModel()->labelForAddress(pMultiSend.first.c_str()).toStdString();
@@ -112,8 +112,8 @@ void MultiSendDialog::on_addButton_clicked()
     }
     int nMultiSendPercent = ui->multiSendPercentEdit->text().toInt(&fValidConversion, 10);
     int nSumMultiSend = 0;
-    for (int i = 0; i < (int)pwalletMain->vMultiSend.size(); i++)
-        nSumMultiSend += pwalletMain->vMultiSend[i].second;
+    for (int i = 0; i < (int)model->wallet().getWisprWallet()->vMultiSend.size(); i++)
+        nSumMultiSend += model->wallet().getWisprWallet()->vMultiSend[i].second;
     if (nSumMultiSend + nMultiSendPercent > 100) {
         ui->message->setProperty("status", "error");
         ui->message->style()->polish(ui->message);
@@ -131,12 +131,12 @@ void MultiSendDialog::on_addButton_clicked()
     std::pair<std::string, int> pMultiSend;
     pMultiSend.first = strAddress;
     pMultiSend.second = nMultiSendPercent;
-    pwalletMain->vMultiSend.push_back(pMultiSend);
+    model->wallet().getWisprWallet()->vMultiSend.push_back(pMultiSend);
     ui->message->setProperty("status", "ok");
     ui->message->style()->polish(ui->message);
     std::string strMultiSendPrint;
-    for (int i = 0; i < (int)pwalletMain->vMultiSend.size(); i++) {
-        pMultiSend = pwalletMain->vMultiSend[i];
+    for (int i = 0; i < (int)model->wallet().getWisprWallet()->vMultiSend.size(); i++) {
+        pMultiSend = model->wallet().getWisprWallet()->vMultiSend[i];
         strMultiSendPrint += pMultiSend.first.c_str();
         strMultiSendPrint += " - ";
         strMultiSendPrint += std::to_string(pMultiSend.second);
@@ -153,8 +153,8 @@ void MultiSendDialog::on_addButton_clicked()
             model->updateAddressBookLabels(address.Get(), "(no label)", "send");
     }
 
-    WalletBatch walletdb(pwalletMain->GetDBHandle());
-    if(!walletdb.WriteMultiSend(pwalletMain->vMultiSend)) {
+    WalletBatch walletdb(model->wallet().getWisprWallet()->GetDBHandle());
+    if(!walletdb.WriteMultiSend(model->wallet().getWisprWallet()->vMultiSend)) {
         ui->message->setProperty("status", "error");
         ui->message->style()->polish(ui->message);
         ui->message->setText(tr("Saved the MultiSend to memory, but failed saving properties to the database."));
@@ -166,19 +166,19 @@ void MultiSendDialog::on_addButton_clicked()
 
 void MultiSendDialog::on_deleteButton_clicked()
 {
-    std::vector<std::pair<std::string, int> > vMultiSendTemp = pwalletMain->vMultiSend;
+    std::vector<std::pair<std::string, int> > vMultiSendTemp = model->wallet().getWisprWallet()->vMultiSend;
     std::string strAddress = ui->multiSendAddressEdit->text().toStdString();
     bool fRemoved = false;
-    for (int i = 0; i < (int)pwalletMain->vMultiSend.size(); i++) {
-        if (pwalletMain->vMultiSend[i].first == strAddress) {
-            pwalletMain->vMultiSend.erase(pwalletMain->vMultiSend.begin() + i);
+    for (int i = 0; i < (int)model->wallet().getWisprWallet()->vMultiSend.size(); i++) {
+        if (model->wallet().getWisprWallet()->vMultiSend[i].first == strAddress) {
+            model->wallet().getWisprWallet()->vMultiSend.erase(model->wallet().getWisprWallet()->vMultiSend.begin() + i);
             fRemoved = true;
         }
     }
-    WalletBatch walletdb(pwalletMain->GetDBHandle());
+    WalletBatch walletdb(model->wallet().getWisprWallet()->GetDBHandle());
     if (!walletdb.EraseMultiSend(vMultiSendTemp))
         fRemoved = false;
-    if (!walletdb.WriteMultiSend(pwalletMain->vMultiSend))
+    if (!walletdb.WriteMultiSend(model->wallet().getWisprWallet()->vMultiSend))
         fRemoved = false;
 
     if (fRemoved)
@@ -192,16 +192,16 @@ void MultiSendDialog::on_deleteButton_clicked()
 void MultiSendDialog::on_activateButton_clicked()
 {
     QString strRet;
-    if (pwalletMain->vMultiSend.size() < 1)
+    if (model->wallet().getWisprWallet()->vMultiSend.size() < 1)
         strRet = tr("Unable to activate MultiSend, check MultiSend vector");
     else if (!(ui->multiSendStakeCheckBox->isChecked() || ui->multiSendMasternodeCheckBox->isChecked())) {
         strRet = tr("Need to select to send on stake and/or masternode rewards");
-    } else if (CBitcoinAddress(pwalletMain->vMultiSend[0].first).IsValid()) {
-        pwalletMain->fMultiSendStake = ui->multiSendStakeCheckBox->isChecked();
-        pwalletMain->fMultiSendMasternodeReward = ui->multiSendMasternodeCheckBox->isChecked();
+    } else if (CBitcoinAddress(model->wallet().getWisprWallet()->vMultiSend[0].first).IsValid()) {
+        model->wallet().getWisprWallet()->fMultiSendStake = ui->multiSendStakeCheckBox->isChecked();
+        model->wallet().getWisprWallet()->fMultiSendMasternodeReward = ui->multiSendMasternodeCheckBox->isChecked();
 
-        WalletBatch walletdb(pwalletMain->GetDBHandle());
-        if (!walletdb.WriteMSettings(pwalletMain->fMultiSendStake, pwalletMain->fMultiSendMasternodeReward, pwalletMain->nLastMultiSendHeight))
+        WalletBatch walletdb(model->wallet().getWisprWallet()->GetDBHandle());
+        if (!walletdb.WriteMSettings(model->wallet().getWisprWallet()->fMultiSendStake, model->wallet().getWisprWallet()->fMultiSendMasternodeReward, model->wallet().getWisprWallet()->nLastMultiSendHeight))
             strRet = tr("MultiSend activated but writing settings to DB failed");
         else
             strRet = tr("MultiSend activated");
@@ -215,10 +215,10 @@ void MultiSendDialog::on_activateButton_clicked()
 void MultiSendDialog::on_disableButton_clicked()
 {
     QString strRet;
-    pwalletMain->setMultiSendDisabled();
-    WalletBatch walletdb(pwalletMain->GetDBHandle());
+    model->wallet().getWisprWallet()->setMultiSendDisabled();
+    WalletBatch walletdb(model->wallet().getWisprWallet()->GetDBHandle());
 
-    if (!walletdb.WriteMSettings(false, false, pwalletMain->nLastMultiSendHeight))
+    if (!walletdb.WriteMSettings(false, false, model->wallet().getWisprWallet()->nLastMultiSendHeight))
         strRet = tr("MultiSend deactivated but writing settings to DB failed");
     else
         strRet = tr("MultiSend deactivated");

@@ -142,7 +142,7 @@ void Bip38ToolDialog::on_encryptKeyButton_ENC_clicked()
     }
 
     CKey key;
-    if (!pwalletMain->GetKey(keyID, key)) {
+    if (!model->wallet().getWisprWallet()->GetKey(keyID, key)) {
         ui->statusLabel_ENC->setStyleSheet("QLabel { color: red; }");
         ui->statusLabel_ENC->setText(tr("Private key for the entered address is not available."));
         return;
@@ -218,28 +218,28 @@ void Bip38ToolDialog::on_importAddressButton_DEC_clicked()
         ui->statusLabel_DEC->setStyleSheet("QLabel { color: red; }");
         ui->statusLabel_DEC->setText(tr("Please wait while key is imported"));
 
-        pwalletMain->MarkDirty();
-        pwalletMain->SetAddressBook(vchAddress, "", "receive");
+        model->wallet().getWisprWallet()->MarkDirty();
+        model->wallet().getWisprWallet()->SetAddressBook(vchAddress, "", "receive");
 
         // Don't throw error in case a key is already there
-        if (pwalletMain->HaveKey(vchAddress)) {
+        if (model->wallet().getWisprWallet()->HaveKey(vchAddress)) {
             ui->statusLabel_DEC->setStyleSheet("QLabel { color: red; }");
             ui->statusLabel_DEC->setText(tr("Key Already Held By Wallet"));
             return;
         }
 
-        pwalletMain->mapKeyMetadata[vchAddress].nCreateTime = 1;
+        model->wallet().getWisprWallet()->mapKeyMetadata[vchAddress].nCreateTime = 1;
 
-        if (!pwalletMain->AddKeyPubKey(key, pubkey)) {
+        if (!model->wallet().getWisprWallet()->AddKeyPubKey(key, pubkey)) {
             ui->statusLabel_DEC->setStyleSheet("QLabel { color: red; }");
             ui->statusLabel_DEC->setText(tr("Error Adding Key To Wallet"));
             return;
         }
-        WalletRescanReserver reserver(pwalletMain.get());
+        WalletRescanReserver reserver(model->wallet().getWisprWallet().get());
         reserver.reserve();
         // whenever a key is imported, we need to scan the whole chain
-        pwalletMain->UpdateTimeFirstKey(1); // 0 would be considered 'no value'
-        pwalletMain->ScanForWalletTransactions(chainActive.Genesis()->GetBlockHash(), {}, reserver, true);
+        model->wallet().getWisprWallet()->UpdateTimeFirstKey(1); // 0 would be considered 'no value'
+        model->wallet().getWisprWallet()->ScanForWalletTransactions(chainActive.Genesis()->GetBlockHash(), {}, reserver, true);
     }
 
     ui->statusLabel_DEC->setStyleSheet("QLabel { color: green; }");

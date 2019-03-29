@@ -13,6 +13,7 @@
 #include <qt/guiutil.h>
 
 #include <interfaces/node.h>
+#include <interfaces/wallet.h>
 #include <validation.h> // For DEFAULT_SCRIPTCHECK_THREADS
 #include <net.h>
 #include <netbase.h>
@@ -496,7 +497,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
 #endif
         case StakeSplitThreshold:
             settings.setValue("nStakeSplitThreshold", value.toInt());
-//            setStakeSplitThreshold(value.toInt());
+            setStakeSplitThreshold(value.toInt());
             break;
         case DisplayUnit:
             setDisplayUnit(value);
@@ -618,10 +619,10 @@ void OptionsModel::setDisplayUnit(const QVariant &value)
 }
 
 /* Update StakeSplitThreshold's value in wallet */
-//void OptionsModel::setStakeSplitThreshold(int value)
-//{
-//    walletModel->setStakeSplitThreshold;
-//}
+void OptionsModel::setStakeSplitThreshold(int value)
+{
+    m_node.getWallets().at(0)->setStakeSplitThreshold(value);
+}
 
 
 bool OptionsModel::getProxySettings(QNetworkProxy& proxy) const

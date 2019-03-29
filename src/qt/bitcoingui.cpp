@@ -1505,7 +1505,13 @@ bool BitcoinGUI::eventFilter(QObject *object, QEvent *event)
 void BitcoinGUI::setStakingStatus()
 {
     if (walletFrame) {
-//            fMultiSend = pwalletMain->isMultiSendEnabled();
+        WalletView * const walletView = walletFrame->currentWalletView();
+        if (walletView) {
+            WalletModel * const walletModel = walletView->getWalletModel();
+            if(walletModel){
+                fMultiSend = walletModel->wallet().getWisprWallet()->isMultiSendEnabled();
+            }
+        }
 
         if (nLastCoinStakeSearchInterval) {
             labelStakingIcon->show();

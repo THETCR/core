@@ -205,7 +205,7 @@ void PrivacyDialog::on_pushButtonMintzWSP_clicked()
 
     CWalletTx wtx;
     std::vector<CDeterministicMint> vMints;
-    std::string strError = pwalletMain->MintZerocoin(nAmount, wtx, vMints, CoinControlDialog::coinControl());
+    std::string strError = model->wallet().getWisprWallet()->MintZerocoin(nAmount, wtx, vMints, CoinControlDialog::coinControl());
 
     // Return if something went wrong during minting
     if (strError != ""){
@@ -250,7 +250,7 @@ void PrivacyDialog::on_pushButtonMintReset_clicked()
     ui->TEMintStatus->repaint ();
 
     int64_t nTime = GetTimeMillis();
-    std::string strResetMintResult = pwalletMain->ResetMintZerocoin();
+    std::string strResetMintResult = model->wallet().getWisprWallet()->ResetMintZerocoin();
     double fDuration = (double)(GetTimeMillis() - nTime)/1000.0;
     ui->TEMintStatus->setPlainText(QString::fromStdString(strResetMintResult) + tr("Duration: ") + QString::number(fDuration) + tr(" sec.\n"));
     ui->TEMintStatus->repaint ();
@@ -265,7 +265,7 @@ void PrivacyDialog::on_pushButtonSpentReset_clicked()
     ui->TEMintStatus->setPlainText(tr("Starting ResetSpentZerocoin: "));
     ui->TEMintStatus->repaint ();
     int64_t nTime = GetTimeMillis();
-    std::string strResetSpentResult = pwalletMain->ResetSpentZerocoin();
+    std::string strResetSpentResult = model->wallet().getWisprWallet()->ResetSpentZerocoin();
     double fDuration = (double)(GetTimeMillis() - nTime)/1000.0;
     ui->TEMintStatus->setPlainText(QString::fromStdString(strResetSpentResult) + tr("Duration: ") + QString::number(fDuration) + tr(" sec.\n"));
     ui->TEMintStatus->repaint ();
@@ -277,7 +277,7 @@ void PrivacyDialog::on_pushButtonSpentReset_clicked()
 void PrivacyDialog::on_pushButtonSpendzWSP_clicked()
 {
 
-    if (!walletModel || !walletModel->getOptionsModel() || !pwalletMain)
+    if (!walletModel || !walletModel->getOptionsModel() || !model->wallet().getWisprWallet())
         return;
 
     if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
@@ -437,7 +437,7 @@ void PrivacyDialog::sendzWSP()
                 }
             }
             CZerocoinMint mint;
-            if (!pwalletMain->GetMint(meta.hashSerial, mint)) {
+            if (!model->wallet().getWisprWallet()->GetMint(meta.hashSerial, mint)) {
                 ui->TEMintStatus->setPlainText(tr("Failed to fetch mint associated with serial hash"));
                 ui->TEMintStatus->repaint();
                 return;
@@ -452,11 +452,11 @@ void PrivacyDialog::sendzWSP()
     bool fSuccess = false;
     if(ui->payTo->text().isEmpty()){
         // Spend to newly generated local address
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, nSecurityLevel, wtxNew, receipt, vMintsSelected, fMintChange, fMinimizeChange);
+        fSuccess = model->wallet().getWisprWallet()->SpendZerocoin(nAmount, nSecurityLevel, wtxNew, receipt, vMintsSelected, fMintChange, fMinimizeChange);
     }
     else {
         // Spend to supplied destination address
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, nSecurityLevel, wtxNew, receipt, vMintsSelected, fMintChange, fMinimizeChange, &address);
+        fSuccess = model->wallet().getWisprWallet()->SpendZerocoin(nAmount, nSecurityLevel, wtxNew, receipt, vMintsSelected, fMintChange, fMinimizeChange, &address);
     }
 
     // Display errors during spend
@@ -651,7 +651,7 @@ void PrivacyDialog::setBalance(const interfaces::WalletBalances& balances)
         mapImmature.insert(std::make_pair(denom, 0));
     }
 
-    std::vector<CMintMeta> vMints = pwalletMain->zwspTracker->GetMints(false);
+    std::vector<CMintMeta> vMints = model->wallet().getWisprWallet()->zwspTracker->GetMints(false);
     map<libzerocoin::CoinDenomination, int> mapMaturityHeights = GetMintMaturityHeight();
     for (auto& meta : vMints){
         // All denominations
@@ -812,14 +812,14 @@ void PrivacyDialog::updateAutomintStatus()
 {
     QString strAutomintStatus = tr("AutoMint Status:");
 
-    if (pwalletMain->isZeromintEnabled ()) {
+    if (model->wallet().getWisprWallet()->isZeromintEnabled ()) {
        strAutomintStatus += tr(" <b>enabled</b>.");
     }
     else {
        strAutomintStatus += tr(" <b>disabled</b>.");
     }
 
-    strAutomintStatus += tr(" Configured target percentage: <b>") + QString::number(pwalletMain->getZeromintPercentage()) + "%</b>";
+    strAutomintStatus += tr(" Configured target percentage: <b>") + QString::number(model->wallet().getWisprWallet()->getZeromintPercentage()) + "%</b>";
     ui->label_AutoMintStatus->setText(strAutomintStatus);
 }
 
