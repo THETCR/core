@@ -2124,6 +2124,13 @@ UniValue analyzepsbt(const JSONRPCRequest& request)
 #ifdef ENABLE_WALLET
 UniValue listunspent(const JSONRPCRequest& request)
 {
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
     if (request.fHelp || request.params.size() > 4)
         throw std::runtime_error(
             "listunspent ( minconf maxconf  [\"address\",...] )\n"
@@ -2193,13 +2200,13 @@ UniValue listunspent(const JSONRPCRequest& request)
 
     UniValue results(UniValue::VARR);
     std::vector<COutput> vecOutputs;
-    assert(pwalletMain != nullptr);
+    assert(pwallet != nullptr);
     std::cout << "RawTransaction lock\n";
     {
-        auto locked_chain = pwalletMain->chain().lock();
-        LOCK(pwalletMain->cs_wallet);
+        auto locked_chain = pwallet->chain().lock();
+        LOCK(pwallet->cs_wallet);
         std::cout << "AvailableCoins\n";
-        pwalletMain->AvailableCoins(*locked_chain, vecOutputs, false, nullptr, AvailableCoinsType::ALL_COINS, false, nWatchonlyConfig);
+        pwallet->AvailableCoins(*locked_chain, vecOutputs, false, nullptr, AvailableCoinsType::ALL_COINS, false, nWatchonlyConfig);
     }
 
     std::cout << "vecOutputs\n";
@@ -2225,8 +2232,8 @@ UniValue listunspent(const JSONRPCRequest& request)
         std::cout << "entry address\n";
         if (ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, address)) {
             entry.pushKV("address", CBitcoinAddress(address).ToString());
-            if (pwalletMain->mapAddressBook.count(address))
-                entry.pushKV("account", pwalletMain->mapAddressBook[address].name);
+            if (pwallet->mapAddressBook.count(address))
+                entry.pushKV("account", pwallet->mapAddressBook[address].name);
         }
         entry.pushKV("scriptPubKey", HexStr(pk.begin(), pk.end()));
         if (pk.IsPayToScriptHash()) {
@@ -2235,7 +2242,7 @@ UniValue listunspent(const JSONRPCRequest& request)
             if (ExtractDestination(pk, address)) {
                 const CScriptID& hash = boost::get<CScriptID>(address);
                 CScript redeemScript;
-                if (pwalletMain->GetCScript(hash, redeemScript))
+                if (pwallet->GetCScript(hash, redeemScript))
                     entry.pushKV("redeemScript", HexStr(redeemScript.begin(), redeemScript.end()));
             }
         }
@@ -2251,6 +2258,13 @@ UniValue listunspent(const JSONRPCRequest& request)
 
 UniValue signrawtransaction(const JSONRPCRequest& request)
 {
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 4)
         throw std::runtime_error(
             "signrawtransaction \"hexstring\" ( [{\"txid\":\"id\",\"vout\":n,\"scriptPubKey\":\"hex\",\"redeemScript\":\"hex\"},...] [\"privatekey1\",...] sighashtype )\n"
@@ -2260,7 +2274,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
             "The third optional argument (may be null) is an array of base58-encoded private\n"
             "keys that, if given, will be the only keys used to sign the transaction.\n"
             #ifdef ENABLE_WALLET
-            + HelpRequiringPassphrase(pwalletMain.get()) + "\n"
+            + HelpRequiringPassphrase(pwallet) + "\n"
                                           #endif
 
                                           "\nArguments:\n"
@@ -2308,7 +2322,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
             HelpExampleCli("signrawtransaction", "\"myhex\"") + HelpExampleRpc("signrawtransaction", "\"myhex\""));
 
 #ifdef ENABLE_WALLET
-    LOCK2(cs_main, pwalletMain ? &pwalletMain->cs_wallet : NULL);
+    LOCK2(cs_main, pwallet ? &pwallet->cs_wallet : NULL);
 #else
     LOCK(cs_main);
 #endif
@@ -2370,8 +2384,8 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
         }
     }
 #ifdef ENABLE_WALLET
-    else if (pwalletMain)
-        EnsureWalletIsUnlocked(pwalletMain.get());
+    else if (pwallet)
+        EnsureWalletIsUnlocked(pwallet);
 #endif
 
     // Add previous txouts given in the RPC call:
@@ -2429,7 +2443,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
     }
 
 #ifdef ENABLE_WALLET
-    const CKeyStore& keystore = ((fGivenKeys || !pwalletMain) ? tempKeystore : *pwalletMain);
+    const CKeyStore& keystore = ((fGivenKeys || !pwallet) ? tempKeystore : *pwallet);
 #else
     const CKeyStore& keystore = tempKeystore;
 #endif
