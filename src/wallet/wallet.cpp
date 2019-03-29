@@ -4657,8 +4657,8 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
     //Load zerocoin mint hashes to memory
     walletInstance->zwspTracker->Init();
-//    zwalletMain->LoadMintPoolFromDB();
-//    zwalletMain->SyncWithChain();
+    zwalletMain->LoadMintPoolFromDB();
+    zwalletMain->SyncWithChain();
 
     chain.loadWallet(interfaces::MakeWallet(walletInstance));
 
