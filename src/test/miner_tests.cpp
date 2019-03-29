@@ -12,11 +12,10 @@
 #include "uint256.h"
 #include <util/system.h>
 #include <test/test_wispr.h>
-#include <wallet/test/wallet_test_fixture.h>
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(miner_tests, WalletTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(miner_tests, TestingSetup)
 
 static
 struct {
