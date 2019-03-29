@@ -21,10 +21,6 @@
 #include <wallet/wallet.h>
 #include <warnings.h>
 
-#ifdef ENABLE_WALLET
-extern CWallet* pwalletMain;
-#endif // ENABLE_WALLET
-
 using namespace std;
 
 std::map<uint256, CTransaction> mapTxLockReq;
