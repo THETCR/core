@@ -25,8 +25,6 @@
 #ifdef ENABLE_WALLET
 #include <wallet/wallet.h>
 #endif
-#include <interfaces/chain.h>
-#include <interfaces/wallet.h>
 
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
@@ -72,7 +70,6 @@ fs::path BasicTestingSetup::SetDataDir(const std::string& name)
 TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(chainName)
 {
     SetDataDir("tempdir");
-    m_chain = interfaces::MakeChain();
     const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
@@ -97,14 +94,6 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     if (!ActivateBestChain(state, chainparams)) {
         throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
     }
-#ifdef ENABLE_WALLET
-    bool fFirstRun;
-    pwalletMain = new CWallet(*m_chain, WalletLocation(), WalletDatabase::CreateMock());
-//    pwalletMain = new CWallet("wallet.dat", *m_chain, WalletLocation(), WalletDatabase::CreateMock());
-    pwalletMain->LoadWallet(fFirstRun);
-//    RegisterValidationInterface(pwalletMain);
-//    pwalletMain->chain().handleNotifications(pwalletMain);
-#endif
     nScriptCheckThreads = 3;
     for (int i = 0; i < nScriptCheckThreads - 1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
