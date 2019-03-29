@@ -114,10 +114,6 @@ TestingSetup::~TestingSetup()
     pcoinsTip.reset();
     pcoinsdbview.reset();
     pblocktree.reset();
-#ifdef ENABLE_WALLET
-    delete pwalletMain;
-    pwalletMain = nullptr;
-#endif
 }
 
 TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
