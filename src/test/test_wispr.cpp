@@ -114,6 +114,7 @@ TestingSetup::~TestingSetup()
     pcoinsTip.reset();
     pcoinsdbview.reset();
     pblocktree.reset();
+    pwalletMain.reset();
 }
 
 TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
