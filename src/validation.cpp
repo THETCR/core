@@ -5560,6 +5560,9 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
         }
     }
 
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     if (pwallet) {
         // If turned on MultiSend will send a transaction (or more) on the after maturity of a stake
         if (pwallet->isMultiSendEnabled())
