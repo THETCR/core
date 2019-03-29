@@ -141,10 +141,13 @@ static void ReleaseWallet(CWallet* wallet)
     wallet->Flush();
     wallet->WalletLogPrintf("ReleaseWallet m_chain_notifications_handler\n");
     wallet->m_chain_notifications_handler.reset();
+    wallet->WalletLogPrintf("ReleaseWallet delete wallet\n");
     delete wallet;
     // Wallet is now released, notify UnloadWallet, if any.
     {
+        wallet->WalletLogPrintf("ReleaseWallet g_wallet_release_mutex\n");
         LOCK(g_wallet_release_mutex);
+        wallet->WalletLogPrintf("ReleaseWallet g_unloading_wallet_set\n");
         if (g_unloading_wallet_set.erase(wallet) == 0) {
             // UnloadWallet was not called for this wallet, all done.
             return;
