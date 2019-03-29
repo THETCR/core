@@ -365,9 +365,6 @@ void Shutdown(InitInterfaces& interfaces)
     UnregisterAllValidationInterfaces();
     GetMainSignals().UnregisterBackgroundSignalScheduler();
     GetMainSignals().UnregisterWithMempoolSignals(mempool);
-#ifdef ENABLE_WALLET
-    pwalletMain.reset();
-#endif
     globalVerifyHandle.reset();
     ECC_Stop();
     LogPrintf("%s: done\n", __func__);

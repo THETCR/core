@@ -52,6 +52,13 @@ void budgetToJSON(CBudgetProposal* pbudgetProposal, UniValue& bObj)
 
 UniValue preparebudget(const JSONRPCRequest& request)
 {
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
     int nBlockMin = 0;
     CBlockIndex* pindexPrev = chainActive.Tip();
 
@@ -75,9 +82,9 @@ UniValue preparebudget(const JSONRPCRequest& request)
             HelpExampleCli("preparebudget", "\"test-proposal\" \"https://forum.wispr.tech/t/test-proposal\" 2 820800 \"D9oc6C3dttUbv8zd7zGNq1qKBGf4ZQ1XEE\" 500") +
             HelpExampleRpc("preparebudget", "\"test-proposal\" \"https://forum.wispr.tech/t/test-proposal\" 2 820800 \"D9oc6C3dttUbv8zd7zGNq1qKBGf4ZQ1XEE\" 500"));
 
-    LOCK2(cs_main, pwalletMain->cs_wallet);
+    LOCK2(cs_main, pwallet->cs_wallet);
 
-    EnsureWalletIsUnlocked(pwalletMain.get());
+    EnsureWalletIsUnlocked(pwallet);
 
     std::string strProposalName = SanitizeString(request.params[0].get_str());
     if (strProposalName.size() > 20)
@@ -133,14 +140,14 @@ UniValue preparebudget(const JSONRPCRequest& request)
     // }
 
     CWalletTx wtx;
-    if (!pwalletMain->GetBudgetSystemCollateralTX(wtx, budgetProposalBroadcast.GetHash(), useIX)) { // 50 WSP collateral for proposal
+    if (!pwallet->GetBudgetSystemCollateralTX(wtx, budgetProposalBroadcast.GetHash(), useIX)) { // 50 WSP collateral for proposal
         throw runtime_error("Error making collateral transaction for proposal. Please check your wallet balance.");
     }
 
     // make our change address
-    CReserveKey reservekey(pwalletMain.get());
+    CReserveKey reservekey(pwallet);
     //send the tx to the network
-    pwalletMain->CommitTransaction(wtx, reservekey, useIX ? NetMsgType::TXLOCKREQUEST : NetMsgType::TX);
+    pwallet->CommitTransaction(wtx, reservekey, useIX ? NetMsgType::TXLOCKREQUEST : NetMsgType::TX);
 
     return wtx.tx->GetHash().ToString();
 }
