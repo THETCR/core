@@ -11,6 +11,7 @@
 #include <wallet/wallet.h>
 
 #include <test/test_wispr.h>
+#include <wallet/test/wallet_test_fixture.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
@@ -20,13 +21,11 @@
 extern JSONRPCRequest createArgs(int nRequired, const char* address1 = nullptr, const char* address2 = nullptr);
 extern UniValue CallRPC(string args);
 
-extern CWallet* pwalletMain;
-
-BOOST_FIXTURE_TEST_SUITE(rpc_wallet_tests, TestingSetup)
+BOOST_FIXTURE_TEST_SUITE(rpc_wallet_tests, WalletTestingSetup)
 
 BOOST_AUTO_TEST_CASE(rpc_addmultisig)
 {
-    LOCK(pwalletMain->cs_wallet);
+    LOCK(m_wallet.cs_wallet);
 
 //    rpcfn_type addmultisig = tableRPC["addmultisigaddress"]->actor;
 
@@ -78,12 +77,12 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     // Test RPC calls for various wallet statistics
     UniValue r;
     std::cout << "lock\n";
-    LOCK2(cs_main, pwalletMain->cs_wallet);
+    LOCK2(cs_main, m_wallet.cs_wallet);
 
     std::cout << "walletdb\n";
-    WalletBatch walletdb(pwalletMain->GetDBHandle());
+    WalletBatch walletdb(m_wallet.GetDBHandle());
     std::cout << "GenerateNewKey\n";
-    CPubKey demoPubkey = pwalletMain->GenerateNewKey(walletdb);
+    CPubKey demoPubkey = m_wallet.GenerateNewKey(walletdb);
     std::cout << "CBitcoinAddress\n";
     CBitcoinAddress demoAddress = CBitcoinAddress(CTxDestination(demoPubkey.GetID()));
     UniValue retValue;
@@ -92,15 +91,15 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     BOOST_TEST_PASSPOINT();
     std::cout << "BOOST_CHECK_NO_THROW\n";
     BOOST_CHECK_NO_THROW({ /*Initialize Wallet with an account */
-        WalletBatch walletdb(pwalletMain->GetDBHandle());
+        WalletBatch walletdb(m_wallet.GetDBHandle());
         CAccount account;
         account.vchPubKey = demoPubkey;
-        pwalletMain->SetAddressBook(account.vchPubKey.GetID(), strAccount, strPurpose);
+        m_wallet.SetAddressBook(account.vchPubKey.GetID(), strAccount, strPurpose);
         walletdb.WriteAccount(strAccount, account);
     });
     BOOST_TEST_PASSPOINT();
     std::cout << "GenerateNewKey 2\n";
-    CPubKey setaccountDemoPubkey = pwalletMain->GenerateNewKey(walletdb);
+    CPubKey setaccountDemoPubkey = m_wallet.GenerateNewKey(walletdb);
     CBitcoinAddress setaccountDemoAddress = CBitcoinAddress(CTxDestination(setaccountDemoPubkey.GetID()));
 
     std::cout << "setaccount rpc\n";
