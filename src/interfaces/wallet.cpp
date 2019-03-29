@@ -407,6 +407,10 @@ public:
     {
         return m_wallet->GetLockedCoins();
     }
+    CAmount getLockedWatchOnlyBalance() override
+    {
+        return m_wallet->GetLockedWatchOnlyBalance();
+    }
     bool tryGetBalances(WalletBalances& balances, int& num_blocks) override
     {
         auto locked_chain = m_wallet->chain().lock(true /* try_lock */);

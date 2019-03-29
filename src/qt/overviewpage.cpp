@@ -186,9 +186,9 @@ void OverviewPage::setBalance(const interfaces::WalletBalances& balances)
 
     CAmount nLockedBalance = 0;
     CAmount nWatchOnlyLockedBalance = 0;
-    if (pwalletMain) {
-        nLockedBalance = pwalletMain->GetLockedCoins();
-        nWatchOnlyLockedBalance = pwalletMain->GetLockedWatchOnlyBalance();
+    if (walletModel) {
+        nLockedBalance = walletModel->getLockedBalance();
+        nWatchOnlyLockedBalance = walletModel->wallet().getLockedWatchOnlyBalance();
     }
 
     // WSP Balance
