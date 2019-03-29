@@ -235,7 +235,7 @@ void MultisigDialog::on_importAddressButton_clicked(){
 
     addMultisig(stoi(vRedeem[0]), keys);
 
-    WalletRescanReserver reserver(pwalletMain);
+    WalletRescanReserver reserver(pwalletMain.get());
     reserver.reserve();
     // rescan to find txs associated with imported address
     pwalletMain->ScanForWalletTransactions(chainActive.Genesis()->GetBlockHash(), {}, reserver,  true);
