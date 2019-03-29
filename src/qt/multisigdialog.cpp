@@ -742,8 +742,8 @@ void MultisigDialog::commitMultisigTx()
     CMutableTransaction tx(multisigTx);
     try{
 #ifdef ENABLE_WALLET
-        CWalletTx wtx(pwalletMain, CTransaction(tx));
-        CReserveKey keyChange(pwalletMain);
+        CWalletTx wtx(pwalletMain.get(), CTransaction(tx));
+        CReserveKey keyChange(pwalletMain.get());
         if (!pwalletMain->CommitTransaction(wtx, keyChange))
             throw runtime_error(std::string("Transaction rejected - Failed to commit"));
 #else
