@@ -29,8 +29,11 @@ private:
     WalletLocation m_location;
     /** Internal database handle. */
     WalletDatabase& database;
+
+    /** Wallet that holds this zerocoin wallet. */
+    std::shared_ptr<CWallet> pwallet;
 public:
-    CzWSPWallet(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database);
+    CzWSPWallet(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database, CWallet* pwallet);
     void AddToMintPool(const std::pair<uint256, uint32_t>& pMint, bool fVerbose);
     bool SetMasterSeed(const uint256& seedMaster, bool fResetCount = false);
     uint256 GetMasterSeed() { return seedMaster; }

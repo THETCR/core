@@ -165,13 +165,16 @@ bool CCryptoKeyStore::IsLocked() const
 
 bool CCryptoKeyStore::Lock()
 {
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+    //TODO Remove this
+    CWallet* pwallet = wallets.at(0).get();
     if (!SetCrypted())
         return false;
 
     {
         LOCK(cs_KeyStore);
         vMasterKey.clear();
-        pwalletMain->zwalletMain->Lock();
+        pwallet->zwalletMain->Lock();
     }
 
     NotifyStatusChanged(this);
@@ -180,6 +183,9 @@ bool CCryptoKeyStore::Lock()
 
 bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no_keys)
 {
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+    //TODO Remove this
+    CWallet* pwallet = wallets.at(0).get();
     {
         LOCK(cs_KeyStore);
         if (!SetCrypted())
@@ -213,13 +219,13 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no
         fDecryptionThoroughlyChecked = true;
 
         uint256 hashSeed;
-        if (WalletBatch(pwalletMain->GetDBHandle()).ReadCurrentSeedHash(hashSeed)) {
+        if (WalletBatch(pwallet->GetDBHandle()).ReadCurrentSeedHash(hashSeed)) {
 
             uint256 nSeed;
             if (!GetDeterministicSeed(hashSeed, nSeed)) {
                 return error("Failed to read zWSP seed from DB. Wallet is probably corrupt.");
             }
-            pwalletMain->zwalletMain->SetMasterSeed(nSeed, false);
+            pwallet->zwalletMain->SetMasterSeed(nSeed, false);
         } else {
             // First time this wallet has been unlocked with dzWSP
             // Borrow random generator from the key class so that we don't have to worry about randomness
@@ -227,8 +233,8 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no
             key.MakeNewKey(true);
             uint256 seed = key.GetPrivKey_256();
             LogPrintf("%s: first run of zwsp wallet detected, new seed generated. Seedhash=%s\n", __func__, Hash(seed.begin(), seed.end()).GetHex());
-            pwalletMain->zwalletMain->SetMasterSeed(seed, true);
-            pwalletMain->zwalletMain->GenerateMintPool();
+            pwallet->zwalletMain->SetMasterSeed(seed, true);
+            pwallet->zwalletMain->GenerateMintPool();
     }
     }
 
@@ -268,7 +274,7 @@ bool CCryptoKeyStore::AddCryptedKey(const CPubKey &vchPubKey, const std::vector<
     }
 
     mapCryptedKeys[vchPubKey.GetID()] = make_pair(vchPubKey, vchCryptedSecret);
-//    ImplicitlyLearnRelatedKeyScripts(vchPubKey);
+    ImplicitlyLearnRelatedKeyScripts(vchPubKey);
     return true;
 }
 
@@ -351,7 +357,10 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
 
 bool CCryptoKeyStore::AddDeterministicSeed(const uint256& seed)
 {
-    WalletBatch db(pwalletMain->GetDBHandle());
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+    //TODO Remove this
+    CWallet* pwallet = wallets.at(0).get();
+    WalletBatch db(pwallet->GetDBHandle());
     std::string strErr;
     uint256 hashSeed = Hash(seed.begin(), seed.end());
 
@@ -386,7 +395,10 @@ bool CCryptoKeyStore::AddDeterministicSeed(const uint256& seed)
 bool CCryptoKeyStore::GetDeterministicSeed(const uint256& hashSeed, uint256& seedOut)
 {
 
-    WalletBatch db(pwalletMain->GetDBHandle());
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+    //TODO Remove this
+    CWallet* pwallet = wallets.at(0).get();
+    WalletBatch db(pwallet->GetDBHandle());
     std::string strErr;
     if (IsCrypted()) {
         if(!IsLocked()) { //if we have password

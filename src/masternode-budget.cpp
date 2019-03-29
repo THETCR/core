@@ -146,6 +146,9 @@ void CBudgetManager::CheckOrphanVotes()
 
 void CBudgetManager::SubmitFinalBudget()
 {
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     static int nSubmittedHeight = 0; // height at which final budget was submitted last time
     int nCurrentHeight;
 
@@ -213,15 +216,15 @@ void CBudgetManager::SubmitFinalBudget()
 
     if (!mapCollateralTxids.count(tempBudget.GetHash())) {
         CWalletTx wtx;
-        if (!pwalletMain->GetBudgetFinalizationCollateralTX(wtx, tempBudget.GetHash(), false)) {
+        if (!pwallet->GetBudgetFinalizationCollateralTX(wtx, tempBudget.GetHash(), false)) {
             LogPrint(BCLog::MNBUDGET,"CBudgetManager::SubmitFinalBudget - Can't make collateral transaction\n");
             return;
         }
 
         // Get our change address
-        CReserveKey reservekey(pwalletMain.get());
+        CReserveKey reservekey(pwallet);
         // Send the tx to the network. Do NOT use SwiftTx, locking might need too much time to propagate, especially for testnet
-        pwalletMain->CommitTransaction(wtx, reservekey, "NO-ix");
+        pwallet->CommitTransaction(wtx, reservekey, "NO-ix");
         tx = (CTransaction)*wtx.tx;
         txidCollateral = tx.GetHash();
         mapCollateralTxids.insert(std::make_pair(tempBudget.GetHash(), txidCollateral));

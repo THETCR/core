@@ -307,6 +307,9 @@ void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight, CConnman* connman)
 //received a consensus vote
 bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx, CConnman* connman)
 {
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     int n = mnodeman.GetMasternodeRank(ctx.vinMasternode, ctx.nBlockHeight, MIN_SWIFTTX_PROTO_VERSION);
 
     CMasternode* pmn = mnodeman.Find(ctx.vinMasternode);
@@ -350,10 +353,10 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx, CConnman* connman)
         (*i).second.AddSignature(ctx);
 
 #ifdef ENABLE_WALLET
-        if (pwalletMain) {
+        if (pwallet) {
             //when we get back signatures, we'll count them as requests. Otherwise the client will think it didn't propagate.
-            if (pwalletMain->mapRequestCount.count(ctx.txHash))
-                pwalletMain->mapRequestCount[ctx.txHash]++;
+            if (pwallet->mapRequestCount.count(ctx.txHash))
+                pwallet->mapRequestCount[ctx.txHash]++;
         }
 #endif
 
@@ -365,8 +368,8 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx, CConnman* connman)
             CTransaction& tx = mapTxLockReq[ctx.txHash];
             if (!CheckForConflictingLocks(tx)) {
 #ifdef ENABLE_WALLET
-                if (pwalletMain) {
-//                    if (pwalletMain->UpdatedTransaction((*i).second.txHash)) {
+                if (pwallet) {
+//                    if (pwallet->UpdatedTransaction((*i).second.txHash)) {
 //                        nCompleteTXLocks++;
 //                    }
                 }

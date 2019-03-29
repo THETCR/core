@@ -24,6 +24,9 @@ void CActiveMasternode::ManageStatus()
 
     if (!fMasterNode) return;
 
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     if (fDebug) LogPrintf("CActiveMasternode::ManageStatus() - Begin\n");
 
     //need correct blocks to send ping
@@ -49,13 +52,13 @@ void CActiveMasternode::ManageStatus()
         status = ACTIVE_MASTERNODE_NOT_CAPABLE;
         notCapableReason = "";
 
-        if (pwalletMain->IsLocked()) {
+        if (pwallet->IsLocked()) {
             notCapableReason = "Wallet is locked.";
             LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason);
             return;
         }
 
-        if (pwalletMain->GetBalance() == 0) {
+        if (pwallet->GetBalance() == 0) {
             notCapableReason = "Hot node, waiting for remote activation.";
             LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason);
             return;
@@ -98,8 +101,8 @@ void CActiveMasternode::ManageStatus()
                 return;
             }
 
-            LOCK(pwalletMain->cs_wallet);
-            pwalletMain->LockCoin(vin.prevout);
+            LOCK(pwallet->cs_wallet);
+            pwallet->LockCoin(vin.prevout);
 
             // send to all nodes
             CPubKey pubKeyMasternode;
@@ -351,8 +354,11 @@ bool CActiveMasternode::GetMasterNodeVin(CTxIn& vin, CPubKey& pubkey, CKey& secr
     // wait for reindex and/or import to finish
     if (fImporting || fReindex) return false;
 
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     // Find possible candidates
-    TRY_LOCK(pwalletMain->cs_wallet, fWallet);
+    TRY_LOCK(pwallet->cs_wallet, fWallet);
     if (!fWallet) return false;
 
     std::vector<COutput> possibleCoins = SelectCoinsMasternode();
@@ -403,6 +409,9 @@ bool CActiveMasternode::GetVinFromOutput(COutput out, CTxIn& vin, CPubKey& pubke
     // wait for reindex and/or import to finish
     if (fImporting || fReindex) return false;
 
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     CScript pubScript;
 
     vin = CTxIn(out.tx->tx->GetHash(), out.i);
@@ -418,7 +427,7 @@ bool CActiveMasternode::GetVinFromOutput(COutput out, CTxIn& vin, CPubKey& pubke
         return false;
     }
 
-    if (!pwalletMain->GetKey(keyID, secretKey)) {
+    if (!pwallet->GetKey(keyID, secretKey)) {
         LogPrintf("CActiveMasternode::GetMasterNodeVin - Private key for address is not known\n");
         return false;
     }
@@ -434,6 +443,9 @@ std::vector<COutput> CActiveMasternode::SelectCoinsMasternode()
     std::vector<COutput> filteredCoins;
     std::vector<COutPoint> confLockedCoins;
 
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     // Temporary unlock MN coins from masternode.conf
     if (gArgs.GetBoolArg("-mnconflock", true)) {
         uint256 mnTxHash;
@@ -446,18 +458,18 @@ std::vector<COutput> CActiveMasternode::SelectCoinsMasternode()
 
             COutPoint outpoint = COutPoint(mnTxHash, nIndex);
             confLockedCoins.push_back(outpoint);
-            pwalletMain->UnlockCoin(outpoint);
+            pwallet->UnlockCoin(outpoint);
         }
     }
 
     // Retrieve all possible outputs
-    auto locked_chain = pwalletMain->chain().lock();
-    pwalletMain->AvailableCoins(*locked_chain, vCoins);
+    auto locked_chain = pwallet->chain().lock();
+    pwallet->AvailableCoins(*locked_chain, vCoins);
 
     // Lock MN coins from masternode.conf back if they where temporary unlocked
     if (!confLockedCoins.empty()) {
         for (COutPoint outpoint: confLockedCoins)
-        pwalletMain->LockCoin(outpoint);
+        pwallet->LockCoin(outpoint);
     }
 
     // Filter

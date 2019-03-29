@@ -2014,7 +2014,9 @@ void CConnman::ThreadMessageHandler()
 void CConnman::ThreadStakeMinter()
 {
     LogPrintf("ThreadStakeMinter started\n");
-    CWallet* pwallet = pwalletMain.get();
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     try {
         BitcoinMiner(pwallet, true);
     } catch (std::exception& e) {

@@ -32,8 +32,11 @@ private:
     WalletLocation m_location;
     /** Internal database handle. */
     WalletDatabase& database;
+
+    /** Wallet that holds this zerocoin tracker. */
+    std::shared_ptr<CWallet> pwallet;
 public:
-    CzWSPTracker(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database);
+    CzWSPTracker(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database, CWallet* pwallet);
     ~CzWSPTracker();
     void Add(const CDeterministicMint& dMint, bool isNew = false, bool isArchived = false, CzWSPWallet* zWSPWallet = nullptr);
     void Add(const CZerocoinMint& mint, bool isNew = false, bool isArchived = false);
