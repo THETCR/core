@@ -150,6 +150,7 @@ static void ReleaseWallet(CWallet* wallet)
         wallet->WalletLogPrintf("ReleaseWallet g_unloading_wallet_set\n");
         if (g_unloading_wallet_set.erase(wallet) == 0) {
             // UnloadWallet was not called for this wallet, all done.
+            wallet->WalletLogPrintf("ReleaseWallet return\n");
             return;
         }
     }
