@@ -15,6 +15,7 @@
 #include <policy/fees.h>
 #include <policy/policy.h>
 #include <primitives/transaction.h>
+#include <primitives/zerocoin.h>
 #include <rpc/server.h>
 #include <scheduler.h>
 #include <script/ismine.h>
@@ -595,7 +596,7 @@ public:
         }
     }
 
-    void listMints(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus, bool fWrongSeed) override {
+    std::set<CMintMeta> listMints(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus, bool fWrongSeed) override {
         m_wallet->zwspTracker->ListMints(fUnusedOnly, fMaturedOnly, fUpdateStatus, fWrongSeed);
     }
     std::shared_ptr<CWallet> m_wallet;

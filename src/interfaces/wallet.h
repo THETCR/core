@@ -29,6 +29,7 @@ enum class FeeReason;
 enum class OutputType;
 enum class AvailableCoinsType;
 struct CRecipient;
+struct CMintMeta;
 
 namespace interfaces {
 
@@ -319,7 +320,7 @@ public:
     virtual bool addressIsUsed(const std::string &sAddress) = 0;
     virtual bool isMultiSendEnabled() = 0;
     virtual void setStakeSplitThreshold(int value) = 0;
-    virtual void listMints(bool fUnusedOnly = false, bool fMaturedOnly = false, bool fUpdateStatus = false, bool fWrongSeed = false) = 0;
+    virtual std::set<CMintMeta> listMints(bool fUnusedOnly = false, bool fMaturedOnly = false, bool fUpdateStatus = false, bool fWrongSeed = false) = 0;
 
 
 };
