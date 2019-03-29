@@ -1864,7 +1864,7 @@ bool AppInitMain(InitInterfaces& interfaces)
     bool fFirstRun = true;
     auto chain = interfaces::MakeChain();
     WalletLocation location;
-    pwalletMain.reset(new CWallet(*chain, location, WalletDatabase::Create(location.GetPath()));
+    pwalletMain.reset(new CWallet(*chain, location, WalletDatabase::Create(location.GetPath())));
     DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
     if (nLoadWalletRet != DBErrors::LOAD_OK) {
         if (nLoadWalletRet == DBErrors::CORRUPT)
