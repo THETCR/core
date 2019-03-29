@@ -42,7 +42,6 @@
 #include <utility>
 #include <vector>
 
-//extern std::unique_ptr<CWallet> pwalletMain;
 
 /**
  * Settings

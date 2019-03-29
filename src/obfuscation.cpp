@@ -438,14 +438,17 @@ bool CObfuscationPool::SetCollateralAddress(std::string strAddress)
 //
 void CObfuscationPool::UnlockCoins()
 {
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     while (true) {
-        TRY_LOCK(pwalletMain->cs_wallet, lockWallet);
+        TRY_LOCK(pwallet->cs_wallet, lockWallet);
         if (!lockWallet) {
             MilliSleep(50);
             continue;
         }
         for (CTxIn v: lockedCoins)
-            pwalletMain->UnlockCoin(v.prevout);
+            pwallet->UnlockCoin(v.prevout);
         break;
     }
 
@@ -587,9 +590,12 @@ void CObfuscationPool::CheckFinalTransaction(CConnman* connman)
 {
     if (!fMasterNode) return; // check and relay final tx only on masternode
 
-    CWalletTx txNew = CWalletTx(pwalletMain.get(), CTransaction(finalTransaction));
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
-    LOCK2(cs_main, pwalletMain->cs_wallet);
+    CWallet* pwallet = wallets.at(0).get();
+    CWalletTx txNew = CWalletTx(pwallet, CTransaction(finalTransaction));
+
+    LOCK2(cs_main, pwallet->cs_wallet);
     {
         LogPrint(BCLog::OBFUSCATION, "Transaction 2: %s\n", txNew.tx->ToString());
 
@@ -672,6 +678,9 @@ void CObfuscationPool::ChargeFees()
 {
     if (!fMasterNode) return;
 
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     //we don't need to charge collateral for every offence.
     int offences = 0;
     int r = rand() % 100;
@@ -734,7 +743,7 @@ void CObfuscationPool::ChargeFees()
             if (!found && r > target) {
                 LogPrintf("CObfuscationPool::ChargeFees -- found uncooperative node (didn't send transaction). charging fees.\n");
 
-                CWalletTx wtxCollateral = CWalletTx(pwalletMain.get(), txCollateral);
+                CWalletTx wtxCollateral = CWalletTx(pwallet, txCollateral);
 
                 // Broadcast
                 if (!wtxCollateral.AcceptToMemoryPool(true)) {
@@ -754,7 +763,7 @@ void CObfuscationPool::ChargeFees()
                 if (!s.fHasSig && r > target) {
                     LogPrintf("CObfuscationPool::ChargeFees -- found uncooperative node (didn't sign). charging fees.\n");
 
-                    CWalletTx wtxCollateral = CWalletTx(pwalletMain.get(), v.collateral);
+                    CWalletTx wtxCollateral = CWalletTx(pwallet, v.collateral);
 
                     // Broadcast
                     if (!wtxCollateral.AcceptToMemoryPool(false)) {
@@ -773,6 +782,9 @@ void CObfuscationPool::ChargeFees()
 //  - Obfuscation is completely free, to pay miners we randomly pay the collateral of users.
 void CObfuscationPool::ChargeRandomFees()
 {
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     if (fMasterNode) {
         int i = 0;
 
@@ -791,7 +803,7 @@ void CObfuscationPool::ChargeRandomFees()
             if (r <= 10) {
                 LogPrintf("CObfuscationPool::ChargeRandomFees -- charging random fees. %u\n", i);
 
-                CWalletTx wtxCollateral = CWalletTx(pwalletMain.get(), txCollateral);
+                CWalletTx wtxCollateral = CWalletTx(pwallet, txCollateral);
 
                 // Broadcast
                 if (!wtxCollateral.AcceptToMemoryPool(true)) {
@@ -1267,6 +1279,9 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
 {
     if (fMasterNode) return false;
 
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     finalTransaction = CMutableTransaction(finalTransactionNew);
     LogPrintf("CObfuscationPool::SignFinalTransaction %s", finalTransaction.ToString());
 
@@ -1316,7 +1331,7 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
                     return false;
                 }
 
-                const CKeyStore& keystore = *pwalletMain;
+                const CKeyStore& keystore = *pwallet;
 
                 LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::Sign - Signing my input %i\n", mine);
                 if (!SignSignature(keystore, prevPubKey, finalTransaction, mine, nValue1, int(SIGHASH_ALL | SIGHASH_ANYONECANPAY))) { // changes scriptSig
@@ -1391,6 +1406,9 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
 {
     return false;  // Disabled until Obfuscation is completely removed
 
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     if (!fEnableZeromint) return false;
     if (fMasterNode) return false;
     if (state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) return false;
@@ -1410,7 +1428,7 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
         return false;
     }
 
-    if (!fDryRun && pwalletMain->IsLocked()) {
+    if (!fDryRun && pwallet->IsLocked()) {
         strAutoDenomResult = _("Wallet is locked.");
         return false;
     }
@@ -1439,17 +1457,17 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
     CAmount nLowestDenom = OBFUSCATION_COLLATERAL + obfuScationDenominations[obfuScationDenominations.size() - 1] * 5;
 
     // if there are no OBF collateral inputs yet
-    if (!pwalletMain->HasCollateralInputs())
+    if (!pwallet->HasCollateralInputs())
         // should have some additional amount for them
         nLowestDenom += OBFUSCATION_COLLATERAL * 4;
 
-    CAmount nBalanceNeedsAnonymized = nAnonymizeWisprAmount * COIN - pwalletMain->GetAnonymizedBalance();
+    CAmount nBalanceNeedsAnonymized = nAnonymizeWisprAmount * COIN - pwallet->GetAnonymizedBalance();
 
     // if balanceNeedsAnonymized is more than pool max, take the pool max
     if (nBalanceNeedsAnonymized > OBFUSCATION_POOL_MAX) nBalanceNeedsAnonymized = OBFUSCATION_POOL_MAX;
 
     // if balanceNeedsAnonymized is more than non-anonymized, take non-anonymized
-    CAmount nAnonymizableBalance = pwalletMain->GetAnonymizableBalance();
+    CAmount nAnonymizableBalance = pwallet->GetAnonymizableBalance();
     if (nBalanceNeedsAnonymized > nAnonymizableBalance) nBalanceNeedsAnonymized = nAnonymizableBalance;
 
     if (nBalanceNeedsAnonymized < nLowestDenom) {
@@ -1461,12 +1479,12 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
     LogPrint(BCLog::OBFUSCATION, "DoAutomaticDenominating : nLowestDenom=%d, nBalanceNeedsAnonymized=%d\n", nLowestDenom, nBalanceNeedsAnonymized);
 
     // select coins that should be given to the pool
-    if (!pwalletMain->SelectCoinsDark(nValueMin, nBalanceNeedsAnonymized, vCoins, nValueIn, 0, nZeromintPercentage)) {
+    if (!pwallet->SelectCoinsDark(nValueMin, nBalanceNeedsAnonymized, vCoins, nValueIn, 0, nZeromintPercentage)) {
         nValueIn = 0;
         vCoins.clear();
 
-        if (pwalletMain->SelectCoinsDark(nValueMin, 9999999 * COIN, vCoins, nValueIn, -2, 0)) {
-            nOnlyDenominatedBalance = pwalletMain->GetDenominatedBalance(true) + pwalletMain->GetDenominatedBalance() - pwalletMain->GetAnonymizedBalance();
+        if (pwallet->SelectCoinsDark(nValueMin, 9999999 * COIN, vCoins, nValueIn, -2, 0)) {
+            nOnlyDenominatedBalance = pwallet->GetDenominatedBalance(true) + pwallet->GetDenominatedBalance() - pwallet->GetAnonymizedBalance();
             nBalanceNeedsDenominated = nBalanceNeedsAnonymized - nOnlyDenominatedBalance;
 
             if (nBalanceNeedsDenominated > nValueIn) nBalanceNeedsDenominated = nValueIn;
@@ -1484,14 +1502,14 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
 
     if (fDryRun) return true;
 
-    nOnlyDenominatedBalance = pwalletMain->GetDenominatedBalance(true) + pwalletMain->GetDenominatedBalance() - pwalletMain->GetAnonymizedBalance();
+    nOnlyDenominatedBalance = pwallet->GetDenominatedBalance(true) + pwallet->GetDenominatedBalance() - pwallet->GetAnonymizedBalance();
     nBalanceNeedsDenominated = nBalanceNeedsAnonymized - nOnlyDenominatedBalance;
 
     //check if we have should create more denominated inputs
     if (nBalanceNeedsDenominated > nOnlyDenominatedBalance) return CreateDenominated(nBalanceNeedsDenominated);
 
     //check if we have the collateral sized inputs
-    if (!pwalletMain->HasCollateralInputs()) return !pwalletMain->HasCollateralInputs(false) && MakeCollateralAmounts();
+    if (!pwallet->HasCollateralInputs()) return !pwallet->HasCollateralInputs(false) && MakeCollateralAmounts();
 
     std::vector<CTxOut> vOut;
 
@@ -1504,7 +1522,7 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
         int nUseQueue = rand() % 100;
         UpdateState(POOL_STATUS_ACCEPTING_ENTRIES, connman);
 
-        if (pwalletMain->GetDenominatedBalance(true) > 0) { //get denominated unconfirmed inputs
+        if (pwallet->GetDenominatedBalance(true) > 0) { //get denominated unconfirmed inputs
             LogPrintf("DoAutomaticDenominating -- Found unconfirmed denominated outputs, will wait till they confirm to continue.\n");
             strAutoDenomResult = _("Found unconfirmed denominated outputs, will wait till they confirm to continue.");
             return false;
@@ -1514,14 +1532,14 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
         std::string strReason;
         CValidationState state;
         if (txCollateral == CMutableTransaction()) {
-            if (!pwalletMain->CreateCollateralTransaction(txCollateral, strReason)) {
+            if (!pwallet->CreateCollateralTransaction(txCollateral, strReason)) {
                 LogPrintf("% -- create collateral error:%s\n", __func__, strReason);
                 return false;
             }
         } else {
             if (!IsCollateralValid(CTransaction(txCollateral))) {
                 LogPrintf("%s -- invalid collateral, recreating...\n", __func__);
-                if (!pwalletMain->CreateCollateralTransaction(txCollateral, strReason)) {
+                if (!pwallet->CreateCollateralTransaction(txCollateral, strReason)) {
                     LogPrintf("%s -- create collateral error: %s\n", __func__, strReason);
                     return false;
                 }
@@ -1566,7 +1584,7 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
                 std::vector<CTxIn> vTempCoins;
                 std::vector<COutput> vTempCoins2;
                 // Try to match their denominations if possible
-                if (!pwalletMain->SelectCoinsByDenominations(dsq.nDenom, nValueMin, nBalanceNeedsAnonymized, vTempCoins, vTempCoins2, nValueIn, 0, nZeromintPercentage)) {
+                if (!pwallet->SelectCoinsByDenominations(dsq.nDenom, nValueMin, nBalanceNeedsAnonymized, vTempCoins, vTempCoins2, nValueIn, 0, nZeromintPercentage)) {
                     LogPrintf("DoAutomaticDenominating --- Couldn't match denominations %d\n", dsq.nDenom);
                     continue;
                 }
@@ -1629,7 +1647,7 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
                 vecMasternodesUsed.push_back(pmn->vin);
 
                 std::vector<CAmount> vecAmounts;
-                pwalletMain->ConvertList(vCoins, vecAmounts);
+                pwallet->ConvertList(vCoins, vecAmounts);
                 // try to get a single random denom out of vecAmounts
                 while (sessionDenom == 0)
                     sessionDenom = GetDenominationsByAmounts(vecAmounts);
@@ -1656,17 +1674,20 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
 
 bool CObfuscationPool::PrepareObfuscationDenominate()
 {
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     std::string strError = "";
     // Submit transaction to the pool if we get here
     // Try to use only inputs with the same number of rounds starting from lowest number of rounds possible
     for (int i = 0; i < nZeromintPercentage; i++) {
-        strError = pwalletMain->PrepareObfuscationDenominate(i, i + 1);
+        strError = pwallet->PrepareObfuscationDenominate(i, i + 1);
         LogPrintf("DoAutomaticDenominating : Running Obfuscation denominate for %d rounds. Return '%s'\n", i, strError);
         if (strError == "") return true;
     }
 
     // We failed? That's strange but let's just make final attempt and try to mix everything
-    strError = pwalletMain->PrepareObfuscationDenominate(0, nZeromintPercentage);
+    strError = pwallet->PrepareObfuscationDenominate(0, nZeromintPercentage);
     LogPrintf("DoAutomaticDenominating : Running Obfuscation denominate for all rounds. Return '%s'\n", strError);
     if (strError == "") return true;
 
@@ -1678,13 +1699,16 @@ bool CObfuscationPool::PrepareObfuscationDenominate()
 
 bool CObfuscationPool::SendRandomPaymentToSelf()
 {
-    int64_t nBalance = pwalletMain->GetBalance();
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
+    int64_t nBalance = pwallet->GetBalance();
     int64_t nPayment = (nBalance * 0.35) + (rand() % nBalance);
 
     if (nPayment > nBalance) nPayment = nBalance - (0.1 * COIN);
 
     // make our change address
-    CReserveKey reservekey(pwalletMain.get());
+    CReserveKey reservekey(pwallet);
 
     CScript scriptChange;
     CPubKey vchPubKey;
@@ -1700,13 +1724,13 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
     vecSend.push_back(std::make_pair(scriptChange, nPayment));
 
     CCoinControl* coinControl = nullptr;
-    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFail, coinControl, AvailableCoinsType::ONLY_DENOMINATED);
+    bool success = pwallet->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFail, coinControl, AvailableCoinsType::ONLY_DENOMINATED);
     if (!success) {
         LogPrintf("SendRandomPaymentToSelf: Error - %s\n", strFail);
         return false;
     }
 
-    pwalletMain->CommitTransaction(wtx, reservekey);
+    pwallet->CommitTransaction(wtx, reservekey);
 
     LogPrintf("SendRandomPaymentToSelf Success: tx %s\n", wtx.tx->GetHash().GetHex());
 
@@ -1716,6 +1740,9 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
 // Split up large inputs or create fee sized inputs
 bool CObfuscationPool::MakeCollateralAmounts()
 {
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     CWalletTx wtx;
     CAmount nFeeRet = 0;
     std::string strFail = "";
@@ -1724,9 +1751,9 @@ bool CObfuscationPool::MakeCollateralAmounts()
     coinControl.fAllowOtherInputs = false;
     coinControl.fAllowWatchOnly = false;
     // make our collateral address
-    CReserveKey reservekeyCollateral(pwalletMain.get());
+    CReserveKey reservekeyCollateral(pwallet);
     // make our change address
-    CReserveKey reservekeyChange(pwalletMain.get());
+    CReserveKey reservekeyChange(pwallet);
 
     CScript scriptCollateral;
     CPubKey vchPubKey;
@@ -1736,14 +1763,14 @@ bool CObfuscationPool::MakeCollateralAmounts()
     vecSend.push_back(std::make_pair(scriptCollateral, OBFUSCATION_COLLATERAL * 4));
 
     // try to use non-denominated and not mn-like funds
-    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekeyChange,
+    bool success = pwallet->CreateTransaction(vecSend, wtx, reservekeyChange,
         nFeeRet, strFail, &coinControl, AvailableCoinsType::ONLY_NONDENOMINATED_NOT10000IFMN);
     if (!success) {
         // if we failed (most likeky not enough funds), try to use all coins instead -
         // MN-like funds should not be touched in any case and we can't mix denominated without collaterals anyway
         CCoinControl* coinControlNull = nullptr;
         LogPrintf("MakeCollateralAmounts: ONLY_NONDENOMINATED_NOT10000IFMN Error - %s\n", strFail);
-        success = pwalletMain->CreateTransaction(vecSend, wtx, reservekeyChange,
+        success = pwallet->CreateTransaction(vecSend, wtx, reservekeyChange,
             nFeeRet, strFail, coinControlNull, AvailableCoinsType::ONLY_NOT10000IFMN);
         if (!success) {
             LogPrintf("MakeCollateralAmounts: ONLY_NOT10000IFMN Error - %s\n", strFail);
@@ -1757,7 +1784,7 @@ bool CObfuscationPool::MakeCollateralAmounts()
     LogPrintf("MakeCollateralAmounts: tx %s\n", wtx.tx->GetHash().GetHex());
 
     // use the same cachedLastSuccess as for DS mixinx to prevent race
-    if (!pwalletMain->CommitTransaction(wtx, reservekeyChange)) {
+    if (!pwallet->CommitTransaction(wtx, reservekeyChange)) {
         LogPrintf("MakeCollateralAmounts: CommitTransaction failed!\n");
         return false;
     }
@@ -1770,6 +1797,9 @@ bool CObfuscationPool::MakeCollateralAmounts()
 // Create denominations
 bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
 {
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     CWalletTx wtx;
     CAmount nFeeRet = 0;
     std::string strFail = "";
@@ -1777,11 +1807,11 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
     CAmount nValueLeft = nTotalValue;
 
     // make our collateral address
-    CReserveKey reservekeyCollateral(pwalletMain.get());
+    CReserveKey reservekeyCollateral(pwallet);
     // make our change address
-    CReserveKey reservekeyChange(pwalletMain.get());
+    CReserveKey reservekeyChange(pwallet);
     // make our denom addresses
-    CReserveKey reservekeyDenom(pwalletMain.get());
+    CReserveKey reservekeyDenom(pwallet);
 
     CScript scriptCollateral;
     CPubKey vchPubKey;
@@ -1789,7 +1819,7 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
     scriptCollateral = GetScriptForDestination(vchPubKey.GetID());
 
     // ****** Add collateral outputs ************ /
-    if (!pwalletMain->HasCollateralInputs()) {
+    if (!pwallet->HasCollateralInputs()) {
         vecSend.push_back(std::make_pair(scriptCollateral, OBFUSCATION_COLLATERAL * 4));
         nValueLeft -= OBFUSCATION_COLLATERAL * 4;
     }
@@ -1823,7 +1853,7 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
     // if we have anything left over, it will be automatically send back as change - there is no need to send it manually
 
     CCoinControl* coinControl = nullptr;
-    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekeyChange,
+    bool success = pwallet->CreateTransaction(vecSend, wtx, reservekeyChange,
         nFeeRet, strFail, coinControl, AvailableCoinsType::ONLY_NONDENOMINATED_NOT10000IFMN);
     if (!success) {
         LogPrintf("CreateDenominated: Error - %s\n", strFail);
@@ -1836,7 +1866,7 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
     reservekeyCollateral.KeepKey();
 
     // use the same cachedLastSuccess as for DS mixinx to prevent race
-    if (pwalletMain->CommitTransaction(wtx, reservekeyChange))
+    if (pwallet->CommitTransaction(wtx, reservekeyChange))
         cachedLastSuccess = chainActive.Tip()->nHeight;
     else
         LogPrintf("CreateDenominated: CommitTransaction failed!\n");
