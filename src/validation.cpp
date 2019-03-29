@@ -2928,7 +2928,7 @@ bool UpdateZWSPSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck)
                         if (setAddedToWallet.count(txid))
                             continue;
                         if (txid == m.GetTxHash()) {
-                            CWalletTx wtx(pwalletMain, *tx);
+                            CWalletTx wtx(pwalletMain.get(), *tx);
                             wtx.nTimeReceived = block.GetBlockTime();
                             wtx.SetMerkleBranch(block.GetHash(), posInBlock);
                             pwalletMain->AddToWallet(wtx);
@@ -3486,7 +3486,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 for (size_t posInBlock = 0;posInBlock < block.vtx.size(); ++posInBlock) {
                     CTransactionRef tx = block.vtx[posInBlock];
                     if (tx->GetHash() == pSpend.second) {
-                        CWalletTx wtx(pwalletMain, *tx);
+                        CWalletTx wtx(pwalletMain.get(), *tx);
                         wtx.nTimeReceived = pindex->GetBlockTime();
                         wtx.SetMerkleBranch(block.GetHash(), posInBlock);
                         pwalletMain->AddToWallet(wtx);
