@@ -77,7 +77,7 @@ UniValue preparebudget(const JSONRPCRequest& request)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    EnsureWalletIsUnlocked(pwalletMain);
+    EnsureWalletIsUnlocked(pwalletMain.get());
 
     std::string strProposalName = SanitizeString(request.params[0].get_str());
     if (strProposalName.size() > 20)
@@ -138,7 +138,7 @@ UniValue preparebudget(const JSONRPCRequest& request)
     }
 
     // make our change address
-    CReserveKey reservekey(pwalletMain);
+    CReserveKey reservekey(pwalletMain.get());
     //send the tx to the network
     pwalletMain->CommitTransaction(wtx, reservekey, useIX ? NetMsgType::TXLOCKREQUEST : NetMsgType::TX);
 

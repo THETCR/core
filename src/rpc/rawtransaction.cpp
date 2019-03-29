@@ -2371,7 +2371,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
     }
 #ifdef ENABLE_WALLET
     else if (pwalletMain)
-        EnsureWalletIsUnlocked(pwalletMain);
+        EnsureWalletIsUnlocked(pwalletMain.get());
 #endif
 
     // Add previous txouts given in the RPC call:

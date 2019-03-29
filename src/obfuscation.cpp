@@ -1684,7 +1684,7 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
     if (nPayment > nBalance) nPayment = nBalance - (0.1 * COIN);
 
     // make our change address
-    CReserveKey reservekey(pwalletMain);
+    CReserveKey reservekey(pwalletMain.get());
 
     CScript scriptChange;
     CPubKey vchPubKey;
