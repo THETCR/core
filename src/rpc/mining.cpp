@@ -36,6 +36,7 @@
 //!WISPR
 #include <base58.h>
 #include <wallet/wallet.h>
+#include <wallet/rpcwallet.h>
 
 /**
  * Return average network hashes per second based on the last 'lookup' blocks,
