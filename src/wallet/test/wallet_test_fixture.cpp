@@ -16,6 +16,4 @@ WalletTestingSetup::WalletTestingSetup(const std::string& chainName):
     m_wallet.m_chain_notifications_handler = m_chain->handleNotifications(m_wallet);
 
     m_chain_client->registerRpcs();
-    pwalletMain.reset(&m_wallet);
-
 }
