@@ -2572,6 +2572,10 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
     }
 
     CValidationState state;
+
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     // undo transactions in reverse order
     for (int i = block.vtx.size() - 1; i >= 0; i--) {
         const CTransaction &tx = *(block.vtx[i]);
@@ -2594,9 +2598,9 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
                         }
 
                         //if this was our spend, then mark it unspent now
-                        if (pwalletMain) {
-                            if (pwalletMain->IsMyZerocoinSpend(spend.getCoinSerialNumber())) {
-                                if (!pwalletMain->SetMintUnspent(spend.getCoinSerialNumber()))
+                        if (pwallet) {
+                            if (pwallet->IsMyZerocoinSpend(spend.getCoinSerialNumber())) {
+                                if (!pwallet->SetMintUnspent(spend.getCoinSerialNumber()))
                                     LogPrintf("%s: failed to automatically reset mint", __func__);
                             }
                         }
@@ -2906,6 +2910,9 @@ bool UpdateZWSPSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck)
         }
     }
 
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     // Track zerocoin money supply
     CAmount nAmountZerocoinSpent = 0;
     pindex->vMintDenominationsInBlock.clear();
@@ -2917,9 +2924,9 @@ bool UpdateZWSPSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck)
             pindex->mapZerocoinSupply.at(denom)++;
 
             //Remove any of our own mints from the mintpool
-            if (!fJustCheck && pwalletMain) {
-                if (pwalletMain->IsMyMint(m.GetValue())) {
-                    pwalletMain->UpdateMint(m.GetValue(), pindex->nHeight, m.GetTxHash(), m.GetDenomination());
+            if (!fJustCheck && pwallet) {
+                if (pwallet->IsMyMint(m.GetValue())) {
+                    pwallet->UpdateMint(m.GetValue(), pindex->nHeight, m.GetTxHash(), m.GetDenomination());
 
                     // Add the transaction to the wallet
                     for (size_t posInBlock = 0;posInBlock < block.vtx.size(); ++posInBlock) {
@@ -2928,10 +2935,10 @@ bool UpdateZWSPSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck)
                         if (setAddedToWallet.count(txid))
                             continue;
                         if (txid == m.GetTxHash()) {
-                            CWalletTx wtx(pwalletMain.get(), *tx);
+                            CWalletTx wtx(pwallet, *tx);
                             wtx.nTimeReceived = block.GetBlockTime();
                             wtx.SetMerkleBranch(block.GetHash(), posInBlock);
-                            pwalletMain->AddToWallet(wtx);
+                            pwallet->AddToWallet(wtx);
                             setAddedToWallet.insert(txid);
                         }
                     }
@@ -3467,15 +3474,18 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         setDirtyBlockIndex.insert(pindex);
     }
 
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     //Record zWSP serials
-    if (pwalletMain) {
+    if (pwallet) {
         std::set<uint256> setAddedTx;
         for (std::pair<CoinSpend, uint256> pSpend : vSpends) {
             // Send signal to wallet if this is ours
-            if (pwalletMain->IsMyZerocoinSpend(pSpend.first.getCoinSerialNumber())) {
+            if (pwallet->IsMyZerocoinSpend(pSpend.first.getCoinSerialNumber())) {
                 LogPrintf("%s: %s detected zerocoinspend in transaction %s \n", __func__,
                           pSpend.first.getCoinSerialNumber().GetHex(), pSpend.second.GetHex());
-                pwalletMain->NotifyZerocoinChanged(pSpend.first.getCoinSerialNumber().GetHex(), "Used",
+                pwallet->NotifyZerocoinChanged(pSpend.first.getCoinSerialNumber().GetHex(), "Used",
                                                    CT_UPDATED);
 
                 //Don't add the same tx multiple times
@@ -3486,10 +3496,10 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 for (size_t posInBlock = 0;posInBlock < block.vtx.size(); ++posInBlock) {
                     CTransactionRef tx = block.vtx[posInBlock];
                     if (tx->GetHash() == pSpend.second) {
-                        CWalletTx wtx(pwalletMain.get(), *tx);
+                        CWalletTx wtx(pwallet, *tx);
                         wtx.nTimeReceived = pindex->GetBlockTime();
                         wtx.SetMerkleBranch(block.GetHash(), posInBlock);
-                        pwalletMain->AddToWallet(wtx);
+                        pwallet->AddToWallet(wtx);
                         setAddedTx.insert(pSpend.second);
                     }
                 }
@@ -3702,9 +3712,12 @@ static void AppendWarning(std::string& res, const std::string& warn)
 /** Check warning conditions and do some notifications on new chain tip set. */
 void static UpdateTip(const CBlockIndex *pindexNew, const CChainParams& chainParams) {
 
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     // If turned on AutoZeromint will automatically convert WSP to zWSP
-    if (pwalletMain->isZeromintEnabled ()){
-        pwalletMain->AutoZeromint ();
+    if (pwallet->isZeromintEnabled ()){
+        pwallet->AutoZeromint ();
     }
 
     // New best block
@@ -5547,14 +5560,14 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
         }
     }
 
-    if (pwalletMain) {
+    if (pwallet) {
         // If turned on MultiSend will send a transaction (or more) on the after maturity of a stake
-        if (pwalletMain->isMultiSendEnabled())
-            pwalletMain->MultiSend();
+        if (pwallet->isMultiSendEnabled())
+            pwallet->MultiSend();
 
         // If turned on Auto Combine will scan wallet for dust to combine
-        if (pwalletMain->fCombineDust)
-            pwalletMain->AutoCombineDust();
+        if (pwallet->fCombineDust)
+            pwallet->AutoCombineDust();
     }
 
     LogPrintf("%s : ACCEPTED Block %ld in %ld milliseconds with size=%d\n", __func__, chainActive.Height(), GetTimeMillis() - nStartTime,
