@@ -30,25 +30,25 @@ namespace {
 //! (https://docs.oracle.com/cd/E17275_01/html/programmer_reference/program_copy.html),
 //! so bitcoin should never create different databases with the same fileid, but
 //! this error can be triggered if users manually copy database files.
-    void CheckUniqueFileid(const BerkeleyEnvironment& env, const std::string& filename, Db& db, WalletDatabaseFileId& fileid)
-    {
-        if (env.IsMock()) return;
+void CheckUniqueFileid(const BerkeleyEnvironment& env, const std::string& filename, Db& db, WalletDatabaseFileId& fileid)
+{
+    if (env.IsMock()) return;
 
-        int ret = db.get_mpf()->get_fileid(fileid.value);
-        if (ret != 0) {
-            throw std::runtime_error(strprintf("BerkeleyBatch: Can't open database %s (get_fileid failed with %d)", filename, ret));
-        }
-
-        for (const auto& item : env.m_fileids) {
-            if (fileid == item.second && &fileid != &item.second) {
-                throw std::runtime_error(strprintf("BerkeleyBatch: Can't open database %s (duplicates fileid %s from %s)", filename,
-                                                   HexStr(std::begin(item.second.value), std::end(item.second.value)), item.first));
-            }
-        }
+    int ret = db.get_mpf()->get_fileid(fileid.value);
+    if (ret != 0) {
+        throw std::runtime_error(strprintf("BerkeleyBatch: Can't open database %s (get_fileid failed with %d)", filename, ret));
     }
 
-    CCriticalSection cs_db;
-    std::map<std::string, std::weak_ptr<BerkeleyEnvironment>> g_dbenvs GUARDED_BY(cs_db); //!< Map from directory name to db environment.
+    for (const auto& item : env.m_fileids) {
+        if (fileid == item.second && &fileid != &item.second) {
+            throw std::runtime_error(strprintf("BerkeleyBatch: Can't open database %s (duplicates fileid %s from %s)", filename,
+                HexStr(std::begin(item.second.value), std::end(item.second.value)), item.first));
+        }
+    }
+}
+
+CCriticalSection cs_db;
+std::map<std::string, std::weak_ptr<BerkeleyEnvironment>> g_dbenvs GUARDED_BY(cs_db); //!< Map from directory name to db environment.
 } // namespace
 
 bool WalletDatabaseFileId::operator==(const WalletDatabaseFileId& rhs) const

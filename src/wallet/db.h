@@ -66,8 +66,8 @@ public:
      * Returns true if strFile is OK.
      */
     enum class VerifyResult { VERIFY_OK,
-        RECOVER_OK,
-        RECOVER_FAIL };
+                        RECOVER_OK,
+                        RECOVER_FAIL };
     typedef bool (*recoverFunc_type)(const fs::path& file_path, std::string& out_backup_filename);
     VerifyResult Verify(const std::string& strFile, recoverFunc_type recoverFunc, std::string& out_backup_filename);
     /**
@@ -121,7 +121,7 @@ public:
 
     /** Create DB handle to real database */
     BerkeleyDatabase(std::shared_ptr<BerkeleyEnvironment> env, std::string filename) :
-            nUpdateCounter(0), nLastSeen(0), nLastFlushed(0), nLastWalletUpdate(0), env(std::move(env)), strFile(std::move(filename))
+        nUpdateCounter(0), nLastSeen(0), nLastFlushed(0), nLastWalletUpdate(0), env(std::move(env)), strFile(std::move(filename))
     {
         auto inserted = this->env->m_databases.emplace(strFile, std::ref(*this));
         assert(inserted.second);
