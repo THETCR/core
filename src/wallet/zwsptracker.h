@@ -16,6 +16,7 @@
 using WalletDatabase = BerkeleyDatabase;
 
 class CDeterministicMint;
+class CWallet;
 class CzWSPWallet;
 
 class CzWSPTracker
