@@ -58,6 +58,8 @@ static void WaitForShutdown()
 //
 static bool AppInit(int argc, char* argv[])
 {
+    std::cout << "WISPRD AppInit\n";
+
     InitInterfaces interfaces;
     interfaces.chain = interfaces::MakeChain();
 
@@ -67,6 +69,7 @@ static bool AppInit(int argc, char* argv[])
     // Parameters
     //
     // If Qt is used, parameters/bitcoin.conf are parsed in qt/bitcoin.cpp's main()
+    std::cout << "WISPRD SetupServerArgs\n";
     SetupServerArgs();
     std::string error;
     if (!gArgs.ParseParameters(argc, argv, error)) {
@@ -92,6 +95,8 @@ static bool AppInit(int argc, char* argv[])
         return true;
     }
 
+    std::cout << "WISPRD Try block\n";
+
     try
     {
         if (!fs::is_directory(GetDataDir(false)))
@@ -110,7 +115,7 @@ static bool AppInit(int argc, char* argv[])
             fprintf(stderr, "Error: %s\n", e.what());
             return false;
         }
-
+        std::cout << "parse masternode.conf\n";
         // parse masternode.conf
         std::string strErr;
         if (!masternodeConfig.read(strErr)) {
@@ -129,6 +134,7 @@ static bool AppInit(int argc, char* argv[])
         // -server defaults to true for bitcoind but not for the GUI so do this here
         gArgs.SoftSetBoolArg("-server", true);
         // Set this early so that parameter interactions go to console
+        std::cout << "WISPRD InitLogging\n";
         InitLogging();
         InitParameterInteraction();
         if (!AppInitBasicSetup())
