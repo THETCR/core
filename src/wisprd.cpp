@@ -1,14 +1,11 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2009-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
 #include <config/wispr-config.h>
 #endif
-
 
 #include <chainparams.h>
 #include <clientversion.h>
@@ -24,9 +21,7 @@
 #include <httpserver.h>
 #include <httprpc.h>
 #include <util/strencodings.h>
-
-
-#include <boost/algorithm/string/predicate.hpp>
+#include <walletinitinterface.h>
 
 #include <stdio.h>
 
@@ -48,7 +43,6 @@ const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
  * Use the buttons <code>Namespaces</code>, <code>Classes</code> or <code>Files</code> at the top of the page to start navigating the code.
  */
 
-
 static void WaitForShutdown()
 {
     while (!ShutdownRequested())
@@ -62,7 +56,7 @@ static void WaitForShutdown()
 //
 // Start
 //
-bool AppInit(int argc, char* argv[])
+static bool AppInit(int argc, char* argv[])
 {
     InitInterfaces interfaces;
     interfaces.chain = interfaces::MakeChain();
@@ -98,7 +92,8 @@ bool AppInit(int argc, char* argv[])
         return true;
     }
 
-    try {
+    try
+    {
         if (!fs::is_directory(GetDataDir(false)))
         {
             fprintf(stderr, "Error: Specified data directory \"%s\" does not exist.\n", gArgs.GetArg("-datadir", "").c_str());
@@ -154,7 +149,7 @@ bool AppInit(int argc, char* argv[])
         if (gArgs.GetBoolArg("-daemon", false))
         {
 #if HAVE_DECL_DAEMON
-            #if defined(MAC_OSX)
+#if defined(MAC_OSX)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
