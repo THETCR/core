@@ -597,7 +597,7 @@ public:
     }
 
     std::set<CMintMeta> listMints(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus, bool fWrongSeed) override {
-        m_wallet->zwspTracker->ListMints(fUnusedOnly, fMaturedOnly, fUpdateStatus, fWrongSeed);
+        return m_wallet->zwspTracker->ListMints(fUnusedOnly, fMaturedOnly, fUpdateStatus, fWrongSeed);
     }
     std::shared_ptr<CWallet> m_wallet;
 };
