@@ -527,7 +527,7 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
   BOOST_TEST_PASSPOINT();
   WalletBatch walletdb(wallet.GetDBHandle(), "cr+");
   BOOST_TEST_PASSPOINT();
-  CzWSPWallet zWallet(wallet.chain(), wallet.GetLocation(), wallet.GetDBHandle(), wallet);
+  CzWSPWallet zWallet(wallet.chain(), wallet.GetLocation(), wallet.GetDBHandle(), &wallet);
   BOOST_TEST_PASSPOINT();
   zWallet.SetMasterSeed(seedMaster);
   wallet.setZWallet(&zWallet);
