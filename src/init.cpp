@@ -367,8 +367,6 @@ void Shutdown(InitInterfaces& interfaces)
     GetMainSignals().UnregisterWithMempoolSignals(mempool);
 #ifdef ENABLE_WALLET
     pwalletMain.reset();
-    delete zwalletMain;
-    zwalletMain = NULL;
 #endif
     globalVerifyHandle.reset();
     ECC_Stop();

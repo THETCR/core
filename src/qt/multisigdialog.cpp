@@ -251,7 +251,7 @@ bool MultisigDialog::addMultisig(int m, std::vector<string> keys){
             throw runtime_error(error.data());
         }
 
-        if (::IsMine(*pwalletMain, redeem) == ISMINE_SPENDABLE){
+        if (model->isMine(redeem) == ISMINE_SPENDABLE){
             throw runtime_error("The wallet already contains this script");
         }
 
@@ -261,7 +261,7 @@ bool MultisigDialog::addMultisig(int m, std::vector<string> keys){
 
         CScriptID innerID(redeem);
         std::string label = ui->multisigAddressLabel->text().toStdString();
-        pwalletMain->SetAddressBook(innerID, label, "receive");
+        model->wallet().setAddressBook(innerID, label, "receive");
         if (!pwalletMain->AddMultiSig(redeem)){
             throw runtime_error("Failure: unable to add address as watch only");
         }
@@ -807,7 +807,7 @@ bool MultisigDialog::createRedeemScript(int m, std::vector<string> vKeys, CScrip
                         strprintf("%s does not refer to a key", keyString));
                 }
                 CPubKey vchPubKey;
-                if (!pwalletMain->GetPubKey(keyID, vchPubKey))
+                if (!model->wallet().getPubKey(keyID, vchPubKey))
                     throw runtime_error(
                         strprintf("no full public key for address %s", keyString));
                 if (!vchPubKey.IsFullyValid()){
