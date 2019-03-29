@@ -106,6 +106,9 @@ static UniValue getnetworkhashps(const JSONRPCRequest& request)
 
 UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGenerate, uint64_t nMaxTries, bool keepScript)
 {
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     static const int nInnerLoopCount = 0x10000;
     int nHeightEnd = 0;
     int nHeight = 0;
@@ -120,7 +123,7 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
     while (nHeight < nHeightEnd && !ShutdownRequested())
     {
         CBlockTemplate* pblocktemplate;
-        pblocktemplate = CreateNewBlock(coinbaseScript->reserveScript, pwalletMain.get(), false);
+        pblocktemplate = CreateNewBlock(coinbaseScript->reserveScript, pwallet, false);
 
 //        std::unique_ptr<CBlockTemplate> pblocktemplate(BlockAssembler(Params()).CreateNewBlock(coinbaseScript->reserveScript));
         if (!pblocktemplate)
@@ -306,6 +309,13 @@ static std::string gbt_vb_name(const Consensus::DeploymentPos pos) {
 
 static UniValue getblocktemplate(const JSONRPCRequest& request)
 {
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
     if (request.fHelp || request.params.size() > 1)
         throw std::runtime_error(
             RPCHelpMan{"getblocktemplate",
@@ -544,7 +554,7 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
 //            pblocktemplate = nullptr;
 //        }
         CScript scriptDummy = CScript() << OP_TRUE;
-        pblocktemplate = CreateNewBlock(scriptDummy, pwalletMain.get(), false);
+        pblocktemplate = CreateNewBlock(scriptDummy, pwallet, false);
         if (!pblocktemplate)
             throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
 
