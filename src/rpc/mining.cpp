@@ -120,7 +120,7 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
     while (nHeight < nHeightEnd && !ShutdownRequested())
     {
         CBlockTemplate* pblocktemplate;
-        pblocktemplate = CreateNewBlock(coinbaseScript->reserveScript, pwalletMain, false);
+        pblocktemplate = CreateNewBlock(coinbaseScript->reserveScript, pwalletMain.get(), false);
 
 //        std::unique_ptr<CBlockTemplate> pblocktemplate(BlockAssembler(Params()).CreateNewBlock(coinbaseScript->reserveScript));
         if (!pblocktemplate)
@@ -544,7 +544,7 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
 //            pblocktemplate = nullptr;
 //        }
         CScript scriptDummy = CScript() << OP_TRUE;
-        pblocktemplate = CreateNewBlock(scriptDummy, pwalletMain, false);
+        pblocktemplate = CreateNewBlock(scriptDummy, pwalletMain.get(), false);
         if (!pblocktemplate)
             throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
 
