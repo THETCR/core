@@ -23,16 +23,17 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test)
 {
     std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
     WalletLocation m_location = WalletLocation("unlocked.dat");
-    CWallet cWallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
+    std::shared_ptr<CWallet> pwallet(new CWallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath())));
+
     SelectParams(CBaseChainParams::MAIN);
     ZerocoinParams *ZCParams = Params().Zerocoin_Params(false);
     (void)ZCParams;
 
     bool fFirstRun;
-    cWallet.LoadWallet(fFirstRun);
-    cWallet.zwspTracker = unique_ptr<CzWSPTracker>(new CzWSPTracker(cWallet.chain(), cWallet.GetLocation(), cWallet.GetDBHandle(), &cWallet));
+    pwallet->LoadWallet(fFirstRun);
+    pwallet->zwspTracker = unique_ptr<CzWSPTracker>(new CzWSPTracker(pwallet->chain(), pwallet->GetLocation(), pwallet->GetDBHandle(), pwallet));
     CTransactionRef tx;
-    CWalletTx* wtx = new CWalletTx(&cWallet, tx);
+    CWalletTx* wtx = new CWalletTx(pwallet.get(), tx);
     bool fMintChange=true;
     bool fMinimizeChange=true;
     std::vector<CZerocoinSpend> vSpends;
@@ -41,13 +42,13 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test)
     int nSecurityLevel = 100;
 
     CZerocoinSpendReceipt receipt;
-    cWallet.SpendZerocoin(nAmount, nSecurityLevel, *wtx, receipt, vMints, fMintChange, fMinimizeChange);
+    pwallet->SpendZerocoin(nAmount, nSecurityLevel, *wtx, receipt, vMints, fMintChange, fMinimizeChange);
 
     BOOST_CHECK_MESSAGE(receipt.GetStatus() == ZWSP_TRX_FUNDS_PROBLEMS, "Failed Invalid Amount Check");
 
     nAmount = 1;
     CZerocoinSpendReceipt receipt2;
-    cWallet.SpendZerocoin(nAmount, nSecurityLevel, *wtx, receipt2, vMints, fMintChange, fMinimizeChange);
+    pwallet->SpendZerocoin(nAmount, nSecurityLevel, *wtx, receipt2, vMints, fMintChange, fMinimizeChange);
 
     // if using "wallet.dat", instead of "unlocked.dat" need this
     /// BOOST_CHECK_MESSAGE(vString == "Error: Wallet locked, unable to create transaction!"," Locked Wallet Check Failed");
