@@ -235,11 +235,11 @@ void MultisigDialog::on_importAddressButton_clicked(){
 
     addMultisig(stoi(vRedeem[0]), keys);
 
-    WalletRescanReserver reserver(pwalletMain.get());
+    WalletRescanReserver reserver(model->wallet().getWisprWallet());
     reserver.reserve();
     // rescan to find txs associated with imported address
-    pwalletMain->ScanForWalletTransactions(chainActive.Genesis()->GetBlockHash(), {}, reserver,  true);
-    pwalletMain->ReacceptWalletTransactions();
+    model->wallet().getWisprWallet()->ScanForWalletTransactions(chainActive.Genesis()->GetBlockHash(), {}, reserver,  true);
+    model->wallet().getWisprWallet()->ReacceptWalletTransactions();
 }
 
 bool MultisigDialog::addMultisig(int m, std::vector<string> keys){
@@ -251,18 +251,18 @@ bool MultisigDialog::addMultisig(int m, std::vector<string> keys){
             throw runtime_error(error.data());
         }
 
-        if (model->isMine(redeem) == ISMINE_SPENDABLE){
+        if (::IsMine(*model->wallet().getWisprWallet(), redeem) == ISMINE_SPENDABLE){
             throw runtime_error("The wallet already contains this script");
         }
 
-        if(!pwalletMain->AddCScript(redeem)){
+        if(!model->wallet().getWisprWallet()->AddCScript(redeem)){
             throw runtime_error("Failure: address invalid or already exists");
         }
 
         CScriptID innerID(redeem);
         std::string label = ui->multisigAddressLabel->text().toStdString();
         model->wallet().setAddressBook(innerID, label, "receive");
-        if (!pwalletMain->AddMultiSig(redeem)){
+        if (!model->wallet().getWisprWallet()->AddMultiSig(redeem)){
             throw runtime_error("Failure: unable to add address as watch only");
         }
 
@@ -472,7 +472,7 @@ bool MultisigDialog::createMultisigTransaction(std::vector<CTxIn> vUserIn, std::
         CScriptID hash = boost::get<CScriptID>(address);
         CScript redeemScript;
 
-        if (!pwalletMain->GetCScript(hash, redeemScript)){
+        if (!model->wallet().getWisprWallet()->GetCScript(hash, redeemScript)){
             throw runtime_error("could not redeem");
         }
         txnouttype type;
@@ -652,7 +652,7 @@ bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, std::string& errorO
                 CScriptID hash = boost::get<CScriptID>(address);
                 CScript redeemScript;
 
-                if (!pwalletMain->GetCScript(hash, redeemScript)){
+                if (!model->wallet().getWisprWallet()->GetCScript(hash, redeemScript)){
                     errorOut = "could not redeem";
                 }
                 privKeystore.AddCScript(redeemScript);
@@ -667,7 +667,7 @@ bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, std::string& errorO
         }
 
         //choose between local wallet and provided
-        const CKeyStore& keystore = fGivenKeys ? privKeystore : *pwalletMain;
+        const CKeyStore& keystore = fGivenKeys ? privKeystore : model->wallet().getWisprWallet();
 
         //attempt to sign each input from local wallet
         int nIn = 0;
@@ -742,9 +742,9 @@ void MultisigDialog::commitMultisigTx()
     CMutableTransaction tx(multisigTx);
     try{
 #ifdef ENABLE_WALLET
-        CWalletTx wtx(pwalletMain.get(), CTransaction(tx));
-        CReserveKey keyChange(pwalletMain.get());
-        if (!pwalletMain->CommitTransaction(wtx, keyChange))
+        CWalletTx wtx(model->wallet().getWisprWallet(), CTransaction(tx));
+        CReserveKey keyChange(model->wallet().getWisprWallet());
+        if (!model->wallet().getWisprWallet()->CommitTransaction(wtx, keyChange))
             throw runtime_error(std::string("Transaction rejected - Failed to commit"));
 #else
         uint256 hashTx = tx.GetHash();
@@ -800,7 +800,7 @@ bool MultisigDialog::createRedeemScript(int m, std::vector<string> vKeys, CScrip
 #ifdef ENABLE_WALLET
             // Case 1: WISPR address and we have full public key:
             CBitcoinAddress address(keyString);
-            if (pwalletMain && address.IsValid()) {
+            if (model && address.IsValid()) {
                 CKeyID keyID;
                 if (!address.GetKeyID(keyID)) {
                     throw runtime_error(

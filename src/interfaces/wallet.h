@@ -321,6 +321,7 @@ public:
     virtual bool isMultiSendEnabled() = 0;
     virtual void setStakeSplitThreshold(int value) = 0;
     virtual std::set<CMintMeta> listMints(bool fUnusedOnly = false, bool fMaturedOnly = false, bool fUpdateStatus = false, bool fWrongSeed = false) = 0;
+    virtual CWallet* getWisprWallet() = 0;
 
 
 };
