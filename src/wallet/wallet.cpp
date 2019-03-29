@@ -4557,8 +4557,8 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
     // Try to top up keypool. No-op if the wallet is locked.
     walletInstance->TopUpKeyPool();
-    CzWSPWallet* zwalletMain = new CzWSPWallet(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle(), walletInstance.get());
-    walletInstance->setZWallet(zwalletMain);
+//    CzWSPWallet* zwalletMain = new CzWSPWallet(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle(), walletInstance.get());
+//    walletInstance->setZWallet(zwalletMain);
     auto locked_chain = chain.lock();
     LOCK(walletInstance->cs_wallet);
 
@@ -4655,8 +4655,8 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
     //Load zerocoin mint hashes to memory
     walletInstance->zwspTracker->Init();
-    zwalletMain->LoadMintPoolFromDB();
-    zwalletMain->SyncWithChain();
+//    zwalletMain->LoadMintPoolFromDB();
+//    zwalletMain->SyncWithChain();
 
     chain.loadWallet(interfaces::MakeWallet(walletInstance));
 
