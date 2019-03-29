@@ -66,9 +66,6 @@
 
 #ifdef ENABLE_WALLET
 #include "accumulators.h"
-#include <wallet/db.h>
-#include <wallet/wallet.h>
-#include <wallet/walletdb.h>
 #endif
 
 #include <stdint.h>
@@ -1216,7 +1213,6 @@ bool AppInitParameterInteraction()
             return InitError(AmountErrMsg("dustrelayfee", gArgs.GetArg("-dustrelayfee", "")));
         dustRelayFee = CFeeRate(n);
     }
-
 
     // This is required by both the wallet and node
     if (gArgs.IsArgSet("-maxtxfee"))
