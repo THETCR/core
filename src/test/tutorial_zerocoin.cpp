@@ -12,6 +12,7 @@
 // Copyright (c) 2017-2018 The PIVX developers
 
 #include <test/test_wispr.h>
+#include <wallet/test/wallet_test_fixture.h>
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include <iostream>
@@ -274,7 +275,7 @@ ZerocoinTutorial()
 	return false;
 }
 
-BOOST_FIXTURE_TEST_SUITE(tutorial_libzerocoin, TestingSetup)
+BOOST_FIXTURE_TEST_SUITE(tutorial_libzerocoin, WalletTestingSetup)
 BOOST_AUTO_TEST_CASE(tutorial_libzerocoin_tests)
 {
 	cout << "libzerocoin v" << ZEROCOIN_VERSION_STRING << " tutorial." << endl << endl;
