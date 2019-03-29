@@ -261,7 +261,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
 
                 if (!setAddedTx.count(txHash)) {
                     CBlock block;
-                    CWalletTx wtx(*pwallet, tx);
+                    CWalletTx wtx(pwallet.get(), tx);
                     if (pindex && ReadBlockFromDisk(block, pindex, Params().GetConsensus())){
                         int posInBlock = 0;
                         for (; posInBlock < (int)block.vtx.size(); posInBlock++){
@@ -321,7 +321,7 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
     if (IsSerialInBlockchain(hashSerial, nHeightTx, txidSpend, txSpend)) {
         //Find transaction details and make a wallettx and add to wallet
         dMint.SetUsed(true);
-        CWalletTx wtx(*pwallet, txSpend);
+        CWalletTx wtx(pwallet.get(), txSpend);
         CBlockIndex* pindex = chainActive[nHeightTx];
         CBlock block;
         if (ReadBlockFromDisk(block, pindex, Params().GetConsensus())){
