@@ -137,7 +137,9 @@ static void ReleaseWallet(CWallet* wallet)
     wallet->WalletLogPrintf("ReleaseWallet\n");
     wallet->WalletLogPrintf("Releasing wallet\n");
     wallet->BlockUntilSyncedToCurrentChain();
+    wallet->WalletLogPrintf("ReleaseWallet flush\n");
     wallet->Flush();
+    wallet->WalletLogPrintf("ReleaseWallet m_chain_notifications_handler\n");
     wallet->m_chain_notifications_handler.reset();
     delete wallet;
     // Wallet is now released, notify UnloadWallet, if any.
@@ -148,6 +150,7 @@ static void ReleaseWallet(CWallet* wallet)
             return;
         }
     }
+    wallet->WalletLogPrintf("ReleaseWallet g_wallet_release_cv\n");
     g_wallet_release_cv.notify_all();
 }
 
