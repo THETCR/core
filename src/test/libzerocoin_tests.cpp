@@ -11,6 +11,7 @@
 **/
 // Copyright (c) 2017-2018 The PIVX developers
 
+#include <test/test_wispr.h>
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include <iostream>
@@ -484,7 +485,7 @@ Test_RunAllTests()
 	delete g_Params;
 }
 
-BOOST_AUTO_TEST_SUITE(libzerocoin)
+BOOST_FIXTURE_TEST_SUITE(libzerocoin, TestingSetup)
 BOOST_AUTO_TEST_CASE(libzerocoin_tests)
 {
 	std::cout << "libzerocoin v" << ZEROCOIN_VERSION_STRING << " test utility." << endl << endl;
