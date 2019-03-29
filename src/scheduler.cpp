@@ -128,7 +128,7 @@ void CScheduler::scheduleEvery(CScheduler::Function f, int64_t deltaMilliSeconds
 }
 
 size_t CScheduler::getQueueInfo(boost::chrono::system_clock::time_point &first,
-                                boost::chrono::system_clock::time_point &last) const
+                             boost::chrono::system_clock::time_point &last) const
 {
     boost::unique_lock<boost::mutex> lock(newTaskMutex);
     size_t result = taskQueue.size();
@@ -172,15 +172,15 @@ void SingleThreadedSchedulerClient::ProcessQueue() {
     // RAII the setting of fCallbacksRunning and calling MaybeScheduleProcessQueue
     // to ensure both happen safely even if callback() throws.
     struct RAIICallbacksRunning {
-      SingleThreadedSchedulerClient* instance;
-      explicit RAIICallbacksRunning(SingleThreadedSchedulerClient* _instance) : instance(_instance) {}
-      ~RAIICallbacksRunning() {
-          {
-              LOCK(instance->m_cs_callbacks_pending);
-              instance->m_are_callbacks_running = false;
-          }
-          instance->MaybeScheduleProcessQueue();
-      }
+        SingleThreadedSchedulerClient* instance;
+        explicit RAIICallbacksRunning(SingleThreadedSchedulerClient* _instance) : instance(_instance) {}
+        ~RAIICallbacksRunning() {
+            {
+                LOCK(instance->m_cs_callbacks_pending);
+                instance->m_are_callbacks_running = false;
+            }
+            instance->MaybeScheduleProcessQueue();
+        }
     } raiicallbacksrunning(this);
 
     callback();

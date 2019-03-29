@@ -37,51 +37,51 @@
 class CScheduler
 {
 public:
-  CScheduler();
-  ~CScheduler();
+    CScheduler();
+    ~CScheduler();
 
-  typedef std::function<void()> Function;
+    typedef std::function<void()> Function;
 
-  // Call func at/after time t
-  void schedule(Function f, boost::chrono::system_clock::time_point t=boost::chrono::system_clock::now());
+    // Call func at/after time t
+    void schedule(Function f, boost::chrono::system_clock::time_point t=boost::chrono::system_clock::now());
 
-  // Convenience method: call f once deltaMilliSeconds from now
-  void scheduleFromNow(Function f, int64_t deltaMilliSeconds);
+    // Convenience method: call f once deltaMilliSeconds from now
+    void scheduleFromNow(Function f, int64_t deltaMilliSeconds);
 
-  // Another convenience method: call f approximately
-  // every deltaMilliSeconds forever, starting deltaMilliSeconds from now.
-  // To be more precise: every time f is finished, it
-  // is rescheduled to run deltaMilliSeconds later. If you
-  // need more accurate scheduling, don't use this method.
-  void scheduleEvery(Function f, int64_t deltaMilliSeconds);
+    // Another convenience method: call f approximately
+    // every deltaMilliSeconds forever, starting deltaMilliSeconds from now.
+    // To be more precise: every time f is finished, it
+    // is rescheduled to run deltaMilliSeconds later. If you
+    // need more accurate scheduling, don't use this method.
+    void scheduleEvery(Function f, int64_t deltaMilliSeconds);
 
-  // To keep things as simple as possible, there is no unschedule.
+    // To keep things as simple as possible, there is no unschedule.
 
-  // Services the queue 'forever'. Should be run in a thread,
-  // and interrupted using boost::interrupt_thread
-  void serviceQueue();
+    // Services the queue 'forever'. Should be run in a thread,
+    // and interrupted using boost::interrupt_thread
+    void serviceQueue();
 
-  // Tell any threads running serviceQueue to stop as soon as they're
-  // done servicing whatever task they're currently servicing (drain=false)
-  // or when there is no work left to be done (drain=true)
-  void stop(bool drain=false);
+    // Tell any threads running serviceQueue to stop as soon as they're
+    // done servicing whatever task they're currently servicing (drain=false)
+    // or when there is no work left to be done (drain=true)
+    void stop(bool drain=false);
 
-  // Returns number of tasks waiting to be serviced,
-  // and first and last task times
-  size_t getQueueInfo(boost::chrono::system_clock::time_point &first,
-                      boost::chrono::system_clock::time_point &last) const;
+    // Returns number of tasks waiting to be serviced,
+    // and first and last task times
+    size_t getQueueInfo(boost::chrono::system_clock::time_point &first,
+                        boost::chrono::system_clock::time_point &last) const;
 
-  // Returns true if there are threads actively running in serviceQueue()
-  bool AreThreadsServicingQueue() const;
+    // Returns true if there are threads actively running in serviceQueue()
+    bool AreThreadsServicingQueue() const;
 
 private:
-  std::multimap<boost::chrono::system_clock::time_point, Function> taskQueue;
-  boost::condition_variable newTaskScheduled;
-  mutable boost::mutex newTaskMutex;
-  int nThreadsServicingQueue;
-  bool stopRequested;
-  bool stopWhenEmpty;
-  bool shouldStop() const { return stopRequested || (stopWhenEmpty && taskQueue.empty()); }
+    std::multimap<boost::chrono::system_clock::time_point, Function> taskQueue;
+    boost::condition_variable newTaskScheduled;
+    mutable boost::mutex newTaskMutex;
+    int nThreadsServicingQueue;
+    bool stopRequested;
+    bool stopWhenEmpty;
+    bool shouldStop() const { return stopRequested || (stopWhenEmpty && taskQueue.empty()); }
 };
 
 /**
@@ -96,31 +96,31 @@ private:
  */
 class SingleThreadedSchedulerClient {
 private:
-  CScheduler *m_pscheduler;
+    CScheduler *m_pscheduler;
 
-  CCriticalSection m_cs_callbacks_pending;
-  std::list<std::function<void ()>> m_callbacks_pending GUARDED_BY(m_cs_callbacks_pending);
-  bool m_are_callbacks_running GUARDED_BY(m_cs_callbacks_pending) = false;
+    CCriticalSection m_cs_callbacks_pending;
+    std::list<std::function<void ()>> m_callbacks_pending GUARDED_BY(m_cs_callbacks_pending);
+    bool m_are_callbacks_running GUARDED_BY(m_cs_callbacks_pending) = false;
 
-  void MaybeScheduleProcessQueue();
-  void ProcessQueue();
+    void MaybeScheduleProcessQueue();
+    void ProcessQueue();
 
 public:
-  explicit SingleThreadedSchedulerClient(CScheduler *pschedulerIn) : m_pscheduler(pschedulerIn) {}
+    explicit SingleThreadedSchedulerClient(CScheduler *pschedulerIn) : m_pscheduler(pschedulerIn) {}
 
-  /**
-   * Add a callback to be executed. Callbacks are executed serially
-   * and memory is release-acquire consistent between callback executions.
-   * Practically, this means that callbacks can behave as if they are executed
-   * in order by a single thread.
-   */
-  void AddToProcessQueue(std::function<void ()> func);
+    /**
+     * Add a callback to be executed. Callbacks are executed serially
+     * and memory is release-acquire consistent between callback executions.
+     * Practically, this means that callbacks can behave as if they are executed
+     * in order by a single thread.
+     */
+    void AddToProcessQueue(std::function<void ()> func);
 
-  // Processes all remaining queue members on the calling thread, blocking until queue is empty
-  // Must be called after the CScheduler has no remaining processing threads!
-  void EmptyQueue();
+    // Processes all remaining queue members on the calling thread, blocking until queue is empty
+    // Must be called after the CScheduler has no remaining processing threads!
+    void EmptyQueue();
 
-  size_t CallbacksPending();
+    size_t CallbacksPending();
 };
 
 #endif

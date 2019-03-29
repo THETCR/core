@@ -22,10 +22,6 @@
 #include <ui_interface.h>
 #include <validation.h>
 
-#ifdef ENABLE_WALLET
-#include <wallet/wallet.h>
-#endif
-
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
 FastRandomContext g_insecure_rand_ctx;
@@ -37,7 +33,7 @@ std::ostream& operator<<(std::ostream& os, const uint256& num)
 }
 
 BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
-        : m_path_root(fs::temp_directory_path() / "test_wispr" / strprintf("%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(1 << 30))))
+    : m_path_root(fs::temp_directory_path() / "test_wispr" / strprintf("%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(1 << 30))))
 {
     SHA256AutoDetect();
     ECC_Start();
@@ -94,6 +90,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     if (!ActivateBestChain(state, chainparams)) {
         throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
     }
+
     nScriptCheckThreads = 3;
     for (int i = 0; i < nScriptCheckThreads - 1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
@@ -137,10 +134,8 @@ CBlock
 TestChain100Setup::CreateAndProcessBlock(const std::vector<CMutableTransaction>& txns, const CScript& scriptPubKey)
 {
     const CChainParams& chainparams = Params();
-    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
-    CWallet* pwallet = wallets.at(0).get();
-    CBlockTemplate* pblocktemplate = CreateNewBlock(scriptPubKey, pwallet, false);
+    CBlockTemplate* pblocktemplate = CreateNewBlock(scriptPubKey, false);
     CBlock& block = pblocktemplate->block;
 
     // Replace mempool-selected txns with just coinbase plus passed-in txns:
