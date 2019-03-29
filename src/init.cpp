@@ -1288,6 +1288,7 @@ bool AppInitSanityChecks()
     std::string sha256_algo = SHA256AutoDetect();
     LogPrintf("Using the '%s' SHA256 implementation\n", sha256_algo);
     RandomInit();
+    std::cout << "Init ECC_Start\n";
     ECC_Start();
     globalVerifyHandle.reset(new ECCVerifyHandle());
 
