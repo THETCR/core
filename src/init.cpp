@@ -1805,6 +1805,7 @@ bool AppInitMain(InitInterfaces& interfaces)
         g_txindex->Start();
     }
 
+    std::cout << "Init step 9 load wallet\n";
     // ********************************************************* Step 9: load wallet
     for (const auto& client : interfaces.chain_clients) {
         if (!client->load()) {
@@ -1814,6 +1815,7 @@ bool AppInitMain(InitInterfaces& interfaces)
 
     // ********************************************************* Step 10: data directory maintenance
 
+    std::cout << "Prune mode\n";
     // if pruning, unset the service bit and perform the initial blockstore prune
     // after any wallet rescanning has taken place.
     if (fPruneMode) {
