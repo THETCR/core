@@ -4356,8 +4356,7 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
     bool fFirstRun = true;
     // TODO: Can't use std::make_shared because we need a custom deleter but
     // should be possible to use std::allocate_shared.
-//    std::shared_ptr<CWallet> walletInstance(new CWallet(chain, location, WalletDatabase::Create(location.GetPath())), ReleaseWallet);
-    std::shared_ptr<CWallet> walletInstance(new CWallet(chain, location, WalletDatabase::Create(location.GetPath())));
+    std::shared_ptr<CWallet> walletInstance(new CWallet(chain, location, WalletDatabase::Create(location.GetPath())), ReleaseWallet);
     DBErrors nLoadWalletRet = walletInstance->LoadWallet(fFirstRun);
     if (nLoadWalletRet != DBErrors::LOAD_OK)
     {
@@ -4558,9 +4557,9 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
     // Try to top up keypool. No-op if the wallet is locked.
     walletInstance->TopUpKeyPool();
-    CzWSPWallet* zwalletMain = new CzWSPWallet(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle(), *walletInstance);
-    walletInstance->setZWallet(zwalletMain);
-    walletInstance->zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle(), *walletInstance));
+//    CzWSPWallet* zwalletMain = new CzWSPWallet(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle(), *walletInstance);
+//    walletInstance->setZWallet(zwalletMain);
+//    walletInstance->zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle(), *walletInstance));
 
     auto locked_chain = chain.lock();
     LOCK(walletInstance->cs_wallet);
@@ -4658,8 +4657,8 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
     //Load zerocoin mint hashes to memory
     walletInstance->zwspTracker->Init();
-    zwalletMain->LoadMintPoolFromDB();
-    zwalletMain->SyncWithChain();
+//    zwalletMain->LoadMintPoolFromDB();
+//    zwalletMain->SyncWithChain();
 
     chain.loadWallet(interfaces::MakeWallet(walletInstance));
 
