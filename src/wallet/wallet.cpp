@@ -4873,7 +4873,7 @@ void CWallet::EraseFromWallet(const uint256& hash)
 bool CWallet::IsUsed(const std::string address) const
 {
     LOCK(cs_wallet);
-    CScript scriptPubKey = GetScriptForDestination(address.Get());
+    CScript scriptPubKey = GetScriptForDestination(DecodeDestination(address));
     if (!::IsMine(*this, scriptPubKey)) {
         return false;
     }
@@ -7133,7 +7133,7 @@ void CWallet::AutoZeromintForAddress()
     std::map<std::string, std::vector<COutput> > mapAddressCoins = AvailableCoinsByAddress(true);
 
     for (auto address : setAutoConvertAddresses) {
-        CTxDestination dest = address.Get();
+        CTxDestination dest = DecodeDestination(address);
 
         if (!mapBalances.count(dest) || !mapAddressCoins.count(address))
             continue;
@@ -7334,7 +7334,7 @@ void CWallet::AutoCombineDust()
             continue;
 
         std::vector<std::pair<CScript, CAmount> > vecSend;
-        CScript scriptPubKey = GetScriptForDestination(it->first.Get());
+        CScript scriptPubKey = GetScriptForDestination(DecodeDestination(it->first));
         vecSend.push_back(std::make_pair(scriptPubKey, nTotalRewardsValue));
 
         //Send change to same address
@@ -7440,7 +7440,7 @@ bool CWallet::MultiSend()
             nAmount = ((out.tx->GetCredit(*locked_chain, filter) - out.tx->GetDebit(filter)) * vMultiSend[i].second) / 100;
             std::string strAddSend(vMultiSend[i].first);
             CScript scriptPubKey;
-            scriptPubKey = GetScriptForDestination(strAddSend);
+            scriptPubKey = GetScriptForDestination(DecodeDestination(strAddSend));
             vecSend.push_back(std::make_pair(scriptPubKey, nAmount));
         }
 
@@ -7981,7 +7981,7 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, CWalletTx& wtxNew, 
             }
 
             if (address) {
-                scriptZerocoinSpend = GetScriptForDestination(address->Get());
+                scriptZerocoinSpend = GetScriptForDestination(DecodeDestination(*address));
                 if (nChange) {
                     // Reserve a new key pair from key pool
                     CPubKey vchPubKey;

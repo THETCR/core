@@ -918,14 +918,15 @@ UniValue bip38encrypt(const JSONRPCRequest& request)
     std::string strAddress = request.params[0].get_str();
     std::string strPassphrase = request.params[1].get_str();
 
-    CBitcoinAddress address;
-    if (!address.SetString(strAddress))
+    if (!IsValidDestinationString(strAddress))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WISPR address");
-    CKeyID keyID;
-    if (!address.GetKeyID(keyID))
+
+    CTxDestination destination = DecodeDestination(strAddress);
+    const CKeyID *keyID = boost::get<CKeyID>(&destination);
+    if (!keyID)
         throw JSONRPCError(RPC_TYPE_ERROR, "Address does not refer to a key");
     CKey vchSecret;
-    if (!pwallet->GetKey(keyID, vchSecret))
+    if (!pwallet->GetKey(*keyID, vchSecret))
         throw JSONRPCError(RPC_WALLET_ERROR, "Private key for address " + strAddress + " is not known");
 
     uint256 privKey = vchSecret.GetPrivKey_256();
@@ -988,7 +989,7 @@ UniValue bip38decrypt(const JSONRPCRequest& request)
     CPubKey pubkey = key.GetPubKey();
     pubkey.IsCompressed();
     assert(key.VerifyPubKey(pubkey));
-    result.pushKV("Address", CBitcoinAddress(pubkey.GetID()).ToString());
+    result.pushKV("Address", EncodeDestination(pubkey.GetID()));
     CKeyID vchAddress = pubkey.GetID();
     WalletRescanReserver reserver(pwallet);
     if (!reserver.reserve()) {
