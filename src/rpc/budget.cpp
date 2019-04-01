@@ -211,7 +211,7 @@ UniValue submitbudget(const JSONRPCRequest& request)
     if (nBlockEnd < pindexPrev->nHeight)
         throw runtime_error("Invalid ending block, starting block + (payment_cycle*payments) must be more than current height.");
 
-    CTxDestination address(request.params[4].get_str());
+    CTxDestination address = DecodeDestination(request.params[4].get_str());
     if (!IsValidDestination(address))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WISPR address");
 
