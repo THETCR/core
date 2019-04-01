@@ -4533,6 +4533,7 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
                               _("This is the transaction fee you will pay if you send a transaction."));
         }
         walletInstance->m_pay_tx_fee = CFeeRate(nFeePerK, 1000);
+        payTxFee = walletInstance->m_pay_tx_fee;
         if (walletInstance->m_pay_tx_fee < chain.relayMinFee()) {
             chain.initError(strprintf(_("Invalid amount for -paytxfee=<amount>: '%s' (must be at least %s)"),
                 gArgs.GetArg("-paytxfee", ""), chain.relayMinFee().ToString()));

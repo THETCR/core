@@ -62,6 +62,8 @@ public:
 
 private:
     uint512 GetZerocoinSeed(uint32_t n);
+
+    friend struct WalletTestingSetup;
 };
 
 #endif //WISPR_ZWSPWALLET_H

@@ -64,6 +64,9 @@ public:
     bool UpdateZerocoinMint(const CZerocoinMint& mint);
     bool UpdateState(const CMintMeta& meta);
     void Clear();
+
+    friend struct WalletTestingSetup;
+
 };
 
 #endif //WISPR_ZWSPTRACKER_H

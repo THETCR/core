@@ -1082,32 +1082,31 @@ public:
 
     std::set<CBitcoinAddress> setAutoConvertAddresses;
 
-    bool fFileBacked;
-    bool fWalletUnlockAnonymizeOnly;
-    std::string strWalletFile;
-    bool fBackupMints;
+    bool fFileBacked = false;
+    bool fWalletUnlockAnonymizeOnly = false;
+    bool fBackupMints = false;
     std::unique_ptr<CzWSPTracker> zwspTracker;
 
     std::set<int64_t> setKeyPool;
 
     // Stake Settings
-    unsigned int nHashDrift;
-    unsigned int nHashInterval;
-    uint64_t nStakeSplitThreshold;
-    int nStakeSetUpdateTime;
+    unsigned int nHashDrift = 45;
+    unsigned int nHashInterval = 22;
+    uint64_t nStakeSplitThreshold = 2000;
+    int nStakeSetUpdateTime = 300;
 
     //MultiSend
     std::vector<std::pair<std::string, int> > vMultiSend;
-    bool fMultiSendStake;
-    bool fMultiSendMasternodeReward;
-    bool fMultiSendNotify;
-    std::string strMultiSendChangeAddress;
-    int nLastMultiSendHeight;
+    bool fMultiSendStake = false;
+    bool fMultiSendMasternodeReward = false;
+    bool fMultiSendNotify = false;
+    std::string strMultiSendChangeAddress = "";
+    int nLastMultiSendHeight = 0;
     std::vector<std::string> vDisabledAddresses;
 
     //Auto Combine Inputs
-    bool fCombineDust;
-    CAmount nAutoCombineThreshold;
+    bool fCombineDust = false;
+    CAmount nAutoCombineThreshold = 0;
 
     /**
      * Select a set of coins such that nValueRet >= nTargetValue and at least
@@ -1141,8 +1140,6 @@ public:
     /** Construct wallet with specified name and database implementation. */
     CWallet(interfaces::Chain& chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database) : m_chain(chain), m_location(location), database(std::move(database))
     {
-        SetNull();
-        strWalletFile = location.GetName();
         fFileBacked = true;
     }
 
@@ -1152,40 +1149,6 @@ public:
         assert(NotifyUnload.empty());
         delete encrypted_batch;
         encrypted_batch = nullptr;
-    }
-
-    void SetNull()
-    {
-        nWalletVersion = FEATURE_BASE;
-        nWalletMaxVersion = FEATURE_BASE;
-        fFileBacked = false;
-        nMasterKeyMaxID = 0;
-        encrypted_batch = nullptr;
-        nOrderPosNext = 0;
-        nNextResend = 0;
-        nLastResend = 0;
-        nTimeFirstKey = 0;
-        fWalletUnlockAnonymizeOnly = false;
-        fBackupMints = false;
-
-        // Stake Settings
-        nHashDrift = 45;
-        nStakeSplitThreshold = 2000;
-        nHashInterval = 22;
-        nStakeSetUpdateTime = 300; // 5 minutes
-
-        //MultiSend
-        vMultiSend.clear();
-        fMultiSendStake = false;
-        fMultiSendMasternodeReward = false;
-        fMultiSendNotify = false;
-        strMultiSendChangeAddress = "";
-        nLastMultiSendHeight = 0;
-        vDisabledAddresses.clear();
-
-        //Auto Combine Dust
-        fCombineDust = false;
-        nAutoCombineThreshold = 0;
     }
 
     int getZeromintPercentage()
@@ -1775,6 +1738,8 @@ public:
 //    int nStakeLimitHeight = 0; // for regtest, don't stake above nStakeLimitHeight
 
     friend struct WalletTestingSetup;
+    friend class CzWSPWallet;
+    friend class CzWSPTracker;
 
     bool IsAnonymizeOnlyUnlocked(){
         return fWalletUnlockAnonymizeOnly;
