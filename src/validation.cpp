@@ -4920,7 +4920,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     int blockHeight = chainActive.Height() + 1;
     for (const auto& tx : block.vtx) {
         if (!CheckTransaction(
-                tx,
+                *tx,
                 fZerocoinActive,
                 blockHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT(),
                 state,
@@ -5642,7 +5642,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 
                     if (!ContextualCheckZerocoinSpendNoSerialCheck(*stakeTxIn, spend, pindex, 0))
                         return state.DoS(100,error("%s: forked chain ContextualCheckZerocoinSpend failed for tx %s", __func__,
-                                                   stakeTxIn.GetHash().GetHex()), REJECT_INVALID, "bad-txns-invalid-zpiv");
+                                                   stakeTxIn->GetHash().GetHex()), REJECT_INVALID, "bad-txns-invalid-zpiv");
 
                     // Now only the ZKP left..
                     // As the spend maturity is 200, the acc value must be accumulated, otherwise it's not ready to be spent
