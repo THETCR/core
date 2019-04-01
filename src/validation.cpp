@@ -309,8 +309,6 @@ CLightWorker lightWorker;
 //
 const std::string strMessageMagic = "DarkNet Signed Message:\n";
 
-static void CheckBlockIndex();
-
 // Internal stuff
 namespace {
     CBlockIndex *&pindexBestInvalid = g_chainstate.pindexBestInvalid;

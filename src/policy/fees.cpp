@@ -16,9 +16,9 @@ static constexpr double INF_FEERATE = 1e99;
 
 std::string StringForFeeEstimateHorizon(FeeEstimateHorizon horizon) {
     static const std::map<FeeEstimateHorizon, std::string> horizon_strings = {
-            {FeeEstimateHorizon::SHORT_HALFLIFE, "short"},
-            {FeeEstimateHorizon::MED_HALFLIFE, "medium"},
-            {FeeEstimateHorizon::LONG_HALFLIFE, "long"},
+        {FeeEstimateHorizon::SHORT_HALFLIFE, "short"},
+        {FeeEstimateHorizon::MED_HALFLIFE, "medium"},
+        {FeeEstimateHorizon::LONG_HALFLIFE, "long"},
     };
     auto horizon_string = horizon_strings.find(horizon);
 
@@ -29,16 +29,16 @@ std::string StringForFeeEstimateHorizon(FeeEstimateHorizon horizon) {
 
 std::string StringForFeeReason(FeeReason reason) {
     static const std::map<FeeReason, std::string> fee_reason_strings = {
-            {FeeReason::NONE, "None"},
-            {FeeReason::HALF_ESTIMATE, "Half Target 60% Threshold"},
-            {FeeReason::FULL_ESTIMATE, "Target 85% Threshold"},
-            {FeeReason::DOUBLE_ESTIMATE, "Double Target 95% Threshold"},
-            {FeeReason::CONSERVATIVE, "Conservative Double Target longer horizon"},
-            {FeeReason::MEMPOOL_MIN, "Mempool Min Fee"},
-            {FeeReason::PAYTXFEE, "PayTxFee set"},
-            {FeeReason::FALLBACK, "Fallback fee"},
-            {FeeReason::REQUIRED, "Minimum Required Fee"},
-            {FeeReason::MAXTXFEE, "MaxTxFee limit"}
+        {FeeReason::NONE, "None"},
+        {FeeReason::HALF_ESTIMATE, "Half Target 60% Threshold"},
+        {FeeReason::FULL_ESTIMATE, "Target 85% Threshold"},
+        {FeeReason::DOUBLE_ESTIMATE, "Double Target 95% Threshold"},
+        {FeeReason::CONSERVATIVE, "Conservative Double Target longer horizon"},
+        {FeeReason::MEMPOOL_MIN, "Mempool Min Fee"},
+        {FeeReason::PAYTXFEE, "PayTxFee set"},
+        {FeeReason::FALLBACK, "Fallback fee"},
+        {FeeReason::REQUIRED, "Minimum Required Fee"},
+        {FeeReason::MAXTXFEE, "MaxTxFee limit"}
     };
     auto reason_string = fee_reason_strings.find(reason);
 
@@ -49,9 +49,9 @@ std::string StringForFeeReason(FeeReason reason) {
 
 bool FeeModeFromString(const std::string& mode_string, FeeEstimateMode& fee_estimate_mode) {
     static const std::map<std::string, FeeEstimateMode> fee_modes = {
-            {"UNSET", FeeEstimateMode::UNSET},
-            {"ECONOMICAL", FeeEstimateMode::ECONOMICAL},
-            {"CONSERVATIVE", FeeEstimateMode::CONSERVATIVE},
+        {"UNSET", FeeEstimateMode::UNSET},
+        {"ECONOMICAL", FeeEstimateMode::ECONOMICAL},
+        {"CONSERVATIVE", FeeEstimateMode::CONSERVATIVE},
     };
     auto mode = fee_modes.find(mode_string);
 
@@ -173,9 +173,9 @@ public:
 
 
 TxConfirmStats::TxConfirmStats(const std::vector<double>& defaultBuckets,
-                               const std::map<double, unsigned int>& defaultBucketMap,
+                                const std::map<double, unsigned int>& defaultBucketMap,
                                unsigned int maxPeriods, double _decay, unsigned int _scale)
-        : buckets(defaultBuckets), bucketMap(defaultBucketMap)
+    : buckets(defaultBuckets), bucketMap(defaultBucketMap)
 {
     decay = _decay;
     assert(_scale != 0 && "_scale must be non-zero");
@@ -314,8 +314,8 @@ double TxConfirmStats::EstimateMedianVal(int confTarget, double sufficientTxVal,
                 }
                 continue;
             }
-                // Otherwise update the cumulative stats, and the bucket variables
-                // and reset the counters
+            // Otherwise update the cumulative stats, and the bucket variables
+            // and reset the counters
             else {
                 failBucket = EstimatorBucket(); // Reset any failed bucket, currently passing
                 foundAnswer = true;
@@ -525,7 +525,7 @@ bool CBlockPolicyEstimator::removeTx(uint256 hash, bool inBlock)
 }
 
 CBlockPolicyEstimator::CBlockPolicyEstimator()
-        : nBestSeenHeight(0), firstRecordedHeight(0), historicalFirst(0), historicalBest(0), trackedTxs(0), untrackedTxs(0)
+    : nBestSeenHeight(0), firstRecordedHeight(0), historicalFirst(0), historicalBest(0), trackedTxs(0), untrackedTxs(0)
 {
     static_assert(MIN_BUCKET_FEERATE > 0, "Min feerate must be nonzero");
     size_t bucketIndex = 0;
@@ -675,22 +675,22 @@ CFeeRate CBlockPolicyEstimator::estimateRawFee(int confTarget, double successThr
     TxConfirmStats* stats;
     double sufficientTxs = SUFFICIENT_FEETXS;
     switch (horizon) {
-        case FeeEstimateHorizon::SHORT_HALFLIFE: {
-            stats = shortStats.get();
-            sufficientTxs = SUFFICIENT_TXS_SHORT;
-            break;
-        }
-        case FeeEstimateHorizon::MED_HALFLIFE: {
-            stats = feeStats.get();
-            break;
-        }
-        case FeeEstimateHorizon::LONG_HALFLIFE: {
-            stats = longStats.get();
-            break;
-        }
-        default: {
-            throw std::out_of_range("CBlockPolicyEstimator::estimateRawFee unknown FeeEstimateHorizon");
-        }
+    case FeeEstimateHorizon::SHORT_HALFLIFE: {
+        stats = shortStats.get();
+        sufficientTxs = SUFFICIENT_TXS_SHORT;
+        break;
+    }
+    case FeeEstimateHorizon::MED_HALFLIFE: {
+        stats = feeStats.get();
+        break;
+    }
+    case FeeEstimateHorizon::LONG_HALFLIFE: {
+        stats = longStats.get();
+        break;
+    }
+    default: {
+        throw std::out_of_range("CBlockPolicyEstimator::estimateRawFee unknown FeeEstimateHorizon");
+    }
     }
 
     LOCK(m_cs_fee_estimator);
@@ -712,18 +712,18 @@ unsigned int CBlockPolicyEstimator::HighestTargetTracked(FeeEstimateHorizon hori
 {
     LOCK(m_cs_fee_estimator);
     switch (horizon) {
-        case FeeEstimateHorizon::SHORT_HALFLIFE: {
-            return shortStats->GetMaxConfirms();
-        }
-        case FeeEstimateHorizon::MED_HALFLIFE: {
-            return feeStats->GetMaxConfirms();
-        }
-        case FeeEstimateHorizon::LONG_HALFLIFE: {
-            return longStats->GetMaxConfirms();
-        }
-        default: {
-            throw std::out_of_range("CBlockPolicyEstimator::HighestTargetTracked unknown FeeEstimateHorizon");
-        }
+    case FeeEstimateHorizon::SHORT_HALFLIFE: {
+        return shortStats->GetMaxConfirms();
+    }
+    case FeeEstimateHorizon::MED_HALFLIFE: {
+        return feeStats->GetMaxConfirms();
+    }
+    case FeeEstimateHorizon::LONG_HALFLIFE: {
+        return longStats->GetMaxConfirms();
+    }
+    default: {
+        throw std::out_of_range("CBlockPolicyEstimator::HighestTargetTracked unknown FeeEstimateHorizon");
+    }
     }
 }
 

@@ -72,91 +72,90 @@ void SyncWithValidationInterfaceQueue() LOCKS_EXCLUDED(cs_main);
  */
 class CValidationInterface {
 protected:
-  /**
-   * Protected destructor so that instances can only be deleted by derived classes.
-   * If that restriction is no longer desired, this should be made public and virtual.
-   */
-  ~CValidationInterface() = default;
-  /**
-   * Notifies listeners when the block chain tip advances.
-   *
-   * When multiple blocks are connected at once, UpdatedBlockTip will be called on the final tip
-   * but may not be called on every intermediate tip. If the latter behavior is desired,
-   * subscribe to BlockConnected() instead.
-   *
-   * Called on a background thread.
-   */
-  virtual void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {}
-  /**
-   * Notifies listeners of a transaction having been added to mempool.
-   *
-   * Called on a background thread.
-   */
-  virtual void TransactionAddedToMempool(const CTransactionRef &ptxn) {}
-  /**
-   * Notifies listeners of a transaction leaving mempool.
-   *
-   * This only fires for transactions which leave mempool because of expiry,
-   * size limiting, reorg (changes in lock times/coinbase maturity), or
-   * replacement. This does not include any transactions which are included
-   * in BlockConnectedDisconnected either in block->vtx or in txnConflicted.
-   *
-   * Called on a background thread.
-   */
-  virtual void TransactionRemovedFromMempool(const CTransactionRef &ptx) {}
-  /**
-   * Notifies listeners of a block being connected.
-   * Provides a vector of transactions evicted from the mempool as a result.
-   *
-   * Called on a background thread.
-   */
-  virtual void BlockConnected(const std::shared_ptr<const CBlock> &block, const CBlockIndex *pindex, const std::vector<CTransactionRef> &txnConflicted) {}
-  /**
-   * Notifies listeners of a block being disconnected
-   *
-   * Called on a background thread.
-   */
-  virtual void BlockDisconnected(const std::shared_ptr<const CBlock> &block) {}
-  /**
-   * Notifies listeners of the new active block chain on-disk.
-   *
-   * Prior to this callback, any updates are not guaranteed to persist on disk
-   * (ie clients need to handle shutdown/restart safety by being able to
-   * understand when some updates were lost due to unclean shutdown).
-   *
-   * When this callback is invoked, the validation changes done by any prior
-   * callback are guaranteed to exist on disk and survive a restart, including
-   * an unclean shutdown.
-   *
-   * Provides a locator describing the best chain, which is likely useful for
-   * storing current state on disk in client DBs.
-   *
-   * Called on a background thread.
-   */
-  virtual void ChainStateFlushed(const CBlockLocator &locator) {}
-  /** Tells listeners to broadcast their data. */
-  virtual void ResendWalletTransactions(int64_t nBestBlockTime, CConnman* connman) {}
-  /**
-   * Notifies listeners of a block validation result.
-   * If the provided CValidationState IsValid, the provided block
-   * is guaranteed to be the current best block at the time the
-   * callback was generated (not necessarily now)
-   */
-  virtual void BlockChecked(const CBlock&, const CValidationState&) {}
-  /**
-   * Notifies listeners that a block which builds directly on our current tip
-   * has been received and connected to the headers tree, though not validated yet */
-  virtual void NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& block) {}
-
-  virtual void NotifyTransactionLock(const CTransaction &tx){}
-  virtual bool UpdatedTransaction(const uint256 &hash){ return false; }
-  virtual void SetBestChain(const CBlockLocator &chain){}
-  virtual void Inventory(const uint256 &hash){}
-  virtual void BlockFound(const uint256 &hash){}
-  virtual void ResetRequestCount(const uint256 &hash) {};
-  friend void ::RegisterValidationInterface(CValidationInterface*);
-  friend void ::UnregisterValidationInterface(CValidationInterface*);
-  friend void ::UnregisterAllValidationInterfaces();
+    /**
+     * Protected destructor so that instances can only be deleted by derived classes.
+     * If that restriction is no longer desired, this should be made public and virtual.
+     */
+    ~CValidationInterface() = default;
+    /**
+     * Notifies listeners when the block chain tip advances.
+     *
+     * When multiple blocks are connected at once, UpdatedBlockTip will be called on the final tip
+     * but may not be called on every intermediate tip. If the latter behavior is desired,
+     * subscribe to BlockConnected() instead.
+     *
+     * Called on a background thread.
+     */
+    virtual void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {}
+    /**
+     * Notifies listeners of a transaction having been added to mempool.
+     *
+     * Called on a background thread.
+     */
+    virtual void TransactionAddedToMempool(const CTransactionRef &ptxn) {}
+    /**
+     * Notifies listeners of a transaction leaving mempool.
+     *
+     * This only fires for transactions which leave mempool because of expiry,
+     * size limiting, reorg (changes in lock times/coinbase maturity), or
+     * replacement. This does not include any transactions which are included
+     * in BlockConnectedDisconnected either in block->vtx or in txnConflicted.
+     *
+     * Called on a background thread.
+     */
+    virtual void TransactionRemovedFromMempool(const CTransactionRef &ptx) {}
+    /**
+     * Notifies listeners of a block being connected.
+     * Provides a vector of transactions evicted from the mempool as a result.
+     *
+     * Called on a background thread.
+     */
+    virtual void BlockConnected(const std::shared_ptr<const CBlock> &block, const CBlockIndex *pindex, const std::vector<CTransactionRef> &txnConflicted) {}
+    /**
+     * Notifies listeners of a block being disconnected
+     *
+     * Called on a background thread.
+     */
+    virtual void BlockDisconnected(const std::shared_ptr<const CBlock> &block) {}
+    /**
+     * Notifies listeners of the new active block chain on-disk.
+     *
+     * Prior to this callback, any updates are not guaranteed to persist on disk
+     * (ie clients need to handle shutdown/restart safety by being able to
+     * understand when some updates were lost due to unclean shutdown).
+     *
+     * When this callback is invoked, the validation changes done by any prior
+     * callback are guaranteed to exist on disk and survive a restart, including
+     * an unclean shutdown.
+     *
+     * Provides a locator describing the best chain, which is likely useful for
+     * storing current state on disk in client DBs.
+     *
+     * Called on a background thread.
+     */
+    virtual void ChainStateFlushed(const CBlockLocator &locator) {}
+    /** Tells listeners to broadcast their data. */
+    virtual void ResendWalletTransactions(int64_t nBestBlockTime, CConnman* connman) {}
+    /**
+     * Notifies listeners of a block validation result.
+     * If the provided CValidationState IsValid, the provided block
+     * is guaranteed to be the current best block at the time the
+     * callback was generated (not necessarily now)
+     */
+    virtual void BlockChecked(const CBlock&, const CValidationState&) {}
+    /**
+     * Notifies listeners that a block which builds directly on our current tip
+     * has been received and connected to the headers tree, though not validated yet */
+    virtual void NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& block) {}
+    virtual void NotifyTransactionLock(const CTransaction &tx){}
+    virtual bool UpdatedTransaction(const uint256 &hash){ return false; }
+    virtual void SetBestChain(const CBlockLocator &chain){}
+    virtual void Inventory(const uint256 &hash){}
+    virtual void BlockFound(const uint256 &hash){}
+    virtual void ResetRequestCount(const uint256 &hash) {};
+    friend void ::RegisterValidationInterface(CValidationInterface*);
+    friend void ::UnregisterValidationInterface(CValidationInterface*);
+    friend void ::UnregisterAllValidationInterfaces();
 };
 
 struct MainSignalsInstance;

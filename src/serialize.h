@@ -163,7 +163,7 @@ class CSizeComputer;
 enum
 {
     // primary actions
-            SER_NETWORK         = (1 << 0),
+    SER_NETWORK         = (1 << 0),
     SER_DISK            = (1 << 1),
     SER_GETHASH         = (1 << 2),
 };
@@ -396,7 +396,7 @@ I ReadVarInt(Stream& is)
     while(true) {
         unsigned char chData = ser_readdata8(is);
         if (n > (std::numeric_limits<I>::max() >> 7)) {
-            throw std::ios_base::failure("ReadVarInt(): size too large");
+           throw std::ios_base::failure("ReadVarInt(): size too large");
         }
         n = (n << 7) | (chData & 0x7F);
         if (chData & 0x80) {

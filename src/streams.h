@@ -70,7 +70,7 @@ public:
  */
 class CVectorWriter
 {
-public:
+ public:
 
 /*
  * @param[in]  nTypeIn Serialization Type
@@ -146,7 +146,7 @@ public:
      * @param[in]  pos Starting position. Vector index where reads should start.
      */
     VectorReader(int type, int version, const std::vector<unsigned char>& data, size_t pos)
-            : m_type(type), m_version(version), m_data(data), m_pos(pos)
+        : m_type(type), m_version(version), m_data(data), m_pos(pos)
     {
         if (m_pos > m_data.size()) {
             throw std::ios_base::failure("VectorReader(...): end of data (m_pos > m_data.size())");
@@ -159,8 +159,8 @@ public:
      */
     template <typename... Args>
     VectorReader(int type, int version, const std::vector<unsigned char>& data, size_t pos,
-                 Args&&... args)
-            : VectorReader(type, version, data, pos)
+                  Args&&... args)
+        : VectorReader(type, version, data, pos)
     {
         ::UnserializeMany(*this, std::forward<Args>(args)...);
     }
@@ -747,7 +747,7 @@ protected:
 
 public:
     CBufferedFile(FILE *fileIn, uint64_t nBufSize, uint64_t nRewindIn, int nTypeIn, int nVersionIn) :
-            nType(nTypeIn), nVersion(nVersionIn), nSrcPos(0), nReadPos(0), nReadLimit(std::numeric_limits<uint64_t>::max()), nRewind(nRewindIn), vchBuf(nBufSize, 0)
+        nType(nTypeIn), nVersion(nVersionIn), nSrcPos(0), nReadPos(0), nReadLimit(std::numeric_limits<uint64_t>::max()), nRewind(nRewindIn), vchBuf(nBufSize, 0)
     {
         src = fileIn;
     }

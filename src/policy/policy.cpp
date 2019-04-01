@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,15 +7,13 @@
 
 #include <policy/policy.h>
 
-#include "consensus/tx_verify.h"
-#include "consensus/validation.h"
+#include <consensus/validation.h>
 #include <validation.h>
 #include <coins.h>
 #include <tinyformat.h>
 #include <util/system.h>
 #include <util/strencodings.h>
 
-typedef std::vector<unsigned char> valtype;
 
 CAmount GetDustThreshold(const CTxOut& txout, const CFeeRate& dustRelayFeeIn)
 {
@@ -53,26 +51,17 @@ CAmount GetDustThreshold(const CTxOut& txout, const CFeeRate& dustRelayFeeIn)
 
 bool IsDust(const CTxOut& txout, const CFeeRate& dustRelayFeeIn)
 {
-    // "Dust" is defined in terms of CTransaction::minRelayTxFee, which has units uwsp-per-kilobyte.
-    // If you'd pay more than 1/3 in fees to spend something, then we consider it dust.
-    // A typical txout is 34 bytes big, and will need a CTxIn of at least 148 bytes to spend
-    // i.e. total is 148 + 32 = 182 bytes. Default -minrelaytxfee is 10000 uwsp per kB
-    // and that means that fee per txout is 182 * 10000 / 1000 = 1820 uwsp.
-    // So dust is a txout less than 1820 *3 = 5460 uwsp
-    // with default -minrelaytxfee = minRelayTxFee = 10000 uwsp per kB.
-    size_t nSize = GetSerializeSize(txout,0)+148u;
-    return (txout.nValue < 3*dustRelayFeeIn.GetFee(nSize));
+    return (txout.nValue < GetDustThreshold(txout, dustRelayFeeIn));
 }
 
 bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType)
 {
-    std::vector<valtype> vSolutions;
+    std::vector<std::vector<unsigned char> > vSolutions;
     whichType = Solver(scriptPubKey, vSolutions);
-    if (whichType == TX_NONSTANDARD)
-        return false;
 
-    if (whichType == TX_MULTISIG)
-    {
+    if (whichType == TX_NONSTANDARD || whichType == TX_WITNESS_UNKNOWN) {
+        return false;
+    } else if (whichType == TX_MULTISIG) {
         unsigned char m = vSolutions.front()[0];
         unsigned char n = vSolutions.back()[0];
         // Support up to x-of-3 multisig txns as standard
@@ -81,15 +70,15 @@ bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType)
         if (m < 1 || m > n)
             return false;
     } else if (whichType == TX_NULL_DATA &&
-        (!gArgs.GetBoolArg("-datacarrier", true) || scriptPubKey.size() > nMaxDatacarrierBytes))
-        return false;
+               (!fAcceptDatacarrier || scriptPubKey.size() > nMaxDatacarrierBytes)) {
+          return false;
+    }
 
-    return whichType != TX_NONSTANDARD;
+    return true;
 }
 
 bool IsStandardTx(const CTransaction& tx, std::string& reason)
 {
-    AssertLockHeld(cs_main);
     if (tx.nVersion > CTransaction::CURRENT_VERSION || tx.nVersion < 1) {
         reason = "version";
         return false;
@@ -140,7 +129,7 @@ bool IsStandardTx(const CTransaction& tx, std::string& reason)
         else if ((whichType == TX_MULTISIG) && (!fIsBareMultisigStd)) {
             reason = "bare-multisig";
             return false;
-        } else if (IsDust(txout, ::minRelayTxFee)) {
+        } else if (IsDust(txout, ::dustRelayFee)) {
             reason = "dust";
             return false;
         }
@@ -177,7 +166,8 @@ bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs)
         return true; // coinbase has no inputs and zerocoinspend has a special input
     //todo should there be a check for a 'standard' zerocoinspend here?
 
-    for (unsigned int i = 0; i < tx.vin.size(); i++) {
+    for (unsigned int i = 0; i < tx.vin.size(); i++)
+    {
         const CTxOut& prev = mapInputs.AccessCoin(tx.vin[i].prevout).out;
 
         std::vector<std::vector<unsigned char> > vSolutions;

@@ -15,7 +15,6 @@
 
 #include <amount.h>
 #include <coins.h>
-#include <core_memusage.h>
 #include <crypto/siphash.h>
 #include <indirectmap.h>
 #include <policy/feerate.h>
@@ -108,6 +107,7 @@ public:
                     int64_t _nTime, unsigned int _entryHeight,
                     bool spendsCoinbase,
                     int64_t nSigOpsCost, LockPoints lp);
+
     const CTransaction& GetTx() const { return *this->tx; }
     CTransactionRef GetSharedTx() const { return this->tx; }
     const CAmount& GetFee() const { return nFee; }
@@ -148,32 +148,32 @@ public:
 struct update_descendant_state
 {
     update_descendant_state(int64_t _modifySize, CAmount _modifyFee, int64_t _modifyCount) :
-            modifySize(_modifySize), modifyFee(_modifyFee), modifyCount(_modifyCount)
+        modifySize(_modifySize), modifyFee(_modifyFee), modifyCount(_modifyCount)
     {}
 
     void operator() (CTxMemPoolEntry &e)
-    { e.UpdateDescendantState(modifySize, modifyFee, modifyCount); }
+        { e.UpdateDescendantState(modifySize, modifyFee, modifyCount); }
 
-private:
-    int64_t modifySize;
-    CAmount modifyFee;
-    int64_t modifyCount;
+    private:
+        int64_t modifySize;
+        CAmount modifyFee;
+        int64_t modifyCount;
 };
 
 struct update_ancestor_state
 {
     update_ancestor_state(int64_t _modifySize, CAmount _modifyFee, int64_t _modifyCount, int64_t _modifySigOpsCost) :
-            modifySize(_modifySize), modifyFee(_modifyFee), modifyCount(_modifyCount), modifySigOpsCost(_modifySigOpsCost)
+        modifySize(_modifySize), modifyFee(_modifyFee), modifyCount(_modifyCount), modifySigOpsCost(_modifySigOpsCost)
     {}
 
     void operator() (CTxMemPoolEntry &e)
-    { e.UpdateAncestorState(modifySize, modifyFee, modifyCount, modifySigOpsCost); }
+        { e.UpdateAncestorState(modifySize, modifyFee, modifyCount, modifySigOpsCost); }
 
-private:
-    int64_t modifySize;
-    CAmount modifyFee;
-    int64_t modifyCount;
-    int64_t modifySigOpsCost;
+    private:
+        int64_t modifySize;
+        CAmount modifyFee;
+        int64_t modifyCount;
+        int64_t modifySigOpsCost;
 };
 
 struct update_fee_delta
@@ -472,29 +472,29 @@ public:
     static const int ROLLING_FEE_HALFLIFE = 60 * 60 * 12; // public only for testing
 
     typedef boost::multi_index_container<
-            CTxMemPoolEntry,
-            boost::multi_index::indexed_by<
-                    // sorted by txid
-                    boost::multi_index::hashed_unique<mempoolentry_txid, SaltedTxidHasher>,
-                    // sorted by fee rate
-                    boost::multi_index::ordered_non_unique<
-                            boost::multi_index::tag<descendant_score>,
-                            boost::multi_index::identity<CTxMemPoolEntry>,
-                            CompareTxMemPoolEntryByDescendantScore
-                    >,
-                    // sorted by entry time
-                    boost::multi_index::ordered_non_unique<
-                            boost::multi_index::tag<entry_time>,
-                            boost::multi_index::identity<CTxMemPoolEntry>,
-                            CompareTxMemPoolEntryByEntryTime
-                    >,
-                    // sorted by fee rate with ancestors
-                    boost::multi_index::ordered_non_unique<
-                            boost::multi_index::tag<ancestor_score>,
-                            boost::multi_index::identity<CTxMemPoolEntry>,
-                            CompareTxMemPoolEntryByAncestorFee
-                    >
+        CTxMemPoolEntry,
+        boost::multi_index::indexed_by<
+            // sorted by txid
+            boost::multi_index::hashed_unique<mempoolentry_txid, SaltedTxidHasher>,
+            // sorted by fee rate
+            boost::multi_index::ordered_non_unique<
+                boost::multi_index::tag<descendant_score>,
+                boost::multi_index::identity<CTxMemPoolEntry>,
+                CompareTxMemPoolEntryByDescendantScore
+            >,
+            // sorted by entry time
+            boost::multi_index::ordered_non_unique<
+                boost::multi_index::tag<entry_time>,
+                boost::multi_index::identity<CTxMemPoolEntry>,
+                CompareTxMemPoolEntryByEntryTime
+            >,
+            // sorted by fee rate with ancestors
+            boost::multi_index::ordered_non_unique<
+                boost::multi_index::tag<ancestor_score>,
+                boost::multi_index::identity<CTxMemPoolEntry>,
+                CompareTxMemPoolEntryByAncestorFee
             >
+        >
     > indexed_transaction_set;
 
     /**
@@ -535,7 +535,6 @@ public:
      */
     mutable RecursiveMutex cs;
     indexed_transaction_set mapTx GUARDED_BY(cs);
-//    std::map<uint256, CTxMemPoolEntry> mapTx GUARDED_BY(cs);
 
     using txiter = indexed_transaction_set::nth_index<0>::type::const_iterator;
     std::vector<std::pair<uint256, txiter> > vTxHashes; //!< All tx witness hashes/entries in mapTx, in random order
@@ -728,8 +727,8 @@ private:
      *  same transaction again, if encountered in another transaction chain.
      */
     void UpdateForDescendants(txiter updateIt,
-                              cacheMap &cachedDescendants,
-                              const std::set<uint256> &setExclude) EXCLUSIVE_LOCKS_REQUIRED(cs);
+            cacheMap &cachedDescendants,
+            const std::set<uint256> &setExclude) EXCLUSIVE_LOCKS_REQUIRED(cs);
     /** Update ancestors of hash to add/remove it as a descendant transaction. */
     void UpdateAncestorsOf(bool add, txiter hash, setEntries &setAncestors) EXCLUSIVE_LOCKS_REQUIRED(cs);
     /** Set ancestor state for an entry */
@@ -795,19 +794,19 @@ struct insertion_order {};
 
 struct DisconnectedBlockTransactions {
     typedef boost::multi_index_container<
-            CTransactionRef,
-            boost::multi_index::indexed_by<
-                    // sorted by txid
-                    boost::multi_index::hashed_unique<
-                            boost::multi_index::tag<txid_index>,
-                            mempoolentry_txid,
-                            SaltedTxidHasher
-                    >,
-                    // sorted by order in the blockchain
-                    boost::multi_index::sequenced<
-                            boost::multi_index::tag<insertion_order>
-                    >
+        CTransactionRef,
+        boost::multi_index::indexed_by<
+            // sorted by txid
+            boost::multi_index::hashed_unique<
+                boost::multi_index::tag<txid_index>,
+                mempoolentry_txid,
+                SaltedTxidHasher
+            >,
+            // sorted by order in the blockchain
+            boost::multi_index::sequenced<
+                boost::multi_index::tag<insertion_order>
             >
+        >
     > indexed_disconnected_transactions;
 
     // It's almost certainly a logic bug if we don't clear out queuedTx before

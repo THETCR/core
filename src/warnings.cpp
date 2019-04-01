@@ -7,7 +7,6 @@
 #include <clientversion.h>
 #include <util/system.h>
 #include <warnings.h>
-#include <validation.h>
 
 CCriticalSection cs_warnings;
 std::string strMiscWarning GUARDED_BY(cs_warnings);

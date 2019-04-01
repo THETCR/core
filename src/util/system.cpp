@@ -345,10 +345,10 @@ ArgsManager::ArgsManager() :
  * between mainnet and regtest/testnet won't cause problems due to these
  * parameters by accident. */
     m_network_only_args{
-        "-addnode", "-connect",
-        "-port", "-bind",
-        "-rpcport", "-rpcbind",
-        "-wallet",
+      "-addnode", "-connect",
+      "-port", "-bind",
+      "-rpcport", "-rpcbind",
+      "-wallet",
     }
 {
     // nothing to do
@@ -387,14 +387,13 @@ const std::set<std::string> ArgsManager::GetUnsuitableSectionOnlyArgs() const
     return unsuitables;
 }
 
-
 const std::list<SectionInfo> ArgsManager::GetUnrecognizedSections() const
 {
     // Section names to be recognized in the config file.
     static const std::set<std::string> available_sections{
-            CBaseChainParams::REGTEST,
-            CBaseChainParams::TESTNET,
-            CBaseChainParams::MAIN
+        CBaseChainParams::REGTEST,
+        CBaseChainParams::TESTNET,
+        CBaseChainParams::MAIN
     };
 
     LOCK(cs_args);

@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2016-2017 The PIVX developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -63,7 +62,7 @@ const CBlockIndex *CChain::FindFork(const CBlockIndex *pindex) const {
 CBlockIndex* CChain::FindEarliestAtLeast(int64_t nTime) const
 {
     std::vector<CBlockIndex*>::const_iterator lower = std::lower_bound(vChain.begin(), vChain.end(), nTime,
-                                                                       [](CBlockIndex* pBlock, const int64_t& time) -> bool { return pBlock->GetBlockTimeMax() < time; });
+        [](CBlockIndex* pBlock, const int64_t& time) -> bool { return pBlock->GetBlockTimeMax() < time; });
     return (lower == vChain.end() ? nullptr : *lower);
 }
 
@@ -94,8 +93,8 @@ const CBlockIndex* CBlockIndex::GetAncestor(int height) const
         int heightSkipPrev = GetSkipHeight(heightWalk - 1);
         if (pindexWalk->pskip != nullptr &&
             (heightSkip == height ||
-                (heightSkip > height && !(heightSkipPrev < heightSkip - 2 &&
-                    heightSkipPrev >= height)))) {
+             (heightSkip > height && !(heightSkipPrev < heightSkip - 2 &&
+                                       heightSkipPrev >= height)))) {
             // Only follow pskip if pprev->pskip isn't better than pskip->pprev.
             pindexWalk = pindexWalk->pskip;
             heightWalk = heightSkip;

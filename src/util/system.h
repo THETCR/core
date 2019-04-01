@@ -57,7 +57,7 @@ extern std::string strBudgetMode;
 
 //extern std::map<std::string, std::string> mapArgs;
 //extern std::map<std::string, std::vector<std::string> > mapMultiArgs;
-extern bool fDebug;
+//extern bool fDebug;
 
 // Application startup time (used for uptime calculation)
 int64_t GetStartupTime();
@@ -412,14 +412,14 @@ inline void insert(std::set<TsetT>& dst, const Tsrc& src) {
 class WinCmdLineArgs
 {
 public:
-  WinCmdLineArgs();
-  ~WinCmdLineArgs();
-  std::pair<int, char**> get();
+    WinCmdLineArgs();
+    ~WinCmdLineArgs();
+    std::pair<int, char**> get();
 
 private:
-  int argc;
-  char** argv;
-  std::vector<std::string> args;
+    int argc;
+    char** argv;
+    std::vector<std::string> args;
 };
 #endif
 

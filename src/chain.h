@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,6 +8,7 @@
 
 #include "pow.h"
 #include <consensus/params.h>
+#include <flatfile.h>
 #include <primitives/block.h>
 #include <tinyformat.h>
 #include <flatfile.h>
@@ -43,62 +43,58 @@ static constexpr int64_t MAX_BLOCK_TIME_GAP = 90 * 60;
 class CBlockFileInfo
 {
 public:
-  unsigned int nBlocks;      //! number of blocks stored in file
-  unsigned int nSize;        //! number of used bytes of block file
-  unsigned int nUndoSize;    //! number of used bytes in the undo file
-  unsigned int nHeightFirst; //! lowest height of block in file
-  unsigned int nHeightLast;  //! highest height of block in file
-  uint64_t nTimeFirst;       //! earliest time of block in file
-  uint64_t nTimeLast;        //! latest time of block in file
+    unsigned int nBlocks;      //!< number of blocks stored in file
+    unsigned int nSize;        //!< number of used bytes of block file
+    unsigned int nUndoSize;    //!< number of used bytes in the undo file
+    unsigned int nHeightFirst; //!< lowest height of block in file
+    unsigned int nHeightLast;  //!< highest height of block in file
+    uint64_t nTimeFirst;       //!< earliest time of block in file
+    uint64_t nTimeLast;        //!< latest time of block in file
 
-  ADD_SERIALIZE_METHODS;
+    ADD_SERIALIZE_METHODS;
 
-  template <typename Stream, typename Operation>
-  inline void SerializationOp(Stream& s, Operation ser_action)
-  {
-      READWRITE(VARINT(nBlocks));
-      READWRITE(VARINT(nSize));
-      READWRITE(VARINT(nUndoSize));
-      READWRITE(VARINT(nHeightFirst));
-      READWRITE(VARINT(nHeightLast));
-      READWRITE(VARINT(nTimeFirst));
-      READWRITE(VARINT(nTimeLast));
-  }
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action) {
+        READWRITE(VARINT(nBlocks));
+        READWRITE(VARINT(nSize));
+        READWRITE(VARINT(nUndoSize));
+        READWRITE(VARINT(nHeightFirst));
+        READWRITE(VARINT(nHeightLast));
+        READWRITE(VARINT(nTimeFirst));
+        READWRITE(VARINT(nTimeLast));
+    }
 
-  void SetNull()
-  {
-      nBlocks = 0;
-      nSize = 0;
-      nUndoSize = 0;
-      nHeightFirst = 0;
-      nHeightLast = 0;
-      nTimeFirst = 0;
-      nTimeLast = 0;
-  }
+     void SetNull() {
+         nBlocks = 0;
+         nSize = 0;
+         nUndoSize = 0;
+         nHeightFirst = 0;
+         nHeightLast = 0;
+         nTimeFirst = 0;
+         nTimeLast = 0;
+     }
 
-  CBlockFileInfo()
-  {
-      SetNull();
-  }
+     CBlockFileInfo() {
+         SetNull();
+     }
 
-  std::string ToString() const;
+     std::string ToString() const;
 
-  /** update statistics (does not update nSize) */
-  void AddBlock(unsigned int nHeightIn, uint64_t nTimeIn)
-  {
-      if (nBlocks == 0 || nHeightFirst > nHeightIn)
-          nHeightFirst = nHeightIn;
-      if (nBlocks == 0 || nTimeFirst > nTimeIn)
-          nTimeFirst = nTimeIn;
-      nBlocks++;
-      if (nHeightIn > nHeightLast)
-          nHeightLast = nHeightIn;
-      if (nTimeIn > nTimeLast)
-          nTimeLast = nTimeIn;
-  }
+     /** update statistics (does not update nSize) */
+     void AddBlock(unsigned int nHeightIn, uint64_t nTimeIn) {
+         if (nBlocks==0 || nHeightFirst > nHeightIn)
+             nHeightFirst = nHeightIn;
+         if (nBlocks==0 || nTimeFirst > nTimeIn)
+             nTimeFirst = nTimeIn;
+         nBlocks++;
+         if (nHeightIn > nHeightLast)
+             nHeightLast = nHeightIn;
+         if (nTimeIn > nTimeLast)
+             nTimeLast = nTimeIn;
+     }
 };
 
-enum BlockStatus {
+enum BlockStatus: uint32_t {
     //! Unused.
             BLOCK_VALID_UNKNOWN = 0,
 
@@ -137,7 +133,6 @@ enum BlockStatus {
     BLOCK_FAILED_MASK = BLOCK_FAILED_VALID | BLOCK_FAILED_CHILD,
 
     BLOCK_OPT_WITNESS       =   128, //!< block data in blk*.data was received with a witness-enforcing client
-
 };
 
 /** The block chain is a tree shaped structure starting with the
@@ -148,7 +143,7 @@ enum BlockStatus {
 class CBlockIndex
 {
 public:
-    //! pointer to the hash of the block, if any. memory is owned by this CBlockIndex
+    //! pointer to the hash of the block, if any. Memory is owned by this CBlockIndex
     const uint256* phashBlock;
 
     //! pointer to the index of the predecessor of this block
@@ -188,7 +183,7 @@ public:
     unsigned int nChainTx;
 
     //! Verification status of this block. See enum BlockStatus
-    unsigned int nStatus;
+    uint32_t nStatus;
 
     unsigned int nFlags; // ppcoin: block index flags
     enum {
@@ -209,15 +204,16 @@ public:
     int64_t nMoneySupply;
 
     //! block header
-    int nVersion;
+    int32_t nVersion;
     uint256 hashMerkleRoot;
-    unsigned int nTime;
-    unsigned int nBits;
-    unsigned int nNonce;
+    uint32_t nTime;
+    uint32_t nBits;
+    uint32_t nNonce;
     uint256 nAccumulatorCheckpoint;
 
     //! (memory only) Sequential id assigned to distinguish order in which blocks are received.
-    uint32_t nSequenceId;
+    int32_t nSequenceId;
+
     //! (memory only) Maximum nTime in the chain up to and including this block.
     unsigned int nTimeMax;
 
@@ -234,7 +230,7 @@ public:
         nFile = 0;
         nDataPos = 0;
         nUndoPos = 0;
-        nChainWork = 0;
+        nChainWork = uint256();
         nTx = 0;
         nChainTx = 0;
         nStatus = 0;
@@ -267,6 +263,7 @@ public:
     {
         SetNull();
     }
+
     explicit CBlockIndex(const CBlockHeader& block)
     {
         SetNull();
@@ -322,22 +319,20 @@ public:
     }
 
 
-    FlatFilePos GetBlockPos() const
-    {
+    FlatFilePos GetBlockPos() const {
         FlatFilePos ret;
         if (nStatus & BLOCK_HAVE_DATA) {
             ret.nFile = nFile;
-            ret.nPos = nDataPos;
+            ret.nPos  = nDataPos;
         }
         return ret;
     }
 
-    FlatFilePos GetUndoPos() const
-    {
+    FlatFilePos GetUndoPos() const {
         FlatFilePos ret;
         if (nStatus & BLOCK_HAVE_UNDO) {
             ret.nFile = nFile;
-            ret.nPos = nUndoPos;
+            ret.nPos  = nUndoPos;
         }
         return ret;
     }
@@ -408,6 +403,7 @@ public:
     {
         return (int64_t)nTime;
     }
+
     int64_t GetBlockTimeMax() const
     {
         return (int64_t)nTimeMax;
@@ -417,7 +413,8 @@ public:
     {
         return GetBlockTime();
     }
-    enum { nMedianTimeSpan = 11 };
+
+    static constexpr int nMedianTimeSpan = 11;
 
     int64_t GetMedianTimePast() const
     {
@@ -430,7 +427,7 @@ public:
             *(--pbegin) = pindex->GetBlockTime();
 
         std::sort(pbegin, pend);
-        return pbegin[(pend - pbegin) / 2];
+        return pbegin[(pend - pbegin)/2];
     }
 
     bool IsProofOfWork() const
@@ -486,10 +483,10 @@ public:
 
     std::string ToString() const
     {
-        return strprintf("CBlockIndex(pprev=%p, nHeight=%d, merkle=%s, hashBlock=%s, nBits=%s)",
-                         pprev, nHeight,
-                         hashMerkleRoot.ToString(),
-                         GetBlockHash().ToString(), nBits);
+        return strprintf("CBlockIndex(pprev=%p, nHeight=%d, merkle=%s, hashBlock=%s)",
+            pprev, nHeight,
+            hashMerkleRoot.ToString(),
+            GetBlockHash().ToString());
     }
 
     //! Check whether this block index entry is valid up to the passed validity level.
@@ -550,8 +547,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
-    {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         int _nVersion = s.GetVersion();
         if (!(s.GetType() & SER_GETHASH))
             READWRITE(VARINT(_nVersion, VarIntMode::NONNEGATIVE_SIGNED));
@@ -629,8 +625,8 @@ public:
         std::string str = "CDiskBlockIndex(";
         str += CBlockIndex::ToString();
         str += strprintf("\n                hashBlock=%s, hashPrev=%s)",
-                         GetBlockHash().ToString(),
-                         hashPrev.ToString());
+            GetBlockHash().ToString(),
+            hashPrev.ToString());
         return str;
     }
 };

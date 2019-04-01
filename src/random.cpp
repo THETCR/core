@@ -375,80 +375,80 @@ void LockingCallbackOpenSSL(int mode, int i, const char* file, int line);
 namespace {
 
 class RNGState {
-  Mutex m_mutex;
-  /* The RNG state consists of 256 bits of entropy, taken from the output of
-   * one operation's SHA512 output, and fed as input to the next one.
-   * Carrying 256 bits of entropy should be sufficient to guarantee
-   * unpredictability as long as any entropy source was ever unpredictable
-   * to an attacker. To protect against situations where an attacker might
-   * observe the RNG's state, fresh entropy is always mixed when
-   * GetStrongRandBytes is called.
-   */
-  unsigned char m_state[32] GUARDED_BY(m_mutex) = {0};
-  uint64_t m_counter GUARDED_BY(m_mutex) = 0;
-  bool m_strongly_seeded GUARDED_BY(m_mutex) = false;
-  std::unique_ptr<Mutex[]> m_mutex_openssl;
+    Mutex m_mutex;
+    /* The RNG state consists of 256 bits of entropy, taken from the output of
+     * one operation's SHA512 output, and fed as input to the next one.
+     * Carrying 256 bits of entropy should be sufficient to guarantee
+     * unpredictability as long as any entropy source was ever unpredictable
+     * to an attacker. To protect against situations where an attacker might
+     * observe the RNG's state, fresh entropy is always mixed when
+     * GetStrongRandBytes is called.
+     */
+    unsigned char m_state[32] GUARDED_BY(m_mutex) = {0};
+    uint64_t m_counter GUARDED_BY(m_mutex) = 0;
+    bool m_strongly_seeded GUARDED_BY(m_mutex) = false;
+    std::unique_ptr<Mutex[]> m_mutex_openssl;
 
 public:
-  RNGState() noexcept
-  {
-      InitHardwareRand();
+    RNGState() noexcept
+    {
+        InitHardwareRand();
 
-      // Init OpenSSL library multithreading support
-      m_mutex_openssl.reset(new Mutex[CRYPTO_num_locks()]);
-      CRYPTO_set_locking_callback(LockingCallbackOpenSSL);
+        // Init OpenSSL library multithreading support
+        m_mutex_openssl.reset(new Mutex[CRYPTO_num_locks()]);
+        CRYPTO_set_locking_callback(LockingCallbackOpenSSL);
 
-      // OpenSSL can optionally load a config file which lists optional loadable modules and engines.
-      // We don't use them so we don't require the config. However some of our libs may call functions
-      // which attempt to load the config file, possibly resulting in an exit() or crash if it is missing
-      // or corrupt. Explicitly tell OpenSSL not to try to load the file. The result for our libs will be
-      // that the config appears to have been loaded and there are no modules/engines available.
-      OPENSSL_no_config();
-  }
+        // OpenSSL can optionally load a config file which lists optional loadable modules and engines.
+        // We don't use them so we don't require the config. However some of our libs may call functions
+        // which attempt to load the config file, possibly resulting in an exit() or crash if it is missing
+        // or corrupt. Explicitly tell OpenSSL not to try to load the file. The result for our libs will be
+        // that the config appears to have been loaded and there are no modules/engines available.
+        OPENSSL_no_config();
+    }
 
-  ~RNGState()
-  {
-      // Securely erase the memory used by the OpenSSL PRNG
-      RAND_cleanup();
-      // Shutdown OpenSSL library multithreading support
-      CRYPTO_set_locking_callback(nullptr);
-  }
+    ~RNGState()
+    {
+        // Securely erase the memory used by the OpenSSL PRNG
+        RAND_cleanup();
+        // Shutdown OpenSSL library multithreading support
+        CRYPTO_set_locking_callback(nullptr);
+    }
 
-  /** Extract up to 32 bytes of entropy from the RNG state, mixing in new entropy from hasher.
-   *
-   * If this function has never been called with strong_seed = true, false is returned.
-   */
-  bool MixExtract(unsigned char* out, size_t num, CSHA512&& hasher, bool strong_seed) noexcept
-  {
-      assert(num <= 32);
-      unsigned char buf[64];
-      static_assert(sizeof(buf) == CSHA512::OUTPUT_SIZE, "Buffer needs to have hasher's output size");
-      bool ret;
-      {
-          LOCK(m_mutex);
-          ret = (m_strongly_seeded |= strong_seed);
-          // Write the current state of the RNG into the hasher
-          hasher.Write(m_state, 32);
-          // Write a new counter number into the state
-          hasher.Write((const unsigned char*)&m_counter, sizeof(m_counter));
-          ++m_counter;
-          // Finalize the hasher
-          hasher.Finalize(buf);
-          // Store the last 32 bytes of the hash output as new RNG state.
-          memcpy(m_state, buf + 32, 32);
-      }
-      // If desired, copy (up to) the first 32 bytes of the hash output as output.
-      if (num) {
-          assert(out != nullptr);
-          memcpy(out, buf, num);
-      }
-      // Best effort cleanup of internal state
-      hasher.Reset();
-      memory_cleanse(buf, 64);
-      return ret;
-  }
+    /** Extract up to 32 bytes of entropy from the RNG state, mixing in new entropy from hasher.
+     *
+     * If this function has never been called with strong_seed = true, false is returned.
+     */
+    bool MixExtract(unsigned char* out, size_t num, CSHA512&& hasher, bool strong_seed) noexcept
+    {
+        assert(num <= 32);
+        unsigned char buf[64];
+        static_assert(sizeof(buf) == CSHA512::OUTPUT_SIZE, "Buffer needs to have hasher's output size");
+        bool ret;
+        {
+            LOCK(m_mutex);
+            ret = (m_strongly_seeded |= strong_seed);
+            // Write the current state of the RNG into the hasher
+            hasher.Write(m_state, 32);
+            // Write a new counter number into the state
+            hasher.Write((const unsigned char*)&m_counter, sizeof(m_counter));
+            ++m_counter;
+            // Finalize the hasher
+            hasher.Finalize(buf);
+            // Store the last 32 bytes of the hash output as new RNG state.
+            memcpy(m_state, buf + 32, 32);
+        }
+        // If desired, copy (up to) the first 32 bytes of the hash output as output.
+        if (num) {
+            assert(out != nullptr);
+            memcpy(out, buf, num);
+        }
+        // Best effort cleanup of internal state
+        hasher.Reset();
+        memory_cleanse(buf, 64);
+        return ret;
+    }
 
-  Mutex& GetOpenSSLMutex(int i) { return m_mutex_openssl[i]; }
+    Mutex& GetOpenSSLMutex(int i) { return m_mutex_openssl[i]; }
 };
 
 RNGState& GetRNGState() noexcept
@@ -564,9 +564,9 @@ static void SeedStartup(CSHA512& hasher) noexcept
 }
 
 enum class RNGLevel {
-  FAST, //!< Automatically called by GetRandBytes
-  SLOW, //!< Automatically called by GetStrongRandBytes
-  SLEEP, //!< Called by RandAddSeedSleep()
+    FAST, //!< Automatically called by GetRandBytes
+    SLOW, //!< Automatically called by GetStrongRandBytes
+    SLEEP, //!< Called by RandAddSeedSleep()
 };
 
 static void ProcRand(unsigned char* out, int num, RNGLevel level)

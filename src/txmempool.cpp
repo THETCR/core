@@ -21,8 +21,8 @@
 CTxMemPoolEntry::CTxMemPoolEntry(const CTransactionRef& _tx, const CAmount& _nFee,
                                  int64_t _nTime, unsigned int _entryHeight,
                                  bool _spendsCoinbase, int64_t _sigOpsCost, LockPoints lp)
-        : tx(_tx), nFee(_nFee), nTxWeight(GetTransactionWeight(*tx)), nUsageSize(RecursiveDynamicUsage(tx)), nTime(_nTime), entryHeight(_entryHeight),
-          spendsCoinbase(_spendsCoinbase), sigOpCost(_sigOpsCost), lockPoints(lp)
+    : tx(_tx), nFee(_nFee), nTxWeight(GetTransactionWeight(*tx)), nUsageSize(RecursiveDynamicUsage(tx)), nTime(_nTime), entryHeight(_entryHeight),
+    spendsCoinbase(_spendsCoinbase), sigOpCost(_sigOpsCost), lockPoints(lp)
 {
     nCountWithDescendants = 1;
     nSizeWithDescendants = GetTxSize();
@@ -735,19 +735,19 @@ bool CTxMemPool::CompareDepthAndScore(const uint256& hasha, const uint256& hashb
 }
 
 namespace {
-    class DepthAndScoreComparator
+class DepthAndScoreComparator
+{
+public:
+    bool operator()(const CTxMemPool::indexed_transaction_set::const_iterator& a, const CTxMemPool::indexed_transaction_set::const_iterator& b)
     {
-    public:
-        bool operator()(const CTxMemPool::indexed_transaction_set::const_iterator& a, const CTxMemPool::indexed_transaction_set::const_iterator& b)
-        {
-            uint64_t counta = a->GetCountWithAncestors();
-            uint64_t countb = b->GetCountWithAncestors();
-            if (counta == countb) {
-                return CompareTxMemPoolEntryByScore()(*a, *b);
-            }
-            return counta < countb;
+        uint64_t counta = a->GetCountWithAncestors();
+        uint64_t countb = b->GetCountWithAncestors();
+        if (counta == countb) {
+            return CompareTxMemPoolEntryByScore()(*a, *b);
         }
-    };
+        return counta < countb;
+    }
+};
 } // namespace
 
 std::vector<CTxMemPool::indexed_transaction_set::const_iterator> CTxMemPool::GetSortedDepthAndScore() const
@@ -1101,6 +1101,4 @@ void CTxMemPool::getTransactions(std::set<uint256>& setTxid)
     for (const CTxMemPoolEntry& e: mempool.mapTx) {
         setTxid.insert(e.GetSharedTx()->GetHash());
     }
-//        for (map<uint256, CTxMemPoolEntry>::iterator mi = mapTx.begin(); mi != mapTx.end(); ++mi)
-//        setTxid.insert((*mi).first);
 }

@@ -27,7 +27,7 @@ enum class OutputType {
     CHANGE_AUTO,
 };
 
-NODISCARD bool ParseOutputType(const std::string& type, OutputType& output_type);
+NODISCARD bool ParseOutputType(const std::string& str, OutputType& output_type);
 const std::string& FormatOutputType(OutputType type);
 
 /**

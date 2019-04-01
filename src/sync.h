@@ -78,26 +78,26 @@ template <typename PARENT>
 class LOCKABLE AnnotatedMixin : public PARENT
 {
 public:
-  ~AnnotatedMixin() {
-      DeleteLock((void*)this);
-  }
+    ~AnnotatedMixin() {
+        DeleteLock((void*)this);
+    }
 
-  void lock() EXCLUSIVE_LOCK_FUNCTION()
-  {
-      PARENT::lock();
-  }
+    void lock() EXCLUSIVE_LOCK_FUNCTION()
+    {
+        PARENT::lock();
+    }
 
-  void unlock() UNLOCK_FUNCTION()
-  {
-      PARENT::unlock();
-  }
+    void unlock() UNLOCK_FUNCTION()
+    {
+        PARENT::unlock();
+    }
 
-  bool try_lock() EXCLUSIVE_TRYLOCK_FUNCTION(true)
-  {
-      return PARENT::try_lock();
-  }
+    bool try_lock() EXCLUSIVE_TRYLOCK_FUNCTION(true)
+    {
+        return PARENT::try_lock();
+    }
 
-  using UniqueLock = std::unique_lock<PARENT>;
+    using UniqueLock = std::unique_lock<PARENT>;
 };
 
 /**
@@ -119,58 +119,58 @@ template <typename Mutex, typename Base = typename Mutex::UniqueLock>
 class SCOPED_LOCKABLE UniqueLock : public Base
 {
 private:
-  void Enter(const char* pszName, const char* pszFile, int nLine)
-  {
-      EnterCritical(pszName, pszFile, nLine, (void*)(Base::mutex()));
+    void Enter(const char* pszName, const char* pszFile, int nLine)
+    {
+        EnterCritical(pszName, pszFile, nLine, (void*)(Base::mutex()));
 #ifdef DEBUG_LOCKCONTENTION
-      if (!Base::try_lock()) {
+        if (!Base::try_lock()) {
             PrintLockContention(pszName, pszFile, nLine);
 #endif
-      Base::lock();
+            Base::lock();
 #ifdef DEBUG_LOCKCONTENTION
-      }
+        }
 #endif
-  }
+    }
 
-  bool TryEnter(const char* pszName, const char* pszFile, int nLine)
-  {
-      EnterCritical(pszName, pszFile, nLine, (void*)(Base::mutex()), true);
-      Base::try_lock();
-      if (!Base::owns_lock())
-          LeaveCritical();
-      return Base::owns_lock();
-  }
+    bool TryEnter(const char* pszName, const char* pszFile, int nLine)
+    {
+        EnterCritical(pszName, pszFile, nLine, (void*)(Base::mutex()), true);
+        Base::try_lock();
+        if (!Base::owns_lock())
+            LeaveCritical();
+        return Base::owns_lock();
+    }
 
 public:
-  UniqueLock(Mutex& mutexIn, const char* pszName, const char* pszFile, int nLine, bool fTry = false) EXCLUSIVE_LOCK_FUNCTION(mutexIn) : Base(mutexIn, std::defer_lock)
-  {
-      if (fTry)
-          TryEnter(pszName, pszFile, nLine);
-      else
-          Enter(pszName, pszFile, nLine);
-  }
+    UniqueLock(Mutex& mutexIn, const char* pszName, const char* pszFile, int nLine, bool fTry = false) EXCLUSIVE_LOCK_FUNCTION(mutexIn) : Base(mutexIn, std::defer_lock)
+    {
+        if (fTry)
+            TryEnter(pszName, pszFile, nLine);
+        else
+            Enter(pszName, pszFile, nLine);
+    }
 
-  UniqueLock(Mutex* pmutexIn, const char* pszName, const char* pszFile, int nLine, bool fTry = false) EXCLUSIVE_LOCK_FUNCTION(pmutexIn)
-  {
-      if (!pmutexIn) return;
+    UniqueLock(Mutex* pmutexIn, const char* pszName, const char* pszFile, int nLine, bool fTry = false) EXCLUSIVE_LOCK_FUNCTION(pmutexIn)
+    {
+        if (!pmutexIn) return;
 
-      *static_cast<Base*>(this) = Base(*pmutexIn, std::defer_lock);
-      if (fTry)
-          TryEnter(pszName, pszFile, nLine);
-      else
-          Enter(pszName, pszFile, nLine);
-  }
+        *static_cast<Base*>(this) = Base(*pmutexIn, std::defer_lock);
+        if (fTry)
+            TryEnter(pszName, pszFile, nLine);
+        else
+            Enter(pszName, pszFile, nLine);
+    }
 
-  ~UniqueLock() UNLOCK_FUNCTION()
-  {
-      if (Base::owns_lock())
-          LeaveCritical();
-  }
+    ~UniqueLock() UNLOCK_FUNCTION()
+    {
+        if (Base::owns_lock())
+            LeaveCritical();
+    }
 
-  operator bool()
-  {
-      return Base::owns_lock();
-  }
+    operator bool()
+    {
+        return Base::owns_lock();
+    }
 };
 
 template<typename MutexArg>
@@ -201,97 +201,97 @@ using DebugLock = UniqueLock<typename std::remove_reference<typename std::remove
 class CSemaphore
 {
 private:
-  std::condition_variable condition;
-  std::mutex mutex;
-  int value;
+    std::condition_variable condition;
+    std::mutex mutex;
+    int value;
 
 public:
-  explicit CSemaphore(int init) : value(init) {}
+    explicit CSemaphore(int init) : value(init) {}
 
-  void wait()
-  {
-      std::unique_lock<std::mutex> lock(mutex);
-      condition.wait(lock, [&]() { return value >= 1; });
-      value--;
-  }
+    void wait()
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        condition.wait(lock, [&]() { return value >= 1; });
+        value--;
+    }
 
-  bool try_wait()
-  {
-      std::lock_guard<std::mutex> lock(mutex);
-      if (value < 1)
-          return false;
-      value--;
-      return true;
-  }
+    bool try_wait()
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (value < 1)
+            return false;
+        value--;
+        return true;
+    }
 
-  void post()
-  {
-      {
-          std::lock_guard<std::mutex> lock(mutex);
-          value++;
-      }
-      condition.notify_one();
-  }
+    void post()
+    {
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            value++;
+        }
+        condition.notify_one();
+    }
 };
 
 /** RAII-style semaphore lock */
 class CSemaphoreGrant
 {
 private:
-  CSemaphore* sem;
-  bool fHaveGrant;
+    CSemaphore* sem;
+    bool fHaveGrant;
 
 public:
-  void Acquire()
-  {
-      if (fHaveGrant)
-          return;
-      sem->wait();
-      fHaveGrant = true;
-  }
+    void Acquire()
+    {
+        if (fHaveGrant)
+            return;
+        sem->wait();
+        fHaveGrant = true;
+    }
 
-  void Release()
-  {
-      if (!fHaveGrant)
-          return;
-      sem->post();
-      fHaveGrant = false;
-  }
+    void Release()
+    {
+        if (!fHaveGrant)
+            return;
+        sem->post();
+        fHaveGrant = false;
+    }
 
-  bool TryAcquire()
-  {
-      if (!fHaveGrant && sem->try_wait())
-          fHaveGrant = true;
-      return fHaveGrant;
-  }
+    bool TryAcquire()
+    {
+        if (!fHaveGrant && sem->try_wait())
+            fHaveGrant = true;
+        return fHaveGrant;
+    }
 
-  void MoveTo(CSemaphoreGrant& grant)
-  {
-      grant.Release();
-      grant.sem = sem;
-      grant.fHaveGrant = fHaveGrant;
-      fHaveGrant = false;
-  }
+    void MoveTo(CSemaphoreGrant& grant)
+    {
+        grant.Release();
+        grant.sem = sem;
+        grant.fHaveGrant = fHaveGrant;
+        fHaveGrant = false;
+    }
 
-  CSemaphoreGrant() : sem(nullptr), fHaveGrant(false) {}
+    CSemaphoreGrant() : sem(nullptr), fHaveGrant(false) {}
 
-  explicit CSemaphoreGrant(CSemaphore& sema, bool fTry = false) : sem(&sema), fHaveGrant(false)
-  {
-      if (fTry)
-          TryAcquire();
-      else
-          Acquire();
-  }
+    explicit CSemaphoreGrant(CSemaphore& sema, bool fTry = false) : sem(&sema), fHaveGrant(false)
+    {
+        if (fTry)
+            TryAcquire();
+        else
+            Acquire();
+    }
 
-  ~CSemaphoreGrant()
-  {
-      Release();
-  }
+    ~CSemaphoreGrant()
+    {
+        Release();
+    }
 
-  operator bool() const
-  {
-      return fHaveGrant;
-  }
+    operator bool() const
+    {
+        return fHaveGrant;
+    }
 };
 
 #endif // BITCOIN_SYNC_H

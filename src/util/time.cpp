@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2016-2017 The PIVX developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -15,7 +14,6 @@
 #include <boost/thread.hpp>
 #include <ctime>
 #include <tinyformat.h>
-
 
 static std::atomic<int64_t> nMockTime(0); //!< For unit testing
 
@@ -39,11 +37,10 @@ int64_t GetMockTime()
     return nMockTime.load(std::memory_order_relaxed);
 }
 
-
 int64_t GetTimeMillis()
 {
     int64_t now = (boost::posix_time::microsec_clock::universal_time() -
-        boost::posix_time::ptime(boost::gregorian::date(1970,1,1))).total_milliseconds();
+                   boost::posix_time::ptime(boost::gregorian::date(1970,1,1))).total_milliseconds();
     assert(now > 0);
     return now;
 }
@@ -51,7 +48,7 @@ int64_t GetTimeMillis()
 int64_t GetTimeMicros()
 {
     int64_t now = (boost::posix_time::microsec_clock::universal_time() -
-        boost::posix_time::ptime(boost::gregorian::date(1970,1,1))).total_microseconds();
+                   boost::posix_time::ptime(boost::gregorian::date(1970,1,1))).total_microseconds();
     assert(now > 0);
     return now;
 }
