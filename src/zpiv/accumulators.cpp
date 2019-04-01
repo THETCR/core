@@ -492,7 +492,7 @@ int SearchMintHeightOf(CBigNum value){
 
     CTransaction txMinted;
     uint256 hashBlock;
-    if (!GetTransaction(txid, txMinted, hashBlock))
+    if (!GetTransaction(txid, txMinted, Params().GetConsensus(), hashBlock))
         throw searchMintHeightException("searchForMintHeightOf:: failed to read tx");
 
     int nHeightTest;
