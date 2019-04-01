@@ -41,7 +41,7 @@ uint32_t GetChecksum(const CBigNum &bnValue)
 // Find the first occurance of a certain accumulator checksum. Return 0 if not found.
 int GetChecksumHeight(uint32_t nChecksum, CoinDenomination denomination)
 {
-    CBlockIndex* pindex = chainActive[Params().Zerocoin_StartHeight()];
+    CBlockIndex* pindex = chainActive[Params().NEW_PROTOCOLS_STARTHEIGHT()];
     if (!pindex)
         return 0;
 
@@ -93,7 +93,7 @@ bool GetAccumulatorValueFromDB(uint256 nCheckpoint, CoinDenomination denom, CBig
 void AddAccumulatorChecksum(const uint32_t nChecksum, const CBigNum &bnValue)
 {
     //Since accumulators are switching at v2, stop databasing v1 because its useless. Only focus on v2.
-    if (chainActive.Height() >= Params().Zerocoin_Block_V2_Start()) {
+    if (chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
         zerocoinDB->WriteAccumulatorValue(nChecksum, bnValue);
         mapAccumulatorValues.insert(make_pair(nChecksum, bnValue));
     }
@@ -147,7 +147,7 @@ bool LoadAccumulatorValuesFromDB(const uint256 nCheckpoint)
         if (!zerocoinDB->ReadAccumulatorValue(nChecksum, bnValue)) {
             if (!count(listAccCheckpointsNoDB.begin(), listAccCheckpointsNoDB.end(), nCheckpoint))
                 listAccCheckpointsNoDB.push_back(nCheckpoint);
-            LogPrint("zero", "%s : Missing databased value for checksum %d", __func__, nChecksum);
+            LogPrint(BCLog::ZERO, "%s : Missing databased value for checksum %d", __func__, nChecksum);
             return false;
         }
         mapAccumulatorValues.insert(make_pair(nChecksum, bnValue));
@@ -289,7 +289,7 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
             return error("%s: failed to get zerocoin mintlist from block %d", __func__, pindex->nHeight);
 
         nTotalMintsFound += listPubcoins.size();
-        LogPrint("zero", "%s found %d mints\n", __func__, listPubcoins.size());
+        LogPrint(BCLog::ZERO, "%s found %d mints\n", __func__, listPubcoins.size());
 
         //add the pubcoins to accumulator
         for (const PublicCoin& pubcoin : listPubcoins) {
@@ -305,7 +305,7 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
     else
         nCheckpoint = mapAccumulators.GetCheckpoint();
 
-    LogPrint("zero", "%s checkpoint=%s\n", __func__, nCheckpoint.GetHex());
+    LogPrint(BCLog::ZERO, "%s checkpoint=%s\n", __func__, nCheckpoint.GetHex());
     return true;
 }
 
@@ -509,7 +509,7 @@ void AccumulateRange(CoinWitnessData* coinWitness, int nHeightEnd)
     int nHeightStart = std::max(coinWitness->nHeightAccStart, coinWitness->nHeightAccEnd + 1);
     CBlockIndex* pindex = chainActive[nHeightStart];
 
-    LogPrint("zero", "%s: start=%d end=%d\n", __func__, nHeightStart, nHeightEnd);
+    LogPrint(BCLog::ZERO, "%s: start=%d end=%d\n", __func__, nHeightStart, nHeightEnd);
     while (pindex && pindex->nHeight <= nHeightEnd) {
         coinWitness->nMintsAdded += AddBlockMintsToAccumulator(coinWitness, pindex, true);
         coinWitness->nHeightAccEnd = pindex->nHeight;
@@ -532,9 +532,9 @@ bool GenerateAccumulatorWitness(CoinWitnessData* coinWitness, AccumulatorMap& ma
 {
     try {
         // Lock
-        LogPrint("zero", "%s: generating\n", __func__);
+        LogPrint(BCLog::ZERO, "%s: generating\n", __func__);
         if (!LockMethod()) return false;
-        LogPrint("zero", "%s: after lock\n", __func__);
+        LogPrint(BCLog::ZERO, "%s: after lock\n", __func__);
 
         int64_t nTimeStart = GetTimeMicros();
 
@@ -565,7 +565,7 @@ bool GenerateAccumulatorWitness(CoinWitnessData* coinWitness, AccumulatorMap& ma
         if (pindexCheckpoint) {
             nHeightStop = pindexCheckpoint->nHeight - 10;
             nHeightStop -= nHeightStop % 10;
-            LogPrint("zero", "%s: using checkpoint height %d\n", __func__, pindexCheckpoint->nHeight);
+            LogPrint(BCLog::ZERO, "%s: using checkpoint height %d\n", __func__, pindexCheckpoint->nHeight);
         } else {
             nHeightStop = nHeightMax;
         }
@@ -584,7 +584,7 @@ bool GenerateAccumulatorWitness(CoinWitnessData* coinWitness, AccumulatorMap& ma
 
         // calculate how many mints of this denomination existed in the accumulator we initialized
         coinWitness->nMintsAdded += ComputeAccumulatedCoins(coinWitness->nHeightAccStart, coinWitness->denom);
-        LogPrint("zero", "%s : %d mints added to witness\n", __func__, coinWitness->nMintsAdded);
+        LogPrint(BCLog::ZERO, "%s : %d mints added to witness\n", __func__, coinWitness->nMintsAdded);
 
         int64_t nTime1 = GetTimeMicros();
         LogPrint("bench", "        - Witness generated in %.2fms\n", 0.001 * (nTime1 - nTimeStart));
@@ -786,7 +786,7 @@ bool CalculateAccumulatorWitnessFor(
 
         // calculate how many mints of this denomination existed in the accumulator we initialized
         nMintsAdded += ComputeAccumulatedCoins(startHeight, den);
-        LogPrint("zero", "%s : %d mints added to witness\n", __func__, nMintsAdded);
+        LogPrint(BCLog::ZERO, "%s : %d mints added to witness\n", __func__, nMintsAdded);
 
         return true;
 
@@ -807,9 +807,9 @@ bool GenerateAccumulatorWitness(
 {
     try {
         // Lock
-        LogPrint("zero", "%s: generating\n", __func__);
+        LogPrint(BCLog::ZERO, "%s: generating\n", __func__);
         if (!LockMethod()) return false;
-        LogPrint("zero", "%s: after lock\n", __func__);
+        LogPrint(BCLog::ZERO, "%s: after lock\n", __func__);
 
         int nHeightMintAdded = SearchMintHeightOf(coin.getValue());
         //get the checkpoint added at the next multiple of 10
@@ -872,7 +872,7 @@ bool GenerateAccumulatorWitness(
 
         // calculate how many mints of this denomination existed in the accumulator we initialized
         nMintsAdded += ComputeAccumulatedCoins(nAccStartHeight, coin.getDenomination());
-        LogPrint("zero", "%s : %d mints added to witness\n", __func__, nMintsAdded);
+        LogPrint(BCLog::ZERO, "%s : %d mints added to witness\n", __func__, nMintsAdded);
 
         return true;
 
