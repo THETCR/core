@@ -5,8 +5,8 @@
 #include <streams.h>
 #include "zerocoin.h"
 #include "hash.h"
-#include "util.h"
-#include "utilstrencodings.h"
+#include <util/system.h>
+#include <util/strencodings.h>
 
 bool CMintMeta::operator <(const CMintMeta& a) const
 {
