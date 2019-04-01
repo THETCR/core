@@ -153,6 +153,12 @@ public:
         return MakeUnique<BerkeleyDatabase>(std::make_shared<BerkeleyEnvironment>(), "");
     }
 
+    /** Return object for accessing temporary in-memory database. */
+    static std::unique_ptr<BerkeleyDatabase> CreatePrecompute()
+    {
+        return MakeUnique<BerkeleyDatabase>(std::make_shared<BerkeleyEnvironment>(), "precomputes.dat");
+    }
+
     /** Rewrite the entire database on disk, with the exception of key pszSkip if non-zero
      */
     bool Rewrite(const char* pszSkip=nullptr);

@@ -63,6 +63,7 @@ namespace BCLog {
         ALERT       = (1 << 28),
         POS         = (1 << 29),
         SPORK         = (1 << 30),
+        PRECOMPUTE         = (1 << 31),
         ALL         = ~(uint32_t)0,
     };
 

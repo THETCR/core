@@ -59,6 +59,7 @@
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/thread.hpp>
 
 using namespace std;
 /**
@@ -4305,6 +4306,7 @@ bool CWallet::Verify(interfaces::Chain& chain, const WalletLocation& location, b
 
     // Keep same database environment instance across Verify/Recover calls below.
     std::unique_ptr<WalletDatabase> database = WalletDatabase::Create(wallet_path);
+    std::unique_ptr<WalletDatabase> pc_database = WalletDatabase::CreatePrecompute();
 
     try {
         if (!WalletBatch::VerifyEnvironment(wallet_path, error_string)) {
@@ -7689,20 +7691,20 @@ bool CWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransa
 bool CWallet::CheckCoinSpend(libzerocoin::CoinSpend& spend, libzerocoin::Accumulator& accumulator, CZerocoinSpendReceipt& receipt)
 {
     if (!spend.Verify(accumulator)) {
-        receipt.SetStatus(_("The transaction did not verify"), ZPIV_BAD_SERIALIZATION);
+        receipt.SetStatus(_("The transaction did not verify"), ZWSP_BAD_SERIALIZATION);
         return error("%s : The transaction did not verify", __func__);
     }
 
     if (Params().NetworkID() != CBaseChainParams::REGTEST && IsSerialKnown(spend.getCoinSerialNumber())) {
         //Tried to spend an already spent zPIV
-        receipt.SetStatus(_("The coin spend has been used"), ZPIV_SPENT_USED_ZPIV);
+        receipt.SetStatus(_("The coin spend has been used"), ZWSP_SPENT_USED_ZWSP);
         uint256 hashSerial = GetSerialHash(spend.getCoinSerialNumber());
-        if(!zpivTracker->HasSerialHash(hashSerial))
+        if(!zwspTracker->HasSerialHash(hashSerial))
             return error("%s: serialhash %s not found in tracker", __func__, hashSerial.GetHex());
 
-        CMintMeta meta = zpivTracker->Get(hashSerial);
+        CMintMeta meta = zwspTracker->Get(hashSerial);
         meta.isUsed = true;
-        if (!zpivTracker->UpdateState(meta))
+        if (!zwspTracker->UpdateState(meta))
             LogPrintf("%s: failed to write zerocoinmint\n", __func__);
 
         return false;
@@ -7728,14 +7730,14 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
                                  CZerocoinSpendReceipt& receipt, libzerocoin::SpendType spendType, CBlockIndex* pindexCheckpoint)
 {
     // Default error status if not changed below
-    receipt.SetStatus(_("Transaction Mint Started"), ZPIV_TXMINT_GENERAL);
+    receipt.SetStatus(_("Transaction Mint Started"), ZWSP_TXMINT_GENERAL);
     libzerocoin::ZerocoinParams* paramsAccumulator = Params().Zerocoin_Params(false);
     AccumulatorMap mapAccumulators(paramsAccumulator);
     int64_t nTimeStart = GetTimeMicros();
 
     int nLockAttempts = 0;
     while (nLockAttempts < 100) {
-        TRY_LOCK(zpivTracker->cs_spendcache, lockSpendcache);
+        TRY_LOCK(zwspTracker->cs_spendcache, lockSpendcache);
         if (!lockSpendcache) {
             fGlobalUnlockSpendCache = true;
             MilliSleep(100);
@@ -7745,8 +7747,8 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
 
         for (auto &it : mapMintsSelected) {
             CZerocoinMint mint = it.second;
-            CMintMeta meta = zpivTracker->Get(GetSerialHash(mint.GetSerialNumber()));
-            CoinWitnessData *coinWitness = zpivTracker->GetSpendCache(meta.hashStake);
+            CMintMeta meta = zwspTracker->Get(GetSerialHash(mint.GetSerialNumber()));
+            CoinWitnessData *coinWitness = zwspTracker->GetSpendCache(meta.hashStake);
 
             if (!coinWitness->nHeightAccEnd) {
                 *coinWitness = CoinWitnessData(mint);
@@ -7756,7 +7758,7 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
             // Generate the witness for each mint being spent
             if (!GenerateAccumulatorWitness(coinWitness, mapAccumulators, pindexCheckpoint)) {
                 receipt.SetStatus(_("Couldn't generate the accumulator witness"),
-                                  ZPIV_FAILED_ACCUMULATOR_INITIALIZATION);
+                                  ZWSP_FAILED_ACCUMULATOR_INITIALIZATION);
                 return error("%s : %s", __func__, receipt.GetStatusMessage());
             }
 
@@ -7768,7 +7770,7 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
             privateCoin.setRandomness(mint.GetRandomness());
             privateCoin.setSerialNumber(mint.GetSerialNumber());
             int64_t nTime2 = GetTimeMicros();
-            LogPrint("bench", "        - CoinSpend constructed in %.2fms\n", 0.001 * (nTime2 - nTime1));
+            LogPrint(BCLog::BENCH, "        - CoinSpend constructed in %.2fms\n", 0.001 * (nTime2 - nTime1));
 
             //Version 2 zerocoins have a privkey associated with them
             uint8_t nVersion = mint.GetVersion();
@@ -7780,7 +7782,7 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
                 privateCoin.setPrivKey(key.GetPrivKey());
             }
             int64_t nTime3 = GetTimeMicros();
-            LogPrint("bench", "        - Signing key set in %.2fms\n", 0.001 * (nTime3 - nTime2));
+            LogPrint(BCLog::BENCH, "        - Signing key set in %.2fms\n", 0.001 * (nTime3 - nTime2));
 
             libzerocoin::Accumulator accumulator = mapAccumulators.GetAccumulator(coinWitness->denom);
             uint32_t nChecksum = GetChecksum(accumulator.getValue());
@@ -7789,14 +7791,14 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
                 return error("%s: could not find checksum used for spend\n", __func__);
 
             int64_t nTime4 = GetTimeMicros();
-            LogPrint("bench", "        - Accumulator value fetched in %.2fms\n", 0.001 * (nTime4 - nTime3));
+            LogPrint(BCLog::BENCH, "        - Accumulator value fetched in %.2fms\n", 0.001 * (nTime4 - nTime3));
 
             try {
                 libzerocoin::CoinSpend spend(paramsCoin, paramsAccumulator, privateCoin, accumulator, nChecksum,
                                              *coinWitness->pWitness, hashTxOut, spendType);
 
                 if (!CheckCoinSpend(spend, accumulator, receipt)) {
-                    receipt.SetStatus(_("CoinSpend: failed check"), ZPIV_SPEND_ERROR);
+                    receipt.SetStatus(_("CoinSpend: failed check"), ZWSP_SPEND_ERROR);
                     return error("%s : %s", __func__, receipt.GetStatusMessage());
                 }
 
@@ -7807,9 +7809,9 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
                 receipt.AddSpend(zcSpend);
 
                 int64_t nTime5 = GetTimeMicros();
-                LogPrint("bench", "        - CoinSpend verified in %.2fms\n", 0.001 * (nTime5 - nTime4));
+                LogPrint(BCLog::BENCH, "        - CoinSpend verified in %.2fms\n", 0.001 * (nTime5 - nTime4));
             } catch (const std::exception &) {
-                receipt.SetStatus(_("CoinSpend: Accumulator witness does not verify"), ZPIV_INVALID_WITNESS);
+                receipt.SetStatus(_("CoinSpend: Accumulator witness does not verify"), ZWSP_INVALID_WITNESS);
                 return error("%s : %s", __func__, receipt.GetStatusMessage());
             }
         }
@@ -7818,14 +7820,14 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
 
     if (nLockAttempts == 100) {
         LogPrintf("%s : could not get lock on cs_spendcache\n", __func__);
-        receipt.SetStatus(_("could not get lock on cs_spendcache"), ZPIV_TXMINT_GENERAL);
+        receipt.SetStatus(_("could not get lock on cs_spendcache"), ZWSP_TXMINT_GENERAL);
         return false;
     }
 
     int64_t nTimeFinished = GetTimeMicros();
-    LogPrint("bench", "    - %s took %.2fms [%.3fms/spend]\n", __func__, 0.001 * (nTimeFinished - nTimeStart), 0.001 * (nTimeFinished - nTimeStart) / mapMintsSelected.size());
+    LogPrint(BCLog::BENCH, "    - %s took %.2fms [%.3fms/spend]\n", __func__, 0.001 * (nTimeFinished - nTimeStart), 0.001 * (nTimeFinished - nTimeStart) / mapMintsSelected.size());
 
-    receipt.SetStatus(_("Spend Valid"), ZPIV_SPEND_OKAY); // Everything okay
+    receipt.SetStatus(_("Spend Valid"), ZWSP_SPEND_OKAY); // Everything okay
 
     return true;
 }
@@ -8495,7 +8497,9 @@ void ThreadPrecomputeSpends()
 {
     boost::this_thread::interruption_point();
     LogPrintf("ThreadPrecomputeSpends started\n");
-    CWallet* pwallet = pwalletMain;
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+
+    CWallet* pwallet = wallets.at(0).get();
     try {
         pwallet->PrecomputeSpends();
         boost::this_thread::interruption_point();
@@ -8512,7 +8516,7 @@ void CWallet::PrecomputeSpends()
     LogPrintf("Precomputer started\n");
     RenameThread("pivx-precomputer");
 
-    CWalletDB walletdb("precomputes.dat", "cr+");
+    WalletBatch walletdb(*pc_database, "cr+");
 
     // Create LRU Cache
     std::list<std::pair<uint256, CoinWitnessCacheData> > item_list;
@@ -8527,7 +8531,7 @@ void CWallet::PrecomputeSpends()
     int64_t nLastCacheCleanUpTime = GetTime();
     int64_t nLastCacheWriteDB = nLastCacheCleanUpTime;
     int nRequiredStakeDepthBuffer = Params().Zerocoin_RequiredStakeDepth() + 10;
-    int nAdjustableCacheLength = GetArg("-precomputecachelength", DEFAULT_PRECOMPUTE_LENGTH);
+    int nAdjustableCacheLength = gArgs.GetArg("-precomputecachelength", DEFAULT_PRECOMPUTE_LENGTH);
 
     // Force the cache length to be divisible by 10
     if (nAdjustableCacheLength % 10)
@@ -8573,7 +8577,7 @@ void CWallet::PrecomputeSpends()
             // Load the precomputes into the LRU cache
             walletdb.LoadPrecomputes(item_list, item_map);
             fLoadedPrecomputesFromDB = true;
-            LogPrint("precompute", "%s: Loaded precomputes from database. Size of lru cache: %d\n", __func__,
+            LogPrint(BCLog::PRECOMPUTE, "%s: Loaded precomputes from database. Size of lru cache: %d\n", __func__,
                      item_map.size());
         }
 
@@ -8586,7 +8590,7 @@ void CWallet::PrecomputeSpends()
             CoinWitnessCacheData tempDataHolder;
 
             {
-                TRY_LOCK(zpivTracker->cs_spendcache, fLocked);
+                TRY_LOCK(zwspTracker->cs_spendcache, fLocked);
                 if (!fLocked)
                     continue;
 
@@ -8602,7 +8606,7 @@ void CWallet::PrecomputeSpends()
 
                 uint256 serialHash = stakeInput->GetSerialHash();
                 setInputHashes.insert(serialHash);
-                CoinWitnessData* witnessData = zpivTracker->GetSpendCache(serialHash);
+                CoinWitnessData* witnessData = zwspTracker->GetSpendCache(serialHash);
 
                 // Initialize nHeightStop so it can be set below
                 int nHeightStop = 0;
@@ -8625,18 +8629,18 @@ void CWallet::PrecomputeSpends()
                                                                        : witnessData->nHeightAccStart) +
                                            nAdjustableCacheLength);
 
-                    LogPrint("precompute", "%s: Got Witness Data from lru cache: %s\n", __func__,
+                    LogPrint(BCLog::PRECOMPUTE, "%s: Got Witness Data from lru cache: %s\n", __func__,
                              witnessData->ToString());
                 } else if (mapDirtyWitnessData.count(serialHash) || walletdb.ReadPrecompute(serialHash, tempDataHolder)) {
                     if (mapDirtyWitnessData.count(serialHash)) {
                         // Get the witness data from the dirty cache if it exists
                         *witnessData = CoinWitnessData(mapDirtyWitnessData.at(serialHash));
-                        LogPrint("precompute", "%s: Got Witness Data from mapDirtyWitnessData: %s\n", __func__,
+                        LogPrint(BCLog::PRECOMPUTE, "%s: Got Witness Data from mapDirtyWitnessData: %s\n", __func__,
                                  witnessData->ToString());
                     } else {
                         // Get the witness data from the database
                         *witnessData = CoinWitnessData(tempDataHolder);
-                        LogPrint("precompute", "%s: Got Witness Data from precompute database: %s\n", __func__,
+                        LogPrint(BCLog::PRECOMPUTE, "%s: Got Witness Data from precompute database: %s\n", __func__,
                                  witnessData->ToString());
                     }
 
@@ -8674,7 +8678,7 @@ void CWallet::PrecomputeSpends()
 
                 CBlockIndex* pindexStop = chainActive[nHeightStop];
                 AccumulatorMap mapAccumulators(Params().Zerocoin_Params(false));
-                LogPrint("precompute","%s: caching mint %s of denom %d start=%d stop=%d end=%s\n", __func__,
+                LogPrint(BCLog::PRECOMPUTE,"%s: caching mint %s of denom %d start=%d stop=%d end=%s\n", __func__,
                          witnessData->coin->getValue().GetHex().substr(0, 6),
                          ZerocoinDenominationToInt(witnessData->denom),
                          witnessData->nHeightAccStart, nHeightStop, witnessData->nHeightAccEnd);
@@ -8728,7 +8732,7 @@ void CWallet::PrecomputeSpends()
 
         // On first load, and every 5 minutes clean up our cache with only valid unspent inputs
         if (fOnFirstLoad || nLastCacheCleanUpTime < GetTime() - PRECOMPUTE_FLUSH_TIME) {
-            LogPrint("precompute", "%s: Cleaning up precompute cache\n", __func__);
+            LogPrint(BCLog::PRECOMPUTE, "%s: Cleaning up precompute cache\n", __func__);
 
             // We only want to clear the cache if we have calculated new witness data
             if (setInputHashes.size()) {
@@ -8770,7 +8774,7 @@ void CWallet::PrecomputeSpends()
                 walletdb.WritePrecompute(item.first, item.second);
             }
 
-            LogPrint("precompute", "%s: Writing precomputes to database. Precomputes size: %d\n", __func__, item_map.size());
+            LogPrint(BCLog::PRECOMPUTE, "%s: Writing precomputes to database. Precomputes size: %d\n", __func__, item_map.size());
             nLastCacheWriteDB = GetTime();
         }
 
@@ -8779,7 +8783,7 @@ void CWallet::PrecomputeSpends()
         if (ShutdownRequested())
             break;
 
-        LogPrint("precompute", "%s: Finished precompute round...\n\n", __func__);
+        LogPrint(BCLog::PRECOMPUTE, "%s: Finished precompute round...\n\n", __func__);
         MilliSleep(5000);
     }
 }
