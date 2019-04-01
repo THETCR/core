@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <test/test_wispr.h>
+#include <wallet/test/wallet_test_fixture.h>
 
 #include <core_io.h>
 #include "libzerocoin/Denominations.h"
@@ -25,7 +26,7 @@
 
 using namespace libzerocoin;
 
-BOOST_AUTO_TEST_SUITE(zerocoin_implementation_tests)
+BOOST_FIXTURE_TEST_SUITE(zerocoin_implementation_tests, WalletTestingSetup)
 
 BOOST_AUTO_TEST_CASE(zcparams_test)
 {
@@ -112,19 +113,6 @@ std::vector<std::pair<std::string, std::string> > vecRawMints = {std::make_pair(
 //create a zerocoin mint from vecsend
 BOOST_AUTO_TEST_CASE(checkzerocoinmint_test)
         {
-            std::string strWalletFile = "unittestwallet.dat";
-//
-    std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
-    WalletLocation m_location = WalletLocation("unittestwallet.dat");
-    BOOST_TEST_PASSPOINT();
-    std::shared_ptr<CWallet> pwallet(new CWallet(*m_chain, m_location, WalletDatabase::CreateMock()));
-    CWallet wallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
-    BOOST_TEST_PASSPOINT();
-    WalletBatch walletdb(pwallet->GetDBHandle(), "cr+");
-    BOOST_TEST_PASSPOINT();
-    CzWSPWallet zWallet(pwallet->chain(), pwallet->GetLocation(), pwallet->GetDBHandle(), *pwallet);
-    BOOST_TEST_PASSPOINT();
-    pwallet->setZWallet(&zWallet);
                 std::cout << "generating privkeys\n";
 
                 //generate a privkey
@@ -543,7 +531,8 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
   CzWSPWallet zWallet(pwallet->chain(), pwallet->GetLocation(), pwallet->GetDBHandle(), *pwallet);
   BOOST_TEST_PASSPOINT();
   zWallet.SetMasterSeed(seedMaster);
-  pwallet->setZWallet(&zWallet);
+    pwallet->setZWallet(&zWallet);
+//    pwallet->zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(pwallet->chain(), pwallet->GetLocation(), pwallet->GetDBHandle(), *pwallet));
 
   int64_t nTimeStart = GetTimeMillis();
   CoinDenomination denom = CoinDenomination::ZQ_FIFTY;
