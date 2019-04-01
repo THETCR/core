@@ -5931,7 +5931,7 @@ UniValue clearspendcache(const JSONRPCRequest& request)
     EnsureWalletIsUnlocked(pwallet);
 
     CzWSPTracker* zwspTracker = pwallet->zwspTracker.get();
-
+    WalletLocation location("precomputes.dat");
     {
         int nTries = 0;
         while (nTries < 100) {
@@ -5939,7 +5939,7 @@ UniValue clearspendcache(const JSONRPCRequest& request)
             if (fLocked) {
                 if (zwspTracker->ClearSpendCache()) {
                     fClearSpendCache = true;
-                    WalletBatch walletdb("precomputes.dat", "cr+");
+                    WalletBatch walletdb(pwallet->GetDBHandle());
                     walletdb.EraseAllPrecomputes();
                     return "Successfully Cleared the Precompute Spend Cache and Database";
                 }
@@ -6829,7 +6829,7 @@ static const CRPCCommand commands[] =
     {"zerocoin", "setzwspseed", &setzwspseed, {}},
     {"zerocoin", "generatemintlist", &generatemintlist, {}},
     {"zerocoin", "searchdzwsp", &searchdzwsp, {}},
-    {"zerocoin", "dzwspstate", &dzwspstate, {}}
+    {"zerocoin", "dzwspstate", &dzwspstate, {}},
     {"zerocoin", "clearspendcache", &clearspendcache, {}}
 
 };
