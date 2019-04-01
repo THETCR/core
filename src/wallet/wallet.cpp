@@ -134,27 +134,19 @@ static void ReleaseWallet(CWallet* wallet)
 {
     // Unregister and delete the wallet right after BlockUntilSyncedToCurrentChain
     // so that it's in sync with the current chainstate.
-    wallet->WalletLogPrintf("ReleaseWallet\n");
     wallet->WalletLogPrintf("Releasing wallet\n");
     wallet->BlockUntilSyncedToCurrentChain();
-    wallet->WalletLogPrintf("ReleaseWallet flush\n");
     wallet->Flush();
-    wallet->WalletLogPrintf("ReleaseWallet m_chain_notifications_handler\n");
     wallet->m_chain_notifications_handler.reset();
-    wallet->WalletLogPrintf("ReleaseWallet delete wallet\n");
     delete wallet;
     // Wallet is now released, notify UnloadWallet, if any.
     {
-        wallet->WalletLogPrintf("ReleaseWallet g_wallet_release_mutex\n");
         LOCK(g_wallet_release_mutex);
-        wallet->WalletLogPrintf("ReleaseWallet g_unloading_wallet_set\n");
         if (g_unloading_wallet_set.erase(wallet) == 0) {
             // UnloadWallet was not called for this wallet, all done.
-            wallet->WalletLogPrintf("ReleaseWallet return\n");
             return;
         }
     }
-    wallet->WalletLogPrintf("ReleaseWallet g_wallet_release_cv\n");
     g_wallet_release_cv.notify_all();
 }
 
