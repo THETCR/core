@@ -284,7 +284,7 @@ std::string CWallet::GenerateNewAutoMintKey()
     std::string btcAddress;
     WalletBatch batch(*database);
     CKeyID keyID = GenerateNewKey(batch).GetID();
-    btcAddress.Set(keyID);
+    btcAddress = EncodeDestination(keyID);
     batch.WriteAutoConvertKey(btcAddress);
     SetAddressBook(keyID, "automint-address", "receive");
     setAutoConvertAddresses.emplace(btcAddress);

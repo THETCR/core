@@ -71,7 +71,7 @@ bool WalletBatch::WriteAutoConvertKey(const std::string& strAddress)
     if (!keyID) {
         return false;
     }
-    return WriteIC(std::make_pair(std::string("automint"), keyID), strAddress);
+    return WriteIC(std::make_pair(std::string("automint"), *keyID), strAddress);
 }
 
 void WalletBatch::LoadAutoConvertKeys(std::set<std::string>& setAddresses)
