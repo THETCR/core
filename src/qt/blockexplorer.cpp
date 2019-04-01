@@ -10,6 +10,7 @@
 #include "guiutil.h"
 #include <validation.h>
 #include <key_io.h>
+#include <primitives/transaction.h>
 #include "net.h"
 #include "txdb.h"
 #include <qt/forms/ui_blockexplorer.h>
@@ -378,7 +379,7 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
     return Content;
 }
 
-std::string AddressToString(const CBitcoinAddress& Address)
+std::string AddressToString(const std::string& Address)
 {
     std::string TxLabels[] =
         {
@@ -426,7 +427,7 @@ std::string AddressToString(const CBitcoinAddress& Address)
     TxContent += "</table>";
 
     std::string Content;
-    Content += "<h1>" + _("Transactions to/from") + "&nbsp;<span>" + Address.ToString() + "</span></h1>";
+    Content += "<h1>" + _("Transactions to/from") + "&nbsp;<span>" + Address + "</span></h1>";
     Content += TxContent;
     return Content;
 }
@@ -518,9 +519,9 @@ bool BlockExplorer::switchTo(const QString& query)
     }
 
     // If the query is not an integer, nor a block hash, nor a transaction hash, assume an address
-    CBitcoinAddress Address;
-    Address.SetString(query.toUtf8().constData());
-    if (Address.IsValid()) {
+    std::string Address;
+    Address = EncodeDestination(query.toUtf8().constData());
+    if (IsValidDestinationString(Address)) {
         std::string Content = AddressToString(Address);
         if (Content.empty())
             return false;
