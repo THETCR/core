@@ -5,6 +5,7 @@
 
 #include "netbase.h"
 #include "masternodeconfig.h"
+#include "chainparams.h"
 #include <util/system.h>
 #include "util/strencodings.h"
 #include "ui_interface.h"

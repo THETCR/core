@@ -9,6 +9,7 @@
 #include "core_io.h"
 #include "guiutil.h"
 #include <validation.h>
+#include <key_io.h>
 #include "net.h"
 #include "txdb.h"
 #include <qt/forms/ui_blockexplorer.h>
@@ -60,12 +61,12 @@ static std::string ScriptToString(const CScript& Script, bool Long = false, bool
         return "unknown";
 
     CTxDestination Dest;
-    CBitcoinAddress Address;
-    if (ExtractDestination(Script, Dest) && Address.Set(Dest)) {
+    if (ExtractDestination(Script, Dest)) {
+        std::string Address = EncodeDestination(Dest);
         if (Highlight)
-            return "<span class=\"addr\">" + Address.ToString() + "</span>";
+            return "<span class=\"addr\">" + Address + "</span>";
         else
-            return makeHRef(Address.ToString());
+            return makeHRef(Address);
     } else
         return Long ? "<pre>" + FormatScript(Script) + "</pre>" : _("Non-standard script");
 }
