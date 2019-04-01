@@ -12,6 +12,7 @@
 #include "coincontroldialog.h"
 #include "libzerocoin/Denominations.h"
 #include "optionsmodel.h"
+#include <key_io.h>
 #include "sendcoinsentry.h"
 #include "walletmodel.h"
 #include <wallet/coincontrol.h>
@@ -319,12 +320,12 @@ void PrivacyDialog::sendzWSP()
     QSettings settings;
 
     // Handle 'Pay To' address options
-    CBitcoinAddress address(ui->payTo->text().toStdString());
+    CTxDestination address = DecodeDestination(ui->payTo->text().toStdString());
     if(ui->payTo->text().isEmpty()){
         QMessageBox::information(this, tr("Spend Zerocoin"), tr("No 'Pay To' address provided, creating local payment"), QMessageBox::Ok, QMessageBox::Ok);
     }
     else{
-        if (!address.IsValid()) {
+        if (!IsValidDestination(address)) {
             QMessageBox::warning(this, tr("Spend Zerocoin"), tr("Invalid Wispr Address"), QMessageBox::Ok, QMessageBox::Ok);
             ui->payTo->setFocus();
             return;
@@ -383,7 +384,7 @@ void PrivacyDialog::sendzWSP()
     // General info
     QString strQuestionString = tr("Are you sure you want to send?<br /><br />");
     QString strAmount = "<b>" + QString::number(dAmount, 'f', 8) + " zWSP</b>";
-    QString strAddress = tr(" to address ") + QString::fromStdString(address.ToString()) + strAddressLabel + " <br />";
+    QString strAddress = tr(" to address ") + QString::fromStdString(address) + strAddressLabel + " <br />";
 
     if(ui->payTo->text().isEmpty()){
         // No address provided => send to local address
@@ -494,7 +495,7 @@ void PrivacyDialog::sendzWSP()
         if(txout.scriptPubKey.IsZerocoinMint())
             strStats += tr("zWSP Mint");
         else if(ExtractDestination(txout.scriptPubKey, dest))
-            strStats += tr(CBitcoinAddress(dest).ToString().c_str());
+            strStats += tr(EncodeDestination(dest).c_str());
         strStats += "\n";
     }
     double fDuration = (double)(GetTimeMillis() - nTime)/1000.0;
