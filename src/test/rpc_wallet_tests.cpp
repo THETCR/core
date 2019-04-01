@@ -11,6 +11,7 @@
 #include <wallet/wallet.h>
 
 #include <test/test_wispr.h>
+#include <wallet/test/wallet_test_fixture.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
@@ -20,7 +21,7 @@
 extern JSONRPCRequest createArgs(int nRequired, const char* address1 = nullptr, const char* address2 = nullptr);
 extern UniValue CallRPC(string args);
 
-BOOST_FIXTURE_TEST_SUITE(rpc_wallet_tests, TestingSetup)
+BOOST_FIXTURE_TEST_SUITE(rpc_wallet_tests, WalletTestingSetup)
 
 BOOST_AUTO_TEST_CASE(rpc_addmultisig)
 {
