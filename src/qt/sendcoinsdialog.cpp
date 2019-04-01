@@ -795,9 +795,10 @@ void SendCoinsDialog::updateMinFeeLabel()
     coin_control.m_feerate.reset(); // Explicitly use only fee estimation rate for smart fee labels
     int returned_target;
     FeeReason reason;
-    if (model && model->getOptionsModel())
-        CFeeRate feeRate = CFeeRate(model->wallet().getMinimumFee(1000, coin_control, &returned_target, &reason));
+    if (model && model->getOptionsModel()){
+         CFeeRate feeRate = CFeeRate(model->wallet().getMinimumFee(1000, coin_control, &returned_target, &reason));
          ui->checkBoxMinimumFee->setText(tr("Pay only the minimum fee of %1").arg(BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), feeRate.GetFeePerK()) + "/kB"));
+    }
 }
 
 void SendCoinsDialog::updateCoinControlState(CCoinControl& ctrl)
