@@ -7,6 +7,7 @@
 #include "masternode.h"
 #include "addrman.h"
 #include "masternodeman.h"
+#include "key_io.h"
 #include "obfuscation.h"
 #include <net_processing.h>
 #include "shutdown.h"
@@ -437,7 +438,7 @@ bool CMasternodeBroadcast::Create(CTxIn txin, CService service, CKey keyCollater
     if (fImporting || fReindex) return false;
 
     LogPrint(BCLog::MASTERNODE, "CMasternodeBroadcast::Create -- pubKeyCollateralAddressNew = %s, pubKeyMasternodeNew.GetID() = %s\n",
-        CBitcoinAddress(pubKeyCollateralAddressNew.GetID()).ToString(),
+        EncodeDestination(pubKeyCollateralAddressNew.GetID()),
         pubKeyMasternodeNew.GetID().ToString());
 
     CMasternodePing mnp(txin);

@@ -8,6 +8,7 @@
 #include "masternode-sync.h"
 #include "masternode.h"
 #include "masternodeman.h"
+#include "key_io.h"
 #include <net_processing.h>
 #include "obfuscation.h"
 #include <util/system.h>
@@ -577,8 +578,8 @@ void CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, CAmount nFees, b
 
             CTxDestination address1;
             ExtractDestination(payee, address1);
-            CBitcoinAddress address2(address1);
-            LogPrint(BCLog::MNBUDGET,"CBudgetManager::FillBlockPayee - Budget payment to %s for %lld, nHighestCount = %d\n", address2.ToString(), nAmount, nHighestCount);
+            std::string address2 = EncodeDestination(address1);
+            LogPrint(BCLog::MNBUDGET,"CBudgetManager::FillBlockPayee - Budget payment to %s for %lld, nHighestCount = %d\n", address2, nAmount, nHighestCount);
         }
         else {
             LogPrint(BCLog::MNBUDGET,"CBudgetManager::FillBlockPayee - No Budget payment, nHighestCount = %d\n", nHighestCount);
@@ -596,9 +597,9 @@ void CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, CAmount nFees, b
 
             CTxDestination address1;
             ExtractDestination(payee, address1);
-            CBitcoinAddress address2(address1);
+            std::string address2 = EncodeDestination(address1);
 
-            LogPrint(BCLog::MNBUDGET,"CBudgetManager::FillBlockPayee - Budget payment to %s for %lld\n", address2.ToString(), nAmount);
+            LogPrint(BCLog::MNBUDGET,"CBudgetManager::FillBlockPayee - Budget payment to %s for %lld\n", address2, nAmount);
         }
     }
 }
@@ -2161,10 +2162,10 @@ TrxValidationStatus CFinalizedBudget::IsTransactionValid(const CTransaction& txN
     if (transactionStatus == TrxValidationStatus::InValid) {
         CTxDestination address1;
         ExtractDestination(vecBudgetPayments[nCurrentBudgetPayment].payee, address1);
-        CBitcoinAddress address2(address1);
+        std::string address2 = EncodeDestination(address1);
 
         LogPrint(BCLog::MNBUDGET,"CFinalizedBudget::IsTransactionValid - Missing required payment - %s: %d c: %d\n",
-                  address2.ToString(), vecBudgetPayments[nCurrentBudgetPayment].nAmount, nCurrentBudgetPayment);
+                  address2, vecBudgetPayments[nCurrentBudgetPayment].nAmount, nCurrentBudgetPayment);
     }
 
     return transactionStatus;

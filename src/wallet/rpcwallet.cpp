@@ -4296,7 +4296,7 @@ UniValue printAddresses(CWallet * const pwallet)
     for (const COutput& out: vCoins) {
         CTxDestination utxoAddress;
         ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, utxoAddress);
-        std::string strAdd = CBitcoinAddress(utxoAddress).ToString();
+        std::string strAdd = EncodeDestination(utxoAddress);
 
         if (mapAddresses.find(strAdd) == mapAddresses.end()) //if strAdd is not already part of the map
             mapAddresses[strAdd] = (double)out.tx->tx->vout[out.i].nValue / (double)COIN;
@@ -4366,7 +4366,7 @@ UniValue multisend(const JSONRPCRequest& request)
             if (pwallet->vMultiSend.size() < 1)
                 throw JSONRPCError(RPC_INVALID_REQUEST, "Unable to activate MultiSend, check MultiSend vector");
 
-            if (CBitcoinAddress(pwallet->vMultiSend[0].first).IsValid()) {
+            if (IsValidDestinationString(pwallet->vMultiSend[0].first)) {
                 pwallet->fMultiSendStake = true;
                 if (!walletdb.WriteMSettings(true, pwallet->fMultiSendMasternodeReward, pwallet->nLastMultiSendHeight)) {
                     UniValue obj(UniValue::VOBJ);
@@ -4384,7 +4384,7 @@ UniValue multisend(const JSONRPCRequest& request)
             if (pwallet->vMultiSend.size() < 1)
                 throw JSONRPCError(RPC_INVALID_REQUEST, "Unable to activate MultiSend, check MultiSend vector");
 
-            if (CBitcoinAddress(pwallet->vMultiSend[0].first).IsValid()) {
+            if (IsValidDestinationString(pwallet->vMultiSend[0].first)) {
                 pwallet->fMultiSendMasternodeReward = true;
 
                 if (!walletdb.WriteMSettings(pwallet->fMultiSendStake, true, pwallet->nLastMultiSendHeight)) {
@@ -4427,7 +4427,7 @@ UniValue multisend(const JSONRPCRequest& request)
     }
     if (request.params.size() == 2 && request.params[0].get_str() == "disable") {
         std::string disAddress = request.params[1].get_str();
-        if (!CBitcoinAddress(disAddress).IsValid())
+        if (!IsValidDestinationString(disAddress))
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "address you want to disable is not valid");
         else {
             pwallet->vDisabledAddresses.push_back(disAddress);
@@ -4468,8 +4468,8 @@ UniValue multisend(const JSONRPCRequest& request)
 
     //if the user is entering a new MultiSend item
     std::string strAddress = request.params[0].get_str();
-    CBitcoinAddress address(strAddress);
-    if (!address.IsValid())
+    std::string address = strAddress;
+    if (!IsValidDestinationString(address))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WSP address");
     if (std::stoi(request.params[1].get_str().c_str()) < 0)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");
@@ -4834,14 +4834,14 @@ UniValue mintzerocoin(const JSONRPCRequest& request)
 static UniValue DoZwspSpend(CWallet * const pwallet, const CAmount nAmount, bool fMintChange, bool fMinimizeChange, std::vector<CZerocoinMint>& vMintsSelected, std::string address_str)
 {
     int64_t nTimeStart = GetTimeMillis();
-    CBitcoinAddress address = CBitcoinAddress(); // Optional sending address. Dummy initialization here.
+    std::string address = std::string(); // Optional sending address. Dummy initialization here.
     CWalletTx wtx;
     CZerocoinSpendReceipt receipt;
     bool fSuccess;
 
     if(address_str != "") { // Spend to supplied destination address
-        address = CBitcoinAddress(address_str);
-        if(!address.IsValid())
+        address = address_str;
+        if(!IsValidDestinationString(address))
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WISPR address");
         fSuccess = pwallet->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, &address);
     } else                   // Spend to newly generated local address
@@ -4875,7 +4875,7 @@ static UniValue DoZwspSpend(CWallet * const pwallet, const CAmount nAmount, bool
         if(txout.scriptPubKey.IsZerocoinMint())
             out.pushKV("address", "zerocoinmint");
         else if(ExtractDestination(txout.scriptPubKey, dest))
-            out.pushKV("address", CBitcoinAddress(dest).ToString());
+            out.pushKV("address", EncodeDestination(dest));
         vout.push_back(out);
     }
 
@@ -5045,11 +5045,11 @@ UniValue spendzerocoinmints(const JSONRPCRequest& request)
         nAmount += mint.GetDenominationAsAmount();
     }
 
-    CBitcoinAddress address = CBitcoinAddress(); // Optional sending address. Dummy initialization here.
+    std::string address = std::string(); // Optional sending address. Dummy initialization here.
     if (request.params.size() == 4) {
         // Destination address was supplied as params[4]. Optional parameters MUST be at the end
         // to avoid type confusion from the JSON interpreter
-        address = CBitcoinAddress(request.params[3].get_str());
+        address = std::string(request.params[3].get_str());
         if(!address.IsValid())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid PIVX address");
     }
@@ -5788,7 +5788,7 @@ UniValue createautomintaddress(const JSONRPCRequest& request)
 
     EnsureWalletIsUnlocked(pwallet);
     LOCK(pwallet->cs_wallet);
-    CBitcoinAddress address = pwallet->GenerateNewAutoMintKey();
+    std::string address = pwallet->GenerateNewAutoMintKey();
     return address.ToString();
 }
 
@@ -5990,18 +5990,18 @@ UniValue getaccount(const JSONRPCRequest& request)
 
     LOCK2(cs_main, pwallet->cs_wallet);
 
-    CBitcoinAddress address(request.params[0].get_str());
-    if (!address.IsValid())
+    std::string address = request.params[0].get_str();
+    if (!IsValidDestinationString(address))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WISPR address");
 
     std::string strAccount;
-    map<CTxDestination, CAddressBookData>::iterator mi = pwallet->mapAddressBook.find(address.Get());
+    map<CTxDestination, CAddressBookData>::iterator mi = pwallet->mapAddressBook.find(address);
     if (mi != pwallet->mapAddressBook.end() && !(*mi).second.name.empty())
         strAccount = (*mi).second.name;
     return strAccount;
 }
 
-CBitcoinAddress GetAccountAddress(CWallet * const pwallet, string strAccount, bool bForceNew = false)
+std::string GetAccountAddress(CWallet * const pwallet, string strAccount, bool bForceNew = false)
 {
     WalletBatch walletdb(pwallet->GetDBHandle());
 
@@ -6032,7 +6032,7 @@ CBitcoinAddress GetAccountAddress(CWallet * const pwallet, string strAccount, bo
         walletdb.WriteAccount(strAccount, account);
     }
 
-    return CBitcoinAddress(account.vchPubKey.GetID());
+    return EncodeDestination(account.vchPubKey.GetID());
 }
 
 UniValue getaccountaddress(const JSONRPCRequest& request)
@@ -6306,8 +6306,8 @@ UniValue sendfrom(const JSONRPCRequest& request)
     LOCK(pwallet->cs_wallet);
 
     std::string strAccount = LabelFromValue(request.params[0]);
-    CBitcoinAddress address(request.params[1].get_str());
-    if (!address.IsValid())
+    std::string address = request.params[1].get_str();
+    if (!IsValidDestinationString(address))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WISPR address");
     CAmount nAmount = AmountFromValue(request.params[2]);
     int nMinDepth = 1;
