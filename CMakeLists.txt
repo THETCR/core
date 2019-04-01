@@ -31,8 +31,9 @@ set(BDBXX_LIBRARY D:/Development/Libraries/CPP/bdb/lib/libdb48d.lib)
 set(ZMQ_LIBRARY D:/Development/Libraries/CPP/ZeroMQ 4.0.4/lib/libzmq-v120-mt-4_0_4.lib)
 set(ZMQ_INCLUDE_DIR D:/Development/Libraries/CPP/ZeroMQ 4.0.4/include)
 set(SHLWAPI_INCLUDE_DIR D:/Development/Compilers/C++/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/include)
-set(GMP_INCLUDE_DIR D:/Development/Libraries/CPP/gmp/include)
-set(GMP_LIBRARY D:/Development/Libraries/CPP/gmp/include/libgmp-10.dll)
+set(GMP_INCLUDE_DIRS D:/Development/Libraries/CPP/gmp/include)
+set(GMP_DIR D:/Development/Libraries/CPP/gmp)
+set(GMP_LIBRARIES D:/Development/Libraries/CPP/gmp/include/libgmp-10.dll)
 set(GMPXX_LIBRARY D:/Development/Libraries/CPP/gmp/cxx/libgmpxx-4.dll)
 set(Protobuf_LIBRARIES D:/Development/Libraries/CPP/protoc/lib/libprotobuf.lib)
 set(Protobuf_INCLUDE_DIR D:/Development/Libraries/CPP/protoc/include)
@@ -62,6 +63,7 @@ add_custom_target(check)
 #Libraries to link to. The :: is for convenience
 set(QT_LIBRARIES Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Test Qt5::Network)
 find_package(Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test CONFIG REQUIRED )
+find_package(GMP REQUIRED)
 
 include_directories(
         src
@@ -95,6 +97,7 @@ endif()
 
 add_definitions(
         -DENABLE_WALLET=1
+        -DUSE_NUM_GMP=1
 )
 
 file(GLOB SOURCE_FILES
