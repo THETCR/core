@@ -490,7 +490,7 @@ int SearchMintHeightOf(CBigNum value){
     if (!zerocoinDB->ReadCoinMint(value, txid))
         throw searchMintHeightException("searchForMintHeightOf:: failed to read mint from db");
 
-    CTransaction txMinted;
+    CTransactionRef txMinted;
     uint256 hashBlock;
     if (!GetTransaction(txid, txMinted, Params().GetConsensus(), hashBlock))
         throw searchMintHeightException("searchForMintHeightOf:: failed to read tx");
