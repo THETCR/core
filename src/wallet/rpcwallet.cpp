@@ -5049,8 +5049,8 @@ UniValue spendzerocoinmints(const JSONRPCRequest& request)
     if (request.params.size() == 4) {
         // Destination address was supplied as params[4]. Optional parameters MUST be at the end
         // to avoid type confusion from the JSON interpreter
-        address = std::string(request.params[3].get_str());
-        if(!address.IsValid())
+        address = request.params[3].get_str();
+        if(!IsValidDestinationString(address))
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid PIVX address");
     }
 
@@ -5417,10 +5417,8 @@ UniValue importzerocoins(const JSONRPCRequest& request)
         CPrivKey privkey;
         if (nVersion >= libzerocoin::PrivateCoin::PUBKEY_VERSION) {
             std::string strPrivkey = find_value(o, "k").get_str();
-            CBitcoinSecret vchSecret;
-            bool fGood = vchSecret.SetString(strPrivkey);
-            CKey key = vchSecret.GetKey();
-            if (!key.IsValid() && fGood)
+            CKey key = DecodeSecret(strPrivkey);
+            if (!key.IsValid())
                 return JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "privkey is not valid");
             privkey = key.GetPrivKey();
         }
@@ -5789,7 +5787,7 @@ UniValue createautomintaddress(const JSONRPCRequest& request)
     EnsureWalletIsUnlocked(pwallet);
     LOCK(pwallet->cs_wallet);
     std::string address = pwallet->GenerateNewAutoMintKey();
-    return address.ToString();
+    return address;
 }
 
 UniValue getstakingstatus(const JSONRPCRequest& request)
@@ -5886,10 +5884,8 @@ UniValue spendrawzerocoin(const JSONRPCRequest& request)
 
     std::string priv_key_str = request.params[3].get_str();
     CPrivKey privkey;
-    CBitcoinSecret vchSecret;
-    bool fGood = vchSecret.SetString(priv_key_str);
-    CKey key = vchSecret.GetKey();
-    if (!key.IsValid() && fGood)
+    CKey key = DecodeSecret(priv_key_str);
+    if (!key.IsValid())
         return JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "privkey is not valid");
     privkey = key.GetPrivKey();
 
@@ -5995,7 +5991,7 @@ UniValue getaccount(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WISPR address");
 
     std::string strAccount;
-    map<CTxDestination, CAddressBookData>::iterator mi = pwallet->mapAddressBook.find(address);
+    map<CTxDestination, CAddressBookData>::iterator mi = pwallet->mapAddressBook.find(DecodeDestination(address));
     if (mi != pwallet->mapAddressBook.end() && !(*mi).second.name.empty())
         strAccount = (*mi).second.name;
     return strAccount;
@@ -6066,7 +6062,7 @@ UniValue getaccountaddress(const JSONRPCRequest& request)
 
     UniValue ret(UniValue::VSTR);
 
-    ret = GetAccountAddress(pwallet, strAccount).ToString();
+    ret = GetAccountAddress(pwallet, strAccount);
     return ret;
 }
 
@@ -6349,7 +6345,7 @@ UniValue sendfrom(const JSONRPCRequest& request)
     if (nAmount > nBalance)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Account has insufficient funds");
 
-    CTransactionRef tx = SendMoney(*locked_chain, pwallet, address.Get(), nAmount, fSubtractFeeFromAmount, coin_control, std::move(mapValue));
+    CTransactionRef tx = SendMoney(*locked_chain, pwallet, address, nAmount, fSubtractFeeFromAmount, coin_control, std::move(mapValue));
 //    SendMoney(address.Get(), nAmount, wtx);
 
     return wtx.tx->GetHash().GetHex();
