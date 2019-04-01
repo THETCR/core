@@ -4648,15 +4648,15 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
         }
     }
 //Inititalize zWSPWallet
-    chain.initMessage(_("Syncing zWSP wallet..."));
+//    chain.initMessage(_("Syncing zWSP wallet..."));
 
-    walletInstance->InitAutoConvertAddresses();
+//    walletInstance->InitAutoConvertAddresses();
 
-    bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
-    walletInstance->setZWspAutoBackups(fEnableZWspBackups);
+//    bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
+//    walletInstance->setZWspAutoBackups(fEnableZWspBackups);
 
     //Load zerocoin mint hashes to memory
-    walletInstance->zwspTracker->Init();
+//    walletInstance->zwspTracker->Init();
 //    zwalletMain->LoadMintPoolFromDB();
 //    zwalletMain->SyncWithChain();
 
@@ -4678,6 +4678,21 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
 void CWallet::postInitProcess()
 {
+    CzWSPWallet* zwalletMain = new CzWSPWallet(chain(), GetLocation(), GetDBHandle(), *this);
+    setZWallet(zwalletMain);
+//    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(chain(), GetLocation(), GetDBHandle(), *this));
+    //Inititalize zWSPWallet
+    chain().initMessage(_("Syncing zWSP wallet..."));
+
+    InitAutoConvertAddresses();
+
+    bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
+    setZWspAutoBackups(fEnableZWspBackups);
+
+    //Load zerocoin mint hashes to memory
+    zwspTracker->Init();
+    zwalletMain->LoadMintPoolFromDB();
+    zwalletMain->SyncWithChain();
     // Generate coins in the background
     GenerateBitcoins(gArgs.GetBoolArg("-gen", false), this, gArgs.GetArg("-genproclimit", 1));
     // Add wallet transactions that aren't already in a block to mempool
@@ -8456,7 +8471,7 @@ bool CWallet::DatabaseMint(CDeterministicMint& dMint)
 void CWallet::setZWallet(CzWSPWallet* zwallet)
 {
     zwalletMain = zwallet;
-//    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(m_chain, GetLocation(), GetDBHandle(), this));
+    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(m_chain, GetLocation(), GetDBHandle(), *this));
 }
 
 //!OLD

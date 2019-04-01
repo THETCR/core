@@ -532,7 +532,7 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
   BOOST_TEST_PASSPOINT();
   zWallet.SetMasterSeed(seedMaster);
     pwallet->setZWallet(&zWallet);
-    pwallet->zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(pwallet->chain(), pwallet->GetLocation(), pwallet->GetDBHandle(), *pwallet));
+//    pwallet->zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(pwallet->chain(), pwallet->GetLocation(), pwallet->GetDBHandle(), *pwallet));
 
   int64_t nTimeStart = GetTimeMillis();
   CoinDenomination denom = CoinDenomination::ZQ_FIFTY;
