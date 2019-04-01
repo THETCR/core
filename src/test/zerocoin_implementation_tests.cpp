@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <wallet/test/wallet_test_fixture.h>
+#include <test/test_wispr.h>
 
 #include <core_io.h>
 #include "libzerocoin/Denominations.h"
@@ -25,7 +25,7 @@
 
 using namespace libzerocoin;
 
-BOOST_FIXTURE_TEST_SUITE(zerocoin_implementation_tests, WalletTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(zerocoin_implementation_tests, TestingSetup)
 
 BOOST_AUTO_TEST_CASE(zcparams_test)
 {

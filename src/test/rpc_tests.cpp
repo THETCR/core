@@ -13,7 +13,6 @@
 #include <netbase.h>
 
 #include <test/test_wispr.h>
-#include <wallet/test/wallet_test_fixture.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
@@ -58,7 +57,7 @@ UniValue CallRPC(std::string args)
 }
 
 
-BOOST_FIXTURE_TEST_SUITE(rpc_tests, WalletTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(rpc_tests, TestingSetup)
 
 BOOST_AUTO_TEST_CASE(rpc_rawparams)
 {
