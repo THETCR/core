@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinmint_test)
     std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
     WalletLocation m_location = WalletLocation("unittestwallet.dat");
     BOOST_TEST_PASSPOINT();
-    std::shared_ptr<CWallet> pwallet(new CWallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath())));
+    std::shared_ptr<CWallet> pwallet(new CWallet(*m_chain, m_location, WalletDatabase::CreateMock()));
     CWallet wallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath()));
     BOOST_TEST_PASSPOINT();
     WalletBatch walletdb(pwallet->GetDBHandle(), "cr+");
