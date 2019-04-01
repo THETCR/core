@@ -1,11 +1,9 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Copyright (c) 2014-2016 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_COINCONTROL_H
-#define BITCOIN_COINCONTROL_H
+#ifndef BITCOIN_WALLET_COINCONTROL_H
+#define BITCOIN_WALLET_COINCONTROL_H
 
 #include <policy/feerate.h>
 #include <policy/fees.h>
@@ -18,6 +16,7 @@
 class CCoinControl
 {
 public:
+    //! Custom change destination, if not set an address is generated
     CTxDestination destChange;
     bool useObfuScation;
     bool useSwiftTX;
@@ -44,10 +43,10 @@ public:
   //! Fee estimation mode to control arguments to estimateSmartFee
   FeeEstimateMode m_fee_mode;
 
-  CCoinControl()
-  {
-      SetNull();
-  }
+    CCoinControl()
+    {
+        SetNull();
+    }
 
     void SetNull();
 
@@ -102,4 +101,4 @@ private:
     std::set<COutPoint> setSelected;
 };
 
-#endif // BITCOIN_COINCONTROL_H
+#endif // BITCOIN_WALLET_COINCONTROL_H

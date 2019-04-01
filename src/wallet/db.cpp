@@ -201,15 +201,15 @@ bool BerkeleyEnvironment::Open(bool retry)
     dbenv->set_flags(DB_TXN_WRITE_NOSYNC, 1);
     dbenv->log_set_config(DB_LOG_AUTO_REMOVE, 1);
     int ret = dbenv->open(strPath.c_str(),
-                          DB_CREATE |
-                          DB_INIT_LOCK |
-                          DB_INIT_LOG |
-                          DB_INIT_MPOOL |
-                          DB_INIT_TXN |
-                          DB_THREAD |
-                          DB_RECOVER |
-                          nEnvFlags,
-                          S_IRUSR | S_IWUSR);
+                         DB_CREATE |
+                             DB_INIT_LOCK |
+                             DB_INIT_LOG |
+                             DB_INIT_MPOOL |
+                             DB_INIT_TXN |
+                             DB_THREAD |
+                             DB_RECOVER |
+                             nEnvFlags,
+                         S_IRUSR | S_IWUSR);
     if (ret != 0) {
         LogPrintf("BerkeleyEnvironment::Open: Error %d opening database environment: %s\n", ret, DbEnv::strerror(ret));
         int ret2 = dbenv->close(0);
@@ -258,14 +258,14 @@ BerkeleyEnvironment::BerkeleyEnvironment()
     dbenv->set_flags(DB_AUTO_COMMIT, 1);
     dbenv->log_set_config(DB_LOG_IN_MEMORY, 1);
     int ret = dbenv->open(nullptr,
-                          DB_CREATE |
-                          DB_INIT_LOCK |
-                          DB_INIT_LOG |
-                          DB_INIT_MPOOL |
-                          DB_INIT_TXN |
-                          DB_THREAD |
-                          DB_PRIVATE,
-                          S_IRUSR | S_IWUSR);
+                         DB_CREATE |
+                             DB_INIT_LOCK |
+                             DB_INIT_LOG |
+                             DB_INIT_MPOOL |
+                             DB_INIT_TXN |
+                             DB_THREAD |
+                             DB_PRIVATE,
+                         S_IRUSR | S_IWUSR);
     if (ret > 0)
         throw std::runtime_error(strprintf("BerkeleyEnvironment::MakeMock: Error %d opening database environment.", ret));
 
@@ -296,7 +296,7 @@ BerkeleyBatch::SafeDbt::SafeDbt()
 }
 
 BerkeleyBatch::SafeDbt::SafeDbt(void* data, size_t size)
-        : m_dbt(data, size)
+    : m_dbt(data, size)
 {
 }
 
@@ -345,7 +345,7 @@ bool BerkeleyBatch::Recover(const fs::path& file_path, void *callbackDataIn, boo
     newFilename = strprintf("%s.%d.bak", filename, now);
 
     int result = env->dbenv->dbrename(nullptr, filename.c_str(), nullptr,
-                                      newFilename.c_str(), DB_AUTO_COMMIT);
+                                       newFilename.c_str(), DB_AUTO_COMMIT);
     if (result == 0)
         LogPrintf("Renamed %s to %s\n", filename, newFilename);
     else
@@ -560,11 +560,11 @@ BerkeleyBatch::BerkeleyBatch(BerkeleyDatabase& database, const char* pszMode, bo
             }
 
             ret = pdb_temp->open(nullptr,                             // Txn pointer
-                                 fMockDb ? nullptr : strFilename.c_str(),  // Filename
-                                 fMockDb ? strFilename.c_str() : "main",   // Logical db name
-                                 DB_BTREE,                                 // Database type
-                                 nFlags,                                   // Flags
-                                 0);
+                            fMockDb ? nullptr : strFilename.c_str(),  // Filename
+                            fMockDb ? strFilename.c_str() : "main",   // Logical db name
+                            DB_BTREE,                                 // Database type
+                            nFlags,                                   // Flags
+                            0);
 
             if (ret != 0) {
                 throw std::runtime_error(strprintf("BerkeleyBatch: Error %d, can't open database %s", ret, strFilename));

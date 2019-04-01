@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_CRYPTER_H
-#define BITCOIN_CRYPTER_H
+#ifndef BITCOIN_WALLET_CRYPTER_H
+#define BITCOIN_WALLET_CRYPTER_H
 
 #include <keystore.h>
 #include <serialize.h>
@@ -36,79 +36,79 @@ const unsigned int WALLET_CRYPTO_IV_SIZE = 16;
 class CMasterKey
 {
 public:
-  std::vector<unsigned char> vchCryptedKey;
-  std::vector<unsigned char> vchSalt;
-  //! 0 = EVP_sha512()
-  //! 1 = scrypt()
-  unsigned int nDerivationMethod;
-  unsigned int nDeriveIterations;
-  //! Use this for more parameters to key derivation,
-  //! such as the various parameters to scrypt
-  std::vector<unsigned char> vchOtherDerivationParameters;
+    std::vector<unsigned char> vchCryptedKey;
+    std::vector<unsigned char> vchSalt;
+    //! 0 = EVP_sha512()
+    //! 1 = scrypt()
+    unsigned int nDerivationMethod;
+    unsigned int nDeriveIterations;
+    //! Use this for more parameters to key derivation,
+    //! such as the various parameters to scrypt
+    std::vector<unsigned char> vchOtherDerivationParameters;
 
-  ADD_SERIALIZE_METHODS;
+    ADD_SERIALIZE_METHODS;
 
-  template <typename Stream, typename Operation>
-  inline void SerializationOp(Stream& s, Operation ser_action) {
-      READWRITE(vchCryptedKey);
-      READWRITE(vchSalt);
-      READWRITE(nDerivationMethod);
-      READWRITE(nDeriveIterations);
-      READWRITE(vchOtherDerivationParameters);
-  }
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action) {
+        READWRITE(vchCryptedKey);
+        READWRITE(vchSalt);
+        READWRITE(nDerivationMethod);
+        READWRITE(nDeriveIterations);
+        READWRITE(vchOtherDerivationParameters);
+    }
 
-  CMasterKey()
-  {
-      // 25000 rounds is just under 0.1 seconds on a 1.86 GHz Pentium M
-      // ie slightly lower than the lowest hardware we need bother supporting
-      nDeriveIterations = 25000;
-      nDerivationMethod = 0;
-      vchOtherDerivationParameters = std::vector<unsigned char>(0);
-  }
+    CMasterKey()
+    {
+        // 25000 rounds is just under 0.1 seconds on a 1.86 GHz Pentium M
+        // ie slightly lower than the lowest hardware we need bother supporting
+        nDeriveIterations = 25000;
+        nDerivationMethod = 0;
+        vchOtherDerivationParameters = std::vector<unsigned char>(0);
+    }
 };
 
 typedef std::vector<unsigned char, secure_allocator<unsigned char> > CKeyingMaterial;
 
 namespace wallet_crypto_tests
 {
-class TestCrypter;
+    class TestCrypter;
 }
 
 /** Encryption/decryption context with key information */
 class CCrypter
 {
-  friend class wallet_crypto_tests::TestCrypter; // for test access to chKey/chIV
+friend class wallet_crypto_tests::TestCrypter; // for test access to chKey/chIV
 private:
-  std::vector<unsigned char, secure_allocator<unsigned char>> vchKey;
-  std::vector<unsigned char, secure_allocator<unsigned char>> vchIV;
-  bool fKeySet;
+    std::vector<unsigned char, secure_allocator<unsigned char>> vchKey;
+    std::vector<unsigned char, secure_allocator<unsigned char>> vchIV;
+    bool fKeySet;
 
-  int BytesToKeySHA512AES(const std::vector<unsigned char>& chSalt, const SecureString& strKeyData, int count, unsigned char *key,unsigned char *iv) const;
+    int BytesToKeySHA512AES(const std::vector<unsigned char>& chSalt, const SecureString& strKeyData, int count, unsigned char *key,unsigned char *iv) const;
 
 public:
-  bool SetKeyFromPassphrase(const SecureString &strKeyData, const std::vector<unsigned char>& chSalt, const unsigned int nRounds, const unsigned int nDerivationMethod);
-  bool Encrypt(const CKeyingMaterial& vchPlaintext, std::vector<unsigned char> &vchCiphertext) const;
-  bool Decrypt(const std::vector<unsigned char>& vchCiphertext, CKeyingMaterial& vchPlaintext) const;
-  bool SetKey(const CKeyingMaterial& chNewKey, const std::vector<unsigned char>& chNewIV);
+    bool SetKeyFromPassphrase(const SecureString &strKeyData, const std::vector<unsigned char>& chSalt, const unsigned int nRounds, const unsigned int nDerivationMethod);
+    bool Encrypt(const CKeyingMaterial& vchPlaintext, std::vector<unsigned char> &vchCiphertext) const;
+    bool Decrypt(const std::vector<unsigned char>& vchCiphertext, CKeyingMaterial& vchPlaintext) const;
+    bool SetKey(const CKeyingMaterial& chNewKey, const std::vector<unsigned char>& chNewIV);
 
-  void CleanKey()
-  {
-      memory_cleanse(vchKey.data(), vchKey.size());
-      memory_cleanse(vchIV.data(), vchIV.size());
-      fKeySet = false;
-  }
+    void CleanKey()
+    {
+        memory_cleanse(vchKey.data(), vchKey.size());
+        memory_cleanse(vchIV.data(), vchIV.size());
+        fKeySet = false;
+    }
 
-  CCrypter()
-  {
-      fKeySet = false;
-      vchKey.resize(WALLET_CRYPTO_KEY_SIZE);
-      vchIV.resize(WALLET_CRYPTO_IV_SIZE);
-  }
+    CCrypter()
+    {
+        fKeySet = false;
+        vchKey.resize(WALLET_CRYPTO_KEY_SIZE);
+        vchIV.resize(WALLET_CRYPTO_IV_SIZE);
+    }
 
-  ~CCrypter()
-  {
-      CleanKey();
-  }
+    ~CCrypter()
+    {
+        CleanKey();
+    }
 };
 
 /** Keystore which keeps the private keys encrypted.
@@ -164,4 +164,4 @@ public:
     bool AddDeterministicSeed(const uint256& seed);
 };
 
-#endif // BITCOIN_CRYPTER_H
+#endif // BITCOIN_WALLET_CRYPTER_H

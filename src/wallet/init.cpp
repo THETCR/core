@@ -257,7 +257,6 @@ void WalletInit::Construct(InitInterfaces& interfaces) const
 
 bool LoadWallets(interfaces::Chain& chain, const std::vector<std::string>& wallet_files)
 {
-    std::cout << "LoadWallets\n";
     for (const std::string& walletFile : wallet_files) {
         std::shared_ptr<CWallet> pwallet = CWallet::CreateWalletFromFile(chain, WalletLocation(walletFile));
         if (!pwallet) {
