@@ -1912,14 +1912,6 @@ static UniValue keypoolrefill(const JSONRPCRequest& request)
 }
 
 
-static void LockWallet(CWallet* pWallet)
-{
-//    LOCK(cs_nWalletUnlockTime);
-//    nWalletUnlockTime = 0;
-    pWallet->fWalletUnlockAnonymizeOnly = false;
-    pWallet->Lock();
-}
-
 static UniValue walletpassphrase(const JSONRPCRequest& request)
 {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
