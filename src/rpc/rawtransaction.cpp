@@ -35,6 +35,7 @@
 #include <util/strencodings.h>
 #include <validation.h>
 #include <validationinterface.h>
+#include <zpiv/deterministicmint.h>
 
 #include <swifttx.h>
 #include <zwspchain.h>
@@ -2628,7 +2629,7 @@ UniValue createrawzerocoinstake(const JSONRPCRequest& request)
     coinstake_tx.vin.push_back(newTxIn);
 
     UniValue ret(UniValue::VOBJ);
-    ret.pushKV("hex", EncodeHexTx(coinstake_tx));
+    ret.pushKV("hex", EncodeHexTx(CTransaction(coinstake_tx)));
     CPrivKey pk = input_mint.GetPrivKey();
     CKey key;
     key.SetPrivKey(pk, true);
