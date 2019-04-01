@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     BOOST_CHECK_NO_THROW(CallRPC("getaccountaddress \"\""));
     BOOST_CHECK_NO_THROW(CallRPC("getaccountaddress accountThatDoesntExists")); // Should generate a new account
     BOOST_CHECK_NO_THROW(retValue = CallRPC("getaccountaddress " + strAccount));
-    BOOST_CHECK(EncodeDestination(retValue.get_str()) == demoAddress);
+    BOOST_CHECK(retValue.get_str() == demoAddress);
     std::cout << "getaccount rpc\n";
     /*********************************
      * 			getaccount
