@@ -293,7 +293,7 @@ libbitcoin_server_a_SOURCES = \
   checkpoints.cpp \
   consensus/tx_verify.cpp \
   flatfile.cpp \
-  zpiv/genwit.cpp \
+  genwit.cpp \
   httprpc.cpp \
   httpserver.cpp \
   index/base.cpp \
