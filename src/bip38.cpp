@@ -6,9 +6,12 @@
 #include "base58.h"
 #include "hash.h"
 #include "pubkey.h"
+#include "key.h"
+#include "key_io.h"
 #include <util/system.h>
 #include "util/strencodings.h"
 #include "random.h"
+#include <support/allocators/secure.h>
 
 #include <openssl/aes.h>
 #include <openssl/sha.h>
@@ -286,7 +289,7 @@ bool BIP38_Decrypt(std::string strPassphrase, std::string strEncryptedKey, uint2
     CKey k;
     k.Set(privKey.begin(), privKey.end(), fCompressed);
     CPubKey pubkey = k.GetPubKey();
-    std::string address = CBitcoinAddress(pubkey.GetID()).ToString();
+    std::string address = EncodeDestination(pubkey.GetID());
 
     return strAddressHash == AddressToBip38Hash(address);
 }
