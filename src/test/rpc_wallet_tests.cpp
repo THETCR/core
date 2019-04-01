@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     BOOST_CHECK_NO_THROW(retValue = CallRPC("getaddressesbyaccount " + strAccount));
     UniValue arr = retValue.get_array();
     BOOST_CHECK(arr.size() > 0);
-    BOOST_CHECK(EncodeDestination(arr[0].get_str()) == demoAddress);
+    BOOST_CHECK(arr[0].get_str() == demoAddress);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
