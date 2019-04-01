@@ -320,12 +320,12 @@ void PrivacyDialog::sendzWSP()
     QSettings settings;
 
     // Handle 'Pay To' address options
-    CTxDestination address = DecodeDestination(ui->payTo->text().toStdString());
+    CTxDestination destination = DecodeDestination(ui->payTo->text().toStdString());
     if(ui->payTo->text().isEmpty()){
         QMessageBox::information(this, tr("Spend Zerocoin"), tr("No 'Pay To' address provided, creating local payment"), QMessageBox::Ok, QMessageBox::Ok);
     }
     else{
-        if (!IsValidDestination(address)) {
+        if (!IsValidDestination(destination)) {
             QMessageBox::warning(this, tr("Spend Zerocoin"), tr("Invalid Wispr Address"), QMessageBox::Ok, QMessageBox::Ok);
             ui->payTo->setFocus();
             return;
@@ -381,6 +381,7 @@ void PrivacyDialog::sendzWSP()
         strAddressLabel = "<br />(" + ui->addAsLabel->text() + ") ";
     }
 
+    std::string address = EncodeDestination(destination);
     // General info
     QString strQuestionString = tr("Are you sure you want to send?<br /><br />");
     QString strAmount = "<b>" + QString::number(dAmount, 'f', 8) + " zWSP</b>";
@@ -462,9 +463,9 @@ void PrivacyDialog::sendzWSP()
         // If zWSP was spent successfully update the addressbook with the label
         std::string labelText = ui->addAsLabel->text().toStdString();
         if (!labelText.empty())
-            walletModel->updateAddressBookLabels(address.Get(), labelText, "send");
+            walletModel->updateAddressBookLabels(address, labelText, "send");
         else
-            walletModel->updateAddressBookLabels(address.Get(), "(no label)", "send");
+            walletModel->updateAddressBookLabels(address, "(no label)", "send");
     }
 
     // Clear zwsp selector in case it was used
