@@ -42,7 +42,7 @@
 #include "zwspchain.h"
 #include "libzerocoin/Coin.h"
 #include "spork.h"
-#include "primitives/deterministicmint.h"
+#include "zpiv/deterministicmint.h"
 #include <miner.h>
 
 #include <univalue.h>
@@ -4831,7 +4831,7 @@ UniValue mintzerocoin(const JSONRPCRequest& request)
     return arrMints;
 }
 
-static UniValue DoZwspSpend(CWallet * const pwallet, const CAmount nAmount, bool fMintChange, bool fMinimizeChange, const int nSecurityLevel, std::vector<CZerocoinMint>& vMintsSelected, std::string address_str)
+static UniValue DoZwspSpend(CWallet * const pwallet, const CAmount nAmount, bool fMintChange, bool fMinimizeChange, std::vector<CZerocoinMint>& vMintsSelected, std::string address_str)
 {
     int64_t nTimeStart = GetTimeMillis();
     CBitcoinAddress address = CBitcoinAddress(); // Optional sending address. Dummy initialization here.
@@ -4843,9 +4843,9 @@ static UniValue DoZwspSpend(CWallet * const pwallet, const CAmount nAmount, bool
         address = CBitcoinAddress(address_str);
         if(!address.IsValid())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WISPR address");
-        fSuccess = pwallet->SpendZerocoin(nAmount, nSecurityLevel, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, &address);
+        fSuccess = pwallet->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, &address);
     } else                   // Spend to newly generated local address
-        fSuccess = pwallet->SpendZerocoin(nAmount, nSecurityLevel, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange);
+        fSuccess = pwallet->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange);
 
     if (!fSuccess)
         throw JSONRPCError(RPC_WALLET_ERROR, receipt.GetStatusMessage());
@@ -4900,9 +4900,9 @@ UniValue spendzerocoin(const JSONRPCRequest& request)
         return NullUniValue;
     }
 
-    if (request.fHelp || request.params.size() > 5 || request.params.size() < 4)
+    if (request.fHelp || request.params.size() > 4 || request.params.size() < 3)
         throw std::runtime_error(
-            "spendzerocoin amount mintchange minimizechange securitylevel ( \"address\" )\n"
+            "spendzerocoin amount mintchange minimizechange ( \"address\" )\n"
             "\nSpend zWSP to a WSP address.\n" +
             HelpRequiringPassphrase(pwallet) + "\n"
 
@@ -4910,12 +4910,7 @@ UniValue spendzerocoin(const JSONRPCRequest& request)
             "1. amount          (numeric, required) Amount to spend.\n"
             "2. mintchange      (boolean, required) Re-mint any leftover change.\n"
             "3. minimizechange  (boolean, required) Try to minimize the returning change  [false]\n"
-            "4. securitylevel   (numeric, required) Amount of checkpoints to add to the accumulator.\n"
-            "                       A checkpoint contains 10 blocks worth of zerocoinmints.\n"
-            "                       The more checkpoints that are added, the more untraceable the transaction.\n"
-            "                       Use [100] to add the maximum amount of checkpoints available.\n"
-            "                       Adding more checkpoints makes the minting process take longer\n"
-            "5. \"address\"     (string, optional, default=change) Send to specified address or to a new change address.\n"
+            "4. \"address\"     (string, optional, default=change) Send to specified address or to a new change address.\n"
             "                       If there is change then an address is required\n"
 
             "\nResult:\n"
@@ -4942,8 +4937,8 @@ UniValue spendzerocoin(const JSONRPCRequest& request)
             "}\n"
 
             "\nExamples\n" +
-            HelpExampleCli("spendzerocoin", "5000 false true 100 \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\"") +
-            HelpExampleRpc("spendzerocoin", "5000 false true 100 \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\""));
+            HelpExampleCli("spendzerocoin", "5000 false true \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\"") +
+            HelpExampleRpc("spendzerocoin", "5000 false true \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\""));
 
     LOCK2(cs_main, pwallet->cs_wallet);
 
@@ -4955,12 +4950,11 @@ UniValue spendzerocoin(const JSONRPCRequest& request)
     CAmount nAmount = AmountFromValue(request.params[0]);   // Spending amount
     bool fMintChange = request.params[1].get_bool();        // Mint change to zWSP
     bool fMinimizeChange = request.params[2].get_bool();    // Minimize change
-    int nSecurityLevel = request.params[3].get_int();       // Security level
-    std::string address_str = request.params.size() > 4 ? request.params[4].get_str() : "";
+    std::string address_str = request.params.size() > 3 ? request.params[3].get_str() : "";
 
     std::vector<CZerocoinMint> vMintsSelected;
 
-    return DoZwspSpend(pwallet, nAmount, fMintChange, fMinimizeChange, nSecurityLevel, vMintsSelected, address_str);
+    return DoZwspSpend(pwallet, nAmount, fMintChange, fMinimizeChange, vMintsSelected, address_str);
 }
 
 UniValue spendzerocoinmints(const JSONRPCRequest& request)
@@ -5051,7 +5045,16 @@ UniValue spendzerocoinmints(const JSONRPCRequest& request)
         nAmount += mint.GetDenominationAsAmount();
     }
 
-    return DoZwspSpend(pwallet, nAmount, false, true, 100, vMintsSelected, address_str);
+    CBitcoinAddress address = CBitcoinAddress(); // Optional sending address. Dummy initialization here.
+    if (params.size() == 4) {
+        // Destination address was supplied as params[4]. Optional parameters MUST be at the end
+        // to avoid type confusion from the JSON interpreter
+        address = CBitcoinAddress(params[3].get_str());
+        if(!address.IsValid())
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid PIVX address");
+    }
+
+    return DoZwspSpend(pwallet, nAmount, false, true, vMintsSelected, address_str);
 }
 
 UniValue resetmintzerocoin(const JSONRPCRequest& request)
@@ -5837,6 +5840,117 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
     obj.pushKV("staking status", nStaking);
 
     return obj;
+}
+
+UniValue spendrawzerocoin(const JSONRPCRequest& request)
+{
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
+    if (request.fHelp || request.params.size() < 4 || request.params.size() > 5)
+        throw runtime_error(
+                "spendrawzerocoin \"serialHex\" denom \"randomnessHex\" [\"address\"]\n"
+                "\nCreate and broadcast a TX spending the provided zericoin.\n"
+
+                "\nArguments:\n"
+                "1. \"serialHex\"        (string, required) A zerocoin serial number (hex)\n"
+                "2. \"randomnessHex\"    (string, required) A zerocoin randomness value (hex)\n"
+                "3. denom                (numeric, required) A zerocoin denomination (decimal)\n"
+                "4. \"priv key\"         (string, required) The private key associated with this coin (hex)\n"
+                "5. \"address\"          (string, optional) PIVX address to spend to. If not specified, spend to change add.\n"
+
+                "\nResult:\n"
+                "\"txid\"             (string) The transaction txid in hex\n"
+
+                "\nExamples\n" +
+                HelpExampleCli("spendrawzerocoin", "\"f80892e78c30a393ef4ab4d5a9d5a2989de6ebc7b976b241948c7f489ad716a2\" \"a4fd4d7248e6a51f1d877ddd2a4965996154acc6b8de5aa6c83d4775b283b600\" 100 \"xxx\"") +
+                HelpExampleRpc("spendrawzerocoin", "\"f80892e78c30a393ef4ab4d5a9d5a2989de6ebc7b976b241948c7f489ad716a2\", \"a4fd4d7248e6a51f1d877ddd2a4965996154acc6b8de5aa6c83d4775b283b600\", 100, \"xxx\""));
+
+    LOCK2(cs_main, pwallet->cs_wallet);
+
+    if (GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
+        throw JSONRPCError(RPC_WALLET_ERROR, "zPIV is currently disabled due to maintenance.");
+
+    CBigNum serial;
+    serial.SetHex(request.params[0].get_str());
+
+    CBigNum randomness;
+    randomness.SetHex(request.params[1].get_str());
+
+    const int denom_int = request.params[2].get_int();
+    libzerocoin::CoinDenomination denom = libzerocoin::IntToZerocoinDenomination(denom_int);
+
+    std::string priv_key_str = request.params[3].get_str();
+    CPrivKey privkey;
+    CBitcoinSecret vchSecret;
+    bool fGood = vchSecret.SetString(priv_key_str);
+    CKey key = vchSecret.GetKey();
+    if (!key.IsValid() && fGood)
+        return JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "privkey is not valid");
+    privkey = key.GetPrivKey();
+
+    std::string address_str = "";
+    if (request.params.size() == 5)
+        address_str = request.params[4].get_str();
+
+    // Create the coin associated with these secrets
+    libzerocoin::PrivateCoin coin(Params().Zerocoin_Params(false), denom, serial, randomness);
+    coin.setPrivKey(privkey);
+    coin.setVersion(libzerocoin::PrivateCoin::CURRENT_VERSION);
+
+    // Create the mint associated with this coin
+    CZerocoinMint mint(denom, coin.getPublicCoin().getValue(), randomness, serial, false, CZerocoinMint::CURRENT_VERSION, &privkey);
+    vector<CZerocoinMint> vMintsSelected = {mint};
+    CAmount nAmount = mint.GetDenominationAsAmount();
+
+    return DoZwspSpend(pwallet, nAmount, false, true, vMintsSelected, address_str);
+}
+
+UniValue clearspendcache(const JSONRPCRequest& request)
+{
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
+    if(request.fHelp || request.params.size() != 0)
+        throw runtime_error(
+                "clearspendcache\n"
+                "\nClear the pre-computed zPIV spend cache, and database.\n" +
+                HelpRequiringPassphrase(pwallet) + "\n"
+
+                                            "\nExamples\n" +
+                HelpExampleCli("clearspendcache", "") + HelpExampleRpc("clearspendcache", ""));
+
+    EnsureWalletIsUnlocked(pwallet);
+
+    CzWSPTracker* zwspTracker = pwallet->zwspTracker.get();
+
+    {
+        int nTries = 0;
+        while (nTries < 100) {
+            TRY_LOCK(zwspTracker->cs_spendcache, fLocked);
+            if (fLocked) {
+                if (zwspTracker->ClearSpendCache()) {
+                    fClearSpendCache = true;
+                    WalletBatch walletdb("precomputes.dat", "cr+");
+                    walletdb.EraseAllPrecomputes();
+                    return "Successfully Cleared the Precompute Spend Cache and Database";
+                }
+            } else {
+                fGlobalUnlockSpendCache = true;
+                nTries++;
+                MilliSleep(100);
+            }
+        }
+    }
+    throw JSONRPCError(RPC_WALLET_ERROR, "Error: Spend cache not cleared!");
 }
 
 UniValue abortrescan(const JSONRPCRequest& request); // in rpcdump.cpp
@@ -6716,6 +6830,7 @@ static const CRPCCommand commands[] =
     {"zerocoin", "generatemintlist", &generatemintlist, {}},
     {"zerocoin", "searchdzwsp", &searchdzwsp, {}},
     {"zerocoin", "dzwspstate", &dzwspstate, {}}
+    {"zerocoin", "clearspendcache", &clearspendcache, {}}
 
 };
 // clang-format on

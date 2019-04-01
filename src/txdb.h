@@ -12,7 +12,7 @@
 #include <chain.h>
 #include "libzerocoin/Coin.h"
 #include "libzerocoin/CoinSpend.h"
-#include "primitives/zerocoin.h"
+#include "zpiv/zerocoin.h"
 #include <primitives/block.h>
 
 #include <map>

@@ -16,7 +16,7 @@
 #include <util/system.h>
 #include <util/time.h>
 #include <wallet/wallet.h>
-#include <primitives/deterministicmint.h>
+#include <zpiv/deterministicmint.h>
 #include <libzerocoin/bignum.h>
 
 #include <atomic>
@@ -1728,4 +1728,110 @@ std::list<CDeterministicMint> WalletBatch::ListArchivedDeterministicMints()
 
     pcursor->close();
     return listMints;
+}
+
+void CWalletDB::LoadPrecomputes(std::list<std::pair<uint256, CoinWitnessCacheData> >& itemList, std::map<uint256, list<std::pair<uint256, CoinWitnessCacheData> >::iterator>& itemMap)
+{
+
+    Dbc* pcursor = GetCursor();
+    if (!pcursor)
+        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+    unsigned int fFlags = DB_SET_RANGE;
+    for (;;)
+    {
+        // Read next record
+        CDataStream ssKey(SER_DISK, CLIENT_VERSION);
+        if (fFlags == DB_SET_RANGE)
+            ssKey << make_pair(string("precompute"), uint256(0));
+        CDataStream ssValue(SER_DISK, CLIENT_VERSION);
+        int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
+        fFlags = DB_NEXT;
+        if (ret == DB_NOTFOUND)
+            break;
+        else if (ret != 0)
+        {
+            pcursor->close();
+            throw runtime_error(std::string(__func__)+" : error scanning precompute DB");
+        }
+
+        // Unserialize
+        string strType;
+        ssKey >> strType;
+        if (strType != "precompute")
+            break;
+
+        uint256 hash;
+        ssKey >> hash;
+
+        CoinWitnessCacheData cacheData;
+        ssValue >> cacheData;
+
+        itemList.push_front(std::make_pair(hash, cacheData));
+        itemMap.insert(make_pair(hash, itemList.begin()));
+
+        if (itemMap.size() == PRECOMPUTE_LRU_CACHE_SIZE)
+            break;
+    }
+
+    pcursor->close();
+}
+
+void CWalletDB::LoadPrecomputes(set<uint256> setHashes)
+{
+    Dbc* pcursor = GetCursor();
+    if (!pcursor)
+        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+    unsigned int fFlags = DB_SET_RANGE;
+    for (;;)
+    {
+        // Read next record
+        CDataStream ssKey(SER_DISK, CLIENT_VERSION);
+        if (fFlags == DB_SET_RANGE)
+            ssKey << make_pair(string("precompute"), uint256(0));
+        CDataStream ssValue(SER_DISK, CLIENT_VERSION);
+        int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
+        fFlags = DB_NEXT;
+        if (ret == DB_NOTFOUND)
+            break;
+        else if (ret != 0)
+        {
+            pcursor->close();
+            throw runtime_error(std::string(__func__)+" : error scanning precompute DB");
+        }
+
+        // Unserialize
+        string strType;
+        ssKey >> strType;
+        if (strType != "precompute")
+            break;
+
+        uint256 hash;
+        ssKey >> hash;
+
+        setHashes.insert(hash);
+    }
+
+    pcursor->close();
+}
+
+void CWalletDB::EraseAllPrecomputes()
+{
+    set<uint256> setHashes;
+    LoadPrecomputes(setHashes);
+
+    for (auto hash : setHashes)
+        ErasePrecompute(hash);
+}
+
+bool CWalletDB::WritePrecompute(const uint256& hash, const CoinWitnessCacheData& data)
+{
+    return Write(make_pair(string("precompute"), hash), data);
+}
+bool CWalletDB::ReadPrecompute(const uint256& hash, CoinWitnessCacheData& data)
+{
+    return Read(make_pair(string("precompute"), hash), data);
+}
+bool CWalletDB::ErasePrecompute(const uint256& hash)
+{
+    return Erase(make_pair(string("precompute"), hash));
 }

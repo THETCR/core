@@ -49,9 +49,9 @@ public:
 	 * @param msghash hash of meta data to create a signature of knowledge on.
 	 * @return
 	 */
-	bool Verify(const CBigNum& coinSerialNumber, const CBigNum& valueOfCommitmentToCoin,const uint256 msghash) const;
+    bool Verify(const CBigNum& coinSerialNumber, const CBigNum& valueOfCommitmentToCoin,const uint256 msghash, bool isInParamsValidationRange = true) const;
 	ADD_SERIALIZE_METHODS;
-  template <typename Stream, typename Operation>  inline void SerializationOp(Stream& s, Operation ser_action) {
+  template <typename Stream, typename Operation>  inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
 	    READWRITE(s_notprime);
 	    READWRITE(sprime);
 	    READWRITE(hash);
@@ -65,8 +65,8 @@ private:
 	// this is s_notprime instead of s
 	// because the serialization macros
 	// define something named s and it conflicts
-	std::vector<CBigNum> s_notprime;
-	std::vector<CBigNum> sprime;
+	vector<CBigNum> s_notprime;
+	vector<CBigNum> sprime;
 	inline CBigNum challengeCalculation(const CBigNum& a_exp, const CBigNum& b_exp,
 	                                   const CBigNum& h_exp) const;
 };

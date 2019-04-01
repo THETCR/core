@@ -65,7 +65,6 @@ private:
     QMenu* contextMenu;
     const PlatformStyle *platformStyle;
     
-    int nSecurityLevel = 0;
     bool fMinimizeChange = false;
     bool fDenomsMinimized;
 

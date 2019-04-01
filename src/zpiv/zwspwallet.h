@@ -8,9 +8,9 @@
 #include <map>
 #include <interfaces/chain.h>
 #include "libzerocoin/Coin.h"
-#include "mintpool.h"
+#include <zpiv/mintpool.h>
 #include "uint256.h"
-#include "primitives/zerocoin.h"
+#include "zpiv/zerocoin.h"
 #include "walletutil.h"
 #include "walletdb.h"
 

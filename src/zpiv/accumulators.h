@@ -8,8 +8,8 @@
 #include "libzerocoin/Accumulator.h"
 #include "libzerocoin/Coin.h"
 #include "libzerocoin/Denominations.h"
-#include "primitives/zerocoin.h"
-#include "accumulatormap.h"
+#include "zpiv/zerocoin.h"
+#include <zpiv/accumulatormap.h>
 #include "chain.h"
 #include "uint256.h"
 #include "bloom.h"

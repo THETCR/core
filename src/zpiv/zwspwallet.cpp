@@ -3,13 +3,13 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "consensus/validation.h"
-#include <wallet/zwspwallet.h>
+#include <zpiv/zwspwallet.h>
 #include <validation.h>
 #include "txdb.h"
 #include <wallet/walletdb.h>
 #include "shutdown.h"
 #include <wallet/wallet.h>
-#include "primitives/deterministicmint.h"
+#include "zpiv/deterministicmint.h"
 #include "zwspchain.h"
 
 using namespace libzerocoin;

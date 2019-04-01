@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <streams.h>
-#include "primitives/zerocoin.h"
+#include "zpiv/zerocoin.h"
 #include "hash.h"
 #include <tinyformat.h>
 #include <util/strencodings.h>

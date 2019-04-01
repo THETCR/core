@@ -15,6 +15,7 @@
 #include "timedata.h"
 #include <util/system.h>
 #include "stakeinput.h"
+#include <util/moneystr.h>
 #include "zwspchain.h"
 
 using namespace std;
@@ -318,7 +319,7 @@ bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64_t& nStakeModifier, int
 }
 
 //test hash vs target
-bool stakeTargetHit(uint256 hashProofOfStake, int64_t nValueIn, uint256 bnTargetPerCoinDay)
+bool stakeTargetHit(const uint256& hashProofOfStake, const int64_t& nValueIn, const uint256& bnTargetPerCoinDay)
 {
     //get the stake weight - weight is equal to coin amount
     uint256 bnCoinDayWeight = uint256(nValueIn) / 100;
@@ -391,7 +392,7 @@ bool Stake(CStakeInput* stakeInput, unsigned int nBits, unsigned int nTimeBlockF
     bool fSuccess = false;
     unsigned int nTryTime = 0;
     int nHeightStart = chainActive.Height();
-    int nHashDrift = 30;
+    int nHashDrift = 300;
     CDataStream ssUniqueID = stakeInput->GetUniqueness();
     CAmount nValueIn = stakeInput->GetValue();
     for (int i = 0; i < nHashDrift; i++) //iterate the hashing
@@ -401,7 +402,7 @@ bool Stake(CStakeInput* stakeInput, unsigned int nBits, unsigned int nTimeBlockF
             break;
 
         //hash this iteration
-        nTryTime = nTimeTx + nHashDrift - i;
+        nTryTime = nTimeTx + (nHashDrift/2) - i;
 
         // if stake hash does not meet the target then continue to next iteration
         if (!CheckStakeV2(ssUniqueID, nValueIn, nStakeModifier, bnTargetPerCoinDay, nTimeBlockFrom, nTryTime, hashProofOfStake))

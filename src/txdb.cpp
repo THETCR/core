@@ -6,7 +6,7 @@
 
 #include <txdb.h>
 
-#include <accumulators.h>
+#include <zpiv/accumulators.h>
 #include <chainparams.h>
 #include <hash.h>
 #include <random.h>

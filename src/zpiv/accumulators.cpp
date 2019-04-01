@@ -2,13 +2,13 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "accumulators.h"
-#include "accumulatormap.h"
+#include <zpiv/accumulators.h>
+#include <zpiv/accumulatormap.h>
 #include "chainparams.h"
 #include "txdb.h"
 #include "shutdown.h"
 #include "spork.h"
-#include "accumulatorcheckpoints.h"
+#include <zpiv/accumulatorcheckpoints.h>
 #include "ui_interface.h"
 #include "zwspchain.h"
 

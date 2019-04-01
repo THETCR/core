@@ -4,9 +4,9 @@
 
 #include "accumulatormap.h"
 #include "accumulators.h"
+#include "main.h"
 #include "txdb.h"
 #include "libzerocoin/Denominations.h"
-#include <validation.h>
 
 using namespace libzerocoin;
 using namespace std;
@@ -17,7 +17,7 @@ AccumulatorMap::AccumulatorMap(libzerocoin::ZerocoinParams* params)
     this->params = params;
     for (auto& denom : zerocoinDenomList) {
         unique_ptr<Accumulator> uptr(new Accumulator(params, denom));
-        mapAccumulators.insert(std::make_pair(denom, std::move(uptr)));
+        mapAccumulators.insert(make_pair(denom, std::move(uptr)));
     }
 }
 
@@ -33,7 +33,7 @@ void AccumulatorMap::Reset(libzerocoin::ZerocoinParams* params2)
     mapAccumulators.clear();
     for (auto& denom : zerocoinDenomList) {
         unique_ptr<Accumulator> uptr(new Accumulator(params2, denom));
-        mapAccumulators.insert(std::make_pair(denom, std::move(uptr)));
+        mapAccumulators.insert(make_pair(denom, std::move(uptr)));
     }
 }
 
@@ -55,8 +55,8 @@ bool AccumulatorMap::Load(uint256 nCheckpoint)
 //Load accumulator map from a hard-checkpoint
 void AccumulatorMap::Load(const AccumulatorCheckpoints::Checkpoint& checkpoint)
 {
-     for (auto it : checkpoint)
-         mapAccumulators.at(it.first)->setValue(it.second);
+    for (auto it : checkpoint)
+        mapAccumulators.at(it.first)->setValue(it.second);
 }
 
 //Add a zerocoin to the accumulator of its denomination.
@@ -71,6 +71,11 @@ bool AccumulatorMap::Accumulate(const PublicCoin& pubCoin, bool fSkipValidation)
     else
         mapAccumulators.at(denom)->accumulate(pubCoin);
     return true;
+}
+
+libzerocoin::Accumulator AccumulatorMap::GetAccumulator(libzerocoin::CoinDenomination denom)
+{
+    return libzerocoin::Accumulator(params, denom, GetValue(denom));
 }
 
 //Get the value of a specific accumulator

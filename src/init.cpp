@@ -11,8 +11,8 @@
 
 #include <init.h>
 
-#include "accumulatorcheckpoints.h"
-#include "accumulators.h"
+#include "zpiv/accumulators.h"
+#include "zpiv/accumulatorcheckpoints.h"
 #include "activemasternode.h"
 #include <addrman.h>
 #include <amount.h>
@@ -63,10 +63,6 @@
 #include <walletinitinterface.h>
 #include "zwspchain.h"
 #include "reverse_iterate.h"
-
-#ifdef ENABLE_WALLET
-#include "accumulators.h"
-#endif
 
 #include <stdint.h>
 #include <stdio.h>
@@ -1683,18 +1679,53 @@ bool AppInitMain(InitInterfaces& interfaces)
                     }
                 }
 
+                // Wrapped serials inflation check
+                bool reindexDueWrappedSerials = false;
+                bool reindexZerocoin = false;
+                int chainHeight = chainActive.Height();
+                if(Params().NetworkID() == CBaseChainParams::MAIN && chainHeight > Params().Zerocoin_Block_EndFakeSerial()) {
+
+                    // Supply needs to be exactly GetSupplyBeforeFakeSerial + GetWrapppedSerialInflationAmount
+                    CBlockIndex* pblockindex = chainActive[Params().Zerocoin_Block_EndFakeSerial() + 1];
+                    CAmount zpivSupplyCheckpoint = Params().GetSupplyBeforeFakeSerial() + GetWrapppedSerialInflationAmount();
+
+                    if (pblockindex->GetZerocoinSupply() < zpivSupplyCheckpoint) {
+                        // Trigger reindex due wrapping serials
+                        LogPrintf("Current GetZerocoinSupply: %d vs %d\n", pblockindex->GetZerocoinSupply()/COIN , zpivSupplyCheckpoint/COIN);
+                        reindexDueWrappedSerials = true;
+                    } else if (pblockindex->GetZerocoinSupply() > zpivSupplyCheckpoint) {
+                        // Trigger global zPIV reindex
+                        reindexZerocoin = true;
+                        LogPrintf("Current GetZerocoinSupply: %d vs %d\n", pblockindex->GetZerocoinSupply()/COIN , zpivSupplyCheckpoint/COIN);
+                    }
+
+                }
+
+                // Reindex only for wrapped serials inflation.
+                if (reindexDueWrappedSerials)
+                    AddWrappedSerialsInflation();
+
                 // Recalculate money supply for blocks that are impacted by accounting issue after zerocoin activation
-                if (gArgs.GetBoolArg("-reindexmoneysupply", false)) {
-                    if (chainActive.Height() > Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+                if (gArgs.GetBoolArg("-reindexmoneysupply", false) || reindexZerocoin) {
+                    if (chainHeight > Params().NEW_PROTOCOLS_STARTHEIGHT()) {
                         RecalculateZWSPMinted();
                         RecalculateZWSPSpent();
                     }
-                    RecalculateWSPSupply(1);
+                    // Recalculate from the zerocoin activation or from scratch.
+                    RecalculateWSPSupply(reindexZerocoin ? Params().NEW_PROTOCOLS_STARTHEIGHT() : 1);
+                }
+
+                // Check Recalculation result
+                if(Params().NetworkID() == CBaseChainParams::MAIN && chainHeight > Params().Zerocoin_Block_EndFakeSerial()) {
+                    CBlockIndex* pblockindex = chainActive[Params().Zerocoin_Block_EndFakeSerial() + 1];
+                    CAmount zpivSupplyCheckpoint = Params().GetSupplyBeforeFakeSerial() + GetWrapppedSerialInflationAmount();
+                    if (pblockindex->GetZerocoinSupply() != zpivSupplyCheckpoint)
+                        return InitError(strprintf("ZerocoinSupply Recalculation failed: %d vs %d", pblockindex->GetZerocoinSupply()/COIN , zpivSupplyCheckpoint/COIN));
                 }
 
                 // Force recalculation of accumulators.
                 if (gArgs.GetBoolArg("-reindexaccumulators", false)) {
-                    if (chainActive.Height() > Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+                    if (chainHeight > Params().NEW_PROTOCOLS_STARTHEIGHT()) {
                         CBlockIndex *pindex = chainActive[Params().NEW_PROTOCOLS_STARTHEIGHT()];
                         while (pindex->nHeight < chainActive.Height()) {
                             if (!count(listAccCheckpointsNoDB.begin(), listAccCheckpointsNoDB.end(),

@@ -5,7 +5,7 @@
 #ifndef WISPR_ZWSPTRACKER_H
 #define WISPR_ZWSPTRACKER_H
 
-#include "primitives/zerocoin.h"
+#include "zpiv/zerocoin.h"
 #include <interfaces/chain.h>
 #include <wallet/db.h>
 #include <wallet/walletdb.h>

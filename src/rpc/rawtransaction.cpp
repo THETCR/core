@@ -2547,6 +2547,96 @@ UniValue getspentzerocoinamount(const JSONRPCRequest& request)
     return FormatMoney(nValue);
 }
 
+#ifdef ENABLE_WALLET
+UniValue createrawzerocoinstake(const JSONRPCRequest& request)
+{
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
+    if (request.fHelp || request.params.size() != 1)
+        throw runtime_error(
+                "createrawzerocoinstake mint_input \n"
+                "\nCreates raw zPIV coinstakes (without MN output).\n" +
+                HelpRequiringPassphrase(pwallet) + "\n"
+
+                                            "\nArguments:\n"
+                                            "1. mint_input      (hex string, required) serial hash of the mint used as input\n"
+
+                                            "\nResult:\n"
+                                            "{\n"
+                                            "   \"hex\": \"xxx\",           (hex string) raw coinstake transaction\n"
+                                            "   \"private-key\": \"xxx\"    (hex string) private key of the input mint [needed to\n"
+                                            "                                            sign a block with this stake]"
+                                            "}\n"
+                                            "\nExamples\n" +
+                HelpExampleCli("createrawzerocoinstake", "0d8c16eee7737e3cc1e4e70dc006634182b175e039700931283b202715a0818f") +
+                HelpExampleRpc("createrawzerocoinstake", "0d8c16eee7737e3cc1e4e70dc006634182b175e039700931283b202715a0818f"));
+
+
+    assert(pwallet != nullptr);
+    LOCK2(cs_main, pwallet->cs_wallet);
+
+    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
+        throw JSONRPCError(RPC_WALLET_ERROR, "zPIV is currently disabled due to maintenance.");
+
+    std::string serial_hash = request.params[0].get_str();
+    if (!IsHex(serial_hash))
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected hex serial hash");
+
+    EnsureWalletIsUnlocked(pwallet);
+
+    uint256 hashSerial(serial_hash);
+    CZerocoinMint input_mint;
+    if (!pwallet->GetMint(hashSerial, input_mint)) {
+        std::string strErr = "Failed to fetch mint associated with serial hash " + serial_hash;
+        throw JSONRPCError(RPC_WALLET_ERROR, strErr);
+    }
+
+    CMutableTransaction coinstake_tx;
+
+    // create the zerocoinmint output (one spent denom + three 1-zPIV denom)
+    libzerocoin::CoinDenomination staked_denom = input_mint.GetDenomination();
+    std::vector<CTxOut> vOutMint(5);
+    // Mark coin stake transaction
+    CScript scriptEmpty;
+    scriptEmpty.clear();
+    vOutMint[0] = CTxOut(0, scriptEmpty);
+    CDeterministicMint dMint;
+    if (!pwallet->CreateZWSPOutPut(staked_denom, vOutMint[1], dMint))
+        throw JSONRPCError(RPC_WALLET_ERROR, "failed to create new zpiv output");
+
+    for (int i=2; i<5; i++) {
+        if (!pwallet->CreateZWSPOutPut(libzerocoin::ZQ_ONE, vOutMint[i], dMint))
+            throw JSONRPCError(RPC_WALLET_ERROR, "failed to create new zpiv output");
+    }
+    coinstake_tx.vout = vOutMint;
+
+    //hash with only the output info in it to be used in Signature of Knowledge
+    uint256 hashTxOut = coinstake_tx.GetHash();
+    CZerocoinSpendReceipt receipt;
+
+    // create the zerocoinspend input
+    CTxIn newTxIn;
+    // !TODO: mint checks
+    if (!pwallet->MintToTxIn(input_mint, hashTxOut, newTxIn, receipt, libzerocoin::SpendType::STAKE))
+        throw JSONRPCError(RPC_WALLET_ERROR, "failed to create zc-spend stake input");
+
+    coinstake_tx.vin.push_back(newTxIn);
+
+    UniValue ret(UniValue::VOBJ);
+    ret.pushKV("hex", EncodeHexTx(coinstake_tx));
+    CPrivKey pk = input_mint.GetPrivKey();
+    CKey key;
+    key.SetPrivKey(pk, true);
+    ret.pushKV("private-key", HexStr(key));
+    return ret;
+
+}
+#endif
 
 // clang-format off
 static const CRPCCommand commands[] =
@@ -2578,6 +2668,7 @@ static const CRPCCommand commands[] =
     { "hidden",             "signrawtransaction",           &signrawtransaction,        {"hexstring","prevtxs","privkeys","sighashtype"} },
 
     {"zerocoin", "getspentzerocoinamount", &getspentzerocoinamount, {}},
+    {"zerocoin", "createrawzerocoinstake", &createrawzerocoinstake, {}},
 
 };
 // clang-format on

@@ -15,7 +15,7 @@
 #include <policy/fees.h>
 #include <policy/policy.h>
 #include <primitives/transaction.h>
-#include <primitives/zerocoin.h>
+#include <zpiv/zerocoin.h>
 #include <rpc/server.h>
 #include <scheduler.h>
 #include <script/ismine.h>
@@ -32,7 +32,7 @@
 #include <wallet/rpcwallet.h>
 #include <wallet/wallet.h>
 #include <wallet/walletutil.h>
-#include <wallet/zwsptracker.h>
+#include <zpiv/zwsptracker.h>
 #include <key_io.h>
 #include <zwspchain.h>
 

@@ -135,8 +135,8 @@ BITCOIN_CORE_H = \
   compressor.h \
   consensus/consensus.h \
   consensus/tx_verify.h \
-  primitives/deterministicmint.h \
-  primitives/zerocoin.h \
+  zpiv/deterministicmint.h \
+  zpiv/zerocoin.h \
   core_io.h \
   core_memusage.h \
   cuckoocache.h \
@@ -383,8 +383,8 @@ libbitcoin_wallet_a_SOURCES = \
   masternodeman.cpp \
   mintpool.cpp \
   wallet/rpcdump.cpp \
-  primitives/deterministicmint.cpp \
-  primitives/zerocoin.cpp \
+  zpiv/deterministicmint.cpp \
+  zpiv/zerocoin.cpp \
   wallet/rpcwallet.cpp \
   kernel.cpp \
   wallet/wallet.cpp \
@@ -525,8 +525,8 @@ libbitcoin_common_a_SOURCES = \
   chainparams.cpp \
   coins.cpp \
   compressor.cpp \
-  primitives/deterministicmint.cpp \
-  primitives/zerocoin.cpp \
+  zpiv/deterministicmint.cpp \
+  zpiv/zerocoin.cpp \
   core_read.cpp \
   core_write.cpp \
   invalid.cpp \

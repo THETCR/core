@@ -149,6 +149,12 @@ static const bool DEFAULT_PEERBLOOMFILTERS = true;
 /** Default for -stopatheight */
 static const int DEFAULT_STOPATHEIGHT = 0;
 
+/** zPIV precomputing variables
+ * Set the number of included blocks to precompute per cycle. */
+static const int DEFAULT_PRECOMPUTE_LENGTH = 1000;
+static const int MIN_PRECOMPUTE_LENGTH = 500;
+static const int MAX_PRECOMPUTE_LENGTH = 2000;
+
 struct BlockHasher
 {
     // this used to call `GetCheapHash()` in uint256, which was later moved; the
@@ -189,6 +195,7 @@ static const bool DEFAULT_PEERBLOOMFILTERS_ZC = false;
 extern bool fTxIndex;
 extern bool fAlerts;
 extern bool fVerifyingBlocks;
+extern bool fClearSpendCache;
 
 //extern bool fLargeWorkForkFound; moved to warnings
 //extern bool fLargeWorkInvalidChainFound;
@@ -403,16 +410,20 @@ void UpdateCoins(const CTransaction& tx, CCoinsViewCache& inputs, int nHeight);
 
 /** Context-independent validity checks */
 bool CheckZerocoinMint(const uint256& txHash, const CTxOut& txout, CValidationState& state, bool fCheckOnly = false);
-bool CheckZerocoinSpend(const CTransaction& tx, bool fVerifySignature, CValidationState& state);
+bool CheckZerocoinSpend(const CTransaction& tx, bool fVerifySignature, CValidationState& state, bool fFakeSerialAttack = false);
 bool ContextualCheckZerocoinSpend(const CTransaction& tx, const libzerocoin::CoinSpend& spend, CBlockIndex* pindex);
 bool IsTransactionInChain(const uint256& txId, int& nHeightTx, CTransactionRef& tx, const Consensus::Params& consensusParams);
 bool IsTransactionInChain(const uint256& txId, int& nHeightTx);
 bool IsBlockHashInChain(const uint256& hashBlock);
 bool ValidOutPoint(const COutPoint out, int nHeight);
+void AddWrappedSerialsInflation();
 void RecalculateZWSPSpent();
 void RecalculateZWSPMinted();
 bool RecalculateWSPSupply(int nHeightStart);
 bool ReindexAccumulators(std::list<uint256>& listMissingCheckpoints, std::string& strError);
+
+// Fake Serial attack Range
+bool isBlockBetweenFakeSerialAttackRange(int nHeight);
 
 /** Transaction validation functions */
 

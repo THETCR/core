@@ -58,6 +58,8 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", ""
                                        "Enable SwiftX, show confirmations for locked transactions (bool, default: %s)"),
         QT_TRANSLATE_NOOP("wispr-core", ""
+                                       "Enable automatic Zerocoin minting from specific addresses (0-1, default: %u)"),
+        QT_TRANSLATE_NOOP("wispr-core", ""
                                        "Enable automatic wallet backups triggered after each zWSP minting (0-1, "
                                        "default: %u)"),
         QT_TRANSLATE_NOOP("wispr-core", ""
@@ -134,8 +136,13 @@ static const char UNUSED *wispr_strings[] = {
                                        "Maintain a full transaction index, used by the getrawtransaction rpc call "
                                        "(default: %u)"),
         QT_TRANSLATE_NOOP("wispr-core", ""
+                                       "Maximum average size of an index occurrence in the block spam filter "
+                                       "(default: %u)"),
+        QT_TRANSLATE_NOOP("wispr-core", ""
                                        "Maximum size of data in data carrier transactions we relay and mine "
                                        "(default: %u)"),
+        QT_TRANSLATE_NOOP("wispr-core", ""
+                                       "Maximum size of the list of indexes in the block spam filter (default: %u)"),
         QT_TRANSLATE_NOOP("wispr-core", ""
                                        "Maximum total fees to use in a single wallet transaction, setting too low "
                                        "may abort large transactions (default: %s)"),
@@ -162,6 +169,9 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", ""
                                        "Set maximum size of high-priority/low-fee transactions in bytes (default: %d)"),
         QT_TRANSLATE_NOOP("wispr-core", ""
+                                       "Set the number of included blocks to precompute per cycle. (minimum: %d) "
+                                       "(maximum: %d) (default: %d)"),
+        QT_TRANSLATE_NOOP("wispr-core", ""
                                        "Set the number of script verification threads (%u to %d, 0 = auto, <0 = "
                                        "leave that many cores free, default: %d)"),
         QT_TRANSLATE_NOOP("wispr-core", ""
@@ -184,6 +194,11 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", ""
                                        "SwiftX requires inputs with at least 6 confirmations, you might need to wait "
                                        "a few minutes and try again."),
+        QT_TRANSLATE_NOOP("wispr-core", ""
+                                       "The block database contains a block which appears to be from the future. "
+                                       "This may be due to your computer's date and time being set incorrectly. Only "
+                                       "rebuild the block database if you are sure that your computer's date and "
+                                       "time are correct"),
         QT_TRANSLATE_NOOP("wispr-core", ""
                                        "This is a pre-release test build - use at your own risk - do not use for "
                                        "staking or merchant applications!"),
@@ -247,6 +262,7 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", "Accept connections from outside (default: 1 if no -proxy or -connect)"),
         QT_TRANSLATE_NOOP("wispr-core", "Accept public REST requests (default: %u)"),
         QT_TRANSLATE_NOOP("wispr-core", "Add a node to connect to and attempt to keep the connection open"),
+        QT_TRANSLATE_NOOP("wispr-core", "Adding Wrapped Serials supply..."),
         QT_TRANSLATE_NOOP("wispr-core", "Allow DNS lookups for -addnode, -seednode and -connect"),
         QT_TRANSLATE_NOOP("wispr-core", "Already have that input."),
         QT_TRANSLATE_NOOP("wispr-core", "Always query for peer addresses via DNS lookup (default: %u)"),
@@ -265,6 +281,7 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", "Cannot resolve -whitebind address: '%s'"),
         QT_TRANSLATE_NOOP("wispr-core", "Cannot write default address"),
         QT_TRANSLATE_NOOP("wispr-core", "CoinSpend: Accumulator witness does not verify"),
+        QT_TRANSLATE_NOOP("wispr-core", "CoinSpend: failed check"),
         QT_TRANSLATE_NOOP("wispr-core", "Collateral not valid."),
         QT_TRANSLATE_NOOP("wispr-core", "Connect only to the specified node(s)"),
         QT_TRANSLATE_NOOP("wispr-core", "Connect through SOCKS5 proxy"),
@@ -275,6 +292,7 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", "Copyright (C) 2015-%i The WISPR Core Developers"),
         QT_TRANSLATE_NOOP("wispr-core", "Corrupted block database detected"),
         QT_TRANSLATE_NOOP("wispr-core", "Could not parse masternode.conf"),
+        QT_TRANSLATE_NOOP("wispr-core", "Couldn't generate the accumulator witness"),
         QT_TRANSLATE_NOOP("wispr-core", "Debugging/Testing options:"),
         QT_TRANSLATE_NOOP("wispr-core", "Delete blockchain folders and resync from scratch"),
         QT_TRANSLATE_NOOP("wispr-core", "Disable OS notifications for incoming transactions (default: %u)"),
@@ -286,6 +304,7 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", "Do you want to rebuild the block database now?"),
         QT_TRANSLATE_NOOP("wispr-core", "Done loading"),
         QT_TRANSLATE_NOOP("wispr-core", "Enable automatic Zerocoin minting (0-1, default: %u)"),
+        QT_TRANSLATE_NOOP("wispr-core", "Enable precomputation of zPIV spends and stakes (0-1, default %u)"),
         QT_TRANSLATE_NOOP("wispr-core", "Enable publish hash block in <address>"),
         QT_TRANSLATE_NOOP("wispr-core", "Enable publish hash transaction (locked via SwiftX) in <address>"),
         QT_TRANSLATE_NOOP("wispr-core", "Enable publish hash transaction in <address>"),
@@ -413,6 +432,9 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", "Randomly drop 1 of every <n> network messages"),
         QT_TRANSLATE_NOOP("wispr-core", "Randomly fuzz 1 of every <n> network messages"),
         QT_TRANSLATE_NOOP("wispr-core", "Rebuild block chain index from current blk000??.dat files"),
+        QT_TRANSLATE_NOOP("wispr-core", "Recalculating PIV supply..."),
+        QT_TRANSLATE_NOOP("wispr-core", "Recalculating minted ZPIV..."),
+        QT_TRANSLATE_NOOP("wispr-core", "Recalculating spent ZPIV..."),
         QT_TRANSLATE_NOOP("wispr-core", "Receive and display P2P network alerts (default: %u)"),
         QT_TRANSLATE_NOOP("wispr-core", "Reindex the WSP and zWSP money supply statistics"),
         QT_TRANSLATE_NOOP("wispr-core", "Reindex the accumulator database"),
@@ -458,6 +480,7 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", "Submitted following entries to masternode: %u / %d"),
         QT_TRANSLATE_NOOP("wispr-core", "Submitted to masternode, waiting for more entries ( %u / %d ) %s"),
         QT_TRANSLATE_NOOP("wispr-core", "Submitted to masternode, waiting in queue %s"),
+        QT_TRANSLATE_NOOP("wispr-core", "Support the zerocoin light node protocol (default: %u)"),
         QT_TRANSLATE_NOOP("wispr-core", "SwiftX options:"),
         QT_TRANSLATE_NOOP("wispr-core", "Synchronization failed"),
         QT_TRANSLATE_NOOP("wispr-core", "Synchronization finished"),
@@ -501,6 +524,7 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", "Use UPnP to map the listening port (default: %u)"),
         QT_TRANSLATE_NOOP("wispr-core", "Use UPnP to map the listening port (default: 1 when listening)"),
         QT_TRANSLATE_NOOP("wispr-core", "Use a custom max chain reorganization depth (default: %u)"),
+        QT_TRANSLATE_NOOP("wispr-core", "Use block spam filter (default: %u)"),
         QT_TRANSLATE_NOOP("wispr-core", "Use the test network"),
         QT_TRANSLATE_NOOP("wispr-core", "User Agent comment (%s) contains unsafe characters."),
         QT_TRANSLATE_NOOP("wispr-core", "Username for JSON-RPC connections"),
@@ -526,6 +550,7 @@ static const char UNUSED *wispr_strings[] = {
         QT_TRANSLATE_NOOP("wispr-core", "Zapping all transactions from wallet..."),
         QT_TRANSLATE_NOOP("wispr-core", "ZeroMQ notification options:"),
         QT_TRANSLATE_NOOP("wispr-core", "Zerocoin options:"),
+        QT_TRANSLATE_NOOP("wispr-core", "could not get lock on cs_spendcache"),
         QT_TRANSLATE_NOOP("wispr-core", "isValid(): Invalid -proxy address or hostname: '%s'"),
         QT_TRANSLATE_NOOP("wispr-core", "on startup"),
         QT_TRANSLATE_NOOP("wispr-core", "wallet.dat corrupt, salvage failed"),

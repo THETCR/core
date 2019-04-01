@@ -2,15 +2,15 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <primitives/deterministicmint.h>
-#include <wallet/zwsptracker.h>
+#include <zpiv/deterministicmint.h>
+#include <zpiv/zwsptracker.h>
 #include <util/system.h>
 #include "sync.h"
 #include <validation.h>
 #include "txdb.h"
 #include "txmempool.h"
-#include <wallet/zwspwallet.h>
-#include "accumulators.h"
+#include <zpiv/zwspwallet.h>
+#include <zpiv/accumulators.h>
 
 using namespace std;
 

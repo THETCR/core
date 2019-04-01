@@ -215,7 +215,6 @@ static const CRPCConvertParam vRPCConvertParams[] =
     {"spendzerocoin", 0, "amount"},
     {"spendzerocoin", 1, "mintchange"},
     {"spendzerocoin", 2, "minimizechange"},
-    {"spendzerocoin", 3, "securitylevel"},
     {"spendzerocoinmints", 0, "mints_list"},
     {"importzerocoins", 0, "importdata"},
     {"exportzerocoins", 0, "include_spent"},
@@ -234,7 +233,10 @@ static const CRPCConvertParam vRPCConvertParams[] =
     {"getmintsinblocks", 0, "height"},
     {"getmintsinblocks", 1, "range"},
     {"getmintsinblocks", 2, "coinDenomination"},
-    {"getfeeinfo", 0, "blocks"}
+    {"getfeeinfo", 0, "blocks"},
+    {"getserials", 0, "starting_height"},
+    {"getserials", 1, "range"},
+    {"getserials", 2, "fVerbose"}
 };
 // clang-format on
 

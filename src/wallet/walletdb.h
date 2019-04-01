@@ -11,10 +11,10 @@
 #include <script/sign.h>
 #include <wallet/db.h>
 #include <key.h>
-#include "primitives/zerocoin.h"
+#include <zpiv/zerocoin.h>
 #include "libzerocoin/Accumulator.h"
 #include "libzerocoin/Denominations.h"
-#include <wallet/zwsptracker.h>
+#include <zpiv/zwsptracker.h>
 #include <list>
 #include <stdint.h>
 #include <string>
@@ -317,7 +317,12 @@ public:
     CAmount GetAccountCreditDebit(const std::string& strAccount);
     void ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& acentries);
 
-//    DBErrors ReorderTransactions(CWallet* pwallet);
+    void LoadPrecomputes(std::list<std::pair<uint256, CoinWitnessCacheData> >& itemList, std::map<uint256, list<std::pair<uint256, CoinWitnessCacheData> >::iterator>& itemMap);
+    void LoadPrecomputes(set<uint256> setHashes);
+    void EraseAllPrecomputes();
+    bool WritePrecompute(const uint256& hash, const CoinWitnessCacheData& data);
+    bool ReadPrecompute(const uint256& hash, CoinWitnessCacheData& data);
+    bool ErasePrecompute(const uint256& hash);
 private:
     BerkeleyBatch m_batch;
     WalletDatabase& m_database;

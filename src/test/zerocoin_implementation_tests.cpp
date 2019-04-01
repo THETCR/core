@@ -13,15 +13,15 @@
 #include "consensus/validation.h"
 #include <validation.h>
 #include "txdb.h"
-#include "primitives/deterministicmint.h"
+#include "zpiv/deterministicmint.h"
 #include "key.h"
-#include "accumulatorcheckpoints.h"
+#include <zpiv/accumulatorcheckpoints.h>
 #include "libzerocoin/bignum.h"
 #include <boost/test/unit_test.hpp>
 #include <iostream>
-#include <accumulators.h>
+#include <zpiv/accumulators.h>
 #include <wallet/wallet.h>
-#include <wallet/zwspwallet.h>
+#include <zpiv/zwspwallet.h>
 #include "zwspchain.h"
 
 using namespace libzerocoin;
