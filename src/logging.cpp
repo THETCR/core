@@ -133,7 +133,9 @@ const CLogCategoryDesc LogCategories[] =
     {BCLog::ZERO, "zero"},
     {BCLog::MNBUDGET, "mnbudget"},
     {BCLog::ZWSP, "zwsp"},
-    {BCLog::ALERT, "alert"},
+    {BCLog::POS, "proof of stake"},
+    {BCLog::SPORK, "spork"},
+    {BCLog::PRECOMPUTE, "precompute"},
     {BCLog::ALL, "all"},
 };
 
