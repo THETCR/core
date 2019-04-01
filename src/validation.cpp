@@ -669,7 +669,7 @@ bool ContextualCheckZerocoinSpend(const CTransaction& tx, const CoinSpend& spend
 bool ContextualCheckZerocoinSpendNoSerialCheck(const CTransaction& tx, const CoinSpend& spend, CBlockIndex* pindex, const uint256& hashBlock)
 {
     //Check to see if the zPIV is properly signed
-    if (pindex->nHeight >= Params().Zerocoin_Block_V2_Start()) {
+    if (pindex->nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
         try {
             if (!spend.HasValidSignature())
                 return error("%s: V2 zPIV spend does not have a valid signature\n", __func__);
@@ -5435,7 +5435,10 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     if (block.GetHash() != Params().GetConsensus().hashGenesisBlock && !CheckWork(block, pindexPrev))
         return false;
 
+
+    bool isPoS = false;
     if (block.IsProofOfStake()) {
+        isPoS = true;
         pindex->SetProofOfStake();
         pindex->prevoutStake = block.vtx[1]->vin[0].prevout;
         pindex->nStakeTime = block.nTime;
@@ -5451,8 +5454,9 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         if (stake->IsZWSP() && !ContextualCheckZerocoinStake(pindexPrev->nHeight, stake.get()))
             return state.DoS(100, error("%s: staked zWSP fails context checks", __func__));
 
+        uint256 hash = block.GetHash();
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
-            mapProofOfStake.insert(std::make_pair(hash, hashProofOfStake));
+            mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
     }
     if(block.IsProofOfWork()){
         uint256 hashProofOfStake = block.GetPoWHash();
@@ -5507,151 +5511,6 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     }
 
     int nHeight = pindex->nHeight;
-
-    if (block.IsProofOfStake()) {
-        LOCK(cs_main);
-
-        CCoinsViewCache coins(pcoinsTip.get());
-
-        if (!coins.HaveInputs(*block.vtx[1])) {
-            // the inputs are spent at the chain tip so we should look at the recently spent outputs
-
-            for (CTxIn in : block.vtx[1]->vin) {
-                auto it = mapStakeSpent.find(in.prevout);
-                if (it == mapStakeSpent.end()) {
-                    return false;
-                }
-                if (it->second <= pindexPrev->nHeight) {
-                    return false;
-                }
-            }
-        }
-
-        // if this is on a fork
-        if (!chainActive.Contains(pindexPrev)) {
-            // start at the block we're adding on to
-            CBlockIndex *last = pindexPrev;
-
-            // while that block is not on the main chain
-            while (!chainActive.Contains(last)) {
-                CBlock bl;
-                ReadBlockFromDisk(bl, last, chainparams.GetConsensus());
-                // loop through every spent input from said block
-                for (const auto& t : bl.vtx) {
-                    for (const CTxIn& in: t->vin) {
-                        // loop through every spent input in the staking transaction of the new block
-                        for (const CTxIn& stakeIn : block.vtx[1]->vin) {
-                            // if they spend the same input
-                            if (stakeIn.prevout == in.prevout) {
-                                // reject the block
-                                return false;
-                            }
-                        }
-                    }
-                }
-
-                // go to the parent block
-                last = pindexPrev->pprev;
-            }
-        }
-    }
-
-    // Header is valid/has work, merkle tree and segwit merkle tree are good...RELAY NOW
-    // (but if it does not build on our best tip, let the SendMessages loop relay it)
-    if (!IsInitialBlockDownload() && chainActive.Tip() == pindex->pprev)
-        GetMainSignals().NewPoWValidBlock(pindex, pblock);
-
-    // Write block to history file
-    if (fNewBlock) *fNewBlock = true;
-    try {
-        FlatFilePos blockPos = SaveBlockToDisk(block, pindex->nHeight, chainparams, dbp);
-        if (blockPos.IsNull()) {
-            state.Error(strprintf("%s: Failed to find position to write new block to disk", __func__));
-            return false;
-        }
-        ReceivedBlockTransactions(block, pindex, blockPos, chainparams.GetConsensus());
-    } catch (const std::runtime_error& e) {
-        return AbortNode(state, std::string("System error: ") + e.what());
-    }
-
-    FlushStateToDisk(chainparams, state, FlushStateMode::NONE);
-
-    CheckBlockIndex(chainparams.GetConsensus());
-
-    return true;
-}
-
-bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, CDiskBlockPos* dbp, bool fAlreadyCheckedBlock)
-{
-    AssertLockHeld(cs_main);
-
-    CBlockIndex*& pindex = *ppindex;
-
-    // Get prev block index
-    CBlockIndex* pindexPrev = NULL;
-    if (block.GetHash() != Params().HashGenesisBlock()) {
-        BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
-        if (mi == mapBlockIndex.end())
-            return state.DoS(0, error("%s : prev block %s not found", __func__, block.hashPrevBlock.ToString().c_str()), 0, "bad-prevblk");
-        pindexPrev = (*mi).second;
-        if (pindexPrev->nStatus & BLOCK_FAILED_MASK) {
-            //If this "invalid" block is an exact match from the checkpoints, then reconsider it
-            if (Checkpoints::CheckBlock(pindexPrev->nHeight, block.hashPrevBlock, true)) {
-                LogPrintf("%s : Reconsidering block %s height %d\n", __func__, pindexPrev->GetBlockHash().GetHex(), pindexPrev->nHeight);
-                CValidationState statePrev;
-                ReconsiderBlock(statePrev, pindexPrev);
-                if (statePrev.IsValid()) {
-                    ActivateBestChain(statePrev);
-                    return true;
-                }
-            }
-            return state.DoS(100, error("%s : prev block %s is invalid, unable to add block %s", __func__, block.hashPrevBlock.GetHex(), block.GetHash().GetHex()),
-                             REJECT_INVALID, "bad-prevblk");
-        }
-    }
-
-    if (block.GetHash() != Params().HashGenesisBlock() && !CheckWork(block, pindexPrev))
-        return false;
-
-    bool isPoS = false;
-    if (block.IsProofOfStake()) {
-        isPoS = true;
-        uint256 hashProofOfStake = 0;
-        unique_ptr<CStakeInput> stake;
-
-        if (!CheckProofOfStake(block, hashProofOfStake, stake))
-            return state.DoS(100, error("%s: proof of stake check failed", __func__));
-
-        if (!stake)
-            return error("%s: null stake ptr", __func__);
-
-        if (stake->IsZPIV() && !ContextualCheckZerocoinStake(pindexPrev->nHeight, stake.get()))
-            return state.DoS(100, error("%s: staked zPIV fails context checks", __func__));
-
-        uint256 hash = block.GetHash();
-        if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
-            mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
-    }
-
-    if (!AcceptBlockHeader(block, state, &pindex))
-        return false;
-
-    if (pindex->nStatus & BLOCK_HAVE_DATA) {
-        // TODO: deal better with duplicate blocks.
-        // return state.DoS(20, error("AcceptBlock() : already have block %d %s", pindex->nHeight, pindex->GetBlockHash().ToString()), REJECT_DUPLICATE, "duplicate");
-        LogPrintf("AcceptBlock() : already have block %d %s", pindex->nHeight, pindex->GetBlockHash().ToString());
-        return true;
-    }
-
-    if ((!fAlreadyCheckedBlock && !CheckBlock(block, state)) || !ContextualCheckBlock(block, state, pindex->pprev)) {
-        if (state.IsInvalid() && !state.CorruptionPossible()) {
-            pindex->nStatus |= BLOCK_FAILED_VALID;
-            setDirtyBlockIndex.insert(pindex);
-        }
-        return false;
-    }
-
-    int nHeight = pindex->nHeight;
     int splitHeight = -1;
 
     if (isPoS) {
@@ -5662,29 +5521,29 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
         bool isBlockFromFork = pindexPrev != nullptr && chainActive.Tip() != pindexPrev;
 
         // Coin stake
-        CTransaction &stakeTxIn = block.vtx[1];
+        CTransactionRef &stakeTxIn = block.vtx[1];
 
         // Inputs
-        std::vector<CTxIn> pivInputs;
-        std::vector<CTxIn> zPIVInputs;
+        std::vector<CTxIn> wspInputs;
+        std::vector<CTxIn> zWSPInputs;
 
-        for (const CTxIn& stakeIn : stakeTxIn.vin) {
+        for (const CTxIn& stakeIn : stakeTxIn->vin) {
             if(stakeIn.scriptSig.IsZerocoinSpend()){
-                zPIVInputs.push_back(stakeIn);
+                zWSPInputs.push_back(stakeIn);
             }else{
-                pivInputs.push_back(stakeIn);
+                wspInputs.push_back(stakeIn);
             }
         }
-        const bool hasPIVInputs = !pivInputs.empty();
-        const bool hasZPIVInputs = !zPIVInputs.empty();
+        const bool hasWSPInputs = !wspInputs.empty();
+        const bool hasZPIVInputs = !zWSPInputs.empty();
 
         // ZC started after PoS.
         // Check for serial double spent on the same block, TODO: Move this to the proper method..
 
         vector<CBigNum> inBlockSerials;
-        for (const CTransaction& tx : block.vtx) {
-            for (const CTxIn& in: tx.vin) {
-                if(nHeight >= Params().Zerocoin_StartHeight()) {
+        for (const auto& tx : block.vtx) {
+            for (const CTxIn& in: tx->vin) {
+                if(nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
                     if (in.scriptSig.IsZerocoinSpend()) {
                         CoinSpend spend = TxInToZerocoinSpend(in);
                         // Check for serials double spending in the same block
@@ -5695,10 +5554,10 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                         inBlockSerials.push_back(spend.getCoinSerialNumber());
                     }
                 }
-                if(tx.IsCoinStake()) continue;
-                if(hasPIVInputs)
+                if(tx->IsCoinStake()) continue;
+                if(hasWSPInputs)
                     // Check if coinstake input is double spent inside the same block
-                    for (const CTxIn& pivIn : pivInputs){
+                    for (const CTxIn& pivIn : wspInputs){
                         if(pivIn.prevout == in.prevout){
                             // double spent coinstake input inside block
                             return error("%s: double spent coinstake input inside block", __func__);
@@ -5726,20 +5585,20 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                     return error("%s: forked chain longer than maximum reorg limit", __func__);
                 }
 
-                if(!ReadBlockFromDisk(bl, prev))
+                if(!ReadBlockFromDisk(bl, prev, chainparams.GetConsensus()))
                     // Previous block not on disk
                     return error("%s: previous block %s not on disk", __func__, prev->GetBlockHash().GetHex());
                 // Increase amount of read blocks
                 readBlock++;
                 // Loop through every input from said block
-                for (const CTransaction& t : bl.vtx) {
-                    for (const CTxIn& in: t.vin) {
+                for (const auto& t : bl.vtx) {
+                    for (const CTxIn& in: t->vin) {
                         // Loop through every input of the staking tx
-                        for (const CTxIn& stakeIn : pivInputs) {
+                        for (const CTxIn& stakeIn : wspInputs) {
                             // if it's already spent
 
                             // First regular staking check
-                            if(hasPIVInputs) {
+                            if(hasWSPInputs) {
                                 if (stakeIn.prevout == in.prevout) {
                                     return state.DoS(100, error("%s: input already spent on a previous block", __func__));
                                 }
@@ -5762,7 +5621,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
 
             // Now that this loop if completed. Check if we have zPIV inputs.
             if(hasZPIVInputs){
-                for (const CTxIn& zPivInput : zPIVInputs) {
+                for (const CTxIn& zPivInput : zWSPInputs) {
                     CoinSpend spend = TxInToZerocoinSpend(zPivInput);
 
                     // First check if the serials were not already spent on the forked blocks.
@@ -5792,7 +5651,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                         return state.DoS(100, error("%s: stake zerocoinspend not ready to be spent", __func__));
                     }
 
-                    Accumulator accumulator(Params().Zerocoin_Params(chainActive.Height() < Params().Zerocoin_Block_V2_Start()),
+                    Accumulator accumulator(Params().Zerocoin_Params(chainActive.Height() < Params().NEW_PROTOCOLS_STARTHEIGHT()),
                                             spend.getDenomination(), bnAccumulatorValue);
 
                     //Check that the coinspend is valid
@@ -5827,33 +5686,37 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
             }
         } else {
             if(!isBlockFromFork)
-                for (const CTxIn& zPivInput : zPIVInputs) {
+                for (const CTxIn& zPivInput : zWSPInputs) {
                     CoinSpend spend = TxInToZerocoinSpend(zPivInput);
-                    if (!ContextualCheckZerocoinSpend(stakeTxIn, spend, pindex, 0))
+                    if (!ContextualCheckZerocoinSpend(*stakeTxIn, spend, pindex, 0))
                         return state.DoS(100,error("%s: main chain ContextualCheckZerocoinSpend failed for tx %s", __func__,
-                                                   stakeTxIn.GetHash().GetHex()), REJECT_INVALID, "bad-txns-invalid-zpiv");
+                                                   stakeTxIn->GetHash().GetHex()), REJECT_INVALID, "bad-txns-invalid-zpiv");
                 }
 
         }
 
     }
+    // Header is valid/has work, merkle tree and segwit merkle tree are good...RELAY NOW
+    // (but if it does not build on our best tip, let the SendMessages loop relay it)
+    if (!IsInitialBlockDownload() && chainActive.Tip() == pindex->pprev)
+        GetMainSignals().NewPoWValidBlock(pindex, pblock);
 
     // Write block to history file
+    if (fNewBlock) *fNewBlock = true;
     try {
-        unsigned int nBlockSize = ::GetSerializeSize(block, SER_DISK, CLIENT_VERSION);
-        CDiskBlockPos blockPos;
-        if (dbp != NULL)
-            blockPos = *dbp;
-        if (!FindBlockPos(state, blockPos, nBlockSize + 8, nHeight, block.GetBlockTime(), dbp != NULL))
-            return error("AcceptBlock() : FindBlockPos failed");
-        if (dbp == NULL)
-            if (!WriteBlockToDisk(block, blockPos))
-                return state.Abort("Failed to write block");
-        if (!ReceivedBlockTransactions(block, state, pindex, blockPos))
-            return error("AcceptBlock() : ReceivedBlockTransactions failed");
-    } catch (std::runtime_error& e) {
-        return state.Abort(std::string("System error: ") + e.what());
+        FlatFilePos blockPos = SaveBlockToDisk(block, pindex->nHeight, chainparams, dbp);
+        if (blockPos.IsNull()) {
+            state.Error(strprintf("%s: Failed to find position to write new block to disk", __func__));
+            return false;
+        }
+        ReceivedBlockTransactions(block, pindex, blockPos, chainparams.GetConsensus());
+    } catch (const std::runtime_error& e) {
+        return AbortNode(state, std::string("System error: ") + e.what());
     }
+
+    FlushStateToDisk(chainparams, state, FlushStateMode::NONE);
+
+    CheckBlockIndex(chainparams.GetConsensus());
 
     return true;
 }
