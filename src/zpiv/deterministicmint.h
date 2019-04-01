@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef WISPR_DETERMINISTICMINT_H
-#define WISPR_DETERMINISTICMINT_H
+#ifndef PIVX_DETERMINISTICMINT_H
+#define PIVX_DETERMINISTICMINT_H
 
 #include <libzerocoin/Denominations.h>
 #include <uint256.h>
@@ -49,7 +49,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
         READWRITE(this->nVersion);
         READWRITE(nCount);
@@ -64,4 +64,4 @@ public:
     };
 };
 
-#endif //WISPR_DETERMINISTICMINT_H
+#endif //PIVX_DETERMINISTICMINT_H

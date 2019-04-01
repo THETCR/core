@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <zpiv/mintpool.h>
-#include <util/system.h>
+#include "mintpool.h"
+#include "util.h"
 
 using namespace std;
 
@@ -22,7 +22,7 @@ CMintPool::CMintPool(uint32_t nCount)
 void CMintPool::Add(const CBigNum& bnValue, const uint32_t& nCount)
 {
     uint256 hash = GetPubCoinHash(bnValue);
-    Add(std::make_pair(hash, nCount));
+    Add(make_pair(hash, nCount));
     LogPrintf("%s : add %s to mint pool, nCountLastGenerated=%d\n", __func__, bnValue.GetHex().substr(0, 6), nCountLastGenerated);
 }
 
@@ -54,7 +54,7 @@ bool SortSmallest(const pair<uint256, uint32_t>& a, const pair<uint256, uint32_t
 
 std::list<pair<uint256, uint32_t> > CMintPool::List()
 {
-    std::list<pair<uint256, uint32_t> > listMints;
+    list<pair<uint256, uint32_t> > listMints;
     for (auto pMint : *(this)) {
         listMints.emplace_back(pMint);
     }

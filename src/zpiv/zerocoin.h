@@ -2,11 +2,12 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef WISPR_ZEROCOIN_H
-#define WISPR_ZEROCOIN_H
+#ifndef PIVX_ZEROCOIN_H
+#define PIVX_ZEROCOIN_H
 
 #include <amount.h>
 #include <limits.h>
+#include <chainparams.h>
 #include "libzerocoin/bignum.h"
 #include "libzerocoin/Denominations.h"
 #include "key.h"
@@ -123,7 +124,7 @@ public:
     {
         return this->GetValue() == other.GetValue();
     }
-    
+
     // Copy another CZerocoinMint
     inline CZerocoinMint& operator=(const CZerocoinMint& other) {
         denomination = other.GetDenomination();
@@ -137,7 +138,7 @@ public:
         privkey = other.GetPrivKey();
         return *this;
     }
-    
+
     // why 6 below (SPOCK)
     inline bool checkUnused(int denom, int Height) const {
         if (IsUsed() == false && GetDenomination() == denomination && GetRandomness() != 0 && GetSerialNumber() != 0 && GetHeight() != -1 && GetHeight() != INT_MAX && GetHeight() >= 1 && (GetHeight() + 6 <= Height)) {
@@ -150,7 +151,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(isUsed);
         READWRITE(randomness);
         READWRITE(serialNumber);
@@ -218,11 +219,11 @@ public:
     uint256 GetHash() const;
     void SetMintCount(int nMintsAdded) { this->nMintCount = nMintsAdded; }
     int GetMintCount() const { return nMintCount; }
- 
+
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(coinSerial);
         READWRITE(hashTx);
         READWRITE(pubCoin);
@@ -248,4 +249,14 @@ public:
     int GetNeededSpends();
 };
 
-#endif //WISPR_ZEROCOIN_H
+/**
+ * Wrapped serials attack inflation, only for mainnet.
+ * FUTURE: Move this to another file..
+ * @param denom
+ * @return
+ */
+int GetWrapppedSerialInflation(libzerocoin::CoinDenomination denom);
+
+int64_t GetWrapppedSerialInflationAmount();
+
+#endif //PIVX_ZEROCOIN_H

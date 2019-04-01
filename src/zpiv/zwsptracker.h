@@ -5,7 +5,9 @@
 #ifndef WISPR_ZWSPTRACKER_H
 #define WISPR_ZWSPTRACKER_H
 
-#include "zpiv/zerocoin.h"
+#include <zpiv/zerocoin.h>
+#include <zpiv/witness.h>
+#include <sync.h>
 #include <interfaces/chain.h>
 #include <wallet/db.h>
 #include <wallet/walletdb.h>
@@ -25,6 +27,7 @@ private:
     bool fInitialized;
     std::map<uint256, CMintMeta> mapSerialHashes;
     std::map<uint256, uint256> mapPendingSpends; //serialhash, txid of spend
+    std::map<uint256, std::unique_ptr<CoinWitnessData> > mapStakeCache; //serialhash, witness value, height
     bool UpdateStatusInternal(const std::set<uint256>& setMempool, CMintMeta& mint);
     /** Interface for accessing chain state. */
     interfaces::Chain& m_chain;
@@ -54,6 +57,9 @@ public:
     bool GetMetaFromStakeHash(const uint256& hashStake, CMintMeta& meta) const;
     CAmount GetBalance(bool fConfirmedOnly, bool fUnconfirmedOnly) const;
     std::vector<uint256> GetSerialHashes();
+    mutable CCriticalSection cs_spendcache;
+    CoinWitnessData* GetSpendCache(const uint256& hashStake) EXCLUSIVE_LOCKS_REQUIRED(cs_spendcache);
+    bool ClearSpendCache() EXCLUSIVE_LOCKS_REQUIRED(cs_spendcache);
     std::vector<CMintMeta> GetMints(bool fConfirmedOnly) const;
     CAmount GetUnconfirmedBalance() const;
     std::set<CMintMeta> ListMints(bool fUnusedOnly, bool fMatureOnly, bool fUpdateStatus, bool fWrongSeed = false);

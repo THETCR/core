@@ -9,8 +9,9 @@
 #include <validation.h>
 #include "txdb.h"
 #include "txmempool.h"
-#include <zpiv/zwspwallet.h>
 #include <zpiv/accumulators.h>
+#include <zpiv/zwspwallet.h>
+#include "witness.h"
 
 using namespace std;
 
@@ -104,6 +105,29 @@ bool CzWSPTracker::GetMetaFromStakeHash(const uint256& hashStake, CMintMeta& met
             meta = it.second;
             return true;
         }
+    }
+
+    return false;
+}
+
+CoinWitnessData* CzWSPTracker::GetSpendCache(const uint256& hashStake)
+{
+    AssertLockHeld(cs_spendcache);
+    if (!mapStakeCache.count(hashStake)) {
+        std::unique_ptr<CoinWitnessData> uptr(new CoinWitnessData());
+        mapStakeCache.insert(std::make_pair(hashStake, std::move(uptr)));
+        return mapStakeCache.at(hashStake).get();
+    }
+
+    return mapStakeCache.at(hashStake).get();
+}
+
+bool CzWSPTracker::ClearSpendCache()
+{
+    AssertLockHeld(cs_spendcache);
+    if (!mapStakeCache.empty()) {
+        mapStakeCache.clear();
+        return true;
     }
 
     return false;

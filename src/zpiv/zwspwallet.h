@@ -11,8 +11,8 @@
 #include <zpiv/mintpool.h>
 #include "uint256.h"
 #include "zpiv/zerocoin.h"
-#include "walletutil.h"
-#include "walletdb.h"
+#include <wallet/walletutil.h>
+#include <wallet/walletdb.h>
 
 class CDeterministicMint;
 
