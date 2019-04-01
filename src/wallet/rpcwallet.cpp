@@ -6343,7 +6343,7 @@ UniValue sendfrom(const JSONRPCRequest& request)
     if (nAmount > nBalance)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Account has insufficient funds");
 
-    CTransactionRef tx = SendMoney(*locked_chain, pwallet, address, nAmount, fSubtractFeeFromAmount, coin_control, std::move(mapValue));
+    CTransactionRef tx = SendMoney(*locked_chain, pwallet, DecodeDestination(address), nAmount, fSubtractFeeFromAmount, coin_control, std::move(mapValue));
 //    SendMoney(address.Get(), nAmount, wtx);
 
     return wtx.tx->GetHash().GetHex();
