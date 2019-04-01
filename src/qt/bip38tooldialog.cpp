@@ -192,7 +192,7 @@ void Bip38ToolDialog::on_decryptKeyButton_DEC_clicked()
     CPubKey pubKey = key.GetPubKey();
     std::string address = EncodeDestination(pubKey.GetID());
 
-    ui->decryptedKeyOut_DEC->setText(QString::fromStdString(EncodeSecret(key));
+    ui->decryptedKeyOut_DEC->setText(QString::fromStdString(EncodeSecret(key)));
     ui->addressOut_DEC->setText(QString::fromStdString(address));
 }
 
