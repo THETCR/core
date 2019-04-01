@@ -718,8 +718,8 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     if (pblock->payee != CScript()) {
         CTxDestination address1;
         ExtractDestination(pblock->payee, address1);
-        CBitcoinAddress address2(address1);
-        result.pushKV("payee", address2.ToString().c_str());
+        std::string address2 = EncodeDestination(address1);
+        result.pushKV("payee", address2.c_str());
         result.pushKV("payee_amount", (int64_t)pblock->vtx[0]->vout[1].nValue);
     } else {
         result.pushKV("payee", "");

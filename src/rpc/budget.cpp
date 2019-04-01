@@ -7,6 +7,7 @@
 #include <wallet/db.h>
 #include <core_io.h>
 #include <validation.h>
+#include <key_io.h>
 #include "masternode-budget.h"
 #include "masternode-payments.h"
 #include "masternodeconfig.h"
@@ -25,7 +26,7 @@ void budgetToJSON(CBudgetProposal* pbudgetProposal, UniValue& bObj)
 {
     CTxDestination address1;
     ExtractDestination(pbudgetProposal->GetPayee(), address1);
-    CBitcoinAddress address2(address1);
+    std::string address2 = EncodeDestination(address1);
 
     bObj.pushKV("Name", pbudgetProposal->GetName());
     bObj.pushKV("URL", pbudgetProposal->GetURL());
@@ -35,7 +36,7 @@ void budgetToJSON(CBudgetProposal* pbudgetProposal, UniValue& bObj)
     bObj.pushKV("BlockEnd", (int64_t)pbudgetProposal->GetBlockEnd());
     bObj.pushKV("TotalPaymentCount", (int64_t)pbudgetProposal->GetTotalPaymentCount());
     bObj.pushKV("RemainingPaymentCount", (int64_t)pbudgetProposal->GetRemainingPaymentCount());
-    bObj.pushKV("PaymentAddress", address2.ToString());
+    bObj.pushKV("PaymentAddress", address2);
     bObj.pushKV("Ratio", pbudgetProposal->GetRatio());
     bObj.pushKV("Yeas", (int64_t)pbudgetProposal->GetYeas());
     bObj.pushKV("Nays", (int64_t)pbudgetProposal->GetNays());
@@ -115,12 +116,12 @@ UniValue preparebudget(const JSONRPCRequest& request)
     if (nBlockEnd < pindexPrev->nHeight)
         throw runtime_error("Invalid ending block, starting block + (payment_cycle*payments) must be more than current height.");
 
-    CBitcoinAddress address(request.params[4].get_str());
-    if (!address.IsValid())
+    CTxDestination address(request.params[4].get_str());
+    if (!IsValidDestination(address))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WISPR address");
 
     // Parse WISPR address
-    CScript scriptPubKey = GetScriptForDestination(address.Get());
+    CScript scriptPubKey = GetScriptForDestination(address);
     CAmount nAmount = AmountFromValue(request.params[5]);
 
     //*************************************************************************
@@ -210,12 +211,12 @@ UniValue submitbudget(const JSONRPCRequest& request)
     if (nBlockEnd < pindexPrev->nHeight)
         throw runtime_error("Invalid ending block, starting block + (payment_cycle*payments) must be more than current height.");
 
-    CBitcoinAddress address(request.params[4].get_str());
-    if (!address.IsValid())
+    CTxDestination address(request.params[4].get_str());
+    if (!IsValidDestination(address))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WISPR address");
 
     // Parse WISPR address
-    CScript scriptPubKey = GetScriptForDestination(address.Get());
+    CScript scriptPubKey = GetScriptForDestination(address);
     CAmount nAmount = AmountFromValue(request.params[5]);
     uint256 hash = ParseHashV(request.params[6], "parameter 1");
 
@@ -623,7 +624,7 @@ UniValue getbudgetprojection(const JSONRPCRequest& request)
 
         CTxDestination address1;
         ExtractDestination(pbudgetProposal->GetPayee(), address1);
-        CBitcoinAddress address2(address1);
+        std::string address2 = EncodeDestination(address1);
 
         UniValue bObj(UniValue::VOBJ);
         budgetToJSON(pbudgetProposal, bObj);

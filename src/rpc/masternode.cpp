@@ -13,6 +13,7 @@
 #include "masternodeman.h"
 #include "rpc/server.h"
 #include <util/moneystr.h>
+#include <key_io.h>
 #include <wallet/wallet.h>
 #include <wallet/rpcwallet.h>
 
@@ -101,7 +102,7 @@ UniValue listmasternodes(const JSONRPCRequest& request)
         if (mn != nullptr) {
             if (strFilter != "" && strTxHash.find(strFilter) == std::string::npos &&
                 mn->Status().find(strFilter) == std::string::npos &&
-                CBitcoinAddress(mn->pubKeyCollateralAddress.GetID()).ToString().find(strFilter) == std::string::npos) continue;
+                EncodeDestination(mn->pubKeyCollateralAddress.GetID()).find(strFilter) == std::string::npos) continue;
 
             std::string strStatus = mn->Status();
             std::string strHost;
@@ -120,7 +121,7 @@ UniValue listmasternodes(const JSONRPCRequest& request)
             obj.pushKV("outidx", (uint64_t)oIdx);
             obj.pushKV("pubkey", HexStr(mn->pubKeyMasternode));
             obj.pushKV("status", strStatus);
-            obj.pushKV("addr", CBitcoinAddress(mn->pubKeyCollateralAddress.GetID()).ToString());
+            obj.pushKV("addr", EncodeDestination(mn->pubKeyCollateralAddress.GetID()));
             obj.pushKV("version", mn->protocolVersion);
             obj.pushKV("lastseen", (int64_t)mn->lastPing.sigTime);
             obj.pushKV("activetime", (int64_t)(mn->lastPing.sigTime - mn->sigTime));
@@ -225,7 +226,7 @@ UniValue masternodecurrent (const JSONRPCRequest& request)
 
         obj.pushKV("protocol", (int64_t)winner->protocolVersion);
         obj.pushKV("txhash", winner->vin.prevout.hash.ToString());
-        obj.pushKV("pubkey", CBitcoinAddress(winner->pubKeyCollateralAddress.GetID()).ToString());
+        obj.pushKV("pubkey", EncodeDestination(winner->pubKeyCollateralAddress.GetID()));
         obj.pushKV("lastseen", (winner->lastPing == CMasternodePing()) ? winner->sigTime : (int64_t)winner->lastPing.sigTime);
         obj.pushKV("activeseconds", (winner->lastPing == CMasternodePing()) ? 0 : (int64_t)(winner->lastPing.sigTime - winner->sigTime));
         return obj;
@@ -453,7 +454,7 @@ UniValue createmasternodekey (const JSONRPCRequest& request)
     CKey secret;
     secret.MakeNewKey(false);
 
-    return CBitcoinSecret(secret).ToString();
+    return EncodeSecret(secret);
 }
 
 UniValue getmasternodeoutputs (const JSONRPCRequest& request)
@@ -580,7 +581,7 @@ UniValue getmasternodestatus (const JSONRPCRequest& request)
         mnObj.pushKV("txhash", activeMasternode.vin.prevout.hash.ToString());
         mnObj.pushKV("outputidx", (uint64_t)activeMasternode.vin.prevout.n);
         mnObj.pushKV("netaddr", activeMasternode.service.ToString());
-        mnObj.pushKV("addr", CBitcoinAddress(pmn->pubKeyCollateralAddress.GetID()).ToString());
+        mnObj.pushKV("addr", EncodeDestination(pmn->pubKeyCollateralAddress.GetID()));
         mnObj.pushKV("status", activeMasternode.status);
         mnObj.pushKV("message", activeMasternode.GetStatus());
         return mnObj;
@@ -935,8 +936,8 @@ UniValue decodemasternodebroadcast(const JSONRPCRequest& request)
 
     resultObj.pushKV("vin", mnb.vin.prevout.ToString());
     resultObj.pushKV("addr", mnb.addr.ToString());
-    resultObj.pushKV("pubkeycollateral", CBitcoinAddress(mnb.pubKeyCollateralAddress.GetID()).ToString());
-    resultObj.pushKV("pubkeymasternode", CBitcoinAddress(mnb.pubKeyMasternode.GetID()).ToString());
+    resultObj.pushKV("pubkeycollateral", EncodeDestination(mnb.pubKeyCollateralAddress.GetID()));
+    resultObj.pushKV("pubkeymasternode", EncodeDestination(mnb.pubKeyMasternode.GetID()));
     resultObj.pushKV("vchsig", EncodeBase64(&mnb.sig[0], mnb.sig.size()));
     resultObj.pushKV("sigtime", mnb.sigTime);
     resultObj.pushKV("protocolversion", mnb.protocolVersion);
