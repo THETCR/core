@@ -2772,6 +2772,9 @@ void ThreadScriptCheck() {
 void AddWrappedSerialsInflation()
 {
     CBlockIndex* pindex = chainActive[Params().Zerocoin_Block_EndFakeSerial()];
+    if(pindex == nullptr){
+        return;
+    }
     if (pindex->nHeight > chainActive.Height())
         return;
 
