@@ -1719,12 +1719,12 @@ bool AppInitMain(InitInterfaces& interfaces)
 
                 std::cout << "Check Recalculation result\n";
                 // Check Recalculation result
-                if(Params().NetworkID() == CBaseChainParams::MAIN && chainHeight > Params().Zerocoin_Block_EndFakeSerial()) {
-                    CBlockIndex* pblockindex = chainActive[Params().Zerocoin_Block_EndFakeSerial() + 1];
-                    CAmount zwspSupplyCheckpoint = Params().GetSupplyBeforeFakeSerial() + GetWrapppedSerialInflationAmount();
-                    if (pblockindex->GetZerocoinSupply() != zwspSupplyCheckpoint)
-                        return InitError(strprintf("ZerocoinSupply Recalculation failed: %d vs %d", pblockindex->GetZerocoinSupply()/COIN , zwspSupplyCheckpoint/COIN));
-                }
+//                if(Params().NetworkID() == CBaseChainParams::MAIN && chainHeight > Params().Zerocoin_Block_EndFakeSerial()) {
+//                    CBlockIndex* pblockindex = chainActive[Params().Zerocoin_Block_EndFakeSerial() + 1];
+//                    CAmount zwspSupplyCheckpoint = Params().GetSupplyBeforeFakeSerial() + GetWrapppedSerialInflationAmount();
+//                    if (pblockindex->GetZerocoinSupply() != zwspSupplyCheckpoint)
+//                        return InitError(strprintf("ZerocoinSupply Recalculation failed: %d vs %d", pblockindex->GetZerocoinSupply()/COIN , zwspSupplyCheckpoint/COIN));
+//                }
 
                 std::cout << "reindexaccumulators\n";
                 // Force recalculation of accumulators.
