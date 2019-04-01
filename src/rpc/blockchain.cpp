@@ -2668,20 +2668,20 @@ UniValue getserials(const JSONRPCRequest& request) {
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Can't read block from disk");
 
         // loop through each tx in the block
-        for (const CTransaction& tx : block.vtx) {
-            std::string txid = tx.GetHash().GetHex();
+        for (const auto& tx : block.vtx) {
+            std::string txid = tx->GetHash().GetHex();
             // collect the destination (first output) if fVerbose
             std::string spentTo = "";
             if (fVerbose) {
-                if (tx.vout[0].IsZerocoinMint()) {
+                if (tx->vout[0].IsZerocoinMint()) {
                     spentTo = "Zerocoin Mint";
-                } else if (tx.vout[0].IsEmpty()) {
+                } else if (tx->vout[0].IsEmpty()) {
                     spentTo = "Zerocoin Stake";
                 } else {
                     txnouttype type;
                     vector<CTxDestination> addresses;
                     int nRequired;
-                    if (!ExtractDestinations(tx.vout[0].scriptPubKey, type, addresses, nRequired)) {
+                    if (!ExtractDestinations(tx->vout[0].scriptPubKey, type, addresses, nRequired)) {
                         spentTo = strprintf("type: %d", GetTxnOutputType(type));
                     } else {
                         spentTo = CBitcoinAddress(addresses[0]).ToString();
@@ -2689,7 +2689,7 @@ UniValue getserials(const JSONRPCRequest& request) {
                 }
             }
             // loop through each input
-            for (const CTxIn& txin : tx.vin) {
+            for (const CTxIn& txin : tx->vin) {
                 if (txin.scriptSig.IsZerocoinSpend()) {
                     libzerocoin::CoinSpend spend = TxInToZerocoinSpend(txin);
                     std::string serial_str = spend.getCoinSerialNumber().ToString(16);
