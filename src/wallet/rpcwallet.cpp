@@ -5049,7 +5049,7 @@ UniValue spendzerocoinmints(const JSONRPCRequest& request)
     if (request.params.size() == 4) {
         // Destination address was supplied as params[4]. Optional parameters MUST be at the end
         // to avoid type confusion from the JSON interpreter
-        address = CBitcoinAddress(params[3].get_str());
+        address = CBitcoinAddress(request.params[3].get_str());
         if(!address.IsValid())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid PIVX address");
     }
