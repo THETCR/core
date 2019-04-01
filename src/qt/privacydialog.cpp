@@ -458,14 +458,14 @@ void PrivacyDialog::sendzWSP()
         ui->TEMintStatus->verticalScrollBar()->setValue(ui->TEMintStatus->verticalScrollBar()->maximum()); // Automatically scroll to end of text
         return;
     }
-
+    destination = DecodeDestination(address);
     if (walletModel && walletModel->getAddressTableModel()) {
         // If zWSP was spent successfully update the addressbook with the label
         std::string labelText = ui->addAsLabel->text().toStdString();
         if (!labelText.empty())
-            walletModel->updateAddressBookLabels(address, labelText, "send");
+            walletModel->updateAddressBookLabels(destination, labelText, "send");
         else
-            walletModel->updateAddressBookLabels(address, "(no label)", "send");
+            walletModel->updateAddressBookLabels(destination, "(no label)", "send");
     }
 
     // Clear zwsp selector in case it was used
