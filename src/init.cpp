@@ -252,7 +252,7 @@ void PrepareShutdown(InitInterfaces& interfaces)
     if (g_connman) g_connman->Stop();
     if (g_txindex) g_txindex->Stop();
 
-    StopTorControl();
+//    StopTorControl();
 
     // After everything has been shut down, but before things get flushed, stop the
     // CScheduler/checkqueue threadGroup
