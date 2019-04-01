@@ -519,10 +519,10 @@ bool BlockExplorer::switchTo(const QString& query)
     }
 
     // If the query is not an integer, nor a block hash, nor a transaction hash, assume an address
-    std::string Address;
-    Address = EncodeDestination(query.toUtf8().constData());
-    if (IsValidDestinationString(Address)) {
-        std::string Content = AddressToString(Address);
+    CTxDestination Address;
+    Address = DecodeDestination(query.toUtf8().constData());
+    if (IsValidDestination(Address)) {
+        std::string Content = AddressToString(EncodeDestination(Address));
         if (Content.empty())
             return false;
         setContent(Content);
