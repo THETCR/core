@@ -2289,8 +2289,8 @@ bool CConnman::Start(CScheduler& scheduler, const Options& connOptions)
     if (connOptions.m_use_addrman_outgoing && !connOptions.m_specified_outgoing.empty()) {
         if (clientInterface) {
             clientInterface->ThreadSafeMessageBox(
-                    _("Cannot provide specific connections and have addrman find outgoing connections at the same."),
-                    "", CClientUIInterface::MSG_ERROR);
+                _("Cannot provide specific connections and have addrman find outgoing connections at the same."),
+                "", CClientUIInterface::MSG_ERROR);
         }
         return false;
     }
@@ -2321,7 +2321,7 @@ public:
 #endif
     }
 }
-        instance_of_cnetcleanup;
+instance_of_cnetcleanup;
 
 void CConnman::Interrupt()
 {
