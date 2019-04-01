@@ -9,6 +9,7 @@
 #include "obfuscation.h"
 #include <wallet/coincontrol.h>
 #include "masternodeman.h"
+#include <key_io.h>
 #include "script/sign.h"
 #include "swifttx.h"
 #include "ui_interface.h"
@@ -424,12 +425,12 @@ void CObfuscationPool::SetNull()
 
 bool CObfuscationPool::SetCollateralAddress(std::string strAddress)
 {
-    CBitcoinAddress address;
-    if (!address.SetString(strAddress)) {
+    CTxDestination destination = DecodeDestination(strAddress);
+    if (!IsValidDestination(destination)) {
         LogPrintf("CObfuscationPool::SetCollateralAddress - Invalid Obfuscation collateral address\n");
         return false;
     }
-    collateralPubKey = GetScriptForDestination(address.Get());
+    collateralPubKey = GetScriptForDestination(destination);
     return true;
 }
 
@@ -2161,15 +2162,12 @@ bool CObfuScationSigner::IsVinAssociatedWithPubkey(CTxIn& vin, CPubKey& pubkey)
 
 bool CObfuScationSigner::SetKey(std::string strSecret, std::string& errorMessage, CKey& key, CPubKey& pubkey)
 {
-    CBitcoinSecret vchSecret;
-    bool fGood = vchSecret.SetString(strSecret);
-
-    if (!fGood) {
+    key = DecodeSecret(strSecret);
+    if (!key.IsValid()) {
         errorMessage = _("Invalid private key.");
         return false;
     }
 
-    key = vchSecret.GetKey();
     pubkey = key.GetPubKey();
 
     return true;
@@ -2177,11 +2175,10 @@ bool CObfuScationSigner::SetKey(std::string strSecret, std::string& errorMessage
 
 bool CObfuScationSigner::GetKeysFromSecret(std::string strSecret, CKey& keyRet, CPubKey& pubkeyRet)
 {
-    CBitcoinSecret vchSecret;
-
-    if (!vchSecret.SetString(strSecret)) return false;
-
-    keyRet = vchSecret.GetKey();
+    keyRet = DecodeSecret(strSecret);
+    if (!keyRet.IsValid()) {
+        return false;
+    }
     pubkeyRet = keyRet.GetPubKey();
 
     return true;
