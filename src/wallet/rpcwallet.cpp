@@ -5330,9 +5330,7 @@ UniValue exportzerocoins(const JSONRPCRequest& request)
         if (mint.GetVersion() >= 2) {
             CKey key;
             key.SetPrivKey(mint.GetPrivKey(), true);
-            CBitcoinSecret cBitcoinSecret;
-            cBitcoinSecret.SetKey(key);
-            objMint.pushKV("k", cBitcoinSecret.ToString());
+            objMint.pushKV("k", EncodeSecret(key));
         }
         jsonList.push_back(objMint);
     }
