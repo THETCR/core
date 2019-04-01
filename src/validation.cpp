@@ -5521,7 +5521,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         bool isBlockFromFork = pindexPrev != nullptr && chainActive.Tip() != pindexPrev;
 
         // Coin stake
-        CTransactionRef &stakeTxIn = block.vtx[1];
+        const CTransactionRef &stakeTxIn = block.vtx[1];
 
         // Inputs
         std::vector<CTxIn> wspInputs;
@@ -5640,7 +5640,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
                             return state.DoS(100, error("%s: serial double spent on main chain", __func__));
                     }
 
-                    if (!ContextualCheckZerocoinSpendNoSerialCheck(stakeTxIn, spend, pindex, 0))
+                    if (!ContextualCheckZerocoinSpendNoSerialCheck(*stakeTxIn, spend, pindex, 0))
                         return state.DoS(100,error("%s: forked chain ContextualCheckZerocoinSpend failed for tx %s", __func__,
                                                    stakeTxIn.GetHash().GetHex()), REJECT_INVALID, "bad-txns-invalid-zpiv");
 
@@ -5666,19 +5666,19 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 
 
         // If the stake is not a zPoS then let's check if the inputs were spent on the main chain
-        const CCoinsViewCache coins(pcoinsTip);
-        if(!stakeTxIn.IsZerocoinSpend()) {
-            for (const CTxIn& in: stakeTxIn.vin) {
-                const CCoins* coin = coins.AccessCoins(in.prevout.hash);
+        const CCoinsViewCache coins(pcoinsTip.get());
+        if(!stakeTxIn->IsZerocoinSpend()) {
+            for (const CTxIn& in: stakeTxIn->vin) {
+                const Coin& coin = coins.AccessCoin(in.prevout);
 
-                if(!coin && !isBlockFromFork){
+                if(coin.IsSpent() && !isBlockFromFork){
                     // No coins on the main chain
                     return error("%s: coin stake inputs not available on main chain, received height %d vs current %d", __func__, nHeight, chainActive.Height());
                 }
-                if(coin && !coin->IsAvailable(in.prevout.n)){
+                if(coin.IsSpent() && !coin.IsAvailable(in.prevout.n)){
                     // If this is not available get the height of the spent and validate it with the forked height
                     // Check if this occurred before the chain split
-                    if(!(isBlockFromFork && coin->nHeight > splitHeight)){
+                    if(!(isBlockFromFork && coin.nHeight > splitHeight)){
                         // Coins not available
                         return error("%s: coin stake inputs already spent in main chain", __func__);
                     }
