@@ -597,6 +597,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
     CReserveKey reservekey(pwallet);
     unsigned int nExtraNonce = 0;
 
+    std::cout << "BitcoinMiner while\n";
     while (fGenerateBitcoins || fProofOfStake) {
         if (fProofOfStake) {
             //control the amount of times the client will check for mintable coins
@@ -761,6 +762,8 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
             }
         }
     }
+    std::cout << "BitcoinMiner end of while\n";
+
 }
 
 void static ThreadBitcoinMiner(void* parg)

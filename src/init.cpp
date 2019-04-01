@@ -1827,6 +1827,7 @@ bool AppInitMain(InitInterfaces& interfaces)
         }
     }
 
+    std::cout << "Prune mode\n";
     if (chainparams.GetConsensus().vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout != 0) {
         // Only advertise witness capabilities if they have a reasonable start time.
         // This allows us to have the code merged without a defined softfork, by setting its
@@ -1838,6 +1839,7 @@ bool AppInitMain(InitInterfaces& interfaces)
 
     // ********************************************************* Step 11: import blocks
 
+    std::cout << "Prune mode\n";
     if (!CheckDiskSpace(GetDataDir())) {
         InitError(strprintf(_("Error: Disk space is low for %s"), GetDataDir()));
         return false;
@@ -1847,6 +1849,7 @@ bool AppInitMain(InitInterfaces& interfaces)
         return false;
     }
 
+    std::cout << "Prune mode\n";
     // Either install a handler to notify us when genesis activates, or set fHaveGenesis directly.
     // No locking, as this happens before any background thread is started.
     if (chainActive.Tip() == nullptr) {
@@ -1855,14 +1858,17 @@ bool AppInitMain(InitInterfaces& interfaces)
         fHaveGenesis = true;
     }
 
+    std::cout << "Prune mode\n";
     if (gArgs.IsArgSet("-blocknotify"))
         uiInterface.NotifyBlockTip_connect(BlockNotifyCallback);
 
+    std::cout << "Prune mode\n";
     std::vector<fs::path> vImportFiles;
     for (const std::string& strFile : gArgs.GetArgs("-loadblock")) {
         vImportFiles.push_back(strFile);
     }
 
+    std::cout << "Prune mode\n";
     threadGroup.create_thread(std::bind(&ThreadImport, vImportFiles));
 
     // Wait for genesis block to be processed
@@ -1876,7 +1882,7 @@ bool AppInitMain(InitInterfaces& interfaces)
         }
         uiInterface.NotifyBlockTip_disconnect(BlockNotifyGenesisWait);
     }
-
+    std::cout << "Prune mode\n";
     if (ShutdownRequested()) {
         return false;
     }
@@ -1885,6 +1891,7 @@ bool AppInitMain(InitInterfaces& interfaces)
 
     int chain_active_height;
 
+    std::cout << "Prune mode\n";
     //// debug print
     {
         LOCK(cs_main);
@@ -1957,9 +1964,11 @@ bool AppInitMain(InitInterfaces& interfaces)
             connOptions.m_specified_outgoing = connect;
         }
     }
+    std::cout << "g_connman start\n";
     if (!g_connman->Start(scheduler, connOptions)) {
         return false;
     }
+    std::cout << "NODE_BLOOM_LIGHT_ZC\n";
 
     if (nLocalServices & NODE_BLOOM_LIGHT_ZC) {
         // Run a thread to compute witnesses
@@ -1968,13 +1977,14 @@ bool AppInitMain(InitInterfaces& interfaces)
 
     // ********************************************************* Step 13: finished
 
+    std::cout << "SetRPCWarmupFinished\n";
     SetRPCWarmupFinished();
     uiInterface.InitMessage(_("Done loading"));
 
     for (const auto& client : interfaces.chain_clients) {
         client->start(scheduler);
     }
-
+    std::cout << "Prune mode\n";
     scheduler.scheduleEvery([]{
         g_banman->DumpBanlist();
     }, DUMP_BANS_INTERVAL * 1000);
