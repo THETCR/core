@@ -103,10 +103,10 @@ endif
 # wispr core #
 BITCOIN_CORE_H = \
   activemasternode.h \
-  accumulators.h \
-  accumulatorcheckpoints.h \
-  accumulatorcheckpoints.json.h \
-  accumulatormap.h \
+  zpiv/accumulators.h \
+  zpiv/accumulatorcheckpoints.h \
+  zpiv/accumulatorcheckpoints.json.h \
+  zpiv/accumulatormap.h \
   addrdb.h \
   addrman.h \
   alert.h \
@@ -175,7 +175,7 @@ BITCOIN_CORE_H = \
   masternodeconfig.h \
   merkleblock.h \
   miner.h \
-  mintpool.h \
+  zpiv/mintpool.h \
   mruset.h \
   net.h \
   net_processing.h \
@@ -257,8 +257,9 @@ BITCOIN_CORE_H = \
   wallet/walletutil.h \
   wallet/coinselection.h \
   zwspchain.h \
-  wallet/zwsptracker.h \
-  wallet/zwspwallet.h \
+  zpiv/witness.h \
+  zpiv/zwsptracker.h \
+  zpiv/zwspwallet.h \
   genwit.h \
   concurrentqueue.h \
   lightzwspthread.h \
@@ -292,7 +293,7 @@ libbitcoin_server_a_SOURCES = \
   checkpoints.cpp \
   consensus/tx_verify.cpp \
   flatfile.cpp \
-  genwit.cpp \
+  zpiv/genwit.cpp \
   httprpc.cpp \
   httpserver.cpp \
   index/base.cpp \
@@ -381,7 +382,8 @@ libbitcoin_wallet_a_SOURCES = \
   masternode-sync.cpp \
   masternodeconfig.cpp \
   masternodeman.cpp \
-  mintpool.cpp \
+  zpiv/mintpool.cpp \
+  zpiv/witness.cpp \
   wallet/rpcdump.cpp \
   zpiv/deterministicmint.cpp \
   zpiv/zerocoin.cpp \
@@ -389,8 +391,8 @@ libbitcoin_wallet_a_SOURCES = \
   kernel.cpp \
   wallet/wallet.cpp \
   wallet/walletdb.cpp \
-  wallet/zwspwallet.cpp \
-  wallet/zwsptracker.cpp \
+  zpiv/zwspwallet.cpp \
+  zpiv/zwsptracker.cpp \
   wallet/walletutil.cpp \
   wallet/coinselection.cpp \
   stakeinput.cpp \
@@ -516,9 +518,9 @@ libwispr_consensus_a_SOURCES = \
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_SOURCES = \
-  accumulators.cpp \
-  accumulatorcheckpoints.cpp \
-  accumulatormap.cpp \
+  zpiv/accumulators.cpp \
+  zpiv/accumulatorcheckpoints.cpp \
+  zpiv/accumulatormap.cpp \
   base58.cpp \
   bech32.cpp \
   bip38.cpp \
