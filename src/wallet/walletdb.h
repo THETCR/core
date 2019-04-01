@@ -292,8 +292,8 @@ public:
     bool WriteMintPoolPair(const uint256& hashMasterSeed, const uint256& hashPubcoin, const uint32_t& nCount);
 
     //REMOVED
-    bool WriteAutoConvertKey(const CBitcoinAddress& btcAddress);
-    void LoadAutoConvertKeys(std::set<CBitcoinAddress>& setAddresses);
+    bool WriteAutoConvertKey(const std::string& strAddress);
+    void LoadAutoConvertKeys(std::set<std::string>& setAddresses);
     bool WriteMultiSig(const CScript& script);
     bool EraseMultiSig(const CScript& script);
     // presstab

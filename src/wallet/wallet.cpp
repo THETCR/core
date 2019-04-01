@@ -279,9 +279,9 @@ CPubKey CWallet::GenerateNewKey(WalletBatch &batch, bool internal)
     return pubkey;
 }
 
-CBitcoinAddress CWallet::GenerateNewAutoMintKey()
+std::string CWallet::GenerateNewAutoMintKey()
 {
-    CBitcoinAddress btcAddress;
+    std::string btcAddress;
     WalletBatch batch(*database);
     CKeyID keyID = GenerateNewKey(batch).GetID();
     btcAddress.Set(keyID);
@@ -874,15 +874,17 @@ bool CWallet::GetVinAndKeysFromOutput(COutput out, CTxIn& txinRet, CPubKey& pubK
 
     CTxDestination address1;
     ExtractDestination(pubScript, address1);
-    CBitcoinAddress address2(address1);
+    std::string address2 = EncodeDestination(address1);
+    CTxDestination destination = DecodeDestination(address2);
 
-    CKeyID keyID;
-    if (!address2.GetKeyID(keyID)) {
+
+    CKeyID *keyID = boost::get<CKeyID>(&destination);
+    if (!keyID) {
         LogPrintf("CWallet::GetVinAndKeysFromOutput -- Address does not refer to a key\n");
         return false;
     }
 
-    if (!GetKey(keyID, keyRet)) {
+    if (!GetKey(*keyID, keyRet)) {
         LogPrintf("CWallet::GetVinAndKeysFromOutput -- Private key for address is not known\n");
         return false;
     }
@@ -4868,7 +4870,7 @@ void CWallet::EraseFromWallet(const uint256& hash)
     return;
 }
 
-bool CWallet::IsUsed(const CBitcoinAddress address) const
+bool CWallet::IsUsed(const std::string address) const
 {
     LOCK(cs_wallet);
     CScript scriptPubKey = GetScriptForDestination(address.Get());
@@ -5675,13 +5677,13 @@ CAmount CWallet::GetLockedWatchOnlyBalance() const
 //    }
 //}
 
-map<CBitcoinAddress, std::vector<COutput> > CWallet::AvailableCoinsByAddress(bool fConfirmed, CAmount maxCoinValue)
+map<std::string, std::vector<COutput> > CWallet::AvailableCoinsByAddress(bool fConfirmed, CAmount maxCoinValue)
 {
     std::vector<COutput> vCoins;
     auto locked_chain = chain().lock();
     AvailableCoins(*locked_chain, vCoins, fConfirmed);
 
-    map<CBitcoinAddress, std::vector<COutput> > mapCoins;
+    map<std::string, std::vector<COutput> > mapCoins;
     for (COutput out: vCoins) {
         if (maxCoinValue > 0 && out.tx->tx->vout[out.i].nValue > maxCoinValue)
             continue;
@@ -5690,7 +5692,7 @@ map<CBitcoinAddress, std::vector<COutput> > CWallet::AvailableCoinsByAddress(boo
         if (!ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, address))
             continue;
 
-        mapCoins[CBitcoinAddress(address)].push_back(out);
+        mapCoins[EncodeDestination(address)].push_back(out);
     }
 
     return mapCoins;
@@ -7128,7 +7130,7 @@ void CWallet::AutoZeromintForAddress()
 {
     auto locked_chain = chain().lock();
     std::map<CTxDestination, CAmount> mapBalances = GetAddressBalances(*locked_chain);
-    std::map<CBitcoinAddress, std::vector<COutput> > mapAddressCoins = AvailableCoinsByAddress(true);
+    std::map<std::string, std::vector<COutput> > mapAddressCoins = AvailableCoinsByAddress(true);
 
     for (auto address : setAutoConvertAddresses) {
         CTxDestination dest = address.Get();
@@ -7284,10 +7286,10 @@ void CWallet::AutoCombineDust()
         return;
     }
 
-    map<CBitcoinAddress, std::vector<COutput> > mapCoinsByAddress = AvailableCoinsByAddress(true, nAutoCombineThreshold * COIN);
+    map<std::string, std::vector<COutput> > mapCoinsByAddress = AvailableCoinsByAddress(true, nAutoCombineThreshold * COIN);
 
     //coins are sectioned by address. This combination code only wants to combine inputs that belong to the same address
-    for (map<CBitcoinAddress, std::vector<COutput> >::iterator it = mapCoinsByAddress.begin(); it != mapCoinsByAddress.end(); it++) {
+    for (map<std::string, std::vector<COutput> >::iterator it = mapCoinsByAddress.begin(); it != mapCoinsByAddress.end(); it++) {
         std::vector<COutput> vCoins, vRewardCoins;
         bool maxSize = false;
         vCoins = it->second;
@@ -7412,7 +7414,7 @@ bool CWallet::MultiSend()
         //Disabled Addresses won't send MultiSend transactions
         if (vDisabledAddresses.size() > 0) {
             for (unsigned int i = 0; i < vDisabledAddresses.size(); i++) {
-                if (vDisabledAddresses[i] == CBitcoinAddress(destMyAddress).ToString()) {
+                if (vDisabledAddresses[i] == EncodeDestination(destMyAddress)) {
                     LogPrintf("Multisend: disabled address preventing multisend\n");
                     return false;
                 }
@@ -7436,9 +7438,9 @@ bool CWallet::MultiSend()
         for (unsigned int i = 0; i < vMultiSend.size(); i++) {
             // MultiSend vector is a pair of 1)Address as a std::string 2) Percent of stake to send as an int
             nAmount = ((out.tx->GetCredit(*locked_chain, filter) - out.tx->GetDebit(filter)) * vMultiSend[i].second) / 100;
-            CBitcoinAddress strAddSend(vMultiSend[i].first);
+            std::string strAddSend(vMultiSend[i].first);
             CScript scriptPubKey;
-            scriptPubKey = GetScriptForDestination(strAddSend.Get());
+            scriptPubKey = GetScriptForDestination(strAddSend);
             vecSend.push_back(std::make_pair(scriptPubKey, nAmount));
         }
 
@@ -7832,7 +7834,7 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
     return true;
 }
 
-bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, CWalletTx& wtxNew, CReserveKey& reserveKey, CZerocoinSpendReceipt& receipt, vector<CZerocoinMint>& vSelectedMints, vector<CDeterministicMint>& vNewMints, bool fMintChange,  bool fMinimizeChange, CBitcoinAddress* address)
+bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, CWalletTx& wtxNew, CReserveKey& reserveKey, CZerocoinSpendReceipt& receipt, vector<CZerocoinMint>& vSelectedMints, vector<CDeterministicMint>& vNewMints, bool fMintChange,  bool fMinimizeChange, std::string* address)
 {
     // Check available funds
     int nStatus = ZWSP_TRX_FUNDS_PROBLEMS;
@@ -8332,7 +8334,7 @@ string CWallet::MintZerocoin(CAmount nValue, CWalletTx& wtxNew, std::vector<CDet
     return "";
 }
 
-bool CWallet::SpendZerocoin(CAmount nAmount, CWalletTx& wtxNew, CZerocoinSpendReceipt& receipt, vector<CZerocoinMint>& vMintsSelected, bool fMintChange, bool fMinimizeChange, CBitcoinAddress* addressTo)
+bool CWallet::SpendZerocoin(CAmount nAmount, CWalletTx& wtxNew, CZerocoinSpendReceipt& receipt, vector<CZerocoinMint>& vMintsSelected, bool fMintChange, bool fMinimizeChange, std::string* addressTo)
 {
     // Default: assume something goes wrong. Depending on the problem this gets more specific below
     int nStatus = ZWSP_SPEND_ERROR;

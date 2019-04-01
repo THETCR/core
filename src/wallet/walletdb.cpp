@@ -61,15 +61,20 @@ bool WalletBatch::EraseTx(uint256 hash)
     return EraseIC(std::make_pair(std::string("tx"), hash));
 }
 
-bool WalletBatch::WriteAutoConvertKey(const CBitcoinAddress& btcAddress)
+bool WalletBatch::WriteAutoConvertKey(const std::string& strAddress)
 {
-    CKeyID keyID;
-    if (!btcAddress.GetKeyID(keyID))
+    CTxDestination destination = DecodeDestination(strAddress);
+    if (!IsValidDestination(destination)) {
         return false;
-    return WriteIC(std::make_pair(std::string("automint"), keyID), btcAddress.ToString());
+    }
+    const CKeyID *keyID = boost::get<CKeyID>(&destination);
+    if (!keyID) {
+        return false;
+    }
+    return WriteIC(std::make_pair(std::string("automint"), keyID), strAddress);
 }
 
-void WalletBatch::LoadAutoConvertKeys(std::set<CBitcoinAddress>& setAddresses)
+void WalletBatch::LoadAutoConvertKeys(std::set<std::string>& setAddresses)
 {
     setAddresses.clear();
     Dbc* pcursor = m_batch.GetCursor();
@@ -1409,7 +1414,7 @@ std::list<CZerocoinSpend> WalletBatch::ListSpentCoins()
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(string("zcserial"), CBigNum(0));
+            ssKey << std::make_pair(std::string("zcserial"), CBigNum(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = m_batch.ReadAtCursor(pcursor, ssKey, ssValue);
         fFlags = DB_NEXT;
@@ -1464,7 +1469,7 @@ std::list<CZerocoinMint> WalletBatch::ListArchivedZerocoins()
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(string("zco"), CBigNum(0));
+            ssKey << std::make_pair(std::string("zco"), CBigNum(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = m_batch.ReadAtCursor(pcursor, ssKey, ssValue);
         fFlags = DB_NEXT;
@@ -1507,7 +1512,7 @@ std::list<CDeterministicMint> WalletBatch::ListArchivedDeterministicMints()
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(string("dzco"), CBigNum(0));
+            ssKey << std::make_pair(std::string("dzco"), CBigNum(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = m_batch.ReadAtCursor(pcursor, ssKey, ssValue);
         fFlags = DB_NEXT;
