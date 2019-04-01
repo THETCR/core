@@ -208,7 +208,7 @@ void Bip38ToolDialog::on_importAddressButton_DEC_clicked()
     CTxDestination address = DecodeDestination(ui->addressOut_DEC->text().toStdString());
     CPubKey pubkey = key.GetPubKey();
 
-    if (!IsValidDestination(address) || !key.IsValid() || EncodeDestination(pubkey.GetID()) != address) {
+    if (!IsValidDestination(address) || !key.IsValid() || EncodeDestination(pubkey.GetID()) != EncodeDestination(address)) {
         ui->statusLabel_DEC->setStyleSheet("QLabel { color: red; }");
         ui->statusLabel_DEC->setText(tr("Data Not Valid.") + QString(" ") + tr("Please try again."));
         return;
