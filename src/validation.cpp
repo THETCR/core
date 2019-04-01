@@ -2253,8 +2253,8 @@ bool CScriptCheck::operator()() {
     return VerifyScript(scriptSig, m_tx_out.scriptPubKey, witness, nFlags, CachingTransactionSignatureChecker(ptxTo, nIn, m_tx_out.nValue, cacheStore, *txdata), &error);
 }
 
-CBitcoinAddress addressExp1("WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmDW");
-CBitcoinAddress addressExp2("WhNMBaseKkCM2VtHN1BURZNGmGwJzQTB2Z");
+std::string addressExp1 = "WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmDW";
+std::string addressExp2 = "WhNMBaseKkCM2VtHN1BURZNGmGwJzQTB2Z";
 
 map<COutPoint, COutPoint> mapInvalidOutPoints;
 map<CBigNum, CAmount> mapInvalidSerials;
