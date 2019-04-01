@@ -40,7 +40,7 @@ PublicCoin::PublicCoin(const ZerocoinParams* p, const CBigNum& coin, const CoinD
 		if(denom == d)
 			denomination = d;
 	}
-    if(denomination == 0){
+    if (denomination == 0) {
 		std::cout << "denom does not exist\n";
 		throw std::runtime_error("Denomination does not exist");
 	}

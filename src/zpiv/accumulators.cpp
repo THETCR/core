@@ -12,6 +12,7 @@
 #include "accumulatorcheckpoints.h"
 #include "zwspchain.h"
 #include "tinyformat.h"
+#include "shutdown.h"
 
 using namespace libzerocoin;
 
