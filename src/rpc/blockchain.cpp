@@ -2621,8 +2621,8 @@ UniValue getmintsinblocks(const JSONRPCRequest& request) {
     return obj;
 }
 
-UniValue getserials(const UniValue& params, bool fHelp) {
-    if (fHelp || params.size() < 2 || params.size() > 3)
+UniValue getserials(const JSONRPCRequest& request) {
+    if (request.fHelp || request.params.size() < 2 || request.params.size() > 3)
         throw runtime_error(
                 "getserials \"hash\"\n"
                 "\nLook the inputs of any tx in a range of blocks and returns the serial numbers for any coinspend.\n"
@@ -2640,11 +2640,11 @@ UniValue getserials(const UniValue& params, bool fHelp) {
 
     int nBestHeight = chainActive.Height();
 
-    int heightStart = params[0].get_int();
+    int heightStart = request.params[0].get_int();
     if (heightStart < Params().NEW_PROTOCOLS_STARTHEIGHT())
         heightStart = Params().NEW_PROTOCOLS_STARTHEIGHT();
 
-    int range = params[1].get_int();
+    int range = request.params[1].get_int();
     if (range < 1)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid block range. Must be strictly positive.");
 
@@ -2653,8 +2653,8 @@ UniValue getserials(const UniValue& params, bool fHelp) {
         heightEnd = nBestHeight;
 
     bool fVerbose = false;
-    if (params.size() > 2) {
-        fVerbose = params[2].get_bool();
+    if (request.params.size() > 2) {
+        fVerbose = request.params[2].get_bool();
     }
 
     CBlockIndex* pblockindex = chainActive[heightStart];
@@ -2664,7 +2664,7 @@ UniValue getserials(const UniValue& params, bool fHelp) {
 
     while (true) {
         CBlock block;
-        if (!ReadBlockFromDisk(block, pblockindex))
+        if (!ReadBlockFromDisk(block, pblockindex, Params().GetConsensus()))
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Can't read block from disk");
 
         // loop through each tx in the block
