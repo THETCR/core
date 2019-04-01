@@ -55,6 +55,7 @@
 #include <txdb.h>
 #include <txmempool.h>
 #include <torcontrol.h>
+#include <tinyformat.h>
 #include <ui_interface.h>
 #include <util/system.h>
 #include <util/moneystr.h>
