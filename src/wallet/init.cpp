@@ -280,7 +280,7 @@ void StartWallets(CScheduler& scheduler)
 
     if (gArgs.GetBoolArg("-precompute", true)) {
         // Run a thread to precompute any zPIV spends
-        threadGroup.create_thread(boost::bind(&ThreadPrecomputeSpends));
+//        threadGroup.create_thread(boost::bind(&ThreadPrecomputeSpends));
     }
 }
 
