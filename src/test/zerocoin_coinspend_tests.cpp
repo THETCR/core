@@ -7,14 +7,14 @@
 #include "libzerocoin/Accumulator.h"
 #include "zpiv/zerocoin.h"
 #include "zpiv/deterministicmint.h"
-#include "zpiv/zpivwallet.h"
+#include "zpiv/zwspwallet.h"
 #include "libzerocoin/Coin.h"
 #include "amount.h"
 #include "chainparams.h"
-#include "coincontrol.h"
-#include "main.h"
-#include "wallet.h"
-#include "walletdb.h"
+#include <wallet/coincontrol.h>
+#include <validation.h>
+#include <wallet/wallet.h>
+#include <wallet/walletdb.h>
 #include "txdb.h"
 #include <boost/test/unit_test.hpp>
 #include <iostream>
@@ -38,9 +38,11 @@ BOOST_AUTO_TEST_CASE(zerocoin_wrapped_serial_spend_test)
 
     // Seed + Mints
     string strWalletFile = "unittestwallet.dat";
-    CWalletDB walletdb(strWalletFile, "cr+");
-    CWallet wallet(strWalletFile);
-    CzPIVWallet *czPIVWallet = new CzPIVWallet(wallet.strWalletFile);
+    std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
+    WalletLocation m_location = WalletLocation(strWalletFile);
+    std::shared_ptr<CWallet> pwallet(new CWallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath())));
+    WalletBatch walletdb(pwallet->GetDBHandle(), "cr+");
+    CzWSPWallet *czWSPWallet = new CzWSPWallet(pwallet->chain(), pwallet->GetLocation(), pwallet->GetDBHandle(), *pwallet);
 
     // Get the 5 created mints.
     CoinDenomination denom = CoinDenomination::ZQ_FIFTY;
@@ -48,8 +50,8 @@ BOOST_AUTO_TEST_CASE(zerocoin_wrapped_serial_spend_test)
     for (unsigned int i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
         PrivateCoin coin(ZCParams, denom, false);
         CDeterministicMint dMint;
-        czPIVWallet->GenerateDeterministicZPIV(denom, coin, dMint, true);
-        czPIVWallet->UpdateCount();
+        czWSPWallet->GenerateDeterministicZWSP(denom, coin, dMint, true);
+        czWSPWallet->UpdateCount();
         vCoins.emplace_back(coin);
     }
 
