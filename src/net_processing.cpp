@@ -1701,11 +1701,11 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             return error("message getdata size() = %u", vInv.size());
         }
 
-        if (fDebug || (vInv.size() != 1))
-            LogPrint(BCLog::NET, "received getdata (%u invsz) peer=%d\n", vInv.size(), pfrom->GetId());
+        LogPrint(BCLog::NET, "received getdata (%u invsz) peer=%d\n", vInv.size(), pfrom->GetId());
 
-        if ((fDebug && vInv.size() > 0) || (vInv.size() == 1))
+        if (vInv.size() > 0) {
             LogPrint(BCLog::NET, "received getdata for: %s peer=%d\n", vInv[0].ToString(), pfrom->GetId());
+        }
 
         pfrom->vRecvGetData.insert(pfrom->vRecvGetData.end(), vInv.begin(), vInv.end());
         ProcessGetData(pfrom, chainparams, connman, interruptMsgProc);
@@ -1771,8 +1771,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         // we must use CBlockGetHeader, as CBlockHeaders won't include the 0x00 nTx count at the end
         std::vector<CBlockGetHeader> vHeaders;
         int nLimit = MAX_HEADERS_RESULTS;
-        if (fDebug)
-            LogPrintf("getheaders %d to %s from peer=%d\n", (pindex ? pindex->nHeight : -1), hashStop.ToString(), pfrom->GetId());
+        LogPrint(BCLog::NET, "getheaders %d to %s from peer=%d\n", (pindex ? pindex->nHeight : -1), hashStop.IsNull() ? "end" : hashStop.ToString(), pfrom->GetId());
         for (; pindex; pindex = chainActive.Next(pindex)) {
             vHeaders.push_back(pindex->GetBlockHeader());
             if (--nLimit <= 0 || pindex->GetBlockHash() == hashStop)
@@ -1811,7 +1810,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             if (pmn != nullptr) {
                 if (!pmn->allowFreeTx) {
                     //multiple peers can send us a valid masternode transaction
-                    if (fDebug) LogPrintf("dstx: Masternode sending too many transactions %s\n", tx.GetHash().ToString());
+                    LogPrint(BCLog::MASTERNODE, "dstx: Masternode sending too many transactions %s\n", tx.GetHash().ToString());
                     return true;
                 }
 
@@ -2308,7 +2307,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
 
     else if (strCommand == NetMsgType::REJECT) {
-        if (fDebug) {
+        if (LogAcceptCategory(BCLog::NET)) {
             try {
                 std::string strMsg;
                 unsigned char ccode;
@@ -2812,8 +2811,7 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
         while (!pto->fDisconnect && !pto->mapAskFor.empty() && (*pto->mapAskFor.begin()).first <= nNow) {
             const CInv& inv = (*pto->mapAskFor.begin()).second;
             if (!AlreadyHave(inv)) {
-                if (fDebug)
-                    LogPrint(BCLog::NET, "Requesting %s peer=%d\n", inv.ToString(), pto->GetId());
+                LogPrint(BCLog::NET, "Requesting %s peer=%d\n", inv.ToString(), pto->GetId());
                 vGetData.push_back(inv);
                 if (vGetData.size() >= 1000) {
                     connman->PushMessage(pto, msgMaker.Make(NetMsgType::GETDATA, vGetData));

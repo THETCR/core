@@ -1015,7 +1015,7 @@ bool CObfuscationPool::IsCollateralValid(const CTransaction& txCollateral)
         LOCK(cs_main);
         CValidationState state;
         if (!AcceptableInputs(mempool, state, txCollateral, true, nullptr)) {
-            if (fDebug) LogPrintf("CObfuscationPool::IsCollateralValid - didn't pass IsAcceptable\n");
+            LogPrint(BCLog::OBFUSCATION, "CObfuscationPool::IsCollateralValid - didn't pass IsAcceptable\n");
             return false;
         }
     }
@@ -2213,8 +2213,8 @@ bool CObfuScationSigner::VerifyMessage(CPubKey pubkey, std::vector<unsigned char
         return false;
     }
 
-    if (fDebug && pubkey2.GetID() != pubkey.GetID())
-        LogPrintf("CObfuScationSigner::VerifyMessage -- keys don't match: %s %s\n", pubkey2.GetID().ToString(), pubkey.GetID().ToString());
+    if (pubkey2.GetID() != pubkey.GetID())
+        LogPrint(BCLog::OBFUSCATION, "CObfuScationSigner::VerifyMessage -- keys don't match: %s %s\n", pubkey2.GetID().ToString(), pubkey.GetID().ToString());
 
     return (pubkey2.GetID() == pubkey.GetID());
 }

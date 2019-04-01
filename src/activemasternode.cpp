@@ -27,7 +27,7 @@ void CActiveMasternode::ManageStatus()
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
     CWallet* pwallet = wallets.at(0).get();
-    if (fDebug) LogPrintf("CActiveMasternode::ManageStatus() - Begin\n");
+    LogPrint(BCLog::MASTERNODE, "CActiveMasternode::ManageStatus() - Begin\n");
 
     //need correct blocks to send ping
     if (Params().NetworkID() != CBaseChainParams::REGTEST && !masternodeSync.IsBlockchainSynced()) {

@@ -2004,9 +2004,8 @@ CAmount GetSeeSaw(const CAmount& blockValue, int nMasternodeCount, int nHeight)
     // Use this log to compare the masternode count for different clients
     //LogPrintf("Adjusting seesaw at height %d with %d masternodes (without drift: %d) at %ld\n", nHeight, nMasternodeCount, nMasternodeCount - Params().MasternodeCountDrift(), GetTime());
 
-    if (fDebug)
-        LogPrintf("GetMasternodePayment(): moneysupply=%s, nodecoins=%s \n", FormatMoney(nMoneySupply).c_str(),
-                  FormatMoney(mNodeCoins).c_str());
+     LogPrint(BCLog::MASTERNODE, "GetMasternodePayment(): moneysupply=%s, nodecoins=%s \n", FormatMoney(nMoneySupply).c_str(),
+               FormatMoney(mNodeCoins).c_str());
 
     CAmount ret = 0;
     if (mNodeCoins == 0) {
@@ -4807,8 +4806,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
                                  REJECT_INVALID, "bad-cb-payee");
             }
         } else {
-            if (fDebug)
-                LogPrintf("CheckBlock(): Masternode payment check skipped on sync - skipping IsBlockPayeeValid()\n");
+            LogPrint(BCLog::MNPAYMENTS, "CheckBlock(): Masternode payment check skipped on sync - skipping IsBlockPayeeValid()\n");
         }
     }
 
