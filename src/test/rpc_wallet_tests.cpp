@@ -84,7 +84,6 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     WalletBatch walletdb(m_wallet.GetDBHandle());
     std::cout << "GenerateNewKey\n";
     CPubKey demoPubkey = m_wallet.GenerateNewKey(walletdb);
-    std::cout << "CBitcoinAddress\n";
     std::string demoAddress = EncodeDestination(CTxDestination(demoPubkey.GetID()));
     UniValue retValue;
     std::string strAccount = "walletDemoAccount";

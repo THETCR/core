@@ -63,7 +63,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
             // WSP stake reward
             sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
             sub.type = TransactionRecord::StakeMint;
-            sub.address = CBitcoinAddress(address).ToString();
+            sub.address = EncodeDestination(address);
             sub.credit = nNet;
         } else {
             //Masternode reward
@@ -73,7 +73,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
                 isminetype mine = wtx.txout_is_mine[nIndexMN];
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                 sub.type = TransactionRecord::MNReward;
-                sub.address = CBitcoinAddress(destMN).ToString();
+                sub.address = EncodeDestination(destMN);
                 sub.credit = wtx.tx->vout[nIndexMN].nValue;
             }
         }
@@ -107,7 +107,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
             std::string strAddress = "";
             CTxDestination address;
             if (ExtractDestination(txout.scriptPubKey, address))
-                strAddress = CBitcoinAddress(address).ToString();
+                strAddress = EncodeDestination(address);
 
             // a zerocoinspend that was sent to an address held by this wallet
             isminetype mine = wtx.txout_is_mine[i];
@@ -228,7 +228,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
                 CTxDestination address;
                 if (ExtractDestination(wtx.tx->vout[0].scriptPubKey, address)) {
                     // Sent to WISPR Address
-                    sub.address = CBitcoinAddress(address).ToString();
+                    sub.address = EncodeDestination(address);
                 } else {
                     // Sent to IP, or other non-address transaction like OP_EVAL
                     sub.address = mapValue["to"];
@@ -278,7 +278,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
                         continue;
                     // Sent to WISPR Address
                     sub.type = TransactionRecord::SendToAddress;
-                    sub.address = CBitcoinAddress(address).ToString();
+                    sub.address = EncodeDestination(address);
                 } else if (txout.IsZerocoinMint()){
                     sub.type = TransactionRecord::ZerocoinMint;
                     sub.address = mapValue["zerocoinmint"];
