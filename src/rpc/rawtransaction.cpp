@@ -71,7 +71,7 @@ void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fInclud
 
     UniValue a(UniValue::VARR);
     for (const CTxDestination& addr: addresses)
-        a.push_back(CBitcoinAddress(addr).ToString());
+        a.push_back(EncodeDestination(addr));
     out.pushKV("addresses", a);
 }
 
@@ -2178,13 +2178,13 @@ UniValue listunspent(const JSONRPCRequest& request)
     if (request.params.size() > 1)
         nMaxDepth = request.params[1].get_int();
 
-    set<CBitcoinAddress> setAddress;
+    set<std::string> setAddress;
     if (request.params.size() > 2) {
         UniValue inputs = request.params[2].get_array();
         for (unsigned int inx = 0; inx < inputs.size(); inx++) {
             const UniValue& input = inputs[inx];
-            CBitcoinAddress address(input.get_str());
-            if (!address.IsValid())
+            std::string address = input.get_str();
+            if (!IsValidDestinationString(address))
                 throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid WISPR address: ") + input.get_str());
             if (setAddress.count(address))
                 throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, duplicated address: ") + input.get_str());
@@ -2220,7 +2220,7 @@ UniValue listunspent(const JSONRPCRequest& request)
             if (!ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, address))
                 continue;
 
-            if (!setAddress.count(address))
+            if (!setAddress.count(EncodeDestination(address)))
                 continue;
         }
 
@@ -2232,7 +2232,7 @@ UniValue listunspent(const JSONRPCRequest& request)
         CTxDestination address;
         std::cout << "entry address\n";
         if (ExtractDestination(out.tx->tx->vout[out.i].scriptPubKey, address)) {
-            entry.pushKV("address", CBitcoinAddress(address).ToString());
+            entry.pushKV("address", EncodeDestination(address));
             if (pwallet->mapAddressBook.count(address))
                 entry.pushKV("account", pwallet->mapAddressBook[address].name);
         }
