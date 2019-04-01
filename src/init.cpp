@@ -1687,24 +1687,25 @@ bool AppInitMain(InitInterfaces& interfaces)
 
                     // Supply needs to be exactly GetSupplyBeforeFakeSerial + GetWrapppedSerialInflationAmount
                     CBlockIndex* pblockindex = chainActive[Params().Zerocoin_Block_EndFakeSerial() + 1];
-                    CAmount zpivSupplyCheckpoint = Params().GetSupplyBeforeFakeSerial() + GetWrapppedSerialInflationAmount();
+                    CAmount zwspSupplyCheckpoint = Params().GetSupplyBeforeFakeSerial() + GetWrapppedSerialInflationAmount();
 
-                    if (pblockindex->GetZerocoinSupply() < zpivSupplyCheckpoint) {
+                    if (pblockindex->GetZerocoinSupply() < zwspSupplyCheckpoint) {
                         // Trigger reindex due wrapping serials
-                        LogPrintf("Current GetZerocoinSupply: %d vs %d\n", pblockindex->GetZerocoinSupply()/COIN , zpivSupplyCheckpoint/COIN);
+                        LogPrintf("Current GetZerocoinSupply: %d vs %d\n", pblockindex->GetZerocoinSupply()/COIN , zwspSupplyCheckpoint/COIN);
                         reindexDueWrappedSerials = true;
-                    } else if (pblockindex->GetZerocoinSupply() > zpivSupplyCheckpoint) {
+                    } else if (pblockindex->GetZerocoinSupply() > zwspSupplyCheckpoint) {
                         // Trigger global zPIV reindex
                         reindexZerocoin = true;
-                        LogPrintf("Current GetZerocoinSupply: %d vs %d\n", pblockindex->GetZerocoinSupply()/COIN , zpivSupplyCheckpoint/COIN);
+                        LogPrintf("Current GetZerocoinSupply: %d vs %d\n", pblockindex->GetZerocoinSupply()/COIN , zwspSupplyCheckpoint/COIN);
                     }
 
                 }
-
+                std::cout << "reindexDueWrappedSerials\n";
                 // Reindex only for wrapped serials inflation.
                 if (reindexDueWrappedSerials)
                     AddWrappedSerialsInflation();
 
+                std::cout << "reindexmoneysupply\n";
                 // Recalculate money supply for blocks that are impacted by accounting issue after zerocoin activation
                 if (gArgs.GetBoolArg("-reindexmoneysupply", false) || reindexZerocoin) {
                     if (chainHeight > Params().NEW_PROTOCOLS_STARTHEIGHT()) {
@@ -1715,14 +1716,16 @@ bool AppInitMain(InitInterfaces& interfaces)
                     RecalculateWSPSupply(reindexZerocoin ? Params().NEW_PROTOCOLS_STARTHEIGHT() : 1);
                 }
 
+                std::cout << "Check Recalculation result\n";
                 // Check Recalculation result
                 if(Params().NetworkID() == CBaseChainParams::MAIN && chainHeight > Params().Zerocoin_Block_EndFakeSerial()) {
                     CBlockIndex* pblockindex = chainActive[Params().Zerocoin_Block_EndFakeSerial() + 1];
-                    CAmount zpivSupplyCheckpoint = Params().GetSupplyBeforeFakeSerial() + GetWrapppedSerialInflationAmount();
-                    if (pblockindex->GetZerocoinSupply() != zpivSupplyCheckpoint)
-                        return InitError(strprintf("ZerocoinSupply Recalculation failed: %d vs %d", pblockindex->GetZerocoinSupply()/COIN , zpivSupplyCheckpoint/COIN));
+                    CAmount zwspSupplyCheckpoint = Params().GetSupplyBeforeFakeSerial() + GetWrapppedSerialInflationAmount();
+                    if (pblockindex->GetZerocoinSupply() != zwspSupplyCheckpoint)
+                        return InitError(strprintf("ZerocoinSupply Recalculation failed: %d vs %d", pblockindex->GetZerocoinSupply()/COIN , zwspSupplyCheckpoint/COIN));
                 }
 
+                std::cout << "reindexaccumulators\n";
                 // Force recalculation of accumulators.
                 if (gArgs.GetBoolArg("-reindexaccumulators", false)) {
                     if (chainHeight > Params().NEW_PROTOCOLS_STARTHEIGHT()) {
@@ -1733,6 +1736,7 @@ bool AppInitMain(InitInterfaces& interfaces)
                                 listAccCheckpointsNoDB.emplace_back(pindex->nAccumulatorCheckpoint);
                             pindex = chainActive.Next(pindex);
                         }
+                        std::cout << "listAccCheckpointsNoDB\n";
                         // WISPR: recalculate Accumulator Checkpoints that failed to database properly
                         if (!listAccCheckpointsNoDB.empty()) {
                             uiInterface.InitMessage(_("Calculating missing accumulators..."));
