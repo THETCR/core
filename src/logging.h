@@ -30,7 +30,7 @@ struct CLogCategoryActive
 };
 
 namespace BCLog {
-    enum LogFlags : uint64_t {
+    enum LogFlags : uint32_t {
         NONE        = 0,
         NET         = (1 <<  0),
         TOR         = (1 <<  1),
@@ -60,11 +60,10 @@ namespace BCLog {
         ZERO        = (1 << 25),
         MNBUDGET    = (1 << 26),
         ZWSP        = (1 << 27),
-        ALERT       = (1 << 28),
-        POS         = (1 << 29),
-        SPORK       = (1 << 30),
-        PRECOMPUTE  = (1 << 31),
-        ALL         = ~(uint64_t)0,
+        POS         = (1 << 28),
+        SPORK       = (1 << 29),
+        PRECOMPUTE  = (1 << 30),
+        ALL         = ~(uint32_t)0,
     };
 
     class Logger

@@ -160,6 +160,8 @@ file(GLOB SOURCE_FILES
         src/wallet/test/*.h
         src/zmq/*.cpp
         src/zmq/*.h
+        src/zpiv/*.cpp
+        src/zpiv/*.h
         src/*.cpp
         src/*.h
         )

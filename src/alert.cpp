@@ -202,12 +202,12 @@ bool CAlert::ProcessAlert(bool fThread)
         for (map<uint256, CAlert>::iterator mi = mapAlerts.begin(); mi != mapAlerts.end();) {
             const CAlert& alert = (*mi).second;
             if (Cancels(alert)) {
-                LogPrint(BCLog::ALERT, "cancelling alert %d\n", alert.nID);
+                LogPrintf("ALERT : cancelling alert %d\n", alert.nID);
 //                uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
                 uiInterface.NotifyAlertChanged();
                 mapAlerts.erase(mi++);
             } else if (!alert.IsInEffect()) {
-                LogPrint(BCLog::ALERT, "expiring alert %d\n", alert.nID);
+                LogPrintf("ALERT : expiring alert %d\n", alert.nID);
                 uiInterface.NotifyAlertChanged();
 //                uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
                 mapAlerts.erase(mi++);
@@ -219,7 +219,7 @@ bool CAlert::ProcessAlert(bool fThread)
         for (std::pair<const uint256, CAlert> & item: mapAlerts) {
             const CAlert& alert = item.second;
             if (alert.Cancels(*this)) {
-                LogPrint(BCLog::ALERT, "alert already cancelled by %d\n", alert.nID);
+                LogPrintf("ALERT : alert already cancelled by %d\n", alert.nID);
                 return false;
             }
         }
@@ -234,7 +234,7 @@ bool CAlert::ProcessAlert(bool fThread)
         }
     }
 
-    LogPrint(BCLog::ALERT, "accepted alert %d, AppliesToMe()=%d\n", nID, AppliesToMe());
+    LogPrintf("ALERT : accepted alert %d, AppliesToMe()=%d\n", nID, AppliesToMe());
     return true;
 }
 
