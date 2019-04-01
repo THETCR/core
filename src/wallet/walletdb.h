@@ -184,8 +184,8 @@ private:
 
 public:
     explicit WalletBatch(WalletDatabase& database, const char* pszMode = "r+", bool _fFlushOnClose = true) :
-            m_batch(database, pszMode, _fFlushOnClose),
-            m_database(database)
+        m_batch(database, pszMode, _fFlushOnClose),
+        m_database(database)
     {
     }
     WalletBatch(const WalletBatch&) = delete;
@@ -332,10 +332,5 @@ private:
 
 //! Compacts BDB state so that wallet.dat is self-contained (if there are changes)
 void MaybeCompactWalletDB();
-
-//REMOVED
-//void NotifyBacked(const CWallet& wallet, bool fSuccess, std::string strMessage);
-//bool BackupWallet(const CWallet& wallet, const fs::path& strDest, bool fEnableCustom = true);
-//bool AttemptBackupWallet(const CWallet& wallet, const fs::path& pathSrc, const fs::path& pathDest);
 
 #endif // BITCOIN_WALLET_WALLETDB_H

@@ -1,9 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2018 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2009-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include <wallet/walletdb.h>
 
 #include <consensus/tx_verify.h>
@@ -24,12 +23,10 @@
 
 #include <boost/thread.hpp>
 
-using namespace std;
-
 static uint64_t nAccountingEntryNumber = 0;
 
 //
-// CWalletDB
+// WalletBatch
 //
 
 bool WalletBatch::WriteName(const std::string& strAddress, const std::string& strName)
@@ -139,8 +136,8 @@ bool WalletBatch::WriteKey(const CPubKey& vchPubKey, const CPrivKey& vchPrivKey,
 }
 
 bool WalletBatch::WriteCryptedKey(const CPubKey& vchPubKey,
-                                  const std::vector<unsigned char>& vchCryptedSecret,
-                                  const CKeyMetadata &keyMeta)
+                                const std::vector<unsigned char>& vchCryptedSecret,
+                                const CKeyMetadata &keyMeta)
 {
     if (!WriteKeyMetadata(keyMeta, vchPubKey, true)) {
         return false;
@@ -697,11 +694,18 @@ static bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssVa
                 return false;
             }
         } else if (strType != "bestblock" && strType != "bestblock_nomerkle" &&
-                   strType != "minversion" && strType != "acentry") {
+                strType != "minversion" && strType != "acentry") {
             wss.m_unknown_records++;
         }
-    } catch (...)
-    {
+    } catch (const std::exception& e) {
+        if (strErr.empty()) {
+            strErr = e.what();
+        }
+        return false;
+    } catch (...) {
+        if (strErr.empty()) {
+            strErr = "Caught unknown exception in ReadKeyValue";
+        }
         return false;
     }
     return true;
@@ -793,7 +797,7 @@ DBErrors WalletBatch::LoadWallet(CWallet* pwallet)
     pwallet->WalletLogPrintf("nFileVersion = %d\n", wss.nFileVersion);
 
     pwallet->WalletLogPrintf("Keys: %u plaintext, %u encrypted, %u w/ metadata, %u total. Unknown wallet records: %u\n",
-                             wss.nKeys, wss.nCKeys, wss.nKeyMeta, wss.nKeys + wss.nCKeys, wss.m_unknown_records);
+           wss.nKeys, wss.nCKeys, wss.nKeyMeta, wss.nKeys + wss.nCKeys, wss.m_unknown_records);
 
     // nTimeFirstKey is only reliable if all keys have metadata
     if ((wss.nKeys + wss.nCKeys + wss.nWatchKeys) != wss.nKeyMeta)
@@ -967,203 +971,6 @@ void MaybeCompactWalletDB()
     fOneThread = false;
 }
 
-//void ThreadFlushWalletDB(const std::string& strFile)
-//{
-//    // Make this thread recognisable as the wallet flushing thread
-//    RenameThread("wispr-wallet");
-//
-//    static bool fOneThread;
-//    if (fOneThread)
-//        return;
-//    fOneThread = true;
-//    if (!gArgs.GetBoolArg("-flushwallet", true))
-//        return;
-//
-//    unsigned int nLastSeen = nWalletDBUpdated;
-//    unsigned int nLastFlushed = nWalletDBUpdated;
-//    int64_t nLastWalletUpdate = GetTime();
-//    while (true) {
-//        MilliSleep(500);
-//
-//        if (nLastSeen != nWalletDBUpdated) {
-//            nLastSeen = nWalletDBUpdated;
-//            nLastWalletUpdate = GetTime();
-//        }
-//
-//        if (nLastFlushed != nWalletDBUpdated && GetTime() - nLastWalletUpdate >= 2) {
-//            TRY_LOCK(bitdb.cs_db, lockDb);
-//            if (lockDb) {
-//                // Don't do this if any databases are in use
-//                int nRefCount = 0;
-//                map<string, int>::iterator mi = bitdb.mapFileUseCount.begin();
-//                while (mi != bitdb.mapFileUseCount.end()) {
-//                    nRefCount += (*mi).second;
-//                    mi++;
-//                }
-//
-//                if (nRefCount == 0) {
-//                    boost::this_thread::interruption_point();
-//                    map<string, int>::iterator mi = bitdb.mapFileUseCount.find(strFile);
-//                    if (mi != bitdb.mapFileUseCount.end()) {
-//                        LogPrint(BCLog::DB, "Flushing wallet.dat\n");
-//                        nLastFlushed = nWalletDBUpdated;
-//                        int64_t nStart = GetTimeMillis();
-//
-//                        // Flush wallet.dat so it's self contained
-//                        bitdb.CloseDb(strFile);
-//                        bitdb.CheckpointLSN(strFile);
-//
-//                        bitdb.mapFileUseCount.erase(mi++);
-//                        LogPrint(BCLog::DB, "Flushed wallet.dat %dms\n", GetTimeMillis() - nStart);
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-
-//void NotifyBacked(const CWallet& wallet, bool fSuccess, std::string strMessage)
-//{
-//    LogPrint(BCLog::NONE, strMessage.data());
-//    wallet.NotifyWalletBacked(fSuccess, strMessage);
-//}
-//
-//bool BackupWallet(const CWallet& wallet, const fs::path& strDest, bool fEnableCustom)
-//{
-//    fs::path pathCustom;
-//    fs::path pathWithFile;
-//    if (!wallet.fFileBacked) {
-//        return false;
-//    } else if(fEnableCustom) {
-//        pathWithFile = gArgs.GetArg("-backuppath", "");
-//        if(!pathWithFile.empty()) {
-//            if(!pathWithFile.has_extension()) {
-//                pathCustom = pathWithFile;
-//                pathWithFile /= wallet.GetUniqueWalletBackupName(false);
-//            } else {
-//                pathCustom = pathWithFile.parent_path();
-//            }
-//            try {
-//                fs::create_directories(pathCustom);
-//            } catch(const fs::filesystem_error& e) {
-//                NotifyBacked(wallet, false, strprintf("%s\n", e.what()));
-//                pathCustom = "";
-//            }
-//        }
-//    }
-//
-//    while (true) {
-//        {
-//            LOCK(bitdb.cs_db);
-//            if (!bitdb.mapFileUseCount.count(wallet.strWalletFile) || bitdb.mapFileUseCount[wallet.strWalletFile] == 0) {
-//                // Flush log data to the dat file
-//                bitdb.CloseDb(wallet.strWalletFile);
-//                bitdb.CheckpointLSN(wallet.strWalletFile);
-//                bitdb.mapFileUseCount.erase(wallet.strWalletFile);
-//
-//                // Copy wallet.dat
-//                fs::path pathDest(strDest);
-//                fs::path pathSrc = GetDataDir() / wallet.strWalletFile;
-//                if (is_directory(pathDest)) {
-//                    if(!exists(pathDest)) create_directory(pathDest);
-//                    pathDest /= wallet.strWalletFile;
-//                }
-//                bool defaultPath = AttemptBackupWallet(wallet, pathSrc.string(), pathDest.string());
-//
-//                if(defaultPath && !pathCustom.empty()) {
-//                    int nThreshold = gArgs.GetArg("-custombackupthreshold", DEFAULT_CUSTOMBACKUPTHRESHOLD);
-//                    if (nThreshold > 0) {
-//
-//                        typedef std::multimap<std::time_t, fs::path> folder_set_t;
-//                        folder_set_t folderSet;
-//                        fs::directory_iterator end_iter;
-//
-//                        pathCustom.make_preferred();
-//                        // Build map of backup files for current(!) wallet sorted by last write time
-//
-//                        fs::path currentFile;
-//                        for (fs::directory_iterator dir_iter(pathCustom); dir_iter != end_iter; ++dir_iter) {
-//                            // Only check regular files
-//                            if (fs::is_regular_file(dir_iter->status())) {
-//                                currentFile = dir_iter->path().filename();
-//                                // Only add the backups for the current wallet, e.g. wallet.dat.*
-//                                if (dir_iter->path().stem().string() == wallet.strWalletFile) {
-//                                    folderSet.insert(folder_set_t::value_type(fs::last_write_time(dir_iter->path()), *dir_iter));
-//                                }
-//                            }
-//                        }
-//
-//                        int counter = 0; //TODO: add seconds to avoid naming conflicts
-//                        for (auto entry : folderSet) {
-//                            counter++;
-//                            if(entry.second == pathWithFile) {
-//                                pathWithFile += "(1)";
-//                            }
-//                        }
-//
-//                        if (counter >= nThreshold) {
-//                            std::time_t oldestBackup = 0;
-//                            for(auto entry : folderSet) {
-//                                if(oldestBackup == 0 || entry.first < oldestBackup) {
-//                                    oldestBackup = entry.first;
-//                                }
-//                            }
-//
-//                            try {
-//                                auto entry = folderSet.find(oldestBackup);
-//                                if (entry != folderSet.end()) {
-//                                    fs::remove(entry->second);
-//                                    LogPrintf("Old backup deleted: %s\n", (*entry).second);
-//                                }
-//                            } catch (fs::filesystem_error& error) {
-//                                std::string strMessage = strprintf("Failed to delete backup %s\n", error.what());
-//                                LogPrint(BCLog::NONE, strMessage.data());
-//                                NotifyBacked(wallet, false, strMessage);
-//                            }
-//                        }
-//                    }
-//                    AttemptBackupWallet(wallet, pathSrc.string(), pathWithFile.string());
-//                }
-//
-//                return defaultPath;
-//            }
-//        }
-//        MilliSleep(100);
-//    }
-//    return false;
-//}
-//
-//bool AttemptBackupWallet(const CWallet& wallet, const fs::path& pathSrc, const fs::path& pathDest)
-//{
-//    bool retStatus;
-//    std::string strMessage;
-//    try {
-//        if (fs::equivalent(pathSrc, pathDest)) {
-//            LogPrintf("cannot backup to wallet source file %s\n", pathDest.string());
-//            return false;
-//        }
-//#if BOOST_VERSION >= 105800 /* BOOST_LIB_VERSION 1_58 */
-//        fs::copy_file(pathSrc.c_str(), pathDest, fs::copy_option::overwrite_if_exists);
-//#else
-//        std::ifstream src(pathSrc.c_str(),  std::ios::binary | std::ios::in);
-//        std::ofstream dst(pathDest.c_str(), std::ios::binary | std::ios::out | std::ios::trunc);
-//        dst << src.rdbuf();
-//        dst.flush();
-//        src.close();
-//        dst.close();
-//#endif
-//        strMessage = strprintf("copied wallet.dat to %s\n", pathDest.string());
-//        LogPrint(BCLog::NONE, strMessage.data());
-//        retStatus = true;
-//    } catch (const fs::filesystem_error& e) {
-//        retStatus = false;
-//        strMessage = strprintf("%s\n", e.what());
-//        LogPrint(BCLog::NONE, strMessage.data());
-//    }
-//    NotifyBacked(wallet, retStatus, strMessage);
-//    return retStatus;
-//}
-
 //
 // Try to (very carefully!) recover wallet file if there is a problem.
 //
@@ -1221,6 +1028,7 @@ bool WalletBatch::EraseDestData(const std::string &address, const std::string &k
 {
     return EraseIC(std::make_pair(std::string("destdata"), std::make_pair(address, key)));
 }
+
 
 bool WalletBatch::WriteHDChain(const CHDChain& chain)
 {
@@ -1730,10 +1538,10 @@ std::list<CDeterministicMint> WalletBatch::ListArchivedDeterministicMints()
     return listMints;
 }
 
-void CWalletDB::LoadPrecomputes(std::list<std::pair<uint256, CoinWitnessCacheData> >& itemList, std::map<uint256, list<std::pair<uint256, CoinWitnessCacheData> >::iterator>& itemMap)
+void WalletBatch::LoadPrecomputes(std::list<std::pair<uint256, CoinWitnessCacheData> >& itemList, std::map<uint256, list<std::pair<uint256, CoinWitnessCacheData> >::iterator>& itemMap)
 {
 
-    Dbc* pcursor = GetCursor();
+    Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
         throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
@@ -1744,7 +1552,7 @@ void CWalletDB::LoadPrecomputes(std::list<std::pair<uint256, CoinWitnessCacheDat
         if (fFlags == DB_SET_RANGE)
             ssKey << make_pair(string("precompute"), uint256(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
-        int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
+        int ret = m_batch.ReadAtCursor(pcursor, ssKey, ssValue);
         fFlags = DB_NEXT;
         if (ret == DB_NOTFOUND)
             break;
@@ -1776,9 +1584,9 @@ void CWalletDB::LoadPrecomputes(std::list<std::pair<uint256, CoinWitnessCacheDat
     pcursor->close();
 }
 
-void CWalletDB::LoadPrecomputes(set<uint256> setHashes)
+void WalletBatch::LoadPrecomputes(set<uint256> setHashes)
 {
-    Dbc* pcursor = GetCursor();
+    Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
         throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
@@ -1789,7 +1597,7 @@ void CWalletDB::LoadPrecomputes(set<uint256> setHashes)
         if (fFlags == DB_SET_RANGE)
             ssKey << make_pair(string("precompute"), uint256(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
-        int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
+        int ret = m_batch.ReadAtCursor(pcursor, ssKey, ssValue);
         fFlags = DB_NEXT;
         if (ret == DB_NOTFOUND)
             break;
@@ -1814,7 +1622,7 @@ void CWalletDB::LoadPrecomputes(set<uint256> setHashes)
     pcursor->close();
 }
 
-void CWalletDB::EraseAllPrecomputes()
+void WalletBatch::EraseAllPrecomputes()
 {
     set<uint256> setHashes;
     LoadPrecomputes(setHashes);
@@ -1823,15 +1631,15 @@ void CWalletDB::EraseAllPrecomputes()
         ErasePrecompute(hash);
 }
 
-bool CWalletDB::WritePrecompute(const uint256& hash, const CoinWitnessCacheData& data)
+bool WalletBatch::WritePrecompute(const uint256& hash, const CoinWitnessCacheData& data)
 {
-    return Write(make_pair(string("precompute"), hash), data);
+    return WriteIC(std::make_pair(string("precompute"), hash), data);
 }
-bool CWalletDB::ReadPrecompute(const uint256& hash, CoinWitnessCacheData& data)
+bool WalletBatch::ReadPrecompute(const uint256& hash, CoinWitnessCacheData& data)
 {
-    return Read(make_pair(string("precompute"), hash), data);
+    return m_batch.Read(std::make_pair(string("precompute"), hash), data);
 }
-bool CWalletDB::ErasePrecompute(const uint256& hash)
+bool WalletBatch::ErasePrecompute(const uint256& hash)
 {
-    return Erase(make_pair(string("precompute"), hash));
+    return EraseIC(std::make_pair(string("precompute"), hash));
 }
