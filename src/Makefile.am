@@ -512,7 +512,8 @@ libwispr_consensus_a_SOURCES = \
   uint256.h \
   util/strencodings.cpp \
   util/strencodings.h \
-  version.h
+  version.h \
+  $(libzerocoin_libbitcoin_zerocoin_a_SOURCES)
 
 # common: shared between wisprd, and wispr-qt and non-server tools
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
@@ -693,7 +694,7 @@ wispr_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_
 # bitcoinconsensus library #
 if BUILD_BITCOIN_LIBS
 include_HEADERS = script/bitcoinconsensus.h
-libwisprconsensus_la_SOURCES = $(crypto_libbitcoin_crypto_base_a_SOURCES) $(libwispr_consensus_a_SOURCES) $(libzerocoin_libbitcoin_zerocoin_a_SOURCES)
+libwisprconsensus_la_SOURCES = $(crypto_libbitcoin_crypto_base_a_SOURCES) $(libwispr_consensus_a_SOURCES)
 
 if GLIBC_BACK_COMPAT
   libwisprconsensus_la_SOURCES += compat/glibc_compat.cpp
