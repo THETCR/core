@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(zcparams_test)
     bool fPassed = true;
     try{
         BOOST_TEST_PASSPOINT();
-        SelectParams(CBaseChainParams::MAIN);
+//        SelectParams(CBaseChainParams::MAIN);
         ZerocoinParams *ZCParams = Params().Zerocoin_Params(false);
             (void)ZCParams;
     } catch(std::exception& e) {
