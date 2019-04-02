@@ -12,14 +12,8 @@ WalletTestingSetup::WalletTestingSetup(const std::string& chainName):
     TestingSetup(chainName), m_wallet(*m_chain, WalletLocation(), WalletDatabase::CreateMock())
 {
     bool fFirstRun;
-    std::cout << "WalletTestingSetup LoadWallet\n";
     m_wallet.LoadWallet(fFirstRun);
-    std::cout << "WalletTestingSetup handleNotifications\n";
     m_wallet.m_chain_notifications_handler = m_chain->handleNotifications(m_wallet);
-
-    std::cout << "WalletTestingSetup registerRpcs\n";
     m_chain_client->registerRpcs();
-
-    std::cout << "WalletTestingSetup CreateZWspWallet\n";
     m_wallet.CreateZWspWallet();
 }
