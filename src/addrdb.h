@@ -69,12 +69,12 @@ public:
     std::string banReasonToString() const
     {
         switch (banReason) {
-            case BanReasonNodeMisbehaving:
-                return "node misbehaving";
-            case BanReasonManuallyAdded:
-                return "manually added";
-            default:
-                return "unknown";
+        case BanReasonNodeMisbehaving:
+            return "node misbehaving";
+        case BanReasonManuallyAdded:
+            return "manually added";
+        default:
+            return "unknown";
         }
     }
 };

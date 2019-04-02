@@ -55,10 +55,10 @@ enum Network ParseNetwork(std::string net) {
 std::string GetNetworkName(enum Network net) {
     switch(net)
     {
-        case NET_IPV4: return "ipv4";
-        case NET_IPV6: return "ipv6";
-        case NET_ONION: return "onion";
-        default: return "";
+    case NET_IPV4: return "ipv4";
+    case NET_IPV6: return "ipv6";
+    case NET_ONION: return "onion";
+    default: return "";
     }
 }
 
@@ -544,7 +544,7 @@ bool ConnectSocketDirectly(const CService &addrConnect, const SOCKET& hSocket, i
 #ifdef WIN32
         else if (WSAGetLastError() != WSAEISCONN)
 #else
-            else
+        else
 #endif
         {
             LogConnectFailure(manual_connection, "connect() to %s failed: %s", addrConnect.ToString(), NetworkErrorString(WSAGetLastError()));
@@ -669,8 +669,8 @@ std::string NetworkErrorString(int err)
     wchar_t buf[256];
     buf[0] = 0;
     if(FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_MAX_WIDTH_MASK,
-                      nullptr, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                      buf, ARRAYSIZE(buf), nullptr))
+            nullptr, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            buf, ARRAYSIZE(buf), nullptr))
     {
         return strprintf("%s (%d)", std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>,wchar_t>().to_bytes(buf), err);
     }
@@ -721,7 +721,7 @@ bool SetSocketNonBlocking(const SOCKET& hSocket, bool fNonBlocking)
         u_long nOne = 1;
         if (ioctlsocket(hSocket, FIONBIO, &nOne) == SOCKET_ERROR) {
 #else
-            int fFlags = fcntl(hSocket, F_GETFL, 0);
+        int fFlags = fcntl(hSocket, F_GETFL, 0);
         if (fcntl(hSocket, F_SETFL, fFlags | O_NONBLOCK) == SOCKET_ERROR) {
 #endif
             return false;
@@ -731,7 +731,7 @@ bool SetSocketNonBlocking(const SOCKET& hSocket, bool fNonBlocking)
         u_long nZero = 0;
         if (ioctlsocket(hSocket, FIONBIO, &nZero) == SOCKET_ERROR) {
 #else
-            int fFlags = fcntl(hSocket, F_GETFL, 0);
+        int fFlags = fcntl(hSocket, F_GETFL, 0);
         if (fcntl(hSocket, F_SETFL, fFlags & ~O_NONBLOCK) == SOCKET_ERROR) {
 #endif
             return false;

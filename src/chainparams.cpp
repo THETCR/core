@@ -1,21 +1,23 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2018 The PIVX developers
-// Copyright (c) 2018 The WISPR developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "libzerocoin/Params.h"
-#include "chainparams.h"
-#include "consensus/merkle.h"
+#include <chainparams.h>
+
+#include <chainparamsseeds.h>
+#include <consensus/merkle.h>
 #include <tinyformat.h>
 #include <util/system.h>
-#include "util/strencodings.h"
+#include <util/strencodings.h>
+#include <versionbitsinfo.h>
 
 #include <assert.h>
 
 #include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 
@@ -30,44 +32,44 @@ using namespace std;
 //   (no blocks before with a timestamp after, none after with
 //    timestamp before)
 // + Contains no strange transactions
-static Checkpoints::MapCheckpoints mapCheckpoints =
-        boost::assign::map_list_of
-                (0, uint256("0x0000ec93e0a3fe0aafa3be7dafe1290f5fca039a4037dd5174bc3dd7a35d67f0"))
-                (14317, uint256("0x50929653a7146de37b82b9125e55ea03aa4ae062ce3a2e3098026eea07e5bc81")) // 125.000 Coin Burn Confirmation
-                (50000, uint256("0xb177127054381243141e809bbfb2d568aeae2dd9b3c486e54f0989d4546d0d80")) // Block 50.000
-                (75000, uint256("06f162fe22851c400c1532a6d49d7894640ea0aa292fad5f02f348480da6b20d")) // Block 75.000
-                (100000, uint256("ed8cccfb51c901af271892966160686177a05f101bd3fd517d5b82274a8f6611")) // Block 100.000
-                (125000, uint256("76d5412ec389433de6cd22345209c859b4c18b6d8f8893df479c9f7520d19901")) // Block 125.000
-                (150000, uint256("a7e0dfdc9c3197e9e763e858aafa9553c0235c0e328371a5f8c5ba0b6e44919d")) // Block 150.000
-                (200000, uint256("385e915b52f0ad669b91005ab7ddb22356b6a220e8b98cbcf2c8aca5c5dd3b03")) // Block 200.000
-                (250000, uint256("40ee22bd8b2cc23f83e16d19a53aa8591617772f9722c56b86d16163b2a10416")) // Block 250.000
-                (300000, uint256("700c33f9bf03c018f33167c2c455f05762b49e1f1f06e14833a5e8e269beebe7")) // Block 300.000
-                (350000, uint256("ffb49991aa635992305029cb629037cf5d08e945d2027c79f4f737c11e7d680e")) // Block 350.000
-                (400000, uint256("cf86529d0243cb653da92cbbaddc7f0a4f275bcf557cc112d03c33b756af25d3")); // Block 400.000
-static const Checkpoints::CCheckpointData data = {
-        mapCheckpoints,
-        1540087953, // * UNIX timestamp of last checkpoint block (Done)
-        815060,    // * total number of transactions between genesis and last checkpoint TODO: keep using correct number
-        //   (the tx=... number in the SetBestChain debug.log lines)
-        2000        // * estimated number of transactions per day after checkpoint
-};
-
-
-static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
-        boost::assign::map_list_of(0, uint256("0x001"));
-static const Checkpoints::CCheckpointData dataTestnet = {
-        mapCheckpointsTestnet,
-        1512932225,
-        0,
-        450};
-
-static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
-        boost::assign::map_list_of(0, uint256("0x001"));
-static const Checkpoints::CCheckpointData dataRegtest = {
-        mapCheckpointsRegtest,
-        1411111111,
-        0,
-        100};
+//static Checkpoints::MapCheckpoints mapCheckpoints =
+//        boost::assign::map_list_of
+//                (0, uint256("0x0000ec93e0a3fe0aafa3be7dafe1290f5fca039a4037dd5174bc3dd7a35d67f0"))
+//                (14317, uint256("0x50929653a7146de37b82b9125e55ea03aa4ae062ce3a2e3098026eea07e5bc81")) // 125.000 Coin Burn Confirmation
+//                (50000, uint256("0xb177127054381243141e809bbfb2d568aeae2dd9b3c486e54f0989d4546d0d80")) // Block 50.000
+//                (75000, uint256("06f162fe22851c400c1532a6d49d7894640ea0aa292fad5f02f348480da6b20d")) // Block 75.000
+//                (100000, uint256("ed8cccfb51c901af271892966160686177a05f101bd3fd517d5b82274a8f6611")) // Block 100.000
+//                (125000, uint256("76d5412ec389433de6cd22345209c859b4c18b6d8f8893df479c9f7520d19901")) // Block 125.000
+//                (150000, uint256("a7e0dfdc9c3197e9e763e858aafa9553c0235c0e328371a5f8c5ba0b6e44919d")) // Block 150.000
+//                (200000, uint256("385e915b52f0ad669b91005ab7ddb22356b6a220e8b98cbcf2c8aca5c5dd3b03")) // Block 200.000
+//                (250000, uint256("40ee22bd8b2cc23f83e16d19a53aa8591617772f9722c56b86d16163b2a10416")) // Block 250.000
+//                (300000, uint256("700c33f9bf03c018f33167c2c455f05762b49e1f1f06e14833a5e8e269beebe7")) // Block 300.000
+//                (350000, uint256("ffb49991aa635992305029cb629037cf5d08e945d2027c79f4f737c11e7d680e")) // Block 350.000
+//                (400000, uint256("cf86529d0243cb653da92cbbaddc7f0a4f275bcf557cc112d03c33b756af25d3")); // Block 400.000
+//static const Checkpoints::CCheckpointData data = {
+//        mapCheckpoints,
+//        1540087953, // * UNIX timestamp of last checkpoint block (Done)
+//        815060,    // * total number of transactions between genesis and last checkpoint TODO: keep using correct number
+//        //   (the tx=... number in the SetBestChain debug.log lines)
+//        2000        // * estimated number of transactions per day after checkpoint
+//};
+//
+//
+//static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
+//        boost::assign::map_list_of(0, uint256("0x001"));
+//static const Checkpoints::CCheckpointData dataTestnet = {
+//        mapCheckpointsTestnet,
+//        1512932225,
+//        0,
+//        450};
+//
+//static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
+//        boost::assign::map_list_of(0, uint256("0x001"));
+//static const Checkpoints::CCheckpointData dataRegtest = {
+//        mapCheckpointsRegtest,
+//        1411111111,
+//        0,
+//        100};
 
 libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params(bool useModulusV1) const
 {
@@ -269,11 +271,6 @@ public:
         /* disable fallback fee on mainnet */
         m_fallback_fee_enabled = false;
     }
-
-    const Checkpoints::CCheckpointData& CheckpointsOld() const
-    {
-        return data;
-    }
 };
 
 /**
@@ -374,10 +371,6 @@ public:
         /* enable fallback fee on testnet */
         m_fallback_fee_enabled = true;
     }
-    const Checkpoints::CCheckpointData& Checkpoints() const
-    {
-        return dataTestnet;
-    }
 };
 
 /**
@@ -433,10 +426,6 @@ public:
         /* enable fallback fee on regtest */
         m_fallback_fee_enabled = true;
     }
-    const Checkpoints::CCheckpointData& Checkpoints() const
-    {
-        return dataRegtest;
-    }
 };
 
 /**
@@ -460,12 +449,6 @@ public:
 
         /* enable fallback fee on unittest */
         m_fallback_fee_enabled = true;
-    }
-
-    const Checkpoints::CCheckpointData& Checkpoints() const
-    {
-        // UnitTest share the same checkpoints as MAIN
-        return data;
     }
 
     //! Published setters to allow changing values in unit test cases

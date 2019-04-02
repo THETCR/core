@@ -331,6 +331,7 @@ void CExtKey::SetSeed(const unsigned char *seed, unsigned int nSeedLen) {
     nChild = 0;
     memset(vchFingerprint, 0, sizeof(vchFingerprint));
 }
+
 CExtPubKey CExtKey::Neuter() const {
     CExtPubKey ret;
     ret.nDepth = nDepth;

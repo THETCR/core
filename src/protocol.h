@@ -1,8 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2016-2017 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2009-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef __cplusplus
@@ -170,7 +168,7 @@ extern const char *ALERT;
 /**
  * The notfound message is a reply to a getdata message which requested an
  * object the receiving node does not have available for relay.
- * @ince protocol version 70001.
+ * @since protocol version 70001.
  * @see https://bitcoin.org/en/developer-reference#notfound
  */
 extern const char *NOTFOUND;
@@ -319,13 +317,14 @@ enum ServiceFlags : uint64_t {
     // serving the last 288 (2 day) blocks
     // See BIP159 for details on how this is implemented.
     NODE_NETWORK_LIMITED = (1 << 10),
-  // Bits 24-31 are reserved for temporary experiments. Just pick a bit that
-  // isn't getting used, or one not being used much, and notify the
-  // bitcoin-development mailing list. Remember that service bits are just
-  // unauthenticated advertisements, so your code must be robust against
-  // collisions and other cases where nodes may be advertising a service they
-  // do not actually support. Other service bits should be allocated via the
-  // BIP process.
+
+    // Bits 24-31 are reserved for temporary experiments. Just pick a bit that
+    // isn't getting used, or one not being used much, and notify the
+    // bitcoin-development mailing list. Remember that service bits are just
+    // unauthenticated advertisements, so your code must be robust against
+    // collisions and other cases where nodes may be advertising a service they
+    // do not actually support. Other service bits should be allocated via the
+    // BIP process.
 };
 
 
@@ -436,45 +435,21 @@ public:
     ServiceFlags nServices;
     ServiceFlags nServicesExpected;
 
-  // disk and network only
+    // disk and network only
     unsigned int nTime;
-};
-
-/** inv message data */
-class CInv
-{
-public:
-    CInv();
-    CInv(int typeIn, const uint256& hashIn);
-    CInv(const std::string& strType, const uint256& hashIn);
-
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
-    {
-        READWRITE(type);
-        READWRITE(hash);
-    }
-
-    friend bool operator<(const CInv& a, const CInv& b);
-
-    bool IsKnownType() const;
-    bool IsMasterNodeType() const;
-    const char* GetCommand() const;
-    std::string ToString() const;
-
-    // TODO: make private (improves encapsulation)
-public:
-    int type;
-    uint256 hash;
 };
 
 /** getdata message type flags */
 const uint32_t MSG_WITNESS_FLAG = 1 << 30;
 const uint32_t MSG_TYPE_MASK    = 0xffffffff >> 2;
 
-enum {
+/** getdata / inv message types.
+ * These numbers are defined by the protocol. When adding a new value, be sure
+ * to mention it in the respective BIP.
+ */
+enum GetDataMsg
+{
+    UNDEFINED = 0,
     MSG_TX = 1,
     MSG_BLOCK,
     // Nodes may always request a MSG_FILTERED_BLOCK in a getdata, however,
@@ -500,6 +475,78 @@ enum {
     MSG_WITNESS_BLOCK = MSG_BLOCK | MSG_WITNESS_FLAG, //!< Defined in BIP144
     MSG_WITNESS_TX = MSG_TX | MSG_WITNESS_FLAG,       //!< Defined in BIP144
     MSG_FILTERED_WITNESS_BLOCK = MSG_FILTERED_BLOCK | MSG_WITNESS_FLAG,
+//    UNDEFINED = 0,
+//    MSG_TX = 1,
+//    MSG_BLOCK = 2,
+//    // The following can only occur in getdata. Invs always use TX or BLOCK.
+//    MSG_FILTERED_BLOCK = 3,  //!< Defined in BIP37
+//    MSG_CMPCT_BLOCK = 4,     //!< Defined in BIP152
+//    MSG_WITNESS_BLOCK = MSG_BLOCK | MSG_WITNESS_FLAG, //!< Defined in BIP144
+//    MSG_WITNESS_TX = MSG_TX | MSG_WITNESS_FLAG,       //!< Defined in BIP144
+//    MSG_FILTERED_WITNESS_BLOCK = MSG_FILTERED_BLOCK | MSG_WITNESS_FLAG,
 };
+
+/** inv message data */
+class CInv
+{
+public:
+    CInv();
+    CInv(int typeIn, const uint256& hashIn);
+    CInv(const std::string& strType, const uint256& hashIn);
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action)
+    {
+        READWRITE(type);
+        READWRITE(hash);
+    }
+
+    friend bool operator<(const CInv& a, const CInv& b);
+
+    bool IsKnownType() const;
+    bool IsMasterNodeType() const;
+    std::string GetCommand() const;
+
+    std::string ToString() const;
+
+    // TODO: make private (improves encapsulation)
+public:
+    int type;
+    uint256 hash;
+};
+
+/** getdata message type flags */
+//const uint32_t MSG_WITNESS_FLAG = 1 << 30;
+//const uint32_t MSG_TYPE_MASK    = 0xffffffff >> 2;
+
+//enum {
+//    MSG_TX = 1,
+//    MSG_BLOCK,
+//    // Nodes may always request a MSG_FILTERED_BLOCK in a getdata, however,
+//    // MSG_FILTERED_BLOCK should not appear in any invs except as a part of getdata.
+//    MSG_FILTERED_BLOCK, //!< Defined in BIP37
+//    MSG_TXLOCK_REQUEST,
+//    MSG_TXLOCK_VOTE,
+//    MSG_SPORK,
+//    MSG_MASTERNODE_WINNER,
+//    MSG_MASTERNODE_SCANNING_ERROR,
+//    MSG_BUDGET_VOTE,
+//    MSG_BUDGET_PROPOSAL,
+//    MSG_BUDGET_FINALIZED,
+//    MSG_BUDGET_FINALIZED_VOTE,
+//    MSG_MASTERNODE_QUORUM,
+//    MSG_MASTERNODE_ANNOUNCE,
+//    MSG_MASTERNODE_PING,
+//    MSG_DSTX,
+//    MSG_PUBCOINS,
+//    MSG_GENWIT,
+//    MSG_ACC_VALUE,
+//    MSG_CMPCT_BLOCK ,     //!< Defined in BIP152
+//    MSG_WITNESS_BLOCK = MSG_BLOCK | MSG_WITNESS_FLAG, //!< Defined in BIP144
+//    MSG_WITNESS_TX = MSG_TX | MSG_WITNESS_FLAG,       //!< Defined in BIP144
+//    MSG_FILTERED_WITNESS_BLOCK = MSG_FILTERED_BLOCK | MSG_WITNESS_FLAG,
+//};
 
 #endif // BITCOIN_PROTOCOL_H

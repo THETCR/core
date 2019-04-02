@@ -38,7 +38,6 @@
 #endif
 
 
-
 class CScheduler;
 class CNode;
 class BanMan;
@@ -949,6 +948,7 @@ public:
         vecRequestsFulfilled.push_back(strRequest);
     }
 };
+
 
 
 

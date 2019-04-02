@@ -22,15 +22,15 @@ public:
   static const std::string REGTEST;
   static const std::string UNITTEST;
 
-  const std::string& DataDir() const { return strDataDir; }
-  int RPCPort() const { return nRPCPort; }
+    const std::string& DataDir() const { return strDataDir; }
+    int RPCPort() const { return nRPCPort; }
 
-  CBaseChainParams() = delete;
-  CBaseChainParams(const std::string& data_dir, int rpc_port) : nRPCPort(rpc_port), strDataDir(data_dir) {}
+    CBaseChainParams() = delete;
+    CBaseChainParams(const std::string& data_dir, int rpc_port) : nRPCPort(rpc_port), strDataDir(data_dir) {}
 
 private:
-  int nRPCPort;
-  std::string strDataDir;
+    int nRPCPort;
+    std::string strDataDir;
 };
 
 /**

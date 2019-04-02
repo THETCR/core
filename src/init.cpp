@@ -1,7 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2018 The PIVX developers
+// Copyright (c) 2009-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -55,7 +53,6 @@
 #include <txdb.h>
 #include <txmempool.h>
 #include <torcontrol.h>
-#include <tinyformat.h>
 #include <ui_interface.h>
 #include <util/system.h>
 #include <util/moneystr.h>
@@ -239,7 +236,7 @@ void PrepareShutdown(InitInterfaces& interfaces)
         client->flush();
     }
 #ifdef ENABLE_WALLET
-    GenerateBitcoins(false, nullptr, 0);
+//    GenerateBitcoins(false, nullptr, 0);
 #endif
     StopMapPort();
 
@@ -274,7 +271,6 @@ void PrepareShutdown(InitInterfaces& interfaces)
     DumpMasternodes();
     DumpBudgets();
     DumpMasternodePayments();
-//    UnregisterNodeSignals(GetNodeSignals());
 
     if (fFeeEstimatesInitialized)
     {
@@ -566,7 +562,7 @@ void SetupServerArgs()
     gArgs.AddArg("-mocktime=<n>", "Replace actual time with <n> seconds since epoch (default: 0)", true, OptionsCategory::DEBUG_TEST);
     gArgs.AddArg("-maxsigcachesize=<n>", strprintf("Limit sum of signature cache and script execution cache sizes to <n> MiB (default: %u)", DEFAULT_MAX_SIG_CACHE_SIZE), true, OptionsCategory::DEBUG_TEST);
     gArgs.AddArg("-maxtipage=<n>", strprintf("Maximum tip age in seconds to consider node in initial block download (default: %u)", DEFAULT_MAX_TIP_AGE), true, OptionsCategory::DEBUG_TEST);
-    gArgs.AddArg("-maxtxfee=<amt>", strprintf("Maximum total fees (in %s) to use in a single wallet transaction or raw transaction; setting this too low may abort large transactions (default: %s)",
+    gArgs.AddArg("-maxtxfee=<amt>", strprintf("Maximum total fees (in %s) to use in a single wallet transaction; setting this too low may abort large transactions (default: %s)", // TODO move setting to wallet
         CURRENCY_UNIT, FormatMoney(DEFAULT_TRANSACTION_MAXFEE)), false, OptionsCategory::DEBUG_TEST);
     gArgs.AddArg("-printpriority", strprintf("Log transaction fee per kB when mining blocks (default: %u)", DEFAULT_PRINTPRIORITY), true, OptionsCategory::DEBUG_TEST);
     gArgs.AddArg("-printtoconsole", "Send trace/debug info to console (default: 1 when no -daemon. To disable logging to file, set -nodebuglogfile)", false, OptionsCategory::DEBUG_TEST);
@@ -687,7 +683,8 @@ static void BlockSizeNotifyCallback(int size, const uint256& hashNewTip)
 
     boost::replace_all(strCmd, "%s", hashNewTip.GetHex());
     boost::replace_all(strCmd, "%d", std::to_string(size));
-    boost::thread t(runCommand, strCmd); // thread runs free
+    std::thread t(runCommand, strCmd); // thread runs free
+    t.detach(); // thread runs free
 }
 
 struct CImportingNow
@@ -1285,7 +1282,6 @@ bool AppInitSanityChecks()
     std::string sha256_algo = SHA256AutoDetect();
     LogPrintf("Using the '%s' SHA256 implementation\n", sha256_algo);
     RandomInit();
-    std::cout << "Init ECC_Start\n";
     ECC_Start();
     globalVerifyHandle.reset(new ECCVerifyHandle());
 
@@ -1841,7 +1837,6 @@ bool AppInitMain(InitInterfaces& interfaces)
         g_txindex->Start();
     }
 
-    std::cout << "Init step 9 load wallet\n";
     // ********************************************************* Step 9: load wallet
     for (const auto& client : interfaces.chain_clients) {
         if (!client->load()) {
@@ -1911,6 +1906,7 @@ bool AppInitMain(InitInterfaces& interfaces)
         }
         uiInterface.NotifyBlockTip_disconnect(BlockNotifyGenesisWait);
     }
+
     if (ShutdownRequested()) {
         return false;
     }
@@ -2008,7 +2004,7 @@ bool AppInitMain(InitInterfaces& interfaces)
     for (const auto& client : interfaces.chain_clients) {
         client->start(scheduler);
     }
-    std::cout << "scheduler.scheduleEvery\n";
+
     scheduler.scheduleEvery([]{
         g_banman->DumpBanlist();
     }, DUMP_BANS_INTERVAL * 1000);

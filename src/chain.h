@@ -6,14 +6,11 @@
 #ifndef BITCOIN_CHAIN_H
 #define BITCOIN_CHAIN_H
 
-#include "pow.h"
 #include <consensus/params.h>
 #include <flatfile.h>
 #include <primitives/block.h>
 #include <tinyformat.h>
-#include <flatfile.h>
 #include <uint256.h>
-#include <util/system.h>
 #include "libzerocoin/Denominations.h"
 
 #include <vector>

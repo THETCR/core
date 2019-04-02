@@ -46,7 +46,7 @@ class HTTPWorkItem final : public HTTPClosure
 {
 public:
     HTTPWorkItem(std::unique_ptr<HTTPRequest> _req, const std::string &_path, const HTTPRequestHandler& _func):
-            req(std::move(_req)), path(_path), func(_func)
+        req(std::move(_req)), path(_path), func(_func)
     {
     }
     void operator()() override
@@ -77,7 +77,7 @@ private:
 
 public:
     explicit WorkQueue(size_t _maxDepth) : running(true),
-                                           maxDepth(_maxDepth)
+                                 maxDepth(_maxDepth)
     {
     }
     /** Precondition: worker threads have all stopped (they have been joined).
@@ -125,7 +125,7 @@ public:
 struct HTTPPathHandler
 {
     HTTPPathHandler(std::string _prefix, bool _exactMatch, HTTPRequestHandler _handler):
-            prefix(_prefix), exactMatch(_exactMatch), handler(_handler)
+        prefix(_prefix), exactMatch(_exactMatch), handler(_handler)
     {
     }
     std::string prefix;
@@ -174,8 +174,8 @@ static bool InitHTTPAllowList()
         LookupSubNet(strAllow.c_str(), subnet);
         if (!subnet.IsValid()) {
             uiInterface.ThreadSafeMessageBox(
-                    strprintf("Invalid -rpcallowip subnet specification: %s. Valid are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24).", strAllow),
-                    "", CClientUIInterface::MSG_ERROR);
+                strprintf("Invalid -rpcallowip subnet specification: %s. Valid are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24).", strAllow),
+                "", CClientUIInterface::MSG_ERROR);
             return false;
         }
         rpc_allow_subnets.push_back(subnet);
@@ -191,20 +191,20 @@ static bool InitHTTPAllowList()
 static std::string RequestMethodString(HTTPRequest::RequestMethod m)
 {
     switch (m) {
-        case HTTPRequest::GET:
-            return "GET";
-            break;
-        case HTTPRequest::POST:
-            return "POST";
-            break;
-        case HTTPRequest::HEAD:
-            return "HEAD";
-            break;
-        case HTTPRequest::PUT:
-            return "PUT";
-            break;
-        default:
-            return "unknown";
+    case HTTPRequest::GET:
+        return "GET";
+        break;
+    case HTTPRequest::POST:
+        return "POST";
+        break;
+    case HTTPRequest::HEAD:
+        return "HEAD";
+        break;
+    case HTTPRequest::PUT:
+        return "PUT";
+        break;
+    default:
+        return "unknown";
     }
 }
 
@@ -493,7 +493,7 @@ static void httpevent_callback_fn(evutil_socket_t, short, void* data)
 }
 
 HTTPEvent::HTTPEvent(struct event_base* base, bool _deleteWhenTriggered, const std::function<void()>& _handler):
-        deleteWhenTriggered(_deleteWhenTriggered), handler(_handler)
+    deleteWhenTriggered(_deleteWhenTriggered), handler(_handler)
 {
     ev = event_new(base, -1, 0, httpevent_callback_fn, this);
     assert(ev);
@@ -510,7 +510,7 @@ void HTTPEvent::trigger(struct timeval* tv)
         evtimer_add(ev, tv); // trigger after timeval passed
 }
 HTTPRequest::HTTPRequest(struct evhttp_request* _req) : req(_req),
-                                                        replySent(false)
+                                                       replySent(false)
 {
 }
 HTTPRequest::~HTTPRequest()
@@ -618,21 +618,21 @@ std::string HTTPRequest::GetURI() const
 HTTPRequest::RequestMethod HTTPRequest::GetRequestMethod() const
 {
     switch (evhttp_request_get_command(req)) {
-        case EVHTTP_REQ_GET:
-            return GET;
-            break;
-        case EVHTTP_REQ_POST:
-            return POST;
-            break;
-        case EVHTTP_REQ_HEAD:
-            return HEAD;
-            break;
-        case EVHTTP_REQ_PUT:
-            return PUT;
-            break;
-        default:
-            return UNKNOWN;
-            break;
+    case EVHTTP_REQ_GET:
+        return GET;
+        break;
+    case EVHTTP_REQ_POST:
+        return POST;
+        break;
+    case EVHTTP_REQ_HEAD:
+        return HEAD;
+        break;
+    case EVHTTP_REQ_PUT:
+        return PUT;
+        break;
+    default:
+        return UNKNOWN;
+        break;
     }
 }
 

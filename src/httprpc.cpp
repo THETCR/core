@@ -14,6 +14,7 @@
 #include <util/system.h>
 #include <util/strencodings.h>
 #include <ui_interface.h>
+#include <walletinitinterface.h>
 #include <crypto/hmac_sha256.h>
 #include <stdio.h>
 
@@ -31,7 +32,7 @@ class HTTPRPCTimer : public RPCTimerBase
 {
 public:
     HTTPRPCTimer(struct event_base* eventBase, std::function<void()>& func, int64_t millis) :
-            ev(eventBase, false, func)
+        ev(eventBase, false, func)
     {
         struct timeval tv;
         tv.tv_sec = millis/1000;
@@ -193,7 +194,7 @@ static bool HTTPReq_JSONRPC(HTTPRequest* req, const std::string &)
             // Send reply
             strReply = JSONRPCReply(result, NullUniValue, jreq.id);
 
-            // array of requests
+        // array of requests
         } else if (valRequest.isArray())
             strReply = JSONRPCExecBatch(jreq, valRequest.get_array());
         else
@@ -218,8 +219,8 @@ static bool InitRPCAuthentication()
         LogPrintf("No rpcpassword set - using random cookie authentication.\n");
         if (!GenerateAuthCookie(&strRPCUserColonPass)) {
             uiInterface.ThreadSafeMessageBox(
-                    _("Error: A fatal internal error occurred, see debug.log for details"), // Same message as AbortNode
-                    "", CClientUIInterface::MSG_ERROR);
+                _("Error: A fatal internal error occurred, see debug.log for details"), // Same message as AbortNode
+                "", CClientUIInterface::MSG_ERROR);
             return false;
         }
     } else {
@@ -240,6 +241,9 @@ bool StartHTTPRPC()
         return false;
 
     RegisterHTTPHandler("/", true, HTTPReq_JSONRPC);
+    if (g_wallet_init_interface.HasWalletSupport()) {
+        RegisterHTTPHandler("/wallet/", false, HTTPReq_JSONRPC);
+    }
     struct event_base* eventBase = EventBase();
     assert(eventBase);
     httpRPCTimerInterface = MakeUnique<HTTPRPCTimerInterface>(eventBase);
@@ -256,6 +260,9 @@ void StopHTTPRPC()
 {
     LogPrint(BCLog::RPC, "Stopping HTTP RPC server\n");
     UnregisterHTTPHandler("/", true);
+    if (g_wallet_init_interface.HasWalletSupport()) {
+        UnregisterHTTPHandler("/wallet/", false);
+    }
     if (httpRPCTimerInterface) {
         RPCUnsetTimerInterface(httpRPCTimerInterface.get());
         httpRPCTimerInterface.reset();

@@ -19,7 +19,7 @@
 #include <qt/test/addressbooktests.h>
 #include <qt/test/paymentservertests.h>
 #include <qt/test/wallettests.h>
-#endif
+#endif // ENABLE_WALLET
 
 #include <QApplication>
 #include <QObject>

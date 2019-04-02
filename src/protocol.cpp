@@ -1,15 +1,12 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2017-2018 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2009-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <protocol.h>
 
 #include <util/system.h>
 #include <util/strencodings.h>
-#include <chainparams.h>
 
 #ifndef WIN32
 # include <arpa/inet.h>
@@ -176,7 +173,6 @@ const static std::string allNetMessageTypes[] = {
     NetMsgType::GENWIT,
     NetMsgType::ACCVALUE
 };
-
 const static std::vector<std::string> allNetMessageTypesVec(allNetMessageTypes, allNetMessageTypes+ARRAYLEN(allNetMessageTypes));
 
 CMessageHeader::CMessageHeader(const MessageStartChars& pchMessageStartIn)
@@ -230,6 +226,7 @@ bool CMessageHeader::IsValid(const MessageStartChars& pchMessageStartIn) const
 
     return true;
 }
+
 
 ServiceFlags GetDesirableServiceFlags(ServiceFlags services) {
     if ((services & NODE_NETWORK_LIMITED) && g_initial_block_download_completed) {
@@ -296,19 +293,40 @@ bool CInv::IsMasterNodeType() const{
  	return (type >= 6);
 }
 
-const char* CInv::GetCommand() const
-{
-    if (!IsKnownType()) {
-        LogPrint(BCLog::NET, "CInv::GetCommand() : type=%d unknown type", type);
-        return "UNKNOWN";
-    }
+//const char* CInv::GetCommand() const
+//{
+//    if (!IsKnownType()) {
+//        LogPrint(BCLog::NET, "CInv::GetCommand() : type=%d unknown type", type);
+//        return "UNKNOWN";
+//    }
+//
+//    return ppszTypeName[type];
+//}
 
-    return ppszTypeName[type];
+std::string CInv::GetCommand() const
+{
+    std::string cmd;
+    if (type & MSG_WITNESS_FLAG)
+        cmd.append("witness-");
+    int masked = type & MSG_TYPE_MASK;
+    switch (masked)
+    {
+    case MSG_TX:             return cmd.append(NetMsgType::TX);
+    case MSG_BLOCK:          return cmd.append(NetMsgType::BLOCK);
+    case MSG_FILTERED_BLOCK: return cmd.append(NetMsgType::MERKLEBLOCK);
+    case MSG_CMPCT_BLOCK:    return cmd.append(NetMsgType::CMPCTBLOCK);
+    default:
+        throw std::out_of_range(strprintf("CInv::GetCommand(): type=%d unknown type", type));
+    }
 }
 
 std::string CInv::ToString() const
 {
-    return strprintf("%s %s", GetCommand(), hash.ToString());
+    try {
+        return strprintf("%s %s", GetCommand(), hash.ToString());
+    } catch(const std::out_of_range &) {
+        return strprintf("0x%08x %s", type, hash.ToString());
+    }
 }
 
 const std::vector<std::string> &getAllNetMessageTypes()
