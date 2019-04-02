@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(AlertNotify)
 {
     SetMockTime(11);
 
-    fs::path temp = GetTempPath() / "alertnotify.txt";
+    fs::path temp = fs::temp_directory_path() / "alertnotify.txt";
     fs::remove(temp);
 
     gArgs.ForceSetArg("-alertnotify", std::string("echo %s >> ") + temp.string());
