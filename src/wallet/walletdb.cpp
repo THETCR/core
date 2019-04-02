@@ -724,15 +724,11 @@ bool WalletBatch::IsKeyType(const std::string& strType)
 
 DBErrors WalletBatch::LoadWallet(CWallet* pwallet)
 {
-    std::cout << "WalletBatch LoadWallet start\n";
-
     CWalletScanState wss;
     bool fNoncriticalErrors = false;
     DBErrors result = DBErrors::LOAD_OK;
 
     LOCK(pwallet->cs_wallet);
-    std::cout << "WalletBatch LoadWallet try\n";
-
     try {
         int nMinVersion = 0;
         if (m_batch.Read((std::string)"minversion", nMinVersion))
