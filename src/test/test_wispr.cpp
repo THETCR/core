@@ -20,6 +20,7 @@
 #include <streams.h>
 #include <ui_interface.h>
 #include <validation.h>
+#include <sporkdb.h>
 
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 
@@ -69,7 +70,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
 
-//    RegisterAllCoreRPCCommands(tableRPC);
+    RegisterAllCoreRPCCommands(tableRPC);
     ClearDatadirCache();
 
     // We have to run a scheduler thread to prevent ActivateBestChain
@@ -81,6 +82,8 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     pblocktree.reset(new CBlockTreeDB(1 << 20, true));
     pcoinsdbview.reset(new CCoinsViewDB(1 << 23, true));
     pcoinsTip.reset(new CCoinsViewCache(pcoinsdbview.get()));
+    zerocoinDB.reset(new CZerocoinDB(0, false, fReindex));
+    pSporkDB.reset(new CSporkDB(0, false, false));
     if (!LoadGenesisBlock(chainparams)) {
         throw std::runtime_error("LoadGenesisBlock failed.");
     }
@@ -110,6 +113,8 @@ TestingSetup::~TestingSetup()
     pcoinsTip.reset();
     pcoinsdbview.reset();
     pblocktree.reset();
+    zerocoinDB.reset();
+    pSporkDB.reset();
 }
 
 TestChain100Setup::TestChain100Setup() : TestingSetup(CBaseChainParams::REGTEST)
