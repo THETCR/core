@@ -6521,10 +6521,12 @@ UniValue setgenerate(const JSONRPCRequest& request)
             nHeight = nHeightStart;
             nHeightEnd = nHeightStart + nGenerate;
         }
+
         unsigned int nExtraNonce = 0;
         UniValue blockHashes(UniValue::VARR);
         while (nHeight < nHeightEnd) {
-            unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwallet, false));
+            std::unique_ptr<CBlockTemplate> pblocktemplate(BlockAssembler(Params()).CreateNewBlock(reservekey.reserveScript));
+//            unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwallet, false));
             if (!pblocktemplate.get())
                 throw JSONRPCError(RPC_INTERNAL_ERROR, "Wallet keypool empty");
             CBlock* pblock = &pblocktemplate->block;
@@ -6569,9 +6571,9 @@ UniValue gethashespersec(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("gethashespersec", "") + HelpExampleRpc("gethashespersec", ""));
 
-    if (GetTimeMillis() - nHPSTimerStart > 8000)
+//    if (GetTimeMillis() - nHPSTimerStart > 8000)
         return (int64_t)0;
-    return (int64_t)dHashesPerSec;
+//    return (int64_t)dHashesPerSec;
 }
 
 /**
