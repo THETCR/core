@@ -8,25 +8,18 @@
 #ifndef BITCOIN_CHAINPARAMS_H
 #define BITCOIN_CHAINPARAMS_H
 
-#include "uint256.h"
-#include "chainparamsbase.h"
-#include "checkpoints.h"
-#include "consensus/params.h"
-#include "primitives/block.h"
-#include "protocol.h"
+#include <chainparamsbase.h>
+#include <consensus/params.h>
+#include <primitives/block.h>
+#include <protocol.h>
 
 #include "libzerocoin/Params.h"
 #include <memory>
 #include <vector>
 
-struct CDNSSeedData {
-    std::string name, host;
-  bool supportsServiceBitsFiltering;
-  CDNSSeedData(const std::string& strName, const std::string& strHost) : name(strName), host(strHost) {}
-};
 struct SeedSpec6 {
-  uint8_t addr[16];
-  uint16_t port;
+    uint8_t addr[16];
+    uint16_t port;
 };
 
 typedef std::map<int, uint256> MapCheckpoints;
@@ -34,7 +27,6 @@ typedef std::map<int, uint256> MapCheckpoints;
 struct CCheckpointData {
     MapCheckpoints mapCheckpoints;
 };
-
 
 /**
  * Holds various statistics on transactions within a chain. Used to estimate
@@ -68,9 +60,10 @@ public:
 
         MAX_BASE58_TYPES
     };
-  const Consensus::Params& GetConsensus() const { return consensus; }
+
+    const Consensus::Params& GetConsensus() const { return consensus; }
     const uint256& HashGenesisBlock() const { return consensus.hashGenesisBlock; }
-  const CMessageHeader::MessageStartChars& MessageStart() const { return pchMessageStart; }
+    const CMessageHeader::MessageStartChars& MessageStart() const { return pchMessageStart; }
     const std::vector<unsigned char>& AlertKey() const { return vAlertPubKey; }
     int GetDefaultPort() const { return nDefaultPort; }
     const uint256& ProofOfWorkLimit() const { return consensus.powLimit; }
@@ -143,6 +136,7 @@ public:
     bool MineBlocksOnDemand() const { return fMineBlocksOnDemand; }
     /** In the future use NetworkIDString() for RPC fields */
     bool TestnetToBeDeprecatedFieldRPC() const { return fTestnetToBeDeprecatedFieldRPC; }
+    /** Return the list of hostnames to look up for DNS seeds */
     const std::vector<std::string>& DNSSeeds() const { return vSeeds; }
     const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
     const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
@@ -192,76 +186,36 @@ protected:
 
     Consensus::Params consensus;
     CMessageHeader::MessageStartChars pchMessageStart;
-    //! Raw pub key bytes for the broadcast alert signing key.
-    std::vector<unsigned char> vAlertPubKey;
     int nDefaultPort;
     uint64_t nPruneAfterHeight;
     uint64_t m_assumed_blockchain_size;
     uint64_t m_assumed_chain_state_size;
-    int nMinerThreads;
     std::vector<std::string> vSeeds;
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
     std::string bech32_hrp;
     std::string strNetworkID;
     CBlock genesis;
     std::vector<SeedSpec6> vFixedSeeds;
-    bool fMiningRequiresPeers;
     bool fDefaultConsistencyChecks;
-    bool fDefaultCheckMemPool;
     bool fRequireStandard;
     bool fMineBlocksOnDemand;
-    bool fTestnetToBeDeprecatedFieldRPC;
-    bool fHeadersFirstSyncingActive;
     CCheckpointData checkpointData;
-//    Checkpoints::CCheckpointData checkpointData_old;
     ChainTxData chainTxData;
     bool m_fallback_fee_enabled;
 
+    //! Raw pub key bytes for the broadcast alert signing key.
+    std::vector<unsigned char> vAlertPubKey;
+    bool fMiningRequiresPeers;
     int nBlockDoubleAccumulated;
+    bool fDefaultCheckMemPool;
+    bool fTestnetToBeDeprecatedFieldRPC;
+    bool fHeadersFirstSyncingActive;
+    int nMinerThreads;
 
     // fake serial attack
     int nFakeSerialBlockheightEnd = 0;
     CAmount nSupplyBeforeFakeSerial = 0;
 };
-
-/**
- * Modifiable parameters interface is used by test cases to adapt the parameters in order
- * to test specific features more easily. Test cases should always restore the previous
- * values after finalization.
- */
-
-class CModifiableParams
-{
-public:
-    //! Published setters to allow changing values in unit test cases
-    virtual void setSubsidyHalvingInterval(int anSubsidyHalvingInterval) = 0;
-    virtual void setEnforceBlockUpgradeMajority(int anEnforceBlockUpgradeMajority) = 0;
-    virtual void setRejectBlockOutdatedMajority(int anRejectBlockOutdatedMajority) = 0;
-    virtual void setToCheckBlockUpgradeMajority(int anToCheckBlockUpgradeMajority) = 0;
-    virtual void setDefaultConsistencyChecks(bool aDefaultConsistencyChecks) = 0;
-    virtual void setAllowMinDifficultyBlocks(bool aAllowMinDifficultyBlocks) = 0;
-    virtual void setSkipProofOfWorkCheck(bool aSkipProofOfWorkCheck) = 0;
-};
-
-
-/**
- * Return the currently selected parameters. This won't change after app
- * startup, except for unit tests.
- */
-const CChainParams &Params();
-
-/** Return parameters for the given network. */
-CChainParams& Params(const std::string& chain);
-
-/** Get modifiable network parameters (UNITTEST only) */
-CModifiableParams* ModifiableParams();
-
-/**
- * Sets the params returned by Params() to those for the given BIP70 chain name.
- * @throws std::runtime_error when the chain is not supported.
- */
-void SelectParams(const std::string& chain);
-
 
 /**
  * Creates and returns a std::unique_ptr<CChainParams> of the chosen chain.
@@ -270,5 +224,16 @@ void SelectParams(const std::string& chain);
  */
 std::unique_ptr<const CChainParams> CreateChainParams(const std::string& chain);
 
+/**
+ * Return the currently selected parameters. This won't change after app
+ * startup, except for unit tests.
+ */
+const CChainParams &Params();
+
+/**
+ * Sets the params returned by Params() to those for the given BIP70 chain name.
+ * @throws std::runtime_error when the chain is not supported.
+ */
+void SelectParams(const std::string& chain);
 
 #endif // BITCOIN_CHAINPARAMS_H
