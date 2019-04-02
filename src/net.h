@@ -373,7 +373,7 @@ private:
     void SocketHandler();
     void ThreadSocketHandler();
     void ThreadDNSAddressSeed();
-    void ThreadStakeMinter();
+//    void ThreadStakeMinter();
 
     uint64_t CalculateKeyedNetGroup(const CAddress& ad) const;
 

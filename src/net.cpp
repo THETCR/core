@@ -2011,24 +2011,24 @@ void CConnman::ThreadMessageHandler()
 }
 
 // ppcoin: stake minter thread
-void CConnman::ThreadStakeMinter()
-{
-    LogPrintf("ThreadStakeMinter started\n");
-    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
-    if(pwallet){
-//       try {
-//           BitcoinMiner(pwallet, true);
-//       } catch (std::exception& e) {
-//           LogPrintf("ThreadStakeMinter() exception \n");
-//       } catch (...) {
-//           LogPrintf("ThreadStakeMinter() error \n");
-//       }
-    }
-
-    LogPrintf("ThreadStakeMinter exiting,\n");
-}
+//void CConnman::ThreadStakeMinter()
+//{
+//    LogPrintf("ThreadStakeMinter started\n");
+//    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+//
+//    CWallet* pwallet = wallets.at(0).get();
+//    if(pwallet){
+////       try {
+////           BitcoinMiner(pwallet, true);
+////       } catch (std::exception& e) {
+////           LogPrintf("ThreadStakeMinter() exception \n");
+////       } catch (...) {
+////           LogPrintf("ThreadStakeMinter() error \n");
+////       }
+//    }
+//
+//    LogPrintf("ThreadStakeMinter exiting,\n");
+//}
 
 bool CConnman::BindListenPort(const CService &addrBind, std::string& strError, bool fWhitelisted)
 {
@@ -2309,7 +2309,7 @@ bool CConnman::Start(CScheduler& scheduler, const Options& connOptions)
 
     // ppcoin:mint proof-of-stake blocks in the background
     if (gArgs.GetBoolArg("-staking", true)){
-        threadStakeMinter = std::thread(&TraceThread<std::function<void()> >, "minter", std::function<void()>(std::bind(&CConnman::ThreadStakeMinter, this)));
+//        threadStakeMinter = std::thread(&TraceThread<std::function<void()> >, "minter", std::function<void()>(std::bind(&CConnman::ThreadStakeMinter, this)));
     }
 
     return true;
@@ -2366,8 +2366,8 @@ void CConnman::Stop()
         threadDNSAddressSeed.join();
     if (threadSocketHandler.joinable())
         threadSocketHandler.join();
-    if (threadStakeMinter.joinable())
-        threadStakeMinter.join();
+//    if (threadStakeMinter.joinable())
+//        threadStakeMinter.join();
 
     if (fAddressesInitialized)
     {
