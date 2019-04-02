@@ -4697,7 +4697,6 @@ void CWallet::postInitProcess()
 {
     CzWSPWallet* zwalletMain = new CzWSPWallet(chain(), GetLocation(), GetDBHandle(), *this);
     setZWallet(zwalletMain);
-    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(chain(), GetLocation(), GetDBHandle(), *this));
     //Inititalize zWSPWallet
     chain().initMessage(_("Syncing zWSP wallet..."));
 
@@ -8810,5 +8809,13 @@ void CWallet::PrecomputeSpends()
 
         LogPrint(BCLog::PRECOMPUTE, "%s: Finished precompute round...\n\n", __func__);
         MilliSleep(5000);
+    }
+}
+
+void CWallet::CreateZWspWallet()
+{
+    if(!zwalletMain){
+        CzWSPWallet* zwalletMain = new CzWSPWallet(chain(), GetLocation(), GetDBHandle(), *this);
+        setZWallet(zwalletMain);
     }
 }

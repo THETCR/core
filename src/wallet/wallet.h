@@ -1162,6 +1162,7 @@ public:
         return nZeromintPercentage;
     }
 
+    void CreateZWspWallet();
     void setZWallet(CzWSPWallet* zwallet);
 
     CzWSPWallet* getZWallet() { return zwalletMain; }
