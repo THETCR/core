@@ -4,4 +4,8 @@
 
 #define BOOST_TEST_MODULE Wispr Test Suite
 
+#include <test/test_wispr.h>
+
 #include <boost/test/unit_test.hpp>
+
+BOOST_GLOBAL_FIXTURE(TestingSetup);

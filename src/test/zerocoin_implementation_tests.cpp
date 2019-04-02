@@ -26,7 +26,7 @@
 
 using namespace libzerocoin;
 
-BOOST_FIXTURE_TEST_SUITE(zerocoin_implementation_tests, WalletTestingSetup)
+BOOST_AUTO_TEST_SUITE(zerocoin_implementation_tests)
 
 BOOST_AUTO_TEST_CASE(zcparams_test)
 {
