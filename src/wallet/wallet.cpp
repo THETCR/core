@@ -470,33 +470,6 @@ void CWallet::UpgradeKeyMetadata()
         }
     }
 
-    //ZWSP
-    if(zwalletMain){
-       uint256 hashSeed;
-        std::cout << "CWallet::UpgradeKeyMetadata ReadCurrentSeedHash\n";
-        if (batch->ReadCurrentSeedHash(hashSeed)) {
-           uint256 nSeed;
-            std::cout << "CWallet::UpgradeKeyMetadata GetDeterministicSeed\n";
-           if (!GetDeterministicSeed(this, hashSeed, nSeed)) {
-               throw std::runtime_error("Failed to read zWSP seed from DB. Wallet is probably corrupt.");
-           }
-            std::cout << "CWallet::UpgradeKeyMetadata SetMasterSeed\n";
-            zwalletMain->SetMasterSeed(nSeed, false);
-       } else {
-           // First time this wallet has been unlocked with dzWSP
-           // Borrow random generator from the key class so that we don't have to worry about randomness
-           CKey key;
-           std::cout << "CWallet::UpgradeKeyMetadata MakeNEwKey\n";
-           key.MakeNewKey(true);
-            std::cout << "CWallet::UpgradeKeyMetadata GetPrivKey_256\n";
-            uint256 seed = key.GetPrivKey_256();
-           LogPrintf("%s: first run of zwsp wallet detected, new seed generated. Seedhash=%s\n", __func__, Hash(seed.begin(), seed.end()).GetHex());
-           zwalletMain->SetMasterSeed(seed, true);
-           std::cout << "CWallet::UpgradeKeyMetadata GenerateMintPool\n";
-           zwalletMain->GenerateMintPool();
-       }
-    }
-
     batch.reset(); //write before setting the flag
     SetWalletFlag(WALLET_FLAG_KEY_ORIGIN_METADATA);
 }
@@ -640,7 +613,7 @@ bool CWallet::Unlock(const SecureString& strWalletPassphrase, bool accept_no_key
                 return false;
             if (!crypter.Decrypt(pMasterKey.second.vchCryptedKey, _vMasterKey))
                 continue; // try another master key
-            if (CCryptoKeyStore::Unlock(_vMasterKey, accept_no_keys)) {
+            if (CCryptoKeyStore::Unlock(_vMasterKey, accept_no_keys, this)) {
                 // Now that we've unlocked, upgrade the key metadata
                 fWalletUnlockAnonymizeOnly = anonymizeOnly;
                 UpgradeKeyMetadata();
@@ -667,7 +640,7 @@ bool CWallet::ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase,
                 return false;
             if (!crypter.Decrypt(pMasterKey.second.vchCryptedKey, _vMasterKey))
                 return false;
-            if (CCryptoKeyStore::Unlock(_vMasterKey))
+            if (CCryptoKeyStore::Unlock(_vMasterKey, false, this))
             {
                 int64_t nStartTime = GetTimeMillis();
                 crypter.SetKeyFromPassphrase(strNewWalletPassphrase, pMasterKey.second.vchSalt, pMasterKey.second.nDeriveIterations, pMasterKey.second.nDerivationMethod);

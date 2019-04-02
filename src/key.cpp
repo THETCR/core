@@ -12,8 +12,6 @@
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
 
-#include <iostream>
-
 static secp256k1_context* secp256k1_context_sign = nullptr;
 
 /** These functions are taken from the libsecp256k1 distribution and are very ugly. */
@@ -175,11 +173,8 @@ bool CKey::SetPrivKey(const CPrivKey& privkey, bool fCompressedIn)
 
 uint256 CKey::GetPrivKey_256()
 {
-    std::cout << "CKey::GetPrivKey_256 keydata\n";
     void* key = keydata.data();
-    std::cout << "CKey::GetPrivKey_256 key_256\n";
     uint256* key_256 = (uint256*)key;
-    std::cout << "CKey::GetPrivKey_256 return uint256* key_256 \n";
 
     return *key_256;
 }

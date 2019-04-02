@@ -177,7 +177,7 @@ bool CCryptoKeyStore::Lock()
     return true;
 }
 
-bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no_keys)
+bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no_keys, CWallet* pwallet)
 {
     {
         LOCK(cs_KeyStore);
@@ -210,6 +210,27 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no
             return false;
         vMasterKey = vMasterKeyIn;
         fDecryptionThoroughlyChecked = true;
+
+        if(pwallet){
+            uint256 hashSeed;
+            if (WalletBatch(pwallet->GetDBHandle()).ReadCurrentSeedHash(hashSeed)) {
+
+                uint256 nSeed;
+                if (!GetDeterministicSeed(pwallet, hashSeed, nSeed)) {
+                    return error("Failed to read zWSP seed from DB. Wallet is probably corrupt.");
+                }
+                pwallet->zwalletMain->SetMasterSeed(nSeed, false);
+            } else {
+                // First time this wallet has been unlocked with dzWSP
+                // Borrow random generator from the key class so that we don't have to worry about randomness
+                CKey key;
+                key.MakeNewKey(true);
+                uint256 seed = key.GetPrivKey_256();
+                LogPrintf("%s: first run of zwsp wallet detected, new seed generated. Seedhash=%s\n", __func__, Hash(seed.begin(), seed.end()).GetHex());
+                pwallet->zwalletMain->SetMasterSeed(seed, true);
+                pwallet->zwalletMain->GenerateMintPool();
+            }
+        }
     }
     NotifyStatusChanged(this);
     return true;
