@@ -51,6 +51,12 @@
 #include <wallet/rpcwallet.h>
 #include <boost/assign/list_of.hpp>
 
+/** High fee for sendrawtransaction and testmempoolaccept.
+ * By default, transaction with a fee higher than this will be rejected by the
+ * RPCs. This can be overriden with the maxfeerate argument.
+ */
+constexpr static CAmount DEFAULT_MAX_RAW_TX_FEE{COIN / 10};
+
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fIncludeHex)
 {
     txnouttype type;
@@ -668,6 +674,16 @@ static UniValue decoderawtransaction(const JSONRPCRequest& request)
     TxToUniv(CTransaction(std::move(mtx)), uint256(), result, false);
 
     return result;
+}
+
+static std::string GetAllOutputTypes()
+{
+    std::string ret;
+    for (int i = TX_NONSTANDARD; i <= TX_WITNESS_UNKNOWN; ++i) {
+        if (i != TX_NONSTANDARD) ret += ", ";
+        ret += GetTxnOutputType(static_cast<txnouttype>(i));
+    }
+    return ret;
 }
 
 static UniValue decodescript(const JSONRPCRequest& request)

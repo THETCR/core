@@ -1,7 +1,5 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2019 The Bitcoin Core developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2018 The PIVX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -16,10 +14,6 @@
 #include <ui_interface.h>
 #include <util/strencodings.h>
 #include <util/system.h>
-#ifdef ENABLE_WALLET
-#include <wallet/db.h>
-#include <wallet/wallet.h>
-#endif
 
 #include <boost/signals2/signal.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -82,16 +76,6 @@ void RPCServer::OnStopped(std::function<void ()> slot)
 {
     g_rpcSignals.Stopped.connect(slot);
 }
-
-//void RPCServer::OnPreCommand(std::function<void (const CRPCCommand&)> slot)
-//{
-//    g_rpcSignals.PreCommand.connect(std::bind(slot, _1));
-//}
-//
-//void RPCServer::OnPostCommand(std::function<void (const CRPCCommand&)> slot)
-//{
-//    g_rpcSignals.PostCommand.connect(std::bind(slot, _1));
-//}
 
 void RPCTypeCheck(const UniValue& params,
                   const std::list<UniValueType>& typesExpected,
@@ -366,7 +350,6 @@ static const CRPCCommand vRPCCommands[] =
     { "control",            "help",                   &help,                   {"command"}  },
     { "control",            "stop",                   &stop,                   {"wait"}  },
     { "control",            "uptime",                 &uptime,                 {}  },
-
 };
 // clang-format on
 
