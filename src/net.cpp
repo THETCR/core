@@ -201,7 +201,7 @@ void AdvertiseLocal(CNode *pnode)
         // address than we do.
         FastRandomContext rng;
         if (IsPeerAddrLocalGood(pnode) && (!addrLocal.IsRoutable() ||
-                                           rng.randbits((GetnScore(addrLocal) > LOCAL_MANUAL) ? 3 : 1) == 0))
+             rng.randbits((GetnScore(addrLocal) > LOCAL_MANUAL) ? 3 : 1) == 0))
         {
             addrLocal.SetIP(pnode->GetAddrLocal());
         }
@@ -295,7 +295,7 @@ CNode* CConnman::FindNode(const CNetAddr& ip)
 {
     LOCK(cs_vNodes);
     for (CNode* pnode : vNodes) {
-        if (static_cast<CNetAddr>(pnode->addr) == ip) {
+      if (static_cast<CNetAddr>(pnode->addr) == ip) {
             return pnode;
         }
     }
@@ -382,8 +382,8 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
 
     /// debug print
     LogPrint(BCLog::NET, "trying connection %s lastseen=%.1fhrs\n",
-             pszDest ? pszDest : addrConnect.ToString(),
-             pszDest ? 0.0 : (double)(GetAdjustedTime() - addrConnect.nTime)/3600.0);
+        pszDest ? pszDest : addrConnect.ToString(),
+        pszDest ? 0.0 : (double)(GetAdjustedTime() - addrConnect.nTime)/3600.0);
 
     // Resolve
     const int default_port = Params().GetDefaultPort();
@@ -869,7 +869,7 @@ bool CConnman::AttemptToEvictConnection()
     //  then we probably don't want to evict it no matter what.
     if (std::any_of(vEvictionCandidates.begin(),vEvictionCandidates.end(),[](NodeEvictionCandidate const &n){return n.prefer_evict;})) {
         vEvictionCandidates.erase(std::remove_if(vEvictionCandidates.begin(),vEvictionCandidates.end(),
-                                                 [](NodeEvictionCandidate const &n){return !n.prefer_evict;}),vEvictionCandidates.end());
+                                  [](NodeEvictionCandidate const &n){return !n.prefer_evict;}),vEvictionCandidates.end());
     }
 
     // Identify the network group with the most connections and youngest member.
@@ -1622,7 +1622,7 @@ void CConnman::DumpAddresses()
     adb.Write(addrman);
 
     LogPrint(BCLog::NET, "Flushed %d addresses to peers.dat  %dms\n",
-             addrman.size(), GetTimeMillis() - nStart);
+           addrman.size(), GetTimeMillis() - nStart);
 }
 
 void CConnman::ProcessOneShot()
@@ -2226,8 +2226,8 @@ bool CConnman::Start(CScheduler& scheduler, const Options& connOptions)
     if (fListen && !InitBinds(connOptions.vBinds, connOptions.vWhiteBinds)) {
         if (clientInterface) {
             clientInterface->ThreadSafeMessageBox(
-                    _("Failed to listen on any port. Use -listen=0 if you want this."),
-                    "", CClientUIInterface::MSG_ERROR);
+                _("Failed to listen on any port. Use -listen=0 if you want this."),
+                "", CClientUIInterface::MSG_ERROR);
         }
         return false;
     }
@@ -2302,7 +2302,6 @@ bool CConnman::Start(CScheduler& scheduler, const Options& connOptions)
 
     // Process messages
     threadMessageHandler = std::thread(&TraceThread<std::function<void()> >, "msghand", std::function<void()>(std::bind(&CConnman::ThreadMessageHandler, this)));
-
 
     // Dump network addresses
     scheduler.scheduleEvery(std::bind(&CConnman::DumpAddresses, this), DUMP_PEERS_INTERVAL * 1000);
@@ -2655,17 +2654,17 @@ int CConnman::GetBestHeight() const
 unsigned int CConnman::GetReceiveFloodSize() const { return nReceiveFloodSize; }
 
 CNode::CNode(NodeId idIn, ServiceFlags nLocalServicesIn, int nMyStartingHeightIn, SOCKET hSocketIn, const CAddress& addrIn, uint64_t nKeyedNetGroupIn, uint64_t nLocalHostNonceIn, const CAddress& addrBindIn, const std::string& addrNameIn, bool fInboundIn)
-        : nTimeConnected(GetSystemTimeInSeconds()),
-          addr(addrIn),
-          addrBind(addrBindIn),
-          fInbound(fInboundIn),
-          nKeyedNetGroup(nKeyedNetGroupIn),
-          addrKnown(5000, 0.001),
-          filterInventoryKnown(50000, 0.000001),
-          id(idIn),
-          nLocalHostNonce(nLocalHostNonceIn),
-          nLocalServices(nLocalServicesIn),
-          nMyStartingHeight(nMyStartingHeightIn)
+    : nTimeConnected(GetSystemTimeInSeconds()),
+    addr(addrIn),
+    addrBind(addrBindIn),
+    fInbound(fInboundIn),
+    nKeyedNetGroup(nKeyedNetGroupIn),
+    addrKnown(5000, 0.001),
+    filterInventoryKnown(50000, 0.000001),
+    id(idIn),
+    nLocalHostNonce(nLocalHostNonceIn),
+    nLocalServices(nLocalServicesIn),
+    nMyStartingHeight(nMyStartingHeightIn)
 {
     hSocket = hSocketIn;
     addrName = addrNameIn == "" ? addr.ToStringIPPort() : addrNameIn;
