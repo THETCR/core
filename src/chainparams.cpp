@@ -270,7 +270,7 @@ public:
         m_fallback_fee_enabled = false;
     }
 
-    const Checkpoints::CCheckpointData& Checkpoints() const
+    const Checkpoints::CCheckpointData& CheckpointsOld() const
     {
         return data;
     }

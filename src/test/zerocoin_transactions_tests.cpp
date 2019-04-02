@@ -2,6 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <test/test_wispr.h>
 #include "libzerocoin/Denominations.h"
 #include "amount.h"
 #include "chainparams.h"
@@ -16,7 +17,7 @@
 using namespace libzerocoin;
 
 
-BOOST_AUTO_TEST_SUITE(zerocoin_transactions_tests)
+BOOST_FIXTURE_TEST_SUITE(zerocoin_transactions_tests, TestingSetup)
 
 
 BOOST_AUTO_TEST_CASE(zerocoin_spend_test)

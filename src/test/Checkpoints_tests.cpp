@@ -7,15 +7,14 @@
 // Unit tests for block-chain checkpoints
 //
 
+#include <test/test_wispr.h>
 #include "checkpoints.h"
 
 #include "uint256.h"
 
 #include <boost/test/unit_test.hpp>
 
-using namespace std;
-
-BOOST_AUTO_TEST_SUITE(Checkpoints_tests)
+BOOST_FIXTURE_TEST_SUITE(Checkpoints_tests, TestingSetup)
 
 BOOST_AUTO_TEST_CASE(sanity) {
         uint256 p14317 = uint256("50929653a7146de37b82b9125e55ea03aa4ae062ce3a2e3098026eea07e5bc81"); // 125.000 Coin Burn Confirmation

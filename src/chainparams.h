@@ -31,13 +31,9 @@ struct SeedSpec6 {
 
 typedef std::map<int, uint256> MapCheckpoints;
 
-//struct CCheckpointData {
-////    MapCheckpoints mapCheckpoints;
-//    const MapCheckpoints* mapCheckpoints;
-//    int64_t nTimeLastCheckpoint;
-//    int64_t nTransactionsLastCheckpoint;
-//    double fTransactionsPerDay;
-//};
+struct CCheckpointData {
+    MapCheckpoints mapCheckpoints;
+};
 
 
 /**
@@ -150,7 +146,7 @@ public:
     const std::vector<std::string>& DNSSeeds() const { return vSeeds; }
     const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
     const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
-    virtual const Checkpoints::CCheckpointData& Checkpoints() const = 0;
+//    virtual const Checkpoints::CCheckpointData& Checkpoints() const = 0;
     int PoolMaxTransactions() const { return consensus.nPoolMaxTransactions; }
 
     /** Spork key and Masternode Handling **/
@@ -182,7 +178,7 @@ public:
     bool PivProtocolsStartHeightEqualOrGreaterThen(int nHeight) const { return nHeight >= consensus.nNewProtocolStartHeight; }
     bool PivProtocolsStartHeightSmallerThen(int nHeight) const { return nHeight < consensus.nNewProtocolStartHeight; }
     const std::string& Bech32HRP() const { return bech32_hrp; }
-//    const CCheckpointData& Checkpoints() const { return checkpointData; }
+    const CCheckpointData& Checkpoints() const { return checkpointData; }
     const ChainTxData& TxData() const { return chainTxData; }
 
 
@@ -216,7 +212,8 @@ protected:
     bool fMineBlocksOnDemand;
     bool fTestnetToBeDeprecatedFieldRPC;
     bool fHeadersFirstSyncingActive;
-    Checkpoints::CCheckpointData checkpointData;
+    CCheckpointData checkpointData;
+//    Checkpoints::CCheckpointData checkpointData_old;
     ChainTxData chainTxData;
     bool m_fallback_fee_enabled;
 

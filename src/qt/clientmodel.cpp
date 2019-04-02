@@ -130,7 +130,7 @@ double ClientModel::getVerificationProgress(const CBlockIndex *tipIn) const
         LOCK(cs_main);
         tip = chainActive.Tip();
     }
-    return Checkpoints::GuessVerificationProgress(tip);
+    return m_node.getVerificationProgress();
 }
 
 int ClientModel::getHeaderTipHeight() const

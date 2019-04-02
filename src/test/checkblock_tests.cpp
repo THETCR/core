@@ -8,6 +8,8 @@
 
 
 
+#include <test/test_wispr.h>
+
 #include "clientversion.h"
 #include "consensus/validation.h"
 #include <validation.h>
@@ -20,7 +22,7 @@
 #include <boost/test/unit_test.hpp>
 
 
-BOOST_AUTO_TEST_SUITE(CheckBlock_tests)
+BOOST_FIXTURE_TEST_SUITE(CheckBlock_tests, TestingSetup)
 
 bool read_block(const std::string& filename, CBlock& block)
 {
