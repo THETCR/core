@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(blockfilters_json_test)
         for (unsigned int ii = 0; ii < prev_scripts.size(); ii++) {
             std::vector<unsigned char> raw_script = ParseHex(prev_scripts[ii].get_str());
             CTxOut txout(0, CScript(raw_script.begin(), raw_script.end()));
-            tx_undo.vprevout.emplace_back(txout, 0, false);
+            tx_undo.vprevout.emplace_back(txout, 0, false, false);
         }
 
         uint256 prev_filter_header_basic;
