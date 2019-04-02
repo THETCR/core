@@ -110,7 +110,7 @@ void ZWspControlDialog::updateList()
         itemMint->setText(COLUMN_CONFIRMATIONS, QString::number(nConfirmations));
         itemMint->setData(COLUMN_CONFIRMATIONS, Qt::UserRole, QVariant((qlonglong) nConfirmations));
 
-        CWallet* pwallet = model->wallet().getWisprWallet();
+        CWallet* pwallet = &*model->wallet().getWisprWallet();
         {
             LOCK(pwallet->zwspTracker->cs_spendcache);
 
