@@ -236,11 +236,17 @@ void MultisigDialog::on_importAddressButton_clicked(){
 
     addMultisig(stoi(vRedeem[0]), keys);
 
-    WalletRescanReserver reserver(model->wallet().getWisprWallet());
+    CWallet* pwallet = model->wallet().getWisprWallet();
+
+    WalletRescanReserver reserver(pwallet);
     reserver.reserve();
     // rescan to find txs associated with imported address
-    model->wallet().getWisprWallet()->ScanForWalletTransactions(chainActive.Genesis()->GetBlockHash(), {}, reserver,  true);
-    model->wallet().getWisprWallet()->ReacceptWalletTransactions();
+    pwallet->ScanForWalletTransactions(chainActive.Genesis()->GetBlockHash(), {}, reserver,  true);
+    {
+        auto locked_chain = pwallet->chain().lock();
+        LOCK(pwallet->cs_wallet);
+        pwallet->ReacceptWalletTransactions(*locked_chain);
+    }
 }
 
 bool MultisigDialog::addMultisig(int m, std::vector<string> keys){
