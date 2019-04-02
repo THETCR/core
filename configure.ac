@@ -140,12 +140,17 @@ AC_ARG_WITH([rapidcheck],
 AC_ARG_ENABLE(bench,
     AS_HELP_STRING([--disable-bench],[do not compile benchmarks (default is to compile)]),
     [use_bench=$enableval],
-    [use_bench=no])
+    [use_bench=yes])
 
 AC_ARG_ENABLE([extended-functional-tests],
     AS_HELP_STRING([--enable-extended-functional-tests],[enable expensive functional tests when using lcov (default no)]),
     [use_extended_functional_tests=$enableval],
     [use_extended_functional_tests=no])
+
+AC_ARG_ENABLE([fuzz],
+    AS_HELP_STRING([--enable-fuzz],[enable building of fuzz targets (default no)]),
+    [enable_fuzz=$enableval],
+    [enable_fuzz=no])
 
 AC_ARG_WITH([qrencode],
   [AS_HELP_STRING([--with-qrencode],
@@ -210,7 +215,11 @@ AC_ARG_ENABLE([zmq],
   [disable ZMQ notifications])],
   [use_zmq=$enableval],
   [use_zmq=yes])
-
+AC_ARG_ENABLE([bip70],
+  [AS_HELP_STRING([--disable-bip70],
+  [disable BIP70 (payment protocol) support in GUI (enabled by default)])],
+  [enable_bip70=$enableval],
+  [enable_bip70=auto])
 AC_ARG_WITH([zerocoin-bignum],
   [AS_HELP_STRING([--with-zerocoin-bignum=gmp|openssl|auto],
   [Specify Bignum Implementation. Default is auto])],
@@ -1387,6 +1396,23 @@ if test x$bitcoin_enable_qt != xno; then
   else
     AC_MSG_RESULT([no])
   fi
+
+  AC_MSG_CHECKING([whether to build BIP70 support])
+  if test x$have_protobuf = xno; then
+    if test x$enable_bip70 = xyes; then
+      AC_MSG_ERROR(protobuf missing)
+    fi
+    enable_bip70=no
+    AC_MSG_RESULT(no)
+  else
+    if test x$enable_bip70 != xno; then
+      AC_DEFINE([ENABLE_BIP70],[1],[Define if BIP70 support should be compiled in])
+      enable_bip70=yes
+      AC_MSG_RESULT([yes])
+    else
+      AC_MSG_RESULT([no])
+    fi
+  fi
 fi
 
 AM_CONDITIONAL([ENABLE_ZMQ], [test "x$use_zmq" = "xyes"])
@@ -1429,8 +1455,10 @@ AM_CONDITIONAL([BUILD_DARWIN], [test x$BUILD_OS = xdarwin])
 AM_CONDITIONAL([TARGET_WINDOWS], [test x$TARGET_OS = xwindows])
 AM_CONDITIONAL([ENABLE_WALLET],[test x$enable_wallet = xyes])
 AM_CONDITIONAL([ENABLE_TESTS],[test x$BUILD_TEST = xyes])
+AM_CONDITIONAL([ENABLE_FUZZ],[test x$enable_fuzz = xyes])
 AM_CONDITIONAL([ENABLE_QT],[test x$bitcoin_enable_qt = xyes])
 AM_CONDITIONAL([ENABLE_QT_TESTS],[test x$BUILD_TEST_QT = xyes])
+AM_CONDITIONAL([ENABLE_BIP70],[test x$enable_bip70 = xyes])
 AM_CONDITIONAL([ENABLE_BENCH],[test x$use_bench = xyes])
 AM_CONDITIONAL([USE_QRCODE], [test x$use_qr = xyes])
 AM_CONDITIONAL([USE_LCOV],[test x$use_lcov = xyes])
@@ -1568,11 +1596,15 @@ echo "Options used to compile and link:"
 echo "  with wallet   = $enable_wallet"
 echo "  with gui / qt = $bitcoin_enable_qt"
 if test x$bitcoin_enable_qt != xno; then
+    echo "    with bip70  = $enable_bip70"
     echo "    with qr     = $use_qr"
 fi
 echo "  with zmq      = $use_zmq"
 echo "  with bignum   = $set_bignum"
 echo "  with test     = $use_tests"
+if test x$use_tests != xno; then
+    echo "    with fuzz   = $enable_fuzz"
+fi
 echo "  with bench    = $use_bench"
 echo "  with upnp     = $use_upnp"
 echo "  use asm       = $use_asm"

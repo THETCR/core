@@ -103,10 +103,6 @@ endif
 # wispr core #
 BITCOIN_CORE_H = \
   activemasternode.h \
-  zpiv/accumulators.h \
-  zpiv/accumulatorcheckpoints.h \
-  zpiv/accumulatorcheckpoints.json.h \
-  zpiv/accumulatormap.h \
   addrdb.h \
   addrman.h \
   alert.h \
@@ -135,8 +131,6 @@ BITCOIN_CORE_H = \
   compressor.h \
   consensus/consensus.h \
   consensus/tx_verify.h \
-  zpiv/deterministicmint.h \
-  zpiv/zerocoin.h \
   core_io.h \
   core_memusage.h \
   cuckoocache.h \
@@ -175,7 +169,6 @@ BITCOIN_CORE_H = \
   masternodeconfig.h \
   merkleblock.h \
   miner.h \
-  zpiv/mintpool.h \
   mruset.h \
   net.h \
   net_processing.h \
@@ -207,8 +200,6 @@ BITCOIN_CORE_H = \
   rpc/util.h \
   scheduler.h \
   script/descriptor.h \
-  script/interpreter.h \
-  script/script.h \
   script/ismine.h \
   script/sigcache.h \
   script/sign.h \
@@ -235,7 +226,6 @@ BITCOIN_CORE_H = \
   util/bip32.h \
   util/bytevectorhash.h \
   util/system.h \
-  util/strencodings.h \
   util/memory.h \
   util/moneystr.h \
   util/time.h \
@@ -257,7 +247,14 @@ BITCOIN_CORE_H = \
   wallet/walletutil.h \
   wallet/coinselection.h \
   zwspchain.h \
+  zpiv/accumulators.h \
+  zpiv/accumulatorcheckpoints.h \
+  zpiv/accumulatorcheckpoints.json.h \
+  zpiv/accumulatormap.h \
+  zpiv/deterministicmint.h \
+  zpiv/mintpool.h \
   zpiv/witness.h \
+  zpiv/zerocoin.h \
   zpiv/zwsptracker.h \
   zpiv/zwspwallet.h \
   genwit.h \
@@ -364,17 +361,10 @@ libbitcoin_wallet_a_SOURCES = \
   interfaces/wallet.cpp \
   activemasternode.cpp \
   bip38.cpp \
-  wallet/coincontrol.cpp \
   outputtype.cpp \
   denomination_functions.cpp \
   obfuscation.cpp \
   obfuscation-relay.cpp \
-  wallet/crypter.cpp \
-  wallet/db.cpp \
-  wallet/feebumper.cpp \
-  wallet/fees.cpp \
-  wallet/init.cpp \
-  wallet/psbtwallet.cpp \
   swifttx.cpp \
   masternode.cpp \
   masternode-budget.cpp \
@@ -382,22 +372,29 @@ libbitcoin_wallet_a_SOURCES = \
   masternode-sync.cpp \
   masternodeconfig.cpp \
   masternodeman.cpp \
-  zpiv/mintpool.cpp \
-  zpiv/witness.cpp \
-  wallet/rpcdump.cpp \
-  zpiv/deterministicmint.cpp \
-  zpiv/zerocoin.cpp \
-  wallet/rpcwallet.cpp \
   kernel.cpp \
+  wallet/coincontrol.cpp \
+  wallet/crypter.cpp \
+  wallet/db.cpp \
+  wallet/feebumper.cpp \
+  wallet/fees.cpp \
+  wallet/init.cpp \
+  wallet/psbtwallet.cpp \
+  wallet/rpcdump.cpp \
+  wallet/rpcwallet.cpp \
   wallet/wallet.cpp \
   wallet/walletdb.cpp \
-  zpiv/zwspwallet.cpp \
-  zpiv/zwsptracker.cpp \
   wallet/walletutil.cpp \
   wallet/coinselection.cpp \
   stakeinput.cpp \
   genwit.cpp \
   lightzwspthread.cpp \
+  zpiv/deterministicmint.cpp \
+  zpiv/mintpool.cpp \
+  zpiv/witness.cpp \
+  zpiv/zerocoin.cpp \
+  zpiv/zwsptracker.cpp \
+  zpiv/zwspwallet.cpp \
   $(BITCOIN_CORE_H)
 
 libbitcoin_wallet_tool_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
@@ -519,17 +516,12 @@ libwispr_consensus_a_SOURCES = \
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_SOURCES = \
-  zpiv/accumulators.cpp \
-  zpiv/accumulatorcheckpoints.cpp \
-  zpiv/accumulatormap.cpp \
   base58.cpp \
   bech32.cpp \
   bip38.cpp \
   chainparams.cpp \
   coins.cpp \
   compressor.cpp \
-  zpiv/deterministicmint.cpp \
-  zpiv/zerocoin.cpp \
   core_read.cpp \
   core_write.cpp \
   invalid.cpp \
@@ -550,6 +542,11 @@ libbitcoin_common_a_SOURCES = \
   spork.cpp \
   sporkdb.cpp \
   warnings.cpp \
+  zpiv/accumulators.cpp \
+  zpiv/accumulatorcheckpoints.cpp \
+  zpiv/accumulatormap.cpp \
+  zpiv/deterministicmint.cpp \
+  zpiv/zerocoin.cpp \
   $(BITCOIN_CORE_H)
 
 # util: shared between all executables.
@@ -773,6 +770,10 @@ endif
 
 if ENABLE_TESTS
 include Makefile.test.include
+endif
+
+if ENABLE_BENCH
+include Makefile.bench.include
 endif
 
 if ENABLE_QT
