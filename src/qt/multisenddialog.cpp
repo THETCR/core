@@ -11,6 +11,7 @@
 #include "addresstablemodel.h"
 #include "base58.h"
 #include "walletmodel.h"
+#include <wallet/wallet.h>
 
 #include <QStyle>
 
