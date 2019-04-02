@@ -14,7 +14,6 @@
 #include <versionbitsinfo.h>
 
 #include <assert.h>
-
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
@@ -457,6 +456,7 @@ public:
 
         /* enable fallback fee on regtest */
         m_fallback_fee_enabled = true;
+        std::cout << "Regtest constructor done\n";
     }
 
     /**
@@ -468,7 +468,6 @@ public:
         consensus.vDeployments[d].nTimeout = nTimeout;
     }
     void UpdateVersionBitsParametersFromArgs(const ArgsManager& args);
-    std::cout << "Regtest constructor done\n";
 };
 
 /**
