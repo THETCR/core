@@ -432,6 +432,7 @@ bool CWallet::WriteKeyMetadata(const CKeyMetadata& meta, const CPubKey& pubkey, 
 
 void CWallet::UpgradeKeyMetadata()
 {
+    std::cout << "CWallet::UpgradeKeyMetadata\n";
     AssertLockHeld(cs_wallet);
     if (IsLocked() || IsWalletFlagSet(WALLET_FLAG_KEY_ORIGIN_METADATA)) {
         return;
