@@ -4355,18 +4355,22 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
         // Note that if a validationinterface callback ends up calling
         // ActivateBestChain this may lead to a deadlock! We should
         // probably have a DEBUG_LOCKORDER test for this in the future.
+        std::cout << "LimitValidationInterfaceQueue\n";
         LimitValidationInterfaceQueue();
 
         {
             LOCK(cs_main);
+            std::cout << "chainactive tip\n";
             CBlockIndex* starting_tip = chainActive.Tip();
             bool blocks_connected = false;
             do {
                 // We absolutely may not unlock cs_main until we've made forward progress
                 // (with the exception of shutdown due to hardware issues, low disk space, etc).
                 ConnectTrace connectTrace(mempool); // Destructed before cs_main is unlocked
+                std::cout << "connectTrace\n";
 
                 if (pindexMostWork == nullptr) {
+                    std::cout << "FindMostWorkChain\n";
                     pindexMostWork = FindMostWorkChain();
                 }
 
@@ -4377,6 +4381,7 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
 
                 bool fInvalidFound = false;
                 std::shared_ptr<const CBlock> nullBlockPtr;
+                std::cout << "ActivateBestChainStep\n";
                 if (!ActivateBestChainStep(state, chainparams, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : nullBlockPtr, fInvalidFound, connectTrace))
                     return false;
                 blocks_connected = true;
@@ -4389,11 +4394,13 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
 
                 for (const PerBlockConnectTrace& trace : connectTrace.GetBlocksConnected()) {
                     assert(trace.pblock && trace.pindex);
+                    std::cout << "BlockConnected\n";
                     GetMainSignals().BlockConnected(trace.pblock, trace.pindex, trace.conflictedTxs);
                 }
             } while (!chainActive.Tip() || (starting_tip && CBlockIndexWorkComparator()(chainActive.Tip(), starting_tip)));
             if (!blocks_connected) return true;
 
+            std::cout << "FindFork\n";
             const CBlockIndex* pindexFork = chainActive.FindFork(starting_tip);
             bool fInitialDownload = IsInitialBlockDownload();
 
@@ -4401,9 +4408,11 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
             // Enqueue while holding cs_main to ensure that UpdatedBlockTip is called in the order in which blocks are connected
             if (pindexFork != pindexNewTip) {
                 // Notify ValidationInterface subscribers
+                std::cout << "UpdatedBlockTip\n";
                 GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
 
                 // Always notify the UI if a new block tip was connected
+                std::cout << "NotifyBlockTip\n";
                 uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
             }
         }
@@ -4418,6 +4427,7 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
         if (ShutdownRequested())
             break;
     } while (pindexNewTip != pindexMostWork);
+    std::cout << "CheckBlockIndex\n";
     CheckBlockIndex(chainparams.GetConsensus());
 
     // Write changes periodically to disk, after relay.
