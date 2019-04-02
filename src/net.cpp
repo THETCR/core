@@ -2303,10 +2303,14 @@ bool CConnman::Start(CScheduler& scheduler, const Options& connOptions)
     // Process messages
     threadMessageHandler = std::thread(&TraceThread<std::function<void()> >, "msghand", std::function<void()>(std::bind(&CConnman::ThreadMessageHandler, this)));
 
-//    threadStakeMinter = std::thread(&TraceThread<std::function<void()> >, "minter", std::function<void()>(std::bind(&CConnman::ThreadStakeMinter, this)));
 
     // Dump network addresses
     scheduler.scheduleEvery(std::bind(&CConnman::DumpAddresses, this), DUMP_PEERS_INTERVAL * 1000);
+
+    // ppcoin:mint proof-of-stake blocks in the background
+    if (gArgs.GetBoolArg("-staking", true)){
+        threadStakeMinter = std::thread(&TraceThread<std::function<void()> >, "minter", std::function<void()>(std::bind(&CConnman::ThreadStakeMinter, this)));
+    }
 
     return true;
 }

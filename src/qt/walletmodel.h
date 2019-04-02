@@ -23,7 +23,6 @@
 #include <interfaces/wallet.h>
 #include <support/allocators/secure.h>
 #include "swifttx.h"
-#include <wallet/wallet.h>
 
 #include <map>
 #include <vector>
@@ -44,7 +43,6 @@ class CKeyID;
 class COutPoint;
 class COutput;
 class CPubKey;
-class CWallet;
 class uint256;
 
 namespace interfaces {
