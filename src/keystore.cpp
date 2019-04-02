@@ -178,6 +178,11 @@ bool CBasicKeyStore::AddMultiSig(const CScript& dest)
 {
     LOCK(cs_KeyStore);
     setMultiSig.insert(dest);
+    CPubKey pubKey;
+    if (ExtractPubKey(dest, pubKey)) {
+        mapWatchKeys[pubKey.GetID()] = pubKey;
+        ImplicitlyLearnRelatedKeyScripts(pubKey);
+    }
     return true;
 }
 
@@ -185,6 +190,12 @@ bool CBasicKeyStore::RemoveMultiSig(const CScript& dest)
 {
     LOCK(cs_KeyStore);
     setMultiSig.erase(dest);
+    CPubKey pubKey;
+    if (ExtractPubKey(dest, pubKey)) {
+        mapWatchKeys.erase(pubKey.GetID());
+    }
+    // Related CScripts are not removed; having superfluous scripts around is
+    // harmless (see comment in ImplicitlyLearnRelatedKeyScripts).
     return true;
 }
 

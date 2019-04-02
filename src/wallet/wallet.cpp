@@ -3488,13 +3488,15 @@ bool CWallet::CommitTransaction(CTransactionRef tx, mapValue_t mapValue, std::ve
 
 DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
 {
+    std::cout << "CWallet LoadWallet start\n";
     auto locked_chain = chain().lock();
     LOCK(cs_wallet);
 
     fFirstRunRet = false;
+    std::cout << "WalletBatch LoadWallet\n";
     DBErrors nLoadWalletRet = WalletBatch(*database,"cr+").LoadWallet(this);
     if (nLoadWalletRet == DBErrors::NEED_REWRITE)
-    {
+    {   std::cout << "WalletBatch Rewrite\n";
         if (database->Rewrite("\x04pool"))
         {
             setInternalKeyPool.clear();
@@ -3509,13 +3511,15 @@ DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
     {
         LOCK(cs_KeyStore);
         // This wallet is in its first run if all of these are empty
-        fFirstRunRet = mapKeys.empty() && mapCryptedKeys.empty() && mapWatchKeys.empty() && setWatchOnly.empty() && mapScripts.empty()
+        std::cout << "CWallet LoadWallet fFirstRunRet\n";
+        fFirstRunRet = mapKeys.empty() && mapCryptedKeys.empty() && mapWatchKeys.empty() && setWatchOnly.empty() && mapScripts.empty() && setMultiSig.empty()
             && !IsWalletFlagSet(WALLET_FLAG_DISABLE_PRIVATE_KEYS) && !IsWalletFlagSet(WALLET_FLAG_BLANK_WALLET);
     }
 
     if (nLoadWalletRet != DBErrors::LOAD_OK)
         return nLoadWalletRet;
 
+    std::cout << "CWallet LoadWallet finished ok\n";
     return DBErrors::LOAD_OK;
 }
 

@@ -31,11 +31,11 @@ public:
     virtual bool HaveCScript(const CScriptID &hash) const =0;
     virtual std::set<CScriptID> GetCScripts() const =0;
 
-  //! Support for Watch-only addresses
-  virtual bool AddWatchOnly(const CScript &dest) =0;
-  virtual bool RemoveWatchOnly(const CScript &dest) =0;
-  virtual bool HaveWatchOnly(const CScript &dest) const =0;
-  virtual bool HaveWatchOnly() const =0;
+    //! Support for Watch-only addresses
+    virtual bool AddWatchOnly(const CScript &dest) =0;
+    virtual bool RemoveWatchOnly(const CScript &dest) =0;
+    virtual bool HaveWatchOnly(const CScript &dest) const =0;
+    virtual bool HaveWatchOnly() const =0;
 
   //! Support for MultiSig addresses
   virtual bool AddMultiSig(const CScript& dest) = 0;
@@ -48,38 +48,38 @@ public:
 class CBasicKeyStore : public CKeyStore
 {
 protected:
-  mutable CCriticalSection cs_KeyStore;
+    mutable CCriticalSection cs_KeyStore;
 
-  using KeyMap = std::map<CKeyID, CKey>;
-  using WatchKeyMap = std::map<CKeyID, CPubKey>;
-  using ScriptMap = std::map<CScriptID, CScript>;
-  using WatchOnlySet = std::set<CScript>;
-  using MultiSigScriptSet = std::set<CScript>;
+    using KeyMap = std::map<CKeyID, CKey>;
+    using WatchKeyMap = std::map<CKeyID, CPubKey>;
+    using ScriptMap = std::map<CScriptID, CScript>;
+    using WatchOnlySet = std::set<CScript>;
+    using MultiSigScriptSet = std::set<CScript>;
 
-  KeyMap mapKeys GUARDED_BY(cs_KeyStore);
-  WatchKeyMap mapWatchKeys GUARDED_BY(cs_KeyStore);
-  ScriptMap mapScripts GUARDED_BY(cs_KeyStore);
-  WatchOnlySet setWatchOnly GUARDED_BY(cs_KeyStore);
-  MultiSigScriptSet setMultiSig GUARDED_BY(cs_KeyStore);
+    KeyMap mapKeys GUARDED_BY(cs_KeyStore);
+    WatchKeyMap mapWatchKeys GUARDED_BY(cs_KeyStore);
+    ScriptMap mapScripts GUARDED_BY(cs_KeyStore);
+    WatchOnlySet setWatchOnly GUARDED_BY(cs_KeyStore);
+    MultiSigScriptSet setMultiSig GUARDED_BY(cs_KeyStore);
 
-  void ImplicitlyLearnRelatedKeyScripts(const CPubKey& pubkey) EXCLUSIVE_LOCKS_REQUIRED(cs_KeyStore);
+    void ImplicitlyLearnRelatedKeyScripts(const CPubKey& pubkey) EXCLUSIVE_LOCKS_REQUIRED(cs_KeyStore);
 
 public:
-  bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey) override;
-  bool AddKey(const CKey &key) { return AddKeyPubKey(key, key.GetPubKey()); }
-  bool GetPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const override;
-  bool HaveKey(const CKeyID &address) const override;
-  std::set<CKeyID> GetKeys() const override;
-  bool GetKey(const CKeyID &address, CKey &keyOut) const override;
-  bool AddCScript(const CScript& redeemScript) override;
-  bool HaveCScript(const CScriptID &hash) const override;
-  std::set<CScriptID> GetCScripts() const override;
-  bool GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const override;
+    bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey) override;
+    bool AddKey(const CKey &key) { return AddKeyPubKey(key, key.GetPubKey()); }
+    bool GetPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const override;
+    bool HaveKey(const CKeyID &address) const override;
+    std::set<CKeyID> GetKeys() const override;
+    bool GetKey(const CKeyID &address, CKey &keyOut) const override;
+    bool AddCScript(const CScript& redeemScript) override;
+    bool HaveCScript(const CScriptID &hash) const override;
+    std::set<CScriptID> GetCScripts() const override;
+    bool GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const override;
 
-  bool AddWatchOnly(const CScript &dest) override;
-  bool RemoveWatchOnly(const CScript &dest) override;
-  bool HaveWatchOnly(const CScript &dest) const override;
-  bool HaveWatchOnly() const override;
+    bool AddWatchOnly(const CScript &dest) override;
+    bool RemoveWatchOnly(const CScript &dest) override;
+    bool HaveWatchOnly(const CScript &dest) const override;
+    bool HaveWatchOnly() const override;
 
   bool AddMultiSig(const CScript& dest) override;
   bool RemoveMultiSig(const CScript& dest) override;

@@ -1015,7 +1015,7 @@ private:
     std::unique_ptr<WalletDatabase> database;
 
     /** Internal precompute database handle. */
-    std::unique_ptr<WalletDatabase> pc_database = WalletDatabase::CreatePrecompute();
+    std::unique_ptr<WalletDatabase> pc_database;
 
 
     /**
@@ -1747,8 +1747,8 @@ public:
 //    int nStakeLimitHeight = 0; // for regtest, don't stake above nStakeLimitHeight
 
     friend struct WalletTestingSetup;
-    friend class CzWSPWallet;
-    friend class CzWSPTracker;
+//    friend class CzWSPWallet;
+//    friend class CzWSPTracker;
 
     bool IsAnonymizeOnlyUnlocked(){
         return fWalletUnlockAnonymizeOnly;

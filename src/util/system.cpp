@@ -196,101 +196,101 @@ static bool InterpretBool(const std::string& strValue)
 /** Internal helper functions for ArgsManager */
 class ArgsManagerHelper {
 public:
-  typedef std::map<std::string, std::vector<std::string>> MapArgs;
+    typedef std::map<std::string, std::vector<std::string>> MapArgs;
 
-  /** Determine whether to use config settings in the default section,
-   *  See also comments around ArgsManager::ArgsManager() below. */
-  static inline bool UseDefaultSection(const ArgsManager& am, const std::string& arg) EXCLUSIVE_LOCKS_REQUIRED(am.cs_args)
-  {
-      return (am.m_network == CBaseChainParams::MAIN || am.m_network_only_args.count(arg) == 0);
-  }
+    /** Determine whether to use config settings in the default section,
+     *  See also comments around ArgsManager::ArgsManager() below. */
+    static inline bool UseDefaultSection(const ArgsManager& am, const std::string& arg) EXCLUSIVE_LOCKS_REQUIRED(am.cs_args)
+    {
+        return (am.m_network == CBaseChainParams::MAIN || am.m_network_only_args.count(arg) == 0);
+    }
 
-  /** Convert regular argument into the network-specific setting */
-  static inline std::string NetworkArg(const ArgsManager& am, const std::string& arg)
-  {
-      assert(arg.length() > 1 && arg[0] == '-');
-      return "-" + am.m_network + "." + arg.substr(1);
-  }
+    /** Convert regular argument into the network-specific setting */
+    static inline std::string NetworkArg(const ArgsManager& am, const std::string& arg)
+    {
+        assert(arg.length() > 1 && arg[0] == '-');
+        return "-" + am.m_network + "." + arg.substr(1);
+    }
 
-  /** Find arguments in a map and add them to a vector */
-  static inline void AddArgs(std::vector<std::string>& res, const MapArgs& map_args, const std::string& arg)
-  {
-      auto it = map_args.find(arg);
-      if (it != map_args.end()) {
-          res.insert(res.end(), it->second.begin(), it->second.end());
-      }
-  }
+    /** Find arguments in a map and add them to a vector */
+    static inline void AddArgs(std::vector<std::string>& res, const MapArgs& map_args, const std::string& arg)
+    {
+        auto it = map_args.find(arg);
+        if (it != map_args.end()) {
+            res.insert(res.end(), it->second.begin(), it->second.end());
+        }
+    }
 
-  /** Return true/false if an argument is set in a map, and also
-   *  return the first (or last) of the possibly multiple values it has
-   */
-  static inline std::pair<bool,std::string> GetArgHelper(const MapArgs& map_args, const std::string& arg, bool getLast = false)
-  {
-      auto it = map_args.find(arg);
+    /** Return true/false if an argument is set in a map, and also
+     *  return the first (or last) of the possibly multiple values it has
+     */
+    static inline std::pair<bool,std::string> GetArgHelper(const MapArgs& map_args, const std::string& arg, bool getLast = false)
+    {
+        auto it = map_args.find(arg);
 
-      if (it == map_args.end() || it->second.empty()) {
-          return std::make_pair(false, std::string());
-      }
+        if (it == map_args.end() || it->second.empty()) {
+            return std::make_pair(false, std::string());
+        }
 
-      if (getLast) {
-          return std::make_pair(true, it->second.back());
-      } else {
-          return std::make_pair(true, it->second.front());
-      }
-  }
+        if (getLast) {
+            return std::make_pair(true, it->second.back());
+        } else {
+            return std::make_pair(true, it->second.front());
+        }
+    }
 
-  /* Get the string value of an argument, returning a pair of a boolean
-   * indicating the argument was found, and the value for the argument
-   * if it was found (or the empty string if not found).
-   */
-  static inline std::pair<bool,std::string> GetArg(const ArgsManager &am, const std::string& arg)
-  {
-      LOCK(am.cs_args);
-      std::pair<bool,std::string> found_result(false, std::string());
+    /* Get the string value of an argument, returning a pair of a boolean
+     * indicating the argument was found, and the value for the argument
+     * if it was found (or the empty string if not found).
+     */
+    static inline std::pair<bool,std::string> GetArg(const ArgsManager &am, const std::string& arg)
+    {
+        LOCK(am.cs_args);
+        std::pair<bool,std::string> found_result(false, std::string());
 
-      // We pass "true" to GetArgHelper in order to return the last
-      // argument value seen from the command line (so "wisprd -foo=bar
-      // -foo=baz" gives GetArg(am,"foo")=={true,"baz"}
-      found_result = GetArgHelper(am.m_override_args, arg, true);
-      if (found_result.first) {
-          return found_result;
-      }
+        // We pass "true" to GetArgHelper in order to return the last
+        // argument value seen from the command line (so "bitcoind -foo=bar
+        // -foo=baz" gives GetArg(am,"foo")=={true,"baz"}
+        found_result = GetArgHelper(am.m_override_args, arg, true);
+        if (found_result.first) {
+            return found_result;
+        }
 
-      // But in contrast we return the first argument seen in a config file,
-      // so "foo=bar \n foo=baz" in the config file gives
-      // GetArg(am,"foo")={true,"bar"}
-      if (!am.m_network.empty()) {
-          found_result = GetArgHelper(am.m_config_args, NetworkArg(am, arg));
-          if (found_result.first) {
-              return found_result;
-          }
-      }
+        // But in contrast we return the first argument seen in a config file,
+        // so "foo=bar \n foo=baz" in the config file gives
+        // GetArg(am,"foo")={true,"bar"}
+        if (!am.m_network.empty()) {
+            found_result = GetArgHelper(am.m_config_args, NetworkArg(am, arg));
+            if (found_result.first) {
+                return found_result;
+            }
+        }
 
-      if (UseDefaultSection(am, arg)) {
-          found_result = GetArgHelper(am.m_config_args, arg);
-          if (found_result.first) {
-              return found_result;
-          }
-      }
+        if (UseDefaultSection(am, arg)) {
+            found_result = GetArgHelper(am.m_config_args, arg);
+            if (found_result.first) {
+                return found_result;
+            }
+        }
 
-      return found_result;
-  }
+        return found_result;
+    }
 
-  /* Special test for -testnet and -regtest args, because we
-   * don't want to be confused by craziness like "[regtest] testnet=1"
-   */
-  static inline bool GetNetBoolArg(const ArgsManager &am, const std::string& net_arg) EXCLUSIVE_LOCKS_REQUIRED(am.cs_args)
-  {
-      std::pair<bool,std::string> found_result(false,std::string());
-      found_result = GetArgHelper(am.m_override_args, net_arg, true);
-      if (!found_result.first) {
-          found_result = GetArgHelper(am.m_config_args, net_arg, true);
-          if (!found_result.first) {
-              return false; // not set
-          }
-      }
-      return InterpretBool(found_result.second); // is set, so evaluate
-  }
+    /* Special test for -testnet and -regtest args, because we
+     * don't want to be confused by craziness like "[regtest] testnet=1"
+     */
+    static inline bool GetNetBoolArg(const ArgsManager &am, const std::string& net_arg) EXCLUSIVE_LOCKS_REQUIRED(am.cs_args)
+    {
+        std::pair<bool,std::string> found_result(false,std::string());
+        found_result = GetArgHelper(am.m_override_args, net_arg, true);
+        if (!found_result.first) {
+            found_result = GetArgHelper(am.m_config_args, net_arg, true);
+            if (!found_result.first) {
+                return false; // not set
+            }
+        }
+        return InterpretBool(found_result.second); // is set, so evaluate
+    }
 };
 
 /**
@@ -339,11 +339,11 @@ static bool InterpretNegatedOption(std::string& key, std::string& val)
 }
 
 ArgsManager::ArgsManager() :
-/* These options would cause cross-contamination if values for
- * mainnet were used while running on regtest/testnet (or vice-versa).
- * Setting them as section_only_args ensures that sharing a config file
- * between mainnet and regtest/testnet won't cause problems due to these
- * parameters by accident. */
+    /* These options would cause cross-contamination if values for
+     * mainnet were used while running on regtest/testnet (or vice-versa).
+     * Setting them as section_only_args ensures that sharing a config file
+     * between mainnet and regtest/testnet won't cause problems due to these
+     * parameters by accident. */
     m_network_only_args{
       "-addnode", "-connect",
       "-port", "-bind",
@@ -598,47 +598,47 @@ std::string ArgsManager::GetHelpMessage() const
     LOCK(cs_args);
     for (const auto& arg_map : m_available_args) {
         switch(arg_map.first) {
-        case OptionsCategory::OPTIONS:
-            usage += HelpMessageGroup("Options:");
-            break;
-        case OptionsCategory::CONNECTION:
-            usage += HelpMessageGroup("Connection options:");
-            break;
-        case OptionsCategory::ZMQ:
-            usage += HelpMessageGroup("ZeroMQ notification options:");
-            break;
-        case OptionsCategory::DEBUG_TEST:
-            usage += HelpMessageGroup("Debugging/Testing options:");
-            break;
-        case OptionsCategory::NODE_RELAY:
-            usage += HelpMessageGroup("Node relay options:");
-            break;
-        case OptionsCategory::BLOCK_CREATION:
-            usage += HelpMessageGroup("Block creation options:");
-            break;
-        case OptionsCategory::RPC:
-            usage += HelpMessageGroup("RPC server options:");
-            break;
-        case OptionsCategory::WALLET:
-            usage += HelpMessageGroup("Wallet options:");
-            break;
-        case OptionsCategory::WALLET_DEBUG_TEST:
-            if (show_debug) usage += HelpMessageGroup("Wallet debugging/testing options:");
-            break;
-        case OptionsCategory::CHAINPARAMS:
-            usage += HelpMessageGroup("Chain selection options:");
-            break;
-        case OptionsCategory::GUI:
-            usage += HelpMessageGroup("UI Options:");
-            break;
-        case OptionsCategory::COMMANDS:
-            usage += HelpMessageGroup("Commands:");
-            break;
-        case OptionsCategory::REGISTER_COMMANDS:
-            usage += HelpMessageGroup("Register Commands:");
-            break;
-        default:
-            break;
+            case OptionsCategory::OPTIONS:
+                usage += HelpMessageGroup("Options:");
+                break;
+            case OptionsCategory::CONNECTION:
+                usage += HelpMessageGroup("Connection options:");
+                break;
+            case OptionsCategory::ZMQ:
+                usage += HelpMessageGroup("ZeroMQ notification options:");
+                break;
+            case OptionsCategory::DEBUG_TEST:
+                usage += HelpMessageGroup("Debugging/Testing options:");
+                break;
+            case OptionsCategory::NODE_RELAY:
+                usage += HelpMessageGroup("Node relay options:");
+                break;
+            case OptionsCategory::BLOCK_CREATION:
+                usage += HelpMessageGroup("Block creation options:");
+                break;
+            case OptionsCategory::RPC:
+                usage += HelpMessageGroup("RPC server options:");
+                break;
+            case OptionsCategory::WALLET:
+                usage += HelpMessageGroup("Wallet options:");
+                break;
+            case OptionsCategory::WALLET_DEBUG_TEST:
+                if (show_debug) usage += HelpMessageGroup("Wallet debugging/testing options:");
+                break;
+            case OptionsCategory::CHAINPARAMS:
+                usage += HelpMessageGroup("Chain selection options:");
+                break;
+            case OptionsCategory::GUI:
+                usage += HelpMessageGroup("UI Options:");
+                break;
+            case OptionsCategory::COMMANDS:
+                usage += HelpMessageGroup("Commands:");
+                break;
+            case OptionsCategory::REGISTER_COMMANDS:
+                usage += HelpMessageGroup("Register Commands:");
+                break;
+            default:
+                break;
         }
 
         // When we get to the hidden options, stop
@@ -680,9 +680,9 @@ std::string HelpMessageGroup(const std::string &message) {
 
 std::string HelpMessageOpt(const std::string &option, const std::string &message) {
     return std::string(optIndent,' ') + std::string(option) +
-        std::string("\n") + std::string(msgIndent,' ') +
-        FormatParagraph(message, screenWidth - msgIndent, msgIndent) +
-        std::string("\n\n");
+           std::string("\n") + std::string(msgIndent,' ') +
+           FormatParagraph(message, screenWidth - msgIndent, msgIndent) +
+           std::string("\n\n");
 }
 
 static std::string FormatException(const std::exception* pex, const char* pszThread)
