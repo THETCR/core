@@ -2018,13 +2018,13 @@ void CConnman::ThreadStakeMinter()
 
     CWallet* pwallet = wallets.at(0).get();
     if(pwallet){
-       try {
-           BitcoinMiner(pwallet, true);
-       } catch (std::exception& e) {
-           LogPrintf("ThreadStakeMinter() exception \n");
-       } catch (...) {
-           LogPrintf("ThreadStakeMinter() error \n");
-       }
+//       try {
+//           BitcoinMiner(pwallet, true);
+//       } catch (std::exception& e) {
+//           LogPrintf("ThreadStakeMinter() exception \n");
+//       } catch (...) {
+//           LogPrintf("ThreadStakeMinter() error \n");
+//       }
     }
 
     LogPrintf("ThreadStakeMinter exiting,\n");

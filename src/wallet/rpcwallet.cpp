@@ -6549,7 +6549,7 @@ UniValue setgenerate(const JSONRPCRequest& request)
     {
         gArgs.SoftSetArg("-gen", (fGenerate ? "1" : "0"));
         gArgs.SoftSetArg("-genproclimit", itostr(nGenProcLimit));
-        GenerateBitcoins(fGenerate, pwallet, nGenProcLimit);
+//        GenerateBitcoins(fGenerate, pwallet, nGenProcLimit);
     }
 
     return NullUniValue;
