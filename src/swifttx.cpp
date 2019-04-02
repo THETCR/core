@@ -307,9 +307,12 @@ void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight, CConnman* connman)
 //received a consensus vote
 bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx, CConnman* connman)
 {
-    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
+#ifdef ENABLE_WALLET
+    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
     CWallet* pwallet = wallets.at(0).get();
+#endif
+
     int n = mnodeman.GetMasternodeRank(ctx.vinMasternode, ctx.nBlockHeight, MIN_SWIFTTX_PROTO_VERSION);
 
     CMasternode* pmn = mnodeman.Find(ctx.vinMasternode);

@@ -442,6 +442,9 @@ void CObfuscationPool::UnlockCoins()
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return;
+    }
     while (true) {
         TRY_LOCK(pwallet->cs_wallet, lockWallet);
         if (!lockWallet) {
@@ -594,6 +597,9 @@ void CObfuscationPool::CheckFinalTransaction(CConnman* connman)
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return;
+    }
     CWalletTx txNew = CWalletTx(pwallet, CTransaction(finalTransaction));
 
     LOCK2(cs_main, pwallet->cs_wallet);
@@ -682,6 +688,9 @@ void CObfuscationPool::ChargeFees()
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return;
+    }
     //we don't need to charge collateral for every offence.
     int offences = 0;
     int r = rand() % 100;
@@ -786,6 +795,9 @@ void CObfuscationPool::ChargeRandomFees()
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return;
+    }
     if (fMasterNode) {
         int i = 0;
 
@@ -1283,6 +1295,9 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return false;
+    }
     finalTransaction = CMutableTransaction(finalTransactionNew);
     LogPrintf("CObfuscationPool::SignFinalTransaction %s", finalTransaction.ToString());
 
@@ -1410,6 +1425,9 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return false;
+    }
     if (!fEnableZeromint) return false;
     if (fMasterNode) return false;
     if (state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) return false;
@@ -1678,6 +1696,9 @@ bool CObfuscationPool::PrepareObfuscationDenominate()
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return false;
+    }
     std::string strError = "";
     // Submit transaction to the pool if we get here
     // Try to use only inputs with the same number of rounds starting from lowest number of rounds possible
@@ -1701,8 +1722,10 @@ bool CObfuscationPool::PrepareObfuscationDenominate()
 bool CObfuscationPool::SendRandomPaymentToSelf()
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return false;
+    }
     int64_t nBalance = pwallet->GetBalance();
     int64_t nPayment = (nBalance * 0.35) + (rand() % nBalance);
 
@@ -1742,8 +1765,10 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
 bool CObfuscationPool::MakeCollateralAmounts()
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return false;
+    }
     CWalletTx wtx;
     CAmount nFeeRet = 0;
     std::string strFail = "";
@@ -1799,8 +1824,10 @@ bool CObfuscationPool::MakeCollateralAmounts()
 bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return false;
+    }
     CWalletTx wtx;
     CAmount nFeeRet = 0;
     std::string strFail = "";

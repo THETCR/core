@@ -148,8 +148,10 @@ void CBudgetManager::CheckOrphanVotes()
 void CBudgetManager::SubmitFinalBudget()
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return;
+    }
     static int nSubmittedHeight = 0; // height at which final budget was submitted last time
     int nCurrentHeight;
 

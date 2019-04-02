@@ -25,8 +25,12 @@ void CActiveMasternode::ManageStatus()
     if (!fMasterNode) return;
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
     CWallet* pwallet = wallets.at(0).get();
+
+    if(!pwallet){
+        return;
+    }
+
     LogPrint(BCLog::MASTERNODE, "CActiveMasternode::ManageStatus() - Begin\n");
 
     //need correct blocks to send ping
@@ -355,8 +359,10 @@ bool CActiveMasternode::GetMasterNodeVin(CTxIn& vin, CPubKey& pubkey, CKey& secr
     if (fImporting || fReindex) return false;
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return false;
+    }
     // Find possible candidates
     TRY_LOCK(pwallet->cs_wallet, fWallet);
     if (!fWallet) return false;
@@ -412,6 +418,9 @@ bool CActiveMasternode::GetVinFromOutput(COutput out, CTxIn& vin, CPubKey& pubke
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return false;
+    }
     CScript pubScript;
 
     vin = CTxIn(out.tx->tx->GetHash(), out.i);
@@ -445,6 +454,9 @@ std::vector<COutput> CActiveMasternode::SelectCoinsMasternode()
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
     CWallet* pwallet = wallets.at(0).get();
+    if(!pwallet){
+        return filteredCoins;
+    }
     // Temporary unlock MN coins from masternode.conf
     if (gArgs.GetBoolArg("-mnconflock", true)) {
         uint256 mnTxHash;
