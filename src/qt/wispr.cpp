@@ -494,7 +494,6 @@ int GuiMain(int argc, char* argv[])
     QApplication::setOrganizationName(QAPP_ORG_NAME);
     QApplication::setOrganizationDomain(QAPP_ORG_DOMAIN);
     QApplication::setApplicationName(QAPP_APP_NAME_DEFAULT);
-    GUIUtil::SubstituteFonts(GetLangTerritory());
 
     /// 4. Initialization of translations, so that intro dialog is in user's language
     // Now that QSettings are accessible, initialize translations
@@ -557,9 +556,9 @@ int GuiMain(int argc, char* argv[])
     /// 7a. parse masternode.conf
     std::string strErr;
     if (!masternodeConfig.read(strErr)) {
-        QMessageBox::critical(0, QObject::tr("WISPR Core"),
+        QMessageBox::critical(nullptr, QObject::tr(PACKAGE_NAME),
             QObject::tr("Error reading masternode configuration file: %1").arg(strErr.c_str()));
-        return 0;
+        return EXIT_FAILURE;
     }
 
     /// 8. URI IPC sending
