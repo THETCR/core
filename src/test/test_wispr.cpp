@@ -101,6 +101,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     if (!ActivateBestChain(state, chainparams)) {
         throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
     }
+    std::cout << "ActivateBestChain finished\n";
 
     nScriptCheckThreads = 3;
     std::cout << "nScriptCheckThreads\n";
