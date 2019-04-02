@@ -599,10 +599,28 @@ public:
     std::set<CMintMeta> listMints(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus, bool fWrongSeed) override {
         return m_wallet->zwspTracker->ListMints(fUnusedOnly, fMaturedOnly, fUpdateStatus, fWrongSeed);
     }
-    CWallet* getWisprWallet() override
-    {
-        return m_wallet.get();
+    isminetype scriptIsMine(const CScript& scriptPubKey) override {
+        return IsMine(*m_wallet, scriptPubKey);
     }
+
+    bool addCScript(const CScript& scriptPubKey) override {
+        return m_wallet->AddCScript(scriptPubKey);
+    }
+
+    bool addMultiSig(const CScript& scriptPubKey) override {
+        return m_wallet->AddMultiSig(scriptPubKey);
+
+    }
+
+    bool getCScript(CScriptID hash, CScript& scriptPubKey) override {
+        return m_wallet->GetCScript(hash, scriptPubKey);
+    }
+
+    std::shared_ptr<CWallet> getWisprWallet() override
+    {
+        return m_wallet;
+    }
+
     std::shared_ptr<CWallet> m_wallet;
 };
 

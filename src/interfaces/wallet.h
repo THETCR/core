@@ -321,7 +321,11 @@ public:
     virtual bool isMultiSendEnabled() = 0;
     virtual void setStakeSplitThreshold(int value) = 0;
     virtual std::set<CMintMeta> listMints(bool fUnusedOnly = false, bool fMaturedOnly = false, bool fUpdateStatus = false, bool fWrongSeed = false) = 0;
-    virtual CWallet* getWisprWallet() = 0;
+    virtual isminetype scriptIsMine(const CScript& scriptPubKey) = 0;
+    virtual bool addCScript(const CScript& scriptPubKey) = 0;
+    virtual bool addMultiSig(const CScript& scriptPubKey) = 0;
+    virtual bool getCScript(CScriptID hash, CScript& scriptPubKey) = 0;
+    virtual std::shared_ptr<CWallet> getWisprWallet() = 0;
 
 
 };

@@ -236,7 +236,7 @@ void MultisigDialog::on_importAddressButton_clicked(){
 
     addMultisig(stoi(vRedeem[0]), keys);
 
-    CWallet* pwallet = model->wallet().getWisprWallet();
+    CWallet* pwallet = &*model->wallet().getWisprWallet();
 
     WalletRescanReserver reserver(pwallet);
     reserver.reserve();
@@ -258,18 +258,18 @@ bool MultisigDialog::addMultisig(int m, std::vector<string> keys){
             throw runtime_error(error.data());
         }
 
-        if (::IsMine(*model->wallet().getWisprWallet(), redeem) == ISMINE_SPENDABLE){
+        if (model->wallet().scriptIsMine(redeem) == ISMINE_SPENDABLE){
             throw runtime_error("The wallet already contains this script");
         }
 
-        if(!model->wallet().getWisprWallet()->AddCScript(redeem)){
+        if(!model->wallet().addCScript(redeem)){
             throw runtime_error("Failure: address invalid or already exists");
         }
 
         CScriptID innerID(redeem);
         std::string label = ui->multisigAddressLabel->text().toStdString();
         model->wallet().setAddressBook(innerID, label, "receive");
-        if (!model->wallet().getWisprWallet()->AddMultiSig(redeem)){
+        if (!model->wallet().addMultiSig(redeem)){
             throw runtime_error("Failure: unable to add address as watch only");
         }
 
@@ -479,7 +479,7 @@ bool MultisigDialog::createMultisigTransaction(std::vector<CTxIn> vUserIn, std::
         CScriptID hash = boost::get<CScriptID>(address);
         CScript redeemScript;
 
-        if (!model->wallet().getWisprWallet()->GetCScript(hash, redeemScript)){
+        if (!model->wallet().getCScript(hash, redeemScript)){
             throw runtime_error("could not redeem");
         }
         txnouttype type;
@@ -656,7 +656,7 @@ bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, std::string& errorO
                 CScriptID hash = boost::get<CScriptID>(address);
                 CScript redeemScript;
 
-                if (!model->wallet().getWisprWallet()->GetCScript(hash, redeemScript)){
+                if (!model->wallet().getCScript(hash, redeemScript)){
                     errorOut = "could not redeem";
                 }
                 privKeystore.AddCScript(redeemScript);
@@ -670,8 +670,9 @@ bool MultisigDialog::signMultisigTx(CMutableTransaction& tx, std::string& errorO
             }
         }
 
+        CWallet* pwallet = &*model->wallet().getWisprWallet();
         //choose between local wallet and provided
-        const CKeyStore& keystore = fGivenKeys ? privKeystore : *model->wallet().getWisprWallet();
+        const CKeyStore& keystore = fGivenKeys ? privKeystore : *pwallet;
 
         //attempt to sign each input from local wallet
         int nIn = 0;

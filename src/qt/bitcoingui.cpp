@@ -1503,7 +1503,7 @@ void BitcoinGUI::setStakingStatus()
         if (walletView) {
             WalletModel * const walletModel = walletView->getWalletModel();
             if(walletModel){
-                fMultiSend = walletModel->wallet().getWisprWallet()->isMultiSendEnabled();
+                fMultiSend = walletModel->wallet().isMultiSendEnabled();
             }
         }
 
