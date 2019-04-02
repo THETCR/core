@@ -179,6 +179,7 @@ uint256 CKey::GetPrivKey_256()
     void* key = keydata.data();
     std::cout << "CKey::GetPrivKey_256 key_256\n";
     uint256* key_256 = (uint256*)key;
+    std::cout << "CKey::GetPrivKey_256 return uint256* key_256 \n";
 
     return *key_256;
 }
