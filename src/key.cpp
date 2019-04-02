@@ -12,6 +12,8 @@
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
 
+#include <iostream>
+
 static secp256k1_context* secp256k1_context_sign = nullptr;
 
 /** These functions are taken from the libsecp256k1 distribution and are very ugly. */
