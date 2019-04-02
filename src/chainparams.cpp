@@ -136,8 +136,14 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 1556638704; // November 15th, 2016.
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 1556638704; // November 15th, 2017.
 
+        // The best chain should have at least this much work.
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000051dc8b82f450202ecb3d471");
+
+        // By default assume that the signatures in ancestors of this block are valid.
+        consensus.defaultAssumeValid = uint256S("0x0000000000000000000f1c54590ee18d15ec70e68c8cd4cfbadb1b4f11697eee"); //563378
+
         /**
-         * The message start std::string is designed to be unlikely to occur in normal data.
+         * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 4-byte int at any alignment.
          */
@@ -148,6 +154,8 @@ public:
         vAlertPubKey=ParseHex("0411f84b889c61c1842ec84a15e3093d7dd99d955ab797b24c984cdcfe3aca23f04ec06bd840e8093aaf83488c039027ecc4ad704261245be30289be166f667c61");
         nDefaultPort = 17000;
         nPruneAfterHeight = 600000;
+        m_assumed_blockchain_size = 240;
+        m_assumed_chain_state_size = 3;
         nMinerThreads = 0;
 
         /**
@@ -233,6 +241,30 @@ public:
         consensus.nZerocoinRequiredStakeDepth = 200; //The required confirmations for a zwsp to be stakable
 
         consensus.nBudget_Fee_Confirmations = 6; // Number of confirmations for the finalization fee
+
+        checkpointData = {
+            {
+                {0, uint256S("0x0000ec93e0a3fe0aafa3be7dafe1290f5fca039a4037dd5174bc3dd7a35d67f0")},
+                {14317, uint256S("0x50929653a7146de37b82b9125e55ea03aa4ae062ce3a2e3098026eea07e5bc81")}, // 125.000 Coin Burn Confirmation
+                {50000, uint256S("0xb177127054381243141e809bbfb2d568aeae2dd9b3c486e54f0989d4546d0d80")}, // Block 50.000
+                {75000, uint256S("06f162fe22851c400c1532a6d49d7894640ea0aa292fad5f02f348480da6b20d")}, // Block 75.000
+                {100000, uint256S("ed8cccfb51c901af271892966160686177a05f101bd3fd517d5b82274a8f6611")}, // Block 100.000
+                {125000, uint256S("76d5412ec389433de6cd22345209c859b4c18b6d8f8893df479c9f7520d19901")}, // Block 125.000
+                {150000, uint256S("a7e0dfdc9c3197e9e763e858aafa9553c0235c0e328371a5f8c5ba0b6e44919d")}, // Block 150.000
+                {200000, uint256S("385e915b52f0ad669b91005ab7ddb22356b6a220e8b98cbcf2c8aca5c5dd3b03")}, // Block 200.000
+                {250000, uint256S("40ee22bd8b2cc23f83e16d19a53aa8591617772f9722c56b86d16163b2a10416")}, // Block 250.000
+                {300000, uint256S("700c33f9bf03c018f33167c2c455f05762b49e1f1f06e14833a5e8e269beebe7")}, // Block 300.000
+                {350000, uint256S("ffb49991aa635992305029cb629037cf5d08e945d2027c79f4f737c11e7d680e")}, // Block 350.000
+                {400000, uint256S("cf86529d0243cb653da92cbbaddc7f0a4f275bcf557cc112d03c33b756af25d3")}, // Block 400.000
+            }
+        };
+
+        chainTxData = ChainTxData{
+            // Data from rpc: getchaintxstats 4096 0000000000000000000f1c54590ee18d15ec70e68c8cd4cfbadb1b4f11697eee
+            /* nTime    */ 1540087953,
+            /* nTxCount */ 815060,
+            /* dTxRate  */ 2000
+        };
 
         /* disable fallback fee on mainnet */
         m_fallback_fee_enabled = false;
