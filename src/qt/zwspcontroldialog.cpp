@@ -6,6 +6,7 @@
 #include <qt/forms/ui_zwspcontroldialog.h>
 
 #include <zpiv/accumulators.h>
+#include <wallet/wallet.h>
 #include <validation.h>
 #include "walletmodel.h"
 
