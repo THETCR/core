@@ -21,6 +21,7 @@ struct RegtestingSetup : public TestingSetup {
 BOOST_FIXTURE_TEST_SUITE(blockencodings_tests, RegtestingSetup)
 
 static CBlock BuildBlockTestCase() {
+    std::cout << "BuildBlockTestCase\n";
     CBlock block;
     CMutableTransaction tx;
     tx.vin.resize(1);

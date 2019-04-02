@@ -433,6 +433,7 @@ public:
         fMiningRequiresPeers = false;
         fDefaultCheckMemPool = true;
         fTestnetToBeDeprecatedFieldRPC = false;
+        consensus.fSkipProofOfWorkCheck = false;
 
         checkpointData = {
             {
@@ -488,6 +489,7 @@ public:
         fDefaultConsistencyChecks = true;
         consensus.fAllowMinDifficultyBlocks = false;
         fMineBlocksOnDemand = true;
+        consensus.fSkipProofOfWorkCheck = false;
 
         /* enable fallback fee on unittest */
         m_fallback_fee_enabled = true;
