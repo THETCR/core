@@ -1,7 +1,5 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2018 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <qt/clientmodel.h>
@@ -11,7 +9,6 @@
 #include <qt/guiutil.h>
 #include <qt/peertablemodel.h>
 
-#include "alert.h"
 #include <chain.h>
 #include <chainparams.h>
 #include <checkpoints.h>
@@ -30,11 +27,9 @@
 
 #include <stdint.h>
 
-#include <QDateTime>
 #include <QDebug>
 #include <QTimer>
 
-static const int64_t nClientStartupTime = GetTime();
 static int64_t nLastHeaderTipUpdateNotification = 0;
 static int64_t nLastBlockTipUpdateNotification = 0;
 
@@ -91,48 +86,6 @@ QString ClientModel::getMasternodeCountString() const
     return tr("Total: %1 (IPv4: %2 / IPv6: %3 / Tor: %4 / Unknown: %5)").arg(QString::number((int)mnodeman.size())).arg(QString::number((int)ipv4)).arg(QString::number((int)ipv6)).arg(QString::number((int)onion)).arg(QString::number((int)nUnknown));
 }
 
-int ClientModel::getNumBlocks() const
-{
-    LOCK(cs_main);
-    return chainActive.Height();
-}
-
-int ClientModel::getNumBlocksAtStartup()
-{
-    if (numBlocksAtStartup == -1) numBlocksAtStartup = getNumBlocks();
-    return numBlocksAtStartup;
-}
-
-quint64 ClientModel::getTotalBytesRecv() const
-{
-    return m_node.getTotalBytesRecv();
-}
-
-quint64 ClientModel::getTotalBytesSent() const
-{
-    return m_node.getTotalBytesSent();
-}
-
-QDateTime ClientModel::getLastBlockDate() const
-{
-    LOCK(cs_main);
-    if (chainActive.Tip())
-        return QDateTime::fromTime_t(chainActive.Tip()->GetBlockTime());
-    else
-        return QDateTime::fromTime_t(Params().GenesisBlock().GetBlockTime()); // Genesis block's time of current network
-}
-
-double ClientModel::getVerificationProgress(const CBlockIndex *tipIn) const
-{
-    CBlockIndex *tip = const_cast<CBlockIndex *>(tipIn);
-    if (!tip)
-    {
-        LOCK(cs_main);
-        tip = chainActive.Tip();
-    }
-    return m_node.getVerificationProgress();
-}
-
 int ClientModel::getHeaderTipHeight() const
 {
     if (cachedBestHeaderHeight == -1) {
@@ -163,30 +116,13 @@ int64_t ClientModel::getHeaderTipTime() const
 
 void ClientModel::updateTimer()
 {
-    // Get required lock upfront. This avoids the GUI from getting stuck on
-    // periodical polls if the core is holding the locks for a longer time -
-    // for example, during a wallet rescan.
-    TRY_LOCK(cs_main, lockMain);
-    if (!lockMain)
-        return;
-    // Some quantities (such as number of blocks) change so fast that we don't want to be notified for each change.
-    // Periodically check and update with a timer.
-    int newNumBlocks = getNumBlocks();
-
     static int prevAttempt = -1;
     static int prevAssets = -1;
 
     // check for changed number of blocks we have, number of blocks peers claim to have, reindexing state and importing state
-    if (cachedNumBlocks != newNumBlocks ||
-        cachedReindexing != fReindex || cachedImporting != fImporting ||
-        masternodeSync.RequestedMasternodeAttempt != prevAttempt || masternodeSync.RequestedMasternodeAssets != prevAssets) {
-        cachedNumBlocks = newNumBlocks;
-        cachedReindexing = fReindex;
-        cachedImporting = fImporting;
+    if (masternodeSync.RequestedMasternodeAttempt != prevAttempt || masternodeSync.RequestedMasternodeAssets != prevAssets) {
         prevAttempt = masternodeSync.RequestedMasternodeAttempt;
         prevAssets = masternodeSync.RequestedMasternodeAssets;
-
-        Q_EMIT numBlocksChanged(newNumBlocks, getLastBlockDate(), getVerificationProgress(NULL), false);
     }
 
     // no locking required at this point
@@ -197,12 +133,6 @@ void ClientModel::updateTimer()
 
 void ClientModel::updateMnTimer()
 {
-    // Get required lock upfront. This avoids the GUI from getting stuck on
-    // periodical polls if the core is holding the locks for a longer time -
-    // for example, during a wallet rescan.
-    TRY_LOCK(cs_main, lockMain);
-    if (!lockMain)
-        return;
     QString newMasternodeCountString = getMasternodeCountString();
 
     if (cachedMasternodeCountString != newMasternodeCountString) {
@@ -227,34 +157,29 @@ void ClientModel::updateAlert()
     Q_EMIT alertsChanged(getStatusBarWarnings());
 }
 
-bool ClientModel::inInitialBlockDownload() const
-{
-    return IsInitialBlockDownload();
-}
-
 enum BlockSource ClientModel::getBlockSource() const
 {
     if (m_node.getReindex())
-        return BLOCK_SOURCE_REINDEX;
-    else if (fImporting)
-        return BLOCK_SOURCE_DISK;
+        return BlockSource::REINDEX;
+    else if (m_node.getImporting())
+        return BlockSource::DISK;
     else if (getNumConnections() > 0)
-        return BLOCK_SOURCE_NETWORK;
+        return BlockSource::NETWORK;
 
-    return BLOCK_SOURCE_NONE;
+    return BlockSource::NONE;
 }
 
 QString ClientModel::getStatusBarWarnings() const
 {
-    return QString::fromStdString(GetWarnings("statusbar"));
+    return QString::fromStdString(m_node.getWarnings("gui"));
 }
 
-OptionsModel* ClientModel::getOptionsModel()
+OptionsModel *ClientModel::getOptionsModel()
 {
     return optionsModel;
 }
 
-PeerTableModel* ClientModel::getPeerTableModel()
+PeerTableModel *ClientModel::getPeerTableModel()
 {
     return peerTableModel;
 }
@@ -274,6 +199,11 @@ QString ClientModel::formatBuildDate() const
     return QString::fromStdString(CLIENT_DATE);
 }
 
+QString ClientModel::formatSubVersion() const
+{
+    return QString::fromStdString(strSubVersion);
+}
+
 bool ClientModel::isReleaseVersion() const
 {
     return CLIENT_VERSION_IS_RELEASE;
@@ -286,7 +216,17 @@ QString ClientModel::clientName() const
 
 QString ClientModel::formatClientStartupTime() const
 {
-    return QDateTime::fromTime_t(nClientStartupTime).toString();
+    return QDateTime::fromTime_t(GetStartupTime()).toString();
+}
+
+QString ClientModel::dataDir() const
+{
+    return GUIUtil::boostPathToQString(GetDataDir());
+}
+
+QString ClientModel::blocksDir() const
+{
+    return GUIUtil::boostPathToQString(GetBlocksDir());
 }
 
 void ClientModel::updateBanlist()
@@ -378,6 +318,16 @@ void ClientModel::unsubscribeFromCoreSignals()
     m_handler_banned_list_changed->disconnect();
     m_handler_notify_block_tip->disconnect();
     m_handler_notify_header_tip->disconnect();
+}
+
+bool ClientModel::getProxyInfo(std::string& ip_port) const
+{
+    proxyType ipv4, ipv6;
+    if (m_node.getProxy((Network) 1, ipv4) && m_node.getProxy((Network) 2, ipv6)) {
+      ip_port = ipv4.proxy.ToStringIPPort();
+      return true;
+    }
+    return false;
 }
 
 bool ClientModel::getTorInfo(std::string& ip_port) const

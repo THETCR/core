@@ -132,10 +132,10 @@ private:
     QProgressDialog* progressDialog = nullptr;
 
     QLabel* labelStakingIcon;
-    QPushButton* labelAutoMintIcon;
-    QPushButton* labelEncryptionIcon;
+    GUIUtil::ClickableLabel* labelAutoMintIcon;
+    GUIUtil::ClickableLabel* labelEncryptionIcon;
     QLabel* labelTorIcon;
-    QPushButton* labelConnectionsIcon;
+    GUIUtil::ClickableLabel* labelConnectionsIcon;
 
     QMenuBar* appMenuBar = nullptr;
     QToolBar* appToolBar = nullptr;

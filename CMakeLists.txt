@@ -96,6 +96,7 @@ if(DEFINED DEPENDS_PREFIX)
 endif()
 
 add_definitions(
+        -DPACKAGE_NAME=WISPR
         -DENABLE_WALLET=1
         -DUSE_NUM_GMP=1
 )
