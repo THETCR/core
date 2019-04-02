@@ -503,7 +503,6 @@ struct CombinerAll
 class NetEventsInterface
 {
 public:
-//    virtual int GetHeight() = 0;
     virtual bool ProcessMessages(CNode* pnode, std::atomic<bool>& interrupt) = 0;
     virtual bool SendMessages(CNode* pnode) = 0;
     virtual void InitializeNode(CNode* pnode) = 0;
@@ -780,6 +779,8 @@ public:
     CCriticalSection cs_feeFilter;
     CAmount lastSentFeeFilter{0};
     int64_t nextSendTimeFeeFilter{0};
+
+    std::set<uint256> orphan_work_set;
 
     //! Old
     mruset<CInv> setInventoryKnown;

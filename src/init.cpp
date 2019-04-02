@@ -677,15 +677,15 @@ static void BlockNotifyGenesisWait(bool, const CBlockIndex *pBlockIndex)
     }
 }
 
-static void BlockSizeNotifyCallback(int size, const uint256& hashNewTip)
-{
-    std::string strCmd = gArgs.GetArg("-blocksizenotify", "");
-
-    boost::replace_all(strCmd, "%s", hashNewTip.GetHex());
-    boost::replace_all(strCmd, "%d", std::to_string(size));
-    std::thread t(runCommand, strCmd); // thread runs free
-    t.detach(); // thread runs free
-}
+//static void BlockSizeNotifyCallback(int size, const uint256& hashNewTip)
+//{
+//    std::string strCmd = gArgs.GetArg("-blocksizenotify", "");
+//
+//    boost::replace_all(strCmd, "%s", hashNewTip.GetHex());
+//    boost::replace_all(strCmd, "%d", std::to_string(size));
+//    std::thread t(runCommand, strCmd); // thread runs free
+//    t.detach(); // thread runs free
+//}
 
 struct CImportingNow
 {

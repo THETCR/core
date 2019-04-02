@@ -318,12 +318,6 @@ namespace {
      */
     std::multimap<CBlockIndex*, CBlockIndex*>& mapBlocksUnlinked = g_chainstate.mapBlocksUnlinked;
 
-/**
-     * The set of all CBlockIndex entries with BLOCK_VALID_TRANSACTIONS (for itself and all ancestors) and
-     * as good as our current tip or better. Entries may be failed, though.
-     */
-std::set<CBlockIndex*, CBlockIndexWorkComparator> setBlockIndexCandidates;
-
     CCriticalSection cs_LastBlockFile;
     std::vector<CBlockFileInfo> vinfoBlockFile;
     int nLastBlockFile = 0;
@@ -333,13 +327,6 @@ std::set<CBlockIndex*, CBlockIndexWorkComparator> setBlockIndexCandidates;
      */
     bool fCheckForPruning = false;
 
-/**
-     * Every received block is assigned a unique and increasing identifier, so we
-     * know which one to give priority in case of a fork.
-     */
-CCriticalSection cs_nBlockSequenceId;
-/** Blocks loaded from disk are assigned id 0, so start the counter at 1. */
-uint32_t nBlockSequenceId = 1;
 
     /** Dirty block index entries. */
     std::set<CBlockIndex*> setDirtyBlockIndex;
@@ -4063,8 +4050,6 @@ bool DisconnectBlocksAndReprocess(int blocks)
     LOCK(cs_main);
 
     CValidationState state;
-    const Consensus::Params& consensusParams = Params().GetConsensus();
-
     LogPrintf("DisconnectBlocksAndReprocess: Got command to replay %d blocks\n", blocks);
     for (int i = 0; i <= blocks; i++)
         g_chainstate.DisconnectTip(state, Params(), nullptr);
@@ -6583,7 +6568,6 @@ void UnloadBlockIndex()
         delete entry.second;
     }
     mapBlockIndex.clear();
-    setBlockIndexCandidates.clear();
     fHavePruned = false;
 
     g_chainstate.UnloadBlockIndex();
