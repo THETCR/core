@@ -5,7 +5,6 @@
 
 #include <key.h>
 
-#include <uint256.h>
 #include <crypto/common.h>
 #include <crypto/hmac_sha512.h>
 #include <random.h>
@@ -174,7 +173,9 @@ bool CKey::SetPrivKey(const CPrivKey& privkey, bool fCompressedIn)
 
 uint256 CKey::GetPrivKey_256()
 {
+    std::cout << "CKey::GetPrivKey_256 keydata\n";
     void* key = keydata.data();
+    std::cout << "CKey::GetPrivKey_256 key_256\n";
     uint256* key_256 = (uint256*)key;
 
     return *key_256;
