@@ -497,6 +497,7 @@ public:
 
 void CRegTestParams::UpdateVersionBitsParametersFromArgs(const ArgsManager& args)
 {
+    std::cout << "Update version bits\n";
     if (!args.IsArgSet("-vbparams")) return;
 
     for (const std::string& strDeployment : args.GetArgs("-vbparams")) {
@@ -525,6 +526,8 @@ void CRegTestParams::UpdateVersionBitsParametersFromArgs(const ArgsManager& args
             throw std::runtime_error(strprintf("Invalid deployment (%s)", vDeploymentParams[0]));
         }
     }
+    std::cout << "Update version bits done\n";
+
 }
 
 
