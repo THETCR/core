@@ -326,6 +326,7 @@ public:
     virtual bool addMultiSig(const CScript& scriptPubKey) = 0;
     virtual bool getCScript(CScriptID hash, CScript& scriptPubKey) = 0;
     virtual std::shared_ptr<CWallet> getWisprWallet() = 0;
+    virtual uint64_t getStakeSplitThreshold () = 0;
 
 
 };

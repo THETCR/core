@@ -615,6 +615,9 @@ public:
     bool getCScript(CScriptID hash, CScript& scriptPubKey) override {
         return m_wallet->GetCScript(hash, scriptPubKey);
     }
+    uint64_t getStakeSplitThreshold () override {
+        return m_wallet->nStakeSplitThreshold;
+    }
 
     std::shared_ptr<CWallet> getWisprWallet() override
     {

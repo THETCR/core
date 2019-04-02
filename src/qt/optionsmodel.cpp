@@ -352,8 +352,9 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return settings.value("fShowMasternodesTab");
 #endif
         case StakeSplitThreshold:
-//            if (pwallet)
-//                return QVariant((int)pwallet->nStakeSplitThreshold);
+            if(!m_node.getWallets().empty()) {
+                return QVariant((int)m_node.getWallets().at(0)->getStakeSplitThreshold());
+            }
             return settings.value("nStakeSplitThreshold");
         case DisplayUnit:
 
@@ -621,7 +622,9 @@ void OptionsModel::setDisplayUnit(const QVariant &value)
 /* Update StakeSplitThreshold's value in wallet */
 void OptionsModel::setStakeSplitThreshold(int value)
 {
-    m_node.getWallets().at(0)->setStakeSplitThreshold(value);
+    if(!m_node.getWallets().empty()){
+        m_node.getWallets().at(0)->setStakeSplitThreshold(value);
+    }
 }
 
 
