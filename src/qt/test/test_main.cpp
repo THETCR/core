@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 {
     SetupEnvironment();
     SetupNetworking();
-    SelectParams(CBaseChainParams::REGTEST);
+    SelectParams(CBaseChainParams::UNITTEST);
     noui_connect();
     ClearDatadirCache();
     fs::path pathTemp = fs::temp_directory_path() / strprintf("test_wispr-qt_%lu_%i", (unsigned long)GetTime(), (int)GetRand(100000));
