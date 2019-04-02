@@ -65,12 +65,15 @@ fs::path BasicTestingSetup::SetDataDir(const std::string& name)
 
 TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(chainName)
 {
+    std::cout << "SetDataDir\n";
     SetDataDir("tempdir");
     const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
 
+    std::cout << "RegisterAllCoreRPCCommands\n";
     RegisterAllCoreRPCCommands(tableRPC);
+    std::cout << "ClearDatadirCache\n";
     ClearDatadirCache();
 
     // We have to run a scheduler thread to prevent ActivateBestChain
