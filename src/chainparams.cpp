@@ -64,7 +64,7 @@ static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits
  */
 libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params(bool useModulusV1) const
 {
-//    assert(this);
+    assert(this);
     static CBigNum bnHexModulus = 0;
     if (!bnHexModulus)
         bnHexModulus.SetHex(consensus.zerocoinModulus);
