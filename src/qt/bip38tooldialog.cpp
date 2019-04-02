@@ -236,7 +236,7 @@ void Bip38ToolDialog::on_importAddressButton_DEC_clicked()
             ui->statusLabel_DEC->setText(tr("Error Adding Key To Wallet"));
             return;
         }
-        WalletRescanReserver reserver(model->wallet().getWisprWallet());
+        WalletRescanReserver reserver(&*model->wallet().getWisprWallet());
         reserver.reserve();
         // whenever a key is imported, we need to scan the whole chain
         model->wallet().getWisprWallet()->UpdateTimeFirstKey(1); // 0 would be considered 'no value'

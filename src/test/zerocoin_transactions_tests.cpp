@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test)
     pwallet->LoadWallet(fFirstRun);
     pwallet->zwspTracker = unique_ptr<CzWSPTracker>(new CzWSPTracker(pwallet->chain(), pwallet->GetLocation(), pwallet->GetDBHandle(), *pwallet));
     CTransactionRef tx;
-    CWalletTx* wtx = new CWalletTx(pwallet.get(), tx);
+    CWalletTx* wtx = new CWalletTx(&*pwallet, tx);
     bool fMintChange=true;
     bool fMinimizeChange=true;
     std::vector<CZerocoinSpend> vSpends;
