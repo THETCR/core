@@ -15,7 +15,7 @@
 #include <validation.h>
 #include "merkleblock.h"
 #include <netmessagemaker.h>
-#include "reverse_iterate.h"
+#include "reverse_iterator.h"
 #include "netbase.h"
 #include "policy/fees.h"
 #include "policy/policy.h"

@@ -60,7 +60,7 @@
 #include <warnings.h>
 #include <walletinitinterface.h>
 #include "zwspchain.h"
-#include "reverse_iterate.h"
+#include "reverse_iterator.h"
 
 #include <stdint.h>
 #include <stdio.h>

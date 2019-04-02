@@ -17,7 +17,7 @@
 #include "sync.h"
 #include <util/system.h>
 #include "validationinterface.h"
-#include "reverse_iterate.h"
+#include "reverse_iterator.h"
 #include <wallet/wallet.h>
 #include <warnings.h>
 

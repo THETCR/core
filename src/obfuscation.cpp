@@ -15,7 +15,7 @@
 #include "ui_interface.h"
 #include <util/system.h>
 #include <wallet/wallet.h>
-#include "reverse_iterate.h"
+#include "reverse_iterator.h"
 #include <fs.h>
 
 #include <boost/algorithm/string/replace.hpp>

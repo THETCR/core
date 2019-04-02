@@ -78,7 +78,7 @@ bool TxIndex::DB::ReadTxPos(const uint256 &txid, CDiskTxPos& pos) const
 
 bool TxIndex::DB::WriteTxs(const std::vector<std::pair<uint256, CDiskTxPos>>& v_pos)
 {
-    CLevelDBBatch batch(*this);
+    CDBBatch batch(*this);
     for (const auto& tuple : v_pos) {
         batch.Write(std::make_pair(DB_TXINDEX, tuple.first), tuple.second);
     }
@@ -89,8 +89,8 @@ bool TxIndex::DB::WriteTxs(const std::vector<std::pair<uint256, CDiskTxPos>>& v_
  * Safely persist a transfer of data from the old txindex database to the new one, and compact the
  * range of keys updated. This is used internally by MigrateData.
  */
-static void WriteTxIndexMigrationBatches(CLevelDBWrapper& newdb, CLevelDBWrapper& olddb,
-                                         CLevelDBBatch& batch_newdb, CLevelDBBatch& batch_olddb,
+static void WriteTxIndexMigrationBatches(CDBWrapper& newdb, CDBWrapper& olddb,
+                                         CDBBatch& batch_newdb, CDBBatch& batch_olddb,
                                          const std::pair<unsigned char, uint256>& begin_key,
                                          const std::pair<unsigned char, uint256>& end_key)
 {
@@ -141,15 +141,15 @@ bool TxIndex::DB::MigrateData(CBlockTreeDB& block_tree_db, const CBlockLocator& 
     int report_done = 0;
     const size_t batch_size = 1 << 24; // 16 MiB
 
-    CLevelDBBatch batch_newdb(*this);
-    CLevelDBBatch batch_olddb(block_tree_db);
+    CDBBatch batch_newdb(*this);
+    CDBBatch batch_olddb(block_tree_db);
 
     std::pair<unsigned char, uint256> key;
     std::pair<unsigned char, uint256> begin_key{DB_TXINDEX, uint256()};
     std::pair<unsigned char, uint256> prev_key = begin_key;
 
     bool interrupted = false;
-    std::unique_ptr<CLevelDBIterator> cursor(block_tree_db.NewIterator());
+    std::unique_ptr<CDBIterator> cursor(block_tree_db.NewIterator());
     for (cursor->Seek(begin_key); cursor->Valid(); cursor->Next()) {
         boost::this_thread::interruption_point();
         if (ShutdownRequested()) {

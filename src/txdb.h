@@ -8,7 +8,7 @@
 #define BITCOIN_TXDB_H
 
 #include <coins.h>
-#include "leveldbwrapper.h"
+#include "dbwrapper.h"
 #include <chain.h>
 #include "libzerocoin/Coin.h"
 #include "libzerocoin/CoinSpend.h"
@@ -74,7 +74,7 @@ struct CDiskTxPos : public FlatFilePos
 class CCoinsViewDB final : public CCoinsView
 {
 protected:
-    CLevelDBWrapper db;
+    CDBWrapper db;
 public:
     explicit CCoinsViewDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
 
@@ -104,16 +104,16 @@ public:
     void Next() override;
 
 private:
-    CCoinsViewDBCursor(CLevelDBIterator* pcursorIn, const uint256 &hashBlockIn):
+    CCoinsViewDBCursor(CDBIterator* pcursorIn, const uint256 &hashBlockIn):
             CCoinsViewCursor(hashBlockIn), pcursor(pcursorIn) {}
-    std::unique_ptr<CLevelDBIterator> pcursor;
+    std::unique_ptr<CDBIterator> pcursor;
     std::pair<char, COutPoint> keyTmp;
 
     friend class CCoinsViewDB;
 };
 
 /** Access to the block database (blocks/index/) */
-class CBlockTreeDB : public CLevelDBWrapper
+class CBlockTreeDB : public CDBWrapper
 {
 public:
     explicit CBlockTreeDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
@@ -136,7 +136,7 @@ public:
 };
 
 /** Zerocoin database (zerocoin/) */
-class CZerocoinDB : public CLevelDBWrapper
+class CZerocoinDB : public CDBWrapper
 {
 public:
     explicit CZerocoinDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);

@@ -39,7 +39,7 @@
 #include <primitives/transaction.h>
 #include "zpiv/zerocoin.h"
 #include <random.h>
-#include "reverse_iterate.h"
+#include "reverse_iterator.h"
 #include <script/script.h>
 #include <script/sigcache.h>
 #include <script/standard.h>

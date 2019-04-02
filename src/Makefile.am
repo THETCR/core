@@ -163,7 +163,7 @@ BITCOIN_CORE_H = \
   key.h \
   key_io.h \
   keystore.h \
-  leveldbwrapper.h \
+  dbwrapper.h \
   limitedmap.h \
   logging.h \
   memusage.h \
@@ -195,7 +195,7 @@ BITCOIN_CORE_H = \
   protocol.h \
   psbt.h \
   random.h \
-  reverse_iterate.h \
+  reverse_iterator.h \
   reverselock.h \
   rpc/blockchain.h \
   rpc/client.h \
@@ -302,7 +302,7 @@ libbitcoin_server_a_SOURCES = \
   interfaces/handler.cpp \
   interfaces/node.cpp \
   init.cpp \
-  leveldbwrapper.cpp \
+  dbwrapper.cpp \
   lightzwspthread.cpp \
   merkleblock.cpp \
   miner.cpp \

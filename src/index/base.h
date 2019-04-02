@@ -5,7 +5,7 @@
 #ifndef BITCOIN_INDEX_BASE_H
 #define BITCOIN_INDEX_BASE_H
 
-#include <leveldbwrapper.h>
+#include <dbwrapper.h>
 #include <primitives/block.h>
 #include <primitives/transaction.h>
 #include <threadinterrupt.h>
@@ -22,7 +22,7 @@ class CBlockIndex;
 class BaseIndex : public CValidationInterface
 {
 protected:
-    class DB : public CLevelDBWrapper
+    class DB : public CDBWrapper
     {
     public:
         DB(const fs::path& path, size_t n_cache_size,

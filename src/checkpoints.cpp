@@ -10,7 +10,7 @@
 #include <chainparams.h>
 #include <validation.h>
 #include "uint256.h"
-#include "reverse_iterate.h"
+#include "reverse_iterator.h"
 
 #include <stdint.h>
 

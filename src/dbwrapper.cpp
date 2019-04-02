@@ -1,8 +1,8 @@
-// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2012-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <leveldbwrapper.h>
+#include <dbwrapper.h>
 
 #include <memory>
 #include <random.h>
@@ -16,60 +16,60 @@
 
 class CBitcoinLevelDBLogger : public leveldb::Logger {
 public:
-  // This code is adapted from posix_logger.h, which is why it is using vsprintf.
-  // Please do not do this in normal code
-  void Logv(const char * format, va_list ap) override {
-      if (!LogAcceptCategory(BCLog::LEVELDB)) {
-          return;
-      }
-      char buffer[500];
-      for (int iter = 0; iter < 2; iter++) {
-          char* base;
-          int bufsize;
-          if (iter == 0) {
-              bufsize = sizeof(buffer);
-              base = buffer;
-          }
-          else {
-              bufsize = 30000;
-              base = new char[bufsize];
-          }
-          char* p = base;
-          char* limit = base + bufsize;
+    // This code is adapted from posix_logger.h, which is why it is using vsprintf.
+    // Please do not do this in normal code
+    void Logv(const char * format, va_list ap) override {
+            if (!LogAcceptCategory(BCLog::LEVELDB)) {
+                return;
+            }
+            char buffer[500];
+            for (int iter = 0; iter < 2; iter++) {
+                char* base;
+                int bufsize;
+                if (iter == 0) {
+                    bufsize = sizeof(buffer);
+                    base = buffer;
+                }
+                else {
+                    bufsize = 30000;
+                    base = new char[bufsize];
+                }
+                char* p = base;
+                char* limit = base + bufsize;
 
-          // Print the message
-          if (p < limit) {
-              va_list backup_ap;
-              va_copy(backup_ap, ap);
-              // Do not use vsnprintf elsewhere in bitcoin source code, see above.
-              p += vsnprintf(p, limit - p, format, backup_ap);
-              va_end(backup_ap);
-          }
+                // Print the message
+                if (p < limit) {
+                    va_list backup_ap;
+                    va_copy(backup_ap, ap);
+                    // Do not use vsnprintf elsewhere in bitcoin source code, see above.
+                    p += vsnprintf(p, limit - p, format, backup_ap);
+                    va_end(backup_ap);
+                }
 
-          // Truncate to available space if necessary
-          if (p >= limit) {
-              if (iter == 0) {
-                  continue;       // Try again with larger buffer
-              }
-              else {
-                  p = limit - 1;
-              }
-          }
+                // Truncate to available space if necessary
+                if (p >= limit) {
+                    if (iter == 0) {
+                        continue;       // Try again with larger buffer
+                    }
+                    else {
+                        p = limit - 1;
+                    }
+                }
 
-          // Add newline if necessary
-          if (p == base || p[-1] != '\n') {
-              *p++ = '\n';
-          }
+                // Add newline if necessary
+                if (p == base || p[-1] != '\n') {
+                    *p++ = '\n';
+                }
 
-          assert(p <= limit);
-          base[std::min(bufsize - 1, (int)(p - base))] = '\0';
-          LogPrintf("leveldb: %s", base);  /* Continued */
-          if (base != buffer) {
-              delete[] base;
-          }
-          break;
-      }
-  }
+                assert(p <= limit);
+                base[std::min(bufsize - 1, (int)(p - base))] = '\0';
+                LogPrintf("leveldb: %s", base);  /* Continued */
+                if (base != buffer) {
+                    delete[] base;
+                }
+                break;
+            }
+    }
 };
 
 static void SetMaxOpenFiles(leveldb::Options *options) {
@@ -114,7 +114,7 @@ static leveldb::Options GetOptions(size_t nCacheSize)
     return options;
 }
 
-CLevelDBWrapper::CLevelDBWrapper(const fs::path& path, size_t nCacheSize, bool fMemory, bool fWipe, bool obfuscate)
+CDBWrapper::CDBWrapper(const fs::path& path, size_t nCacheSize, bool fMemory, bool fWipe, bool obfuscate)
     : m_name(fs::basename(path))
 {
     penv = nullptr;
@@ -131,13 +131,13 @@ CLevelDBWrapper::CLevelDBWrapper(const fs::path& path, size_t nCacheSize, bool f
         if (fWipe) {
             LogPrintf("Wiping LevelDB in %s\n", path.string());
             leveldb::Status result = leveldb::DestroyDB(path.string(), options);
-            leveldbwrapper_private::HandleError(result);
+            dbwrapper_private::HandleError(result);
         }
         TryCreateDirectories(path);
         LogPrintf("Opening LevelDB in %s\n", path.string());
     }
     leveldb::Status status = leveldb::DB::Open(options, path.string(), &pdb);
-    leveldbwrapper_private::HandleError(status);
+    dbwrapper_private::HandleError(status);
     LogPrintf("Opened LevelDB successfully\n");
 
     if (gArgs.GetBoolArg("-forcecompactdb", false)) {
@@ -166,7 +166,7 @@ CLevelDBWrapper::CLevelDBWrapper(const fs::path& path, size_t nCacheSize, bool f
     LogPrintf("Using obfuscation key for %s: %s\n", path.string(), HexStr(obfuscate_key));
 }
 
-CLevelDBWrapper::~CLevelDBWrapper()
+CDBWrapper::~CDBWrapper()
 {
     delete pdb;
     pdb = nullptr;
@@ -180,7 +180,7 @@ CLevelDBWrapper::~CLevelDBWrapper()
     options.env = nullptr;
 }
 
-bool CLevelDBWrapper::WriteBatch(CLevelDBBatch& batch, bool fSync)
+bool CDBWrapper::WriteBatch(CDBBatch& batch, bool fSync)
 {
     const bool log_memory = LogAcceptCategory(BCLog::LEVELDB);
     double mem_before = 0;
@@ -188,7 +188,7 @@ bool CLevelDBWrapper::WriteBatch(CLevelDBBatch& batch, bool fSync)
         mem_before = DynamicMemoryUsage() / 1024.0 / 1024;
     }
     leveldb::Status status = pdb->Write(fSync ? syncoptions : writeoptions, &batch.batch);
-    leveldbwrapper_private::HandleError(status);
+    dbwrapper_private::HandleError(status);
     if (log_memory) {
         double mem_after = DynamicMemoryUsage() / 1024.0 / 1024;
         LogPrint(BCLog::LEVELDB, "WriteBatch memory usage: db=%s, before=%.1fMiB, after=%.1fMiB\n",
@@ -197,7 +197,7 @@ bool CLevelDBWrapper::WriteBatch(CLevelDBBatch& batch, bool fSync)
     return true;
 }
 
-size_t CLevelDBWrapper::DynamicMemoryUsage() const {
+size_t CDBWrapper::DynamicMemoryUsage() const {
     std::string memory;
     if (!pdb->GetProperty("leveldb.approximate-memory-usage", &memory)) {
         LogPrint(BCLog::LEVELDB, "Failed to get approximate-memory-usage property\n");
@@ -208,35 +208,37 @@ size_t CLevelDBWrapper::DynamicMemoryUsage() const {
 
 // Prefixed with null character to avoid collisions with other keys
 //
-// We must use a std::string constructor which specifies length so that we copy
+// We must use a string constructor which specifies length so that we copy
 // past the null-terminator.
-const std::string CLevelDBWrapper::OBFUSCATE_KEY_KEY("\000obfuscate_key", 14);
+const std::string CDBWrapper::OBFUSCATE_KEY_KEY("\000obfuscate_key", 14);
 
-const unsigned int CLevelDBWrapper::OBFUSCATE_KEY_NUM_BYTES = 8;
+const unsigned int CDBWrapper::OBFUSCATE_KEY_NUM_BYTES = 8;
 
 /**
- * Returns a std::string (consisting of 8 random bytes) suitable for use as an
+ * Returns a string (consisting of 8 random bytes) suitable for use as an
  * obfuscating XOR key.
  */
-std::vector<unsigned char> CLevelDBWrapper::CreateObfuscateKey() const
+std::vector<unsigned char> CDBWrapper::CreateObfuscateKey() const
 {
     unsigned char buff[OBFUSCATE_KEY_NUM_BYTES];
     GetRandBytes(buff, OBFUSCATE_KEY_NUM_BYTES);
     return std::vector<unsigned char>(&buff[0], &buff[OBFUSCATE_KEY_NUM_BYTES]);
 
 }
-bool CLevelDBWrapper::IsEmpty()
+
+bool CDBWrapper::IsEmpty()
 {
-    std::unique_ptr<CLevelDBIterator> it(NewIterator());
+    std::unique_ptr<CDBIterator> it(NewIterator());
     it->SeekToFirst();
     return !(it->Valid());
 }
-CLevelDBIterator::~CLevelDBIterator() { delete piter; }
-bool CLevelDBIterator::Valid() const { return piter->Valid(); }
-void CLevelDBIterator::SeekToFirst() { piter->SeekToFirst(); }
-void CLevelDBIterator::Next() { piter->Next(); }
 
-namespace leveldbwrapper_private {
+CDBIterator::~CDBIterator() { delete piter; }
+bool CDBIterator::Valid() const { return piter->Valid(); }
+void CDBIterator::SeekToFirst() { piter->SeekToFirst(); }
+void CDBIterator::Next() { piter->Next(); }
+
+namespace dbwrapper_private {
 
 void HandleError(const leveldb::Status& status)
 {
@@ -245,10 +247,10 @@ void HandleError(const leveldb::Status& status)
     const std::string errmsg = "Fatal LevelDB error: " + status.ToString();
     LogPrintf("%s\n", errmsg);
     LogPrintf("You can use -debug=leveldb to get more complete diagnostic messages\n");
-    throw leveldb_error(errmsg);
+    throw dbwrapper_error(errmsg);
 }
 
-const std::vector<unsigned char>& GetObfuscateKey(const CLevelDBWrapper &w)
+const std::vector<unsigned char>& GetObfuscateKey(const CDBWrapper &w)
 {
     return w.obfuscate_key;
 }
