@@ -239,11 +239,9 @@ public:
 /**
  * Testnet (v3)
  */
-class CTestNetParams : public CMainParams
-{
+class CTestNetParams : public CChainParams {
 public:
-    CTestNetParams()
-    {
+    CTestNetParams() {
         strNetworkID = "test";
         consensus.nSubsidyHalvingInterval = 0;
         consensus.nEnforceBlockUpgradeMajority = 51;
@@ -316,6 +314,7 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
+        // nodes with support for servicebits filtering should be at the top
         vSeeds.emplace_back("testnet-seed.wispr.tech");     // Primary DNS Seeder for testnet wispr
         vSeeds.emplace_back("test.wispr-seeds.nl");     // Secondary DNS Seeder for testnet wispr
 
@@ -334,8 +333,8 @@ public:
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
         fDefaultCheckMemPool = false;
-        fRequireStandard = true;
-        fMineBlocksOnDemand = true;
+        fRequireStandard = false;
+        fMineBlocksOnDemand = false;
         fTestnetToBeDeprecatedFieldRPC = true;
 
         consensus.nPoolMaxTransactions = 2;

@@ -152,7 +152,6 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
 
 bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params& params)
 {
-    std::cout << "CheckProofOFWork\n";
     bool fNegative;
     bool fOverflow;
     uint256 bnTarget;
