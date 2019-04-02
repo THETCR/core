@@ -308,8 +308,8 @@ public:
         genesis = CreateGenesisBlock(1512932225, 142000, consensus.powLimit.GetCompact(), 1, 125000 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        printf("Test net\n");
-        printf("genesis = %s\n", genesis.ToString().c_str());
+//        printf("Test net\n");
+//        printf("genesis = %s\n", genesis.ToString().c_str());
         assert(consensus.hashGenesisBlock == uint256("41ddd599aa4bd28e5941b1e51cda473d78f829b84966f8d044ee92df8e2721d3"));
         assert(genesis.hashMerkleRoot == uint256("bcd0064f46daed0b3c1ccff16656a0da04b5509924118b7c13d21c81d62ec521"));
 
@@ -419,10 +419,10 @@ public:
 
         genesis = CreateGenesisBlock(1411111111, 2, consensus.powLimit.GetCompact(), 1, 0 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        printf("Req net\n");
-        printf("genesis = %s\n", genesis.ToString().c_str());
-        assert(consensus.hashGenesisBlock == uint256("0302157c185ae0018bb60f0c506087be772aa2015150f994cc1a6db55e8e23bd"));
-        assert(genesis.hashMerkleRoot == uint256S("0x4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"));
+//        printf("Req net\n");
+//        printf("genesis = %s\n", genesis.ToString().c_str());
+        assert(consensus.hashGenesisBlock == uint256("ff317bf2fb18209612809fe42af88bec38c26769bb89df88c5f4ad391933ccc7"));
+        assert(genesis.hashMerkleRoot == uint256S("6a1b37300c4972fd827a02317446a729aaf77a80584dc51a8a06f0a6ec853b43"));
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();      //!< Regtest mode doesn't have any DNS seeds.
