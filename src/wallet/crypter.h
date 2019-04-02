@@ -12,6 +12,7 @@
 #include <atomic>
 
 class uint256;
+class CWallet;
 
 const unsigned int WALLET_CRYPTO_KEY_SIZE = 32;
 const unsigned int WALLET_CRYPTO_SALT_SIZE = 8;
@@ -160,8 +161,8 @@ public:
      */
     boost::signals2::signal<void (CCryptoKeyStore* wallet)> NotifyStatusChanged;
 
-    bool GetDeterministicSeed(const uint256& hashSeed, uint256& seed);
-    bool AddDeterministicSeed(const uint256& seed);
+    bool GetDeterministicSeed(CWallet* pwallet, const uint256& hashSeed, uint256& seed);
+    bool AddDeterministicSeed(CWallet* pwallet, const uint256& seed);
 };
 
 #endif // BITCOIN_WALLET_CRYPTER_H

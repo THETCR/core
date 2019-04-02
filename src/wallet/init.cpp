@@ -179,40 +179,40 @@ bool VerifyWallets(interfaces::Chain& chain, const std::vector<std::string>& wal
         gArgs.ForceSetArg("-walletdir", canonical_wallet_dir.string());
     }
 
-    if (gArgs.GetBoolArg("-resync", false)) {
-        uiInterface.InitMessage(_("Preparing for resync..."));
-        // Delete the local blockchain folders to force a resync from scratch to get a consitent blockchain-state
-        fs::path blocksDir = GetDataDir() / "blocks";
-        fs::path chainstateDir = GetDataDir() / "chainstate";
-        fs::path sporksDir = GetDataDir() / "sporks";
-        fs::path zerocoinDir = GetDataDir() / "zerocoin";
-
-        LogPrintf("Deleting blockchain folders blocks, chainstate, sporks and zerocoin\n");
-        // We delete in 4 individual steps in case one of the folder is missing already
-        try {
-            if (fs::exists(blocksDir)){
-                fs::remove_all(blocksDir);
-                LogPrintf("-resync: folder deleted: %s\n", blocksDir.string().c_str());
-            }
-
-            if (fs::exists(chainstateDir)){
-                fs::remove_all(chainstateDir);
-                LogPrintf("-resync: folder deleted: %s\n", chainstateDir.string().c_str());
-            }
-
-            if (fs::exists(sporksDir)){
-                fs::remove_all(sporksDir);
-                LogPrintf("-resync: folder deleted: %s\n", sporksDir.string().c_str());
-            }
-
-            if (fs::exists(zerocoinDir)){
-                fs::remove_all(zerocoinDir);
-                LogPrintf("-resync: folder deleted: %s\n", zerocoinDir.string().c_str());
-            }
-        } catch (fs::filesystem_error& error) {
-            LogPrintf("Failed to delete blockchain folders %s\n", error.what());
-        }
-    }
+//    if (gArgs.GetBoolArg("-resync", false)) {
+//        uiInterface.InitMessage(_("Preparing for resync..."));
+//        // Delete the local blockchain folders to force a resync from scratch to get a consitent blockchain-state
+//        fs::path blocksDir = GetDataDir() / "blocks";
+//        fs::path chainstateDir = GetDataDir() / "chainstate";
+//        fs::path sporksDir = GetDataDir() / "sporks";
+//        fs::path zerocoinDir = GetDataDir() / "zerocoin";
+//
+//        LogPrintf("Deleting blockchain folders blocks, chainstate, sporks and zerocoin\n");
+//        // We delete in 4 individual steps in case one of the folder is missing already
+//        try {
+//            if (fs::exists(blocksDir)){
+//                fs::remove_all(blocksDir);
+//                LogPrintf("-resync: folder deleted: %s\n", blocksDir.string().c_str());
+//            }
+//
+//            if (fs::exists(chainstateDir)){
+//                fs::remove_all(chainstateDir);
+//                LogPrintf("-resync: folder deleted: %s\n", chainstateDir.string().c_str());
+//            }
+//
+//            if (fs::exists(sporksDir)){
+//                fs::remove_all(sporksDir);
+//                LogPrintf("-resync: folder deleted: %s\n", sporksDir.string().c_str());
+//            }
+//
+//            if (fs::exists(zerocoinDir)){
+//                fs::remove_all(zerocoinDir);
+//                LogPrintf("-resync: folder deleted: %s\n", zerocoinDir.string().c_str());
+//            }
+//        } catch (fs::filesystem_error& error) {
+//            LogPrintf("Failed to delete blockchain folders %s\n", error.what());
+//        }
+//    }
 
     LogPrintf("Using wallet directory %s\n", GetWalletDir().string());
 

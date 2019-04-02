@@ -468,6 +468,28 @@ void CWallet::UpgradeKeyMetadata()
             }
         }
     }
+
+    //ZWSP
+    if(zwalletMain){
+       uint256 hashSeed;
+       if (batch->ReadCurrentSeedHash(hashSeed)) {
+           uint256 nSeed;
+           if (!GetDeterministicSeed(this, hashSeed, nSeed)) {
+               throw std::runtime_error("Failed to read zWSP seed from DB. Wallet is probably corrupt.");
+           }
+           zwalletMain->SetMasterSeed(nSeed, false);
+       } else {
+           // First time this wallet has been unlocked with dzWSP
+           // Borrow random generator from the key class so that we don't have to worry about randomness
+           CKey key;
+           key.MakeNewKey(true);
+           uint256 seed = key.GetPrivKey_256();
+           LogPrintf("%s: first run of zwsp wallet detected, new seed generated. Seedhash=%s\n", __func__, Hash(seed.begin(), seed.end()).GetHex());
+           zwalletMain->SetMasterSeed(seed, true);
+           zwalletMain->GenerateMintPool();
+       }
+    }
+
     batch.reset(); //write before setting the flag
     SetWalletFlag(WALLET_FLAG_KEY_ORIGIN_METADATA);
 }
@@ -587,6 +609,17 @@ bool CWallet::LoadMultiSig(const CScript& dest)
     return CCryptoKeyStore::AddMultiSig(dest);
 }
 
+bool CWallet::Lock()
+{
+    if(zwalletMain){
+        zwalletMain->Lock();
+    }
+    if(CCryptoKeyStore::Lock()){
+        return true;
+    }
+    return false;
+}
+
 bool CWallet::Unlock(const SecureString& strWalletPassphrase, bool accept_no_keys, bool anonymizeOnly)
 {
     CCrypter crypter;
@@ -647,8 +680,9 @@ bool CWallet::ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase,
                 if (!crypter.Encrypt(_vMasterKey, pMasterKey.second.vchCryptedKey))
                     return false;
                 WalletBatch(*database).WriteMasterKey(pMasterKey.first, pMasterKey.second);
-                if (fWasLocked)
+                if (fWasLocked){
                     Lock();
+                }
                 return true;
             }
         }
@@ -4555,9 +4589,6 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
     // Try to top up keypool. No-op if the wallet is locked.
     walletInstance->TopUpKeyPool();
-//    CzWSPWallet* zwalletMain = new CzWSPWallet(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle(), *walletInstance);
-//    walletInstance->setZWallet(zwalletMain);
-//    walletInstance->zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(walletInstance->chain(), walletInstance->GetLocation(), walletInstance->GetDBHandle(), *walletInstance));
 
     auto locked_chain = chain.lock();
     LOCK(walletInstance->cs_wallet);
@@ -4645,18 +4676,6 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
             }
         }
     }
-//Inititalize zWSPWallet
-//    chain.initMessage(_("Syncing zWSP wallet..."));
-
-//    walletInstance->InitAutoConvertAddresses();
-
-//    bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
-//    walletInstance->setZWspAutoBackups(fEnableZWspBackups);
-
-    //Load zerocoin mint hashes to memory
-//    walletInstance->zwspTracker->Init();
-//    zwalletMain->LoadMintPoolFromDB();
-//    zwalletMain->SyncWithChain();
 
     chain.loadWallet(interfaces::MakeWallet(walletInstance));
 
@@ -4676,21 +4695,21 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
 void CWallet::postInitProcess()
 {
-    CzWSPWallet* zwalletMain = new CzWSPWallet(chain(), GetLocation(), GetDBHandle(), *this);
-    setZWallet(zwalletMain);
+//    CzWSPWallet* zwalletMain = new CzWSPWallet(chain(), GetLocation(), GetDBHandle(), *this);
+//    setZWallet(zwalletMain);
 //    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(chain(), GetLocation(), GetDBHandle(), *this));
     //Inititalize zWSPWallet
-    chain().initMessage(_("Syncing zWSP wallet..."));
+//    chain().initMessage(_("Syncing zWSP wallet..."));
 
-    InitAutoConvertAddresses();
+//    InitAutoConvertAddresses();
 
-    bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
-    setZWspAutoBackups(fEnableZWspBackups);
+//    bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
+//    setZWspAutoBackups(fEnableZWspBackups);
 
     //Load zerocoin mint hashes to memory
-    zwspTracker->Init();
-    zwalletMain->LoadMintPoolFromDB();
-    zwalletMain->SyncWithChain();
+//    zwspTracker->Init();
+//    zwalletMain->LoadMintPoolFromDB();
+//    zwalletMain->SyncWithChain();
     // Generate coins in the background
 //    GenerateBitcoins(gArgs.GetBoolArg("-gen", false), this, gArgs.GetArg("-genproclimit", 1));
     auto locked_chain = chain().lock();

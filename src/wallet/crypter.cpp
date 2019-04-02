@@ -165,16 +165,12 @@ bool CCryptoKeyStore::IsLocked() const
 
 bool CCryptoKeyStore::Lock()
 {
-    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    //TODO Remove this
-    CWallet* pwallet = wallets.at(0).get();
     if (!SetCrypted())
         return false;
 
     {
         LOCK(cs_KeyStore);
         vMasterKey.clear();
-        pwallet->zwalletMain->Lock();
     }
 
     NotifyStatusChanged(this);
@@ -183,9 +179,6 @@ bool CCryptoKeyStore::Lock()
 
 bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no_keys)
 {
-    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    //TODO Remove this
-    CWallet* pwallet = wallets.at(0).get();
     {
         LOCK(cs_KeyStore);
         if (!SetCrypted())
@@ -217,27 +210,7 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn, bool accept_no
             return false;
         vMasterKey = vMasterKeyIn;
         fDecryptionThoroughlyChecked = true;
-
-        uint256 hashSeed;
-        if (WalletBatch(pwallet->GetDBHandle()).ReadCurrentSeedHash(hashSeed)) {
-
-            uint256 nSeed;
-            if (!GetDeterministicSeed(hashSeed, nSeed)) {
-                return error("Failed to read zWSP seed from DB. Wallet is probably corrupt.");
-            }
-            pwallet->zwalletMain->SetMasterSeed(nSeed, false);
-        } else {
-            // First time this wallet has been unlocked with dzWSP
-            // Borrow random generator from the key class so that we don't have to worry about randomness
-            CKey key;
-            key.MakeNewKey(true);
-            uint256 seed = key.GetPrivKey_256();
-            LogPrintf("%s: first run of zwsp wallet detected, new seed generated. Seedhash=%s\n", __func__, Hash(seed.begin(), seed.end()).GetHex());
-            pwallet->zwalletMain->SetMasterSeed(seed, true);
-            pwallet->zwalletMain->GenerateMintPool();
     }
-    }
-
     NotifyStatusChanged(this);
     return true;
 }
@@ -355,11 +328,8 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
     return true;
 }
 
-bool CCryptoKeyStore::AddDeterministicSeed(const uint256& seed)
+bool CCryptoKeyStore::AddDeterministicSeed(CWallet* pwallet, const uint256& seed)
 {
-    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    //TODO Remove this
-    CWallet* pwallet = wallets.at(0).get();
     WalletBatch db(pwallet->GetDBHandle());
     std::string strErr;
     uint256 hashSeed = Hash(seed.begin(), seed.end());
@@ -392,12 +362,9 @@ bool CCryptoKeyStore::AddDeterministicSeed(const uint256& seed)
     return error("s%: Failed to %s\n", __func__, strErr);
 }
 
-bool CCryptoKeyStore::GetDeterministicSeed(const uint256& hashSeed, uint256& seedOut)
+bool CCryptoKeyStore::GetDeterministicSeed(CWallet* pwallet, const uint256& hashSeed, uint256& seedOut)
 {
 
-    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    //TODO Remove this
-    CWallet* pwallet = wallets.at(0).get();
     WalletBatch db(pwallet->GetDBHandle());
     std::string strErr;
     if (IsCrypted()) {
@@ -434,7 +401,4 @@ bool CCryptoKeyStore::GetDeterministicSeed(const uint256& hashSeed, uint256& see
     }
 
     return error("%s: Failed to %s\n", __func__, strErr);
-
-
-//    return error("Failed to decrypt deterministic seed %s", IsLocked() ? "Wallet is locked!" : "");
 }

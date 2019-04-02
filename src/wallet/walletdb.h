@@ -21,9 +21,6 @@
 #include <utility>
 #include <vector>
 
-
-#include <base58.h>
-
 /**
  * Overview of wallet database classes:
  *
