@@ -2607,8 +2607,10 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
     CValidationState state;
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     // undo transactions in reverse order
     for (int i = block.vtx.size() - 1; i >= 0; i--) {
         const CTransaction &tx = *(block.vtx[i]);
@@ -3565,7 +3567,10 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     //Record zWSP serials
     if (pwallet) {
         std::set<uint256> setAddedTx;
@@ -3803,10 +3808,12 @@ void static UpdateTip(const CBlockIndex *pindexNew, const CChainParams& chainPar
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
-    CWallet* pwallet = wallets.at(0).get();
-    // If turned on AutoZeromint will automatically convert WSP to zWSP
-    if (pwallet->isZeromintEnabled ()){
-        pwallet->AutoZeromint ();
+    if(!wallets.empty()){
+        CWallet* pwallet = wallets.at(0).get();
+        // If turned on AutoZeromint will automatically convert WSP to zWSP
+        if (pwallet && pwallet->isZeromintEnabled ()){
+            pwallet->AutoZeromint ();
+        }
     }
 
     // New best block
@@ -3891,7 +3898,6 @@ bool CChainState::DisconnectTip(CValidationState& state, const CChainParams& cha
     if (!FlushStateToDisk(chainparams, state, FlushStateMode::IF_NEEDED))
         return false;
 
-    CValidationState stateDummy;
     if (disconnectpool) {
         // Save transactions to re-add to mempool at end of reorg
         for (auto it = block.vtx.rbegin(); it != block.vtx.rend(); ++it) {
