@@ -28,20 +28,19 @@ using namespace libzerocoin;
 
 BOOST_FIXTURE_TEST_SUITE(zerocoin_implementation_tests, WalletTestingSetup)
 
-BOOST_AUTO_TEST_CASE(zcparams_test)
-{
-    bool fPassed = true;
-    try{
-        BOOST_TEST_PASSPOINT();
+//BOOST_AUTO_TEST_CASE(zcparams_test)
+//{
+//    bool fPassed = true;
+//    try{
 //        SelectParams(CBaseChainParams::MAIN);
-        ZerocoinParams *ZCParams = Params().Zerocoin_Params(false);
-            (void)ZCParams;
-    } catch(std::exception& e) {
-        fPassed = false;
-        std::cout << e.what() << "\n";
-    }
-    BOOST_CHECK(fPassed);
-}
+//        ZerocoinParams *ZCParams = Params().Zerocoin_Params(false);
+//            (void)ZCParams;
+//    } catch(std::exception& e) {
+//        fPassed = false;
+//        std::cout << e.what() << "\n";
+//    }
+//    BOOST_CHECK(fPassed);
+//}
 
 
 std::string zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
