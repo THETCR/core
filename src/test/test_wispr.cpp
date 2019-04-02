@@ -35,7 +35,6 @@ std::ostream& operator<<(std::ostream& os, const uint256& num)
 BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
     : m_path_root(fs::temp_directory_path() / "test_wispr" / strprintf("%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(1 << 30))))
 {
-    std::cout << "SHA256AutoDetect\n";
     SHA256AutoDetect();
     ECC_Start();
     SetupEnvironment();
@@ -48,7 +47,6 @@ BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
     gArgs.ForceSetArg("-vbparams", strprintf("segwit:0:%d", (int64_t)Consensus::BIP9Deployment::NO_TIMEOUT));
     SelectParams(chainName);
     noui_connect();
-    std::cout << "BasicTestingSetup finished\n";
 }
 
 BasicTestingSetup::~BasicTestingSetup()
@@ -67,47 +65,35 @@ fs::path BasicTestingSetup::SetDataDir(const std::string& name)
 
 TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(chainName)
 {
-    std::cout << "SetDataDir\n";
     SetDataDir("tempdir");
     const CChainParams& chainparams = Params();
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
 
-    std::cout << "RegisterAllCoreRPCCommands\n";
     RegisterAllCoreRPCCommands(tableRPC);
-    std::cout << "ClearDatadirCache\n";
     ClearDatadirCache();
 
     // We have to run a scheduler thread to prevent ActivateBestChain
     // from blocking due to queue overrun.
-    std::cout << "serviceQueue\n";
     threadGroup.create_thread(std::bind(&CScheduler::serviceQueue, &scheduler));
     GetMainSignals().RegisterBackgroundSignalScheduler(scheduler);
 
-    std::cout << "mempool sanity\n";
     mempool.setSanityCheck(1.0);
     pblocktree.reset(new CBlockTreeDB(1 << 20, true));
     pcoinsdbview.reset(new CCoinsViewDB(1 << 23, true));
     pcoinsTip.reset(new CCoinsViewCache(pcoinsdbview.get()));
-    zerocoinDB.reset(new CZerocoinDB(0, false, fReindex));
-    pSporkDB.reset(new CSporkDB(0, false, false));
-    std::cout << "LoadGenesis\n";
     if (!LoadGenesisBlock(chainparams)) {
         throw std::runtime_error("LoadGenesisBlock failed.");
     }
 
     CValidationState state;
-    std::cout << "ActivateBestChain\n";
     if (!ActivateBestChain(state, chainparams)) {
         throw std::runtime_error(strprintf("ActivateBestChain failed. (%s)", FormatStateMessage(state)));
     }
-    std::cout << "ActivateBestChain finished\n";
 
     nScriptCheckThreads = 3;
-    std::cout << "nScriptCheckThreads\n";
-    for (int i = 0; i < nScriptCheckThreads - 1; i++){
+    for (int i = 0; i < nScriptCheckThreads - 1; i++)
         threadGroup.create_thread(&ThreadScriptCheck);
-    }
 
     g_banman = MakeUnique<BanMan>(GetDataDir() / "banlist.dat", nullptr, DEFAULT_MISBEHAVING_BANTIME);
     g_connman = MakeUnique<CConnman>(0x1337, 0x1337); // Deterministic randomness for tests.
@@ -151,7 +137,6 @@ CBlock
 TestChain100Setup::CreateAndProcessBlock(const std::vector<CMutableTransaction>& txns, const CScript& scriptPubKey)
 {
     const CChainParams& chainparams = Params();
-
     std::unique_ptr<CBlockTemplate> pblocktemplate = BlockAssembler(chainparams).CreateNewBlock(scriptPubKey);
     CBlock& block = pblocktemplate->block;
 
