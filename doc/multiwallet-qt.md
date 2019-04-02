@@ -12,7 +12,7 @@ some major retrofitting.
 
 Only requiring some minor changes is wispr.cpp.
 
-Finally, two new headers and source files will have to be added to bitcoin-qt.pro.
+Finally, two new headers and source files will have to be added to wispr-qt.pro.
 
 Changes to class BitcoinGUI
 ---------------------------

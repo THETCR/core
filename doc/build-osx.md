@@ -95,7 +95,7 @@ Creating a release build
 ------------------------
 You can ignore this section if you are building `wisprd` for your own use.
 
-wisprd/wispr-cli binaries are not included in the wispr-Qt.app bundle.
+wisprd/wispr-cli binaries are not included in the Wispr-Qt.app bundle.
 
 If you are building `wisprd` or `wispr-qt` for others, your build machine should be set up
 as follows for maximum compatibility:
@@ -106,7 +106,7 @@ All dependencies should be compiled with these flags:
  -arch x86_64
  -isysroot $(xcode-select --print-path)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
 
-Once dependencies are compiled, see release-process.md for how the WISPR-Qt.app
+Once dependencies are compiled, see release-process.md for how the Wispr-Qt.app
 bundle is packaged and signed to create the .dmg disk image that is distributed.
 
 Running

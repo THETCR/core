@@ -83,7 +83,7 @@ src/qt/test/moc*.cpp
 *.qm
 Makefile
 wispr-qt
-WISPR-Qt.app
+Wispr-Qt.app
 background.tiff*
 
 # Unit-tests

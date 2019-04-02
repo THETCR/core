@@ -22,7 +22,7 @@ Unpack the files into a directory, and then run wispr-qt.exe.
 
 ### OSX
 
-Drag WISPR-Qt to your applications folder, and then run WISPR-Qt.
+Drag Wispr-Qt to your applications folder, and then run Wispr-Qt.
 
 ### Need Help?
 

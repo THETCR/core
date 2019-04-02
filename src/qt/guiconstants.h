@@ -57,9 +57,9 @@ static const int MAX_URI_LENGTH = 255;
 
 #define QAPP_ORG_NAME "WISPR"
 #define QAPP_ORG_DOMAIN "wispr.tech"
-#define QAPP_APP_NAME_DEFAULT "WISPR-Qt"
-#define QAPP_APP_NAME_TESTNET "WISPR-Qt-testnet"
-#define QAPP_APP_NAME_REGTEST "WISPR-Qt-regtest"
+#define QAPP_APP_NAME_DEFAULT "Wispr-Qt"
+#define QAPP_APP_NAME_TESTNET "Wispr-Qt-testnet"
+#define QAPP_APP_NAME_REGTEST "Wispr-Qt-regtest"
 
 /* One gigabyte (GB) in bytes */
 static constexpr uint64_t GB_BYTES{1000000000};
