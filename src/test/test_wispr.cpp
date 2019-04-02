@@ -69,7 +69,7 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
     // Ideally we'd move all the RPC tests to the functional testing framework
     // instead of unit tests, but for now we need these here.
 
-    RegisterAllCoreRPCCommands(tableRPC);
+//    RegisterAllCoreRPCCommands(tableRPC);
     ClearDatadirCache();
 
     // We have to run a scheduler thread to prevent ActivateBestChain
