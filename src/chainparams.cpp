@@ -258,7 +258,7 @@ public:
         consensus.nMaturity = 10;
         consensus.nMasternodeCountDrift = 4;
         consensus.nMaxMoneyOut = 120000000 * COIN;
-        consensus.nNewProtocolStartHeight = 750;
+        consensus.nNewProtocolStartHeight = 400000;
         consensus.nNewProtocolStartTime = 1537830552;
         consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
         consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime; // July 2, 2018
@@ -488,6 +488,7 @@ public:
         consensus.fAllowMinDifficultyBlocks = false;
         fMineBlocksOnDemand = true;
         consensus.fSkipProofOfWorkCheck = false;
+        consensus.nNewProtocolStartHeight = 400000;
 
         /* enable fallback fee on unittest */
         m_fallback_fee_enabled = true;
