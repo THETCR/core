@@ -4,9 +4,10 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "uint256.h"
+#include <uint256.h>
 
 #include <util/strencodings.h>
+#include <crypto/common.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -14,6 +15,8 @@
 template <unsigned int BITS>
 base_uint<BITS>::base_uint(const std::string& str)
 {
+    static_assert(BITS/32 > 0 && BITS%32 == 0, "Template parameter BITS must be a positive multiple of 32.");
+
     SetHex(str);
 }
 
@@ -74,16 +77,16 @@ base_uint<BITS>& base_uint<BITS>::operator*=(uint32_t b32)
 template <unsigned int BITS>
 base_uint<BITS>& base_uint<BITS>::operator*=(const base_uint& b)
 {
-    base_uint<BITS> a = *this;
-    *this = 0;
+    base_uint<BITS> a;
     for (int j = 0; j < WIDTH; j++) {
         uint64_t carry = 0;
         for (int i = 0; i + j < WIDTH; i++) {
-            uint64_t n = carry + pn[i + j] + (uint64_t)a.pn[j] * b.pn[i];
-            pn[i + j] = n & 0xffffffff;
+            uint64_t n = carry + a.pn[i + j] + (uint64_t)pn[j] * b.pn[i];
+            a.pn[i + j] = n & 0xffffffff;
             carry = n >> 32;
         }
     }
+    *this = a;
     return *this;
 }
 
@@ -100,7 +103,7 @@ base_uint<BITS>& base_uint<BITS>::operator/=(const base_uint& b)
     if (div_bits > num_bits) // the result is certainly 0.
         return *this;
     int shift = num_bits - div_bits;
-    div <<= shift; // shift so that div and nun align.
+    div <<= shift; // shift so that div and num align.
     while (shift >= 0) {
         if (num >= div) {
             num -= div;
@@ -173,7 +176,7 @@ void base_uint<BITS>::SetHex(const char* psz)
     if (psz[0] == '0' && tolower(psz[1]) == 'x')
         psz += 2;
 
-    // hex std::string to uint
+    // hex string to uint
     const char* pbegin = psz;
     while (::HexDigit(*psz) != -1)
         psz++;
@@ -215,9 +218,9 @@ unsigned int base_uint<BITS>::bits() const
 {
     for (int pos = WIDTH - 1; pos >= 0; pos--) {
         if (pn[pos]) {
-            for (int bits = 31; bits > 0; bits--) {
-                if (pn[pos] & 1 << bits)
-                    return 32 * pos + bits + 1;
+            for (int nbits = 31; nbits > 0; nbits--) {
+                if (pn[pos] & 1U << nbits)
+                    return 32 * pos + nbits + 1;
             }
             return 32 * pos + 1;
         }
@@ -285,8 +288,8 @@ uint256& uint256::SetCompact(uint32_t nCompact, bool* pfNegative, bool* pfOverfl
         *pfNegative = nWord != 0 && (nCompact & 0x00800000) != 0;
     if (pfOverflow)
         *pfOverflow = nWord != 0 && ((nSize > 34) ||
-                                        (nWord > 0xff && nSize > 33) ||
-                                        (nWord > 0xffff && nSize > 32));
+                                     (nWord > 0xff && nSize > 33) ||
+                                     (nWord > 0xffff && nSize > 32));
     return *this;
 }
 
