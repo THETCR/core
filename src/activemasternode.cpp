@@ -25,7 +25,10 @@ void CActiveMasternode::ManageStatus()
     if (!fMasterNode) return;
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
 
     if(!pwallet){
         return;
@@ -359,7 +362,10 @@ bool CActiveMasternode::GetMasterNodeVin(CTxIn& vin, CPubKey& pubkey, CKey& secr
     if (fImporting || fReindex) return false;
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return false;
     }
@@ -416,8 +422,10 @@ bool CActiveMasternode::GetVinFromOutput(COutput out, CTxIn& vin, CPubKey& pubke
     if (fImporting || fReindex) return false;
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return false;
     }
@@ -452,8 +460,10 @@ std::vector<COutput> CActiveMasternode::SelectCoinsMasternode()
     std::vector<COutPoint> confLockedCoins;
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return filteredCoins;
     }

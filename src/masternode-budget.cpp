@@ -148,7 +148,10 @@ void CBudgetManager::CheckOrphanVotes()
 void CBudgetManager::SubmitFinalBudget()
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return;
     }

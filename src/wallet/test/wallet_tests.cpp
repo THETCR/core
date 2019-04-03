@@ -518,8 +518,10 @@ static std::vector<COutput> vCoins;
 static void add_coin(const CAmount& nValue, int nAge = 6*24, bool fIsFromMe = false, int nInput=0)
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     static int nextLockTime = 0;
     CMutableTransaction tx;
     tx.nLockTime = nextLockTime++;        // so all transactions get different hashes

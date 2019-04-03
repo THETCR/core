@@ -8500,8 +8500,10 @@ void ThreadPrecomputeSpends()
     boost::this_thread::interruption_point();
     LogPrintf("ThreadPrecomputeSpends started\n");
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     try {
         pwallet->PrecomputeSpends();
         boost::this_thread::interruption_point();

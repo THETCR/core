@@ -310,7 +310,10 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx, CConnman* connman)
 
 #ifdef ENABLE_WALLET
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
 #endif
 
     int n = mnodeman.GetMasternodeRank(ctx.vinMasternode, ctx.nBlockHeight, MIN_SWIFTTX_PROTO_VERSION);

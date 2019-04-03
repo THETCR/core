@@ -440,8 +440,10 @@ bool CObfuscationPool::SetCollateralAddress(std::string strAddress)
 void CObfuscationPool::UnlockCoins()
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return;
     }
@@ -595,8 +597,10 @@ void CObfuscationPool::CheckFinalTransaction(CConnman* connman)
     if (!fMasterNode) return; // check and relay final tx only on masternode
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return;
     }
@@ -686,8 +690,10 @@ void CObfuscationPool::ChargeFees()
     if (!fMasterNode) return;
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return;
     }
@@ -793,8 +799,10 @@ void CObfuscationPool::ChargeFees()
 void CObfuscationPool::ChargeRandomFees()
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return;
     }
@@ -1293,8 +1301,10 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
     if (fMasterNode) return false;
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return false;
     }
@@ -1423,8 +1433,10 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
     return false;  // Disabled until Obfuscation is completely removed
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return false;
     }
@@ -1694,8 +1706,10 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
 bool CObfuscationPool::PrepareObfuscationDenominate()
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return false;
     }
@@ -1722,7 +1736,10 @@ bool CObfuscationPool::PrepareObfuscationDenominate()
 bool CObfuscationPool::SendRandomPaymentToSelf()
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return false;
     }
@@ -1765,7 +1782,10 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
 bool CObfuscationPool::MakeCollateralAmounts()
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return false;
     }
@@ -1824,7 +1844,10 @@ bool CObfuscationPool::MakeCollateralAmounts()
 bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     if(!pwallet){
         return false;
     }

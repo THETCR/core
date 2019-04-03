@@ -404,7 +404,10 @@ bool CMasternodeBroadcast::Create(std::string strService, std::string strKeyMast
     CKey keyMasternodeNew;
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
 
     //need correct blocks to send ping
     if (!fOffline && !masternodeSync.IsBlockchainSynced()) {
