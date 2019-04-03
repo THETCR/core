@@ -324,7 +324,7 @@ void CTxMemPoolEntry::UpdateAncestorState(int64_t modifySize, CAmount modifyFee,
 }
 
 CTxMemPool::CTxMemPool(CBlockPolicyEstimator* estimator) :
-        nTransactionsUpdated(0), minerPolicyEstimator(estimator)
+    nTransactionsUpdated(0), minerPolicyEstimator(estimator)
 {
     _clear(); //lock free clear
 
@@ -367,7 +367,7 @@ void CTxMemPool::addUnchecked(const CTxMemPoolEntry &entry, setEntries &setAnces
     CAmount delta{0};
     ApplyDelta(entry.GetTx().GetHash(), delta);
     if (delta) {
-        mapTx.modify(newit, update_fee_delta(delta));
+            mapTx.modify(newit, update_fee_delta(delta));
     }
 
     // Update cachedInnerUsage to include contained transaction's usage.
@@ -390,7 +390,7 @@ void CTxMemPool::addUnchecked(const CTxMemPoolEntry &entry, setEntries &setAnces
 
     // Update ancestors with information about this tx
     for (const auto& pit : GetIterSet(setParentTransactions)) {
-        UpdateParent(newit, pit, true);
+            UpdateParent(newit, pit, true);
     }
     UpdateAncestorsOf(true, newit, setAncestors);
     UpdateEntryForAncestors(newit, setAncestors);
