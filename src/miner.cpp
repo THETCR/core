@@ -122,6 +122,13 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     if (chainparams.MineBlocksOnDemand())
         pblock->nVersion = gArgs.GetArg("-blockversion", pblock->nVersion);
 
+    // Make sure to create the correct block version after zerocoin is enabled
+    bool fZerocoinActive = (chainActive.Height() + 1) >= Params().NEW_PROTOCOLS_STARTHEIGHT();
+    if (fZerocoinActive)
+        pblock->nVersion = 8;
+    else
+        pblock->nVersion = 7;
+
     pblock->nTime = GetAdjustedTime();
     const int64_t nMedianTimePast = pindexPrev->GetMedianTimePast();
 
