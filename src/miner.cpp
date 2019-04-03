@@ -62,6 +62,7 @@ BlockAssembler::BlockAssembler(const CChainParams& params, const Options& option
 
 static BlockAssembler::Options DefaultOptions()
 {
+    std::cout << "DefaultOptions\n";
     // Block resource limits
     // If -blockmaxweight is not given, limit to DEFAULT_BLOCK_MAX_WEIGHT
     BlockAssembler::Options options;
@@ -72,6 +73,8 @@ static BlockAssembler::Options DefaultOptions()
     } else {
         options.blockMinFeeRate = CFeeRate(DEFAULT_BLOCK_MIN_TX_FEE);
     }
+    std::cout << "DefaultOptions finished\n";
+
     return options;
 }
 
@@ -96,8 +99,10 @@ Optional<int64_t> BlockAssembler::m_last_block_weight{nullopt};
 
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn)
 {
+    std::cout << "CreateNewBlock start\n";
     int64_t nTimeStart = GetTimeMicros();
 
+    std::cout << "CreateNewBlock resetBlock\n";
     resetBlock();
 
     pblocktemplate.reset(new CBlockTemplate());
@@ -107,10 +112,12 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblock = &pblocktemplate->block; // pointer for convenience
 
     // Add dummy coinbase tx as first transaction
+    std::cout << "CreateNewBlock  dummy coinbase tx\n";
     pblock->vtx.emplace_back();
     pblocktemplate->vTxFees.push_back(-1); // updated at end
     pblocktemplate->vTxSigOpsCost.push_back(-1); // updated at end
 
+    std::cout << "CreateNewBlock tip\n";
     LOCK2(cs_main, mempool.cs);
     CBlockIndex* pindexPrev = chainActive.Tip();
     assert(pindexPrev != nullptr);
