@@ -13,6 +13,7 @@
 #include "masternode.h"
 #include "obfuscation.h"
 #include "spork.h"
+#include <script/standard.h>
 #include <util/system.h>
 #include <fs.h>
 
