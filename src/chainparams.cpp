@@ -456,14 +456,13 @@ public:
 
         /* enable fallback fee on regtest */
         m_fallback_fee_enabled = true;
-        std::cout << "Regtest constructor done\n";
     }
 
     /**
      * Allows modifying the Version Bits regtest parameters.
      */
     void UpdateVersionBitsParameters(Consensus::DeploymentPos d, int64_t nStartTime, int64_t nTimeout)
-    {   std::cout << "UpdateVersionBitsParameters\n";
+    {
         consensus.vDeployments[d].nStartTime = nStartTime;
         consensus.vDeployments[d].nTimeout = nTimeout;
     }

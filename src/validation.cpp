@@ -1904,28 +1904,23 @@ bool ReadBlockFromDisk(CBlock& block, const FlatFilePos& pos, const Consensus::P
     block.SetNull();
 
     // Open history file to read
-    std::cout << "filein\n";
     CAutoFile filein(OpenBlockFile(pos, true), SER_DISK, CLIENT_VERSION);
     if (filein.IsNull())
         return error("ReadBlockFromDisk: OpenBlockFile failed for %s", pos.ToString());
 
     // Read block
     try {
-        std::cout << "serialize block\n";
         filein >> block;
     }
     catch (const std::exception& e) {
-        std::cout << "Deserialize error\n";
         return error("%s: Deserialize or I/O error - %s at %s", __func__, e.what(), pos.ToString());
     }
 
     if (block.IsProofOfWork()) {
         // Check the header
-        std::cout << "Check the header\n";
         if (!CheckProofOfWork(block.GetPoWHash(), block.nBits, consensusParams))
             return error("ReadBlockFromDisk: Errors in block header at %s", pos.ToString());
     }
-    std::cout << "ReadBlockFromDisk finished\n";
 
     return true;
 }
@@ -1935,14 +1930,11 @@ bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus
     FlatFilePos blockPos;
     {
         LOCK(cs_main);
-        std::cout << "GetBlockPos\n";
         blockPos = pindex->GetBlockPos();
     }
-    std::cout << "ReadBlockFromDisk 2\n";
     if (!ReadBlockFromDisk(block, blockPos, consensusParams))
         return false;
     if (block.GetHash() != pindex->GetBlockHash()){
-        std::cout << "hash doesn't match\n";
         return error("ReadBlockFromDisk(CBlock&, CBlockIndex*): GetHash() doesn't match index for %s at %s",
                 pindex->ToString(), pindex->GetBlockPos().ToString());
     }
@@ -4007,15 +3999,12 @@ public:
 bool CChainState::ConnectTip(CValidationState& state, const CChainParams& chainparams, CBlockIndex* pindexNew, const std::shared_ptr<const CBlock>& pblock, ConnectTrace& connectTrace, DisconnectedBlockTransactions &disconnectpool)
 {
 
-    std::cout << "ConnectTip start\n";
     assert(pindexNew->pprev == chainActive.Tip());
     // Read block from disk.
     int64_t nTime1 = GetTimeMicros();
     std::shared_ptr<const CBlock> pthisBlock;
     if (!pblock) {
-        std::cout << "ConnectTip new shared block\n";
         std::shared_ptr<CBlock> pblockNew = std::make_shared<CBlock>();
-        std::cout << "ConnectTip ReadBlockFromDisk\n";
         if (!ReadBlockFromDisk(*pblockNew, pindexNew, chainparams.GetConsensus())){
             return AbortNode(state, "Failed to read block");
         }
@@ -4030,9 +4019,7 @@ bool CChainState::ConnectTip(CValidationState& state, const CChainParams& chainp
     LogPrint(BCLog::BENCH, "  - Load block from disk: %.2fms [%.2fs]\n", (nTime2 - nTime1) * MILLI, nTimeReadFromDisk * MICRO);
     {
         CCoinsViewCache view(pcoinsTip.get());
-        std::cout << "ConnectTip ConnectBlock\n";
         bool rv = ConnectBlock(blockConnecting, state, pindexNew, view, chainparams);
-        std::cout << "ConnectTip BlockChecked\n";
         GetMainSignals().BlockChecked(blockConnecting, state);
         if (!rv) {
             if (state.IsInvalid())
@@ -4041,26 +4028,21 @@ bool CChainState::ConnectTip(CValidationState& state, const CChainParams& chainp
         }
         nTime3 = GetTimeMicros(); nTimeConnectTotal += nTime3 - nTime2;
         LogPrint(BCLog::BENCH, "  - Connect total: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime3 - nTime2) * MILLI, nTimeConnectTotal * MICRO, nTimeConnectTotal * MILLI / nBlocksTotal);
-        std::cout << "ConnectTip flushed\n";
         bool flushed = view.Flush();
         assert(flushed);
     }
     int64_t nTime4 = GetTimeMicros(); nTimeFlush += nTime4 - nTime3;
     LogPrint(BCLog::BENCH, "  - Flush: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime4 - nTime3) * MILLI, nTimeFlush * MICRO, nTimeFlush * MILLI / nBlocksTotal);
     // Write the chain state to disk, if necessary.
-    std::cout << "ConnectTip FlushStateToDisk\n";
     if (!FlushStateToDisk(chainparams, state, FlushStateMode::IF_NEEDED))
         return false;
     int64_t nTime5 = GetTimeMicros(); nTimeChainState += nTime5 - nTime4;
     LogPrint(BCLog::BENCH, "  - Writing chainstate: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime5 - nTime4) * MILLI, nTimeChainState * MICRO, nTimeChainState * MILLI / nBlocksTotal);
     // Remove conflicting transactions from the mempool.;
-    std::cout << "ConnectTip removeForBlock\n";
     mempool.removeForBlock(blockConnecting.vtx, pindexNew->nHeight);
-    std::cout << "ConnectTip disconnectpool.removeForBlock\n";
     disconnectpool.removeForBlock(blockConnecting.vtx);
     // Update chainActive & related variables.
     chainActive.SetTip(pindexNew);
-    std::cout << "ConnectTip UpdateTip\n";
     UpdateTip(pindexNew, chainparams);
 
     int64_t nTime6 = GetTimeMicros(); nTimePostConnect += nTime6 - nTime5; nTimeTotal += nTime6 - nTime1;
@@ -4239,7 +4221,6 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
     // Disconnect active blocks which are no longer in the best chain.
     bool fBlocksDisconnected = false;
     DisconnectedBlockTransactions disconnectpool;
-    std::cout << "ActivateBestChainStep DisconnectTip\n";
     while (chainActive.Tip() && chainActive.Tip() != pindexFork) {
         if (!DisconnectTip(state, chainparams, &disconnectpool)) {
             // This is likely a fatal error, but keep the mempool consistent,
@@ -4268,11 +4249,9 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
         nHeight = nTargetHeight;
 
         // Connect new blocks.
-        std::cout << "ActivateBestChainStep ConnectTip\n";
         for (CBlockIndex *pindexConnect : reverse_iterate(vpindexToConnect)) {
             if (!ConnectTip(state, chainparams, pindexConnect, pindexConnect == pindexMostWork ? pblock : std::shared_ptr<const CBlock>(), connectTrace, disconnectpool)) {
                 if (state.IsInvalid()) {
-                    std::cout << "ActivateBestChainStep state invalid 1\n";
                     // The block violates a consensus rule.
                     if (!state.CorruptionPossible()) {
                         InvalidChainFound(vpindexToConnect.front());
@@ -4285,12 +4264,10 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
                     // A system error occurred (disk space, database error, ...).
                     // Make the mempool consistent with the current tip, just in case
                     // any observers try to use it before shutdown.
-                    std::cout << "ActivateBestChainStep UpdateMempoolForReorg 1\n";
                     UpdateMempoolForReorg(disconnectpool, false);
                     return false;
                 }
             } else {
-                std::cout << "ActivateBestChainStep PruneBlockIndexCandidates\n";
                 PruneBlockIndexCandidates();
                 if (!pindexOldTip || chainActive.Tip()->nChainWork > pindexOldTip->nChainWork) {
                     // We're in a better position than we were. Return temporarily to release the lock.
@@ -4302,13 +4279,11 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
     }
 
     if (fBlocksDisconnected) {
-        std::cout << "ActivateBestChainStep UpdateMempoolForReorg\n";
         // If any blocks were disconnected, disconnectpool may be non empty.  Add
         // any disconnected transactions back to the mempool.
         UpdateMempoolForReorg(disconnectpool, true);
     }
     mempool.check(pcoinsTip.get());
-    std::cout << "ActivateBestChainStep mempool.check(pcoinsTip.get())\n";
 
     // Callbacks/notifications for a new best chain.
     if (fInvalidFound)
@@ -4382,22 +4357,18 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
         // Note that if a validationinterface callback ends up calling
         // ActivateBestChain this may lead to a deadlock! We should
         // probably have a DEBUG_LOCKORDER test for this in the future.
-        std::cout << "LimitValidationInterfaceQueue\n";
         LimitValidationInterfaceQueue();
 
         {
             LOCK(cs_main);
-            std::cout << "chainactive tip\n";
             CBlockIndex* starting_tip = chainActive.Tip();
             bool blocks_connected = false;
             do {
                 // We absolutely may not unlock cs_main until we've made forward progress
                 // (with the exception of shutdown due to hardware issues, low disk space, etc).
                 ConnectTrace connectTrace(mempool); // Destructed before cs_main is unlocked
-                std::cout << "connectTrace\n";
 
                 if (pindexMostWork == nullptr) {
-                    std::cout << "FindMostWorkChain\n";
                     pindexMostWork = FindMostWorkChain();
                 }
 
@@ -4408,7 +4379,6 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
 
                 bool fInvalidFound = false;
                 std::shared_ptr<const CBlock> nullBlockPtr;
-                std::cout << "ActivateBestChainStep\n";
                 if (!ActivateBestChainStep(state, chainparams, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : nullBlockPtr, fInvalidFound, connectTrace))
                     return false;
                 blocks_connected = true;
@@ -4421,13 +4391,11 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
 
                 for (const PerBlockConnectTrace& trace : connectTrace.GetBlocksConnected()) {
                     assert(trace.pblock && trace.pindex);
-                    std::cout << "BlockConnected\n";
                     GetMainSignals().BlockConnected(trace.pblock, trace.pindex, trace.conflictedTxs);
                 }
             } while (!chainActive.Tip() || (starting_tip && CBlockIndexWorkComparator()(chainActive.Tip(), starting_tip)));
             if (!blocks_connected) return true;
 
-            std::cout << "FindFork\n";
             const CBlockIndex* pindexFork = chainActive.FindFork(starting_tip);
             bool fInitialDownload = IsInitialBlockDownload();
 
@@ -4435,11 +4403,9 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
             // Enqueue while holding cs_main to ensure that UpdatedBlockTip is called in the order in which blocks are connected
             if (pindexFork != pindexNewTip) {
                 // Notify ValidationInterface subscribers
-                std::cout << "UpdatedBlockTip\n";
                 GetMainSignals().UpdatedBlockTip(pindexNewTip, pindexFork, fInitialDownload);
 
                 // Always notify the UI if a new block tip was connected
-                std::cout << "NotifyBlockTip\n";
                 uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
             }
         }
@@ -4454,7 +4420,6 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
         if (ShutdownRequested())
             break;
     } while (pindexNewTip != pindexMostWork);
-    std::cout << "CheckBlockIndex\n";
     CheckBlockIndex(chainparams.GetConsensus());
 
     // Write changes periodically to disk, after relay.

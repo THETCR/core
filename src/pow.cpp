@@ -15,7 +15,6 @@
 #include <util/system.h>
 
 #include <math.h>
-#include <iostream>
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
@@ -157,33 +156,25 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
     bool fOverflow;
     uint256 bnTarget;
 
-    std::cout << "CheckProofOfWork SkipProofOfWorkCheck\n";
     if (Params().SkipProofOfWorkCheck())
         return true;
 
-    std::cout << "Hash check\n";
     if(hash == uint256("41ddd599aa4bd28e5941b1e51cda473d78f829b84966f8d044ee92df8e2721d3"))
         return true;
 
     if(hash == uint256("ff317bf2fb18209612809fe42af88bec38c26769bb89df88c5f4ad391933ccc7"))
         return true;
 
-    std::cout << "Set compact\n";
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
 
     // Check range
-    std::cout << "Check range\n";
     if (fNegative || bnTarget == 0 || fOverflow || bnTarget > Params().ProofOfWorkLimit())
         return false;
 
     // Check proof of work matches claimed amount
-    std::cout << "Claimed amount\n";
-    printf("hash = : %s\t", hash.ToString().c_str());
-    printf("bnTarget = : %s\n", bnTarget.ToString().c_str());
     if (hash > bnTarget){
         return false;
     }
 
-    std::cout << "CheckProofOfWork finished\n";
     return true;
 }
