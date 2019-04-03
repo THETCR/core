@@ -400,6 +400,7 @@ public:
         consensus.nNewProtocolStartTime = 1537830552;
         consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
         consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime; // July 2, 2018
+        consensus.nZerocoinHeaderVersion = 8; //Block headers must be this version once zerocoin is active
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00");
 
