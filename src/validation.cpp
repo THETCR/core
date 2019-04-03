@@ -3171,6 +3171,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     assert(pindex);
     assert(*pindex->phashBlock == block.GetHash());
     int64_t nTimeStart = GetTimeMicros();
+    std::cout << "ConnectBlock\n";
 
     // Check it again in case a previous version let a bad block in
     // NOTE: We don't currently (re-)invoke ContextualCheckBlock() or
@@ -3185,6 +3186,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     // is enforced in ContextualCheckBlockHeader(); we wouldn't want to
     // re-enforce that rule here (at least until we make it impossible for
     // GetAdjustedTime() to go backward).
+    std::cout << "ConnectBlock CheckBlock\n";
     if (!CheckBlock(block, state, chainparams.GetConsensus(), !fJustCheck, !fJustCheck)) {
         if (state.CorruptionPossible()) {
             // We don't write down blocks to disk if they may have been
@@ -3201,6 +3203,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     // Special case for the genesis block, skipping connection of its transactions
     // (its coinbase is unspendable)
+    std::cout << "ConnectBlock hashGenesis\n";
     if (block.GetHash() == chainparams.GetConsensus().hashGenesisBlock) {
         if (!fJustCheck)
             view.SetBestBlock(pindex->GetBlockHash());
@@ -3213,11 +3216,13 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 //        return state.DoS(100, error("ConnectBlock() : PoS period not active"),
 //            REJECT_INVALID, "PoS-early");
 
+    std::cout << "ConnectBlock PoW\n";
     if (pindex->nHeight > Params().LAST_POW_BLOCK() && block.IsProofOfWork())
         return state.DoS(100, error("ConnectBlock() : PoW period ended"),
                          REJECT_INVALID, "PoW-ended");
 
     bool fScriptChecks = true;
+    std::cout << "ConnectBlock hashAssumeValid\n";
     if (!hashAssumeValid.IsNull()) {
         // We've been configured with the hash of a block which has been externally verified to have a valid history.
         // A suitable default value is included with the software and updated from time to time.  Because validity
@@ -3247,6 +3252,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     LogPrint(BCLog::BENCH, "    - Sanity checks: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime1 - nTimeStart), nTimeCheck * MICRO, nTimeCheck * MILLI / nBlocksTotal);
 
     // If scripts won't be checked anyways, don't bother seeing if CLTV is activated
+    std::cout << "ConnectBlock fCLTVHasMajority\n";
     bool fCLTVHasMajority = false;
     if (fScriptChecks && pindex->pprev) {
         fCLTVHasMajority = CBlockIndex::IsSuperMajority(9, pindex->pprev, Params().EnforceBlockUpgradeMajority());
@@ -3329,6 +3335,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     //Only continue to enforce if we're below BIP34 activation height or the block hash at that height doesn't correspond.
     fEnforceBIP30 = fEnforceBIP30 && (!pindexBIP34height || !(pindexBIP34height->GetBlockHash() == chainparams.GetConsensus().BIP34Hash));
 
+    std::cout << "ConnectBlock BIP34_IMPLIES_BIP30_LIMIT\n";
     // TODO: Remove BIP30 checking from block height 1,983,702 on, once we have a
     // consensus change that ensures coinbases at those heights can not
     // duplicate earlier coinbases.
@@ -3344,12 +3351,14 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
 
     // Start enforcing BIP68 (sequence locks) and BIP112 (CHECKSEQUENCEVERIFY) using versionbits logic.
+    std::cout << "ConnectBlock VersionBitsState\n";
     int nLockTimeFlags = 0;
     if (VersionBitsState(pindex->pprev, chainparams.GetConsensus(), Consensus::DEPLOYMENT_CSV, versionbitscache) == ThresholdState::ACTIVE) {
         nLockTimeFlags |= LOCKTIME_VERIFY_SEQUENCE;
     }
 
     // Get the script flags for this block
+    std::cout << "ConnectBlock GetBlockScriptFlags\n";
     unsigned int flags = GetBlockScriptFlags(pindex, chainparams.GetConsensus());
 
     int64_t nTime2 = GetTimeMicros(); nTimeForks += nTime2 - nTime1;
@@ -3357,6 +3366,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     CBlockUndo blockundo;
 
+    std::cout << "ConnectBlock control\n";
     CCheckQueueControl<CScriptCheck> control(fScriptChecks && nScriptCheckThreads ? &scriptcheckqueue : nullptr);
 
     std::vector<int> prevheights;
@@ -3364,17 +3374,20 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     int nInputs = 0;
     int64_t nSigOpsCost = 0;
     unsigned int nSigOps = 0;
+    std::cout << "ConnectBlock CDiskTxPos\n";
     CDiskTxPos pos(pindex->GetBlockPos(), GetSizeOfCompactSize(block.vtx.size()));
     std::vector<std::pair<uint256, CDiskTxPos> > vPos;
     std::vector<std::pair<CoinSpend, uint256> > vSpends;
     std::vector<std::pair<PublicCoin, uint256> > vMints;
     vPos.reserve(block.vtx.size());
+    std::cout << "ConnectBlock blockundo\n";
     blockundo.vtxundo.reserve(block.vtx.size() - 1);
     CAmount nValueOut = 0;
     CAmount nValueIn = 0;
     unsigned int nMaxBlockSigOps = MAX_BLOCK_SIGOPS_CURRENT;
     std::vector<uint256> vSpendsInBlock;
     uint256 hashBlock = block.GetHash();
+    std::cout << "ConnectBlock txdata\n";
     std::vector<PrecomputedTransactionData> txdata;
     txdata.reserve(block.vtx.size()); // Required so that pointers to individual PrecomputedTransactionData don't get invalidated
     for (unsigned int i = 0; i < block.vtx.size(); i++)
@@ -3387,6 +3400,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             return state.DoS(100, error("ConnectBlock() : too many sigops"), REJECT_INVALID, "bad-blk-sigops");
 
         //Temporarily disable zerocoin transactions for maintenance
+        std::cout << "ConnectBlock GetSporkValue\n";
         if (block.nTime > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE) && !IsInitialBlockDownload() && tx.ContainsZerocoins()) {
             return state.DoS(100, error("ConnectBlock() : zerocoin transactions are currently in maintenance mode"));
         }
@@ -3436,6 +3450,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         } else if (!tx.IsCoinBase())
         {
             CAmount txfee = 0;
+            std::cout << "ConnectBlock CheckTxInputs\n";
             if (!Consensus::CheckTxInputs(tx, state, view, pindex->nHeight, txfee)) {
                 return error("%s: Consensus::CheckTxInputs: %s, %s", __func__, tx.GetHash().ToString(), FormatStateMessage(state));
             }
@@ -3495,19 +3510,24 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                     tx.GetHash().ToString(), FormatStateMessage(state));
             control.Add(vChecks);
         }
+        std::cout << "ConnectBlock GetValueOut\n";
         nValueOut += tx.GetValueOut();
 
+        std::cout << "ConnectBlock undoDummy\n";
         CTxUndo undoDummy;
         if (i > 0) {
             blockundo.vtxundo.push_back(CTxUndo());
         }
+        std::cout << "ConnectBlock UpdateCoins\n";
         UpdateCoins(tx, view, i == 0 ? undoDummy : blockundo.vtxundo.back(), pindex->nHeight);
 
+        std::cout << "ConnectBlock vPos\n";
         vPos.push_back(std::make_pair(tx.GetHash(), pos));
         pos.nTxOffset += ::GetSerializeSize(tx, CLIENT_VERSION);
     }
 
     //A one-time event where money supply counts were off and recalculated on a certain block.
+    std::cout << "ConnectBlock RecalculateZWSPMinted\n";
     if (pindex->nHeight == Params().NEW_PROTOCOLS_STARTHEIGHT() + 1) {
         RecalculateZWSPMinted();
         RecalculateZWSPSpent();
@@ -3515,11 +3535,13 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
 
     //Track zWSP money supply in the block index
+    std::cout << "ConnectBlock UpdateZWSPSupply\n";
     if (!UpdateZWSPSupply(block, pindex, fJustCheck))
         return state.DoS(100, error("%s: Failed to calculate new zWSP supply for block=%s height=%d", __func__,
                                     block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID);
 
     // track money supply and mint amount info
+    std::cout << "ConnectBlock nMoneySupplyPrev\n";
     CAmount nMoneySupplyPrev = pindex->pprev ? pindex->pprev->nMoneySupply : 0;
     pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn;
     pindex->nMint = pindex->nMoneySupply - nMoneySupplyPrev + nFees;
@@ -3528,15 +3550,18 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 //              FormatMoney(nValueOut), FormatMoney(nValueIn),
 //              FormatMoney(nFees), FormatMoney(pindex->nMint), FormatMoney(nAmountZerocoinSpent));
 
+    std::cout << "ConnectBlock nTimeConnect\n";
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * (nTime3 - nTime2), MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * MICRO, nTimeConnect * MILLI / nBlocksTotal);
 
     //PoW phase redistributed fees to miner. PoS stage destroys fees.
+    std::cout << "ConnectBlock GetBlockSubsidy\n";
     CAmount nExpectedMint = GetBlockSubsidy(pindex->pprev->nHeight, chainparams.GetConsensus());
     if (block.IsProofOfWork() || chainActive.Height() < Params().NEW_PROTOCOLS_STARTHEIGHT()) {
         nExpectedMint += nFees;
     }
     //Check that the block does not overmint
+    std::cout << "ConnectBlock IsBlockValueValid\n";
     if (!IsBlockValueValid(block, nExpectedMint, pindex->nMint)) {
         return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)",
                                     FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)),
@@ -3544,6 +3569,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
+    std::cout << "ConnectBlock mapAccumulators\n";
     AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()));
     if (!ValidateAccumulatorCheckpoint(block, pindex, mapAccumulators))
         return state.DoS(100, error("%s: Failed to validate accumulator checkpoint for block=%s height=%d", __func__,
@@ -3557,6 +3583,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     if (fJustCheck)
         return true;
 
+    std::cout << "ConnectBlock WriteUndoDataForBlock\n";
     if (!WriteUndoDataForBlock(blockundo, state, pindex, chainparams))
         return false;
 
@@ -3565,6 +3592,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         setDirtyBlockIndex.insert(pindex);
     }
 
+    std::cout << "ConnectBlock GetWallets\n";
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
     CWallet* pwallet = nullptr;
@@ -3601,19 +3629,23 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         }
     }
 
+    std::cout << "ConnectBlock zerocoinDB\n";
     // Flush spend/mint info to disk
     if (!zerocoinDB->WriteCoinSpendBatch(vSpends)) return AbortNode(state, ("Failed to record coin serials to database"));
     if (!zerocoinDB->WriteCoinMintBatch(vMints)) return AbortNode(state, ("Failed to record new mints to database"));
 
     //Record accumulator checksums
+    std::cout << "ConnectBlock DatabaseChecksums\n";
     DatabaseChecksums(mapAccumulators);
 
+    std::cout << "ConnectBlock WriteTxIndex\n";
     if (fTxIndex)
         if (!pblocktree->WriteTxIndex(vPos))
             return AbortNode(state, "Failed to write transaction index");
 
 
     // add new entries
+    std::cout << "ConnectBlock add new entries\n";
     for (const auto& tx: block.vtx) {
         if (tx->IsCoinBase() || tx->IsZerocoinSpend())
             continue;
@@ -3623,6 +3655,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
 
     // delete old entries
+    std::cout << "ConnectBlock delete old entries\n";
     for (auto it = mapStakeSpent.begin(); it != mapStakeSpent.end(); ++it) {
         if (it->second < pindex->nHeight - Params().MaxReorganizationDepth()) {
             mapStakeSpent.erase(it->first);
@@ -3645,6 +3678,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     LogPrint(BCLog::BENCH, "    - Callbacks: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime6 - nTime5), nTimeCallbacks * MICRO, nTimeCallbacks * MILLI / nBlocksTotal);
 
     //Remove zerocoinspends from the pending map
+    std::cout << "ConnectBlock vSpendsInBlock\n";
     for (const uint256& txid : vSpendsInBlock) {
         auto it = mapZerocoinspends.find(txid);
         if (it != mapZerocoinspends.end())
@@ -5838,16 +5872,12 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
     indexDummy.phashBlock = &block_hash;
 
     // NOTE: CheckBlockHeader is called by CheckBlock
-    std::cout << "CreateNewBlock ContextualCheckBlockHeader.\n";
     if (!ContextualCheckBlockHeader(block, state, chainparams, pindexPrev, GetAdjustedTime()))
         return error("%s: Consensus::ContextualCheckBlockHeader: %s", __func__, FormatStateMessage(state));
-    std::cout << "CreateNewBlock CheckBlock.\n";
     if (!CheckBlock(block, state, chainparams.GetConsensus(), fCheckPOW, fCheckMerkleRoot))
         return error("%s: Consensus::CheckBlock: %s", __func__, FormatStateMessage(state));
-    std::cout << "CreateNewBlock ContextualCheckBlock.\n";
     if (!ContextualCheckBlock(block, state, chainparams.GetConsensus(), pindexPrev))
         return error("%s: Consensus::ContextualCheckBlock: %s", __func__, FormatStateMessage(state));
-    std::cout << "CreateNewBlock ConnectBlock.\n";
     if (!g_chainstate.ConnectBlock(block, state, &indexDummy, viewNew, chainparams, true))
         return false;
     assert(state.IsValid());
