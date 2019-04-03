@@ -2983,6 +2983,7 @@ bool UpdateZWSPSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck)
 {
     std::list<CZerocoinMint> listMints;
     bool fFilterInvalid = true;
+    std::cout << "ConnectBlock BlockToZerocoinMintList\n";
     BlockToZerocoinMintList(block, listMints, fFilterInvalid);
     std::list<libzerocoin::CoinDenomination> listSpends = ZerocoinSpendListFromBlock(block, fFilterInvalid);
 
@@ -2995,7 +2996,10 @@ bool UpdateZWSPSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck)
 
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 
-    CWallet* pwallet = wallets.at(0).get();
+    CWallet* pwallet = nullptr;
+    if(!wallets.empty()){
+        pwallet = wallets.at(0).get();
+    }
     // Track zerocoin money supply
     CAmount nAmountZerocoinSpent = 0;
     pindex->vMintDenominationsInBlock.clear();
