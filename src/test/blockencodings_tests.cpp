@@ -21,7 +21,6 @@ struct RegtestingSetup : public TestingSetup {
 BOOST_FIXTURE_TEST_SUITE(blockencodings_tests, RegtestingSetup)
 
 static CBlock BuildBlockTestCase() {
-    std::cout << "BuildBlockTestCase\n";
     CBlock block;
     CMutableTransaction tx;
     tx.vin.resize(1);
@@ -59,7 +58,6 @@ constexpr long SHARED_TX_OFFSET{3};
 
 BOOST_AUTO_TEST_CASE(SimpleRoundTripTest)
 {
-    std::cout << "SimpleRoundTripTest start\n";
 
     CTxMemPool pool;
     TestMemPoolEntryHelper entry;
@@ -67,10 +65,8 @@ BOOST_AUTO_TEST_CASE(SimpleRoundTripTest)
 
     LOCK2(cs_main, pool.cs);
     pool.addUnchecked(entry.FromTx(block.vtx[2]));
-    std::cout << "SimpleRoundTripTest addunchecked\n";
 
     BOOST_CHECK_EQUAL(pool.mapTx.find(block.vtx[2]->GetHash())->GetSharedTx().use_count(), SHARED_TX_OFFSET + 0);
-    std::cout << "pool m\n";
 
     // Do a simple ShortTxIDs RT
     {
