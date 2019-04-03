@@ -254,7 +254,7 @@ public:
         consensus.nTargetTimespanV2 =  1 * 60; // WISPR New: 1 day
         consensus.nTargetSpacingV1 = 64;  // WISPR Old: 1 minute
         consensus.nTargetSpacingV2 = 1 * 60;  // WISPR New: 1 minute
-        consensus.nLastPOWBlock = 450;
+        consensus.nLastPOWBlock = 1500;
         consensus.nMaturity = 10;
         consensus.nMasternodeCountDrift = 4;
         consensus.nMaxMoneyOut = 120000000 * COIN;
@@ -401,6 +401,7 @@ public:
         consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
         consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime; // July 2, 2018
         consensus.nZerocoinHeaderVersion = 8; //Block headers must be this version once zerocoin is active
+        consensus.nLastPOWBlock = 1500;
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00");
 
