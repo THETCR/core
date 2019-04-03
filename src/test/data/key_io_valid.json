@@ -77,7 +77,7 @@
     ], 
     [
         "wZKtGFrWharoYbmSCUq6mZmTGwZvdHzdbW", 
-        "96404268d633f7c7e0375839c1e8ca0e092eea1c", 
+        "a91496404268d633f7c7e0375839c1e8ca0e092eea1c87",
         {
             "isPrivkey": false,
             "chain": "main"
@@ -85,7 +85,7 @@
     ], 
     [
         "mKe1CQGA1VxQzghKZRodFGJvCyVKwXmvKP", 
-        "25f2d1a8dee112df2b48fa2d0c926aaae077b9a2", 
+        "a91496404268d633f7c7e0375839c1e8ca0e092eea1c87",
         {
             "isPrivkey": false,
             "chain": "test"
@@ -93,7 +93,7 @@
     ], 
     [
         "4JyMjRoCBjeH3rjoskrbjWmkxWSj9yxJE6", 
-        "39c89fd5a946c23daef541a493742bec23941c18", 
+        "a91439c89fd5a946c23daef541a493742bec23941c1887",
         {
             "isPrivkey": false,
             "chain": "test"
@@ -137,7 +137,7 @@
     ], 
     [
         "WhoFFB1oT3PkmJ1Bq5vPX3mvwaBq33bv5r", 
-        "d1c79fdf09233fc9108e804d3bc0f2b655f01d48", 
+        "76a914d1c79fdf09233fc9108e804d3bc0f2b655f01d4888ac",
         {
             "isPrivkey": false,
             "chain": "main"
@@ -145,7 +145,7 @@
     ], 
     [
         "wWM2G4fK32jY9s3mQEL3D2ceTdhDJxniyk", 
-        "758ef92ac455f08a5216beb6aac9614aa935e3a6", 
+        "a914758ef92ac455f08a5216beb6aac9614aa935e3a687",
         {
             "isPrivkey": false,
             "chain": "main"
@@ -409,7 +409,7 @@
     ], 
     [
         "WTh9tBea7Cf6biyQvU9QNf93u4etq9Y1nz", 
-        "370ee4524f1c58fca8d447a80b505d55037293b3", 
+        "76a914370ee4524f1c58fca8d447a80b505d55037293b388ac",
         {
             "isPrivkey": false,
             "chain": "main"
