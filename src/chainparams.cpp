@@ -396,6 +396,7 @@ public:
         consensus.nTargetSpacingV1 = 64;        // WISPR Old: 1 minutes
         consensus.nTargetSpacingV2 = 1 * 60;        // WISPR New: 1 minute
         consensus.fAllowMinDifficultyBlocks = true;
+        consensus.nNewProtocolStartHeight = 400000;
 
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00");
