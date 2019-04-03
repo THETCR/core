@@ -162,7 +162,10 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
         return true;
 
     std::cout << "Hash check\n";
-    if(hash == uint256("03205c57ebefb02d86c2c0c2de368fa48e92f7df7240f1b528ebbeae70fdbdb1"))
+    if(hash == uint256("41ddd599aa4bd28e5941b1e51cda473d78f829b84966f8d044ee92df8e2721d3"))
+        return true;
+
+    if(hash == uint256("ff317bf2fb18209612809fe42af88bec38c26769bb89df88c5f4ad391933ccc7"))
         return true;
 
     std::cout << "Set compact\n";
