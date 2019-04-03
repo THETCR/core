@@ -123,6 +123,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     assert(pindexPrev != nullptr);
     nHeight = pindexPrev->nHeight + 1;
 
+    std::cout << "CreateNewBlock ComputeBlockVersion\n";
     pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
@@ -152,10 +153,12 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     // not activated.
     // TODO: replace this with a call to main to assess validity of a mempool
     // transaction (which in most cases can be a no-op).
+    std::cout << "CreateNewBlock IsWitnessEnabled\n";
     fIncludeWitness = IsWitnessEnabled(pindexPrev, chainparams.GetConsensus());
 
     int nPackagesSelected = 0;
     int nDescendantsUpdated = 0;
+    std::cout << "CreateNewBlock addPackageTxs\n";
     addPackageTxs(nPackagesSelected, nDescendantsUpdated);
 
     int64_t nTime1 = GetTimeMicros();
@@ -163,6 +166,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     m_last_block_num_txs = nBlockTx;
     m_last_block_weight = nBlockWeight;
 
+    std::cout << "CreateNewBlock Create coinbase transaction.\n";
     // Create coinbase transaction.
     CMutableTransaction coinbaseTx;
     coinbaseTx.vin.resize(1);
@@ -178,6 +182,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     LogPrintf("CreateNewBlock(): block weight: %u txs: %u fees: %ld sigops %d\n", GetBlockWeight(*pblock), nBlockTx, nFees, nBlockSigOpsCost);
 
     // Fill in header
+    std::cout << "CreateNewBlock Fill in header.\n";
     pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
     UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev);
     pblock->nBits          = GetNextWorkRequired(pindexPrev, pblock, chainparams.GetConsensus());
