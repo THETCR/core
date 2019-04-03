@@ -3366,7 +3366,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     CAmount nFees = 0;
     int nInputs = 0;
     int64_t nSigOpsCost = 0;
-    unsigned int nSigOps = 0;
     CDiskTxPos pos(pindex->GetBlockPos(), GetSizeOfCompactSize(block.vtx.size()));
     std::vector<std::pair<uint256, CDiskTxPos> > vPos;
     std::vector<std::pair<CoinSpend, uint256> > vSpends;
@@ -3385,10 +3384,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         const CTransaction &tx = *(block.vtx[i]);
 
         nInputs += tx.vin.size();
-        nSigOps += GetLegacySigOpCount(tx);
-        if (nSigOps > nMaxBlockSigOps)
-            return state.DoS(100, error("ConnectBlock() : too many sigops"), REJECT_INVALID, "bad-blk-sigops");
-
         //Temporarily disable zerocoin transactions for maintenance
         if (block.nTime > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE) && !IsInitialBlockDownload() && tx.ContainsZerocoins()) {
             return state.DoS(100, error("ConnectBlock() : zerocoin transactions are currently in maintenance mode"));
@@ -3476,29 +3471,40 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 }
             }
 
-            // Add in sigops done by pay-to-script-hash inputs;
-            // this is to prevent a "rogue miner" from creating
-            // an incredibly-expensive-to-validate block.
-            nSigOps += GetP2SHSigOpCount(tx, view);
-            if (nSigOps > nMaxBlockSigOps)
-                return state.DoS(100, error("ConnectBlock() : too many sigops"), REJECT_INVALID, "bad-blk-sigops");
+            // Check that transaction is BIP68 final
+            // BIP68 lock checks (as opposed to nLockTime checks) must
+            // be in ConnectBlock because they require the UTXO set
+            prevheights.resize(tx.vin.size());
+            for (size_t j = 0; j < tx.vin.size(); j++) {
+                prevheights[j] = view.AccessCoin(tx.vin[j].prevout).nHeight;
+            }
 
-            if (!tx.IsCoinStake())
-                nFees += view.GetValueIn(tx) - tx.GetValueOut();
-            nValueIn += view.GetValueIn(tx);
+            if (!SequenceLocks(tx, nLockTimeFlags, &prevheights, *pindex)) {
+                return state.DoS(100, error("%s: contains a non-BIP68-final transaction", __func__),
+                                 REJECT_INVALID, "bad-txns-nonfinal");
+            }
+        }
 
+        nValueOut += tx.GetValueOut();
+        // GetTransactionSigOpCost counts 3 types of sigops:
+        // * legacy (always)
+        // * p2sh (when P2SH enabled in flags and excludes coinbase)
+        // * witness (when witness enabled in flags and excludes coinbase)
+        nSigOpsCost += GetTransactionSigOpCost(tx, view, flags);
+        if (nSigOpsCost > MAX_BLOCK_SIGOPS_COST)
+            return state.DoS(100, error("ConnectBlock(): too many sigops"),
+                             REJECT_INVALID, "bad-blk-sigops");
+
+        txdata.emplace_back(tx);
+        if (!tx.IsCoinBase())
+        {
             std::vector<CScriptCheck> vChecks;
-            PrecomputedTransactionData _txdata(tx);
-            unsigned int flags = SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_DERSIG;
-            if (fCLTVHasMajority)
-                flags |= SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY;
-
-            if (!CheckInputs(tx, state, view, fScriptChecks, flags, false, false, _txdata, nScriptCheckThreads ? &vChecks : NULL))
+            bool fCacheResults = fJustCheck; /* Don't cache results if we're actually connecting blocks (still consult the cache, though) */
+            if (!CheckInputs(tx, state, view, fScriptChecks, flags, fCacheResults, fCacheResults, txdata[i], nScriptCheckThreads ? &vChecks : nullptr))
                 return error("ConnectBlock(): CheckInputs on %s failed with %s",
                     tx.GetHash().ToString(), FormatStateMessage(state));
             control.Add(vChecks);
         }
-        nValueOut += tx.GetValueOut();
 
         CTxUndo undoDummy;
         if (i > 0) {
