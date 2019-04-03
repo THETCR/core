@@ -4252,6 +4252,7 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
         for (CBlockIndex *pindexConnect : reverse_iterate(vpindexToConnect)) {
             if (!ConnectTip(state, chainparams, pindexConnect, pindexConnect == pindexMostWork ? pblock : std::shared_ptr<const CBlock>(), connectTrace, disconnectpool)) {
                 if (state.IsInvalid()) {
+                    std::cout << "ActivateBestChainStep state invalid 1\n";
                     // The block violates a consensus rule.
                     if (!state.CorruptionPossible()) {
                         InvalidChainFound(vpindexToConnect.front());
@@ -4264,6 +4265,7 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
                     // A system error occurred (disk space, database error, ...).
                     // Make the mempool consistent with the current tip, just in case
                     // any observers try to use it before shutdown.
+                    std::cout << "ActivateBestChainStep UpdateMempoolForReorg 1\n";
                     UpdateMempoolForReorg(disconnectpool, false);
                     return false;
                 }
