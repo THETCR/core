@@ -4219,6 +4219,7 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
     // Disconnect active blocks which are no longer in the best chain.
     bool fBlocksDisconnected = false;
     DisconnectedBlockTransactions disconnectpool;
+    std::cout << "ActivateBestChainStep DisconnectTip\n";
     while (chainActive.Tip() && chainActive.Tip() != pindexFork) {
         if (!DisconnectTip(state, chainparams, &disconnectpool)) {
             // This is likely a fatal error, but keep the mempool consistent,
@@ -4247,6 +4248,7 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
         nHeight = nTargetHeight;
 
         // Connect new blocks.
+        std::cout << "ActivateBestChainStep ConnectTip\n";
         for (CBlockIndex *pindexConnect : reverse_iterate(vpindexToConnect)) {
             if (!ConnectTip(state, chainparams, pindexConnect, pindexConnect == pindexMostWork ? pblock : std::shared_ptr<const CBlock>(), connectTrace, disconnectpool)) {
                 if (state.IsInvalid()) {
@@ -4266,6 +4268,7 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
                     return false;
                 }
             } else {
+                std::cout << "ActivateBestChainStep PruneBlockIndexCandidates\n";
                 PruneBlockIndexCandidates();
                 if (!pindexOldTip || chainActive.Tip()->nChainWork > pindexOldTip->nChainWork) {
                     // We're in a better position than we were. Return temporarily to release the lock.
@@ -4277,11 +4280,13 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
     }
 
     if (fBlocksDisconnected) {
+        std::cout << "ActivateBestChainStep UpdateMempoolForReorg\n";
         // If any blocks were disconnected, disconnectpool may be non empty.  Add
         // any disconnected transactions back to the mempool.
         UpdateMempoolForReorg(disconnectpool, true);
     }
     mempool.check(pcoinsTip.get());
+    std::cout << "ActivateBestChainStep mempool.check(pcoinsTip.get())\n";
 
     // Callbacks/notifications for a new best chain.
     if (fInvalidFound)
