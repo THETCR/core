@@ -15,6 +15,7 @@
 #include <util/system.h>
 
 #include <math.h>
+#include <iostream>
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
@@ -156,19 +157,24 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
     bool fOverflow;
     uint256 bnTarget;
 
+    std::cout << "CheckProofOfWork SkipProofOfWorkCheck\n";
     if (Params().SkipProofOfWorkCheck())
         return true;
 
+    std::cout << "Hash check\n";
     if(hash == uint256("03205c57ebefb02d86c2c0c2de368fa48e92f7df7240f1b528ebbeae70fdbdb1"))
         return true;
 
+    std::cout << "Set compact\n";
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
 
     // Check range
+    std::cout << "Check range\n";
     if (fNegative || bnTarget == 0 || fOverflow || bnTarget > Params().ProofOfWorkLimit())
         return false;
 
     // Check proof of work matches claimed amount
+    std::cout << "Claimed amount\n";
     if (hash > bnTarget)
         return false;
 
