@@ -175,8 +175,8 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
 
     // Check proof of work matches claimed amount
     std::cout << "Claimed amount\n";
-    printf("hash = : %s", hash.ToString().c_str());
-    printf("bnTarget = : %s", bnTarget.ToString().c_str());
+    printf("hash = : %s\t", hash.ToString().c_str());
+    printf("bnTarget = : %s\n", bnTarget.ToString().c_str());
     if (hash > bnTarget){
         return false;
     }
