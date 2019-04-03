@@ -4780,15 +4780,15 @@ static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state,
     }
 
     // Version 4 header must be used after Params().NEW_PROTOCOLS_STARTHEIGHT(). And never before.
-    if (chainActive.Height() + 1 >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
-        if(block.nVersion < Params().Zerocoin_HeaderVersion())
-            return state.DoS(50, error("CheckBlockHeader() : block version must be above 7 after ZerocoinStartHeight"),
-                             REJECT_INVALID, "block-version");
-    } else {
-        if (block.nVersion >= Params().Zerocoin_HeaderVersion())
-            return state.DoS(50, error("CheckBlockHeader() : block version must be below 8 before ZerocoinStartHeight"),
-                             REJECT_INVALID, "block-version");
-    }
+//    if (chainActive.Height() + 1 >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+//        if(block.nVersion < Params().Zerocoin_HeaderVersion())
+//            return state.DoS(50, error("CheckBlockHeader() : block version must be above 7 after ZerocoinStartHeight"),
+//                             REJECT_INVALID, "block-version");
+//    } else {
+//        if (block.nVersion >= Params().Zerocoin_HeaderVersion())
+//            return state.DoS(50, error("CheckBlockHeader() : block version must be below 8 before ZerocoinStartHeight"),
+//                             REJECT_INVALID, "block-version");
+//    }
 
     return true;
 }
