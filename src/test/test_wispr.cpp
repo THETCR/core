@@ -137,33 +137,26 @@ CBlock
 TestChain100Setup::CreateAndProcessBlock(const std::vector<CMutableTransaction>& txns, const CScript& scriptPubKey)
 {
     const CChainParams& chainparams = Params();
-    std::cout << "CreateNewBlock\n";
     std::unique_ptr<CBlockTemplate> pblocktemplate = BlockAssembler(chainparams).CreateNewBlock(scriptPubKey);
-    std::cout << "pblocktemplate\n";
     CBlock& block = pblocktemplate->block;
 
     // Replace mempool-selected txns with just coinbase plus passed-in txns:
-    std::cout << "resize\n";
     block.vtx.resize(1);
-    std::cout << "CMutableTransaction\n";
     for (const CMutableTransaction& tx : txns)
         block.vtx.push_back(MakeTransactionRef(tx));
     // IncrementExtraNonce creates a valid coinbase and merkleRoot
     {
         LOCK(cs_main);
         unsigned int extraNonce = 0;
-        std::cout << "IncrementExtraNonce\n";
         IncrementExtraNonce(&block, chainActive.Tip(), extraNonce);
     }
 
     while (!CheckProofOfWork(block.GetPoWHash(), block.nBits, chainparams.GetConsensus())) ++block.nNonce;
 
     std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(block);
-    std::cout << "ProcessNewBlock\n";
     ProcessNewBlock(chainparams, shared_pblock, true, nullptr);
 
     CBlock result = block;
-    std::cout << "return\n";
     return result;
 }
 
