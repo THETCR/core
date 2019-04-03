@@ -1537,99 +1537,38 @@ void static ProcessGetData(CNode* pfrom, const CChainParams& chainparams, CConnm
     {
         LOCK(cs_main);
 
-        while (it != pfrom->vRecvGetData.end() && (it->type == MSG_TX || it->type == MSG_WITNESS_TX)) {
+        while (it != pfrom->vRecvGetData.end() && (it->type == MSG_TX || it->type == MSG_WITNESS_TX || it->type == MSG_PUBCOINS || it->type == MSG_TXLOCK_VOTE || it->type == MSG_TXLOCK_REQUEST
+        || it->type == MSG_SPORK  || it->type == MSG_BUDGET_PROPOSAL || it->type == MSG_BUDGET_VOTE || it->type == MSG_BUDGET_FINALIZED|| it->type == MSG_BUDGET_FINALIZED_VOTE
+        || it->type == MSG_MASTERNODE_ANNOUNCE || it->type == MSG_MASTERNODE_PING || it->type == MSG_MASTERNODE_WINNER || it->type == MSG_DSTX)) {
             if (interruptMsgProc)
                 return;
             // Don't bother if send buffer is too full to respond anyway
             if (pfrom->fPauseSend)
                 break;
 
-            const CInv& inv = *it;
+            const CInv &inv = *it;
             it++;
 
-            if (inv.type == MSG_BLOCK || inv.type == MSG_FILTERED_BLOCK) {
-                bool send = false;
-                BlockMap::iterator mi = mapBlockIndex.find(inv.hash);
-                if (mi != mapBlockIndex.end()) {
-                    if (chainActive.Contains(mi->second)) {
-                        send = true;
-                    } else {
-                        // To prevent fingerprinting attacks, only send blocks outside of the active
-                        // chain if they are valid, and no more than a max reorg depth than the best header
-                        // chain we know about.
-                        send = mi->second->IsValid(BLOCK_VALID_SCRIPTS) && (pindexBestHeader != NULL) &&
-                               (chainActive.Height() - mi->second->nHeight < Params().MaxReorganizationDepth());
-                        if (!send) {
-                            LogPrintf("ProcessGetData(): ignoring request from peer=%i for old block that isn't in the main chain\n", pfrom->GetId());
-                        }
-                    }
-                }
-                // Don't send not-validated blocks
-                if (send && (mi->second->nStatus & BLOCK_HAVE_DATA)) {
-                    // Send block from disk
-                    CBlock block;
-                    if (!ReadBlockFromDisk(block, (*mi).second, Params().GetConsensus()))
-                        assert(!"cannot load block from disk");
-                    if (inv.type == MSG_BLOCK)
-                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::BLOCK, block));
-                    else // MSG_FILTERED_BLOCK)
-                    {
-                        LOCK(pfrom->cs_filter);
-                        if (pfrom->pfilter) {
-                            CMerkleBlock merkleBlock(block, *pfrom->pfilter);
-                            connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::MERKLEBLOCK, merkleBlock));
-                            // CMerkleBlock just contains hashes, so also push any transactions in the block the client did not see
-                            // This avoids hurting performance by pointlessly requiring a round-trip
-                            // Note that there is currently no way for a node to request any single transactions we didnt send here -
-                            // they must either disconnect and retry or request the full block.
-                            // Thus, the protocol spec specified allows for us to provide duplicate txn here,
-                            // however we MUST always provide at least what the remote peer needs
-                            typedef std::pair<unsigned int, uint256> PairType;
-                            for (PairType& pair : merkleBlock.vMatchedTxn)
-                                if (!pfrom->setInventoryKnown.count(CInv(MSG_TX, pair.second)))
-                                    connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::TX, block.vtx[pair.first]));
-                        }
-                        // else
-                        // no response
-                    }
-
-                    // Trigger them to send a getblocks request for the next batch of inventory
-                    if (inv.hash == pfrom->hashContinue) {
-                        // Bypass PushInventory, this must send even if redundant,
-                        // and we want it right after the last block so they don't
-                        // wait for other stuff first.
-                        std::vector<CInv> vInv;
-                        vInv.push_back(CInv(MSG_BLOCK, chainActive.Tip()->GetBlockHash()));
-                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::INV, vInv));
-                        pfrom->hashContinue = 0;
-                    }
-                }
-            } else if (inv.IsKnownType()) {
-                // Send stream from relay memory
-                bool pushed = false;
-                {
-                    auto mi = mapRelay.find(inv.hash);
-                    if (mi != mapRelay.end()) {
-                        connman->PushMessage(pfrom, msgMaker.Make(inv.GetCommand(), (*mi).second));
-                        pushed = true;
-                    }
-                }
-
-                if (!pushed && inv.type == MSG_TX) {
-                    CTransactionRef ptx = mempool.get(inv.hash);
-                    //                    CTransaction tx;
-                    if (ptx != nullptr) {
-                        //                        tx(*ptx);
-                        CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-                        ss.reserve(1000);
-                        ss << ptx;
-                        connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::TX, ss));
-                        pushed = true;
-                    }
-                }
+             if (inv.IsKnownType()) {
+                 // Send stream from relay memory
+                 bool push = false;
+                 auto mi = mapRelay.find(inv.hash);
+                 int nSendFlags = (inv.type == MSG_TX ? SERIALIZE_TRANSACTION_NO_WITNESS : 0);
+                 if (mi != mapRelay.end()) {
+                     connman->PushMessage(pfrom, msgMaker.Make(nSendFlags, inv.GetCommand(), *mi->second));
+                     push = true;
+                 } else if (pfrom->timeLastMempoolReq && inv.type == MSG_TX ) {
+                     auto txinfo = mempool.info(inv.hash);
+                     // To protect privacy, do not answer getdata using the mempool when
+                     // that TX couldn't have been INVed in reply to a MEMPOOL request.
+                     if (txinfo.tx && txinfo.nTime <= pfrom->timeLastMempoolReq) {
+                         connman->PushMessage(pfrom, msgMaker.Make(nSendFlags, NetMsgType::TX, *txinfo.tx));
+                         push = true;
+                     }
+                 }
 
                 if (pfrom->GetLocalServices() & NODE_BLOOM_LIGHT_ZC) {
-                    if (!pushed && inv.type == MSG_PUBCOINS) {
+                    if (!push && inv.type == MSG_PUBCOINS) {
                         //std::cout << "asking for pubcoins, requested block hash: " << inv.hash.GetHex() << std::endl;
 
                         bool send = false;
@@ -1662,7 +1601,7 @@ void static ProcessGetData(CNode* pfrom, const CChainParams& chainparams, CConnm
                                     ss << pubcoin.getValue();
                                 }
                                 connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::PUBCOINS, ss));
-                                pushed = true;
+                                push = true;
                             } catch (std::exception& e) {
                                 PrintExceptionContinue(&e, "ProcessMessages()");
                             }
@@ -1670,124 +1609,128 @@ void static ProcessGetData(CNode* pfrom, const CChainParams& chainparams, CConnm
                     }
                 }
 
-                if (!pushed && inv.type == MSG_TXLOCK_VOTE) {
+                if (!push && inv.type == MSG_TXLOCK_VOTE) {
                     if (mapTxLockVote.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << mapTxLockVote[inv.hash];
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::TXLOCKVOTE, ss));
-                        pushed = true;
+                        push = true;
                     }
                 }
-                if (!pushed && inv.type == MSG_TXLOCK_REQUEST) {
+                if (!push && inv.type == MSG_TXLOCK_REQUEST) {
                     if (mapTxLockReq.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << mapTxLockReq[inv.hash];
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::TXLOCKREQUEST, ss));
-                        pushed = true;
+                        push = true;
                     }
                 }
-                if (!pushed && inv.type == MSG_SPORK) {
+                if (!push && inv.type == MSG_SPORK) {
                     if (mapSporks.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << mapSporks[inv.hash];
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::SPORK, ss));
-                        pushed = true;
+                        push = true;
                     }
                 }
-                if (!pushed && inv.type == MSG_MASTERNODE_WINNER) {
+                if (!push && inv.type == MSG_MASTERNODE_WINNER) {
                     if (masternodePayments.mapMasternodePayeeVotes.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << masternodePayments.mapMasternodePayeeVotes[inv.hash];
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::MASTERNODEPAYMENTVOTE, ss));
-                        pushed = true;
+                        push = true;
                     }
                 }
-                if (!pushed && inv.type == MSG_BUDGET_VOTE) {
+                if (!push && inv.type == MSG_BUDGET_VOTE) {
                     if (budget.mapSeenMasternodeBudgetVotes.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << budget.mapSeenMasternodeBudgetVotes[inv.hash];
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::MNBUDGETVOTE, ss));
-                        pushed = true;
+                        push = true;
                     }
                 }
 
-                if (!pushed && inv.type == MSG_BUDGET_PROPOSAL) {
+                if (!push && inv.type == MSG_BUDGET_PROPOSAL) {
                     if (budget.mapSeenMasternodeBudgetProposals.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << budget.mapSeenMasternodeBudgetProposals[inv.hash];
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::MNBUDGETPROPOSAL, ss));
-                        pushed = true;
+                        push = true;
                     }
                 }
 
-                if (!pushed && inv.type == MSG_BUDGET_FINALIZED_VOTE) {
+                if (!push && inv.type == MSG_BUDGET_FINALIZED_VOTE) {
                     if (budget.mapSeenFinalizedBudgetVotes.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << budget.mapSeenFinalizedBudgetVotes[inv.hash];
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::MNBUDGETFINALVOTE, ss));
-                        pushed = true;
+                        push = true;
                     }
                 }
 
-                if (!pushed && inv.type == MSG_BUDGET_FINALIZED) {
+                if (!push && inv.type == MSG_BUDGET_FINALIZED) {
                     if (budget.mapSeenFinalizedBudgets.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << budget.mapSeenFinalizedBudgets[inv.hash];
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::MNBUDGETFINAL, ss));
-                        pushed = true;
+                        push = true;
                     }
                 }
 
-                if (!pushed && inv.type == MSG_MASTERNODE_ANNOUNCE) {
+                if (!push && inv.type == MSG_MASTERNODE_ANNOUNCE) {
                     if (mnodeman.mapSeenMasternodeBroadcast.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << mnodeman.mapSeenMasternodeBroadcast[inv.hash];
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::MNANNOUNCE, ss));
-                        pushed = true;
+                        push = true;
                     }
                 }
 
-                if (!pushed && inv.type == MSG_MASTERNODE_PING) {
+                if (!push && inv.type == MSG_MASTERNODE_PING) {
                     if (mnodeman.mapSeenMasternodePing.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << mnodeman.mapSeenMasternodePing[inv.hash];
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::MNPING, ss));
-                        pushed = true;
+                        push = true;
                     }
                 }
 
-                if (!pushed && inv.type == MSG_DSTX) {
+                if (!push && inv.type == MSG_DSTX) {
                     if (mapObfuscationBroadcastTxes.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << mapObfuscationBroadcastTxes[inv.hash].tx << mapObfuscationBroadcastTxes[inv.hash].vin << mapObfuscationBroadcastTxes[inv.hash].vchSig << mapObfuscationBroadcastTxes[inv.hash].sigTime;
 
                         connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::DSTX, ss));
-                        pushed = true;
+                        push = true;
                     }
                 }
 
 
-                if (!pushed) {
+                if (!push) {
                     vNotFound.push_back(inv);
                 }
             }
-
             // Track requests for our stuff.
             GetMainSignals().Inventory(inv.hash);
+        }
+    } // release cs_main
 
-            if (inv.type == MSG_BLOCK || inv.type == MSG_FILTERED_BLOCK)
-                break;
+    if (it != pfrom->vRecvGetData.end() && !pfrom->fPauseSend) {
+        const CInv &inv = *it;
+        if (inv.type == MSG_BLOCK || inv.type == MSG_FILTERED_BLOCK || inv.type == MSG_CMPCT_BLOCK || inv.type == MSG_WITNESS_BLOCK) {
+            it++;
+            ProcessGetBlockData(pfrom, chainparams, inv, connman);
         }
     }
 
