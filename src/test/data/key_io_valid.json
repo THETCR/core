@@ -3,8 +3,7 @@
         "WQGGVuNKqaZnWa2LYh5aijHgNhEx3kPqHU", 
         "1171a35bbb2e9f07b4ccbab27da916d83ccb3371", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -12,8 +11,7 @@
         "wU4fiNVYMxhXjNskTLxejQCcBzUtkSGoch", 
         "5c86ea4182398f1f9689d6ed27ad3d5c53d8b885", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -21,8 +19,7 @@
         "mfJcn1NkyUjNf5NnPbKDqUVDe7GgBsG21x", 
         "fdaab7326dfc31dfb3c7f319020b420e0a59e8a6", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -30,8 +27,7 @@
         "4YF3B4g1yHGQFkZXKiqqYf72qbiccfW6yv", 
         "cb596c69e023f6f8c86616b2fff426e835805310", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -75,8 +71,7 @@
         "WPRcmjSzRyNz73jZYKXvqCqCjt2hFxdsB5", 
         "083e2dd0c13580c10cd269770d147a5d433a20b7", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -84,8 +79,7 @@
         "wZKtGFrWharoYbmSCUq6mZmTGwZvdHzdbW", 
         "96404268d633f7c7e0375839c1e8ca0e092eea1c", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -93,8 +87,7 @@
         "mKe1CQGA1VxQzghKZRodFGJvCyVKwXmvKP", 
         "25f2d1a8dee112df2b48fa2d0c926aaae077b9a2", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -102,8 +95,7 @@
         "4JyMjRoCBjeH3rjoskrbjWmkxWSj9yxJE6", 
         "39c89fd5a946c23daef541a493742bec23941c18", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -147,8 +139,7 @@
         "WhoFFB1oT3PkmJ1Bq5vPX3mvwaBq33bv5r", 
         "d1c79fdf09233fc9108e804d3bc0f2b655f01d48", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -156,8 +147,7 @@
         "wWM2G4fK32jY9s3mQEL3D2ceTdhDJxniyk", 
         "758ef92ac455f08a5216beb6aac9614aa935e3a6", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -165,8 +155,7 @@
         "mLSt3bsFwgKBk723g6Py2ECborPeoUCFy3", 
         "2ed06633eb7f0fbd1ac528983d48d346f8ca4370", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -174,8 +163,7 @@
         "4SgAMaEYpgcEMSttNHUkuexyK1VctSBgqx", 
         "8e490ff9482e4b576eaff2c6ab13dd7a08f0c86a", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -219,8 +207,7 @@
         "WRrdsyR4D9yq72yEzwQSY7MFXjbT9YRTdU", 
         "22e9c1106c87c48f61321261255b5243eab0413b", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -228,8 +215,7 @@
         "wYkz26TLgdbzTAzjsWiBjwyYNq3sGcz5xr", 
         "9007565f878e4e48194bb33c43870dcade0e8978", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -237,8 +223,7 @@
         "mWsdupaUJgoLTBytjBGz6GmeViyrKT5YwJ", 
         "a13041ec8e49274cd31918ec7226ed15ab440536", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -246,8 +231,7 @@
         "4TLvBN6EeA4dDTrXWbFoiYTnvMjBaHv7LS", 
         "959d738c3eb420d7f640b830db1718b2cfbe7113", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -291,8 +275,7 @@
         "Wey2nkgzSbmk8xp6LtNXCduoWUGtr1ALVn", 
         "b2b9026a0509ece86f8e021bf27513cc23eb8724", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -300,8 +283,7 @@
         "wTEYtMqtVEMX2CZ92VRbPQWuFKW9WMdd1N", 
         "536d3fd59bce67e790a4e1d7c1f3a79fd3f65cbf", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -309,8 +291,7 @@
         "maZL5Jonem6pxPWdQNcLuEmqXQdv2NpaEq", 
         "c99a625d043aa3b27d797a7140d27de816d800e9", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -318,8 +299,7 @@
         "4N61GCAKzaz8NQ9JcDVS7FAHPytPnd7sGt", 
         "5bf2d388724845ebb2becf0d3c482ffd72c1c3ce", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -363,8 +343,7 @@
         "WQd9iJKJrwpKqBXeNoKwJPAdBGsgHj1dyd", 
         "1564b55a923d178340624e16366f902c602eb3c6", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -372,8 +351,7 @@
         "wPzu6HyMhKf9D1dwwBjuKd2XsuXagrt5NW", 
         "2fefea5a88a3d6dd393e20aebca56a5777d9b9c9", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -381,8 +359,7 @@
         "mbE9aaH4xY1wC8Df7y3Vzi3ZVqcRedKzp4", 
         "d0f1d87aad0b037e5067ca575d990aa9f1785c97", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -390,8 +367,7 @@
         "4YRpwC3zMqnvRheACN2YKUdN46ZUcdBUne", 
         "cd63c8459fe57e3da40b2daa6c6a5b808d4589ae", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "test"
         }
     ], 
@@ -435,8 +411,7 @@
         "WTh9tBea7Cf6biyQvU9QNf93u4etq9Y1nz", 
         "370ee4524f1c58fca8d447a80b505d55037293b3", 
         {
-            "addrType": "pubkey", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ], 
@@ -444,8 +419,7 @@
         "wYJMb2jQQDT7haKB2Mcgrae95JLf8mradu", 
         "8afe1c411f83163e8402e838137c3b83a81356f3", 
         {
-            "addrType": "script", 
-            "isPrivkey": false, 
+            "isPrivkey": false,
             "chain": "main"
         }
     ]

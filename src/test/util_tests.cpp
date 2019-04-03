@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(util_HexStr)
 
     BOOST_CHECK_EQUAL(
         HexStr(ParseHex_vec.rbegin(), ParseHex_vec.rend()),
-        "04678afdb0"
+        "b0fd8a6704"
     );
 
     BOOST_CHECK_EQUAL(
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(util_HexStr)
     BOOST_CHECK_EQUAL(
         HexStr(std::reverse_iterator<const uint8_t *>(ParseHex_expected + 5),
                std::reverse_iterator<const uint8_t *>(ParseHex_expected)),
-        "04678afdb0"
+        "b0fd8a6704"
     );
 
     BOOST_CHECK_EQUAL(
