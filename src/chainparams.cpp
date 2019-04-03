@@ -397,7 +397,9 @@ public:
         consensus.nTargetSpacingV2 = 1 * 60;        // WISPR New: 1 minute
         consensus.fAllowMinDifficultyBlocks = true;
         consensus.nNewProtocolStartHeight = 400000;
-
+        consensus.nNewProtocolStartTime = 1537830552;
+        consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
+        consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime; // July 2, 2018
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00");
 
@@ -432,7 +434,7 @@ public:
         fMiningRequiresPeers = false;
         fDefaultCheckMemPool = true;
         fTestnetToBeDeprecatedFieldRPC = false;
-        consensus.fSkipProofOfWorkCheck = false;
+        consensus.fSkipProofOfWorkCheck = true;
 
         checkpointData = {
             {
@@ -490,7 +492,9 @@ public:
         fMineBlocksOnDemand = true;
         consensus.fSkipProofOfWorkCheck = false;
         consensus.nNewProtocolStartHeight = 400000;
-
+        consensus.nNewProtocolStartTime = 1537830552;
+        consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
+        consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime; // July 2, 2018
         /* enable fallback fee on unittest */
         m_fallback_fee_enabled = true;
     }
