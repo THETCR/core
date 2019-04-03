@@ -101,6 +101,14 @@ txnouttype Solver(const CScript& scriptPubKey, std::vector<std::vector<unsigned 
         return TX_SCRIPTHASH;
     }
 
+    // Zerocoin
+    if (scriptPubKey.IsZerocoinMint()){
+        if(scriptPubKey.size() > 150) return TX_NONSTANDARD;
+        std::vector<unsigned char> hashBytes(scriptPubKey.begin()+2, scriptPubKey.end());
+        vSolutionsRet.push_back(hashBytes);
+        return TX_ZEROCOINMINT;
+    }
+
     int witnessversion;
     std::vector<unsigned char> witnessprogram;
     if (scriptPubKey.IsWitnessProgram(witnessversion, witnessprogram)) {
@@ -119,13 +127,7 @@ txnouttype Solver(const CScript& scriptPubKey, std::vector<std::vector<unsigned 
         }
         return TX_NONSTANDARD;
     }
-    // Zerocoin
-    if (scriptPubKey.IsZerocoinMint()){
-        if(scriptPubKey.size() > 150) return TX_NONSTANDARD;
-        std::vector<unsigned char> hashBytes(scriptPubKey.begin()+2, scriptPubKey.end());
-        vSolutionsRet.push_back(hashBytes);
-        return TX_ZEROCOINMINT;
-    }
+
     // Provably prunable, data-carrying output
     //
     // So long as script passes the IsUnspendable() test and all but the first
