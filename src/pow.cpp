@@ -178,5 +178,6 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
     if (hash > bnTarget)
         return false;
 
+    std::cout << "CheckProofOfWork finished\n";
     return true;
 }
