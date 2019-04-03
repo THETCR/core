@@ -124,8 +124,9 @@ BOOST_FIXTURE_TEST_SUITE(script_tests, BasicTestingSetup)
     CMutableTransaction BuildCreditingTransaction(const CScript& scriptPubKey, int nValue = 0)
     {
         CMutableTransaction txCredit;
-        txCredit.nVersion = 2;
+        txCredit.nVersion = 1;
         txCredit.nLockTime = 0;
+        txCredit.nTime = 0;
         txCredit.vin.resize(1);
         txCredit.vout.resize(1);
         txCredit.vin[0].prevout.SetNull();
@@ -140,12 +141,12 @@ BOOST_FIXTURE_TEST_SUITE(script_tests, BasicTestingSetup)
     CMutableTransaction BuildSpendingTransaction(const CScript& scriptSig, const CScriptWitness& scriptWitness, const CTransaction& txCredit)
     {
         CMutableTransaction txSpend;
-        txSpend.nVersion = 2;
+        txSpend.nVersion = 1;
         txSpend.nLockTime = 0;
+        txSpend.nTime = 0;
         txSpend.vin.resize(1);
         txSpend.vout.resize(1);
-//        txSpend.vin[0].prevPubKey = txCredit.vout[0].scriptPubKey;
-//        txSpend.vin[0].scriptWitness = scriptWitness;
+        txSpend.vin[0].scriptWitness = scriptWitness;
         txSpend.vin[0].prevout.hash = txCredit.GetHash();
         txSpend.vin[0].prevout.n = 0;
         txSpend.vin[0].scriptSig = scriptSig;
