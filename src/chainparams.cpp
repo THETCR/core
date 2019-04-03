@@ -328,7 +328,7 @@ public:
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_test, pnSeed6_test + ARRAYLEN(pnSeed6_test));
 
-        consensus.fSkipProofOfWorkCheck = false;
+        consensus.fSkipProofOfWorkCheck = true;
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
         fDefaultCheckMemPool = false;
@@ -491,7 +491,7 @@ public:
         fDefaultConsistencyChecks = true;
         consensus.fAllowMinDifficultyBlocks = false;
         fMineBlocksOnDemand = true;
-        consensus.fSkipProofOfWorkCheck = false;
+        consensus.fSkipProofOfWorkCheck = true;
         consensus.nNewProtocolStartHeight = 400000;
         consensus.nNewProtocolStartTime = 1537830552;
         consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
