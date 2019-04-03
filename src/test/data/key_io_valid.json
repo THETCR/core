@@ -85,7 +85,7 @@
     ], 
     [
         "mKe1CQGA1VxQzghKZRodFGJvCyVKwXmvKP", 
-        "a91496404268d633f7c7e0375839c1e8ca0e092eea1c87",
+        "76a91425f2d1a8dee112df2b48fa2d0c926aaae077b9a288ac",
         {
             "isPrivkey": false,
             "chain": "test"
@@ -229,7 +229,7 @@
     ], 
     [
         "4TLvBN6EeA4dDTrXWbFoiYTnvMjBaHv7LS", 
-        "959d738c3eb420d7f640b830db1718b2cfbe7113", 
+        "a914959d738c3eb420d7f640b830db1718b2cfbe711387",
         {
             "isPrivkey": false,
             "chain": "test"
