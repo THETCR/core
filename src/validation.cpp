@@ -1904,20 +1904,24 @@ bool ReadBlockFromDisk(CBlock& block, const FlatFilePos& pos, const Consensus::P
     block.SetNull();
 
     // Open history file to read
+    std::cout << "filein\n";
     CAutoFile filein(OpenBlockFile(pos, true), SER_DISK, CLIENT_VERSION);
     if (filein.IsNull())
         return error("ReadBlockFromDisk: OpenBlockFile failed for %s", pos.ToString());
 
     // Read block
     try {
+        std::cout << "serialize block\n";
         filein >> block;
     }
     catch (const std::exception& e) {
+        std::cout << "Deserialize error\n";
         return error("%s: Deserialize or I/O error - %s at %s", __func__, e.what(), pos.ToString());
     }
 
     if (block.IsProofOfWork()) {
         // Check the header
+        std::cout << "Check the header\n";
         if (!CheckProofOfWork(block.GetPoWHash(), block.nBits, consensusParams))
             return error("ReadBlockFromDisk: Errors in block header at %s", pos.ToString());
     }
@@ -1930,9 +1934,10 @@ bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus
     FlatFilePos blockPos;
     {
         LOCK(cs_main);
+        std::cout << "GetBlockPos\n";
         blockPos = pindex->GetBlockPos();
     }
-
+    std::cout << "ReadBlockFromDisk 2\n";
     if (!ReadBlockFromDisk(block, blockPos, consensusParams))
         return false;
     if (block.GetHash() != pindex->GetBlockHash()){
