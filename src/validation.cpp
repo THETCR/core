@@ -1935,9 +1935,11 @@ bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus
 
     if (!ReadBlockFromDisk(block, blockPos, consensusParams))
         return false;
-    if (block.GetHash() != pindex->GetBlockHash())
+    if (block.GetHash() != pindex->GetBlockHash()){
+        std::cout << "hash doesn't match\n";
         return error("ReadBlockFromDisk(CBlock&, CBlockIndex*): GetHash() doesn't match index for %s at %s",
                 pindex->ToString(), pindex->GetBlockPos().ToString());
+    }
     return true;
 }
 
@@ -3812,7 +3814,7 @@ void static UpdateTip(const CBlockIndex *pindexNew, const CChainParams& chainPar
         CWallet* pwallet = wallets.at(0).get();
         // If turned on AutoZeromint will automatically convert WSP to zWSP
         if (pwallet && pwallet->isZeromintEnabled ()){
-            pwallet->AutoZeromint ();
+            pwallet->AutoZeromint();
         }
     }
 
@@ -4008,8 +4010,9 @@ bool CChainState::ConnectTip(CValidationState& state, const CChainParams& chainp
         std::cout << "ConnectTip new shared block\n";
         std::shared_ptr<CBlock> pblockNew = std::make_shared<CBlock>();
         std::cout << "ConnectTip ReadBlockFromDisk\n";
-        if (!ReadBlockFromDisk(*pblockNew, pindexNew, chainparams.GetConsensus()))
+        if (!ReadBlockFromDisk(*pblockNew, pindexNew, chainparams.GetConsensus())){
             return AbortNode(state, "Failed to read block");
+        }
         pthisBlock = pblockNew;
     } else {
         pthisBlock = pblock;
