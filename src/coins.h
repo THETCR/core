@@ -81,7 +81,7 @@ public:
     }
 
     bool IsSpent() const {
-        return (out.IsNull() && out.scriptPubKey.IsZerocoinMint());
+        return (out.IsNull() || out.scriptPubKey.IsZerocoinMint());
     }
 
     size_t DynamicMemoryUsage() const {
