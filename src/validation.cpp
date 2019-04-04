@@ -2304,7 +2304,7 @@ CAmount GetInvalidUTXOValue()
         bool fSpent = false;
         CCoinsViewCache cache(pcoinsTip.get());
         const Coin &coin = cache.AccessCoin(out);
-        if(!coin.IsAvailable(out.n))
+        if(coin.IsSpent())
             fSpent = true;
 
         if (!fSpent)
@@ -5678,7 +5678,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
                     // No coins on the main chain
                     return error("%s: coin stake inputs not available on main chain, received height %d vs current %d", __func__, nHeight, chainActive.Height());
                 }
-                if(coin.IsSpent() && !coin.IsAvailable(in.prevout.n)){
+                if(coin.IsSpent()){
                     // If this is not available get the height of the spent and validate it with the forked height
                     // Check if this occurred before the chain split
                     if(!(isBlockFromFork && coin.nHeight > splitHeight)){

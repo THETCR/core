@@ -413,7 +413,7 @@ bool MultisigDialog::createMultisigTransaction(std::vector<CTxIn> vUserIn, std::
 
         for(CTxIn in : vUserIn){
             const Coin& coin = view.AccessCoin(in.prevout);
-            if(!coin.IsAvailable(in.prevout.n) || coin.IsSpent()){
+            if(coin.IsSpent()){
                 continue;
             }
             CTxOut prevout = coin.out;
@@ -464,7 +464,7 @@ bool MultisigDialog::createMultisigTransaction(std::vector<CTxIn> vUserIn, std::
 
         const Coin& coin = view.AccessCoin(tx.vin[0].prevout);
 
-        if(coin.IsSpent() || !coin.IsAvailable(tx.vin[0].prevout.n)){
+        if(coin.IsSpent()){
             throw runtime_error("Coins unavailable (unconfirmed/spent)");
         }
 

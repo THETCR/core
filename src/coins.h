@@ -81,13 +81,7 @@ public:
     }
 
     bool IsSpent() const {
-        return out.IsNull();
-    }
-
-    //! check whether a particular output is still available
-    bool IsAvailable(unsigned int nPos) const
-    {
-        return (!out.IsNull() && !out.scriptPubKey.IsZerocoinMint());
+        return (out.IsNull() && out.scriptPubKey.IsZerocoinMint());
     }
 
     size_t DynamicMemoryUsage() const {

@@ -6948,7 +6948,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
     for (unsigned int i = 0; i < mergedTx.vin.size(); i++) {
         CTxIn& txin = mergedTx.vin[i];
         const Coin& coin = view.AccessCoin(txin.prevout);
-        if (!coin.IsAvailable(txin.prevout.n)) {
+        if (coin.IsSpent()) {
             TxInErrorToJSON(txin, vErrors, "Input not found or already spent");
             continue;
         }
