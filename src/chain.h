@@ -515,6 +515,12 @@ public:
     //! Efficiently find an ancestor of this block.
     CBlockIndex* GetAncestor(int height);
     const CBlockIndex* GetAncestor(int height) const;
+
+    uint256 GetProofOfWorkHash() const
+    {
+        return GetBlockHeader().GetPoWHash();
+    }
+
 };
 
 uint256 GetBlockProof(const CBlockIndex& block);

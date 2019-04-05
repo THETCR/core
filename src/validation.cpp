@@ -3616,11 +3616,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     //Record accumulator checksums
     DatabaseChecksums(mapAccumulators);
 
-    if (fTxIndex)
-        if (!pblocktree->WriteTxIndex(vPos))
-            return AbortNode(state, "Failed to write transaction index");
-
-
     // add new entries
     for (const auto& tx: block.vtx) {
         if (tx->IsCoinBase() || tx->IsZerocoinSpend())
