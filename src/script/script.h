@@ -173,19 +173,19 @@ enum opcodetype
     OP_CHECKMULTISIG = 0xae,
     OP_CHECKMULTISIGVERIFY = 0xaf,
 
-  // expansion
-  OP_NOP1 = 0xb0,
-  OP_NOP2 = 0xb1,
-  OP_CHECKLOCKTIMEVERIFY = OP_NOP2,
-  OP_NOP3 = 0xb2,
-  OP_CHECKSEQUENCEVERIFY = OP_NOP3,
-  OP_NOP4 = 0xb3,
-  OP_NOP5 = 0xb4,
-  OP_NOP6 = 0xb5,
-  OP_NOP7 = 0xb6,
-  OP_NOP8 = 0xb7,
-  OP_NOP9 = 0xb8,
-  OP_NOP10 = 0xb9,
+    // expansion
+    OP_NOP1 = 0xb0,
+    OP_CHECKLOCKTIMEVERIFY = 0xb1,
+    OP_NOP2 = OP_CHECKLOCKTIMEVERIFY,
+    OP_CHECKSEQUENCEVERIFY = 0xb2,
+    OP_NOP3 = OP_CHECKSEQUENCEVERIFY,
+    OP_NOP4 = 0xb3,
+    OP_NOP5 = 0xb4,
+    OP_NOP6 = 0xb5,
+    OP_NOP7 = 0xb6,
+    OP_NOP8 = 0xb7,
+    OP_NOP9 = 0xb8,
+    OP_NOP10 = 0xb9,
 
     // zerocoin
     OP_ZEROCOINMINT = 0xc1,
@@ -546,14 +546,15 @@ public:
      */
     unsigned int GetSigOpCount(const CScript& scriptSig) const;
 
-  bool IsPayToScriptHash() const;
-  bool IsPayToWitnessScriptHash() const;
-  bool IsWitnessProgram(int& version, std::vector<unsigned char>& program) const;
+    bool IsPayToScriptHash() const;
+    bool IsPayToWitnessScriptHash() const;
+    bool IsWitnessProgram(int& version, std::vector<unsigned char>& program) const;
   bool IsZerocoinMint() const;
   bool IsZerocoinSpend() const;
-  /** Called by IsStandardTx and P2SH/BIP62 VerifyScript (which makes it consensus-critical). */
-  bool IsPushOnly(const_iterator pc) const;
-  bool IsPushOnly() const;
+
+    /** Called by IsStandardTx and P2SH/BIP62 VerifyScript (which makes it consensus-critical). */
+    bool IsPushOnly(const_iterator pc) const;
+    bool IsPushOnly() const;
 
     /** Check if the script contains valid OP_CODES */
     bool HasValidOps() const;
