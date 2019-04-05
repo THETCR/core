@@ -39,7 +39,7 @@
 #include <primitives/transaction.h>
 #include "zpiv/zerocoin.h"
 #include <random.h>
-#include "reverse_iterator.h"
+#include <reverse_iterator.h>
 #include <script/script.h>
 #include <script/sigcache.h>
 #include <script/standard.h>
@@ -3366,11 +3366,8 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     CAmount nFees = 0;
     int nInputs = 0;
     int64_t nSigOpsCost = 0;
-    CDiskTxPos pos(pindex->GetBlockPos(), GetSizeOfCompactSize(block.vtx.size()));
-    std::vector<std::pair<uint256, CDiskTxPos> > vPos;
     std::vector<std::pair<CoinSpend, uint256> > vSpends;
     std::vector<std::pair<PublicCoin, uint256> > vMints;
-    vPos.reserve(block.vtx.size());
     blockundo.vtxundo.reserve(block.vtx.size() - 1);
     CAmount nValueOut = 0;
     CAmount nValueIn = 0;
@@ -3510,9 +3507,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             blockundo.vtxundo.push_back(CTxUndo());
         }
         UpdateCoins(tx, view, i == 0 ? undoDummy : blockundo.vtxundo.back(), pindex->nHeight);
-
-        vPos.push_back(std::make_pair(tx.GetHash(), pos));
-        pos.nTxOffset += ::GetSerializeSize(tx, CLIENT_VERSION);
     }
 
     //A one-time event where money supply counts were off and recalculated on a certain block.
