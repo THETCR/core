@@ -400,86 +400,86 @@ static void ReplaceRedeemScript(CScript& script, const CScript& redeemScript)
     script = PushAll(stack);
 }
 
-BOOST_AUTO_TEST_CASE(test_big_witness_transaction)
-{
-    CMutableTransaction mtx;
-    mtx.nVersion = 3;
-
-    CKey key;
-    key.MakeNewKey(true); // Need to use compressed keys in segwit or the signing will fail
-    CBasicKeyStore keystore;
-    BOOST_CHECK(keystore.AddKeyPubKey(key, key.GetPubKey()));
-    CKeyID hash = key.GetPubKey().GetID();
-    CScript scriptPubKey = CScript() << OP_0 << std::vector<unsigned char>(hash.begin(), hash.end());
-
-    std::vector<int> sigHashes;
-    sigHashes.push_back(SIGHASH_NONE | SIGHASH_ANYONECANPAY);
-    sigHashes.push_back(SIGHASH_SINGLE | SIGHASH_ANYONECANPAY);
-    sigHashes.push_back(SIGHASH_ALL | SIGHASH_ANYONECANPAY);
-    sigHashes.push_back(SIGHASH_NONE);
-    sigHashes.push_back(SIGHASH_SINGLE);
-    sigHashes.push_back(SIGHASH_ALL);
-
-    // create a big transaction of 4500 inputs signed by the same key
-    for(uint32_t ij = 0; ij < 4500; ij++) {
-        uint32_t i = mtx.vin.size();
-        uint256 prevId;
-        prevId.SetHex("0000000000000000000000000000000000000000000000000000000000000100");
-        COutPoint outpoint(prevId, i);
-
-        mtx.vin.resize(mtx.vin.size() + 1);
-        mtx.vin[i].prevout = outpoint;
-        mtx.vin[i].scriptSig = CScript();
-
-        mtx.vout.resize(mtx.vout.size() + 1);
-        mtx.vout[i].nValue = 1000;
-        mtx.vout[i].scriptPubKey = CScript() << OP_1;
-    }
-
-    // sign all inputs
-    for(uint32_t i = 0; i < mtx.vin.size(); i++) {
-        bool hashSigned = SignSignature(keystore, scriptPubKey, mtx, i, 1000, sigHashes.at(i % sigHashes.size()));
-        assert(hashSigned);
-    }
-
-    CDataStream ssout(SER_NETWORK, PROTOCOL_VERSION);
-    ssout << mtx;
-    CTransaction tx(deserialize, ssout);
-
-    // check all inputs concurrently, with the cache
-    PrecomputedTransactionData txdata(tx);
-    boost::thread_group threadGroup;
-    CCheckQueue<CScriptCheck> scriptcheckqueue(128);
-    CCheckQueueControl<CScriptCheck> control(&scriptcheckqueue);
-
-    for (int i=0; i<20; i++)
-        threadGroup.create_thread(std::bind(&CCheckQueue<CScriptCheck>::Thread, std::ref(scriptcheckqueue)));
-
-    std::vector<Coin> coins;
-    for(uint32_t i = 0; i < mtx.vin.size(); i++) {
-        Coin coin;
-        coin.nHeight = 1;
-        coin.fCoinBase = false;
-        coin.fCoinStake = false;
-        coin.out.nValue = 1000;
-        coin.out.scriptPubKey = scriptPubKey;
-        coins.emplace_back(std::move(coin));
-    }
-
-    for(uint32_t i = 0; i < mtx.vin.size(); i++) {
-        std::vector<CScriptCheck> vChecks;
-        CScriptCheck check(coins[tx.vin[i].prevout.n].out, tx, i, SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_WITNESS, false, &txdata);
-        vChecks.push_back(CScriptCheck());
-        check.swap(vChecks.back());
-        control.Add(vChecks);
-    }
-
-    bool controlCheck = control.Wait();
-    assert(controlCheck);
-
-    threadGroup.interrupt_all();
-    threadGroup.join_all();
-}
+//BOOST_AUTO_TEST_CASE(test_big_witness_transaction)
+//{
+//    CMutableTransaction mtx;
+//    mtx.nVersion = 3;
+//
+//    CKey key;
+//    key.MakeNewKey(true); // Need to use compressed keys in segwit or the signing will fail
+//    CBasicKeyStore keystore;
+//    BOOST_CHECK(keystore.AddKeyPubKey(key, key.GetPubKey()));
+//    CKeyID hash = key.GetPubKey().GetID();
+//    CScript scriptPubKey = CScript() << OP_0 << std::vector<unsigned char>(hash.begin(), hash.end());
+//
+//    std::vector<int> sigHashes;
+//    sigHashes.push_back(SIGHASH_NONE | SIGHASH_ANYONECANPAY);
+//    sigHashes.push_back(SIGHASH_SINGLE | SIGHASH_ANYONECANPAY);
+//    sigHashes.push_back(SIGHASH_ALL | SIGHASH_ANYONECANPAY);
+//    sigHashes.push_back(SIGHASH_NONE);
+//    sigHashes.push_back(SIGHASH_SINGLE);
+//    sigHashes.push_back(SIGHASH_ALL);
+//
+//    // create a big transaction of 4500 inputs signed by the same key
+//    for(uint32_t ij = 0; ij < 4500; ij++) {
+//        uint32_t i = mtx.vin.size();
+//        uint256 prevId;
+//        prevId.SetHex("0000000000000000000000000000000000000000000000000000000000000100");
+//        COutPoint outpoint(prevId, i);
+//
+//        mtx.vin.resize(mtx.vin.size() + 1);
+//        mtx.vin[i].prevout = outpoint;
+//        mtx.vin[i].scriptSig = CScript();
+//
+//        mtx.vout.resize(mtx.vout.size() + 1);
+//        mtx.vout[i].nValue = 1000;
+//        mtx.vout[i].scriptPubKey = CScript() << OP_1;
+//    }
+//
+//    // sign all inputs
+//    for(uint32_t i = 0; i < mtx.vin.size(); i++) {
+//        bool hashSigned = SignSignature(keystore, scriptPubKey, mtx, i, 1000, sigHashes.at(i % sigHashes.size()));
+//        assert(hashSigned);
+//    }
+//
+//    CDataStream ssout(SER_NETWORK, PROTOCOL_VERSION);
+//    ssout << mtx;
+//    CTransaction tx(deserialize, ssout);
+//
+//    // check all inputs concurrently, with the cache
+//    PrecomputedTransactionData txdata(tx);
+//    boost::thread_group threadGroup;
+//    CCheckQueue<CScriptCheck> scriptcheckqueue(128);
+//    CCheckQueueControl<CScriptCheck> control(&scriptcheckqueue);
+//
+//    for (int i=0; i<20; i++)
+//        threadGroup.create_thread(std::bind(&CCheckQueue<CScriptCheck>::Thread, std::ref(scriptcheckqueue)));
+//
+//    std::vector<Coin> coins;
+//    for(uint32_t i = 0; i < mtx.vin.size(); i++) {
+//        Coin coin;
+//        coin.nHeight = 1;
+//        coin.fCoinBase = false;
+//        coin.fCoinStake = false;
+//        coin.out.nValue = 1000;
+//        coin.out.scriptPubKey = scriptPubKey;
+//        coins.emplace_back(std::move(coin));
+//    }
+//
+//    for(uint32_t i = 0; i < mtx.vin.size(); i++) {
+//        std::vector<CScriptCheck> vChecks;
+//        CScriptCheck check(coins[tx.vin[i].prevout.n].out, tx, i, SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_WITNESS, false, &txdata);
+//        vChecks.push_back(CScriptCheck());
+//        check.swap(vChecks.back());
+//        control.Add(vChecks);
+//    }
+//
+//    bool controlCheck = control.Wait();
+//    assert(controlCheck);
+//
+//    threadGroup.interrupt_all();
+//    threadGroup.join_all();
+//}
 
 SignatureData CombineSignatures(const CMutableTransaction& input1, const CMutableTransaction& input2, const CTransactionRef tx)
 {
