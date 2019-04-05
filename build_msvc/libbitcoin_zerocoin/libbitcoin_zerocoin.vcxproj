@@ -53,7 +53,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{93B86837-B543-48A5-A89B-7C87ABB77DF2}</ProjectGuid>
+    <ProjectGuid>{93B86837-B543-48A5-A89B-7C87ABB77DF3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>libbitcoin_zerocoin</RootNamespace>
     <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>

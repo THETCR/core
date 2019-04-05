@@ -20,9 +20,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libunivalue", "libunivalue\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbitcoin_wallet", "libbitcoin_wallet\libbitcoin_wallet.vcxproj", "{93B86837-B543-48A5-A89B-7C87ABB77DF2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbitcoin_zerocoin", "libbitcoin_zerocoin\libbitcoin_zerocoin.vcxproj", "{93B86837-B543-48A5-A89B-7C87ABB77DF3}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbitcoin_zmq", "libbitcoin_zmq\libbitcoin_zmq.vcxproj", "{792D487F-F14C-49FC-A9DE-3FC150F31C3F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_bitcoin", "test_bitcoin\test_bitcoin.vcxproj", "{A56B73DB-D46D-4882-8374-1FE3FFA08F07}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_wispr", "test_wispr\test_wispr.vcxproj", "{A56B73DB-D46D-4882-8374-1FE3FFA08F07}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbitcoin_cli", "libbitcoin_cli\libbitcoin_cli.vcxproj", "{0667528C-D734-4009-ADF9-C0D6C4A5A5A6}"
 EndProject
@@ -120,6 +122,14 @@ Global
         {93B86837-B543-48A5-A89B-7C87ABB77DF2}.Release|x64.Build.0 = Release|x64
         {93B86837-B543-48A5-A89B-7C87ABB77DF2}.Release|x86.ActiveCfg = Release|Win32
         {93B86837-B543-48A5-A89B-7C87ABB77DF2}.Release|x86.Build.0 = Release|Win32
+        {93B86837-B543-48A5-A89B-7C87ABB77DF3}.Debug|x64.ActiveCfg = Debug|x64
+        {93B86837-B543-48A5-A89B-7C87ABB77DF3}.Debug|x64.Build.0 = Debug|x64
+        {93B86837-B543-48A5-A89B-7C87ABB77DF3}.Debug|x86.ActiveCfg = Debug|Win32
+        {93B86837-B543-48A5-A89B-7C87ABB77DF3}.Debug|x86.Build.0 = Debug|Win32
+        {93B86837-B543-48A5-A89B-7C87ABB77DF3}.Release|x64.ActiveCfg = Release|x64
+        {93B86837-B543-48A5-A89B-7C87ABB77DF3}.Release|x64.Build.0 = Release|x64
+        {93B86837-B543-48A5-A89B-7C87ABB77DF3}.Release|x86.ActiveCfg = Release|Win32
+        {93B86837-B543-48A5-A89B-7C87ABB77DF3}.Release|x86.Build.0 = Release|Win32
         {792D487F-F14C-49FC-A9DE-3FC150F31C3F}.Debug|x64.ActiveCfg = Debug|x64
         {792D487F-F14C-49FC-A9DE-3FC150F31C3F}.Debug|x64.Build.0 = Debug|x64
         {792D487F-F14C-49FC-A9DE-3FC150F31C3F}.Debug|x86.ActiveCfg = Debug|Win32
