@@ -403,7 +403,7 @@ static void ReplaceRedeemScript(CScript& script, const CScript& redeemScript)
 BOOST_AUTO_TEST_CASE(test_big_witness_transaction)
 {
     CMutableTransaction mtx;
-    mtx.nVersion = 1;
+    mtx.nVersion = 2;
 
     CKey key;
     key.MakeNewKey(true); // Need to use compressed keys in segwit or the signing will fail
