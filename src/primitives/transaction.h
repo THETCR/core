@@ -19,11 +19,11 @@
 
 class CTransaction;
 static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x04;
-static const uint8_t WISPR_TXN_VERSION = 0x03;
+static const int32_t WISPR_TXN_VERSION = 3;
 
-inline bool IsWisprTxVersion(int nVersion)
+inline bool IsWisprTxVersion(int32_t nVersion)
 {
-    return (nVersion & 0x0) >= WISPR_TXN_VERSION;
+    return nVersion >= WISPR_TXN_VERSION;
 //    return (nVersion & 0xFF) >= WISPR_TXN_VERSION;
 }
 
