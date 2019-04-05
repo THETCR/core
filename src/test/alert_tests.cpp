@@ -6,14 +6,14 @@
 // Unit tests for alert system
 //
 
-#include "alert.h"
-#include "clientversion.h"
-#include "data/alertTests.raw.h"
+#include <alert.h>
+#include <clientversion.h>
+#include <test/data/alertTests.raw.h>
 
-#include "serialize.h"
-#include "streams.h"
+#include <serialize.h>
+#include <streams.h>
 #include <util/system.h>
-#include "util/strencodings.h"
+#include <util/strencodings.h>
 #include <fs.h>
 
 #include <fstream>
