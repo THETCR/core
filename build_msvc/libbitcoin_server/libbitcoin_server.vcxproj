@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Label="configInitTarget" Project="..\common.init.vcxproj" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{460FEE33-1FE1-483F-B3BF-931FF8E969A5}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>libbitcoin_server</RootNamespace>
+    <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
+    <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;HAVE_CONFIG_H;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;HAVE_CONFIG_H;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;HAVE_CONFIG_H;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;HAVE_CONFIG_H;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\addrdb.cpp">
+      <ObjectFileName>$(IntDir)addrdb.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\addrman.cpp">
+      <ObjectFileName>$(IntDir)addrman.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\alert.cpp">
+      <ObjectFileName>$(IntDir)alert.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\banman.cpp">
+      <ObjectFileName>$(IntDir)banman.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\bloom.cpp">
+      <ObjectFileName>$(IntDir)bloom.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\blockencodings.cpp">
+      <ObjectFileName>$(IntDir)blockencodings.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\blockfilter.cpp">
+      <ObjectFileName>$(IntDir)blockfilter.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\blocksignature.cpp">
+      <ObjectFileName>$(IntDir)blocksignature.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chain.cpp">
+      <ObjectFileName>$(IntDir)chain.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\checkpoints.cpp">
+      <ObjectFileName>$(IntDir)checkpoints.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\consensus\tx_verify.cpp">
+      <ObjectFileName>$(IntDir)consensus_tx_verify.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\flatfile.cpp">
+      <ObjectFileName>$(IntDir)flatfile.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\genwit.cpp">
+      <ObjectFileName>$(IntDir)genwit.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\httprpc.cpp">
+      <ObjectFileName>$(IntDir)httprpc.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\httpserver.cpp">
+      <ObjectFileName>$(IntDir)httpserver.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\index\base.cpp">
+      <ObjectFileName>$(IntDir)index_base.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\index\txindex.cpp">
+      <ObjectFileName>$(IntDir)index_txindex.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\interfaces\chain.cpp">
+      <ObjectFileName>$(IntDir)interfaces_chain.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\interfaces\handler.cpp">
+      <ObjectFileName>$(IntDir)interfaces_handler.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\interfaces\node.cpp">
+      <ObjectFileName>$(IntDir)interfaces_node.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\init.cpp">
+      <ObjectFileName>$(IntDir)init.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\dbwrapper.cpp">
+      <ObjectFileName>$(IntDir)dbwrapper.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lightzwspthread.cpp">
+      <ObjectFileName>$(IntDir)lightzwspthread.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\merkleblock.cpp">
+      <ObjectFileName>$(IntDir)merkleblock.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\miner.cpp">
+      <ObjectFileName>$(IntDir)miner.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\net.cpp">
+      <ObjectFileName>$(IntDir)net.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\net_processing.cpp">
+      <ObjectFileName>$(IntDir)net_processing.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\node\coin.cpp">
+      <ObjectFileName>$(IntDir)node_coin.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\node\transaction.cpp">
+      <ObjectFileName>$(IntDir)node_transaction.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\noui.cpp">
+      <ObjectFileName>$(IntDir)noui.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\outputtype.cpp">
+      <ObjectFileName>$(IntDir)outputtype.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\policy\fees.cpp">
+      <ObjectFileName>$(IntDir)policy_fees.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\policy\policy.cpp">
+      <ObjectFileName>$(IntDir)policy_policy.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\policy\rbf.cpp">
+      <ObjectFileName>$(IntDir)policy_rbf.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pow.cpp">
+      <ObjectFileName>$(IntDir)pow.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rest.cpp">
+      <ObjectFileName>$(IntDir)rest.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rpc\blockchain.cpp">
+      <ObjectFileName>$(IntDir)rpc_blockchain.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rpc\masternode.cpp">
+      <ObjectFileName>$(IntDir)rpc_masternode.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rpc\budget.cpp">
+      <ObjectFileName>$(IntDir)rpc_budget.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rpc\mining.cpp">
+      <ObjectFileName>$(IntDir)rpc_mining.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rpc\misc.cpp">
+      <ObjectFileName>$(IntDir)rpc_misc.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rpc\net.cpp">
+      <ObjectFileName>$(IntDir)rpc_net.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rpc\rawtransaction.cpp">
+      <ObjectFileName>$(IntDir)rpc_rawtransaction.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rpc\server.cpp">
+      <ObjectFileName>$(IntDir)rpc_server.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rpc\util.cpp">
+      <ObjectFileName>$(IntDir)rpc_util.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\script\sigcache.cpp">
+      <ObjectFileName>$(IntDir)script_sigcache.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sporkdb.cpp">
+      <ObjectFileName>$(IntDir)sporkdb.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\shutdown.cpp">
+      <ObjectFileName>$(IntDir)shutdown.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\timedata.cpp">
+      <ObjectFileName>$(IntDir)timedata.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\torcontrol.cpp">
+      <ObjectFileName>$(IntDir)torcontrol.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\txdb.cpp">
+      <ObjectFileName>$(IntDir)txdb.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\txmempool.cpp">
+      <ObjectFileName>$(IntDir)txmempool.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui_interface.cpp">
+      <ObjectFileName>$(IntDir)ui_interface.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\validation.cpp">
+      <ObjectFileName>$(IntDir)validation.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\validationinterface.cpp">
+      <ObjectFileName>$(IntDir)validationinterface.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\versionbits.cpp">
+      <ObjectFileName>$(IntDir)versionbits.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zwspchain.cpp">
+      <ObjectFileName>$(IntDir)zwspchain.obj</ObjectFileName>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\srcpcegister.h" />
+  </ItemGroup>
+  <Import Label="configTarget" Project="..\common.vcxproj" />
+</Project>

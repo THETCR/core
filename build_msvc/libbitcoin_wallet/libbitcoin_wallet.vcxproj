@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Label="configInitTarget" Project="..\common.init.vcxproj" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\interfaces\handler.cpp">
+      <ObjectFileName>$(IntDir)interfaces_handler.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\interfaces\wallet.cpp">
+      <ObjectFileName>$(IntDir)interfaces_wallet.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\activemasternode.cpp">
+      <ObjectFileName>$(IntDir)activemasternode.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\bip38.cpp">
+      <ObjectFileName>$(IntDir)bip38.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\outputtype.cpp">
+      <ObjectFileName>$(IntDir)outputtype.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\denomination_functions.cpp">
+      <ObjectFileName>$(IntDir)denomination_functions.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\obfuscation.cpp">
+      <ObjectFileName>$(IntDir)obfuscation.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\obfuscation-relay.cpp">
+      <ObjectFileName>$(IntDir)obfuscation-relay.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\swifttx.cpp">
+      <ObjectFileName>$(IntDir)swifttx.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\masternode.cpp">
+      <ObjectFileName>$(IntDir)masternode.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\masternode-budget.cpp">
+      <ObjectFileName>$(IntDir)masternode-budget.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\masternode-payments.cpp">
+      <ObjectFileName>$(IntDir)masternode-payments.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\masternode-sync.cpp">
+      <ObjectFileName>$(IntDir)masternode-sync.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\masternodeconfig.cpp">
+      <ObjectFileName>$(IntDir)masternodeconfig.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\masternodeman.cpp">
+      <ObjectFileName>$(IntDir)masternodeman.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\kernel.cpp">
+      <ObjectFileName>$(IntDir)kernel.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\coincontrol.cpp">
+      <ObjectFileName>$(IntDir)wallet_coincontrol.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\crypter.cpp">
+      <ObjectFileName>$(IntDir)wallet_crypter.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\db.cpp">
+      <ObjectFileName>$(IntDir)wallet_db.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\feebumper.cpp">
+      <ObjectFileName>$(IntDir)wallet_feebumper.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\fees.cpp">
+      <ObjectFileName>$(IntDir)wallet_fees.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\init.cpp">
+      <ObjectFileName>$(IntDir)wallet_init.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\psbtwallet.cpp">
+      <ObjectFileName>$(IntDir)wallet_psbtwallet.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\rpcdump.cpp">
+      <ObjectFileName>$(IntDir)wallet_rpcdump.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\rpcwallet.cpp">
+      <ObjectFileName>$(IntDir)wallet_rpcwallet.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\wallet.cpp">
+      <ObjectFileName>$(IntDir)wallet_wallet.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\walletdb.cpp">
+      <ObjectFileName>$(IntDir)wallet_walletdb.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\walletutil.cpp">
+      <ObjectFileName>$(IntDir)wallet_walletutil.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wallet\coinselection.cpp">
+      <ObjectFileName>$(IntDir)wallet_coinselection.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\stakeinput.cpp">
+      <ObjectFileName>$(IntDir)stakeinput.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\genwit.cpp">
+      <ObjectFileName>$(IntDir)genwit.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lightzwspthread.cpp">
+      <ObjectFileName>$(IntDir)lightzwspthread.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zpiv\deterministicmint.cpp">
+      <ObjectFileName>$(IntDir)zpiv_deterministicmint.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zpiv\mintpool.cpp">
+      <ObjectFileName>$(IntDir)zpiv_mintpool.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zpiv\witness.cpp">
+      <ObjectFileName>$(IntDir)zpiv_witness.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zpiv\zerocoin.cpp">
+      <ObjectFileName>$(IntDir)zpiv_zerocoin.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zpiv\zwsptracker.cpp">
+      <ObjectFileName>$(IntDir)zpiv_zwsptracker.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zpiv\zwspwallet.cpp">
+      <ObjectFileName>$(IntDir)zpiv_zwspwallet.obj</ObjectFileName>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{93B86837-B543-48A5-A89B-7C87ABB77DF2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>libbitcoin_wallet</RootNamespace>
+    <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
+    <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;_SCL_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;_SCL_SECURE_NO_WARNINGS;WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;_SCL_SECURE_NO_WARNINGS;WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Label="configTarget" Project="..\common.vcxproj" />
+</Project>
