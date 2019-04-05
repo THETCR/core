@@ -1266,7 +1266,6 @@ uint256 SignatureHash(const CScript& scriptCode, const T& txTo, unsigned int nIn
         // Version
         ss << txTo.nVersion;
         if(txTo.nVersion < 2){
-            std::cout << "Stream: nTime\n";
             ss << txTo.nTime;
         }
         // Input prevouts/nSequence (none/all, depending on flags)
