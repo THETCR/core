@@ -5763,8 +5763,10 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
     if (nMints || nSpends)
         LogPrintf("%s : block contains %d zWSP mints and %d zWSP spends\n", __func__, nMints, nSpends);
 
-    if (!CheckBlockSignature(*pblock))
+    if (!CheckBlockSignature(*pblock)){
+        std::cout << "CheckBlockSignature failed\n";
         return error("ProcessNewBlock() : bad proof-of-stake block signature");
+    }
 
     {
         CBlockIndex *pindex = nullptr;
