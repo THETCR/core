@@ -4976,8 +4976,10 @@ bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
     uint256 hashTarget;
     hashTarget.SetCompact(block.nBits);
 
-    if (pindexPrev == NULL)
+    if (pindexPrev == nullptr){
+        std::cout << "null pindexPrev\n";
         return error("%s : null pindexPrev for block %s", __func__, block.GetHash().ToString().c_str());
+    }
 
     unsigned int nBitsRequired;
     if(block.nVersion > 7){
@@ -4989,12 +4991,14 @@ bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
     LogPrintf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
     if (block.IsProofOfWork()) {
         if (hashProof > hashTarget){
+            std::cout << "icorrect proof of work\n";
             return error("%s : incorrect proof of work - at %d", __func__, pindexPrev->nHeight + 1);
         }
         return true;
     }
 
     if (block.nBits != nBitsRequired){
+        std::cout << "Bits don't match\n";
         LogPrintf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
         return error("%s : incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
     }
