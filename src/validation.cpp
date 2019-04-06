@@ -4987,8 +4987,10 @@ bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
     }else{
         nBitsRequired  = GetNextTargetRequired(pindexPrev, block.IsProofOfStake());
     }
+    printf("Block hashProof=%s, hashTarget=%s\n", hashProof.ToString().c_str(), hashTarget.ToString().c_str());
     LogPrintf("Block hashProof=%s, hashTarget=%s\n", hashProof.ToString(), hashTarget.ToString());
     LogPrintf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
+    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
     if (block.IsProofOfWork()) {
         if (hashProof > hashTarget){
             std::cout << "incorrect proof of work\n";
