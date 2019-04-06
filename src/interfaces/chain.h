@@ -258,6 +258,11 @@ public:
         virtual void BlockDisconnected(const CBlock& block) {}
         virtual void ChainStateFlushed(const CBlockLocator& locator) {}
         virtual void ResendWalletTransactions(Lock& locked_chain, int64_t best_block_time) {}
+
+        //!WISPR
+        virtual bool UpdatedTransaction(const uint256 &hash){ return false; }
+        virtual void SetBestChain(const CBlockLocator &chain){}
+        virtual void Inventory(const uint256 &hash){}
     };
 
     //! Register handler for notifications.

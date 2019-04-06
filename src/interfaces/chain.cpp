@@ -213,6 +213,16 @@ public:
         auto locked_chain = m_chain.assumeLocked();
         m_notifications->ResendWalletTransactions(*locked_chain, best_block_time);
     }
+    bool UpdatedTransaction(const uint256 &hash) override
+    {
+        m_notifications->UpdatedTransaction(hash);
+    }
+    void SetBestChain(const CBlockLocator &chain) override {
+        m_notifications->SetBestChain(hash);
+    }
+    void Inventory(const uint256 &hash) override {
+        m_notifications->Inventory(hash);
+    }
     Chain& m_chain;
     Chain::Notifications* m_notifications;
 };
