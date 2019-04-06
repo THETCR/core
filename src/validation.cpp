@@ -296,7 +296,6 @@ set<pair<COutPoint, unsigned int> > setStakeSeen;
 // of the incoming block.
 map<COutPoint, int> mapStakeSpent;
 map<unsigned int, unsigned int> mapHashedBlocks;
-bool fTxIndex = true;
 bool fAlerts = DEFAULT_ALERTS;
 bool fClearSpendCache = false;
 bool fVerifyingBlocks = false;

@@ -14,7 +14,7 @@
 
 //!WISPR
 #include <swifttx.h>
-#include <net_processing.h>
+#include <netmessagemaker.h>
 
 std::string TransactionErrorString(const TransactionError err)
 {
@@ -58,10 +58,18 @@ TransactionError BroadcastTransaction(const CTransactionRef tx, uint256& hashTx,
     bool fHaveMempool = mempool.exists(hashTx);
     if (!fHaveMempool && !fHaveChain) {
         // push to local node and sync with wallets
-        if (fSwiftX) {
+        if (fSwiftX && g_connman) {
             mapTxLockReq.insert(std::make_pair(tx->GetHash(), *tx));
             CreateNewLock(*tx);
-            RelayTransactionLockReq(*tx, g_connman.get(), true);
+//            RelayTransactionLockReq(*tx, g_connman.get(), true);
+            CInv inv(MSG_TXLOCK_REQUEST, tx->GetHash());
+            bool relayToAll = true;
+            g_connman->ForEachNode([&inv, relayToAll, tx](CNode* pnode) {
+                if (!(!relayToAll && !pnode->fRelayTxes)){
+                    g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::TXLOCKREQUEST, tx));
+                }
+                pnode->PushInventory(inv);
+            });
         }
         // push to local node and sync with wallets
         CValidationState state;

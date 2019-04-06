@@ -192,7 +192,6 @@ extern CAmount maxTxFee;
 static const bool DEFAULT_ALERTS = true;
 static const bool DEFAULT_PEERBLOOMFILTERS_ZC = false;
 
-extern bool fTxIndex;
 extern bool fAlerts;
 extern bool fVerifyingBlocks;
 extern bool fClearSpendCache;
