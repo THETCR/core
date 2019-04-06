@@ -5409,7 +5409,6 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 
     pindex->hashProofOfStake = mapProofOfStake[hash];
     if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
-        std::cout << "bnStakeModifierV2\n";
         pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
 
@@ -5752,7 +5751,6 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
         return error("%s: ActivateBestChain failed (%s)", __func__, FormatStateMessage(state));
 
     if (!fLiteMode) {
-        std::cout << "fLiteMode is false\n";
         if (masternodeSync.RequestedMasternodeAssets > MASTERNODE_SYNC_LIST) {
             obfuScationPool.NewBlock(g_connman.get());
             masternodePayments.ProcessBlock(chainActive.Height() + 10);
