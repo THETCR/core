@@ -443,7 +443,6 @@ public:
 
         genesis = CreateGenesisBlock(1411111111, 2, 0x207fffff, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        printf("Reg net genesis\n genesis = %s\n", genesis.ToString().c_str());
         assert(consensus.hashGenesisBlock == uint256("dac15ca6bf3e831421cfc24078aec4de02c19e8dcc1b3a83b0e516d041faaf1d"));
         assert(genesis.hashMerkleRoot == uint256S("2c9c60a275b2090856fbc87f484ee23c5aa7e462eff49cded1aff054e2204715"));
 
