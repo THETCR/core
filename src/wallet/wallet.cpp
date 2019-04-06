@@ -7066,19 +7066,19 @@ set<CTxDestination> CWallet::GetAccountAddresses(string strAccount) const
     return result;
 }
 
-//bool CWallet::UpdatedTransaction(const uint256& hashTx)
-//{
-//    {
-//        LOCK(cs_wallet);
-//        // Only notify UI if this transaction is in this wallet
-//        map<uint256, CWalletTx>::const_iterator mi = mapWallet.find(hashTx);
-//        if (mi != mapWallet.end()) {
-//            NotifyTransactionChanged(this, hashTx, CT_UPDATED);
-//            return true;
-//        }
-//    }
-//    return false;
-//}
+bool CWallet::UpdatedTransaction(const uint256& hashTx)
+{
+    {
+        LOCK(cs_wallet);
+        // Only notify UI if this transaction is in this wallet
+        map<uint256, CWalletTx>::const_iterator mi = mapWallet.find(hashTx);
+        if (mi != mapWallet.end()) {
+            NotifyTransactionChanged(this, hashTx, CT_UPDATED);
+            return true;
+        }
+    }
+    return false;
+}
 
 /** @} */ // end of Actions
 

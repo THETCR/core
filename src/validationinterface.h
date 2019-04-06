@@ -146,16 +146,16 @@ protected:
     /**
      * Notifies listeners that a block which builds directly on our current tip
      * has been received and connected to the headers tree, though not validated yet */
-    virtual void NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& block) {}
+    virtual void NewPoWValidBlock(const CBlockIndex *pindex, const std::shared_ptr<const CBlock>& block) {};
+    friend void ::RegisterValidationInterface(CValidationInterface*);
+    friend void ::UnregisterValidationInterface(CValidationInterface*);
+    friend void ::UnregisterAllValidationInterfaces();
     virtual void NotifyTransactionLock(const CTransaction &tx){}
     virtual bool UpdatedTransaction(const uint256 &hash){ return false; }
     virtual void SetBestChain(const CBlockLocator &chain){}
     virtual void Inventory(const uint256 &hash){}
     virtual void BlockFound(const uint256 &hash){}
     virtual void ResetRequestCount(const uint256 &hash) {};
-    friend void ::RegisterValidationInterface(CValidationInterface*);
-    friend void ::UnregisterValidationInterface(CValidationInterface*);
-    friend void ::UnregisterAllValidationInterfaces();
 };
 
 struct MainSignalsInstance;
@@ -205,6 +205,8 @@ public:
   void Inventory(const uint256 &) ;
   /** Notifies listeners that a block has been successfully mined */
   void BlockFound(const uint256 &);
+  /** Notifies listeners that a block has been successfully mined */
+  void ResetRequestCount(const uint256 &);
 };
 
 CMainSignals& GetMainSignals();
