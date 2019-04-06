@@ -4724,18 +4724,18 @@ static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state,
         return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
     }
 
-    if (Params().NetworkID() != CBaseChainParams::REGTEST) {
+//    if (Params().NetworkID() != CBaseChainParams::REGTEST) {
 //         Version 8 header must be used after Params().NEW_PROTOCOLS_STARTHEIGHT(). And never before.
-            if (chainActive.Height() + 1 >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
-                if(block.nVersion < Params().Zerocoin_HeaderVersion())
-                    return state.DoS(50, error("CheckBlockHeader() : block version must be above 7 after ZerocoinStartHeight"),
-                                     REJECT_INVALID, "block-version");
-            } else {
-                if (block.nVersion >= Params().Zerocoin_HeaderVersion())
-                    return state.DoS(50, error("CheckBlockHeader() : block version must be below 8 before ZerocoinStartHeight"),
-                                     REJECT_INVALID, "block-version");
-            }
-    }
+//            if (chainActive.Height() + 1 >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+//                if(block.nVersion < Params().Zerocoin_HeaderVersion())
+//                    return state.DoS(50, error("CheckBlockHeader() : block version must be above 7 after ZerocoinStartHeight"),
+//                                     REJECT_INVALID, "block-version");
+//            } else {
+//                if (block.nVersion >= Params().Zerocoin_HeaderVersion())
+//                    return state.DoS(50, error("CheckBlockHeader() : block version must be below 8 before ZerocoinStartHeight"),
+//                                     REJECT_INVALID, "block-version");
+//            }
+//    }
     return true;
 }
 
