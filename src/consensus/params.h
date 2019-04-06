@@ -68,46 +68,50 @@ struct Params {
     uint32_t nRuleChangeActivationThreshold;
     uint32_t nMinerConfirmationWindow;
     BIP9Deployment vDeployments[MAX_VERSION_BITS_DEPLOYMENTS];
+    /** Proof of work parameters */
+    uint256 powLimit;
+    bool fPowAllowMinDifficultyBlocks;
+    bool fPowNoRetargeting;
+    int64_t nPowTargetSpacing;
+    int64_t nPowTargetTimespan;
+    int64_t DifficultyAdjustmentInterval() const { return nTargetTimespanV2 / nTargetSpacingV2; }
+    uint256 nMinimumChainWork;
+    uint256 defaultAssumeValid;
     /** Used to check majorities for block version upgrade */
     int nEnforceBlockUpgradeMajority;
     int nRejectBlockOutdatedMajority;
     int nToCheckBlockUpgradeMajority;
-    /** Proof of work parameters */
-    uint256 powLimit;
     bool fAllowMinDifficultyBlocks;
 
-  int nMaxReorganizationDepth;
-  int64_t nTargetTimespanV1;
-  int64_t nTargetTimespanV2;
-  int64_t nTargetSpacingV1;
-  int64_t nTargetSpacingV2;
-  int nLastPOWBlock;
-  int nMasternodeCountDrift;
-  int nMaturity;
-  CAmount nMaxMoneyOut;
-  bool fSkipProofOfWorkCheck;
-  int nPoolMaxTransactions;
-  std::string strSporkKey;
-  std::string strObfuscationPoolDummyAddress;
-  int64_t nStartMasternodePayments;
-  std::string zerocoinModulus;
-  int nMaxZerocoinSpendsPerTransaction;
-  CAmount nMinZerocoinMintFee;
-  int nMintRequiredConfirmations;
-  int nRequiredAccumulation;
-  int nDefaultSecurityLevel;
-  int nZerocoinHeaderVersion;
-  int64_t nBudget_Fee_Confirmations;
-  int nZerocoinStartHeight;
-  int nNewProtocolStartHeight;
+    int nMaxReorganizationDepth;
+    int64_t nTargetTimespanV1;
+    int64_t nTargetTimespanV2;
+    int64_t nTargetSpacingV1;
+    int64_t nTargetSpacingV2;
+    int nLastPOWBlock;
+    int nMasternodeCountDrift;
+    int nMaturity;
+    CAmount nMaxMoneyOut;
+    bool fSkipProofOfWorkCheck;
+    int nPoolMaxTransactions;
+    std::string strSporkKey;
+    std::string strObfuscationPoolDummyAddress;
+    int64_t nStartMasternodePayments;
+    std::string zerocoinModulus;
+    int nMaxZerocoinSpendsPerTransaction;
+    CAmount nMinZerocoinMintFee;
+    int nMintRequiredConfirmations;
+    int nRequiredAccumulation;
+    int nDefaultSecurityLevel;
+    int nZerocoinHeaderVersion;
+    int64_t nBudget_Fee_Confirmations;
+    int nZerocoinStartHeight;
+    int nNewProtocolStartHeight;
 
-  int nZerocoinStartTime;
-  int nNewProtocolStartTime;
-  int nZerocoinRequiredStakeDepth;
-  uint256 stakeLimit;
-  int64_t DifficultyAdjustmentInterval() const { return nTargetTimespanV2 / nTargetSpacingV2; }
-  uint256 nMinimumChainWork;
-  uint256 defaultAssumeValid;
+    int nZerocoinStartTime;
+    int nNewProtocolStartTime;
+    int nZerocoinRequiredStakeDepth;
+    uint256 stakeLimit;
 };
 } // namespace Consensus
 

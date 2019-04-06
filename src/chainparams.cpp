@@ -85,32 +85,16 @@ public:
     CMainParams() {
         strNetworkID = "main";
         consensus.nSubsidyHalvingInterval = 0;
-        consensus.nEnforceBlockUpgradeMajority = 750;
-        consensus.nRejectBlockOutdatedMajority = 950;
-        consensus.nToCheckBlockUpgradeMajority = 1000;
-        consensus.nMaxReorganizationDepth = 500;
-        consensus.powLimit = ~uint256(0) >> 16; // WISPR starting difficulty is 1 / 2^12
-        consensus.stakeLimit = ~uint256(0) >> 48;
-        consensus.nTargetTimespanV1 =  16 * 60; // WISPR Old: 1 day
-        consensus.nTargetTimespanV2 =  1 * 60; // WISPR New: 1 day
-        consensus.nTargetSpacingV1 = 64;  // WISPR Old: 1 minute
-        consensus.nTargetSpacingV2 = 1 * 60;  // WISPR New: 1 minute
-        consensus.nMaturity = 100;
-        consensus.nMasternodeCountDrift = 20;
-        consensus.nMaxMoneyOut = 120000000 * COIN;
-        consensus.fAllowMinDifficultyBlocks = false;
-        /** Height or Time Based Activations **/
-        consensus.nLastPOWBlock = 450;
-        consensus.nNewProtocolStartHeight = 400000;
-        consensus.nNewProtocolStartTime = 1539963322; //Friday, October 19, 2018 3:35:22 PM
-        consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
-        consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime;
-
         consensus.BIP16Exception = uint256S("0x00000000000002dc756eebf4f49723ed8d30cc28a5f108eb94b1ba88ac4f9c22");
         consensus.BIP34Height = 650000;
         consensus.BIP34Hash = uint256S("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8");
         consensus.BIP65Height = 650000; // 000000000000000004c2b624ed5d7756c508d90fd0da2c7c679febfa6c4735f0
         consensus.BIP66Height = 650000; // 00000000000000000379eaa19dce8c9b722d46ae6a57c2f1a988119488b50931
+        consensus.powLimit = ~uint256(0) >> 16; // WISPR starting difficulty is 1 / 2^12
+        consensus.nPowTargetTimespan = 16 * 60; // two weeks
+        consensus.nPowTargetSpacing = 64;
+        consensus.fPowAllowMinDifficultyBlocks = false;
+        consensus.fPowNoRetargeting = false;
         consensus.nRuleChangeActivationThreshold = 1916; // 95% of 2016
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
@@ -142,15 +126,12 @@ public:
         pchMessageStart[1] = 0x45;
         pchMessageStart[2] = 0x12;
         pchMessageStart[3] = 0x77;
-        vAlertPubKey=ParseHex("0411f84b889c61c1842ec84a15e3093d7dd99d955ab797b24c984cdcfe3aca23f04ec06bd840e8093aaf83488c039027ecc4ad704261245be30289be166f667c61");
         nDefaultPort = 17000;
         nPruneAfterHeight = 600000;
         m_assumed_blockchain_size = 240;
         m_assumed_chain_state_size = 3;
-        nMinerThreads = 0;
 
         genesis = CreateGenesisBlock(1513403825, 36156, consensus.powLimit.GetCompact(), 1, 125000 * COIN);
-
         consensus.hashGenesisBlock = genesis.GetHash();
         assert(consensus.hashGenesisBlock == uint256("0x0000ec93e0a3fe0aafa3be7dafe1290f5fca039a4037dd5174bc3dd7a35d67f0"));
         assert(genesis.hashMerkleRoot == uint256("0xbcd0064f46daed0b3c1ccff16656a0da04b5509924118b7c13d21c81d62ec521"));
@@ -165,17 +146,39 @@ public:
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
         base58Prefixes[EXT_COIN_TYPE] = {0x80, 0x00, 0x00, 0x77};
 
-        // 	BIP44 coin type is from https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-//        base58Prefixes[EXT_COIN_TYPE] = {0x80, 0x00, 0x00, 0x77};
         bech32_hrp = "wr";
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
-        fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
-        fDefaultCheckMemPool = false;
         fRequireStandard = true;
         fMineBlocksOnDemand = false;
+
+        //!<WISPR
+        nMinerThreads = 0;
+        vAlertPubKey=ParseHex("0411f84b889c61c1842ec84a15e3093d7dd99d955ab797b24c984cdcfe3aca23f04ec06bd840e8093aaf83488c039027ecc4ad704261245be30289be166f667c61");
+        fMiningRequiresPeers = true;
+        fDefaultCheckMemPool = false;
+        consensus.nEnforceBlockUpgradeMajority = 750;
+        consensus.nRejectBlockOutdatedMajority = 950;
+        consensus.nToCheckBlockUpgradeMajority = 1000;
+        consensus.nMaxReorganizationDepth = 500;
+        consensus.powLimit = ~uint256(0) >> 16; // WISPR starting difficulty is 1 / 2^12
+        consensus.stakeLimit = ~uint256(0) >> 48;
+        consensus.nTargetTimespanV1 =  16 * 60; // WISPR Old: 1 day
+        consensus.nTargetTimespanV2 =  1 * 60; // WISPR New: 1 day
+        consensus.nTargetSpacingV1 = 64;  // WISPR Old: 1 minute
+        consensus.nTargetSpacingV2 = 1 * 60;  // WISPR New: 1 minute
+        consensus.nMaturity = 100;
+        consensus.nMasternodeCountDrift = 20;
+        consensus.nMaxMoneyOut = 120000000 * COIN;
+        consensus.fAllowMinDifficultyBlocks = false;
+        /** Height or Time Based Activations **/
+        consensus.nLastPOWBlock = 450;
+        consensus.nNewProtocolStartHeight = 400000;
+        consensus.nNewProtocolStartTime = 1539963322; //Friday, October 19, 2018 3:35:22 PM
+        consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
+        consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime;
         consensus.fSkipProofOfWorkCheck = false;
         fTestnetToBeDeprecatedFieldRPC = false;
         fHeadersFirstSyncingActive = true;
@@ -244,31 +247,16 @@ public:
     CTestNetParams() {
         strNetworkID = "test";
         consensus.nSubsidyHalvingInterval = 0;
-        consensus.nEnforceBlockUpgradeMajority = 51;
-        consensus.nRejectBlockOutdatedMajority = 75;
-        consensus.nToCheckBlockUpgradeMajority = 100;
-        consensus.nMaxReorganizationDepth = 500;
-        consensus.powLimit = ~uint256(0) >> 16; // WISPR starting difficulty is 1 / 2^12
-        consensus.stakeLimit = ~uint256(0) >> 48;
-        consensus.fAllowMinDifficultyBlocks = true;
-        consensus.nTargetTimespanV1 =  16 * 60; // WISPR Old: 1 day
-        consensus.nTargetTimespanV2 =  1 * 60; // WISPR New: 1 day
-        consensus.nTargetSpacingV1 = 64;  // WISPR Old: 1 minute
-        consensus.nTargetSpacingV2 = 1 * 60;  // WISPR New: 1 minute
-        consensus.nLastPOWBlock = 1500;
-        consensus.nMaturity = 10;
-        consensus.nMasternodeCountDrift = 4;
-        consensus.nMaxMoneyOut = 120000000 * COIN;
-        consensus.nNewProtocolStartHeight = 400000;
-        consensus.nNewProtocolStartTime = 1537830552;
-        consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
-        consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime; // July 2, 2018
-
         consensus.BIP16Exception = uint256S("0x00000000dd30457c001f4095d208cc1296b0eed002427aa599874af7a432b105");
         consensus.BIP34Height = 21111;
         consensus.BIP34Hash = uint256S("0x0000000023b3a96d3484e5abb3755c413e7d41500f8e2a5c3f0dd01299cd8ef8");
         consensus.BIP65Height = 581885; // 00000000007f6655f22f98e72ed80d8b06dc761d5da09df0fa1dc4be4f861eb6
         consensus.BIP66Height = 330776; // 000000002104c8c45e99a8853285a3b592602a3ccde2b832481da85e9e4ba182
+        consensus.powLimit = ~uint256(0) >> 16; // WISPR starting difficulty is 1 / 2^12
+        consensus.nPowTargetTimespan = 16 * 60; // two weeks
+        consensus.nPowTargetSpacing = 64;
+        consensus.fPowAllowMinDifficultyBlocks = true;
+        consensus.fPowNoRetargeting = false;
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
@@ -295,19 +283,13 @@ public:
         pchMessageStart[1] = 0x46;
         pchMessageStart[2] = 0x13;
         pchMessageStart[3] = 0x78;
-        vAlertPubKey=ParseHex("04b20dd657f5e4fe0cf9aebb956498c383bac98a079c1003df02c2f121574cd280b8900248a8c6a43074b356e670ef83ec1aadfec60602df7c2366bae732372bba");
         nDefaultPort = 17002;
         nPruneAfterHeight = 1000;
         m_assumed_blockchain_size = 30;
         m_assumed_chain_state_size = 2;
-        nMinerThreads = 0;
-
 
         genesis = CreateGenesisBlock(1512932225, 142000, consensus.powLimit.GetCompact(), 1, 125000 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-
-//        printf("Test net\n");
-//        printf("genesis = %s\n", genesis.ToString().c_str());
         assert(consensus.hashGenesisBlock == uint256("41ddd599aa4bd28e5941b1e51cda473d78f829b84966f8d044ee92df8e2721d3"));
         assert(genesis.hashMerkleRoot == uint256("bcd0064f46daed0b3c1ccff16656a0da04b5509924118b7c13d21c81d62ec521"));
 
@@ -325,16 +307,40 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
         base58Prefixes[EXT_COIN_TYPE] = {0x80, 0x00, 0x00, 0x01};
+
         bech32_hrp = "tw";
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_test, pnSeed6_test + ARRAYLEN(pnSeed6_test));
 
-        consensus.fSkipProofOfWorkCheck = true;
-        fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
-        fDefaultCheckMemPool = false;
         fRequireStandard = false;
         fMineBlocksOnDemand = false;
+
+        //!WISPR
+        consensus.nEnforceBlockUpgradeMajority = 51;
+        consensus.nRejectBlockOutdatedMajority = 75;
+        consensus.nToCheckBlockUpgradeMajority = 100;
+        consensus.nMaxReorganizationDepth = 500;
+        consensus.powLimit = ~uint256(0) >> 16; // WISPR starting difficulty is 1 / 2^12
+        consensus.stakeLimit = ~uint256(0) >> 48;
+        consensus.fAllowMinDifficultyBlocks = true;
+        consensus.nTargetTimespanV1 =  16 * 60; // WISPR Old: 1 day
+        consensus.nTargetTimespanV2 =  1 * 60; // WISPR New: 1 day
+        consensus.nTargetSpacingV1 = 64;  // WISPR Old: 1 minute
+        consensus.nTargetSpacingV2 = 1 * 60;  // WISPR New: 1 minute
+        consensus.nLastPOWBlock = 1500;
+        consensus.nMaturity = 10;
+        consensus.nMasternodeCountDrift = 4;
+        consensus.nMaxMoneyOut = 120000000 * COIN;
+        consensus.nNewProtocolStartHeight = 400000;
+        consensus.nNewProtocolStartTime = 1537830552;
+        consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
+        consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime; // July 2, 2018
+        vAlertPubKey=ParseHex("04b20dd657f5e4fe0cf9aebb956498c383bac98a079c1003df02c2f121574cd280b8900248a8c6a43074b356e670ef83ec1aadfec60602df7c2366bae732372bba");
+        nMinerThreads = 0;
+        consensus.fSkipProofOfWorkCheck = true;
+        fMiningRequiresPeers = true;
+        fDefaultCheckMemPool = false;
         fTestnetToBeDeprecatedFieldRPC = true;
 
         consensus.nPoolMaxTransactions = 2;
@@ -343,6 +349,32 @@ public:
         consensus.nStartMasternodePayments = consensus.nNewProtocolStartTime;
         consensus.nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
         // here because we only have a 8 block finalization window on testnet
+
+        fHeadersFirstSyncingActive = true;
+
+
+        nBlockDoubleAccumulated = -1;
+
+        // Fake Serial Attack
+        nFakeSerialBlockheightEnd = -1;
+        nSupplyBeforeFakeSerial = 0;   // zerocoin supply at block nFakeSerialBlockheightEnd
+        /** Zerocoin */
+        consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
+                                    "4069182906412495150821892985591491761845028084891200728449926873928072877767359714183472702618963750149718246911"
+                                    "6507761337985909570009733045974880842840179742910064245869181719511874612151517265463228221686998754918242243363"
+                                    "7259085141865462043576798423387184774447920739934236584823824281198163815010674810451660377306056201619676256133"
+                                    "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
+                                    "31438167899885040445364023527381951378636564391212010397122822120720357";
+        consensus.nMaxZerocoinSpendsPerTransaction = 7; // Assume about 20kb each
+        consensus.nMinZerocoinMintFee = 0.01 * COIN; //high fee required for zerocoin mints
+        consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
+        consensus.nRequiredAccumulation = 1;
+        consensus.nDefaultSecurityLevel = 100; //full security level for accumulators
+        consensus.nZerocoinHeaderVersion = 8; //Block headers must be this version once zerocoin is active
+        consensus.nZerocoinRequiredStakeDepth = 200; //The required confirmations for a zwsp to be stakable
+
+        consensus.nBudget_Fee_Confirmations = 6; // Number of confirmations for the finalization fee
+
 
         checkpointData = {
             {
@@ -375,6 +407,11 @@ public:
         consensus.BIP34Hash = uint256();
         consensus.BIP65Height = 1351; // BIP65 activated on regtest (Used in functional tests)
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in functional tests)
+        consensus.powLimit = ~uint256(0) >> 1; // WISPR starting difficulty is 1 / 2^12
+        consensus.nPowTargetTimespan = 16 * 60; // two weeks
+        consensus.nPowTargetSpacing = 64;
+        consensus.fPowAllowMinDifficultyBlocks = true;
+        consensus.fPowNoRetargeting = true;
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
@@ -386,23 +423,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
-        consensus.nEnforceBlockUpgradeMajority = 750;
-        consensus.nRejectBlockOutdatedMajority = 950;
-        consensus.nToCheckBlockUpgradeMajority = 1000;
-        consensus.nMaxReorganizationDepth = 500;
-        consensus.powLimit = ~uint256(0) >> 1; // WISPR starting difficulty is 1 / 2^12
-        consensus.stakeLimit = ~uint256(0) >> 48;
-        consensus.nTargetTimespanV1 = 16 * 60; // WISPR Old: 1 day
-        consensus.nTargetTimespanV2 = 1 * 60; // WISPR New: 1 day
-        consensus.nTargetSpacingV1 = 64;        // WISPR Old: 1 minutes
-        consensus.nTargetSpacingV2 = 1 * 60;        // WISPR New: 1 minute
-        consensus.fAllowMinDifficultyBlocks = true;
-        consensus.nNewProtocolStartHeight = 400000;
-        consensus.nNewProtocolStartTime = 1537830552;
-        consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
-        consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime; // July 2, 2018
-        consensus.nZerocoinHeaderVersion = 8; //Block headers must be this version once zerocoin is active
-        consensus.nLastPOWBlock = 1500;
+
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00");
 
@@ -414,7 +435,6 @@ public:
         pchMessageStart[2] = 0xB7;
         pchMessageStart[3] = 0xDF;
         nDefaultPort = 17004;
-        nMinerThreads = 1;
         nPruneAfterHeight = 1000;
         m_assumed_blockchain_size = 0;
         m_assumed_chain_state_size = 0;
@@ -423,8 +443,6 @@ public:
 
         genesis = CreateGenesisBlock(1411111111, 2, consensus.powLimit.GetCompact(), 1, 0 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-//        printf("Req net\n");
-//        printf("genesis = %s\n", genesis.ToString().c_str());
         assert(consensus.hashGenesisBlock == uint256("ff317bf2fb18209612809fe42af88bec38c26769bb89df88c5f4ad391933ccc7"));
         assert(genesis.hashMerkleRoot == uint256S("6a1b37300c4972fd827a02317446a729aaf77a80584dc51a8a06f0a6ec853b43"));
 
@@ -434,10 +452,6 @@ public:
         fDefaultConsistencyChecks = true;
         fRequireStandard = false;
         fMineBlocksOnDemand = true;
-        fMiningRequiresPeers = false;
-        fDefaultCheckMemPool = true;
-        fTestnetToBeDeprecatedFieldRPC = false;
-        consensus.fSkipProofOfWorkCheck = true;
 
         checkpointData = {
             {
@@ -462,6 +476,61 @@ public:
 
         /* enable fallback fee on regtest */
         m_fallback_fee_enabled = true;
+
+        nMinerThreads = 1;
+        consensus.nEnforceBlockUpgradeMajority = 750;
+        consensus.nRejectBlockOutdatedMajority = 950;
+        consensus.nToCheckBlockUpgradeMajority = 1000;
+        consensus.nMaxReorganizationDepth = 500;
+        consensus.powLimit = ~uint256(0) >> 1; // WISPR starting difficulty is 1 / 2^12
+        consensus.stakeLimit = ~uint256(0) >> 48;
+        consensus.nTargetTimespanV1 = 16 * 60; // WISPR Old: 1 day
+        consensus.nTargetTimespanV2 = 1 * 60; // WISPR New: 1 day
+        consensus.nTargetSpacingV1 = 64;        // WISPR Old: 1 minutes
+        consensus.nTargetSpacingV2 = 1 * 60;        // WISPR New: 1 minute
+        consensus.fAllowMinDifficultyBlocks = true;
+        consensus.nNewProtocolStartHeight = 400000;
+        consensus.nNewProtocolStartTime = 1537830552;
+        consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
+        consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime; // July 2, 2018
+        consensus.nZerocoinHeaderVersion = 8; //Block headers must be this version once zerocoin is active
+        consensus.nLastPOWBlock = 1500;
+        fMiningRequiresPeers = false;
+        fDefaultCheckMemPool = true;
+        fTestnetToBeDeprecatedFieldRPC = false;
+        consensus.fSkipProofOfWorkCheck = true;
+
+        vAlertPubKey=ParseHex("0411f84b889c61c1842ec84a15e3093d7dd99d955ab797b24c984cdcfe3aca23f04ec06bd840e8093aaf83488c039027ecc4ad704261245be30289be166f667c61");
+        consensus.nMaturity = 100;
+        consensus.nMasternodeCountDrift = 20;
+        consensus.nMaxMoneyOut = 120000000 * COIN;
+        fHeadersFirstSyncingActive = true;
+
+        consensus.nPoolMaxTransactions = 3;
+        consensus.strSporkKey = "04ac60266c909c22b95415270278b8ea90bec852922d3b2bd110cfba62fc4da20f7d5d6c7f109c9604a421c6e75e47a3c8963dcd1b9b7ca71aaeef3d410e4cc65a";
+        consensus.strObfuscationPoolDummyAddress = "WYCSnxDBqGkcruCwreLtBfpXtSMgoo5yUJ";
+        consensus.nStartMasternodePayments = consensus.nNewProtocolStartTime; // July 2, 2018
+
+        nBlockDoubleAccumulated = -1;
+
+        // Fake Serial Attack
+        nFakeSerialBlockheightEnd = -1;
+        nSupplyBeforeFakeSerial = 0;   // zerocoin supply at block nFakeSerialBlockheightEnd
+        /** Zerocoin */
+        consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
+                                    "4069182906412495150821892985591491761845028084891200728449926873928072877767359714183472702618963750149718246911"
+                                    "6507761337985909570009733045974880842840179742910064245869181719511874612151517265463228221686998754918242243363"
+                                    "7259085141865462043576798423387184774447920739934236584823824281198163815010674810451660377306056201619676256133"
+                                    "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
+                                    "31438167899885040445364023527381951378636564391212010397122822120720357";
+        consensus.nMaxZerocoinSpendsPerTransaction = 7; // Assume about 20kb each
+        consensus.nMinZerocoinMintFee = 0.01 * COIN; //high fee required for zerocoin mints
+        consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
+        consensus.nRequiredAccumulation = 1;
+        consensus.nDefaultSecurityLevel = 100; //full security level for accumulators
+        consensus.nZerocoinRequiredStakeDepth = 200; //The required confirmations for a zwsp to be stakable
+
+        consensus.nBudget_Fee_Confirmations = 6; // Number of confirmations for the finalization fee
     }
 
     /**
