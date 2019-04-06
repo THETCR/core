@@ -5373,10 +5373,10 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
                                        block.GetBlockTime(), block.vtx[1]->nTime));
         }
     }
-    if (block.GetHash() != Params().GetConsensus().hashGenesisBlock && !CheckWork(block, pindexPrev)){
-        std::cout << "CheckWork failed\n";
-        return false;
-    }
+//    if (block.GetHash() != Params().GetConsensus().hashGenesisBlock && !CheckWork(block, pindexPrev)){
+//        std::cout << "CheckWork failed\n";
+//        return false;
+//    }
 
 
     bool isPoS = false;
