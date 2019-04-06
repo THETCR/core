@@ -643,20 +643,10 @@ public:
         return vChain.size() > 0 ? vChain[0] : nullptr;
     }
 
-  /** Returns the index entry for the tip of this chain, or nullptr if none. */
-  CBlockIndex* Tip(bool fProofOfStake = false) const
-  {
-      if (vChain.size() < 1)
-          return nullptr;
-
-      CBlockIndex* pindex = vChain[vChain.size() - 1];
-
-      if (fProofOfStake) {
-          while (pindex && pindex->pprev && !pindex->IsProofOfStake())
-              pindex = pindex->pprev;
-      }
-      return pindex;
-  }
+    /** Returns the index entry for the tip of this chain, or nullptr if none. */
+    CBlockIndex *Tip() const {
+        return vChain.size() > 0 ? vChain[vChain.size() - 1] : nullptr;
+    }
 
     /** Returns the index entry at a particular height in this chain, or nullptr if no such height exists. */
     CBlockIndex *operator[](int nHeight) const {
