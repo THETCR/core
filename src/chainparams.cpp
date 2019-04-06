@@ -408,8 +408,8 @@ public:
         consensus.BIP65Height = 1351; // BIP65 activated on regtest (Used in functional tests)
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in functional tests)
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        consensus.nPowTargetTimespan = 16 * 60; // two weeks
-        consensus.nPowTargetSpacing = 64;
+        consensus.nPowTargetTimespan = 14 * 24 * 60 * 60; // two weeks
+        consensus.nPowTargetSpacing = 10 * 60;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
@@ -441,8 +441,9 @@ public:
 
         UpdateVersionBitsParametersFromArgs(args);
 
-        genesis = CreateGenesisBlock(1411111111, 2, 0x207fffff, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1554565666, 2, 0x207fffff, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
+        printf("Reg test\n block = %s\n", genesis.ToString().c_str());
         assert(consensus.hashGenesisBlock == uint256("dac15ca6bf3e831421cfc24078aec4de02c19e8dcc1b3a83b0e516d041faaf1d"));
         assert(genesis.hashMerkleRoot == uint256S("2c9c60a275b2090856fbc87f484ee23c5aa7e462eff49cded1aff054e2204715"));
 
@@ -603,7 +604,6 @@ void CRegTestParams::UpdateVersionBitsParametersFromArgs(const ArgsManager& args
         }
     }
 }
-
 
 static std::unique_ptr<const CChainParams> globalChainParams;
 
