@@ -59,7 +59,12 @@ static void DuplicateInputs(benchmark::State& state)
 
     CBlockIndex* pindexPrev = ::chainActive.Tip();
     assert(pindexPrev != nullptr);
-    block.nBits = GetNextWorkRequired(pindexPrev, &block, chainparams.GetConsensus());
+//    block.nBits = GetNextWorkRequired(pindexPrev, &block, chainparams.GetConsensus());
+    if (block.nVersion > 7) {
+        block.nBits = GetNextWorkRequired(pindexPrev, &block, chainparams.GetConsensus());
+    } else {
+        block.nBits = GetNextTargetRequired(pindexPrev, block.IsProofOfStake());
+    }
     block.nNonce = 0;
     auto nHeight = pindexPrev->nHeight + 1;
 

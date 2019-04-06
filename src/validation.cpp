@@ -5022,7 +5022,13 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
 
     // Check proof of work
     const Consensus::Params& consensusParams = params.GetConsensus();
-    if (block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
+    unsigned int nBitsRequired;
+    if(block.nVersion > 7){
+        nBitsRequired  = GetNextWorkRequired(pindexPrev, &block, consensusParams);
+    }else{
+        nBitsRequired  = GetNextTargetRequired(pindexPrev, false);
+    }
+    if (block.nBits != nBitsRequired)
         return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
 
     // Check against checkpoints
