@@ -5732,9 +5732,11 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
         bool ret = CheckBlock(*pblock, state, chainparams.GetConsensus());
         if (ret) {
             // Store to disk
+            std::cout << "CheckBlock passed\n";
             ret = g_chainstate.AcceptBlock(pblock, state, chainparams, &pindex, fForceProcessing, nullptr, fNewBlock);
         }
         if (!ret) {
+            std::cout << "CheckBlock or AcceptBlock failed\n";
             GetMainSignals().BlockChecked(*pblock, state);
             return error("%s: AcceptBlock FAILED (%s)", __func__, FormatStateMessage(state));
         }
@@ -5747,6 +5749,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
         return error("%s: ActivateBestChain failed (%s)", __func__, FormatStateMessage(state));
 
     if (!fLiteMode) {
+        std::cout << "fLiteMode is false\n";
         if (masternodeSync.RequestedMasternodeAssets > MASTERNODE_SYNC_LIST) {
             obfuScationPool.NewBlock(g_connman.get());
             masternodePayments.ProcessBlock(chainActive.Height() + 10);
