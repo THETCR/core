@@ -215,10 +215,10 @@ public:
     }
     bool UpdatedTransaction(const uint256 &hash) override
     {
-        m_notifications->UpdatedTransaction(hash);
+       return m_notifications->UpdatedTransaction(hash);
     }
     void SetBestChain(const CBlockLocator &chain) override {
-        m_notifications->SetBestChain(hash);
+        m_notifications->SetBestChain(chain);
     }
     void Inventory(const uint256 &hash) override {
         m_notifications->Inventory(hash);
