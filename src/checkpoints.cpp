@@ -4,20 +4,18 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "checkpoints.h"
+#include <checkpoints.h>
 
 #include <chain.h>
 #include <chainparams.h>
+#include <reverse_iterator.h>
 #include <validation.h>
 #include "uint256.h"
-#include "reverse_iterator.h"
 
 #include <stdint.h>
 
 
-
-namespace Checkpoints
-{
+namespace Checkpoints {
 /**
      * How many times we expect transactions after the last checkpoint to
      * be slower. This number is a compromise, as it can't be accurate for
@@ -85,19 +83,19 @@ int GetTotalBlocksEstimate()
     return checkpoints.rbegin()->first;
 }
 
-CBlockIndex* GetLastCheckpoint(const CCheckpointData& data)
-{
-    const MapCheckpoints& checkpoints = data.mapCheckpoints;
-
-    for (const MapCheckpoints::value_type& i : reverse_iterate(checkpoints))
+    CBlockIndex* GetLastCheckpoint(const CCheckpointData& data)
     {
-        const uint256& hash = i.second;
-        CBlockIndex* pindex = LookupBlockIndex(hash);
-        if (pindex) {
-            return pindex;
+        const MapCheckpoints& checkpoints = data.mapCheckpoints;
+
+        for (const MapCheckpoints::value_type& i : reverse_iterate(checkpoints))
+        {
+            const uint256& hash = i.second;
+            CBlockIndex* pindex = LookupBlockIndex(hash);
+            if (pindex) {
+                return pindex;
+            }
         }
+        return nullptr;
     }
-    return nullptr;
-}
 
 } // namespace Checkpoints

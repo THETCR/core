@@ -240,6 +240,10 @@ void PrepareShutdown(InitInterfaces& interfaces)
 #endif
     StopMapPort();
 
+    // Shutdown witness thread if it's enabled
+    if (g_connman->GetLocalServices() == NODE_BLOOM_LIGHT_ZC) {
+        lightWorker.StopLightZwspThread();
+    }
     // Because these depend on each-other, we make sure that neither can be
     // using the other before destroying them.
     if (peerLogic) UnregisterValidationInterface(peerLogic.get());
@@ -252,11 +256,6 @@ void PrepareShutdown(InitInterfaces& interfaces)
     // CScheduler/checkqueue threadGroup
     threadGroup.interrupt_all();
     threadGroup.join_all();
-
-    // Shutdown witness thread if it's enabled
-    if (g_connman->GetLocalServices() == NODE_BLOOM_LIGHT_ZC) {
-        lightWorker.StopLightZwspThread();
-    }
 
     // After the threads that potentially access these pointers have been stopped,
     // destruct and reset all to nullptr.

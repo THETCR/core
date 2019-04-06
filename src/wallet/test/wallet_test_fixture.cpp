@@ -13,7 +13,8 @@ WalletTestingSetup::WalletTestingSetup(const std::string& chainName):
 {
     bool fFirstRun;
     m_wallet.LoadWallet(fFirstRun);
-    m_wallet.m_chain_notifications_handler = m_chain->handleNotifications(m_wallet);
-    m_chain_client->registerRpcs();
     m_wallet.CreateZWspWallet();
+    m_wallet.m_chain_notifications_handler = m_chain->handleNotifications(m_wallet);
+
+    m_chain_client->registerRpcs();
 }

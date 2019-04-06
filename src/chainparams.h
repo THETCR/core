@@ -62,49 +62,45 @@ public:
     };
 
     const Consensus::Params& GetConsensus() const { return consensus; }
-    const uint256& HashGenesisBlock() const { return consensus.hashGenesisBlock; }
     const CMessageHeader::MessageStartChars& MessageStart() const { return pchMessageStart; }
-    const std::vector<unsigned char>& AlertKey() const { return vAlertPubKey; }
     int GetDefaultPort() const { return nDefaultPort; }
-    const uint256& ProofOfWorkLimit() const { return consensus.powLimit; }
-    const uint256& ProofOfStakeLimit() const { return consensus.stakeLimit; }
-    int SubsidyHalvingInterval() const { return consensus.nSubsidyHalvingInterval; }
-    /** Used to check majorities for block version upgrade */
-    int EnforceBlockUpgradeMajority() const { return consensus.nEnforceBlockUpgradeMajority; }
-  int RejectBlockOutdatedMajority() const { return consensus.nRejectBlockOutdatedMajority; }
-  int ToCheckBlockUpgradeMajority() const { return consensus.nToCheckBlockUpgradeMajority; }
 
-  int MaxReorganizationDepth() const { return consensus.nMaxReorganizationDepth; }
-
-    /** Used if GenerateBitcoins is called with a negative number of threads */
-    int DefaultMinerThreads() const { return nMinerThreads; }
     const CBlock& GenesisBlock() const { return genesis; }
-    /** Make miner wait to have peers to avoid wasting work */
-    bool MiningRequiresPeers() const { return fMiningRequiresPeers; }
-    /** Headers first syncing is disabled */
-    bool HeadersFirstSyncingActive() const { return fHeadersFirstSyncingActive; };
     /** Default value for -checkmempool and -checkblockindex argument */
     bool DefaultConsistencyChecks() const { return fDefaultConsistencyChecks; }
+    /** Policy: Filter transactions that do not match well-defined patterns */
+    bool RequireStandard() const { return fRequireStandard; }
     uint64_t PruneAfterHeight() const { return nPruneAfterHeight; }
     /** Minimum free space (in GB) needed for data directory */
     uint64_t AssumedBlockchainSize() const { return m_assumed_blockchain_size; }
     /** Minimum free space (in GB) needed for data directory when pruned; Does not include prune target*/
     uint64_t AssumedChainStateSize() const { return m_assumed_chain_state_size; }
+    /** Make miner stop after a block is found. In RPC, don't return until nGenProcLimit blocks are generated */
+    bool MineBlocksOnDemand() const { return fMineBlocksOnDemand; }
+    /** Return the BIP70 network string (main, test or regtest) */
+    std::string NetworkIDString() const { return strNetworkID; }
+    /** Return true if the fallback fee is by default enabled for this network */
+    bool IsFallbackFeeEnabled() const { return m_fallback_fee_enabled; }
+    /** Return the list of hostnames to look up for DNS seeds */
+    const std::vector<std::string>& DNSSeeds() const { return vSeeds; }
+    const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
+    const std::string& Bech32HRP() const { return bech32_hrp; }
+    const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
+    const CCheckpointData& Checkpoints() const { return checkpointData; }
+    const ChainTxData& TxData() const { return chainTxData; }
     /** Allow mining of a min-difficulty block */
     bool AllowMinDifficultyBlocks() const { return consensus.fAllowMinDifficultyBlocks; }
     /** Skip proof-of-work check: allow mining of any difficulty block */
     bool SkipProofOfWorkCheck() const { return consensus.fSkipProofOfWorkCheck; }
-    /** Policy: Filter transactions that do not match well-defined patterns */
-    bool RequireStandard() const { return fRequireStandard; }
     int64_t TargetTimespanV1() const {
-            return consensus.nTargetTimespanV1;
+        return consensus.nTargetTimespanV1;
     }
     int64_t TargetSpacingV1() const {
-            return consensus.nTargetSpacingV1;
+        return consensus.nTargetSpacingV1;
     }
     int64_t IntervalV1() const {
-            return consensus.nTargetTimespanV1 / consensus.nTargetSpacingV1;
-        }
+        return consensus.nTargetTimespanV1 / consensus.nTargetSpacingV1;
+    }
     int64_t TargetTimespanV2() const {
         return consensus.nTargetTimespanV2;
     }
@@ -114,46 +110,43 @@ public:
     int64_t IntervalV2() const {
         return consensus.nTargetTimespanV2 / consensus.nTargetSpacingV2;
     }
-  int64_t TargetTimespan(int nHeight) const {
+    int64_t TargetTimespan(int nHeight) const {
         if(PivProtocolsStartHeightEqualOrGreaterThen(nHeight)){
             return consensus.nTargetTimespanV2;
         }else{
             return consensus.nTargetTimespanV1;
         }
-  }
-  int64_t TargetSpacing(int nHeight) const {
-      if(PivProtocolsStartHeightEqualOrGreaterThen(nHeight)){
-          return consensus.nTargetSpacingV2;
-      }else{
-          return consensus.nTargetSpacingV1;
-      }
-  }
+    }
+    int64_t TargetSpacing(int nHeight) const {
+        if(PivProtocolsStartHeightEqualOrGreaterThen(nHeight)){
+            return consensus.nTargetSpacingV2;
+        }else{
+            return consensus.nTargetSpacingV1;
+        }
+    }
+    const uint256& HashGenesisBlock() const { return consensus.hashGenesisBlock; }
+    const std::vector<unsigned char>& AlertKey() const { return vAlertPubKey; }
+    /** Make miner wait to have peers to avoid wasting work */
+    bool MiningRequiresPeers() const { return fMiningRequiresPeers; }
+    /** Headers first syncing is disabled */
+    bool HeadersFirstSyncingActive() const { return fHeadersFirstSyncingActive; };
+    const uint256& ProofOfWorkLimit() const { return consensus.powLimit; }
+    const uint256& ProofOfStakeLimit() const { return consensus.stakeLimit; }
+    int SubsidyHalvingInterval() const { return consensus.nSubsidyHalvingInterval; }
+    /** Used to check majorities for block version upgrade */
+    int EnforceBlockUpgradeMajority() const { return consensus.nEnforceBlockUpgradeMajority; }
+    int RejectBlockOutdatedMajority() const { return consensus.nRejectBlockOutdatedMajority; }
+    int ToCheckBlockUpgradeMajority() const { return consensus.nToCheckBlockUpgradeMajority; }
+
+    int MaxReorganizationDepth() const { return consensus.nMaxReorganizationDepth; }
+
+    /** Used if GenerateBitcoins is called with a negative number of threads */
+    int DefaultMinerThreads() const { return nMinerThreads; }
     int COINBASE_MATURITY() const { return consensus.nMaturity; }
     CAmount MaxMoneyOut() const { return consensus.nMaxMoneyOut; }
     /** The masternode count that we will allow the see-saw reward payments to be off by */
     int MasternodeCountDrift() const { return consensus.nMasternodeCountDrift; }
-    /** Make miner stop after a block is found. In RPC, don't return until nGenProcLimit blocks are generated */
-    bool MineBlocksOnDemand() const { return fMineBlocksOnDemand; }
-    /** In the future use NetworkIDString() for RPC fields */
-    bool TestnetToBeDeprecatedFieldRPC() const { return fTestnetToBeDeprecatedFieldRPC; }
-    /** Return the list of hostnames to look up for DNS seeds */
-    const std::vector<std::string>& DNSSeeds() const { return vSeeds; }
-    const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
-    const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
-//    virtual const Checkpoints::CCheckpointData& Checkpoints() const = 0;
-    int PoolMaxTransactions() const { return consensus.nPoolMaxTransactions; }
-
-    /** Spork key and Masternode Handling **/
-    std::string SporkKey() const { return consensus.strSporkKey; }
-    std::string ObfuscationPoolDummyAddress() const { return consensus.strObfuscationPoolDummyAddress; }
-    int64_t StartMasternodePayments() const { return consensus.nStartMasternodePayments; }
-    int64_t Budget_Fee_Confirmations() const { return consensus.nBudget_Fee_Confirmations; }
-
-    /** Return the BIP70 network string (main, test or regtest) */
-    std::string NetworkIDString() const { return strNetworkID; }
     std::string NetworkID() const { return strNetworkID; }
-    /** Return true if the fallback fee is by default enabled for this network */
-    bool IsFallbackFeeEnabled() const { return m_fallback_fee_enabled; }
     /** Zerocoin **/
     std::string Zerocoin_Modulus() const { return consensus.zerocoinModulus; }
     libzerocoin::ZerocoinParams* Zerocoin_Params(bool useModulusV1) const;
@@ -171,10 +164,16 @@ public:
     int NEW_PROTOCOLS_STARTTIME() const { return consensus.nNewProtocolStartTime; }
     bool PivProtocolsStartHeightEqualOrGreaterThen(int nHeight) const { return nHeight >= consensus.nNewProtocolStartHeight; }
     bool PivProtocolsStartHeightSmallerThen(int nHeight) const { return nHeight < consensus.nNewProtocolStartHeight; }
-    const std::string& Bech32HRP() const { return bech32_hrp; }
-    const CCheckpointData& Checkpoints() const { return checkpointData; }
-    const ChainTxData& TxData() const { return chainTxData; }
 
+    /** In the future use NetworkIDString() for RPC fields */
+    bool TestnetToBeDeprecatedFieldRPC() const { return fTestnetToBeDeprecatedFieldRPC; }
+    int PoolMaxTransactions() const { return consensus.nPoolMaxTransactions; }
+
+    /** Spork key and Masternode Handling **/
+    std::string SporkKey() const { return consensus.strSporkKey; }
+    std::string ObfuscationPoolDummyAddress() const { return consensus.strObfuscationPoolDummyAddress; }
+    int64_t StartMasternodePayments() const { return consensus.nStartMasternodePayments; }
+    int64_t Budget_Fee_Confirmations() const { return consensus.nBudget_Fee_Confirmations; }
 
     // fake serial attack
     int Zerocoin_Block_EndFakeSerial() const { return nFakeSerialBlockheightEnd; }

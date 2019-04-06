@@ -72,7 +72,6 @@ static BlockAssembler::Options DefaultOptions()
     } else {
         options.blockMinFeeRate = CFeeRate(DEFAULT_BLOCK_MIN_TX_FEE);
     }
-
     return options;
 }
 

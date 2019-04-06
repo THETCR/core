@@ -75,7 +75,7 @@ const char *MNVERIFY="mnv";
 const char *PUBCOINS="pubcoins";
 const char *GENWIT="genwit";
 const char *ACCVALUE="accvalue";
-};
+} // namespace NetMsgType
 
 static const char* ppszTypeName[] =
     {
@@ -253,7 +253,7 @@ CAddress::CAddress(CService ipIn, ServiceFlags nServicesIn) : CService(ipIn)
 
 void CAddress::Init()
 {
-    nServices = NODE_NETWORK;
+    nServices = NODE_NONE;
     nTime = 100000000;
 }
 
