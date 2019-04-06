@@ -228,9 +228,6 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
     for (unsigned int i = 0; i < sizeof(blockinfo)/sizeof(*blockinfo); ++i)
     {
         CBlock *pblock = &pblocktemplate->block; // pointer for convenience
-        std::cout << "First print\n";
-        std::cout << pblock->GetBlockTime() << "\n";
-        std::cout << chainActive.Tip()->GetMedianTimePast() << "\n";
         {
             LOCK(cs_main);
             pblock->nVersion = 7;
@@ -251,9 +248,6 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
             pblock->nNonce = blockinfo[i].nonce;
         }
         std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
-        std::cout << "Second print\n";
-        std::cout << pblock->GetBlockTime() << "\n";
-        std::cout << chainActive.Tip()->GetMedianTimePast() << "\n";
         BOOST_CHECK(ProcessNewBlock(chainparams, shared_pblock, true, nullptr));
         pblock->hashPrevBlock = pblock->GetHash();
     }
