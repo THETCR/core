@@ -70,26 +70,21 @@ BOOST_AUTO_TEST_CASE(rpc_addmultisig)
     std::string short2(address1Hex + 1, address1Hex + sizeof(address1Hex)); // first byte missing
     BOOST_CHECK_THROW(CallRPC(string("addmultisig ")+createArgs(2, short2.c_str()).params.get_str()), std::runtime_error);
 //    BOOST_CHECK_THROW(addmultisig(createArgs(2, short2.c_str())), std::runtime_error);
-    std::cout << "addmultisig finished\n";
 }
 
 BOOST_AUTO_TEST_CASE(rpc_wallet)
 {
     // Test RPC calls for various wallet statistics
     UniValue r;
-    std::cout << "lock\n";
     LOCK2(cs_main, m_wallet.cs_wallet);
 
-    std::cout << "walletdb\n";
     WalletBatch walletdb(m_wallet.GetDBHandle());
-    std::cout << "GenerateNewKey\n";
     CPubKey demoPubkey = m_wallet.GenerateNewKey(walletdb);
     std::string demoAddress = EncodeDestination(CTxDestination(demoPubkey.GetID()));
     UniValue retValue;
     std::string strAccount = "walletDemoAccount";
     std::string strPurpose = "receive";
     BOOST_TEST_PASSPOINT();
-    std::cout << "BOOST_CHECK_NO_THROW\n";
     BOOST_CHECK_NO_THROW({ /*Initialize Wallet with an account */
         WalletBatch walletdb(m_wallet.GetDBHandle());
         CAccount account;
@@ -98,11 +93,9 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
         walletdb.WriteAccount(strAccount, account);
     });
     BOOST_TEST_PASSPOINT();
-    std::cout << "GenerateNewKey 2\n";
     CPubKey setaccountDemoPubkey = m_wallet.GenerateNewKey(walletdb);
     std::string setaccountDemoAddress = EncodeDestination(CTxDestination(setaccountDemoPubkey.GetID()));
 
-    std::cout << "setaccount rpc\n";
     /*********************************
      * 			setaccount
      *********************************/
@@ -113,26 +106,17 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     /* WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmD (33 chars) is an illegal address (should be 34 chars) */
     BOOST_CHECK_THROW(CallRPC("setaccount WfJehDzxfR7hMDdvgadn6ppZF7BLHTGmD nullaccount"), std::runtime_error);
 
-    std::cout << "listunspent rpc\n";
     /*********************************
      * 			listunspent
      *********************************/
-    std::cout << "listunspent 1\n";
     BOOST_CHECK_NO_THROW(CallRPC("listunspent"));
-    std::cout << "listunspent 2\n";
     BOOST_CHECK_THROW(CallRPC("listunspent string"), std::runtime_error);
-    std::cout << "listunspent 3\n";
     BOOST_CHECK_THROW(CallRPC("listunspent 0 string"), std::runtime_error);
-    std::cout << "listunspent 4\n";
     BOOST_CHECK_THROW(CallRPC("listunspent 0 1 not_array"), std::runtime_error);
-    std::cout << "listunspent 5\n";
     BOOST_CHECK_THROW(CallRPC("listunspent 0 1 [] extra"), std::runtime_error);
-    std::cout << "listunspent 6\n";
     BOOST_CHECK_NO_THROW(r = CallRPC("listunspent 0 1 []"));
-    std::cout << "listunspent 7\n";
     BOOST_CHECK(r.get_array().empty());
 
-    std::cout << "listreceivedbyaddress rpc\n";
     /*********************************
      * 		listreceivedbyaddress
      *********************************/
@@ -143,7 +127,6 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     BOOST_CHECK_NO_THROW(CallRPC("listreceivedbyaddress 0 true"));
     BOOST_CHECK_THROW(CallRPC("listreceivedbyaddress 0 true extra"), std::runtime_error);
 
-    std::cout << "listreceivedbyaccount rpc\n";
     /*********************************
      * 		listreceivedbyaccount
      *********************************/
@@ -153,18 +136,15 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     BOOST_CHECK_THROW(CallRPC("listreceivedbyaccount 0 not_bool"), std::runtime_error);
     BOOST_CHECK_NO_THROW(CallRPC("listreceivedbyaccount 0 true"));
     BOOST_CHECK_THROW(CallRPC("listreceivedbyaccount 0 true extra"), std::runtime_error);
-    std::cout << "getrawchangeaddress rpc\n";
     /*********************************
      * 		getrawchangeaddress
      *********************************/
     BOOST_CHECK_NO_THROW(CallRPC("getrawchangeaddress"));
-    std::cout << "getnewaddress rpc\n";
     /*********************************
      * 		getnewaddress
      *********************************/
     BOOST_CHECK_NO_THROW(CallRPC("getnewaddress"));
     BOOST_CHECK_NO_THROW(CallRPC("getnewaddress getnewaddress_demoaccount"));
-    std::cout << "getaccountaddress rpc\n";
     /*********************************
      * 		getaccountaddress
      *********************************/
@@ -172,13 +152,11 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     BOOST_CHECK_NO_THROW(CallRPC("getaccountaddress accountThatDoesntExists")); // Should generate a new account
     BOOST_CHECK_NO_THROW(retValue = CallRPC("getaccountaddress " + strAccount));
     BOOST_CHECK(retValue.get_str() == demoAddress);
-    std::cout << "getaccount rpc\n";
     /*********************************
      * 			getaccount
      *********************************/
     BOOST_CHECK_THROW(CallRPC("getaccount"), std::runtime_error);
     BOOST_CHECK_NO_THROW(CallRPC("getaccount " + demoAddress));
-    std::cout << "verifymessage rpc\n";
     /*********************************
      * 	signmessage + verifymessage
      *********************************/
@@ -198,7 +176,6 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
     BOOST_CHECK(CallRPC("verifymessage " + demoAddress + " " + retValue.get_str() + " wrongmessage").get_bool() == false);
     /* Correct address, message and signature*/
     BOOST_CHECK(CallRPC("verifymessage " + demoAddress + " " + retValue.get_str() + " mymessage").get_bool() == true);
-    std::cout << "getaddressesbyaccount rpc\n";
     /*********************************
      * 		getaddressesbyaccount
      *********************************/

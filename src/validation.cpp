@@ -3169,7 +3169,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 //            REJECT_INVALID, "PoS-early");
 
     if (pindex->nHeight > Params().LAST_POW_BLOCK() && block.IsProofOfWork()){
-        std::cout << pindex->nHeight << "\n";
         return state.DoS(100, error("ConnectBlock() : PoW period ended"),
                          REJECT_INVALID, "PoW-ended");
     }
@@ -4979,7 +4978,6 @@ bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
     hashTarget.SetCompact(block.nBits);
 
     if (pindexPrev == nullptr){
-        std::cout << "null pindexPrev\n";
         return error("%s : null pindexPrev for block %s", __func__, block.GetHash().ToString().c_str());
     }
 
@@ -4995,14 +4993,12 @@ bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
     printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
     if (block.IsProofOfWork() && !consensusParams.fSkipProofOfWorkCheck) {
         if (hashProof > hashTarget){
-            std::cout << "incorrect proof of work\n";
             return error("%s : incorrect proof of work - at %d", __func__, pindexPrev->nHeight + 1);
         }
         return true;
     }
 
     if (block.nBits != nBitsRequired){
-        std::cout << "Bits don't match\n";
         LogPrintf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
         return error("%s : incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
     }
@@ -5352,43 +5348,34 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     CBlockIndex *pindexDummy = nullptr;
     CBlockIndex *&pindex = ppindex ? *ppindex : pindexDummy;
     uint256 hash = block.GetHash();
-    std::cout << "bn2Hash\n";
     uint256 bn2Hash = block.IsProofOfWork() ? hash : block.vtx[1]->vin[0].prevout.hash;
 
     // Get prev block index
     CBlockIndex* pindexPrev = nullptr;
-    std::cout << "prev block index\n";
     if (block.GetHash() != Params().GetConsensus().hashGenesisBlock) {
         BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
         if (mi == mapBlockIndex.end()){
-            std::cout << "bad-prevblk\n";
             return state.DoS(0, error("%s : prev block %s not found", __func__, block.hashPrevBlock.ToString().c_str()), 0, "bad-prevblk");
         }
         pindexPrev = (*mi).second;
     }
 
-    std::cout << "AcceptBlockHeader\n";
     if (!AcceptBlockHeader(block, state, chainparams, &pindex))
         return false;
 
-    std::cout << "PivProtocolsStartHeightSmallerThen\n";
     if(pindexPrev && Params().PivProtocolsStartHeightSmallerThen(pindexPrev->nHeight + 1)) {
-        std::cout << "CheckCoinStakeTimestamp\n";
         if (block.IsProofOfStake() && !CheckCoinStakeTimestamp(block.GetBlockTime(), (int64_t) block.vtx[1]->nTime)) {
-            std::cout << "coinstake timestamp\n";
             return state.DoS(50, error("AcceptBlock() : coinstake timestamp violation nTimeBlock=%d nTimeTx=%u\n",
                                        block.GetBlockTime(), block.vtx[1]->nTime));
         }
     }
 //    if (block.GetHash() != Params().GetConsensus().hashGenesisBlock && !CheckWork(block, pindexPrev)){
-//        std::cout << "CheckWork failed\n";
 //        return false;
 //    }
 
 
     bool isPoS = false;
     if (block.IsProofOfStake()) {
-        std::cout << "IsProofOfStake\n";
         isPoS = true;
         pindex->SetProofOfStake();
         pindex->prevoutStake = block.vtx[1]->vin[0].prevout;
@@ -5410,16 +5397,13 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
     }
     if(block.IsProofOfWork()){
-        std::cout << "IsProofOfWork\n";
         uint256 hashProofOfStake = block.GetPoWHash();
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
             mapProofOfStake.insert(std::make_pair(hash, hashProofOfStake));
     }
 
-    std::cout << "hashProofOfStake\n";
     pindex->hashProofOfStake = mapProofOfStake[hash];
     if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
-        std::cout << "bn2Hash\n";
         pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
 
@@ -5455,7 +5439,6 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         if (pindex->nChainWork < nMinimumChainWork) return true;
     }
 
-    std::cout << "CheckBlock\n";
     if (!CheckBlock(block, state, chainparams.GetConsensus()) ||
         !ContextualCheckBlock(block, state, chainparams.GetConsensus(), pindex->pprev)) {
         if (state.IsInvalid() && !state.CorruptionPossible()) {
@@ -5469,7 +5452,6 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     int splitHeight = -1;
 
     if (isPoS) {
-        std::cout << "isPoS\n";
         LOCK(cs_main);
 
         // Blocks arrives in order, so if prev block is not the tip then we are on a fork.
@@ -5712,7 +5694,6 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
 
     int nMints = 0;
     int nSpends = 0;
-    std::cout << "ContainsZerocoins\n";
     for (const auto& tx : pblock->vtx) {
         if (tx->ContainsZerocoins()) {
             for (const CTxIn& in : tx->vin) {
@@ -5729,7 +5710,6 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
         LogPrintf("%s : block contains %d zWSP mints and %d zWSP spends\n", __func__, nMints, nSpends);
 
     if (!CheckBlockSignature(*pblock)){
-        std::cout << "CheckBlockSignature failed\n";
         return error("ProcessNewBlock() : bad proof-of-stake block signature");
     }
 
@@ -5744,17 +5724,14 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
 
         // Ensure that CheckBlock() passes before calling AcceptBlock, as
         // belt-and-suspenders.
-        std::cout << "CheckBlock\n";
         bool ret = CheckBlock(*pblock, state, chainparams.GetConsensus());
         if (ret) {
             // Store to disk
-            std::cout << "AcceptBlock\n";
             ret = g_chainstate.AcceptBlock(pblock, state, chainparams, &pindex, fForceProcessing, nullptr, fNewBlock);
         }
         if (!ret) {
             printf("%s \n", FormatStateMessage(state).c_str());
 //            printf("block = %s \n", pblock->ToString().c_str());
-            std::cout << "BlockChecked\n";
             GetMainSignals().BlockChecked(*pblock, state);
             return error("%s: AcceptBlock FAILED (%s)", __func__, FormatStateMessage(state));
         }
@@ -5762,21 +5739,18 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
 
     NotifyHeaderTip();
 
-    std::cout << "ActivateBestChain\n";
     CValidationState state; // Only used to report errors, not invalidity - ignore it
     if (!g_chainstate.ActivateBestChain(state, chainparams, pblock))
         return error("%s: ActivateBestChain failed (%s)", __func__, FormatStateMessage(state));
 
     if (!fLiteMode && g_connman) {
         if (masternodeSync.RequestedMasternodeAssets > MASTERNODE_SYNC_LIST) {
-            std::cout << "obfuScationPool\n";
             obfuScationPool.NewBlock(g_connman.get());
             masternodePayments.ProcessBlock(chainActive.Height() + 10);
             budget.NewBlock(g_connman.get());
         }
     }
 
-    std::cout << "GetWallets\n";
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
     CWallet* pwallet = nullptr;
     if(!wallets.empty()){
@@ -5784,12 +5758,10 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
     }
     if (pwallet) {
         // If turned on MultiSend will send a transaction (or more) on the after maturity of a stake
-        std::cout << "isMultiSendEnabled\n";
         if (pwallet->isMultiSendEnabled())
             pwallet->MultiSend();
 
         // If turned on Auto Combine will scan wallet for dust to combine
-        std::cout << "fCombineDust\n";
         if (pwallet->fCombineDust)
             pwallet->AutoCombineDust();
     }
