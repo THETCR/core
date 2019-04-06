@@ -261,7 +261,6 @@ public:
 
         //!WISPR
         virtual bool UpdatedTransaction(const uint256 &hash){ return false; }
-        virtual void SetBestChain(const CBlockLocator &chain){}
         virtual void Inventory(const uint256 &hash){}
     };
 

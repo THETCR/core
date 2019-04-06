@@ -152,7 +152,6 @@ protected:
     friend void ::UnregisterAllValidationInterfaces();
     virtual void NotifyTransactionLock(const CTransaction &tx){}
     virtual bool UpdatedTransaction(const uint256 &hash){ return false; }
-    virtual void SetBestChain(const CBlockLocator &chain){}
     virtual void Inventory(const uint256 &hash){}
 //    virtual void BlockFound(const uint256 &hash){}
 //    virtual void ResetRequestCount(const uint256 &hash) {};
@@ -199,8 +198,6 @@ public:
   void NotifyTransactionLock(const CTransaction &);
   /** Notifies listeners of an updated transaction without new data (for now: a coinbase potentially becoming visible). */
   bool UpdatedTransaction(const uint256 &);
-  /** Notifies listeners of a new active block chain. */
-  void SetBestChain(const CBlockLocator &);
   /** Notifies listeners about an inventory item being seen on the network. */
   void Inventory(const uint256 &) ;
   /** Notifies listeners that a block has been successfully mined */

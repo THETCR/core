@@ -32,7 +32,6 @@ struct ValidationInterfaceConnections {
   //!wispr
   boost::signals2::scoped_connection NotifyTransactionLock;
   boost::signals2::scoped_connection UpdatedTransaction;
-  boost::signals2::scoped_connection SetBestChain;
   boost::signals2::scoped_connection Inventory;
 //  boost::signals2::scoped_connection BlockFound;
 //  boost::signals2::scoped_connection ResetRequestCount;
@@ -56,8 +55,6 @@ struct MainSignalsInstance {
   boost::signals2::signal<void (const CTransaction &)> NotifyTransactionLock;
   /** Notifies listeners of an updated transaction without new data (for now: a coinbase potentially becoming visible). */
   boost::signals2::signal<bool (const uint256 &)> UpdatedTransaction;
-  /** Notifies listeners of a new active block chain. */
-  boost::signals2::signal<void (const CBlockLocator &)> SetBestChain;
   /** Notifies listeners about an inventory item being seen on the network. */
   boost::signals2::signal<void (const uint256 &)> Inventory;
   /** Notifies listeners that a block has been successfully mined */
@@ -129,7 +126,6 @@ void RegisterValidationInterface(CValidationInterface* pwalletIn) {
     //!wispr
     conns.NotifyTransactionLock = g_signals.m_internals->NotifyTransactionLock.connect(std::bind(&CValidationInterface::NotifyTransactionLock, pwalletIn, std::placeholders::_1));
     conns.UpdatedTransaction = g_signals.m_internals->UpdatedTransaction.connect(std::bind(&CValidationInterface::UpdatedTransaction, pwalletIn, std::placeholders::_1));
-    conns.SetBestChain = g_signals.m_internals->SetBestChain.connect(std::bind(&CValidationInterface::SetBestChain, pwalletIn, std::placeholders::_1));
     conns.Inventory = g_signals.m_internals->Inventory.connect(std::bind(&CValidationInterface::Inventory, pwalletIn, std::placeholders::_1));
 //    conns.BlockFound = g_signals.m_internals->BlockFound.connect(std::bind(&CValidationInterface::ResetRequestCount, pwalletIn, std::placeholders::_1));
 //    conns.ResetRequestCount = g_signals.m_internals->ResetRequestCount.connect(std::bind(&CValidationInterface::ResetRequestCount, pwalletIn, std::placeholders::_1));
@@ -225,11 +221,6 @@ bool CMainSignals::UpdatedTransaction(const uint256 &hash)
 {
     m_internals->UpdatedTransaction(hash);
     return false;
-}
-
-void CMainSignals::SetBestChain(const CBlockLocator &chain)
-{
-    m_internals->SetBestChain(chain);
 }
 
 void CMainSignals::Inventory(const uint256 &hash)

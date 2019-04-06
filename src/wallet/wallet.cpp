@@ -675,12 +675,6 @@ void CWallet::ChainStateFlushed(const CBlockLocator& loc)
     batch.WriteBestBlock(loc);
 }
 
-void CWallet::SetBestChain(const CBlockLocator& loc)
-{
-    WalletBatch batch(*database);
-    batch.WriteBestBlock(loc);
-}
-
 void CWallet::SetMinVersion(enum WalletFeature nVersion, WalletBatch* batch_in, bool fExplicit)
 {
     LOCK(cs_wallet);
