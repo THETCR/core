@@ -6574,8 +6574,8 @@ bool CWallet::CreateTransaction(const std::vector<std::pair<CScript, CAmount> >&
                 *static_cast<CTransactionRef*>(&wtxNew.tx) = MakeTransactionRef(std::move(txNew));
 
                 // Limit size
-                unsigned int nBytes = ::GetSerializeSize(*(CTransaction*)&wtxNew, PROTOCOL_VERSION);
-                if (nBytes >= MAX_STANDARD_TX_SIZE) {
+                unsigned int nBytes = GetTransactionWeight(*wtxNew.tx);
+                if (nBytes >= MAX_STANDARD_TX_WEIGHT) {
                     strFailReason = _("Transaction too large");
                     return false;
                 }
@@ -6723,7 +6723,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
             // Limit size
             unsigned int nBytes = ::GetSerializeSize(txNew, PROTOCOL_VERSION);
-            if (nBytes >= DEFAULT_BLOCK_MAX_SIZE / 5)
+            if (nBytes >= DEFAULT_BLOCK_MAX_WEIGHT / 5)
                 return error("CreateCoinStake : exceeded coinstake size limit");
 
             //Masternode payment
@@ -7319,7 +7319,7 @@ void CWallet::AutoCombineDust()
 
             // Around 180 bytes per input. We use 190 to be certain
             txSizeEstimate += 190;
-            if (txSizeEstimate >= MAX_STANDARD_TX_SIZE - 200) {
+            if (txSizeEstimate >= MAX_STANDARD_TX_WEIGHT - 200) {
                 maxSize = true;
                 break;
             }
