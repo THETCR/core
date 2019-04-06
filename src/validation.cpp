@@ -812,7 +812,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         return state.DoS(10, error("AcceptToMemoryPool : Zerocoin transactions are temporarily disabled for maintenance"), REJECT_INVALID, "bad-tx");
 
     int chainHeight = chainActive.Height();
-    if (!CheckTransaction(tx, chainHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT(), true, state, isBlockBetweenFakeSerialAttackRange(chainHeight)))
+    if (!CheckTransaction(tx, state, true, chainHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT(), true,  isBlockBetweenFakeSerialAttackRange(chainHeight)))
         return state.DoS(100, error("AcceptToMemoryPool: : CheckTransaction failed"), REJECT_INVALID, "bad-tx");
 
     // Coinbase is only valid in a block, not as a loose transaction
@@ -1097,7 +1097,7 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
         *pfMissingInputs = false;
 
 
-    if (!CheckTransaction(tx, chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT(), true, state))
+    if (!CheckTransaction(tx, state, true, chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT(), true))
         return error("AcceptableInputs: : CheckTransaction failed");
 
     // Coinbase is only valid in a block, not as a loose transaction
@@ -1413,7 +1413,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         *pfMissingInputs = false;
     }
 
-    if (!CheckTransaction(tx, chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT(), true, state))
+    if (!CheckTransaction(tx, state, true, chainActive.Height() >= Params().NEW_PROTOCOLS_STARTHEIGHT(), true))
         return false; // state filled in by CheckTransaction
 
     // Coinbase is only valid in a block, not as a loose transaction
@@ -4913,9 +4913,10 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     for (const auto& tx : block.vtx) {
         if (!CheckTransaction(
                 *tx,
+                state,
+                true,
                 fZerocoinActive,
                 blockHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT(),
-                state,
                 isBlockBetweenFakeSerialAttackRange(blockHeight)
         )){
             return state.Invalid(false, state.GetRejectCode(), state.GetRejectReason(),
@@ -5401,15 +5402,15 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         pindexPrev = (*mi).second;
         if (pindexPrev->nStatus & BLOCK_FAILED_MASK) {
             //If this "invalid" block is an exact match from the checkpoints, then reconsider it
-            if (Checkpoints::CheckBlock(pindexPrev->nHeight, block.hashPrevBlock, true)) {
-                LogPrintf("%s : Reconsidering block %s height %d\n", __func__, pindexPrev->GetBlockHash().GetHex(), pindexPrev->nHeight);
-                CValidationState statePrev;
-                ResetBlockFailureFlags(pindexPrev);
-                if (statePrev.IsValid()) {
-                    ::ActivateBestChain(statePrev, chainparams);
-                    return true;
-                }
-            }
+//            if (Checkpoints::CheckBlock(pindexPrev->nHeight, block.hashPrevBlock, true)) {
+//                LogPrintf("%s : Reconsidering block %s height %d\n", __func__, pindexPrev->GetBlockHash().GetHex(), pindexPrev->nHeight);
+//                CValidationState statePrev;
+//                ResetBlockFailureFlags(pindexPrev);
+//                if (statePrev.IsValid()) {
+//                    ::ActivateBestChain(statePrev, chainparams);
+//                    return true;
+//                }
+//            }
             return state.DoS(100, error("%s : prev block %s is invalid, unable to add block %s", __func__, block.hashPrevBlock.GetHex(), block.GetHash().GetHex()),
                              REJECT_INVALID, "bad-prevblk");
         }

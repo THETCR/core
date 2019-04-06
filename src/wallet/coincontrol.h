@@ -22,8 +22,6 @@ public:
     bool useSwiftTX;
     bool fSplitBlock;
     int nSplitBlock;
-    //! Minimum absolute fee (not per kilobyte)
-    CAmount nMinimumTotalFee;
     //! Override the default change type if set, ignored if destChange is set
     boost::optional<OutputType> m_change_type;
     //! If false, allows unselected inputs, but requires all selected inputs be used

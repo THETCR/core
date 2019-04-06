@@ -1478,7 +1478,7 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
 
     // ** find the coins we'll use
     std::vector<CTxIn> vCoins;
-    CAmount nValueMin = CENT;
+    CAmount nValueMin = 0.01 * COIN;
     CAmount nValueIn = 0;
 
     CAmount nOnlyDenominatedBalance;

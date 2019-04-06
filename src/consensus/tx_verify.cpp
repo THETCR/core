@@ -161,7 +161,7 @@ int64_t GetTransactionSigOpCost(const CTransaction& tx, const CCoinsViewCache& i
     return nSigOps;
 }
 
-bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fRejectBadUTXO, CValidationState& state, bool fFakeSerialAttack)
+bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fCheckDuplicateInputs, bool fZerocoinActive, bool fRejectBadUTXO, bool fFakeSerialAttack)
 {
     // Basic checks that don't depend on any context
     if (tx.vin.empty())
@@ -215,25 +215,33 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
     }
 
     // Check for duplicate inputs - note that this check is slow so we skip it in CheckBlock
-    std::set<COutPoint> vInOutPoints;
-    std::set<CBigNum> vZerocoinSpendSerials;
-    for (const auto& txin : tx.vin){
-        if (vInOutPoints.count(txin.prevout))
-            return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputs-duplicate");
+    if (fCheckDuplicateInputs) {
+        std::set<COutPoint> vInOutPoints;
+        std::set<CBigNum> vZerocoinSpendSerials;
+        for (const auto& txin : tx.vin)
+        {
+            if (vInOutPoints.count(txin.prevout))
+                return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputs-duplicate");
 
 
-        //duplicate zcspend serials are checked in CheckZerocoinSpend()
-        if (!txin.scriptSig.IsZerocoinSpend())
-            vInOutPoints.insert(txin.prevout);
+            //duplicate zcspend serials are checked in CheckZerocoinSpend()
+            if (!txin.scriptSig.IsZerocoinSpend())
+                vInOutPoints.insert(txin.prevout);
+        }
     }
 
-    if (tx.IsCoinBase()) {
+    if (tx.IsCoinBase())
+    {
         if (tx.vin[0].scriptSig.size() < 2 || tx.vin[0].scriptSig.size() > 150)
             return state.DoS(100, false, REJECT_INVALID, "bad-cb-length");
-    } else if (fZerocoinActive && tx.IsZerocoinSpend()) {
+    }
+    else if (fZerocoinActive && tx.IsZerocoinSpend())
+    {
         if(tx.vin.size() < 1 || static_cast<int>(tx.vin.size()) > Params().Zerocoin_MaxSpendsPerTransaction())
             return state.DoS(10, error("CheckTransaction() : Zerocoin Spend has more than allowed txin's"), REJECT_INVALID, "bad-zerocoinspend");
-    } else {
+    }
+    else
+    {
         for (const auto& txin : tx.vin)
             if (txin.prevout.IsNull() && (fZerocoinActive && !txin.scriptSig.IsZerocoinSpend()))
                 return state.DoS(10, false, REJECT_INVALID, "bad-txns-prevout-null");

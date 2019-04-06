@@ -14,7 +14,6 @@ void CCoinControl::SetNull()
     useObfuScation = false;
     fAllowOtherInputs = false;
     fAllowWatchOnly = true;
-    nMinimumTotalFee = 0;
     fSplitBlock = false;
     nSplitBlock = 1;
     destChange = CNoDestination();

@@ -117,30 +117,30 @@ void static RandomTransaction(CMutableTransaction &tx, bool fSingle) {
 
 BOOST_FIXTURE_TEST_SUITE(sighash_tests, BasicTestingSetup)
 
-    BOOST_AUTO_TEST_CASE(sighash_test)
-    {
-        SeedInsecureRand(false);
+BOOST_AUTO_TEST_CASE(sighash_test)
+{
+    SeedInsecureRand(false);
 
-#if defined(PRINT_SIGHASH_JSON)
-        std::cout << "[\n";
+    #if defined(PRINT_SIGHASH_JSON)
+    std::cout << "[\n";
     std::cout << "\t[\"raw_transaction, script, input_index, hashType, signature_hash (result)\"],\n";
     int nRandomTests = 500;
-#else
-        int nRandomTests = 50000;
-#endif
-        for (int i=0; i<nRandomTests; i++) {
-            int nHashType = InsecureRand32();
-            CMutableTransaction txTo;
-            RandomTransaction(txTo, (nHashType & 0x1f) == SIGHASH_SINGLE);
-            CScript scriptCode;
-            RandomScript(scriptCode);
-            int nIn = InsecureRandRange(txTo.vin.size());
+    #else
+    int nRandomTests = 50000;
+    #endif
+    for (int i=0; i<nRandomTests; i++) {
+        int nHashType = InsecureRand32();
+        CMutableTransaction txTo;
+        RandomTransaction(txTo, (nHashType & 0x1f) == SIGHASH_SINGLE);
+        CScript scriptCode;
+        RandomScript(scriptCode);
+        int nIn = InsecureRandRange(txTo.vin.size());
 
-            uint256 sh, sho;
-            sho = SignatureHashOld(scriptCode, CTransaction(txTo), nIn, nHashType);
-            sh = SignatureHash(scriptCode, txTo, nIn, nHashType, 0, SigVersion::BASE);
-#if defined(PRINT_SIGHASH_JSON)
-            CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
+        uint256 sh, sho;
+        sho = SignatureHashOld(scriptCode, CTransaction(txTo), nIn, nHashType);
+        sh = SignatureHash(scriptCode, txTo, nIn, nHashType, 0, SigVersion::BASE);
+        #if defined(PRINT_SIGHASH_JSON)
+        CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
         ss << txTo;
 
         std::cout << "\t[\"" ;
@@ -153,59 +153,59 @@ BOOST_FIXTURE_TEST_SUITE(sighash_tests, BasicTestingSetup)
           std::cout << ",";
         }
         std::cout << "\n";
-#endif
-            BOOST_CHECK(sh == sho);
-        }
-#if defined(PRINT_SIGHASH_JSON)
-        std::cout << "]\n";
-#endif
+        #endif
+        BOOST_CHECK(sh == sho);
     }
+    #if defined(PRINT_SIGHASH_JSON)
+    std::cout << "]\n";
+    #endif
+}
 
 // Goal: check that SignatureHash generates correct hash
-    BOOST_AUTO_TEST_CASE(sighash_from_data)
-    {
-        UniValue tests = read_json(std::string(json_tests::sighash, json_tests::sighash + sizeof(json_tests::sighash)));
+BOOST_AUTO_TEST_CASE(sighash_from_data)
+{
+    UniValue tests = read_json(std::string(json_tests::sighash, json_tests::sighash + sizeof(json_tests::sighash)));
 
-        for (unsigned int idx = 0; idx < tests.size(); idx++) {
-            UniValue test = tests[idx];
-            std::string strTest = test.write();
-            if (test.size() < 1) // Allow for extra stuff (useful for comments)
-            {
-                BOOST_ERROR("Bad test: " << strTest);
-                continue;
-            }
-            if (test.size() == 1) continue; // comment
-
-            std::string raw_tx, raw_script, sigHashHex;
-            int nIn, nHashType;
-            uint256 sh;
-            CTransactionRef tx;
-            CScript scriptCode = CScript();
-
-            try {
-                // deserialize test data
-                raw_tx = test[0].get_str();
-                raw_script = test[1].get_str();
-                nIn = test[2].get_int();
-                nHashType = test[3].get_int();
-                sigHashHex = test[4].get_str();
-
-                CDataStream stream(ParseHex(raw_tx), SER_NETWORK, PROTOCOL_VERSION);
-                stream >> tx;
-
-                CValidationState state;
-                BOOST_CHECK_MESSAGE(CheckTransaction(*tx, false, false, state), strTest);
-                BOOST_CHECK(state.IsValid());
-
-                std::vector<unsigned char> raw = ParseHex(raw_script);
-                scriptCode.insert(scriptCode.end(), raw.begin(), raw.end());
-            } catch (std::exception& e) {
-                BOOST_ERROR("Bad test, couldn't deserialize data: " << strTest << e.what());
-                continue;
-            }
-
-            sh = SignatureHash(scriptCode, *tx, nIn, nHashType, 0, SigVersion::BASE);
-            BOOST_CHECK_MESSAGE(sh.GetHex() == sigHashHex, strTest);
+    for (unsigned int idx = 0; idx < tests.size(); idx++) {
+        UniValue test = tests[idx];
+        std::string strTest = test.write();
+        if (test.size() < 1) // Allow for extra stuff (useful for comments)
+        {
+            BOOST_ERROR("Bad test: " << strTest);
+            continue;
         }
+        if (test.size() == 1) continue; // comment
+
+        std::string raw_tx, raw_script, sigHashHex;
+        int nIn, nHashType;
+        uint256 sh;
+        CTransactionRef tx;
+        CScript scriptCode = CScript();
+
+        try {
+          // deserialize test data
+          raw_tx = test[0].get_str();
+          raw_script = test[1].get_str();
+          nIn = test[2].get_int();
+          nHashType = test[3].get_int();
+          sigHashHex = test[4].get_str();
+
+          CDataStream stream(ParseHex(raw_tx), SER_NETWORK, PROTOCOL_VERSION);
+          stream >> tx;
+
+          CValidationState state;
+          BOOST_CHECK_MESSAGE(CheckTransaction(*tx, state), strTest);
+          BOOST_CHECK(state.IsValid());
+
+          std::vector<unsigned char> raw = ParseHex(raw_script);
+          scriptCode.insert(scriptCode.end(), raw.begin(), raw.end());
+        } catch (...) {
+          BOOST_ERROR("Bad test, couldn't deserialize data: " << strTest);
+          continue;
+        }
+
+        sh = SignatureHash(scriptCode, *tx, nIn, nHashType, 0, SigVersion::BASE);
+        BOOST_CHECK_MESSAGE(sh.GetHex() == sigHashHex, strTest);
     }
+}
 BOOST_AUTO_TEST_SUITE_END()
