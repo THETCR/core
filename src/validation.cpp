@@ -3168,9 +3168,11 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 //        return state.DoS(100, error("ConnectBlock() : PoS period not active"),
 //            REJECT_INVALID, "PoS-early");
 
-    if (pindex->nHeight > Params().LAST_POW_BLOCK() && block.IsProofOfWork())
+    if (pindex->nHeight > Params().LAST_POW_BLOCK() && block.IsProofOfWork()){
+        std::cout << pindex->nHeight << "\n";
         return state.DoS(100, error("ConnectBlock() : PoW period ended"),
                          REJECT_INVALID, "PoW-ended");
+    }
 
     bool fScriptChecks = true;
     if (!hashAssumeValid.IsNull()) {
