@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
         std::cout << chainActive.Tip()->GetMedianTimePast() << "\n";
         {
             LOCK(cs_main);
-            pblock->nVersion = 1;
+            pblock->nVersion = 7;
             pblock->nTime = chainActive.Tip()->GetMedianTimePast()+1;
             CMutableTransaction txCoinbase(*pblock->vtx[0]);
             txCoinbase.nVersion = 1;
