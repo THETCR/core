@@ -119,6 +119,11 @@ const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfSta
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake) {
     uint256 bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit() : Params().ProofOfWorkLimit();
 
+    if (Params().GetConsensus().fAllowMinDifficultyBlocks)
+    {
+            return bnTargetLimit.GetCompact();
+    }
+
     if (pindexLast == nullptr)
         return bnTargetLimit.GetCompact(); // genesis block
 

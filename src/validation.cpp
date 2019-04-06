@@ -5030,8 +5030,8 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     }else{
         nBitsRequired  = GetNextTargetRequired(pindexPrev, false);
     }
-    if (block.nBits != nBitsRequired)
-        return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
+//    if (block.nBits != nBitsRequired)
+//        return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
 
     // Check against checkpoints
     if (fCheckpointsEnabled) {
