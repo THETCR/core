@@ -5372,7 +5372,8 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         return false;
 
     std::cout << "PivProtocolsStartHeightSmallerThen\n";
-    if(Params().PivProtocolsStartHeightSmallerThen(pindexPrev->nHeight + 1)) {
+    if(Params().PivProtocolsStartHeightSmallerThen(pindexPrev->nHeight + 1 && block.vtx.size() > 1)) {
+        std::cout << "CheckCoinStakeTimestamp\n";
         if (block.IsProofOfStake() && !CheckCoinStakeTimestamp(block.GetBlockTime(), (int64_t) block.vtx[1]->nTime)) {
             std::cout << "coinstake timestamp\n";
             return state.DoS(50, error("AcceptBlock() : coinstake timestamp violation nTimeBlock=%d nTimeTx=%u\n",
