@@ -214,16 +214,19 @@ void CMainSignals::NewPoWValidBlock(const CBlockIndex *pindex, const std::shared
 
 void CMainSignals::NotifyTransactionLock(const CTransaction &tx)
 {
+    std::cout << "m_internals->NotifyTransactionLock\n";
     m_internals->NotifyTransactionLock(tx);
 }
 
 void CMainSignals::UpdatedTransaction(const uint256 &hash)
 {
+    std::cout << "m_internals->UpdatedTransaction\n";
     m_internals->UpdatedTransaction(hash);
 }
 
 void CMainSignals::Inventory(const uint256 &hash)
 {
+    std::cout << "m_internals->Inventory\n";
     m_internals->Inventory(hash);
 }
 
