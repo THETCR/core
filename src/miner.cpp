@@ -99,6 +99,7 @@ void BlockAssembler::resetBlock()
 Optional<int64_t> BlockAssembler::m_last_block_num_txs{nullopt};
 Optional<int64_t> BlockAssembler::m_last_block_weight{nullopt};
 
+std::pair<int, std::pair<uint256, uint256> > pCheckpointCache;
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn)
 {
     int64_t nTimeStart = GetTimeMicros();
@@ -120,8 +121,10 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     CBlockIndex* pindexPrev = chainActive.Tip();
     assert(pindexPrev != nullptr);
     nHeight = pindexPrev->nHeight + 1;
+    bool fProofOfStake = nHeight > Params().LAST_POW_BLOCK();
+    bool fZerocoinActive = nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT();
 
-    pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
+        pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
     if (chainparams.MineBlocksOnDemand())
@@ -173,7 +176,47 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblocktemplate->vchCoinbaseCommitment = GenerateCoinbaseCommitment(*pblock, pindexPrev, chainparams.GetConsensus());
     pblocktemplate->vTxFees[0] = -nFees;
 
+//    if (!fProofOfStake) {
+//        //Masternode and general budget payments
+//        FillBlockPayee(coinbaseTx, nFees, fProofOfStake, false);
+//
+//        //Make payee
+//        if (coinbaseTx.vout.size() > 1) {
+//            pblock->payee = coinbaseTx.vout[1].scriptPubKey;
+//        }
+//    }
+
+    nLastBlockTx = nBlockTx;
+
     LogPrintf("CreateNewBlock(): block weight: %u txs: %u fees: %ld sigops %d\n", GetBlockWeight(*pblock), nBlockTx, nFees, nBlockSigOpsCost);
+
+//    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+//    CWallet* pwallet = nullptr;
+//    if(!wallets.empty()){
+//        pwallet = wallets.at(0).get();
+//    }
+//    if (fProofOfStake) {
+//        pblock->nTime = GetAdjustedTime();
+//        CBlockIndex* pindexPrev = chainActive.Tip();
+//        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, Params().GetConsensus());
+//        CMutableTransaction txCoinStake;
+//        int64_t nSearchTime = pblock->nTime; // search to current time
+//        bool fStakeFound = false;
+//        if (nSearchTime >= nLastCoinStakeSearchTime) {
+//            unsigned int nTxNewTime = 0;
+//            if (pwallet->CreateCoinStake(*pwallet, pblock->nBits, nSearchTime - nLastCoinStakeSearchTime, txCoinStake, nTxNewTime)) {
+//                pblock->nTime = nTxNewTime;
+//                coinbaseTx.vout[0].SetEmpty();
+//                pblock->vtx.push_back(MakeTransactionRef(std::move(CTransaction(txCoinStake))));
+//                fStakeFound = true;
+//            }
+//            nLastCoinStakeSearchInterval = nSearchTime - nLastCoinStakeSearchTime;
+//            nLastCoinStakeSearchTime = nSearchTime;
+//        }
+//
+//        if (!fStakeFound)
+//            return nullptr;
+//    }
 
     // Fill in header
     pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
@@ -185,6 +228,28 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         pblock->nBits = GetNextTargetRequired(pindexPrev, pblock->IsProofOfStake());
     }
     pblock->nNonce         = 0;
+    //Calculate the accumulator checkpoint only if the previous cached checkpoint need to be updated
+    uint256 nCheckpoint;
+    uint256 hashBlockLastAccumulated = chainActive[nHeight - (nHeight % 10) - 10]->GetBlockHash();
+    if (nHeight >= pCheckpointCache.first || pCheckpointCache.second.first != hashBlockLastAccumulated) {
+        //For the period before v2 activation, zWSP will be disabled and previous block's checkpoint is all that will be needed
+        pCheckpointCache.second.second = pindexPrev->nAccumulatorCheckpoint;
+        if (pindexPrev->nHeight + 1 >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+            AccumulatorMap mapAccumulators(Params().Zerocoin_Params(false));
+            if (fZerocoinActive && !CalculateAccumulatorCheckpoint(nHeight, nCheckpoint, mapAccumulators)) {
+                LogPrintf("%s: failed to get accumulator checkpoint\n", __func__);
+            } else {
+                // the next time the accumulator checkpoint should be recalculated ( the next height that is multiple of 10)
+                pCheckpointCache.first = nHeight + (10 - (nHeight % 10));
+
+                // the block hash of the last block used in the accumulator checkpoint calc. This will handle reorg situations.
+                pCheckpointCache.second.first = hashBlockLastAccumulated;
+                pCheckpointCache.second.second = nCheckpoint;
+            }
+        }
+    }
+
+    pblock->nAccumulatorCheckpoint = pCheckpointCache.second.second;
     pblocktemplate->vTxSigOpsCost[0] = WITNESS_SCALE_FACTOR * GetLegacySigOpCount(*pblock->vtx[0]);
 
     CValidationState state;
