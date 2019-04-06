@@ -444,8 +444,8 @@ public:
         genesis = CreateGenesisBlock(1411111111, 2, 0x207fffff, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
         printf("Reg net genesis\n genesis = %s\n", genesis.ToString().c_str());
-        assert(consensus.hashGenesisBlock == uint256("ff317bf2fb18209612809fe42af88bec38c26769bb89df88c5f4ad391933ccc7"));
-        assert(genesis.hashMerkleRoot == uint256S("6a1b37300c4972fd827a02317446a729aaf77a80584dc51a8a06f0a6ec853b43"));
+        assert(consensus.hashGenesisBlock == uint256("dac15ca6bf3e831421cfc24078aec4de02c19e8dcc1b3a83b0e516d041faaf1d"));
+        assert(genesis.hashMerkleRoot == uint256S("2c9c60a275b2090856fbc87f484ee23c5aa7e462eff49cded1aff054e2204715"));
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();      //!< Regtest mode doesn't have any DNS seeds.
@@ -456,7 +456,7 @@ public:
 
         checkpointData = {
             {
-                {0, uint256S("ff317bf2fb18209612809fe42af88bec38c26769bb89df88c5f4ad391933ccc7")},
+                {0, uint256S("dac15ca6bf3e831421cfc24078aec4de02c19e8dcc1b3a83b0e516d041faaf1d")},
             }
         };
 

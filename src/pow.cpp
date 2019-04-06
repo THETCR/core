@@ -162,7 +162,7 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
     if(hash == uint256("41ddd599aa4bd28e5941b1e51cda473d78f829b84966f8d044ee92df8e2721d3"))
         return true;
 
-    if(hash == uint256("ff317bf2fb18209612809fe42af88bec38c26769bb89df88c5f4ad391933ccc7"))
+    if(hash == uint256("dac15ca6bf3e831421cfc24078aec4de02c19e8dcc1b3a83b0e516d041faaf1d"))
         return true;
 
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
