@@ -560,7 +560,7 @@ public:
 
         fMiningRequiresPeers = false;
         fDefaultConsistencyChecks = true;
-        consensus.fAllowMinDifficultyBlocks = false;
+        consensus.fAllowMinDifficultyBlocks = true;
         fMineBlocksOnDemand = true;
         consensus.fSkipProofOfWorkCheck = true;
         consensus.nNewProtocolStartHeight = 400000;
