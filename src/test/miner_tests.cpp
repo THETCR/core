@@ -228,10 +228,12 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
     for (unsigned int i = 0; i < sizeof(blockinfo)/sizeof(*blockinfo); ++i)
     {
         CBlock *pblock = &pblocktemplate->block; // pointer for convenience
+        std::cout << pblock->GetBlockTime() << "\n";
+        std::cout << chainActive.Tip()->GetMedianTimePast() << "\n";
         {
             LOCK(cs_main);
             pblock->nVersion = 1;
-            pblock->nTime = chainActive.Tip()->GetMedianTimePast()+3;
+            pblock->nTime = chainActive.Tip()->GetMedianTimePast()+1;
             CMutableTransaction txCoinbase(*pblock->vtx[0]);
             txCoinbase.nVersion = 1;
             txCoinbase.vin[0].scriptSig = CScript();
@@ -248,6 +250,8 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
             pblock->nNonce = blockinfo[i].nonce;
         }
         std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
+        std::cout << pblock->GetBlockTime() << "\n";
+        std::cout << chainActive.Tip()->GetMedianTimePast() << "\n";
         BOOST_CHECK(ProcessNewBlock(chainparams, shared_pblock, true, nullptr));
         pblock->hashPrevBlock = pblock->GetHash();
     }
