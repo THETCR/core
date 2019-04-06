@@ -97,6 +97,7 @@ BITCOIN_TESTS =\
   test/bech32_tests.cpp \
   test/bip32_tests.cpp \
   test/blockchain_tests.cpp \
+  test/blockencodings_tests.cpp \
   test/bswap_tests.cpp \
   test/checkqueue_tests.cpp \
   test/budget_tests.cpp \
@@ -107,6 +108,7 @@ BITCOIN_TESTS =\
   test/crypto_tests.cpp \
   test/cuckoocache_tests.cpp \
   test/denialofservice_tests.cpp \
+  test/descriptor_tests.cpp \
   test/flatfile_tests.cpp \
   test/fs_tests.cpp \
   test/getarg_tests.cpp \
@@ -119,6 +121,7 @@ BITCOIN_TESTS =\
   test/mempool_tests.cpp \
   test/merkle_tests.cpp \
   test/merkleblock_tests.cpp \
+  test/miner_tests.cpp \
   test/mruset_tests.cpp \
   test/multisig_tests.cpp \
   test/net_tests.cpp \
