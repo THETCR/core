@@ -5346,8 +5346,10 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     CBlockIndex* pindexPrev = nullptr;
     if (block.GetHash() != Params().GetConsensus().hashGenesisBlock) {
         BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
-        if (mi == mapBlockIndex.end())
+        if (mi == mapBlockIndex.end()){
+            std::cout << "bad-prevblk\n";
             return state.DoS(0, error("%s : prev block %s not found", __func__, block.hashPrevBlock.ToString().c_str()), 0, "bad-prevblk");
+        }
         pindexPrev = (*mi).second;
     }
 
@@ -5356,12 +5358,15 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 
     if(Params().PivProtocolsStartHeightSmallerThen(pindexPrev->nHeight + 1)) {
         if (block.IsProofOfStake() && !CheckCoinStakeTimestamp(block.GetBlockTime(), (int64_t) block.vtx[1]->nTime)) {
+            std::cout << "coinstake timestamp\n";
             return state.DoS(50, error("AcceptBlock() : coinstake timestamp violation nTimeBlock=%d nTimeTx=%u\n",
                                        block.GetBlockTime(), block.vtx[1]->nTime));
         }
     }
-    if (block.GetHash() != Params().GetConsensus().hashGenesisBlock && !CheckWork(block, pindexPrev))
+    if (block.GetHash() != Params().GetConsensus().hashGenesisBlock && !CheckWork(block, pindexPrev)){
+        std::cout << "CheckWork failed\n";
         return false;
+    }
 
 
     bool isPoS = false;
@@ -5394,6 +5399,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 
     pindex->hashProofOfStake = mapProofOfStake[hash];
     if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
+        std::cout << "bnStakeModifierV2\n";
         pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
 
@@ -5442,6 +5448,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     int splitHeight = -1;
 
     if (isPoS) {
+        std::cout << "isPoS\n";
         LOCK(cs_main);
 
         // Blocks arrives in order, so if prev block is not the tip then we are on a fork.
