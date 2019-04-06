@@ -384,9 +384,13 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
     while (chainActive.Tip()->nHeight < 210000) {
         CBlockIndex* prev = chainActive.Tip();
         CBlockIndex* next = new CBlockIndex();
+        if(prev->nHeight > chainparams.LAST_POW_BLOCK()){
+            next->SetProofOfStake();
+        }
         next->phashBlock = new uint256(InsecureRand256());
         pcoinsTip->SetBestBlock(next->GetBlockHash());
         next->pprev = prev;
+        prev->pnext = next;
         next->nHeight = prev->nHeight + 1;
         next->BuildSkip();
         chainActive.SetTip(next);
