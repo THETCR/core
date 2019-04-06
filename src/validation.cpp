@@ -5033,8 +5033,8 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
 
     // Check timestamp against prev
     if (block.GetBlockTime() <= pindexPrev->GetMedianTimePast()){
-        std::cout << block.GetBlockTime();
-        std::cout << pindexPrev->GetMedianTimePast();
+        std::cout << block.GetBlockTime() << "\n";
+        std::cout << pindexPrev->GetMedianTimePast() << "\n";
         return state.Invalid(false, REJECT_INVALID, "time-too-old", "block's timestamp is too early");
     }
     // Check timestamp
