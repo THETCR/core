@@ -5702,6 +5702,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
 
     int nMints = 0;
     int nSpends = 0;
+    std::cout << "ContainsZerocoins\n";
     for (const auto& tx : pblock->vtx) {
         if (tx->ContainsZerocoins()) {
             for (const CTxIn& in : tx->vin) {
@@ -5733,14 +5734,17 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
 
         // Ensure that CheckBlock() passes before calling AcceptBlock, as
         // belt-and-suspenders.
+        std::cout << "CheckBlock\n";
         bool ret = CheckBlock(*pblock, state, chainparams.GetConsensus());
         if (ret) {
             // Store to disk
+            std::cout << "AcceptBlock\n";
             ret = g_chainstate.AcceptBlock(pblock, state, chainparams, &pindex, fForceProcessing, nullptr, fNewBlock);
         }
         if (!ret) {
             printf("%s \n", FormatStateMessage(state).c_str());
 //            printf("block = %s \n", pblock->ToString().c_str());
+            std::cout << "BlockChecked\n";
             GetMainSignals().BlockChecked(*pblock, state);
             return error("%s: AcceptBlock FAILED (%s)", __func__, FormatStateMessage(state));
         }
@@ -5748,18 +5752,21 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
 
     NotifyHeaderTip();
 
+    std::cout << "ActivateBestChain\n";
     CValidationState state; // Only used to report errors, not invalidity - ignore it
     if (!g_chainstate.ActivateBestChain(state, chainparams, pblock))
         return error("%s: ActivateBestChain failed (%s)", __func__, FormatStateMessage(state));
 
-    if (!fLiteMode) {
+    if (!fLiteMode && g_connman) {
         if (masternodeSync.RequestedMasternodeAssets > MASTERNODE_SYNC_LIST) {
+            std::cout << "obfuScationPool\n";
             obfuScationPool.NewBlock(g_connman.get());
             masternodePayments.ProcessBlock(chainActive.Height() + 10);
             budget.NewBlock(g_connman.get());
         }
     }
 
+    std::cout << "GetWallets\n";
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
     CWallet* pwallet = nullptr;
     if(!wallets.empty()){
@@ -5767,10 +5774,12 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
     }
     if (pwallet) {
         // If turned on MultiSend will send a transaction (or more) on the after maturity of a stake
+        std::cout << "isMultiSendEnabled\n";
         if (pwallet->isMultiSendEnabled())
             pwallet->MultiSend();
 
         // If turned on Auto Combine will scan wallet for dust to combine
+        std::cout << "fCombineDust\n";
         if (pwallet->fCombineDust)
             pwallet->AutoCombineDust();
     }
