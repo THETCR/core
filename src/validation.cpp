@@ -5032,9 +5032,11 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     }
 
     // Check timestamp against prev
-    if (block.GetBlockTime() <= pindexPrev->GetMedianTimePast())
+    if (block.GetBlockTime() <= pindexPrev->GetMedianTimePast()){
+        std::cout << block.GetBlockTime();
+        std::cout << pindexPrev->GetMedianTimePast();
         return state.Invalid(false, REJECT_INVALID, "time-too-old", "block's timestamp is too early");
-
+    }
     // Check timestamp
     if (block.GetBlockTime() > nAdjustedTime + MAX_FUTURE_BLOCK_TIME)
         return state.Invalid(false, REJECT_INVALID, "time-too-new", "block timestamp too far in the future");
@@ -5720,7 +5722,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
         }
         if (!ret) {
             printf("%s \n", FormatStateMessage(state).c_str());
-            printf("block = %s \n", pblock->ToString().c_str());
+//            printf("block = %s \n", pblock->ToString().c_str());
             GetMainSignals().BlockChecked(*pblock, state);
             return error("%s: AcceptBlock FAILED (%s)", __func__, FormatStateMessage(state));
         }
