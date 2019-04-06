@@ -407,7 +407,7 @@ public:
         consensus.BIP34Hash = uint256();
         consensus.BIP65Height = 1351; // BIP65 activated on regtest (Used in functional tests)
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in functional tests)
-        consensus.powLimit = ~uint256(0) >> 1; // WISPR starting difficulty is 1 / 2^12
+        consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 16 * 60; // two weeks
         consensus.nPowTargetSpacing = 64;
         consensus.fPowAllowMinDifficultyBlocks = true;
@@ -441,8 +441,9 @@ public:
 
         UpdateVersionBitsParametersFromArgs(args);
 
-        genesis = CreateGenesisBlock(1411111111, 2, consensus.powLimit.GetCompact(), 1, 0 * COIN);
+        genesis = CreateGenesisBlock(1411111111, 2, 0x207fffff, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
+        printf("Reg net genesis\n genesis = %s\n", genesis.ToString().c_str());
         assert(consensus.hashGenesisBlock == uint256("ff317bf2fb18209612809fe42af88bec38c26769bb89df88c5f4ad391933ccc7"));
         assert(genesis.hashMerkleRoot == uint256S("6a1b37300c4972fd827a02317446a729aaf77a80584dc51a8a06f0a6ec853b43"));
 
@@ -482,7 +483,7 @@ public:
         consensus.nRejectBlockOutdatedMajority = 950;
         consensus.nToCheckBlockUpgradeMajority = 1000;
         consensus.nMaxReorganizationDepth = 500;
-        consensus.powLimit = ~uint256(0) >> 1; // WISPR starting difficulty is 1 / 2^12
+//        consensus.powLimit = ~uint256(0) >> 1; // WISPR starting difficulty is 1 / 2^12
         consensus.stakeLimit = ~uint256(0) >> 48;
         consensus.nTargetTimespanV1 = 16 * 60; // WISPR Old: 1 day
         consensus.nTargetTimespanV2 = 1 * 60; // WISPR New: 1 day
