@@ -4991,7 +4991,7 @@ bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
     LogPrintf("Block hashProof=%s, hashTarget=%s\n", hashProof.ToString(), hashTarget.ToString());
     LogPrintf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
     printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
-    if (block.IsProofOfWork()) {
+    if (block.IsProofOfWork() && !consensusParams.fSkipProofOfWorkCheck) {
         if (hashProof > hashTarget){
             std::cout << "incorrect proof of work\n";
             return error("%s : incorrect proof of work - at %d", __func__, pindexPrev->nHeight + 1);

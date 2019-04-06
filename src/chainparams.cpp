@@ -163,7 +163,6 @@ public:
         consensus.nRejectBlockOutdatedMajority = 950;
         consensus.nToCheckBlockUpgradeMajority = 1000;
         consensus.nMaxReorganizationDepth = 500;
-        consensus.powLimit = ~uint256(0) >> 16; // WISPR starting difficulty is 1 / 2^12
         consensus.stakeLimit = ~uint256(0) >> 48;
         consensus.nTargetTimespanV1 =  16 * 60; // WISPR Old: 1 day
         consensus.nTargetTimespanV2 =  1 * 60; // WISPR New: 1 day
