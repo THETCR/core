@@ -54,7 +54,7 @@ struct MainSignalsInstance {
   /** Notifies listeners of an updated transaction lock without new data. */
   boost::signals2::signal<void (const CTransaction &)> NotifyTransactionLock;
   /** Notifies listeners of an updated transaction without new data (for now: a coinbase potentially becoming visible). */
-  boost::signals2::signal<bool (const uint256 &)> UpdatedTransaction;
+  boost::signals2::signal<void (const uint256 &)> UpdatedTransaction;
   /** Notifies listeners about an inventory item being seen on the network. */
   boost::signals2::signal<void (const uint256 &)> Inventory;
   /** Notifies listeners that a block has been successfully mined */
@@ -217,10 +217,9 @@ void CMainSignals::NotifyTransactionLock(const CTransaction &tx)
     m_internals->NotifyTransactionLock(tx);
 }
 
-bool CMainSignals::UpdatedTransaction(const uint256 &hash)
+void CMainSignals::UpdatedTransaction(const uint256 &hash)
 {
     m_internals->UpdatedTransaction(hash);
-    return false;
 }
 
 void CMainSignals::Inventory(const uint256 &hash)

@@ -213,9 +213,9 @@ public:
         auto locked_chain = m_chain.assumeLocked();
         m_notifications->ResendWalletTransactions(*locked_chain, best_block_time);
     }
-    bool UpdatedTransaction(const uint256 &hash) override
+    void UpdatedTransaction(const uint256 &hash) override
     {
-       return m_notifications->UpdatedTransaction(hash);
+        m_notifications->UpdatedTransaction(hash);
     }
     void Inventory(const uint256 &hash) override {
         m_notifications->Inventory(hash);

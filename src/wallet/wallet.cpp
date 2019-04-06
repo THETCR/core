@@ -7044,7 +7044,7 @@ set<CTxDestination> CWallet::GetAccountAddresses(string strAccount) const
     return result;
 }
 
-bool CWallet::UpdatedTransaction(const uint256& hashTx)
+void CWallet::UpdatedTransaction(const uint256& hashTx)
 {
     {
         LOCK(cs_wallet);
@@ -7052,10 +7052,8 @@ bool CWallet::UpdatedTransaction(const uint256& hashTx)
         map<uint256, CWalletTx>::const_iterator mi = mapWallet.find(hashTx);
         if (mi != mapWallet.end()) {
             NotifyTransactionChanged(this, hashTx, CT_UPDATED);
-            return true;
         }
     }
-    return false;
 }
 
 /** @} */ // end of Actions
