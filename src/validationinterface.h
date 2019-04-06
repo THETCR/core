@@ -205,8 +205,6 @@ public:
   void Inventory(const uint256 &) ;
   /** Notifies listeners that a block has been successfully mined */
   void BlockFound(const uint256 &);
-  /** Notifies listeners that a block has been successfully mined */
-  void ResetRequestCount(const uint256 &);
 };
 
 CMainSignals& GetMainSignals();

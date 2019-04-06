@@ -35,7 +35,7 @@ struct ValidationInterfaceConnections {
   boost::signals2::scoped_connection SetBestChain;
   boost::signals2::scoped_connection Inventory;
   boost::signals2::scoped_connection BlockFound;
-  boost::signals2::scoped_connection ResetRequestCount;
+//  boost::signals2::scoped_connection ResetRequestCount;
 
 };
 
@@ -62,8 +62,6 @@ struct MainSignalsInstance {
   boost::signals2::signal<void (const uint256 &)> Inventory;
   /** Notifies listeners that a block has been successfully mined */
   boost::signals2::signal<void (const uint256 &)> BlockFound;
-    /** Notifies listeners that a block has been successfully mined */
-    boost::signals2::signal<void (const uint256 &)> ResetRequestCount;
     // We are not allowed to assume the scheduler only runs in one thread,
     // but must ensure all callbacks happen in-order, so we end up creating
     // our own queue here :(
@@ -133,8 +131,8 @@ void RegisterValidationInterface(CValidationInterface* pwalletIn) {
     conns.UpdatedTransaction = g_signals.m_internals->UpdatedTransaction.connect(std::bind(&CValidationInterface::UpdatedTransaction, pwalletIn, std::placeholders::_1));
     conns.SetBestChain = g_signals.m_internals->SetBestChain.connect(std::bind(&CValidationInterface::SetBestChain, pwalletIn, std::placeholders::_1));
     conns.Inventory = g_signals.m_internals->Inventory.connect(std::bind(&CValidationInterface::Inventory, pwalletIn, std::placeholders::_1));
-    conns.BlockFound = g_signals.m_internals->BlockFound.connect(std::bind(&CValidationInterface::BlockFound, pwalletIn, std::placeholders::_1));
-    conns.ResetRequestCount = g_signals.m_internals->ResetRequestCount.connect(std::bind(&CValidationInterface::ResetRequestCount, pwalletIn, std::placeholders::_1));
+    conns.BlockFound = g_signals.m_internals->BlockFound.connect(std::bind(&CValidationInterface::ResetRequestCount, pwalletIn, std::placeholders::_1));
+//    conns.ResetRequestCount = g_signals.m_internals->ResetRequestCount.connect(std::bind(&CValidationInterface::ResetRequestCount, pwalletIn, std::placeholders::_1));
 }
 
 void UnregisterValidationInterface(CValidationInterface* pwalletIn) {
@@ -242,7 +240,7 @@ void CMainSignals::Inventory(const uint256 &hash)
 void CMainSignals::BlockFound(const uint256 &hash) {
     m_internals->BlockFound(hash);
 }
-void CMainSignals::ResetRequestCount(const uint256 &hash){
-    m_internals->ResetRequestCount(hash);
-}
+//void CMainSignals::ResetRequestCount(const uint256 &hash){
+//    m_internals->ResetRequestCount(hash);
+//}
 
