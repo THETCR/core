@@ -407,7 +407,7 @@ class CAddress : public CService
 {
 public:
     CAddress();
-    explicit CAddress(CService ipIn, ServiceFlags nServicesIn);
+    explicit CAddress(CService ipIn, ServiceFlags nServicesIn = NODE_NONE);
 
     void Init();
 
