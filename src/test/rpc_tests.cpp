@@ -21,8 +21,6 @@
 
 #include <rpc/blockchain.h>
 
-using namespace std;
-
 JSONRPCRequest createArgs(int nRequired, const char* address1= nullptr, const char* address2= nullptr)
 {
     JSONRPCRequest newRequest;
@@ -87,14 +85,6 @@ BOOST_AUTO_TEST_CASE(rpc_rawparams)
     BOOST_CHECK_NO_THROW(r = CallRPC(std::string("decoderawtransaction ")+rawtx+" false"));
     BOOST_CHECK_THROW(r = CallRPC(std::string("decoderawtransaction ")+rawtx+" false extra"), std::runtime_error);
 
-    BOOST_CHECK_THROW(CallRPC("signrawtransaction"), runtime_error);
-    BOOST_CHECK_THROW(CallRPC("signrawtransaction null"), runtime_error);
-    BOOST_CHECK_THROW(CallRPC("signrawtransaction ff00"), runtime_error);
-    BOOST_CHECK_NO_THROW(CallRPC(string("signrawtransaction ")+rawtx));
-//    BOOST_CHECK_NO_THROW(CallRPC(string("signrawtransaction ")+rawtx+" null null NONE|ANYONECANPAY"));
-//    BOOST_CHECK_NO_THROW(CallRPC(string("signrawtransaction ")+rawtx+" [] [] NONE|ANYONECANPAY"));
-    BOOST_CHECK_THROW(CallRPC(string("signrawtransaction ")+rawtx+" null null badenum"), runtime_error);
-
     // Only check failure cases for sendrawtransaction, there's no network to send to...
     BOOST_CHECK_THROW(CallRPC("sendrawtransaction"), std::runtime_error);
     BOOST_CHECK_THROW(CallRPC("sendrawtransaction null"), std::runtime_error);
@@ -132,7 +122,7 @@ BOOST_AUTO_TEST_CASE(rpc_rawsign)
       "[{\"txid\":\"204542c7d2f37b6dab7c71eead3ba017afd21fd2dc6ee57b5a32db1e672474ec\","
       "\"vout\":1,\"scriptPubKey\":\"a914f5404a39a4799d8710e15db4c4512c5e06f97fed87\","
       "\"redeemScript\":\"5121021431a18c7039660cd9e3612a2a47dc53b69cb38ea4ad743b7df8245fd0438f8e21029bbeff390ce736bd396af43b52a1c14ed52c086b1e5585c15931f68725772bac52ae\"}]";
-    r = CallRPC(string("createrawtransaction ")+prevout+" "+
+    r = CallRPC(std::string("createrawtransaction ")+prevout+" "+
       "{\"Wa4qRD6Eg9zZAUGA9NYgRDVeW3VEXC1x3N\":1}");
     std::string notsigned = r.get_str();
     std::string privkey1 = "\"5t9pdUbF2atWYjj5DgFyzbiJyghzkFfFcjj9NqLkGGc3vDbngLf\"";
@@ -143,7 +133,7 @@ BOOST_AUTO_TEST_CASE(rpc_rawsign)
     r = CallRPC(std::string("signrawtransactionwithkey ")+notsigned+" [] "+prevout);
     BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == false);
     r = CallRPC(std::string("signrawtransactionwithkey ")+notsigned+" ["+privkey1+","+privkey2+"] "+prevout);
-//    BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == true);
+    BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == true);
     g_rpc_interfaces = nullptr;
 }
 
@@ -206,6 +196,9 @@ static UniValue ValueFromString(const std::string &str)
 
 BOOST_AUTO_TEST_CASE(rpc_parse_monetary_values)
 {
+    BOOST_CHECK_THROW(AmountFromValue(ValueFromString("-0.00000001")), UniValue);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0")), 0LL);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.00000000")), 0LL);
     BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.00000001")), 1LL);
     BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.17622195")), 17622195LL);
     BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.5")), 50000000LL);
@@ -214,6 +207,24 @@ BOOST_AUTO_TEST_CASE(rpc_parse_monetary_values)
     BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("1.00000000")), 100000000LL);
     BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("20999999.9999999")), 2099999999999990LL);
     BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("20999999.99999999")), 2099999999999999LL);
+
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("1e-8")), COIN/100000000);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.1e-7")), COIN/100000000);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.01e-6")), COIN/100000000);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.0000000000000000000000000000000000000000000000000000000000000000000000000001e+68")), COIN/100000000);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("10000000000000000000000000000000000000000000000000000000000000000e-64")), COIN);
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000e64")), COIN);
+
+    BOOST_CHECK_THROW(AmountFromValue(ValueFromString("1e-9")), UniValue); //should fail
+    BOOST_CHECK_THROW(AmountFromValue(ValueFromString("0.000000019")), UniValue); //should fail
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.00000001000000")), 1LL); //should pass, cut trailing 0
+    BOOST_CHECK_THROW(AmountFromValue(ValueFromString("19e-9")), UniValue); //should fail
+    BOOST_CHECK_EQUAL(AmountFromValue(ValueFromString("0.19e-6")), 19); //should pass, leading 0 is present
+
+    BOOST_CHECK_THROW(AmountFromValue(ValueFromString("92233720368.54775808")), UniValue); //overflow error
+    BOOST_CHECK_THROW(AmountFromValue(ValueFromString("1e+11")), UniValue); //overflow error
+    BOOST_CHECK_THROW(AmountFromValue(ValueFromString("1e11")), UniValue); //overflow error signless
+    BOOST_CHECK_THROW(AmountFromValue(ValueFromString("93e+9")), UniValue); //overflow error
 }
 
 BOOST_AUTO_TEST_CASE(json_parse_errors)
@@ -223,6 +234,9 @@ BOOST_AUTO_TEST_CASE(json_parse_errors)
     // Valid, with leading or trailing whitespace
     BOOST_CHECK_EQUAL(ParseNonRFCJSONValue(" 1.0").get_real(), 1.0);
     BOOST_CHECK_EQUAL(ParseNonRFCJSONValue("1.0 ").get_real(), 1.0);
+
+    BOOST_CHECK_THROW(AmountFromValue(ParseNonRFCJSONValue(".19e-6")), std::runtime_error); //should fail, missing leading 0, therefore invalid JSON
+    BOOST_CHECK_EQUAL(AmountFromValue(ParseNonRFCJSONValue("0.00000000000000000000000000000000000001e+30 ")), 1);
     // Invalid, initial garbage
     BOOST_CHECK_THROW(ParseNonRFCJSONValue("[1.0"), std::runtime_error);
     BOOST_CHECK_THROW(ParseNonRFCJSONValue("a1.0"), std::runtime_error);
@@ -249,10 +263,10 @@ BOOST_AUTO_TEST_CASE(rpc_ban)
     BOOST_CHECK_NO_THROW(CallRPC(std::string("setban 127.0.0.0 remove")));
     BOOST_CHECK_NO_THROW(r = CallRPC(std::string("listbanned")));
     ar = r.get_array();
-    BOOST_CHECK_EQUAL(ar.size(), 0);
+    BOOST_CHECK_EQUAL(ar.size(), 0U);
 
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("setban 127.0.0.0/24 add 1607731200 true")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
+    BOOST_CHECK_NO_THROW(r = CallRPC(std::string("setban 127.0.0.0/24 add 1607731200 true")));
+    BOOST_CHECK_NO_THROW(r = CallRPC(std::string("listbanned")));
     ar = r.get_array();
     o1 = ar[0].get_obj();
     adr = find_value(o1, "address");
@@ -273,47 +287,149 @@ BOOST_AUTO_TEST_CASE(rpc_ban)
     BOOST_CHECK(banned_until.get_int64() > now);
     BOOST_CHECK(banned_until.get_int64()-now <= 200);
 
-    // must throw an exception because 127.0.0.1 is in already banned suubnet range
-    BOOST_CHECK_THROW(r = CallRPC(string("setban 127.0.0.1 add")), runtime_error);
+    // must throw an exception because 127.0.0.1 is in already banned subnet range
+    BOOST_CHECK_THROW(r = CallRPC(std::string("setban 127.0.0.1 add")), std::runtime_error);
 
-    BOOST_CHECK_NO_THROW(CallRPC(string("setban 127.0.0.0/24 remove")));;
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
+    BOOST_CHECK_NO_THROW(CallRPC(std::string("setban 127.0.0.0/24 remove")));
+    BOOST_CHECK_NO_THROW(r = CallRPC(std::string("listbanned")));
     ar = r.get_array();
-    BOOST_CHECK_EQUAL(ar.size(), 0);
+    BOOST_CHECK_EQUAL(ar.size(), 0U);
 
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("setban 127.0.0.0/255.255.0.0 add")));
-    BOOST_CHECK_THROW(r = CallRPC(string("setban 127.0.1.1 add")), runtime_error);
+    BOOST_CHECK_NO_THROW(r = CallRPC(std::string("setban 127.0.0.0/255.255.0.0 add")));
+    BOOST_CHECK_THROW(r = CallRPC(std::string("setban 127.0.1.1 add")), std::runtime_error);
 
-    BOOST_CHECK_NO_THROW(CallRPC(string("clearbanned")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
+    BOOST_CHECK_NO_THROW(CallRPC(std::string("clearbanned")));
+    BOOST_CHECK_NO_THROW(r = CallRPC(std::string("listbanned")));
     ar = r.get_array();
-    BOOST_CHECK_EQUAL(ar.size(), 0);
+    BOOST_CHECK_EQUAL(ar.size(), 0U);
 
-    BOOST_CHECK_THROW(r = CallRPC(string("setban test add")), runtime_error); //invalid IP
+
+    BOOST_CHECK_THROW(r = CallRPC(std::string("setban test add")), std::runtime_error); //invalid IP
 
     //IPv6 tests
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("setban FE80:0000:0000:0000:0202:B3FF:FE1E:8329 add")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
+    BOOST_CHECK_NO_THROW(r = CallRPC(std::string("setban FE80:0000:0000:0000:0202:B3FF:FE1E:8329 add")));
+    BOOST_CHECK_NO_THROW(r = CallRPC(std::string("listbanned")));
     ar = r.get_array();
     o1 = ar[0].get_obj();
     adr = find_value(o1, "address");
     BOOST_CHECK_EQUAL(adr.get_str(), "fe80::202:b3ff:fe1e:8329/128");
 
-    BOOST_CHECK_NO_THROW(CallRPC(string("clearbanned")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("setban 2001:db8::/ffff:fffc:0:0:0:0:0:0 add")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
+    BOOST_CHECK_NO_THROW(CallRPC(std::string("clearbanned")));
+    BOOST_CHECK_NO_THROW(r = CallRPC(std::string("setban 2001:db8::/ffff:fffc:0:0:0:0:0:0 add")));
+    BOOST_CHECK_NO_THROW(r = CallRPC(std::string("listbanned")));
     ar = r.get_array();
     o1 = ar[0].get_obj();
     adr = find_value(o1, "address");
     BOOST_CHECK_EQUAL(adr.get_str(), "2001:db8::/30");
 
-    BOOST_CHECK_NO_THROW(CallRPC(string("clearbanned")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("setban 2001:4d48:ac57:400:cacf:e9ff:fe1d:9c63/128 add")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
+    BOOST_CHECK_NO_THROW(CallRPC(std::string("clearbanned")));
+    BOOST_CHECK_NO_THROW(r = CallRPC(std::string("setban 2001:4d48:ac57:400:cacf:e9ff:fe1d:9c63/128 add")));
+    BOOST_CHECK_NO_THROW(r = CallRPC(std::string("listbanned")));
     ar = r.get_array();
     o1 = ar[0].get_obj();
     adr = find_value(o1, "address");
     BOOST_CHECK_EQUAL(adr.get_str(), "2001:4d48:ac57:400:cacf:e9ff:fe1d:9c63/128");
+}
+
+BOOST_AUTO_TEST_CASE(rpc_convert_values_generatetoaddress)
+{
+    UniValue result;
+
+    BOOST_CHECK_NO_THROW(result = RPCConvertValues("generatetoaddress", {"101", "mkESjLZW66TmHhiFX8MCaBjrhZ543PPh9a"}));
+    BOOST_CHECK_EQUAL(result[0].get_int(), 101);
+    BOOST_CHECK_EQUAL(result[1].get_str(), "mkESjLZW66TmHhiFX8MCaBjrhZ543PPh9a");
+
+    BOOST_CHECK_NO_THROW(result = RPCConvertValues("generatetoaddress", {"101", "mhMbmE2tE9xzJYCV9aNC8jKWN31vtGrguU"}));
+    BOOST_CHECK_EQUAL(result[0].get_int(), 101);
+    BOOST_CHECK_EQUAL(result[1].get_str(), "mhMbmE2tE9xzJYCV9aNC8jKWN31vtGrguU");
+
+    BOOST_CHECK_NO_THROW(result = RPCConvertValues("generatetoaddress", {"1", "mkESjLZW66TmHhiFX8MCaBjrhZ543PPh9a", "9"}));
+    BOOST_CHECK_EQUAL(result[0].get_int(), 1);
+    BOOST_CHECK_EQUAL(result[1].get_str(), "mkESjLZW66TmHhiFX8MCaBjrhZ543PPh9a");
+    BOOST_CHECK_EQUAL(result[2].get_int(), 9);
+
+    BOOST_CHECK_NO_THROW(result = RPCConvertValues("generatetoaddress", {"1", "mhMbmE2tE9xzJYCV9aNC8jKWN31vtGrguU", "9"}));
+    BOOST_CHECK_EQUAL(result[0].get_int(), 1);
+    BOOST_CHECK_EQUAL(result[1].get_str(), "mhMbmE2tE9xzJYCV9aNC8jKWN31vtGrguU");
+    BOOST_CHECK_EQUAL(result[2].get_int(), 9);
+}
+
+BOOST_AUTO_TEST_CASE(rpc_getblockstats_calculate_percentiles_by_weight)
+{
+    int64_t total_weight = 200;
+    std::vector<std::pair<CAmount, int64_t>> feerates;
+    CAmount result[NUM_GETBLOCKSTATS_PERCENTILES] = { 0 };
+
+    for (int64_t i = 0; i < 100; i++) {
+        feerates.emplace_back(std::make_pair(1 ,1));
+    }
+
+    for (int64_t i = 0; i < 100; i++) {
+        feerates.emplace_back(std::make_pair(2 ,1));
+    }
+
+    CalculatePercentilesByWeight(result, feerates, total_weight);
+    BOOST_CHECK_EQUAL(result[0], 1);
+    BOOST_CHECK_EQUAL(result[1], 1);
+    BOOST_CHECK_EQUAL(result[2], 1);
+    BOOST_CHECK_EQUAL(result[3], 2);
+    BOOST_CHECK_EQUAL(result[4], 2);
+
+    // Test with more pairs, and two pairs overlapping 2 percentiles.
+    total_weight = 100;
+    CAmount result2[NUM_GETBLOCKSTATS_PERCENTILES] = { 0 };
+    feerates.clear();
+
+    feerates.emplace_back(std::make_pair(1, 9));
+    feerates.emplace_back(std::make_pair(2 , 16)); //10th + 25th percentile
+    feerates.emplace_back(std::make_pair(4 ,50)); //50th + 75th percentile
+    feerates.emplace_back(std::make_pair(5 ,10));
+    feerates.emplace_back(std::make_pair(9 ,15));  // 90th percentile
+
+    CalculatePercentilesByWeight(result2, feerates, total_weight);
+
+    BOOST_CHECK_EQUAL(result2[0], 2);
+    BOOST_CHECK_EQUAL(result2[1], 2);
+    BOOST_CHECK_EQUAL(result2[2], 4);
+    BOOST_CHECK_EQUAL(result2[3], 4);
+    BOOST_CHECK_EQUAL(result2[4], 9);
+
+    // Same test as above, but one of the percentile-overlapping pairs is split in 2.
+    total_weight = 100;
+    CAmount result3[NUM_GETBLOCKSTATS_PERCENTILES] = { 0 };
+    feerates.clear();
+
+    feerates.emplace_back(std::make_pair(1, 9));
+    feerates.emplace_back(std::make_pair(2 , 11)); // 10th percentile
+    feerates.emplace_back(std::make_pair(2 , 5)); // 25th percentile
+    feerates.emplace_back(std::make_pair(4 ,50)); //50th + 75th percentile
+    feerates.emplace_back(std::make_pair(5 ,10));
+    feerates.emplace_back(std::make_pair(9 ,15)); // 90th percentile
+
+    CalculatePercentilesByWeight(result3, feerates, total_weight);
+
+    BOOST_CHECK_EQUAL(result3[0], 2);
+    BOOST_CHECK_EQUAL(result3[1], 2);
+    BOOST_CHECK_EQUAL(result3[2], 4);
+    BOOST_CHECK_EQUAL(result3[3], 4);
+    BOOST_CHECK_EQUAL(result3[4], 9);
+
+    // Test with one transaction spanning all percentiles.
+    total_weight = 104;
+    CAmount result4[NUM_GETBLOCKSTATS_PERCENTILES] = { 0 };
+    feerates.clear();
+
+    feerates.emplace_back(std::make_pair(1, 100));
+    feerates.emplace_back(std::make_pair(2, 1));
+    feerates.emplace_back(std::make_pair(3, 1));
+    feerates.emplace_back(std::make_pair(3, 1));
+    feerates.emplace_back(std::make_pair(999999, 1));
+
+    CalculatePercentilesByWeight(result4, feerates, total_weight);
+
+    for (int64_t i = 0; i < NUM_GETBLOCKSTATS_PERCENTILES; i++) {
+        BOOST_CHECK_EQUAL(result4[i], 1);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
