@@ -5782,7 +5782,7 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
                 continue;
 
             //check that it is matured
-            if (out.nDepth < (out.tx->tx->IsCoinStake() ? Params().COINBASE_MATURITY() : 10))
+            if (out.nDepth < (out.tx->tx->IsCoinStake() ? COINBASE_MATURITY : 10))
                 continue;
 
             //add to our stake set
@@ -7305,7 +7305,7 @@ void CWallet::AutoCombineDust()
             if (!out.fSpendable)
                 continue;
             //no coins should get this far if they dont have proper maturity, this is double checking
-            if (out.tx->tx->IsCoinStake() && out.tx->GetDepthInMainChain(*locked_chain) < Params().COINBASE_MATURITY() + 1)
+            if (out.tx->tx->IsCoinStake() && out.tx->GetDepthInMainChain(*locked_chain) < COINBASE_MATURITY + 1)
                 continue;
 
             COutPoint outpt(out.tx->tx->GetHash(), out.i);
@@ -7395,7 +7395,7 @@ bool CWallet::MultiSend()
     for (const COutput& out : vCoins) {
 
         //need output with precise confirm count - this is how we identify which is the output to send
-        if (out.tx->GetDepthInMainChain(*locked_chain) != Params().COINBASE_MATURITY() + 1)
+        if (out.tx->GetDepthInMainChain(*locked_chain) != COINBASE_MATURITY + 1)
             continue;
 
         COutPoint outpoint(out.tx->tx->GetHash(), out.i);
