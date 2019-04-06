@@ -179,7 +179,7 @@ public:
         consensus.nNewProtocolStartTime = 1539963322; //Friday, October 19, 2018 3:35:22 PM
         consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
         consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime;
-        consensus.fSkipProofOfWorkCheck = false;
+        consensus.fSkipProofOfWorkCheck = true;
         fTestnetToBeDeprecatedFieldRPC = false;
         fHeadersFirstSyncingActive = true;
 
