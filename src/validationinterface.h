@@ -143,6 +143,9 @@ protected:
      * callback was generated (not necessarily now)
      */
     virtual void BlockChecked(const CBlock&, const CValidationState&) {}
+    virtual void NotifyTransactionLock(const CTransaction &tx){}
+    virtual void UpdatedTransaction(const uint256 &hash){}
+    virtual void Inventory(const uint256 &hash){}
     /**
      * Notifies listeners that a block which builds directly on our current tip
      * has been received and connected to the headers tree, though not validated yet */
@@ -150,9 +153,6 @@ protected:
     friend void ::RegisterValidationInterface(CValidationInterface*);
     friend void ::UnregisterValidationInterface(CValidationInterface*);
     friend void ::UnregisterAllValidationInterfaces();
-    virtual void NotifyTransactionLock(const CTransaction &tx){}
-    virtual void UpdatedTransaction(const uint256 &hash){ return false; }
-    virtual void Inventory(const uint256 &hash){}
 //    virtual void BlockFound(const uint256 &hash){}
 //    virtual void ResetRequestCount(const uint256 &hash) {};
 };
