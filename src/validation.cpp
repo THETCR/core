@@ -5352,10 +5352,12 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     CBlockIndex *pindexDummy = nullptr;
     CBlockIndex *&pindex = ppindex ? *ppindex : pindexDummy;
     uint256 hash = block.GetHash();
+    std::cout << "bn2Hash\n";
     uint256 bn2Hash = block.IsProofOfWork() ? hash : block.vtx[1]->vin[0].prevout.hash;
 
     // Get prev block index
     CBlockIndex* pindexPrev = nullptr;
+    std::cout << "prev block index\n";
     if (block.GetHash() != Params().GetConsensus().hashGenesisBlock) {
         BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
         if (mi == mapBlockIndex.end()){
@@ -5365,9 +5367,11 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         pindexPrev = (*mi).second;
     }
 
+    std::cout << "AcceptBlockHeader\n";
     if (!AcceptBlockHeader(block, state, chainparams, &pindex))
         return false;
 
+    std::cout << "PivProtocolsStartHeightSmallerThen\n";
     if(Params().PivProtocolsStartHeightSmallerThen(pindexPrev->nHeight + 1)) {
         if (block.IsProofOfStake() && !CheckCoinStakeTimestamp(block.GetBlockTime(), (int64_t) block.vtx[1]->nTime)) {
             std::cout << "coinstake timestamp\n";
@@ -5383,6 +5387,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 
     bool isPoS = false;
     if (block.IsProofOfStake()) {
+        std::cout << "IsProofOfStake\n";
         isPoS = true;
         pindex->SetProofOfStake();
         pindex->prevoutStake = block.vtx[1]->vin[0].prevout;
@@ -5404,13 +5409,16 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
             mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
     }
     if(block.IsProofOfWork()){
+        std::cout << "IsProofOfWork\n";
         uint256 hashProofOfStake = block.GetPoWHash();
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
             mapProofOfStake.insert(std::make_pair(hash, hashProofOfStake));
     }
 
+    std::cout << "hashProofOfStake\n";
     pindex->hashProofOfStake = mapProofOfStake[hash];
     if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
+        std::cout << "bn2Hash\n";
         pindex->bnStakeModifierV2 = ComputeStakeModifier(pindex->pprev, bn2Hash);
     }
 
@@ -5446,6 +5454,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         if (pindex->nChainWork < nMinimumChainWork) return true;
     }
 
+    std::cout << "CheckBlock\n";
     if (!CheckBlock(block, state, chainparams.GetConsensus()) ||
         !ContextualCheckBlock(block, state, chainparams.GetConsensus(), pindex->pprev)) {
         if (state.IsInvalid() && !state.CorruptionPossible()) {
