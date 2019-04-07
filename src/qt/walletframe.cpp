@@ -222,7 +222,7 @@ void WalletFrame::changePassphrase()
         walletView->changePassphrase();
 }
 
-void WalletFrame::unlockWallet(bool setContext)
+void WalletFrame::unlockWalletSetContext(bool setContext)
 {
     if (setContext) {
         unlockWallet(AskPassphraseDialog::Context::Unlock_Full);

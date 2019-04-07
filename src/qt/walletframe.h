@@ -101,7 +101,7 @@ public Q_SLOTS:
     void changePassphrase();
     /** Ask for passphrase to unlock wallet temporarily */
     void unlockWallet(AskPassphraseDialog::Context context);
-    void unlockWallet(bool setContext);
+    void unlockWalletSetContext(bool setContext);
     /** Lock wallet */
     void lockWallet();
     /** Toggle Wallet Lock State */
