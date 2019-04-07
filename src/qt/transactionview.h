@@ -41,10 +41,11 @@ class TransactionView : public QWidget
 public:
     explicit TransactionView(const PlatformStyle *platformStyle, QWidget *parent = nullptr);
 
-    void setModel(WalletModel* model);
+    void setModel(WalletModel *model);
 
     // Date ranges for filter
-    enum DateEnum {
+    enum DateEnum
+    {
         All,
         Today,
         ThisWeek,
@@ -74,25 +75,25 @@ private:
     QLineEdit* amountWidget;
     QAction* hideOrphansAction;
 
-    QMenu* contextMenu;
-    QSignalMapper* mapperThirdPartyTxUrls;
+    QMenu *contextMenu;
+    QSignalMapper *mapperThirdPartyTxUrls;
 
-    QFrame* dateRangeWidget;
-    QDateTimeEdit* dateFrom;
-    QDateTimeEdit* dateTo;
+    QFrame *dateRangeWidget;
+    QDateTimeEdit *dateFrom;
+    QDateTimeEdit *dateTo;
     QAction *abandonAction;
     QAction *bumpFeeAction;
 
-    QWidget* createDateRangeWidget();
+    QWidget *createDateRangeWidget();
 
-    GUIUtil::TableViewLastColumnResizingFixer* columnResizingFixer;
+    GUIUtil::TableViewLastColumnResizingFixer *columnResizingFixer;
 
     virtual void resizeEvent(QResizeEvent* event);
 
-    bool eventFilter(QObject* obj, QEvent* event);
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private Q_SLOTS:
-    void contextualMenu(const QPoint&);
+    void contextualMenu(const QPoint &);
     void dateRangeChanged();
     void showDetails();
     void copyAddress();
@@ -100,14 +101,20 @@ private Q_SLOTS:
     void copyLabel();
     void copyAmount();
     void copyTxID();
+    void copyTxHex();
+    void copyTxPlainText();
     void openThirdPartyTxUrl(QString url);
     void updateWatchOnlyColumn(bool fHaveWatchOnly);
+    void abandonTx();
+    void bumpFee();
 
 Q_SIGNALS:
     void doubleClicked(const QModelIndex&);
 
     /**  Fired when a message should be reported to the user */
-    void message(const QString& title, const QString& message, unsigned int style);
+    void message(const QString &title, const QString &message, unsigned int style);
+
+    void bumpedFee(const uint256& txid);
 
     /** Send computed sum back to wallet-view */
     void trxAmount(QString amount);
@@ -119,9 +126,10 @@ public Q_SLOTS:
     void updateHideOrphans(bool fHide);
     void chooseWatchonly(int idx);
     void changedPrefix(const QString& prefix);
-    void changedAmount(const QString& amount);
+    void changedAmount();
     void exportClicked();
     void focusTransaction(const QModelIndex&);
+    void focusTransaction(const uint256& txid);
     void computeSum();
 };
 
