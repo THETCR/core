@@ -229,6 +229,7 @@ TransactionTableModel::TransactionTableModel(const PlatformStyle *_platformStyle
 
     connect(walletModel->getOptionsModel(), &OptionsModel::displayUnitChanged, this, &TransactionTableModel::updateDisplayUnit);
 
+    std::cout << "subscribeToCoreSignals\n";
     subscribeToCoreSignals();
 }
 
