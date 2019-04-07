@@ -4749,7 +4749,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
 
     // Check that the header is valid (particularly PoW).  This is mostly
     // redundant with the call in AcceptBlockHeader.
-    if (!CheckBlockHeader(block, state, consensusParams, block.IsProofOfWork()))
+    if (!CheckBlockHeader(block, state, consensusParams, fCheckPOW))
         return false;
 
 
@@ -5266,10 +5266,6 @@ bool CChainState::AcceptBlockHeader(const CBlockHeader& block, CValidationState&
     CheckBlockIndex(chainparams.GetConsensus());
 
     return true;
-}
-
-bool AcceptBlockHeader(const CBlockHeader& block, CValidationState& state, const CChainParams& chainparams, CBlockIndex** ppindex) {
-    return g_chainstate.AcceptBlockHeader(block, state, chainparams, ppindex);
 }
 
 // Exposed wrapper for AcceptBlockHeader

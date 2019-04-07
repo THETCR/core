@@ -73,7 +73,7 @@ BOOST_FIXTURE_TEST_CASE(scan_for_wallet_transactions, TestChain100Setup)
         BOOST_CHECK(result.last_failed_block.IsNull());
         BOOST_CHECK_EQUAL(result.last_scanned_block, newTip->GetBlockHash());
         BOOST_CHECK_EQUAL(*result.last_scanned_height, newTip->nHeight);
-        BOOST_CHECK_EQUAL(wallet.GetImmatureBalance(), 100 * COIN);
+        BOOST_CHECK_EQUAL(wallet.GetImmatureBalance(), 250000 * COIN);
     }
 
     // Prune the older block file.
@@ -92,7 +92,7 @@ BOOST_FIXTURE_TEST_CASE(scan_for_wallet_transactions, TestChain100Setup)
         BOOST_CHECK_EQUAL(result.last_failed_block, oldTip->GetBlockHash());
         BOOST_CHECK_EQUAL(result.last_scanned_block, newTip->GetBlockHash());
         BOOST_CHECK_EQUAL(*result.last_scanned_height, newTip->nHeight);
-        BOOST_CHECK_EQUAL(wallet.GetImmatureBalance(), 50 * COIN);
+        BOOST_CHECK_EQUAL(wallet.GetImmatureBalance(), 125000 * COIN);
     }
 
     // Prune the remaining block file.
@@ -403,7 +403,7 @@ BOOST_FIXTURE_TEST_CASE(ListCoins, ListCoinsTestingSetup)
     BOOST_CHECK_EQUAL(list.begin()->second.size(), 1U);
 
     // Check initial balance from one mature coinbase transaction.
-    BOOST_CHECK_EQUAL(50 * COIN, wallet->GetAvailableBalance());
+    BOOST_CHECK_EQUAL(125000 * COIN, wallet->GetAvailableBalance());
 
     // Add a transaction creating a change address, and confirm ListCoins still
     // returns the coin associated with the change address underneath the

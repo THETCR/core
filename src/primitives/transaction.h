@@ -18,7 +18,7 @@
 #include <iostream>
 
 class CTransaction;
-static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x04;
+static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
 static const int32_t WISPR_TXN_VERSION = 3;
 
 inline bool IsWisprTxVersion(int32_t nVersion)
@@ -256,7 +256,7 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
     tx.vout.clear();
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
     s >> tx.vin;
-    if (tx.vin.size() == 0 && fAllowWitness && IsWisprTxVersion(tx.nVersion)) {
+    if (tx.vin.size() == 0 && fAllowWitness) {
         /* We read a dummy or an empty vin. */
         s >> flags;
         if (flags != 0) {
@@ -292,7 +292,7 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
     }
     unsigned char flags = 0;
     // Consistency check
-    if (fAllowWitness && IsWisprTxVersion(_nVersion)) {
+    if (fAllowWitness) {
         /* Check whether witnesses need to be serialized. */
         if (tx.HasWitness()) {
             flags |= 1;

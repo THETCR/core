@@ -531,7 +531,6 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
 
 /** Store block on disk. If dbp is provided, the file is known to already reside on disk */
 bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** pindex, const FlatFilePos* dbp = nullptr, bool fAlreadyCheckedBlock = false);
-bool AcceptBlockHeader(const CBlockHeader& block, CValidationState& state, const CChainParams& chainparams, CBlockIndex** ppindex = nullptr);
 
 /** Check whether witness commitments are required for block. */
 bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params);
