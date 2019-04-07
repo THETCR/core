@@ -245,12 +245,12 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
 #endif
 
     QTimer* timerStakingIcon = new QTimer(labelStakingIcon);
-    connect(timerStakingIcon, SIGNAL(timeout()), this, SLOT(setStakingStatus()));
+    connect(timerStakingIcon, &QTimer::timeout, this, &BitcoinGUI::setStakingStatus);
     timerStakingIcon->start(10000);
     setStakingStatus();
 
     QTimer* timerAutoMintIcon = new QTimer(labelAutoMintIcon);
-    connect(timerAutoMintIcon, SIGNAL(timeout()), this, SLOT(setAutoMintStatus()));
+    connect(timerAutoMintIcon, &QTimer::timeout, this, &BitcoinGUI::setAutoMintStatus);
     timerAutoMintIcon->start(10000);
     setAutoMintStatus();
 }
@@ -330,8 +330,8 @@ void BitcoinGUI::createActions()
         masternodeAction->setCheckable(true);
         masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
         tabGroup->addAction(masternodeAction);
-        connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-        connect(masternodeAction, SIGNAL(triggered()), this, SLOT(gotoMasternodePage()));
+        connect(masternodeAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
+        connect(masternodeAction, &QAction::triggered, this, &BitcoinGUI::gotoMasternodePage);
     }
 
     // These showNormalIfMinimized are needed because Send Coins and Receive Coins
@@ -460,9 +460,9 @@ void BitcoinGUI::createActions()
     connect(labelAutoMintIcon, &GUIUtil::ClickableLabel::clicked, this, &BitcoinGUI::optionsClicked);
 
     // Get restart command-line parameters and handle restart
-    connect(rpcConsole, SIGNAL(handleRestart(QStringList)), this, SLOT(handleRestart(QStringList)));
+    connect(rpcConsole, &RPCConsole::handleRestart, this, &BitcoinGUI::handleRestart);
 
-    connect(openBlockExplorerAction, SIGNAL(triggered()), explorerWindow, SLOT(show()));
+    connect(openBlockExplorerAction, &QAction::triggered, explorerWindow, &BitcoinGUI::show);
 
     // prevents an open debug window from becoming stuck/unusable on client shutdown
     connect(quitAction, &QAction::triggered, rpcConsole, &QWidget::hide);
@@ -474,19 +474,19 @@ void BitcoinGUI::createActions()
         connect(backupWalletAction, &QAction::triggered, walletFrame, &WalletFrame::backupWallet);
         connect(changePassphraseAction, &QAction::triggered, walletFrame, &WalletFrame::changePassphrase);
         connect(unlockWalletAction, SIGNAL(triggered(bool)), walletFrame, SLOT(unlockWallet(bool)));
-        connect(lockWalletAction, SIGNAL(triggered()), walletFrame, SLOT(lockWallet()));
+        connect(lockWalletAction, &QAction::triggered, walletFrame, &WalletFrame::lockWallet);
         connect(signMessageAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
         connect(signMessageAction, &QAction::triggered, [this]{ gotoSignMessageTab(); });
         connect(verifyMessageAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
         connect(verifyMessageAction, &QAction::triggered, [this]{ gotoVerifyMessageTab(); });
-        connect(bip38ToolAction, SIGNAL(triggered()), this, SLOT(gotoBip38Tool()));
+        connect(bip38ToolAction, &QAction::triggered, this, &BitcoinGUI::gotoBip38Tool);
         connect(usedSendingAddressesAction, &QAction::triggered, walletFrame, &WalletFrame::usedSendingAddresses);
         connect(usedReceivingAddressesAction, &QAction::triggered, walletFrame, &WalletFrame::usedReceivingAddresses);
         connect(openAction, &QAction::triggered, this, &BitcoinGUI::openClicked);
-        connect(multiSendAction, SIGNAL(triggered()), this, SLOT(gotoMultiSendDialog()));
-        connect(multisigCreateAction, SIGNAL(triggered()), this, SLOT(gotoMultisigCreate()));
-        connect(multisigSpendAction, SIGNAL(triggered()), this, SLOT(gotoMultisigSpend()));
-        connect(multisigSignAction, SIGNAL(triggered()), this, SLOT(gotoMultisigSign()));
+        connect(multiSendAction, &QAction::triggered, this, &BitcoinGUI::gotoMultiSendDialog);
+        connect(multisigCreateAction, &QAction::triggered, this, &BitcoinGUI::gotoMultisigCreate);
+        connect(multisigSpendAction, &QAction::triggered, this, &BitcoinGUI::gotoMultisigSpend);
+        connect(multisigSignAction, &QAction::triggered, this, &BitcoinGUI::gotoMultisigSign);
         connect(m_open_wallet_action->menu(), &QMenu::aboutToShow, [this] {
             m_open_wallet_action->menu()->clear();
             for (std::string path : m_wallet_controller->getWalletsAvailableToOpen()) {
@@ -729,7 +729,7 @@ void BitcoinGUI::setClientModel(ClientModel *_clientModel)
         }
 #endif // ENABLE_WALLET
         unitDisplayControl->setOptionsModel(_clientModel->getOptionsModel());
-        connect(_clientModel->getOptionsModel(), SIGNAL(zeromintEnableChanged(bool)), this, SLOT(setAutoMintStatus()));
+        connect(_clientModel->getOptionsModel(),  &OptionsModel::zeromintEnableChanged, this, &BitcoinGUI::setAutoMintStatus);
 
         OptionsModel* optionsModel = _clientModel->getOptionsModel();
         if (optionsModel && trayIcon) {
