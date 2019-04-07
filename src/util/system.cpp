@@ -88,13 +88,10 @@ const int64_t AUTOMINT_DELAY = (60 * 5); // Wait at least 5 minutes until Automi
 
 int nAnonymizeWisprAmount = 1000;
 int nLiquidityProvider = 0;
-/** Spork enforcement enabled time */
-int64_t enforceMasternodePaymentsTime = 4085657524;
 /** All denominations used by obfuscation */
 std::vector<int64_t> obfuScationDenominations;
 std::string strBudgetMode = "";
 
-bool fDebug = false;
 // Application startup time (used for uptime calculation)
 const int64_t nStartupTime = GetTime();
 
