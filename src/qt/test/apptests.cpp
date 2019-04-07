@@ -66,6 +66,7 @@ void AppTests::appTests()
     }
 #endif
 
+    std::cout << "parameterSetup\n";
     m_app.parameterSetup();
     m_app.createOptionsModel(true /* reset settings */);
     QScopedPointer<const NetworkStyle> style(
