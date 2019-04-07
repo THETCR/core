@@ -139,6 +139,7 @@ void TestGUI()
     bool firstRun;
     std::cout<< "LoadWallet\n";
     wallet->LoadWallet(firstRun);
+    wallet->CreateZWspWallet();
     {
         LOCK(wallet->cs_wallet);
         wallet->SetAddressBook(GetDestinationForKey(test.coinbaseKey.GetPubKey(), wallet->m_default_address_type), "", "receive");
@@ -167,10 +168,15 @@ void TestGUI()
     auto node = interfaces::MakeNode();
     std::cout<< "Create optionsModel\n";
     OptionsModel optionsModel(*node);
+    std::cout<< "Create AddWallet\n";
     AddWallet(wallet);
+    std::cout<< "Create walletModel\n";
     WalletModel walletModel(std::move(node->getWallets().back()), *node, platformStyle.get(), &optionsModel);
+    std::cout<< "Create RemoveWallet\n";
     RemoveWallet(wallet);
+    std::cout<< "Create sendCoinsDialog\n";
     sendCoinsDialog.setModel(&walletModel);
+    std::cout<< "Create transactionView\n";
     transactionView.setModel(&walletModel);
 
     std::cout<< "Send two transaction\n";
