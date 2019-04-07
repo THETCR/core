@@ -62,7 +62,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
             // WSP stake reward
             sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
             sub.type = TransactionRecord::StakeMint;
-            sub.address = EncodeDestination((wtx.txout_address[1]);
+            sub.address = EncodeDestination(wtx.txout_address[1]);
             sub.credit = nNet;
         } else {
             //Masternode reward
