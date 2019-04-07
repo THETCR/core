@@ -182,11 +182,17 @@ void TestGUI()
     std::cout<< "Send two transaction\n";
     // Send two transactions, and verify they are added to transaction list.
     TransactionTableModel* transactionTableModel = walletModel.getTransactionTableModel();
+    std::cout<< "rowCount\n";
     QCOMPARE(transactionTableModel->rowCount({}), 105);
+    std::cout<< "SendCoins 1\n";
     uint256 txid1 = SendCoins(*wallet.get(), sendCoinsDialog, CKeyID(), 5 * COIN, false /* rbf */);
+    std::cout<< "SendCoins 2\n";
     uint256 txid2 = SendCoins(*wallet.get(), sendCoinsDialog, CKeyID(), 10 * COIN, true /* rbf */);
+    std::cout<< "rowCount 2\n";
     QCOMPARE(transactionTableModel->rowCount({}), 107);
+    std::cout<< "FindTx 1\n";
     QVERIFY(FindTx(*transactionTableModel, txid1).isValid());
+    std::cout<< "FindTx 2\n";
     QVERIFY(FindTx(*transactionTableModel, txid2).isValid());
 
     std::cout<< "BumpFee\n";

@@ -79,7 +79,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
         }
 
         parts.append(sub);
-    } else if (wtx.tx->IsZerocoinSpend()) {
+    } else if (wtx.is_zerocoin_spend) {
         //zerocoin spend outputs
         bool fFeeAssigned = false;
         for (unsigned int i = 0; i < wtx.tx->vout.size(); i++) {
