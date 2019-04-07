@@ -1,6 +1,5 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Copyright (c) 2017 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_RECEIVEREQUESTDIALOG_H
@@ -13,11 +12,8 @@
 #include <QLabel>
 #include <QPainter>
 
-class OptionsModel;
-
-namespace Ui
-{
-class ReceiveRequestDialog;
+namespace Ui {
+    class ReceiveRequestDialog;
 }
 
 QT_BEGIN_NAMESPACE
@@ -44,7 +40,7 @@ protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
 private:
-    QMenu* contextMenu;
+    QMenu *contextMenu;
 };
 
 class ReceiveRequestDialog : public QDialog
@@ -52,11 +48,11 @@ class ReceiveRequestDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit ReceiveRequestDialog(QWidget* parent = 0);
+    explicit ReceiveRequestDialog(QWidget *parent = nullptr);
     ~ReceiveRequestDialog();
 
-    void setModel(OptionsModel* model);
-    void setInfo(const SendCoinsRecipient& info);
+    void setModel(WalletModel *model);
+    void setInfo(const SendCoinsRecipient &info);
 
 private Q_SLOTS:
     void on_btnCopyURI_clicked();
@@ -65,8 +61,8 @@ private Q_SLOTS:
     void update();
 
 private:
-    Ui::ReceiveRequestDialog* ui;
-    OptionsModel* model;
+    Ui::ReceiveRequestDialog *ui;
+    WalletModel *model;
     SendCoinsRecipient info;
 };
 
