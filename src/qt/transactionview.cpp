@@ -130,8 +130,19 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
     amountWidget->setValidator(new QDoubleValidator(0, 1e20, 8, this));
     hlayout->addWidget(amountWidget);
 
-    QVBoxLayout* vlayout = new QVBoxLayout(this);
-    vlayout->setContentsMargins(0, 0, 0, 0);
+    // Delay before filtering transactions in ms
+    static const int input_filter_delay = 200;
+
+    QTimer* amount_typing_delay = new QTimer(this);
+    amount_typing_delay->setSingleShot(true);
+    amount_typing_delay->setInterval(input_filter_delay);
+
+    QTimer* prefix_typing_delay = new QTimer(this);
+    prefix_typing_delay->setSingleShot(true);
+    prefix_typing_delay->setInterval(input_filter_delay);
+
+    QVBoxLayout *vlayout = new QVBoxLayout(this);
+    vlayout->setContentsMargins(0,0,0,0);
     vlayout->setSpacing(0);
 
     QTableView* view = new QTableView(this);
@@ -185,7 +196,7 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
     connect(typeWidget, SIGNAL(activated(int)), this, SLOT(chooseType(int)));
     connect(watchOnlyWidget, SIGNAL(activated(int)), this, SLOT(chooseWatchonly(int)));
     connect(addressWidget, SIGNAL(textChanged(QString)), this, SLOT(changedPrefix(QString)));
-    connect(amountWidget, SIGNAL(textChanged(QString)), this, SLOT(changedAmount(QString)));
+    connect(amountWidget, &QLineEdit::textChanged, amount_typing_delay, static_cast<void (QTimer::*)()>(&QTimer::start));
 //    connect(amount_typing_delay, &QTimer::timeout, this, &TransactionView::changedAmount);
 //    connect(search_widget, &QLineEdit::textChanged, prefix_typing_delay, static_cast<void (QTimer::*)()>(&QTimer::start));
 //    connect(prefix_typing_delay, &QTimer::timeout, this, &TransactionView::changedSearch);
