@@ -109,7 +109,6 @@ int main(int argc, char* argv[])
     std::string name = gArgs.GetArg("-wallet", "");
 
     ECCVerifyHandle globalVerifyHandle;
-    std::cout << "wispr-wallet ECC_Start\n";
     ECC_Start();
     if (!WalletTool::ExecuteWalletToolFunc(method, name))
         return EXIT_FAILURE;
