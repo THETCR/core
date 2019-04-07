@@ -44,8 +44,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
     bool fZSpendFromMe = wtx.is_mine_zerocoin_spend;
     if (wtx.is_coinstake) {
         TransactionRecord sub(hash, nTime);
-        CTxDestination address;
-        if (!wtx.tx->IsZerocoinSpend() && !ExtractDestination(wtx.tx->vout[1].scriptPubKey, address))
+        if (!wtx.tx->IsZerocoinSpend() && !boost::get<CNoDestination>(&wtx.txout_address[1]))
             return parts;
 
         if (wtx.is_zerocoin_spend && (fZSpendFromMe || wtx.tracker_has_mint)) {
@@ -63,7 +62,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
             // WSP stake reward
             sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
             sub.type = TransactionRecord::StakeMint;
-            sub.address = EncodeDestination(address);
+            sub.address = EncodeDestination((wtx.txout_address[1]);
             sub.credit = nNet;
         } else {
             //Masternode reward
@@ -73,7 +72,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
                 isminetype mine = wtx.txout_is_mine[nIndexMN];
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                 sub.type = TransactionRecord::MNReward;
-                sub.address = EncodeDestination(destMN);
+                sub.address = EncodeDestination((wtx.txout_address[nIndexMN]);
                 sub.credit = wtx.tx->vout[nIndexMN].nValue;
             }
         }
@@ -105,9 +104,8 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
             }
 
             std::string strAddress = "";
-            CTxDestination address;
-            if (ExtractDestination(txout.scriptPubKey, address))
-                strAddress = EncodeDestination(address);
+            if (!boost::get<CNoDestination>(&wtx.txout_address[i]))
+                strAddress = EncodeDestination(wtx.txout_address[i]);
 
             // a zerocoinspend that was sent to an address held by this wallet
             isminetype mine = wtx.txout_is_mine[i];
@@ -143,7 +141,8 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
             sub.idx = parts.size();
             parts.append(sub);
         }
-    } else if (nNet > 0 || wtx.is_coinbase)
+    }
+    else if (nNet > 0 || wtx.is_coinbase)
     {
         //
         // Credit
@@ -226,9 +225,9 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
             if (mapValue["DS"] == "1") {
                 sub.type = TransactionRecord::Obfuscated;
                 CTxDestination address;
-                if (ExtractDestination(wtx.tx->vout[0].scriptPubKey, address)) {
+                if (!boost::get<CNoDestination>(&wtx.txout_address[0])) {
                     // Sent to WISPR Address
-                    sub.address = EncodeDestination(address);
+                    sub.address = EncodeDestination(wtx.txout_address[0]);
                 } else {
                     // Sent to IP, or other non-address transaction like OP_EVAL
                     sub.address = mapValue["to"];
