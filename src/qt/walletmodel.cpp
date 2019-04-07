@@ -1,7 +1,5 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2018 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2019 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
@@ -172,7 +170,8 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
     QList<SendCoinsRecipient> recipients = transaction.getRecipients();
     std::vector<CRecipient> vecSend;
 
-    if (recipients.empty()) {
+    if(recipients.empty())
+    {
         return OK;
     }
 
@@ -189,6 +188,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
         if (rcp.fSubtractFeeFromAmount)
             fSubtractFeeFromAmount = true;
 
+#ifdef ENABLE_BIP70
         if (rcp.paymentRequest.IsInitialized())
         {   // PaymentRequest...
             CAmount subtotal = 0;
@@ -199,7 +199,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
                 if (out.amount() <= 0) continue;
                 subtotal += out.amount();
                 const unsigned char* scriptStr = (const unsigned char*)out.script().data();
-                CScript scriptPubKey(scriptStr, scriptStr + out.script().size());
+                CScript scriptPubKey(scriptStr, scriptStr+out.script().size());
                 CAmount nAmount = out.amount();
                 CRecipient recipient = {scriptPubKey, nAmount, rcp.fSubtractFeeFromAmount};
                 vecSend.push_back(recipient);
@@ -209,11 +209,16 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
                 return InvalidAmount;
             }
             total += subtotal;
-        } else { // User-entered wispr address / amount:
-            if (!validateAddress(rcp.address)) {
+        }
+        else
+#endif
+        {   // User-entered bitcoin address / amount:
+            if(!validateAddress(rcp.address))
+            {
                 return InvalidAddress;
             }
-            if (rcp.amount <= 0) {
+            if(rcp.amount <= 0)
+            {
                 return InvalidAmount;
             }
             setAddress.insert(rcp.address);
@@ -226,13 +231,15 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
             total += rcp.amount;
         }
     }
-    if (setAddress.size() != nAddresses) {
+    if(setAddress.size() != nAddresses)
+    {
         return DuplicateAddress;
     }
 
     CAmount nBalance = m_wallet->getAvailableBalance(coinControl);
 
-    if (total > nBalance) {
+    if(total > nBalance)
+    {
         return AmountExceedsBalance;
     }
 
@@ -291,6 +298,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction &tran
         std::vector<std::pair<std::string, std::string>> vOrderForm;
         for (const SendCoinsRecipient &rcp : recipients)
         {
+#ifdef ENABLE_BIP70
             if (rcp.paymentRequest.IsInitialized())
             {
                 // Make sure any payment requests involved are still valid.
@@ -304,6 +312,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction &tran
                 vOrderForm.emplace_back("PaymentRequest", std::move(value));
             }
             else
+#endif
             if (!rcp.message.isEmpty()) // Message from normal bitcoin:URI (bitcoin:123...?message=example)
                 vOrderForm.emplace_back("Message", rcp.message.toStdString());
         }
@@ -323,7 +332,9 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction &tran
     for (const SendCoinsRecipient &rcp : transaction.getRecipients())
     {
         // Don't touch the address book when we have a payment request
+#ifdef ENABLE_BIP70
         if (!rcp.paymentRequest.IsInitialized())
+#endif
         {
             std::string strAddress = rcp.address.toStdString();
             CTxDestination dest = DecodeDestination(strAddress);
@@ -430,16 +441,22 @@ RecentRequestsTableModel *WalletModel::getRecentRequestsTableModel()
 
 WalletModel::EncryptionStatus WalletModel::getEncryptionStatus() const
 {
-    if (!m_wallet->isCrypted()) {
+    if(!m_wallet->isCrypted())
+    {
         return Unencrypted;
-    } else if (m_wallet->isAnonymizeOnlyUnlocked()) {
+    }
+    else if (m_wallet->isAnonymizeOnlyUnlocked())
+    {
         return UnlockedForAnonymizationOnly;
-    } else if (m_wallet->isLocked()) {
+    }
+    else if(m_wallet->isLocked())
+    {
         return Locked;
-    } else {
+    }
+    else
+    {
         return Unlocked;
     }
-
 }
 
 bool WalletModel::setWalletEncrypted(bool encrypted, const SecureString &passphrase)

@@ -270,20 +270,22 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
                     continue;
                 }
 
-                CTxDestination address;
-                if (ExtractDestination(txout.scriptPubKey, address)) {
+                if (!boost::get<CNoDestination>(&wtx.txout_address[nOut]))
+                {
                     //This is most likely only going to happen when resyncing deterministic wallet without the knowledge of the
                     //private keys that the change was sent to. Do not display a "sent to" here.
                     if (wtx.tx->IsZerocoinMint())
                         continue;
                     // Sent to WISPR Address
                     sub.type = TransactionRecord::SendToAddress;
-                    sub.address = EncodeDestination(address);
+                    sub.address = EncodeDestination(wtx.txout_address[nOut]);
                 } else if (txout.IsZerocoinMint()){
                     sub.type = TransactionRecord::ZerocoinMint;
                     sub.address = mapValue["zerocoinmint"];
                     sub.credit += txout.nValue;
-                } else {
+                }
+                else
+                {
                     // Sent to IP, or other non-address transaction like OP_EVAL
                     sub.type = TransactionRecord::SendToOther;
                     sub.address = mapValue["to"];
@@ -295,7 +297,8 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
 
                 CAmount nValue = txout.nValue;
                 /* Add fee to first output */
-                if (nTxFee > 0) {
+                if (nTxFee > 0)
+                {
                     nValue += nTxFee;
                     nTxFee = 0;
                 }
@@ -303,7 +306,9 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
 
                 parts.append(sub);
             }
-        } else {
+        }
+        else
+        {
             //
             // Mixed debit transaction, can't break down payees
             //
@@ -340,12 +345,12 @@ void TransactionRecord::updateStatus(const interfaces::WalletTxStatus& wtx, int 
         wtx.is_coinbase ? 1 : 0,
         wtx.time_received,
         idx);
+    status.countsForBalance = wtx.is_trusted && !(wtx.blocks_to_maturity > 0);
     status.depth = wtx.depth_in_main_chain;
 
     //Determine the depth of the block
     int nBlocksToMaturity = wtx.blocks_to_maturity;
 
-    status.countsForBalance = wtx.is_trusted && !(wtx.blocks_to_maturity > 0);
     status.cur_num_blocks = numBlocks;
     status.cur_num_ix_locks = nCompleteTXLocks;
 
