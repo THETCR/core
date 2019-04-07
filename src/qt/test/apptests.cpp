@@ -68,18 +68,30 @@ void AppTests::appTests()
 
     std::cout << "parameterSetup\n";
     m_app.parameterSetup();
+    std::cout << "createOptionsModel\n";
     m_app.createOptionsModel(true /* reset settings */);
+    std::cout << "NetworkStyle\n";
     QScopedPointer<const NetworkStyle> style(
         NetworkStyle::instantiate(QString::fromStdString(Params().NetworkIDString())));
+    std::cout << "setupPlatformStyle\n";
     m_app.setupPlatformStyle();
+    std::cout << "createWindow\n";
     m_app.createWindow(style.data());
+    std::cout << "connect\n";
     connect(&m_app, &BitcoinApplication::windowShown, this, &AppTests::guiTests);
+    std::cout << "expectCallback\n";
     expectCallback("guiTests");
+    std::cout << "baseInitialize\n";
     m_app.baseInitialize();
+    std::cout << "requestInitialize\n";
     m_app.requestInitialize();
+    std::cout << "exec\n";
     m_app.exec();
+    std::cout << "requestShutdown\n";
     m_app.requestShutdown();
+    std::cout << "exec\n";
     m_app.exec();
+    std::cout << "AbortShutdown\n";
 
     // Reset global state to avoid interfering with later tests.
     AbortShutdown();
