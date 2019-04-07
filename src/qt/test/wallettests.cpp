@@ -137,6 +137,7 @@ void TestGUI()
     auto chain = interfaces::MakeChain();
     std::shared_ptr<CWallet> wallet = std::make_shared<CWallet>(*chain, WalletLocation(), WalletDatabase::CreateMock());
     bool firstRun;
+    std::cout<< "LoadWallet\n";
     wallet->LoadWallet(firstRun);
     {
         LOCK(wallet->cs_wallet);
@@ -152,6 +153,7 @@ void TestGUI()
         QCOMPARE(result.last_scanned_block, chainActive.Tip()->GetBlockHash());
         QVERIFY(result.last_failed_block.IsNull());
     }
+    std::cout<< "SetBroadcastTransactions\n";
     wallet->SetBroadcastTransactions(true);
 
     // Create widgets for sending coins and listing transactions.
