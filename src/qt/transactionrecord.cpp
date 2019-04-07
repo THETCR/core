@@ -72,7 +72,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
                 isminetype mine = wtx.txout_is_mine[nIndexMN];
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                 sub.type = TransactionRecord::MNReward;
-                sub.address = EncodeDestination((wtx.txout_address[nIndexMN]);
+                sub.address = EncodeDestination(wtx.txout_address[nIndexMN]);
                 sub.credit = wtx.tx->vout[nIndexMN].nValue;
             }
         }
