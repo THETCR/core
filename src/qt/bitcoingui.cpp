@@ -131,18 +131,23 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
     // Needs walletFrame to be initialized
     createActions();
 
+    std::cout << "createMenuBar \n";
     // Create application menu bar
     createMenuBar();
 
+    std::cout << "createToolBars \n";
     // Create the toolbars
     createToolBars();
 
     // Create system tray icon and notification
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
+        std::cout << "createTrayIcon \n";
         createTrayIcon();
     }
+    std::cout << "notificator \n";
     notificator = new Notificator(QApplication::applicationName(), trayIcon, this);
 
+    std::cout << "statusBar \n";
     // Create status bar
     statusBar();
 
@@ -549,6 +554,8 @@ void BitcoinGUI::createActions()
     std::cout << "QShortcut\n";
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_C), this), &QShortcut::activated, this, &BitcoinGUI::showDebugWindowActivateConsole);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_D), this), &QShortcut::activated, this, &BitcoinGUI::showDebugWindow);
+    std::cout << "createActions Finished\n";
+
 }
 
 void BitcoinGUI::createMenuBar()
