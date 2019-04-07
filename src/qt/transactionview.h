@@ -1,5 +1,4 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Copyright (c) 2017 The PIVX developers
+// Copyright (c) 2011-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -12,8 +11,6 @@
 
 #include <QWidget>
 #include <QKeyEvent>
-#include <QWidget>
-#include <QAction>
 
 class PlatformStyle;
 class TransactionFilterProxy;
@@ -23,7 +20,6 @@ QT_BEGIN_NAMESPACE
 class QComboBox;
 class QDateTimeEdit;
 class QFrame;
-class QItemSelectionModel;
 class QLineEdit;
 class QMenu;
 class QModelIndex;
@@ -56,23 +52,24 @@ public:
     };
 
     enum ColumnWidths {
-        STATUS_COLUMN_WIDTH = 23,
+        STATUS_COLUMN_WIDTH = 30,
         WATCHONLY_COLUMN_WIDTH = 23,
         DATE_COLUMN_WIDTH = 120,
-        TYPE_COLUMN_WIDTH = 240,
+        TYPE_COLUMN_WIDTH = 113,
         AMOUNT_MINIMUM_COLUMN_WIDTH = 120,
         MINIMUM_COLUMN_WIDTH = 23
     };
 
 private:
-    WalletModel* model;
-    TransactionFilterProxy* transactionProxyModel;
-    QTableView* transactionView;
-    QComboBox* dateWidget;
-    QComboBox* typeWidget;
-    QComboBox* watchOnlyWidget;
-    QLineEdit* addressWidget;
-    QLineEdit* amountWidget;
+    WalletModel *model;
+    TransactionFilterProxy *transactionProxyModel;
+    QTableView *transactionView;
+
+    QComboBox *dateWidget;
+    QComboBox *typeWidget;
+    QComboBox *watchOnlyWidget;
+    QLineEdit *search_widget;
+    QLineEdit *amountWidget;
     QAction* hideOrphansAction;
 
     QMenu *contextMenu;
@@ -116,21 +113,17 @@ Q_SIGNALS:
 
     void bumpedFee(const uint256& txid);
 
-    /** Send computed sum back to wallet-view */
-    void trxAmount(QString amount);
-
 public Q_SLOTS:
     void chooseDate(int idx);
     void chooseType(int idx);
-    void hideOrphans(bool fHide);
-    void updateHideOrphans(bool fHide);
     void chooseWatchonly(int idx);
-    void changedPrefix(const QString& prefix);
     void changedAmount();
+    void changedSearch();
     void exportClicked();
     void focusTransaction(const QModelIndex&);
     void focusTransaction(const uint256& txid);
-    void computeSum();
+    void hideOrphans(bool fHide);
+    void updateHideOrphans(bool fHide);
 };
 
 #endif // BITCOIN_QT_TRANSACTIONVIEW_H
