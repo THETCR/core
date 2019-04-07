@@ -41,12 +41,18 @@ WalletModel::WalletModel(std::unique_ptr<interfaces::Wallet> wallet, interfaces:
     cachedEncryptionStatus(Unencrypted),
     cachedNumBlocks(0)
 {
+    std::cout << "haveWatchOnly\n";
     fHaveWatchOnly = m_wallet->haveWatchOnly();
+    std::cout << "fHaveMultiSig\n";
     fHaveMultiSig = m_wallet->haveMultiSig();
 
+    std::cout << "addressTableModel\n";
     addressTableModel = new AddressTableModel(this);
+    std::cout << "transactionTableModel\n";
     transactionTableModel = new TransactionTableModel(platformStyle, this);
+    std::cout << "recentRequestsTableModel\n";
     recentRequestsTableModel = new RecentRequestsTableModel(this);
+    std::cout << "pollTimer\n";
 
     // This timer will be fired repeatedly to update the balance
     pollTimer = new QTimer(this);
