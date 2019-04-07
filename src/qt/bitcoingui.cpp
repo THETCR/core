@@ -84,51 +84,7 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
     m_node(node),
     trayIconMenu{new QMenu()},
     platformStyle(_platformStyle),
-    m_network_style(networkStyle),
-    clientModel(0),
-    walletFrame(0),
-    unitDisplayControl(0),
-    labelStakingIcon(0),
-    labelEncryptionIcon(0),
-    labelTorIcon(0),
-    labelConnectionsIcon(0),
-    labelBlocksIcon(0),
-    progressBarLabel(0),
-    progressBar(0),
-    progressDialog(0),
-    appMenuBar(0),
-    overviewAction(0),
-    historyAction(0),
-    masternodeAction(0),
-    quitAction(0),
-    sendCoinsAction(0),
-    usedSendingAddressesAction(0),
-    usedReceivingAddressesAction(0),
-    signMessageAction(0),
-    verifyMessageAction(0),
-    bip38ToolAction(0),
-    multisigCreateAction(0),
-    multisigSpendAction(0),
-    multisigSignAction(0),
-    aboutAction(0),
-    receiveCoinsAction(0),
-    privacyAction(0),
-    optionsAction(0),
-    toggleHideAction(0),
-    encryptWalletAction(0),
-    backupWalletAction(0),
-    changePassphraseAction(0),
-    aboutQtAction(0),
-    openRPCConsoleAction(0),
-    openAction(0),
-    showHelpMessageAction(0),
-    multiSendAction(0),
-    trayIcon(0),
-    notificator(0),
-    rpcConsole(0),
-    explorerWindow(0),
-    prevBlocks(0),
-    spinnerFrame(0)
+    m_network_style(networkStyle)
 {
     /* Open CSS when configured */
     this->setStyleSheet(GUIUtil::loadStyleSheet());
@@ -329,7 +285,7 @@ void BitcoinGUI::createActions()
     tabGroup->addAction(overviewAction);
 
     sendCoinsAction = new QAction(platformStyle->SingleColorIcon(":/icons/send"), tr("&Send"), this);
-    sendCoinsAction->setStatusTip(tr("Send coins to a WISPR address"));
+    sendCoinsAction->setStatusTip(tr("Send coins to a Wispr address"));
     sendCoinsAction->setToolTip(sendCoinsAction->statusTip());
     sendCoinsAction->setCheckable(true);
     sendCoinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_2));
@@ -506,13 +462,8 @@ void BitcoinGUI::createActions()
     // Get restart command-line parameters and handle restart
     connect(rpcConsole, SIGNAL(handleRestart(QStringList)), this, SLOT(handleRestart(QStringList)));
 
-    // prevents an open debug window from becoming stuck/unusable on client shutdown
-    connect(quitAction, SIGNAL(triggered()), rpcConsole, SLOT(hide()));
-
     connect(openBlockExplorerAction, SIGNAL(triggered()), explorerWindow, SLOT(show()));
 
-    // prevents an open debug window from becoming stuck/unusable on client shutdown
-    connect(quitAction, SIGNAL(triggered()), explorerWindow, SLOT(hide()));
     // prevents an open debug window from becoming stuck/unusable on client shutdown
     connect(quitAction, &QAction::triggered, rpcConsole, &QWidget::hide);
 

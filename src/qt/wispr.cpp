@@ -359,10 +359,14 @@ void BitcoinApplication::initializeResult(bool success)
         qWarning() << "Platform customization:" << platformStyle->getName();
 #ifdef ENABLE_WALLET
         m_wallet_controller = new WalletController(m_node, platformStyle, optionsModel, this);
+#ifdef ENABLE_BIP70
         PaymentServer::LoadRootCAs();
+#endif
         if (paymentServer) {
             paymentServer->setOptionsModel(optionsModel);
+#ifdef ENABLE_BIP70
             connect(m_wallet_controller, &WalletController::coinsSent, paymentServer, &PaymentServer::fetchPaymentACK);
+#endif
         }
 #endif
 
@@ -423,7 +427,7 @@ WId BitcoinApplication::getMainWinId() const
 
 static void SetupUIArgs()
 {
-#if defined(ENABLE_WALLET)
+#if defined(ENABLE_WALLET) && defined(ENABLE_BIP70)
     gArgs.AddArg("-allowselfsignedrootcertificates", strprintf("Allow self signed root certificates (default: %u)", DEFAULT_SELFSIGNED_ROOTCERTS), true, OptionsCategory::GUI);
 #endif
     gArgs.AddArg("-choosedatadir", strprintf("Choose data directory on startup (default: %u)", DEFAULT_CHOOSE_DATADIR), false, OptionsCategory::GUI);
