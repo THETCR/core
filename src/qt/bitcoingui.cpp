@@ -456,16 +456,27 @@ void BitcoinGUI::createActions()
     // Jump directly to tabs in RPC-console
     std::cout << "openInfoAction\n";
     connect(openInfoAction, &QAction::triggered, rpcConsole, &RPCConsole::showInfo);
+    std::cout << "openRPCConsoleAction\n";
     connect(openRPCConsoleAction, &QAction::triggered, rpcConsole, &RPCConsole::showConsole);
+    std::cout << "openNetworkAction\n";
     connect(openNetworkAction, &QAction::triggered, rpcConsole, &RPCConsole::showNetwork);
+    std::cout << "openPeersAction\n";
     connect(openPeersAction, &QAction::triggered, rpcConsole, &RPCConsole::showPeers);
+    std::cout << "openRepairAction\n";
     connect(openRepairAction, &QAction::triggered, rpcConsole, &RPCConsole::showRepair);
+    std::cout << "openConfEditorAction\n";
     connect(openConfEditorAction, &QAction::triggered, rpcConsole, &RPCConsole::showConfEditor);
+    std::cout << "openMNConfEditorAction\n";
     connect(openMNConfEditorAction, &QAction::triggered, rpcConsole, &RPCConsole::showMNConfEditor);
+    std::cout << "showBackupsAction\n";
     connect(showBackupsAction, &QAction::triggered, rpcConsole, &RPCConsole::showBackups);
+    std::cout << "labelConnectionsIcon\n";
     connect(labelConnectionsIcon, &GUIUtil::ClickableLabel::clicked, rpcConsole, &RPCConsole::showPeers);
+    std::cout << "labelEncryptionIcon\n";
     connect(labelEncryptionIcon, &GUIUtil::ClickableLabel::clicked, walletFrame, &WalletFrame::toggleLockWallet);
+    std::cout << "labelAutoMintIcon\n";
     connect(labelAutoMintIcon, &GUIUtil::ClickableLabel::clicked, this, &BitcoinGUI::optionsClicked);
+    std::cout << "rpcConsole\n";
 
     // Get restart command-line parameters and handle restart
     connect(rpcConsole, &RPCConsole::handleRestart, this, &BitcoinGUI::handleRestart);
