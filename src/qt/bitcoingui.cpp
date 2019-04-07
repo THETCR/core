@@ -477,7 +477,7 @@ void BitcoinGUI::createActions()
     std::cout << "rpcConsole\n";
 
     // Get restart command-line parameters and handle restart
-//    connect(rpcConsole, &RPCConsole::handleRestart, this, &BitcoinGUI::handleRestart);
+    connect(rpcConsole, &RPCConsole::handleRestart, this, &BitcoinGUI::handleRestart);
 
     connect(openBlockExplorerAction, &QAction::triggered, explorerWindow, &BitcoinGUI::show);
 
