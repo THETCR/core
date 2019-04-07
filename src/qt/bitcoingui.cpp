@@ -91,6 +91,7 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
 
 
     QSettings settings;
+    std::cout << "restoreGeometry\n";
     if (!restoreGeometry(settings.value("MainWindowGeometry").toByteArray())) {
         // Restore failed (perhaps missing setting), center the window
         move(QApplication::desktop()->availableGeometry().center() - frameGeometry().center());
@@ -111,6 +112,7 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
         /** Create wallet frame and make it the central widget */
         walletFrame = new WalletFrame(_platformStyle, this);
         setCentralWidget(walletFrame);
+        std::cout << "explorerWindow\n";
         explorerWindow = new BlockExplorer(this);
     } else
 #endif // ENABLE_WALLET
@@ -158,6 +160,7 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
     labelWalletEncryptionIcon = new QLabel();
     labelWalletHDStatusIcon = new QLabel();
     labelProxyIcon = new GUIUtil::ClickableLabel();
+    std::cout << "Wispr icons\n";
     labelStakingIcon = new QLabel();
     labelAutoMintIcon = new GUIUtil::ClickableLabel();
     labelAutoMintIcon->setObjectName("labelAutoMintIcon");
@@ -244,6 +247,7 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
     m_app_nap_inhibitor = new CAppNapInhibitor;
 #endif
 
+    std::cout << "Wispr stakings icons\n";
     QTimer* timerStakingIcon = new QTimer(labelStakingIcon);
     connect(timerStakingIcon, &QTimer::timeout, this, &BitcoinGUI::setStakingStatus);
     timerStakingIcon->start(10000);
@@ -306,6 +310,7 @@ void BitcoinGUI::createActions()
     receiveCoinsMenuAction->setStatusTip(receiveCoinsAction->statusTip());
     receiveCoinsMenuAction->setToolTip(receiveCoinsMenuAction->statusTip());
 
+    std::cout << "PrivacyAction\n";
     privacyAction = new QAction(platformStyle->SingleColorIcon(":/icons/privacy"), tr("&Privacy"), this);
     privacyAction->setStatusTip(tr("Privacy Actions for zWSP"));
     privacyAction->setToolTip(privacyAction->statusTip());
@@ -323,6 +328,7 @@ void BitcoinGUI::createActions()
 #ifdef ENABLE_WALLET
 
     QSettings settings;
+    std::cout << "masternodeAction\n";
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeAction = new QAction(QIcon(":/icons/masternodes"), tr("&Masternodes"), this);
         masternodeAction->setStatusTip(tr("Browse masternodes"));
@@ -346,6 +352,7 @@ void BitcoinGUI::createActions()
     connect(receiveCoinsAction, &QAction::triggered, this, &BitcoinGUI::gotoReceiveCoinsPage);
     connect(receiveCoinsMenuAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
     connect(receiveCoinsMenuAction, &QAction::triggered, this, &BitcoinGUI::gotoReceiveCoinsPage);
+    std::cout << "privacyAction connect\n";
     connect(privacyAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
     connect(privacyAction, &QAction::triggered, this, &BitcoinGUI::gotoPrivacyPage);
     connect(historyAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
@@ -392,6 +399,7 @@ void BitcoinGUI::createActions()
 
     openInfoAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation), tr("&Information"), this);
     openInfoAction->setStatusTip(tr("Show diagnostic information"));
+    std::cout << "openRPCConsoleAction\n";
     openRPCConsoleAction = new QAction(platformStyle->TextColorIcon(":/icons/debugwindow"), tr("&Debug window"), this);
     openRPCConsoleAction->setStatusTip(tr("Open debugging and diagnostic console"));
     // initially disable the debug window menu item
@@ -445,8 +453,8 @@ void BitcoinGUI::createActions()
     connect(toggleHideAction, &QAction::triggered, this, &BitcoinGUI::toggleHidden);
     connect(showHelpMessageAction, &QAction::triggered, this, &BitcoinGUI::showHelpMessageClicked);
     connect(openRPCConsoleAction, &QAction::triggered, this, &BitcoinGUI::showDebugWindow);
-    connect(openInfoAction, &QAction::triggered, rpcConsole, &RPCConsole::showInfo);
     // Jump directly to tabs in RPC-console
+    std::cout << "openInfoAction\n";
     connect(openInfoAction, &QAction::triggered, rpcConsole, &RPCConsole::showInfo);
     connect(openRPCConsoleAction, &QAction::triggered, rpcConsole, &RPCConsole::showConsole);
     connect(openNetworkAction, &QAction::triggered, rpcConsole, &RPCConsole::showNetwork);
@@ -470,6 +478,7 @@ void BitcoinGUI::createActions()
 #ifdef ENABLE_WALLET
     if(walletFrame)
     {
+        std::cout << "walletFrame\n";
         connect(encryptWalletAction, &QAction::triggered, walletFrame, &WalletFrame::encryptWallet);
         connect(backupWalletAction, &QAction::triggered, walletFrame, &WalletFrame::backupWallet);
         connect(changePassphraseAction, &QAction::triggered, walletFrame, &WalletFrame::changePassphrase);
