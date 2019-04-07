@@ -100,9 +100,9 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     vbox->addWidget(transactionView);
     QPushButton* exportButton = new QPushButton(tr("&Export"), this);
     exportButton->setToolTip(tr("Export the data in the current tab to a file"));
-#ifndef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
-    exportButton->setIcon(QIcon(":/icons/export"));
-#endif
+    if (platformStyle->getImagesOnButtons()) {
+        exportButton->setIcon(platformStyle->SingleColorIcon(":/icons/export"));
+    }
     hbox_buttons->addStretch();
 
     // Sum of selected transactions
@@ -121,9 +121,9 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     vbox->addLayout(hbox_buttons);
     transactionsPage->setLayout(vbox);
 
-    privacyPage = new PrivacyDialog(platformStyle, this);
-    receiveCoinsPage = new ReceiveCoinsDialog(platformStyle, this);
-    sendCoinsPage = new SendCoinsDialog(platformStyle, this);
+    privacyPage = new PrivacyDialog(platformStyle);
+    receiveCoinsPage = new ReceiveCoinsDialog(platformStyle);
+    sendCoinsPage = new SendCoinsDialog(platformStyle);
 
     addWidget(overviewPage);
     addWidget(transactionsPage);
