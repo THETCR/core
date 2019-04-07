@@ -472,14 +472,12 @@ void BitcoinGUI::createActions()
     connect(showBackupsAction, &QAction::triggered, rpcConsole, &RPCConsole::showBackups);
     std::cout << "labelConnectionsIcon\n";
     connect(labelConnectionsIcon, &GUIUtil::ClickableLabel::clicked, rpcConsole, &RPCConsole::showPeers);
-    std::cout << "labelEncryptionIcon\n";
-    connect(labelEncryptionIcon, &GUIUtil::ClickableLabel::clicked, walletFrame, &WalletFrame::toggleLockWallet);
     std::cout << "labelAutoMintIcon\n";
     connect(labelAutoMintIcon, &GUIUtil::ClickableLabel::clicked, this, &BitcoinGUI::optionsClicked);
     std::cout << "rpcConsole\n";
 
     // Get restart command-line parameters and handle restart
-    connect(rpcConsole, &RPCConsole::handleRestart, this, &BitcoinGUI::handleRestart);
+//    connect(rpcConsole, &RPCConsole::handleRestart, this, &BitcoinGUI::handleRestart);
 
     connect(openBlockExplorerAction, &QAction::triggered, explorerWindow, &BitcoinGUI::show);
 
@@ -489,7 +487,8 @@ void BitcoinGUI::createActions()
 #ifdef ENABLE_WALLET
     if(walletFrame)
     {
-        std::cout << "walletFrame\n";
+        std::cout << "labelEncryptionIcon\n";
+        connect(labelEncryptionIcon, &GUIUtil::ClickableLabel::clicked, walletFrame, &WalletFrame::toggleLockWallet);
         connect(encryptWalletAction, &QAction::triggered, walletFrame, &WalletFrame::encryptWallet);
         connect(backupWalletAction, &QAction::triggered, walletFrame, &WalletFrame::backupWallet);
         connect(changePassphraseAction, &QAction::triggered, walletFrame, &WalletFrame::changePassphrase);
@@ -506,6 +505,7 @@ void BitcoinGUI::createActions()
         connect(multiSendAction, &QAction::triggered, this, &BitcoinGUI::gotoMultiSendDialog);
         connect(multisigCreateAction, &QAction::triggered, this, &BitcoinGUI::gotoMultisigCreate);
         connect(multisigSpendAction, &QAction::triggered, this, &BitcoinGUI::gotoMultisigSpend);
+        std::cout << "multisigSignAction\n";
         connect(multisigSignAction, &QAction::triggered, this, &BitcoinGUI::gotoMultisigSign);
         connect(m_open_wallet_action->menu(), &QMenu::aboutToShow, [this] {
             m_open_wallet_action->menu()->clear();
