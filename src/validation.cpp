@@ -5726,7 +5726,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
             ret = g_chainstate.AcceptBlock(pblock, state, chainparams, &pindex, fForceProcessing, nullptr, fNewBlock);
         }
         if (!ret) {
-            printf("%s \n", FormatStateMessage(state).c_str());
+//            printf("%s \n", FormatStateMessage(state).c_str());
 //            printf("block = %s \n", pblock->ToString().c_str());
             GetMainSignals().BlockChecked(*pblock, state);
             return error("%s: AcceptBlock FAILED (%s)", __func__, FormatStateMessage(state));

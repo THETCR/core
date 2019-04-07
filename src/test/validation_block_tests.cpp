@@ -138,18 +138,14 @@ BOOST_AUTO_TEST_CASE(processnewblock_signals_ordering)
 
     // Connect the genesis block and drain any outstanding events
     BOOST_CHECK(ProcessNewBlock(Params(), std::make_shared<CBlock>(Params().GenesisBlock()), true, &ignored));
-    std::cout << "SyncWithValidationInterfaceQueue \n";
     SyncWithValidationInterfaceQueue();
-    BOOST_TEST_PASSPOINT();
     // subscribe to events (this subscriber will validate event ordering)
     const CBlockIndex* initial_tip = nullptr;
     {
         LOCK(cs_main);
         initial_tip = chainActive.Tip();
     }
-    BOOST_TEST_PASSPOINT();
     TestSubscriber sub(initial_tip->GetBlockHash());
-    BOOST_TEST_PASSPOINT();
     RegisterValidationInterface(&sub);
 
     // create a bunch of threads that repeatedly process a block generated above at random
