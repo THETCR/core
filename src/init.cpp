@@ -1696,12 +1696,10 @@ bool AppInitMain(InitInterfaces& interfaces)
                     }
 
                 }
-                std::cout << "reindexDueWrappedSerials\n";
                 // Reindex only for wrapped serials inflation.
                 if (reindexDueWrappedSerials)
                     AddWrappedSerialsInflation();
 
-                std::cout << "reindexmoneysupply\n";
                 // Recalculate money supply for blocks that are impacted by accounting issue after zerocoin activation
                 if (gArgs.GetBoolArg("-reindexmoneysupply", false) || reindexZerocoin) {
                     if (chainHeight > Params().NEW_PROTOCOLS_STARTHEIGHT()) {
@@ -1712,7 +1710,6 @@ bool AppInitMain(InitInterfaces& interfaces)
                     RecalculateWSPSupply(reindexZerocoin ? Params().NEW_PROTOCOLS_STARTHEIGHT() : 1);
                 }
 
-                std::cout << "Check Recalculation result\n";
                 // Check Recalculation result
 //                if(Params().NetworkID() == CBaseChainParams::MAIN && chainHeight > Params().Zerocoin_Block_EndFakeSerial()) {
 //                    CBlockIndex* pblockindex = chainActive[Params().Zerocoin_Block_EndFakeSerial() + 1];
@@ -1721,7 +1718,6 @@ bool AppInitMain(InitInterfaces& interfaces)
 //                        return InitError(strprintf("ZerocoinSupply Recalculation failed: %d vs %d", pblockindex->GetZerocoinSupply()/COIN , zwspSupplyCheckpoint/COIN));
 //                }
 
-                std::cout << "reindexaccumulators\n";
                 // Force recalculation of accumulators.
                 if (gArgs.GetBoolArg("-reindexaccumulators", false)) {
                     if (chainHeight > Params().NEW_PROTOCOLS_STARTHEIGHT()) {
@@ -1732,7 +1728,6 @@ bool AppInitMain(InitInterfaces& interfaces)
                                 listAccCheckpointsNoDB.emplace_back(pindex->nAccumulatorCheckpoint);
                             pindex = chainActive.Next(pindex);
                         }
-                        std::cout << "listAccCheckpointsNoDB\n";
                         // WISPR: recalculate Accumulator Checkpoints that failed to database properly
                         if (!listAccCheckpointsNoDB.empty()) {
                             uiInterface.InitMessage(_("Calculating missing accumulators..."));
