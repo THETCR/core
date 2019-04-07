@@ -1,6 +1,4 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2018 The PIVX developers
+// Copyright (c) 2011-2018 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -469,7 +467,9 @@ void TransactionRecord::updateStatus(const interfaces::WalletTxStatus& wtx, int 
         if (wtx.lock_time < LOCKTIME_THRESHOLD) {
             status.status = TransactionStatus::OpenUntilBlock;
             status.open_for = wtx.lock_time - numBlocks;
-        } else {
+        }
+        else
+        {
             status.status = TransactionStatus::OpenUntilDate;
             status.open_for = wtx.lock_time;
         }
@@ -497,11 +497,18 @@ void TransactionRecord::updateStatus(const interfaces::WalletTxStatus& wtx, int 
             status.status = TransactionStatus::Conflicted;
         } else if (GetAdjustedTime() - wtx.time_received > 2 * 60 && wtx.request_count == 0) {
             status.status = TransactionStatus::Offline;
-        } else if (status.depth == 0) {
+        } else if (status.depth == 0)
+        {
             status.status = TransactionStatus::Unconfirmed;
-        } else if (status.depth < RecommendedNumConfirmations) {
+            if (wtx.is_abandoned)
+                status.status = TransactionStatus::Abandoned;
+        }
+        else if (status.depth < RecommendedNumConfirmations)
+        {
             status.status = TransactionStatus::Confirming;
-        } else {
+        }
+        else
+        {
             status.status = TransactionStatus::Confirmed;
         }
     }
@@ -511,11 +518,6 @@ void TransactionRecord::updateStatus(const interfaces::WalletTxStatus& wtx, int 
 bool TransactionRecord::statusUpdateNeeded(int numBlocks) const
 {
     return status.cur_num_blocks != numBlocks || status.cur_num_ix_locks != nCompleteTXLocks || status.needsUpdate;
-}
-
-QString TransactionRecord::getTxID() const
-{
-    return QString::fromStdString(hash.ToString());
 }
 
 QString TransactionRecord::getTxHash() const
