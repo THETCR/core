@@ -374,7 +374,7 @@ void TransactionView::updateHideOrphans(bool fHide)
     if (settings.value("fHideOrphans", false).toBool() != fHide) {
         settings.setValue("fHideOrphans", fHide);
         if (model && model->getOptionsModel())
-            emit model->getOptionsModel()->hideOrphansChanged(fHide);
+            Q_EMIT model->getOptionsModel()->hideOrphansChanged(fHide);
     }
     hideOrphans(fHide);
     // retain consistency with other checkboxes

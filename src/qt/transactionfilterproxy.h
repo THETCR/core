@@ -6,7 +6,7 @@
 #ifndef BITCOIN_QT_TRANSACTIONFILTERPROXY_H
 #define BITCOIN_QT_TRANSACTIONFILTERPROXY_H
 
-#include "amount.h"
+#include <amount.h>
 
 #include <QDateTime>
 #include <QSortFilterProxyModel>
@@ -17,7 +17,7 @@ class TransactionFilterProxy : public QSortFilterProxyModel
     Q_OBJECT
 
 public:
-    explicit TransactionFilterProxy(QObject* parent = 0);
+    explicit TransactionFilterProxy(QObject *parent = nullptr);
 
     /** Earliest date that can be represented (far in the past) */
     static const QDateTime MIN_DATE;
@@ -30,13 +30,15 @@ public:
 
     static quint32 TYPE(int type) { return 1 << type; }
 
-    enum WatchOnlyFilter {
+    enum WatchOnlyFilter
+    {
         WatchOnlyFilter_All,
         WatchOnlyFilter_Yes,
         WatchOnlyFilter_No
     };
 
     void setDateRange(const QDateTime& from, const QDateTime& to);
+    void setSearchString(const QString &);
     void setAddressPrefix(const QString& addrPrefix);
     /**
       @note Type filter takes a bit field created with TYPE() or ALL_TYPES
@@ -64,6 +66,7 @@ private:
     QDateTime dateFrom;
     QDateTime dateTo;
     QString addrPrefix;
+    QString m_search_string;
     quint32 typeFilter;
     WatchOnlyFilter watchOnlyFilter;
     CAmount minAmount;
