@@ -156,6 +156,7 @@ void TestGUI()
     std::cout<< "SetBroadcastTransactions\n";
     wallet->SetBroadcastTransactions(true);
 
+    std::cout<< "Create widgets\n";
     // Create widgets for sending coins and listing transactions.
     std::unique_ptr<const PlatformStyle> platformStyle(PlatformStyle::instantiate("other"));
     SendCoinsDialog sendCoinsDialog(platformStyle.get());
@@ -168,6 +169,7 @@ void TestGUI()
     sendCoinsDialog.setModel(&walletModel);
     transactionView.setModel(&walletModel);
 
+    std::cout<< "Send two transaction\n";
     // Send two transactions, and verify they are added to transaction list.
     TransactionTableModel* transactionTableModel = walletModel.getTransactionTableModel();
     QCOMPARE(transactionTableModel->rowCount({}), 105);
@@ -177,12 +179,14 @@ void TestGUI()
     QVERIFY(FindTx(*transactionTableModel, txid1).isValid());
     QVERIFY(FindTx(*transactionTableModel, txid2).isValid());
 
+    std::cout<< "BumpFee\n";
     // Call bumpfee. Test disabled, canceled, enabled, then failing cases.
     BumpFee(transactionView, txid1, true /* expect disabled */, "not BIP 125 replaceable" /* expected error */, false /* cancel */);
     BumpFee(transactionView, txid2, false /* expect disabled */, {} /* expected error */, true /* cancel */);
     BumpFee(transactionView, txid2, false /* expect disabled */, {} /* expected error */, false /* cancel */);
     BumpFee(transactionView, txid2, true /* expect disabled */, "already bumped" /* expected error */, false /* cancel */);
 
+    std::cout<< "Check current balance on OverviewPage\n";
     // Check current balance on OverviewPage
     OverviewPage overviewPage(platformStyle.get());
     overviewPage.setWalletModel(&walletModel);
@@ -193,6 +197,7 @@ void TestGUI()
     QString balanceComparison = BitcoinUnits::formatWithUnit(unit, balance, false, BitcoinUnits::separatorAlways);
     QCOMPARE(balanceText, balanceComparison);
 
+    std::cout<< "Check Request Payment button\n";
     // Check Request Payment button
     ReceiveCoinsDialog receiveCoinsDialog(platformStyle.get());
     receiveCoinsDialog.setModel(&walletModel);
@@ -207,6 +212,7 @@ void TestGUI()
     amountInput->setValue(1);
 
     // Message input
+    std::cout<< "Message input\n";
     QLineEdit* messageInput = receiveCoinsDialog.findChild<QLineEdit*>("reqMessage");
     messageInput->setText("TEST_MESSAGE_1");
     int initialRowCount = requestTableModel->rowCount({});
@@ -227,6 +233,7 @@ void TestGUI()
         }
     }
 
+    std::cout<< "Clear button\n";
     // Clear button
     QPushButton* clearButton = receiveCoinsDialog.findChild<QPushButton*>("clearButton");
     clearButton->click();
