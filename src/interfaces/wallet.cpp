@@ -78,6 +78,7 @@ WalletTx MakeWalletTx(interfaces::Chain::Lock& locked_chain, CWallet& wallet, co
     result.tx = wtx.tx;
     result.txin_is_mine.reserve(wtx.tx->vin.size());
     result.txin_is_denominated.reserve(wtx.tx->vin.size());
+    std::cout << "makewallettx for vin\n";
     for (const auto& txin : wtx.tx->vin) {
         result.txin_is_mine.emplace_back(wallet.IsMine(txin));
         result.txin_is_denominated.emplace_back(wallet.IsDenominated(txin));
@@ -87,6 +88,7 @@ WalletTx MakeWalletTx(interfaces::Chain::Lock& locked_chain, CWallet& wallet, co
     result.txout_address_is_mine.reserve(wtx.tx->vout.size());
     result.txout_is_collateral_amount.reserve(wtx.tx->vout.size());
     result.txout_is_denominated_amount.reserve(wtx.tx->vout.size());
+    std::cout << "makewallettx for vout\n";
     for (const auto& txout : wtx.tx->vout) {
         result.txout_is_mine.emplace_back(wallet.IsMine(txout));
         result.txout_address.emplace_back();
@@ -99,6 +101,7 @@ WalletTx MakeWalletTx(interfaces::Chain::Lock& locked_chain, CWallet& wallet, co
     }
     bool fZSpendFromMe = false;
 
+    std::cout << "makewallettx IsZerocoinSpend\n";
     if (wtx.tx->IsZerocoinSpend()) {
         // a zerocoin spend that was created by this wallet
         libzerocoin::CoinSpend zcspend = TxInToZerocoinSpend(wtx.tx->vin[0]);
@@ -116,6 +119,7 @@ WalletTx MakeWalletTx(interfaces::Chain::Lock& locked_chain, CWallet& wallet, co
     result.is_zerocoin_mint = wtx.IsZerocoinMint();
     result.is_mine_zerocoin_spend = fZSpendFromMe;
     result.tracker_has_mint = wallet.zwspTracker->HasMintTx(hash);
+    std::cout << "makewallettx return\n";
     return result;
 }
 
