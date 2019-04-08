@@ -384,7 +384,6 @@ libbitcoin_wallet_a_SOURCES = \
   stakeinput.cpp \
   genwit.cpp \
   lightzwspthread.cpp \
-  zpiv/accumulators.cpp \
   zpiv/deterministicmint.cpp \
   zpiv/mintpool.cpp \
   zpiv/witness.cpp \
