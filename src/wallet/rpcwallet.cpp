@@ -4816,7 +4816,7 @@ static UniValue DoZwspSpend(CWallet * const pwallet, const CAmount nAmount, bool
         obj.pushKV("pubcoin", spend.GetPubCoin().GetHex());
         obj.pushKV("serial", spend.GetSerial().GetHex());
         uint32_t nChecksum = spend.GetAccumulatorChecksum();
-        obj.pushKV("acc_checksum", HexStr(UintToCharBegin(nChecksum), UintToCharEnd(nChecksum)));
+        obj.pushKV("acc_checksum", HexStr(BEGIN(nChecksum), END(nChecksum)));
         arrSpends.push_back(obj);
         nValueIn += libzerocoin::ZerocoinDenominationToAmount(spend.GetDenomination());
     }

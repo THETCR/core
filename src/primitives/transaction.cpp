@@ -22,7 +22,7 @@ std::string COutPoint::ToStringShort() const
 
 uint256 COutPoint::GetHash()
 {
-    return Hash(hash.begin(), hash.end(), UintToCharBegin(n), UintToCharEnd(n));
+    return Hash(hash.begin(), hash.end(), BEGIN(n), END(n));
 }
 
 CTxIn::CTxIn(COutPoint prevoutIn, CScript scriptSigIn, uint32_t nSequenceIn)

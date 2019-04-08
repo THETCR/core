@@ -18,7 +18,7 @@
 #include <secp256k1.h>
 #include <string>
 
-#define BEGIN(a) ((char*)&(a))
+
 
 /** Compute the 256-bit hash of a void pointer */
 inline void Hash(void* in, unsigned int len, unsigned char* out)

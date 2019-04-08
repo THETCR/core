@@ -741,7 +741,7 @@ bool CheckZerocoinSpend(const CTransaction& tx, bool fVerifySignature, CValidati
             CBigNum bnAccumulatorValue = 0;
             if (!zerocoinDB->ReadAccumulatorValue(newSpend.getAccumulatorChecksum(), bnAccumulatorValue)) {
                 uint32_t nChecksum = newSpend.getAccumulatorChecksum();
-                return state.DoS(100, error("%s: Zerocoinspend could not find accumulator associated with checksum %s", __func__, HexStr(UintToCharBegin(nChecksum), UintToCharEnd(nChecksum))));
+                return state.DoS(100, error("%s: Zerocoinspend could not find accumulator associated with checksum %s", __func__, HexStr(BEGIN(nChecksum), END(nChecksum))));
             }
 
             Accumulator accumulator(Params().Zerocoin_Params(chainActive.Height() < Params().NEW_PROTOCOLS_STARTHEIGHT()),

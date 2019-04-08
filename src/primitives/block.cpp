@@ -11,12 +11,14 @@
 #include <util/strencodings.h>
 #include <crypto/scrypt.h>
 
+#define CVOIDBEGIN(a)        ((const void*)&(a))
+
 uint256 CBlockHeader::GetHash() const
 {
     if(nVersion > 7){
-        return Hash(UintToUCharBegin(nVersion), nAccumulatorCheckpoint.end());
+        return Hash(BEGIN(nVersion), END(nAccumulatorCheckpoint));
     } else if ( nVersion == 7 ) {
-        return  Hash(UintToCharBegin(nVersion), UintToCharEnd(nNonce));
+        return  Hash(BEGIN(nVersion), END(nNonce));
     } else {
         return GetPoWHash();
     }
@@ -24,7 +26,7 @@ uint256 CBlockHeader::GetHash() const
 
 uint256 CBlockHeader::GetPoWHash() const
 {
-    return scrypt_blockhash(((const void*)&(nVersion)));
+    return scrypt_blockhash(CVOIDBEGIN(nVersion));
 }
 
 std::string CBlock::ToString() const
