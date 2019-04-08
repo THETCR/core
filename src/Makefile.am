@@ -490,8 +490,8 @@ libwispr_consensus_a_SOURCES = \
   consensus/validation.h \
   hash.cpp \
   hash.h \
-  libzerocoin/Denominations.h \
   libzerocoin/Denominations.cpp \
+  libzerocoin/Denominations.h \
   prevector.h \
   primitives/block.cpp \
   primitives/block.h \
@@ -508,6 +508,8 @@ libwispr_consensus_a_SOURCES = \
   script/script_error.h \
   serialize.h \
   span.h \
+  support/cleanse.cpp \
+  support/cleanse.h \
   tinyformat.h \
   uint256.cpp \
   uint256.h \
