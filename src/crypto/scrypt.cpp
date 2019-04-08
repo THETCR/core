@@ -28,14 +28,13 @@
  */
 
 #include <crypto/scrypt.h>
-#include <util/strencodings.h>
+#include <crypto/hmac_sha256.h>
 #include <openssl/sha.h>
 #include <string>
 
 #include <string.h>
 #include <stdint.h>
 
-#ifndef __FreeBSD__
 static inline void be32enc(void *pp, uint32_t x)
 {
     uint8_t *p = (uint8_t *)pp;
@@ -44,86 +43,17 @@ static inline void be32enc(void *pp, uint32_t x)
     p[1] = (x >> 16) & 0xff;
     p[0] = (x >> 24) & 0xff;
 }
-#endif
-
-typedef struct HMAC_SHA256Context {
-    SHA256_CTX ictx;
-    SHA256_CTX octx;
-} HMAC_SHA256_CTX;
-
-/* Initialize an HMAC-SHA256 operation with the given key. */
-static void
-HMAC_SHA256_Init(HMAC_SHA256_CTX *ctx, const void *_K, size_t Klen)
-{
-    unsigned char pad[64];
-    unsigned char khash[32];
-    const unsigned char *K = (const unsigned char *)_K;
-    size_t i;
-
-    /* If Klen > 64, the key is really SHA256(K). */
-    if (Klen > 64) {
-        SHA256_Init(&ctx->ictx);
-        SHA256_Update(&ctx->ictx, K, Klen);
-        SHA256_Final(khash, &ctx->ictx);
-        K = khash;
-        Klen = 32;
-    }
-
-    /* Inner SHA256 operation is SHA256(K xor [block of 0x36] || data). */
-    SHA256_Init(&ctx->ictx);
-    memset(pad, 0x36, 64);
-    for (i = 0; i < Klen; i++)
-        pad[i] ^= K[i];
-    SHA256_Update(&ctx->ictx, pad, 64);
-
-    /* Outer SHA256 operation is SHA256(K xor [block of 0x5c] || hash). */
-    SHA256_Init(&ctx->octx);
-    memset(pad, 0x5c, 64);
-    for (i = 0; i < Klen; i++)
-        pad[i] ^= K[i];
-    SHA256_Update(&ctx->octx, pad, 64);
-
-    /* Clean the stack. */
-    memset(khash, 0, 32);
-}
-
-/* Add bytes to the HMAC-SHA256 operation. */
-static void
-HMAC_SHA256_Update(HMAC_SHA256_CTX *ctx, const void *in, size_t len)
-{
-    /* Feed data to the inner SHA256 operation. */
-    SHA256_Update(&ctx->ictx, in, len);
-}
-
-/* Finish an HMAC-SHA256 operation. */
-static void
-HMAC_SHA256_Final(unsigned char digest[32], HMAC_SHA256_CTX *ctx)
-{
-    unsigned char ihash[32];
-
-    /* Finish the inner SHA256 operation. */
-    SHA256_Final(ihash, &ctx->ictx);
-
-    /* Feed the inner hash to the outer SHA256 operation. */
-    SHA256_Update(&ctx->octx, ihash, 32);
-
-    /* Finish the outer SHA256 operation. */
-    SHA256_Final(digest, &ctx->octx);
-
-    /* Clean the stack. */
-    memset(ihash, 0, 32);
-}
 
 /**
  * PBKDF2_SHA256(passwd, passwdlen, salt, saltlen, c, buf, dkLen):
  * Compute PBKDF2(passwd, salt, c, dkLen) using HMAC-SHA256 as the PRF, and
  * write the output to buf.  The value dkLen must be at most 32 * (2^32 - 1).
  */
-void
-PBKDF2_SHA256(const uint8_t *passwd, size_t passwdlen, const uint8_t *salt,
+void PBKDF2_SHA256(const uint8_t *passwd, size_t passwdlen, const uint8_t *salt,
               size_t saltlen, uint64_t c, uint8_t *buf, size_t dkLen)
 {
-    HMAC_SHA256_CTX PShctx, hctx;
+//    CHMAC_SHA256(reinterpret_cast<const unsigned char*>(strSalt.c_str()), strSalt.size()).Write(reinterpret_cast<const unsigned char*>(strPass.c_str()), strPass.size()).Finalize(out);
+//    CHMAC_SHA256 PShctx, hctx;
     size_t i;
     uint8_t ivec[4];
     uint8_t U[32];
@@ -133,8 +63,10 @@ PBKDF2_SHA256(const uint8_t *passwd, size_t passwdlen, const uint8_t *salt,
     size_t clen;
 
     /* Compute HMAC state after processing P and S. */
-    HMAC_SHA256_Init(&PShctx, passwd, passwdlen);
-    HMAC_SHA256_Update(&PShctx, salt, saltlen);
+    CHMAC_SHA256 PShctx(passwd, passwdlen);
+//    HMAC_SHA256_Init(&PShctx, passwd, passwdlen);
+    PShctx.Write(salt, saltlen);
+    CHMAC_SHA256 hctx(passwd, passwdlen);
 
     /* Iterate through the blocks. */
     for (i = 0; i * 32 < dkLen; i++) {
@@ -142,18 +74,18 @@ PBKDF2_SHA256(const uint8_t *passwd, size_t passwdlen, const uint8_t *salt,
         be32enc(ivec, (uint32_t)(i + 1));
 
         /* Compute U_1 = PRF(P, S || INT(i)). */
-        memcpy(&hctx, &PShctx, sizeof(HMAC_SHA256_CTX));
-        HMAC_SHA256_Update(&hctx, ivec, 4);
-        HMAC_SHA256_Final(U, &hctx);
+        memcpy(&hctx, &PShctx, sizeof(CHMAC_SHA256));
+        hctx.Write(ivec, 4);
+        hctx.Finalize(U);
 
         /* T_i = U_1 ... */
         memcpy(T, U, 32);
 
         for (j = 2; j <= c; j++) {
             /* Compute U_j. */
-            HMAC_SHA256_Init(&hctx, passwd, passwdlen);
-            HMAC_SHA256_Update(&hctx, U, 32);
-            HMAC_SHA256_Final(U, &hctx);
+            CHMAC_SHA256 hctx(passwd, passwdlen);
+            hctx.Write(U, 32);
+            hctx.Finalize(U);
 
             /* ... xor U_j ... */
             for (k = 0; k < 32; k++)
@@ -168,11 +100,10 @@ PBKDF2_SHA256(const uint8_t *passwd, size_t passwdlen, const uint8_t *salt,
     }
 
     /* Clean PShctx, since we never called _Final on it. */
-    memset(&PShctx, 0, sizeof(HMAC_SHA256_CTX));
+    memset(&PShctx, 0, sizeof(CHMAC_SHA256));
 }
 
-static inline uint32_t
-le32dec_2(const void * pp)
+static inline uint32_t le32dec_2(const void * pp)
 {
     const uint8_t * p = (uint8_t const *)pp;
 
@@ -180,8 +111,7 @@ le32dec_2(const void * pp)
             ((uint32_t)(p[2]) << 16) + ((uint32_t)(p[3]) << 24));
 }
 
-static inline void
-le32enc_2(void * pp, uint32_t x)
+static inline void le32enc_2(void * pp, uint32_t x)
 {
     uint8_t * p = (uint8_t *)pp;
 
@@ -191,8 +121,7 @@ le32enc_2(void * pp, uint32_t x)
     p[3] = (x >> 24) & 0xff;
 }
 
-static void
-blkcpy(void * dest, const void * src, size_t len)
+static void blkcpy(void * dest, const void * src, size_t len)
 {
     size_t * D = (size_t*)dest;
     const size_t * S = (size_t*)src;
@@ -203,8 +132,7 @@ blkcpy(void * dest, const void * src, size_t len)
         D[i] = S[i];
 }
 
-static void
-blkxor(void * dest, const void * src, size_t len)
+static void blkxor(void * dest, const void * src, size_t len)
 {
     size_t * D = (size_t*)dest;
     const size_t* S = (size_t*)src;
@@ -219,8 +147,7 @@ blkxor(void * dest, const void * src, size_t len)
  * salsa20_8(B):
  * Apply the salsa20/8 core to the provided block.
  */
-static void
-salsa20_8(uint32_t B[16])
+static void salsa20_8(uint32_t B[16])
 {
     uint32_t x[16];
     size_t i;
@@ -265,8 +192,7 @@ salsa20_8(uint32_t B[16])
  * bytes in length; the output Bout must also be the same size.  The
  * temporary space X must be 64 bytes.
  */
-static void
-blockmix_salsa8(const uint32_t * Bin, uint32_t * Bout, uint32_t * X, size_t r)
+static void blockmix_salsa8(const uint32_t * Bin, uint32_t * Bout, uint32_t * X, size_t r)
 {
     size_t i;
 
@@ -297,8 +223,7 @@ blockmix_salsa8(const uint32_t * Bin, uint32_t * Bout, uint32_t * X, size_t r)
  * integerify(B, r):
  * Return the result of parsing B_{2r-1} as a little-endian integer.
  */
-static uint64_t
-integerify(const void * B, size_t r)
+static uint64_t integerify(const void * B, size_t r)
 {
     const uint32_t * X = (const uint32_t*)((uintptr_t)(B) + (2 * r - 1) * 64);
 
@@ -384,9 +309,9 @@ void scrypt(const char* pass, unsigned int pLen, const char* salt, unsigned int 
 
 #define SCRYPT_BUFFER_SIZE (131072 + 63)
 
-#if defined (OPTIMIZED_SALSA) && (defined (__x86_64__) || defined (__i386__) || defined(__arm__))
-extern "C" void scrypt_core(unsigned int *X, unsigned int *V);
-#else
+//#if defined (OPTIMIZED_SALSA) && (defined (__x86_64__) || defined (__i386__) || defined(__arm__))
+//extern "C" void scrypt_core(unsigned int *X, unsigned int *V);
+//#else
 // Generic scrypt_core implementation
 
 static inline void xor_salsa8(unsigned int B[16], const unsigned int Bx[16]) {
@@ -489,7 +414,7 @@ static inline void scrypt_core(unsigned int *X, unsigned int *V) {
     }
 }
 
-#endif
+//#endif
 
 /* cpu and memory intensive function to transform a 80 byte buffer into a 32 byte output
    scratchpad size needs to be at least 63 + (128 * r * p) + (256 * r + 64) + (128 * r * N) bytes
