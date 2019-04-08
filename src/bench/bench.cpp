@@ -109,6 +109,8 @@ void benchmark::BenchRunner::RunAll(Printer& printer, uint64_t num_evals, double
 
     std::cout << "benchmark::BenchRunner::RunAll for benchmarks\n";
     for (const auto& p : benchmarks()) {
+        std::cout << "benchmark::BenchRunner::RunAll p.name =" << p.first.c_str() << "\n";
+
         std::cout << "benchmark::BenchRunner::RunAll regex_match\n";
         if (!std::regex_match(p.first, baseMatch, reFilter)) {
             continue;
