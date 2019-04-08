@@ -234,7 +234,7 @@ void OverviewPage::setBalance(const interfaces::WalletBalances& balances)
 
     // Combined labels
     ui->labelBalancez->setText(BitcoinUnits::formatWithUnit(unit, availableTotalBalance, false, BitcoinUnits::separatorAlways));
-    ui->labelTotalz->setText(BitcoinUnits::formatWithUnit(unit, sumTotalBalance, false, BitcoinUnits::separatorAlways));
+    ui->labelTotalz->setText(BitcoinUnits::formatWithUnit(unit, balances.balance, false, BitcoinUnits::separatorAlways));
 
     // Percentage labels
     ui->labelWSPPercent->setText(sPercentage);
