@@ -64,7 +64,7 @@ const char* BIP71_MIMETYPE_PAYMENTREQUEST = "application/wispr-paymentrequest";
 //
 static QString ipcServerName()
 {
-    QString name("BitcoinQt");
+    QString name("WisprQt");
 
     // Append a simple hash of the datadir
     // Note that GetDataDir(true) returns a different path
