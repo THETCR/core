@@ -338,13 +338,12 @@ void SendCoinsDialog::on_sendButton_clicked()
     WalletModel::EncryptionStatus encStatus = model->getEncryptionStatus();
     if (encStatus == model->Locked || encStatus == model->UnlockedForAnonymizationOnly) {
         WalletModel::UnlockContext ctx(model->requestUnlock(AskPassphraseDialog::Context::Send_WSP, true));
-        if(!ctx.isValid())
-        {
+        if (!ctx.isValid()) {
             // Unlock wallet was cancelled
             fNewRecipientAllowed = true;
             return;
         }
-
+    }
     // prepare transaction for getting txFee earlier
     WalletModelTransaction currentTransaction(recipients);
     WalletModel::SendCoinsReturn prepareStatus;
