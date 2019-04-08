@@ -101,7 +101,7 @@ void BumpFee(TransactionView& view, const uint256& txid, bool expectDisabled, st
     table->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     action->setEnabled(expectDisabled);
     table->customContextMenuRequested({});
-//    QCOMPARE(action->isEnabled(), !expectDisabled);
+    QCOMPARE(action->isEnabled(), !expectDisabled);
 
     action->setEnabled(true);
     QString text;
@@ -111,7 +111,7 @@ void BumpFee(TransactionView& view, const uint256& txid, bool expectDisabled, st
         ConfirmMessage(&text);
     }
     action->trigger();
-//    QVERIFY(text.indexOf(QString::fromStdString(expectError)) != -1);
+    QVERIFY(text.indexOf(QString::fromStdString(expectError)) != -1);
 }
 
 //! Simple qt wallet tests.
