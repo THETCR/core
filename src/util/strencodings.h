@@ -16,10 +16,10 @@
 #include <string>
 #include <vector>
 
-#define BEGIN(a) ((char*)&(a))
-#define END(a) ((char*)&((&(a))[1]))
-#define UBEGIN(a) ((unsigned char*)&(a))
-#define UEND(a) ((unsigned char*)&((&(a))[1]))
+//#define BEGIN(a) ((char*)&(a))
+//#define END(a) ((char*)&((&(a))[1]))
+//#define UBEGIN(a) ((unsigned char*)&(a))
+//#define UEND(a) ((unsigned char*)&((&(a))[1]))
 #define ARRAYLEN(array)     (sizeof(array)/sizeof((array)[0]))
 
 /** Used by SanitizeString() */
@@ -254,5 +254,18 @@ constexpr char ToUpper(char c)
  * @return          string with the first letter capitalized.
  */
 std::string Capitalize(std::string str);
+
+inline char* UintToCharBegin(uint32_t a){
+    return ((char*)&a);
+}
+inline char* UintToCharEnd(uint32_t a){
+    return ((char*)&((&(a))[1]));
+}
+inline const unsigned char* UintToUCharBegin(uint32_t a){
+    return ((unsigned char*)&a);
+}
+inline const unsigned char* UintToUCharEnd(uint32_t a){
+    return ((unsigned char*)&((&(a))[1]));
+}
 
 #endif // BITCOIN_UTIL_STRENCODINGS_H

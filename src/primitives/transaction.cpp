@@ -22,7 +22,7 @@ std::string COutPoint::ToStringShort() const
 
 uint256 COutPoint::GetHash()
 {
-    return Hash(hash.begin(), hash.end(), BEGIN(n), END(n));
+    return Hash(hash.begin(), hash.end(), UintToCharBegin(n), UintToCharEnd(n));
 }
 
 CTxIn::CTxIn(COutPoint prevoutIn, CScript scriptSigIn, uint32_t nSequenceIn)
@@ -200,15 +200,6 @@ bool CTransaction::UsesUTXO(const COutPoint out)
     }
 
     return false;
-}
-
-std::list<COutPoint> CTransaction::GetOutPoints() const
-{
-    std::list<COutPoint> listOutPoints;
-    uint256 txHash = GetHash();
-    for (unsigned int i = 0; i < vout.size(); i++)
-        listOutPoints.emplace_back(COutPoint(txHash, i));
-    return listOutPoints;
 }
 
 CAmount CTransaction::GetZerocoinSpent() const

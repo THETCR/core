@@ -14,9 +14,6 @@
 #include <serialize.h>
 #include <uint256.h>
 
-#include <list>
-#include <iostream>
-
 class CTransaction;
 static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
 static const int32_t WISPR_TXN_VERSION = 3;
@@ -413,7 +410,6 @@ public:
     int GetZerocoinMintCount() const;
 
     bool UsesUTXO(const COutPoint out);
-    std::list<COutPoint> GetOutPoints() const;
 
     /**
      * Get the total transaction size in bytes, including witness data.
