@@ -119,7 +119,10 @@ WalletTx MakeWalletTx(interfaces::Chain::Lock& locked_chain, CWallet& wallet, co
     result.is_zerocoin_mint = wtx.IsZerocoinMint();
     result.is_mine_zerocoin_spend = fZSpendFromMe;
     std::cout << "makewallettx zwspTracker\n";
-    result.tracker_has_mint = wallet.zwspTracker->HasMintTx(hash);
+    if(wallet.zwspTracker){
+        std::cout << "makewallettx zwspTracker HasMintTx\n";
+        result.tracker_has_mint = wallet.zwspTracker->HasMintTx(hash);
+    }
     std::cout << "makewallettx return\n";
     return result;
 }
