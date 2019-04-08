@@ -329,45 +329,6 @@ void SendCoinsDialog::on_sendButton_clicked()
         recipients[0].useSwiftTX = false;
     }
 
-
-    // Format confirmation message
-    QStringList formatted;
-    for (const SendCoinsRecipient& rcp: recipients) {
-        // generate bold amount std::string
-        QString amount = "<b>" + BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), rcp.amount);
-        amount.append("</b> ").append(strFunds);
-
-        // generate monospace address std::string
-        QString address = "<span style='font-family: monospace;'>" + rcp.address;
-        address.append("</span>");
-
-        QString recipientElement;
-
-        if (!rcp.paymentRequest.IsInitialized()) // normal payment
-        {
-            if (rcp.label.length() > 0) // label with address
-            {
-                recipientElement = tr("%1 to %2").arg(amount, GUIUtil::HtmlEscape(rcp.label));
-                recipientElement.append(QString(" (%1)").arg(address));
-            } else // just address
-            {
-                recipientElement = tr("%1 to %2").arg(amount, address);
-            }
-        } else if (!rcp.authenticatedMerchant.isEmpty()) // secure payment request
-        {
-            recipientElement = tr("%1 to %2").arg(amount, GUIUtil::HtmlEscape(rcp.authenticatedMerchant));
-        } else // insecure payment request
-        {
-            recipientElement = tr("%1 to %2").arg(amount, address);
-        }
-
-        if (CoinControlDialog::coinControl()->fSplitBlock) {
-            recipientElement.append(tr(" split into %1 outputs using the UTXO splitter.").arg(CoinControlDialog::coinControl()->nSplitBlock));
-        }
-
-        formatted.append(recipientElement);
-    }
-
     fNewRecipientAllowed = false;
 
     // request unlock only if was locked or unlocked for mixing:
@@ -383,15 +344,7 @@ void SendCoinsDialog::on_sendButton_clicked()
             fNewRecipientAllowed = true;
             return;
         }
-        send(recipients, strFee, formatted);
-        return;
-    }
-    // already unlocked or not encrypted at all
-    send(recipients, strFee, formatted);
-}
 
-void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee, QStringList formatted)
-{
     // prepare transaction for getting txFee earlier
     WalletModelTransaction currentTransaction(recipients);
     WalletModel::SendCoinsReturn prepareStatus;
@@ -415,6 +368,54 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee,
     }
 
     CAmount txFee = currentTransaction.getTransactionFee();
+
+    // Format confirmation message
+    QStringList formatted;
+    for (const SendCoinsRecipient &rcp : currentTransaction.getRecipients())
+    {
+        // generate bold amount string with wallet name in case of multiwallet
+        QString amount = "<b>" + BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), rcp.amount);
+        if (model->isMultiwallet()) {
+            amount.append(" <u>"+tr("from wallet %1").arg(GUIUtil::HtmlEscape(model->getWalletName()))+"</u> ");
+        }
+        amount.append("</b> ").append(strFunds);
+        // generate monospace address string
+        QString address = "<span style='font-family: monospace;'>" + rcp.address;
+        address.append("</span>");
+
+        QString recipientElement;
+        recipientElement = "<br />";
+
+#ifdef ENABLE_BIP70
+        if (!rcp.paymentRequest.IsInitialized()) // normal payment
+#endif
+        {
+            if (rcp.label.length() > 0) // label with address
+            {
+                recipientElement.append(tr("%1 to %2").arg(amount, GUIUtil::HtmlEscape(rcp.label)));
+                recipientElement.append(QString(" (%1)").arg(address));
+            } else // just address
+            {
+                recipientElement.append(tr("%1 to %2").arg(amount, address));
+            }
+        }
+#ifdef ENABLE_BIP70
+        else if(!rcp.authenticatedMerchant.isEmpty()) // authenticated payment request
+        {
+            recipientElement.append(tr("%1 to %2").arg(amount, GUIUtil::HtmlEscape(rcp.authenticatedMerchant)));
+        }
+        else // unauthenticated payment request
+        {
+            recipientElement.append(tr("%1 to %2").arg(amount, address));
+        }
+#endif
+
+        if (CoinControlDialog::coinControl()->fSplitBlock) {
+            recipientElement.append(tr(" split into %1 outputs using the UTXO splitter.").arg(CoinControlDialog::coinControl()->nSplitBlock));
+        }
+
+        formatted.append(recipientElement);
+    }
     QString questionString = tr("Are you sure you want to send?");
     questionString.append("<br /><br />%1");
 

@@ -64,7 +64,6 @@ private:
     ClientModel *clientModel;
     WalletModel *model;
     bool fNewRecipientAllowed;
-    void send(QList<SendCoinsRecipient> recipients, QString strFee, QStringList formatted);
     bool fFeeMinimized;
     const PlatformStyle *platformStyle;
 
