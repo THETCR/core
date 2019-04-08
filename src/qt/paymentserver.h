@@ -57,7 +57,7 @@ class QUrl;
 QT_END_NAMESPACE
 
 // BIP70 max payment request size in bytes (DoS protection)
-static const qint64 BIP70_MAX_PAYMENTREQUEST_SIZE = 50000;
+static const qint64 BIP70_MAX_PAYMENTREQUEST_SIZE = 6000;
 
 class PaymentServer : public QObject
 {
