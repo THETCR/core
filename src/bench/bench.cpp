@@ -125,7 +125,7 @@ void benchmark::BenchRunner::RunAll(Printer& printer, uint64_t num_evals, double
         State state(p.first, num_evals, num_iters, printer);
         if (!is_list_only) {
             std::cout << "benchmark::BenchRunner::RunAll p.second.func\n";
-            std::cout << p.second.func.target_type().name() << "\n";
+            std::cout << state.m_name << "\n";
             p.second.func(state);
         }
         std::cout << "benchmark::BenchRunner::RunAll printer.result(state)\n";
