@@ -65,7 +65,7 @@ using namespace std;
 /**
  * Settings
  */
-CFeeRate payTxFee(DEFAULT_TRANSACTION_FEE);
+CFeeRate payTxFee(DEFAULT_PAY_TX_FEE);
 //CAmount maxTxFee = DEFAULT_TRANSACTION_MAXFEE;
 unsigned int nTxConfirmTarget = 1;
 bool bSpendZeroConfChange = true;
