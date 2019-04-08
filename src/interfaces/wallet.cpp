@@ -335,14 +335,10 @@ public:
     }
     std::vector<WalletTx> getWalletTxs() override
     {
-        std::cout << "getWalletTxs\n";
         auto locked_chain = m_wallet->chain().lock();
-        std::cout << "LOCK\n";
         LOCK(m_wallet->cs_wallet);
         std::vector<WalletTx> result;
-        std::cout << "reserve\n";
         result.reserve(m_wallet->mapWallet.size());
-        std::cout << "for\n";
         for (const auto& entry : m_wallet->mapWallet) {
             result.emplace_back(MakeWalletTx(*locked_chain, *m_wallet, entry.second));
         }
