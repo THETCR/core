@@ -18,7 +18,7 @@
 #include <wallet/coincontrol.h>
 #include "zwspcontroldialog.h"
 #include "spork.h"
-#include "askpassphrasedialog.h"
+#include <qt/askpassphrasedialog.h>
 
 #include <QClipboard>
 #include <QPushButton>

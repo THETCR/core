@@ -10,7 +10,7 @@
 #include <interfaces/node.h>
 #include <key_io.h>
 #include <wallet/wallet.h>
-#include "askpassphrasedialog.h"
+#include <qt/askpassphrasedialog.h>
 
 #include <QFont>
 #include <QDebug>

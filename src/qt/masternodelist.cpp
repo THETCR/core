@@ -16,7 +16,7 @@
 #include "sync.h"
 #include <wallet/wallet.h>
 #include "walletmodel.h"
-#include "askpassphrasedialog.h"
+#include <qt/askpassphrasedialog.h>
 
 #include <QMessageBox>
 #include <QTimer>

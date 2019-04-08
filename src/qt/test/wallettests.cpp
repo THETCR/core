@@ -160,23 +160,23 @@ void TestGUI()
     std::cout<< "Create widgets\n";
     // Create widgets for sending coins and listing transactions.
     std::unique_ptr<const PlatformStyle> platformStyle(PlatformStyle::instantiate("other"));
-    std::cout<< "Create SendCoinsDialog\n";
+    std::cout<< "Create new SendCoinsDialog\n";
     SendCoinsDialog sendCoinsDialog(platformStyle.get());
-    std::cout<< "Create TransactionView\n";
+    std::cout<< "Create new TransactionView\n";
     TransactionView transactionView(platformStyle.get());
     std::cout<< "Create node\n";
     auto node = interfaces::MakeNode();
-    std::cout<< "Create optionsModel\n";
+    std::cout<< "Create new optionsModel\n";
     OptionsModel optionsModel(*node);
-    std::cout<< "Create AddWallet\n";
+    std::cout<< "AddWallet\n";
     AddWallet(wallet);
-    std::cout<< "Create walletModel\n";
+    std::cout<< "Create new walletModel\n";
     WalletModel walletModel(std::move(node->getWallets().back()), *node, platformStyle.get(), &optionsModel);
     std::cout<< "Create RemoveWallet\n";
     RemoveWallet(wallet);
-    std::cout<< "Create sendCoinsDialog\n";
+    std::cout<< "sendCoinsDialog setModel\n";
     sendCoinsDialog.setModel(&walletModel);
-    std::cout<< "Create transactionView\n";
+    std::cout<< "transactionView setModel\n";
     transactionView.setModel(&walletModel);
 
     std::cout<< "Send two transaction\n";

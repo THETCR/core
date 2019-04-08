@@ -69,7 +69,7 @@ private:
     const PlatformStyle *platformStyle;
 
     // Process WalletModel::SendCoinsReturn and generate a pair consisting
-    // of a message and message flags for use in emit message().
+    // of a message and message flags for use in Q_EMIT message().
     // Additional parameter msgArg can be used via .arg(msgArg).
     void processSendCoinsReturn(const WalletModel::SendCoinsReturn& sendCoinsReturn, const QString& msgArg = QString(), bool fPrepare = false);
     void minimizeFeeSection(bool fMinimize);
@@ -84,7 +84,6 @@ private Q_SLOTS:
     void removeEntry(SendCoinsEntry* entry);
     void useAvailableBalance(SendCoinsEntry* entry);
     void updateDisplayUnit();
-    void updateSwiftTX();
     void coinControlFeatureChanged(bool);
     void coinControlButtonClicked();
     void coinControlChangeChecked(int);
@@ -95,20 +94,21 @@ private Q_SLOTS:
     void coinControlClipboardFee();
     void coinControlClipboardAfterFee();
     void coinControlClipboardBytes();
-    void coinControlClipboardPriority();
     void coinControlClipboardLowOutput();
     void coinControlClipboardChange();
+    void updateFeeSectionControls();
+    void updateSmartFeeLabel();
+    void updateSwiftTX();
+    void coinControlClipboardPriority();
     void splitBlockChecked(int);
     void splitBlockLineEditChanged(const QString& text);
     void setMinimumFee();
-    void updateFeeSectionControls();
     void updateMinFeeLabel();
-    void updateSmartFeeLabel();
     void updateGlobalFeeVariables();
 
 Q_SIGNALS:
     // Fired when a message should be reported to the user
-    void message(const QString& title, const QString& message, unsigned int style);
+    void message(const QString &title, const QString &message, unsigned int style);
 };
 
 

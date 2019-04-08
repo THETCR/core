@@ -13,7 +13,7 @@
 #include <key_io.h>
 #include <validation.h> // For strMessageMagic
 #include <wallet/wallet.h>
-#include "askpassphrasedialog.h"
+#include <qt/askpassphrasedialog.h>
 
 #include <string>
 #include <vector>

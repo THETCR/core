@@ -13,7 +13,7 @@
 #include "base58.h"
 #include "bip38.h"
 #include <wallet/wallet.h>
-#include "askpassphrasedialog.h"
+#include <qt/askpassphrasedialog.h>
 
 #include <string>
 #include <vector>
