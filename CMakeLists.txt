@@ -97,9 +97,10 @@ endif()
 
 add_definitions(
         -DPACKAGE_NAME=WISPR
+        -DUSE_NUM_GMP=1
         -DENABLE_WALLET=1
         -DENABLE_BIP70=1
-        -DUSE_NUM_GMP=1
+        -DHAVE_CONSENSUS_LIB=1
 )
 
 file(GLOB SOURCE_FILES
