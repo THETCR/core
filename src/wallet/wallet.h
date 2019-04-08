@@ -1161,6 +1161,7 @@ public:
     }
 
     void CreateZWspWallet();
+    bool HasZerocoinFeatures();
     void setZWallet(CzWSPWallet* zwallet);
 
     CzWSPWallet* getZWallet() { return zwalletMain; }

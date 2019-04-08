@@ -8788,3 +8788,8 @@ void CWallet::CreateZWspWallet()
         zwalletMain->SyncWithChain();
     }
 }
+
+bool CWallet::HasZerocoinFeatures()
+{
+    return (zwalletMain && zwspTracker);
+}
