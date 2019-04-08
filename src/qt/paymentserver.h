@@ -36,7 +36,9 @@
 #include <config/wispr-config.h>
 #endif
 
+#ifdef ENABLE_BIP70
 #include <qt/paymentrequestplus.h>
+#endif
 #include <qt/walletmodel.h>
 
 #include <QObject>
@@ -80,6 +82,7 @@ public:
     // OptionsModel is used for getting proxy settings and display unit
     void setOptionsModel(OptionsModel *optionsModel);
 
+#ifdef ENABLE_BIP70
     // Load root certificate authorities. Pass nullptr (default)
     // to read from the file specified in the -rootcertificates setting,
     // or, if that's not set, to use the system default root certificates.
@@ -98,6 +101,7 @@ public:
     static bool verifySize(qint64 requestSize);
     // Verify the payment request amount is valid
     static bool verifyAmount(const CAmount& requestAmount);
+#endif
 
 Q_SIGNALS:
     // Fired when a valid payment request is received
@@ -106,8 +110,10 @@ Q_SIGNALS:
     // Fired when a message should be reported to the user
     void message(const QString &title, const QString &message, unsigned int style);
 
+#ifdef ENABLE_BIP70
     // Fired when a valid PaymentACK is received
     void receivedPaymentACK(const QString &paymentACKMsg);
+#endif
 
 public Q_SLOTS:
     // Signal this when the main window's UI is ready
@@ -117,14 +123,18 @@ public Q_SLOTS:
     // Handle an incoming URI, URI with local file scheme or file
     void handleURIOrFile(const QString& s);
 
+#ifdef ENABLE_BIP70
     // Submit Payment message to a merchant, get back PaymentACK:
     void fetchPaymentACK(WalletModel* walletModel, const SendCoinsRecipient& recipient, QByteArray transaction);
+#endif
 
 private Q_SLOTS:
     void handleURIConnection();
+#ifdef ENABLE_BIP70
     void netRequestFinished(QNetworkReply*);
     void reportSslErrors(QNetworkReply*, const QList<QSslError> &);
     void handlePaymentACK(const QString& paymentACKMsg);
+#endif
 
 protected:
     // Constructor registers this on the parent QApplication to
@@ -136,6 +146,7 @@ private:
     QLocalServer* uriServer;
     OptionsModel *optionsModel;
 
+#ifdef ENABLE_BIP70
     static bool readPaymentRequestFromFile(const QString& filename, PaymentRequestPlus& request);
     bool processPaymentRequest(const PaymentRequestPlus& request, SendCoinsRecipient& recipient);
     void fetchRequest(const QUrl& url);
@@ -143,6 +154,7 @@ private:
     // Setup networking
     void initNetManager();
     QNetworkAccessManager* netManager;  // Used to fetch payment requests
+#endif
 };
 
 #endif // BITCOIN_QT_PAYMENTSERVER_H

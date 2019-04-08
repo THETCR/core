@@ -98,6 +98,7 @@ endif()
 add_definitions(
         -DPACKAGE_NAME=WISPR
         -DENABLE_WALLET=1
+        -DENABLE_BIP70=1
         -DUSE_NUM_GMP=1
 )
 
