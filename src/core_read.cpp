@@ -223,20 +223,6 @@ std::vector<unsigned char> ParseHexUV(const UniValue& v, const std::string& strN
     return ParseHex(strHex);
 }
 
-uint256 ParseHashUV(const UniValue& v, const std::string& strName)
-{
-    std::string strHex;
-    uint256 result;
-    if (v.isStr())
-        strHex = v.getValStr();
-
-    if (!ParseHashStr(strHex, result)) {
-        throw std::runtime_error("invalid TX input txid");
-    }
-    return result;
-//    return ParseHashStr(strHex, strName); // Note: ParseHashStr("") throws a runtime_error
-}
-
 int ParseSighashString(const UniValue& sighash)
 {
     int hash_type = SIGHASH_ALL;

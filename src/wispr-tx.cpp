@@ -527,22 +527,6 @@ static bool findSighashFlags(int& flags, const std::string& flagStr)
     return false;
 }
 
-uint256 ParseHashUO(std::map<std::string, UniValue>& o, std::string strKey)
-{
-    if (!o.count(strKey))
-        return 0;
-    return ParseHashUV(o[strKey], strKey);
-}
-
-std::vector<unsigned char> ParseHexUO(std::map<std::string, UniValue>& o, std::string strKey)
-{
-    if (!o.count(strKey)) {
-        std::vector<unsigned char> emptyVec;
-        return emptyVec;
-    }
-    return ParseHexUV(o[strKey], strKey);
-}
-
 static CAmount AmountFromValue(const UniValue& value)
 {
     if (!value.isNum() && !value.isStr())
