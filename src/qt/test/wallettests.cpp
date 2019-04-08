@@ -57,14 +57,20 @@ void ConfirmSend(QString* text = nullptr, bool cancel = false)
 //! Send coins to address and return txid.
 uint256 SendCoins(CWallet& wallet, SendCoinsDialog& sendCoinsDialog, const CTxDestination& address, CAmount amount, bool rbf)
 {
+    std::cout<< "SendCoins : entries\n";
     QVBoxLayout* entries = sendCoinsDialog.findChild<QVBoxLayout*>("entries");
+    std::cout<< "SendCoins : first widget\n";
     SendCoinsEntry* entry = qobject_cast<SendCoinsEntry*>(entries->itemAt(0)->widget());
+    std::cout<< "SendCoins : payTo\n";
     entry->findChild<QValidatedLineEdit*>("payTo")->setText(QString::fromStdString(EncodeDestination(address)));
+    std::cout<< "SendCoins : payAmount\n";
     entry->findChild<BitcoinAmountField*>("payAmount")->setValue(amount);
+    std::cout<< "SendCoins : optInRBF this doesnt exist\n";
     sendCoinsDialog.findChild<QFrame*>("frameFee")
         ->findChild<QFrame*>("frameFeeSelection")
         ->findChild<QCheckBox*>("optInRBF")
         ->setCheckState(rbf ? Qt::Checked : Qt::Unchecked);
+    std::cout<< "SendCoins : NotifyTransactionChanged\n";
     uint256 txid;
     boost::signals2::scoped_connection c(wallet.NotifyTransactionChanged.connect([&txid](CWallet*, const uint256& hash, ChangeType status) {
         if (status == CT_NEW) txid = hash;
