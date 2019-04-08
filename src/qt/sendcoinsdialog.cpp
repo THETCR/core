@@ -228,7 +228,9 @@ void SendCoinsDialog::setModel(WalletModel *_model)
         connect(ui->groupCustomFee, SIGNAL(buttonClicked(int)), this, SLOT(updateGlobalFeeVariables()));
         connect(ui->groupCustomFee, SIGNAL(buttonClicked(int)), this, SLOT(coinControlUpdateLabels()));
         connect(ui->customFee, SIGNAL(valueChanged()), this, SLOT(updateGlobalFeeVariables()));
-        connect(ui->customFee, SIGNAL(valueChanged()), this, SLOT(coinControlUpdateLabels()));
+        connect(ui->customFee, &BitcoinAmountField::valueChanged, this, &SendCoinsDialog::coinControlUpdateLabels);
+        connect(ui->optInRBF, &QCheckBox::stateChanged, this, &SendCoinsDialog::updateSmartFeeLabel);
+        connect(ui->optInRBF, &QCheckBox::stateChanged, this, &SendCoinsDialog::coinControlUpdateLabels);
         connect(ui->checkBoxMinimumFee, SIGNAL(stateChanged(int)), this, SLOT(setMinimumFee()));
         connect(ui->checkBoxMinimumFee, SIGNAL(stateChanged(int)), this, SLOT(updateFeeSectionControls()));
         connect(ui->checkBoxMinimumFee, SIGNAL(stateChanged(int)), this, SLOT(updateGlobalFeeVariables()));
@@ -247,6 +249,9 @@ void SendCoinsDialog::setModel(WalletModel *_model)
         updateMinFeeLabel();
         qDebug() << "SendCoinsDialog::setModel updateSmartFeeLabel";
         updateSmartFeeLabel();
+
+        // set default rbf checkbox state
+        ui->optInRBF->setCheckState(Qt::Checked);
         qDebug() << "SendCoinsDialog::setModel updateGlobalFeeVariables";
         updateGlobalFeeVariables();
     }
@@ -421,10 +426,20 @@ void SendCoinsDialog::on_sendButton_clicked()
     QString questionString = tr("Are you sure you want to send?");
     questionString.append("<br /><br />%1");
 
-    if (txFee > 0) {
+    if(txFee > 0)
+    {
         // append fee std::string if a fee is required
         questionString.append("<hr /><span style='color:#aa0000;'>");
         questionString.append(BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), txFee));
+        questionString.append("</span><br />");
+
+        // append RBF message according to transaction's signalling
+        questionString.append("<span style='font-size:10pt; font-weight:normal;'>");
+        if (ui->optInRBF->isChecked()) {
+            questionString.append(tr("You can increase the fee later (signals Replace-By-Fee, BIP-125)."));
+        } else {
+            questionString.append(tr("Not signalling Replace-By-Fee, BIP-125."));
+        }
         questionString.append("</span> ");
         questionString.append(tr("are added as transaction fee"));
         questionString.append(" ");
