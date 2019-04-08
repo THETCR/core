@@ -290,7 +290,6 @@ libbitcoin_server_a_SOURCES = \
   checkpoints.cpp \
   consensus/tx_verify.cpp \
   flatfile.cpp \
-  genwit.cpp \
   httprpc.cpp \
   httpserver.cpp \
   index/base.cpp \
@@ -300,7 +299,6 @@ libbitcoin_server_a_SOURCES = \
   interfaces/node.cpp \
   init.cpp \
   dbwrapper.cpp \
-  lightzwspthread.cpp \
   merkleblock.cpp \
   miner.cpp \
   net.cpp \
@@ -324,7 +322,6 @@ libbitcoin_server_a_SOURCES = \
   rpc/server.cpp \
   rpc/util.cpp \
   script/sigcache.cpp \
-  sporkdb.cpp \
   shutdown.cpp \
   timedata.cpp \
   torcontrol.cpp \
@@ -357,11 +354,9 @@ endif
 libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_wallet_a_SOURCES = \
-  interfaces/handler.cpp \
   interfaces/wallet.cpp \
   activemasternode.cpp \
   bip38.cpp \
-  outputtype.cpp \
   denomination_functions.cpp \
   obfuscation.cpp \
   obfuscation-relay.cpp \
@@ -389,6 +384,7 @@ libbitcoin_wallet_a_SOURCES = \
   stakeinput.cpp \
   genwit.cpp \
   lightzwspthread.cpp \
+  zpiv/accumulators.cpp \
   zpiv/deterministicmint.cpp \
   zpiv/mintpool.cpp \
   zpiv/witness.cpp \
@@ -536,8 +532,8 @@ libbitcoin_common_a_SOURCES = \
   netaddress.cpp \
   netbase.cpp \
   policy/feerate.cpp \
-  psbt.cpp \
   protocol.cpp \
+  psbt.cpp \
   scheduler.cpp \
   script/descriptor.cpp \
   script/ismine.cpp \
