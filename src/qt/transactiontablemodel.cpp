@@ -79,7 +79,6 @@ public:
         qDebug() << "TransactionTablePriv::refreshWallet";
         cachedWallet.clear();
         {
-            qDebug() << "TransactionTablePriv::refreshWallet: const auto& wtx : wallet.getWalletTxs()";
             for (const auto& wtx : wallet.getWalletTxs()) {
                 if (TransactionRecord::showTransaction()) {
                     cachedWallet.append(TransactionRecord::decomposeTransaction(wtx));

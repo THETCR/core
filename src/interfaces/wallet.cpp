@@ -397,7 +397,6 @@ public:
         result.immature_balance = m_wallet->GetImmatureBalance();
         result.have_watch_only = m_wallet->HaveWatchOnly();
         if(m_wallet->HasZerocoinFeatures()){
-            std::cout << "getBalances zerocoin balances\n";
             result.zerocoin_balance = m_wallet->GetZerocoinBalance(false);
             result.unconfirmed_zerocoin_balance = m_wallet->GetUnconfirmedZerocoinBalance();
             result.immature_zerocoin_balance = m_wallet->GetImmatureZerocoinBalance();
