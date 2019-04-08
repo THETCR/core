@@ -28,7 +28,7 @@ public:
     /** Type filter bit field (all types but Obfuscation-SPAM ... enum 0-14 are common) */
     static const quint32 COMMON_TYPES = 0x0005FFFF;
 
-    static quint32 TYPE(int type) { return 1 << type; }
+    static quint32 TYPE(int type) { return 1<<type; }
 
     enum WatchOnlyFilter
     {
@@ -37,9 +37,8 @@ public:
         WatchOnlyFilter_No
     };
 
-    void setDateRange(const QDateTime& from, const QDateTime& to);
+    void setDateRange(const QDateTime &from, const QDateTime &to);
     void setSearchString(const QString &);
-    void setAddressPrefix(const QString& addrPrefix);
     /**
       @note Type filter takes a bit field created with TYPE() or ALL_TYPES
      */
@@ -60,12 +59,11 @@ public:
     static bool isOrphan(const int status, const int type);
 
 protected:
-    bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const;
+    bool filterAcceptsRow(int source_row, const QModelIndex & source_parent) const;
 
 private:
     QDateTime dateFrom;
     QDateTime dateTo;
-    QString addrPrefix;
     QString m_search_string;
     quint32 typeFilter;
     WatchOnlyFilter watchOnlyFilter;

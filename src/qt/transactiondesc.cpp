@@ -35,15 +35,18 @@ QString TransactionDesc::FormatTxStatus(const interfaces::WalletTx& wtx, const i
             return tr("Open for %n more block(s)", "", wtx.tx->nLockTime - numBlocks);
         else
             return tr("Open until %1").arg(GUIUtil::dateTimeStr(wtx.tx->nLockTime));
-    } else {
+    }
+    else
+    {
+        int nDepth = status.depth_in_main_chain;
+        if (nDepth < 0){
+            return tr("conflicted with a transaction with %1 confirmations").arg(-nDepth);
+        }
         int signatures = status.lock_signatures;
         QString strUsingIX = "";
         if (signatures >= 0) {
             if (signatures >= SWIFTTX_SIGNATURES_REQUIRED) {
-                int nDepth = status.depth_in_main_chain;
-                if (nDepth < 0)
-                    return tr("conflicted");
-                else if (GetAdjustedTime() - status.time_received > 2 * 60 && status.request_count == 0)
+                if (GetAdjustedTime() - status.time_received > 2 * 60 && status.request_count == 0)
                     return tr("%1/offline (verified via SwiftX)").arg(nDepth);
                 else if (nDepth < 6)
                     return tr("%1/confirmed (verified via SwiftX)").arg(nDepth);
@@ -51,20 +54,14 @@ QString TransactionDesc::FormatTxStatus(const interfaces::WalletTx& wtx, const i
                     return tr("%1 confirmations (verified via SwiftX)").arg(nDepth);
             } else {
                 if (!status.is_lock_timed_out) {
-                    int nDepth = status.depth_in_main_chain;
-                    if (nDepth < 0)
-                        return tr("conflicted");
-                    else if (GetAdjustedTime() - status.time_received > 2 * 60 && status.request_count == 0)
+                    if (GetAdjustedTime() - status.time_received > 2 * 60 && status.request_count == 0)
                         return tr("%1/offline (SwiftX verification in progress - %2 of %3 signatures)").arg(nDepth).arg(signatures).arg(SWIFTTX_SIGNATURES_TOTAL);
                     else if (nDepth < 6)
                         return tr("%1/confirmed (SwiftX verification in progress - %2 of %3 signatures )").arg(nDepth).arg(signatures).arg(SWIFTTX_SIGNATURES_TOTAL);
                     else
                         return tr("%1 confirmations (SwiftX verification in progress - %2 of %3 signatures)").arg(nDepth).arg(signatures).arg(SWIFTTX_SIGNATURES_TOTAL);
                 } else {
-                    int nDepth = status.depth_in_main_chain;
-                    if (nDepth < 0)
-                        return tr("conflicted");
-                    else if (GetAdjustedTime() - status.time_received > 2 * 60 && status.request_count == 0)
+                    if (GetAdjustedTime() - status.time_received > 2 * 60 && status.request_count == 0)
                         return tr("%1/offline (SwiftX verification failed)").arg(nDepth);
                     else if (nDepth < 6)
                         return tr("%1/confirmed (SwiftX verification failed)").arg(nDepth);
@@ -73,10 +70,7 @@ QString TransactionDesc::FormatTxStatus(const interfaces::WalletTx& wtx, const i
                 }
             }
         } else {
-            int nDepth = status.depth_in_main_chain;
-            if (nDepth < 0)
-                return tr("conflicted");
-            else if (GetAdjustedTime() - status.time_received > 2 * 60 && status.request_count == 0)
+            if (GetAdjustedTime() - status.time_received > 2 * 60 && status.request_count == 0)
                 return tr("%1/offline").arg(nDepth);
             else if (nDepth < 6)
                 return tr("%1/unconfirmed").arg(nDepth);
@@ -294,6 +288,8 @@ QString TransactionDesc::toHTML(interfaces::Node& node, interfaces::Wallet& wall
         strHTML += "<br><b>" + tr("Comment") + ":</b><br>" + GUIUtil::HtmlEscape(wtx.value_map["comment"], true) + "<br>";
 
     strHTML += "<b>" + tr("Transaction ID") + ":</b> " + rec->getTxHash() + "<br>";
+    strHTML += "<b>" + tr("Transaction total size") + ":</b> " + QString::number(wtx.tx->GetTotalSize()) + " bytes<br>";
+    strHTML += "<b>" + tr("Transaction virtual size") + ":</b> " + QString::number(GetVirtualTransactionSize(*wtx.tx)) + " bytes<br>";
     strHTML += "<b>" + tr("Output index") + ":</b> " + QString::number(rec->getOutputIndex()) + "<br>";
 
     // Message from normal bitcoin:URI (bitcoin:123...?message=example)
@@ -301,6 +297,7 @@ QString TransactionDesc::toHTML(interfaces::Node& node, interfaces::Wallet& wall
         if (r.first == "Message")
             strHTML += "<br><b>" + tr("Message") + ":</b><br>" + GUIUtil::HtmlEscape(r.second, true) + "<br>";
 
+#ifdef ENABLE_BIP70
     //
     // PaymentRequest info:
     //
@@ -315,6 +312,7 @@ QString TransactionDesc::toHTML(interfaces::Node& node, interfaces::Wallet& wall
                 strHTML += "<b>" + tr("Merchant") + ":</b> " + GUIUtil::HtmlEscape(merchant) + "<br>";
         }
     }
+#endif
 
     if (wtx.is_coinbase)
     {

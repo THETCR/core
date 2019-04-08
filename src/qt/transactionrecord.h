@@ -25,25 +25,25 @@ struct WalletTxStatus;
 class TransactionStatus
 {
 public:
-    TransactionStatus() :
-    countsForBalance(false), sortKey(""),
-                          matures_in(0), status(Offline), depth(0), open_for(0), cur_num_blocks(-1)
-    {}
+    TransactionStatus():
+        countsForBalance(false), sortKey(""),
+        matures_in(0), status(Offline), depth(0), open_for(0), cur_num_blocks(-1)
+    { }
 
     enum Status {
-        Confirmed, /**< Have 6 or more confirmations (normal tx) or fully mature (mined tx) **/
+        Confirmed,          /**< Have 6 or more confirmations (normal tx) or fully mature (mined tx) **/
         /// Normal (sent/received) transactions
-        OpenUntilDate,  /**< Transaction not yet final, waiting for date */
-        OpenUntilBlock, /**< Transaction not yet final, waiting for block */
-        Offline,        /**< Not sent to any other nodes **/
-        Unconfirmed,    /**< Not yet mined into a block **/
-        Confirming,     /**< Confirmed, but waiting for the recommended number of confirmations **/
-        Conflicted,     /**< Conflicts with other transaction or mempool **/
+        OpenUntilDate,      /**< Transaction not yet final, waiting for date */
+        OpenUntilBlock,     /**< Transaction not yet final, waiting for block */
+        Unconfirmed,        /**< Not yet mined into a block **/
+        Confirming,         /**< Confirmed, but waiting for the recommended number of confirmations **/
+        Conflicted,         /**< Conflicts with other transaction or mempool **/
         Abandoned,          /**< Abandoned from the wallet **/
         /// Generated (mined) transactions
-        Immature,       /**< Mined but waiting for maturity */
-        MaturesWarning, /**< Transaction will likely not mature because no nodes have confirmed */
-        NotAccepted     /**< Mined but not accepted */
+        Immature,           /**< Mined but waiting for maturity */
+        NotAccepted,     /**< Mined but not accepted */
+        Offline,        /**< Not sent to any other nodes **/
+        MaturesWarning /**< Transaction will likely not mature because no nodes have confirmed */
     };
 
     /// Transaction counts towards available balance
@@ -84,14 +84,14 @@ public:
     {
         Other,
         Generated,
-        StakeMint,
-        StakeZWSP,
         SendToAddress,
         SendToOther,
         RecvWithAddress,
-        MNReward,
         RecvFromOther,
         SendToSelf,
+        StakeMint,
+        StakeZWSP,
+        MNReward,
         ZerocoinMint,
         ZerocoinSpend,
         RecvFromZerocoinSpend,

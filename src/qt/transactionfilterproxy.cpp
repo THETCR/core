@@ -14,17 +14,16 @@ const QDateTime TransactionFilterProxy::MIN_DATE = QDateTime::fromTime_t(0);
 // Last date that can be represented (far in the future)
 const QDateTime TransactionFilterProxy::MAX_DATE = QDateTime::fromTime_t(0xFFFFFFFF);
 
-TransactionFilterProxy::TransactionFilterProxy(QObject* parent) : QSortFilterProxyModel(parent),
-                                                                  dateFrom(MIN_DATE),
-                                                                  dateTo(MAX_DATE),
-                                                                  addrPrefix(),
-                                                                  m_search_string(),
-                                                                  typeFilter(COMMON_TYPES),
-                                                                  watchOnlyFilter(WatchOnlyFilter_All),
-                                                                  minAmount(0),
-                                                                  limitRows(-1),
-                                                                  showInactive(true),
-                                                                  fHideOrphans(false)
+TransactionFilterProxy::TransactionFilterProxy(QObject *parent) :
+    QSortFilterProxyModel(parent),
+    dateFrom(MIN_DATE),
+    dateTo(MAX_DATE),
+    m_search_string(),
+    typeFilter(COMMON_TYPES),
+    watchOnlyFilter(WatchOnlyFilter_All),
+    minAmount(0),
+    limitRows(-1),
+    showInactive(true)
 {
 }
 
@@ -75,11 +74,6 @@ void TransactionFilterProxy::setDateRange(const QDateTime &from, const QDateTime
     invalidateFilter();
 }
 
-void TransactionFilterProxy::setAddressPrefix(const QString& addrPrefix)
-{
-    this->addrPrefix = addrPrefix;
-    invalidateFilter();
-}
 void TransactionFilterProxy::setSearchString(const QString &search_string)
 {
     if (m_search_string == search_string) return;
