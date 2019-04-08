@@ -4651,20 +4651,21 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 
 void CWallet::postInitProcess()
 {
-    CzWSPWallet* zwalletMain = new CzWSPWallet(chain(), GetLocation(), GetDBHandle(), *this);
-    setZWallet(zwalletMain);
-    //Inititalize zWSPWallet
-    chain().initMessage(_("Syncing zWSP wallet..."));
-
-    InitAutoConvertAddresses();
-
-    bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
-    setZWspAutoBackups(fEnableZWspBackups);
-
-    //Load zerocoin mint hashes to memory
-    zwspTracker->Init();
-    zwalletMain->LoadMintPoolFromDB();
-    zwalletMain->SyncWithChain();
+    CreateZWspWallet();
+//    CzWSPWallet* zwalletMain = new CzWSPWallet(chain(), GetLocation(), GetDBHandle(), *this);
+//    setZWallet(zwalletMain);
+//    //Inititalize zWSPWallet
+//    chain().initMessage(_("Syncing zWSP wallet..."));
+//
+//    InitAutoConvertAddresses();
+//
+//    bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
+//    setZWspAutoBackups(fEnableZWspBackups);
+//
+//    //Load zerocoin mint hashes to memory
+//    zwspTracker->Init();
+//    zwalletMain->LoadMintPoolFromDB();
+//    zwalletMain->SyncWithChain();
     // Generate coins in the background
 //    GenerateBitcoins(gArgs.GetBoolArg("-gen", false), this, gArgs.GetArg("-genproclimit", 1));
     auto locked_chain = chain().lock();
