@@ -606,14 +606,10 @@ void PrivacyDialog::setBalance(const interfaces::WalletBalances& balances)
 {
     m_balances = balances;
     CAmount balance = balances.balance;
-    CAmount unconfirmedBalance = balances.unconfirmed_balance;
     CAmount immatureBalance = balances.immature_balance;
     CAmount zerocoinBalance = balances.zerocoin_balance;
     CAmount unconfirmedZerocoinBalance = balances.unconfirmed_zerocoin_balance;
     CAmount immatureZerocoinBalance = balances.immature_zerocoin_balance;
-    CAmount watchOnlyBalance = balances.watch_only_balance;
-    CAmount watchUnconfBalance = balances.unconfirmed_watch_only_balance;
-    CAmount watchImmatureBalance = balances.immature_watch_only_balance;
 
     std::map<libzerocoin::CoinDenomination, CAmount> mapDenomBalances;
     std::map<libzerocoin::CoinDenomination, int> mapUnconfirmed;

@@ -919,7 +919,9 @@ void SendCoinsDialog::splitBlockLineEditChanged(const QString& text)
 
     //convert to CAmount
     CAmount nAfterFee;
-    ParseMoney(qAfterFee.toStdString().c_str(), nAfterFee);
+    if(ParseMoney(qAfterFee.toStdString().c_str(), nAfterFee)){
+        return;
+    }
 
     //if greater than 0 then divide after fee by the amount of blocks
     CAmount nSize = nAfterFee;

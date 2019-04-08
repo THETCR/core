@@ -51,11 +51,12 @@ bool CCoinControlWidgetItem::operator<(const QTreeWidgetItem &other) const {
 }
 
 
-CoinControlDialog::CoinControlDialog(const PlatformStyle *_platformStyle, QWidget* parent, bool _fMultisigEnabled) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
-                                                        ui(new Ui::CoinControlDialog),
-                                                        model(nullptr),
-                                                        platformStyle(_platformStyle),
-                                                        fMultisigEnabled(_fMultisigEnabled)
+CoinControlDialog::CoinControlDialog(const PlatformStyle *_platformStyle, QWidget* parent, bool _fMultisigEnabled) :
+  QDialog(parent),
+  ui(new Ui::CoinControlDialog),
+  model(nullptr),
+  platformStyle(_platformStyle),
+  fMultisigEnabled(_fMultisigEnabled)
 {
     ui->setupUi(this);
 

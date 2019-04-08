@@ -94,8 +94,8 @@ private:
     PeerTableModel *peerTableModel;
     BanTableModel *banTableModel;
 
-    QTimer *pollTimer;
     QString cachedMasternodeCountString;
+    QTimer *pollTimer;
     QTimer* pollMnTimer;
 
     void subscribeToCoreSignals();

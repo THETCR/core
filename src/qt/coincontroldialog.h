@@ -65,7 +65,6 @@ private:
     WalletModel *model;
     int sortColumn;
     Qt::SortOrder sortOrder;
-    bool fMultisigEnabled;
 
     QMenu *contextMenu;
     QTreeWidgetItem *contextMenuItem;
@@ -74,6 +73,7 @@ private:
     QAction *unlockAction;
 
     const PlatformStyle *platformStyle;
+    bool fMultisigEnabled;
 
     void sortView(int, Qt::SortOrder);
     void updateView();
