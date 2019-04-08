@@ -91,7 +91,6 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
 
 
     QSettings settings;
-    std::cout << "restoreGeometry\n";
     if (!restoreGeometry(settings.value("MainWindowGeometry").toByteArray())) {
         // Restore failed (perhaps missing setting), center the window
         move(QApplication::desktop()->availableGeometry().center() - frameGeometry().center());
@@ -112,7 +111,6 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
         /** Create wallet frame and make it the central widget */
         walletFrame = new WalletFrame(_platformStyle, this);
         setCentralWidget(walletFrame);
-        std::cout << "explorerWindow\n";
         explorerWindow = new BlockExplorer(this);
     } else
 #endif // ENABLE_WALLET
@@ -131,23 +129,18 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
     // Needs walletFrame to be initialized
     createActions();
 
-    std::cout << "createMenuBar \n";
     // Create application menu bar
     createMenuBar();
 
-    std::cout << "createToolBars \n";
     // Create the toolbars
     createToolBars();
 
     // Create system tray icon and notification
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
-        std::cout << "createTrayIcon \n";
         createTrayIcon();
     }
-    std::cout << "notificator \n";
     notificator = new Notificator(QApplication::applicationName(), trayIcon, this);
 
-    std::cout << "statusBar \n";
     // Create status bar
     statusBar();
 
@@ -165,7 +158,6 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
     labelWalletEncryptionIcon = new QLabel();
     labelWalletHDStatusIcon = new QLabel();
     labelProxyIcon = new GUIUtil::ClickableLabel();
-    std::cout << "Wispr icons\n";
     labelStakingIcon = new QLabel();
     labelAutoMintIcon = new GUIUtil::ClickableLabel();
     labelAutoMintIcon->setObjectName("labelAutoMintIcon");
@@ -252,7 +244,6 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const PlatformStyle *_platformSty
     m_app_nap_inhibitor = new CAppNapInhibitor;
 #endif
 
-    std::cout << "Wispr stakings icons\n";
     QTimer* timerStakingIcon = new QTimer(labelStakingIcon);
     connect(timerStakingIcon, &QTimer::timeout, this, &BitcoinGUI::setStakingStatus);
     timerStakingIcon->start(10000);
@@ -315,7 +306,6 @@ void BitcoinGUI::createActions()
     receiveCoinsMenuAction->setStatusTip(receiveCoinsAction->statusTip());
     receiveCoinsMenuAction->setToolTip(receiveCoinsMenuAction->statusTip());
 
-    std::cout << "PrivacyAction\n";
     privacyAction = new QAction(platformStyle->SingleColorIcon(":/icons/privacy"), tr("&Privacy"), this);
     privacyAction->setStatusTip(tr("Privacy Actions for zWSP"));
     privacyAction->setToolTip(privacyAction->statusTip());
@@ -333,7 +323,6 @@ void BitcoinGUI::createActions()
 #ifdef ENABLE_WALLET
 
     QSettings settings;
-    std::cout << "masternodeAction\n";
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeAction = new QAction(QIcon(":/icons/masternodes"), tr("&Masternodes"), this);
         masternodeAction->setStatusTip(tr("Browse masternodes"));
@@ -357,7 +346,6 @@ void BitcoinGUI::createActions()
     connect(receiveCoinsAction, &QAction::triggered, this, &BitcoinGUI::gotoReceiveCoinsPage);
     connect(receiveCoinsMenuAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
     connect(receiveCoinsMenuAction, &QAction::triggered, this, &BitcoinGUI::gotoReceiveCoinsPage);
-    std::cout << "privacyAction connect\n";
     connect(privacyAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
     connect(privacyAction, &QAction::triggered, this, &BitcoinGUI::gotoPrivacyPage);
     connect(historyAction, &QAction::triggered, [this]{ showNormalIfMinimized(); });
@@ -404,7 +392,6 @@ void BitcoinGUI::createActions()
 
     openInfoAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation), tr("&Information"), this);
     openInfoAction->setStatusTip(tr("Show diagnostic information"));
-    std::cout << "openRPCConsoleAction\n";
     openRPCConsoleAction = new QAction(platformStyle->TextColorIcon(":/icons/debugwindow"), tr("&Debug window"), this);
     openRPCConsoleAction->setStatusTip(tr("Open debugging and diagnostic console"));
     // initially disable the debug window menu item
@@ -459,27 +446,16 @@ void BitcoinGUI::createActions()
     connect(showHelpMessageAction, &QAction::triggered, this, &BitcoinGUI::showHelpMessageClicked);
     connect(openRPCConsoleAction, &QAction::triggered, this, &BitcoinGUI::showDebugWindow);
     // Jump directly to tabs in RPC-console
-    std::cout << "openInfoAction\n";
     connect(openInfoAction, &QAction::triggered, rpcConsole, &RPCConsole::showInfo);
-    std::cout << "openRPCConsoleAction\n";
     connect(openRPCConsoleAction, &QAction::triggered, rpcConsole, &RPCConsole::showConsole);
-    std::cout << "openNetworkAction\n";
     connect(openNetworkAction, &QAction::triggered, rpcConsole, &RPCConsole::showNetwork);
-    std::cout << "openPeersAction\n";
     connect(openPeersAction, &QAction::triggered, rpcConsole, &RPCConsole::showPeers);
-    std::cout << "openRepairAction\n";
     connect(openRepairAction, &QAction::triggered, rpcConsole, &RPCConsole::showRepair);
-    std::cout << "openConfEditorAction\n";
     connect(openConfEditorAction, &QAction::triggered, rpcConsole, &RPCConsole::showConfEditor);
-    std::cout << "openMNConfEditorAction\n";
     connect(openMNConfEditorAction, &QAction::triggered, rpcConsole, &RPCConsole::showMNConfEditor);
-    std::cout << "showBackupsAction\n";
     connect(showBackupsAction, &QAction::triggered, rpcConsole, &RPCConsole::showBackups);
-    std::cout << "labelConnectionsIcon\n";
     connect(labelConnectionsIcon, &GUIUtil::ClickableLabel::clicked, rpcConsole, &RPCConsole::showPeers);
-    std::cout << "labelAutoMintIcon\n";
     connect(labelAutoMintIcon, &GUIUtil::ClickableLabel::clicked, this, &BitcoinGUI::optionsClicked);
-    std::cout << "rpcConsole\n";
 
     // Get restart command-line parameters and handle restart
     connect(rpcConsole, &RPCConsole::handleRestart, this, &BitcoinGUI::handleRestart);
@@ -492,7 +468,6 @@ void BitcoinGUI::createActions()
 #ifdef ENABLE_WALLET
     if(walletFrame)
     {
-        std::cout << "labelEncryptionIcon\n";
         connect(labelEncryptionIcon, &GUIUtil::ClickableLabel::clicked, walletFrame, &WalletFrame::toggleLockWallet);
         connect(encryptWalletAction, &QAction::triggered, walletFrame, &WalletFrame::encryptWallet);
         connect(backupWalletAction, &QAction::triggered, walletFrame, &WalletFrame::backupWallet);
@@ -510,7 +485,6 @@ void BitcoinGUI::createActions()
         connect(multiSendAction, &QAction::triggered, this, &BitcoinGUI::gotoMultiSendDialog);
         connect(multisigCreateAction, &QAction::triggered, this, &BitcoinGUI::gotoMultisigCreate);
         connect(multisigSpendAction, &QAction::triggered, this, &BitcoinGUI::gotoMultisigSpend);
-        std::cout << "multisigSignAction\n";
         connect(multisigSignAction, &QAction::triggered, this, &BitcoinGUI::gotoMultisigSign);
         connect(m_open_wallet_action->menu(), &QMenu::aboutToShow, [this] {
             m_open_wallet_action->menu()->clear();
@@ -551,10 +525,8 @@ void BitcoinGUI::createActions()
     }
 #endif // ENABLE_WALLET
 
-    std::cout << "QShortcut\n";
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_C), this), &QShortcut::activated, this, &BitcoinGUI::showDebugWindowActivateConsole);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_D), this), &QShortcut::activated, this, &BitcoinGUI::showDebugWindow);
-    std::cout << "createActions Finished\n";
 
 }
 
