@@ -107,22 +107,28 @@ void benchmark::BenchRunner::RunAll(Printer& printer, uint64_t num_evals, double
 
     printer.header();
 
+    std::cout << "benchmark::BenchRunner::RunAll for benchmarks\n";
     for (const auto& p : benchmarks()) {
+        std::cout << "benchmark::BenchRunner::RunAll regex_match\n";
         if (!std::regex_match(p.first, baseMatch, reFilter)) {
             continue;
         }
 
+        std::cout << "benchmark::BenchRunner::RunAll num_iters\n";
         uint64_t num_iters = static_cast<uint64_t>(p.second.num_iters_for_one_second * scaling);
         if (0 == num_iters) {
             num_iters = 1;
         }
+        std::cout << "benchmark::BenchRunner::RunAll state\n";
         State state(p.first, num_evals, num_iters, printer);
         if (!is_list_only) {
+            std::cout << "benchmark::BenchRunner::RunAll p.second.func\n";
             p.second.func(state);
         }
+        std::cout << "benchmark::BenchRunner::RunAll printer.result(state)\n";
         printer.result(state);
     }
-
+    std::cout << "benchmark::BenchRunner::RunAll printer.footer\n";
     printer.footer();
 }
 
