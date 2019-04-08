@@ -190,6 +190,7 @@ void SendCoinsDialog::setModel(WalletModel *_model)
     qDebug() << "SendCoinsDialog::setModel";
     this->model = _model;
 
+    qDebug() << "SendCoinsDialog::setModel getOptionsModel";
     if(_model && _model->getOptionsModel())
     {
         for(int i = 0; i < ui->entries->count(); ++i)
@@ -200,11 +201,13 @@ void SendCoinsDialog::setModel(WalletModel *_model)
                 entry->setModel(_model);
             }
         }
+        qDebug() << "SendCoinsDialog::setModel balances";
 
         interfaces::WalletBalances balances = _model->wallet().getBalances();
         setBalance(balances);
         connect(_model, &WalletModel::balanceChanged, this, &SendCoinsDialog::setBalance);
         connect(_model->getOptionsModel(), &OptionsModel::displayUnitChanged, this, &SendCoinsDialog::updateDisplayUnit);
+        qDebug() << "SendCoinsDialog::setModel updateDisplayUnit";
         updateDisplayUnit();
 
         // Coin Control
