@@ -17,6 +17,7 @@
 #include <util/time.h>
 #include <validation.h>
 #include <validationinterface.h>
+#include <sporkdb.h>
 
 #include <boost/thread.hpp>
 
@@ -77,6 +78,8 @@ static void AssembleBlock(benchmark::State& state)
         ::pblocktree.reset(new CBlockTreeDB(1 << 20, true));
         ::pcoinsdbview.reset(new CCoinsViewDB(1 << 23, true));
         ::pcoinsTip.reset(new CCoinsViewCache(pcoinsdbview.get()));
+        ::zerocoinDB.reset(new CZerocoinDB(0, false, false));
+        ::pSporkDB.reset(new CSporkDB(0, false, false));
     }
     {
         const CChainParams& chainparams = Params();
