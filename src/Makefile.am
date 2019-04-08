@@ -511,8 +511,7 @@ libwispr_consensus_a_SOURCES = \
   uint256.h \
   util/strencodings.cpp \
   util/strencodings.h \
-  version.h \
-  $(libzerocoin_libbitcoin_zerocoin_a_SOURCES)
+  version.h
 
 # common: shared between wisprd, and wispr-qt and non-server tools
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
