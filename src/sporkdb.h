@@ -5,7 +5,6 @@
 #ifndef WISPR_CSPORKDB_H
 #define WISPR_CSPORKDB_H
 
-#include <boost/filesystem/path.hpp>
 #include "dbwrapper.h"
 #include "spork.h"
 
