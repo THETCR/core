@@ -8773,5 +8773,18 @@ void CWallet::CreateZWspWallet()
     if(!zwalletMain){
         CzWSPWallet* zwalletMain = new CzWSPWallet(chain(), GetLocation(), GetDBHandle(), *this);
         setZWallet(zwalletMain);
+
+        //Inititalize zWSPWallet
+        chain().initMessage(_("Syncing zWSP wallet..."));
+
+        InitAutoConvertAddresses();
+
+        bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
+        setZWspAutoBackups(fEnableZWspBackups);
+
+        //Load zerocoin mint hashes to memory
+        zwspTracker->Init();
+        zwalletMain->LoadMintPoolFromDB();
+        zwalletMain->SyncWithChain();
     }
 }
