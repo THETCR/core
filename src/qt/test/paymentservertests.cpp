@@ -202,8 +202,7 @@ void PaymentServerTests::paymentServerTests()
     for (const std::pair<CScript, CAmount>& sendingTo : sendingTos) {
         CTxDestination dest;
         if (ExtractDestination(sendingTo.first, dest)){
-            std::cout << sendingTo.second << "\n";
-            QCOMPARE(PaymentServer::verifyAmount(sendingTo.second), false);
+            QCOMPARE(PaymentServer::verifyAmount(sendingTo.second * 10), false);
         }
     }
 
