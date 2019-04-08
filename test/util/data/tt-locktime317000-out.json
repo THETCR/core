@@ -1,6 +1,10 @@
 {
     "txid": "eff9eb1ba0b3cd859a64f31d254284cc24a5a6d87971a3bf459196eca0413842",
+    "hash": "eff9eb1ba0b3cd859a64f31d254284cc24a5a6d87971a3bf459196eca0413842",
     "version": 2,
+    "size": 3189,
+    "vsize": 3189,
+    "weight": 12756,
     "locktime": 317000,
     "vin": [
         {
@@ -195,7 +199,7 @@
     ],
     "vout": [
         {
-            "value": 1.3782,
+            "value": 1.37820000,
             "n": 0,
             "scriptPubKey": {
                 "asm": "OP_DUP OP_HASH160 8fd139bb39ced713f231c58a4d07bf6954d1c201 OP_EQUALVERIFY OP_CHECKSIG",
