@@ -75,7 +75,6 @@ void RPCNestedTests::rpcNestedTests()
     QVERIFY(result == result2);
 
     RPCConsole::RPCExecuteCommandLine(*node, result, "getblock(getbestblockhash())[tx][0]", &filtered);
-    std::cout << result << "\n";
     QVERIFY(result == "bcd0064f46daed0b3c1ccff16656a0da04b5509924118b7c13d21c81d62ec521");
     QVERIFY(filtered == "getblock(getbestblockhash())[tx][0]");
 
