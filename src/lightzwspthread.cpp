@@ -5,14 +5,14 @@
 //
 
 
-#include "lightzwspthread.h"
+#include <lightzwspthread.h>
 #include <logging.h>
 #include <validation.h>
-#include "netmessagemaker.h"
+#include <netmessagemaker.h>
 
 /****** Thread ********/
 void CLightWorker::ThreadLightZWSPSimplified() {
-    RenameThread("pivx-light-thread");
+    RenameThread("wispr-light-thread");
     isWorkerRunning = true;
     while (true) {
         try {

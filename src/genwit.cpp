@@ -3,9 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <iostream>
-#include "genwit.h"
-#include "chainparams.h"
+#include <chainparams.h>
+#include <genwit.h>
 #include <util/system.h>
 
 CGenWit::CGenWit() : accWitValue(0) {}

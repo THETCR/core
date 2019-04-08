@@ -7,11 +7,12 @@
 #ifndef PIVX_LIGHTZWSPTHREAD_H
 #define PIVX_LIGHTZWSPTHREAD_H
 
-#include <atomic>
-#include "genwit.h"
+#include <chainparams.h>
+#include <concurrentqueue.h>
+#include <genwit.h>
 #include <zpiv/accumulators.h>
-#include "concurrentqueue.h"
-#include "chainparams.h"
+
+#include <atomic>
 
 extern CChain& chainActive;
 // Max amount of computation for a single request

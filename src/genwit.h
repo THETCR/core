@@ -5,11 +5,9 @@
 #ifndef PIVX_GENWIT_H
 #define PIVX_GENWIT_H
 
-
-#include <iostream>
-#include "bloom.h"
-#include "libzerocoin/Denominations.h"
-#include "net.h"
+#include <bloom.h>
+#include <libzerocoin/Denominations.h>
+#include <net.h>
 
 class CGenWit {
 

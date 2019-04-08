@@ -331,6 +331,8 @@ libbitcoin_server_a_SOURCES = \
   validation.cpp \
   validationinterface.cpp \
   versionbits.cpp \
+  genwit.cpp \
+  lightzwspthread.cpp \
   zwspchain.cpp \
   $(BITCOIN_CORE_H)
 
@@ -382,8 +384,6 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/walletutil.cpp \
   wallet/coinselection.cpp \
   stakeinput.cpp \
-  genwit.cpp \
-  lightzwspthread.cpp \
   zpiv/deterministicmint.cpp \
   zpiv/mintpool.cpp \
   zpiv/witness.cpp \
@@ -602,7 +602,6 @@ endif
 # Libraries below may be listed more than once to resolve circular dependencies (see
 # https://eli.thegreenplace.net/2013/07/09/library-order-in-static-linking#circular-dependency)
 wisprd_LDADD = \
-  $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_WALLET) \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
@@ -672,7 +671,6 @@ endif
 
 wispr_wallet_LDADD = \
   $(LIBBITCOIN_WALLET_TOOL) \
-  $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_WALLET) \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
