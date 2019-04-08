@@ -34,6 +34,7 @@
 #include <QScrollBar>
 #include <QSettings>
 #include <QTextDocument>
+#include <QDebug>
 #include <util/moneystr.h>
 
 static const std::array<int, 9> confTargets = { {2, 4, 6, 12, 24, 48, 144, 504, 1008} };
@@ -186,6 +187,7 @@ void SendCoinsDialog::setClientModel(ClientModel *_clientModel)
 
 void SendCoinsDialog::setModel(WalletModel *_model)
 {
+    qDebug() << "SendCoinsDialog::setModel";
     this->model = _model;
 
     if(_model && _model->getOptionsModel())
@@ -206,18 +208,20 @@ void SendCoinsDialog::setModel(WalletModel *_model)
         updateDisplayUnit();
 
         // Coin Control
+        qDebug() << "SendCoinsDialog::setModel Coin Control";
         connect(_model->getOptionsModel(), &OptionsModel::displayUnitChanged, this, &SendCoinsDialog::coinControlUpdateLabels);
         connect(_model->getOptionsModel(), &OptionsModel::coinControlFeaturesChanged, this, &SendCoinsDialog::coinControlFeatureChanged);
         ui->frameCoinControl->setVisible(_model->getOptionsModel()->getCoinControlFeatures());
         coinControlUpdateLabels();
 
+        qDebug() << "SendCoinsDialog::setModel fee section";
         // fee section
         connect(ui->sliderSmartFee, SIGNAL(valueChanged(int)), this, SLOT(updateSmartFeeLabel()));
         connect(ui->sliderSmartFee, SIGNAL(valueChanged(int)), this, SLOT(updateGlobalFeeVariables()));
         connect(ui->sliderSmartFee, SIGNAL(valueChanged(int)), this, SLOT(coinControlUpdateLabels()));
-        connect(ui->groupFee, SIGNAL(buttonClicked(int)), this, SLOT(updateFeeSectionControls()));
+        connect(ui->groupFee, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &SendCoinsDialog::updateFeeSectionControls);
+        connect(ui->groupFee, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &SendCoinsDialog::coinControlUpdateLabels);
         connect(ui->groupFee, SIGNAL(buttonClicked(int)), this, SLOT(updateGlobalFeeVariables()));
-        connect(ui->groupFee, SIGNAL(buttonClicked(int)), this, SLOT(coinControlUpdateLabels()));
         connect(ui->groupCustomFee, SIGNAL(buttonClicked(int)), this, SLOT(updateGlobalFeeVariables()));
         connect(ui->groupCustomFee, SIGNAL(buttonClicked(int)), this, SLOT(coinControlUpdateLabels()));
         connect(ui->customFee, SIGNAL(valueChanged()), this, SLOT(updateGlobalFeeVariables()));
@@ -229,10 +233,18 @@ void SendCoinsDialog::setModel(WalletModel *_model)
         connect(ui->checkBoxFreeTx, SIGNAL(stateChanged(int)), this, SLOT(updateGlobalFeeVariables()));
         connect(ui->checkBoxFreeTx, SIGNAL(stateChanged(int)), this, SLOT(coinControlUpdateLabels()));
         CAmount requiredFee = model->wallet().getRequiredFee(1000);
+        ui->customFee->SetMinValue(requiredFee);
+        if (ui->customFee->value() < requiredFee) {
+            ui->customFee->setValue(requiredFee);
+        }
         ui->customFee->setSingleStep(requiredFee);
+        qDebug() << "SendCoinsDialog::setModel updateFeeSectionControls";
         updateFeeSectionControls();
+        qDebug() << "SendCoinsDialog::setModel updateMinFeeLabel";
         updateMinFeeLabel();
+        qDebug() << "SendCoinsDialog::setModel updateSmartFeeLabel";
         updateSmartFeeLabel();
+        qDebug() << "SendCoinsDialog::setModel updateGlobalFeeVariables";
         updateGlobalFeeVariables();
     }
 }
