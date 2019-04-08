@@ -187,10 +187,8 @@ void SendCoinsDialog::setClientModel(ClientModel *_clientModel)
 
 void SendCoinsDialog::setModel(WalletModel *_model)
 {
-    qDebug() << "SendCoinsDialog::setModel";
     this->model = _model;
 
-    qDebug() << "SendCoinsDialog::setModel getOptionsModel";
     if(_model && _model->getOptionsModel())
     {
         for(int i = 0; i < ui->entries->count(); ++i)
@@ -201,23 +199,19 @@ void SendCoinsDialog::setModel(WalletModel *_model)
                 entry->setModel(_model);
             }
         }
-        qDebug() << "SendCoinsDialog::setModel balances";
 
         interfaces::WalletBalances balances = _model->wallet().getBalances();
         setBalance(balances);
         connect(_model, &WalletModel::balanceChanged, this, &SendCoinsDialog::setBalance);
         connect(_model->getOptionsModel(), &OptionsModel::displayUnitChanged, this, &SendCoinsDialog::updateDisplayUnit);
-        qDebug() << "SendCoinsDialog::setModel updateDisplayUnit";
         updateDisplayUnit();
 
         // Coin Control
-        qDebug() << "SendCoinsDialog::setModel Coin Control";
         connect(_model->getOptionsModel(), &OptionsModel::displayUnitChanged, this, &SendCoinsDialog::coinControlUpdateLabels);
         connect(_model->getOptionsModel(), &OptionsModel::coinControlFeaturesChanged, this, &SendCoinsDialog::coinControlFeatureChanged);
         ui->frameCoinControl->setVisible(_model->getOptionsModel()->getCoinControlFeatures());
         coinControlUpdateLabels();
 
-        qDebug() << "SendCoinsDialog::setModel fee section";
         // fee section
         connect(ui->sliderSmartFee, SIGNAL(valueChanged(int)), this, SLOT(updateSmartFeeLabel()));
         connect(ui->sliderSmartFee, SIGNAL(valueChanged(int)), this, SLOT(updateGlobalFeeVariables()));
@@ -243,16 +237,12 @@ void SendCoinsDialog::setModel(WalletModel *_model)
             ui->customFee->setValue(requiredFee);
         }
         ui->customFee->setSingleStep(requiredFee);
-        qDebug() << "SendCoinsDialog::setModel updateFeeSectionControls";
         updateFeeSectionControls();
-        qDebug() << "SendCoinsDialog::setModel updateMinFeeLabel";
         updateMinFeeLabel();
-        qDebug() << "SendCoinsDialog::setModel updateSmartFeeLabel";
         updateSmartFeeLabel();
 
         // set default rbf checkbox state
         ui->optInRBF->setCheckState(Qt::Checked);
-        qDebug() << "SendCoinsDialog::setModel updateGlobalFeeVariables";
         updateGlobalFeeVariables();
     }
 }

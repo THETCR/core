@@ -57,20 +57,14 @@ void ConfirmSend(QString* text = nullptr, bool cancel = false)
 //! Send coins to address and return txid.
 uint256 SendCoins(CWallet& wallet, SendCoinsDialog& sendCoinsDialog, const CTxDestination& address, CAmount amount, bool rbf)
 {
-    std::cout<< "SendCoins : entries\n";
     QVBoxLayout* entries = sendCoinsDialog.findChild<QVBoxLayout*>("entries");
-    std::cout<< "SendCoins : first widget\n";
     SendCoinsEntry* entry = qobject_cast<SendCoinsEntry*>(entries->itemAt(0)->widget());
-    std::cout<< "SendCoins : payTo\n";
     entry->findChild<QValidatedLineEdit*>("payTo")->setText(QString::fromStdString(EncodeDestination(address)));
-    std::cout<< "SendCoins : payAmount\n";
     entry->findChild<BitcoinAmountField*>("payAmount")->setValue(amount);
-    std::cout<< "SendCoins : optInRBF this doesnt exist\n";
     sendCoinsDialog.findChild<QFrame*>("frameFee")
         ->findChild<QFrame*>("frameFeeSelection")
         ->findChild<QCheckBox*>("optInRBF")
         ->setCheckState(rbf ? Qt::Checked : Qt::Unchecked);
-    std::cout<< "SendCoins : NotifyTransactionChanged\n";
     uint256 txid;
     boost::signals2::scoped_connection c(wallet.NotifyTransactionChanged.connect([&txid](CWallet*, const uint256& hash, ChangeType status) {
         if (status == CT_NEW) txid = hash;
@@ -143,7 +137,6 @@ void TestGUI()
     auto chain = interfaces::MakeChain();
     std::shared_ptr<CWallet> wallet = std::make_shared<CWallet>(*chain, WalletLocation(), WalletDatabase::CreateMock());
     bool firstRun;
-    std::cout<< "LoadWallet\n";
     wallet->LoadWallet(firstRun);
     wallet->CreateZWspWallet();
     {
@@ -160,55 +153,35 @@ void TestGUI()
         QCOMPARE(result.last_scanned_block, chainActive.Tip()->GetBlockHash());
         QVERIFY(result.last_failed_block.IsNull());
     }
-    std::cout<< "SetBroadcastTransactions\n";
     wallet->SetBroadcastTransactions(true);
 
-    std::cout<< "Create widgets\n";
     // Create widgets for sending coins and listing transactions.
     std::unique_ptr<const PlatformStyle> platformStyle(PlatformStyle::instantiate("other"));
-    std::cout<< "Create new SendCoinsDialog\n";
     SendCoinsDialog sendCoinsDialog(platformStyle.get());
-    std::cout<< "Create new TransactionView\n";
     TransactionView transactionView(platformStyle.get());
-    std::cout<< "Create node\n";
     auto node = interfaces::MakeNode();
-    std::cout<< "Create new optionsModel\n";
     OptionsModel optionsModel(*node);
-    std::cout<< "AddWallet\n";
     AddWallet(wallet);
-    std::cout<< "Create new walletModel\n";
     WalletModel walletModel(std::move(node->getWallets().back()), *node, platformStyle.get(), &optionsModel);
-    std::cout<< "Create RemoveWallet\n";
     RemoveWallet(wallet);
-    std::cout<< "sendCoinsDialog setModel\n";
     sendCoinsDialog.setModel(&walletModel);
-    std::cout<< "transactionView setModel\n";
     transactionView.setModel(&walletModel);
 
-    std::cout<< "Send two transaction\n";
     // Send two transactions, and verify they are added to transaction list.
     TransactionTableModel* transactionTableModel = walletModel.getTransactionTableModel();
-    std::cout<< "rowCount\n";
     QCOMPARE(transactionTableModel->rowCount({}), 105);
-    std::cout<< "SendCoins 1\n";
     uint256 txid1 = SendCoins(*wallet.get(), sendCoinsDialog, CKeyID(), 5 * COIN, false /* rbf */);
-    std::cout<< "SendCoins 2\n";
     uint256 txid2 = SendCoins(*wallet.get(), sendCoinsDialog, CKeyID(), 10 * COIN, true /* rbf */);
-    std::cout<< "rowCount 2\n";
     QCOMPARE(transactionTableModel->rowCount({}), 107);
-    std::cout<< "FindTx 1\n";
     QVERIFY(FindTx(*transactionTableModel, txid1).isValid());
-    std::cout<< "FindTx 2\n";
     QVERIFY(FindTx(*transactionTableModel, txid2).isValid());
 
-    std::cout<< "BumpFee\n";
     // Call bumpfee. Test disabled, canceled, enabled, then failing cases.
     BumpFee(transactionView, txid1, true /* expect disabled */, "not BIP 125 replaceable" /* expected error */, false /* cancel */);
     BumpFee(transactionView, txid2, false /* expect disabled */, {} /* expected error */, true /* cancel */);
     BumpFee(transactionView, txid2, false /* expect disabled */, {} /* expected error */, false /* cancel */);
     BumpFee(transactionView, txid2, true /* expect disabled */, "already bumped" /* expected error */, false /* cancel */);
 
-    std::cout<< "Check current balance on OverviewPage\n";
     // Check current balance on OverviewPage
     OverviewPage overviewPage(platformStyle.get());
     overviewPage.setWalletModel(&walletModel);
@@ -219,7 +192,6 @@ void TestGUI()
     QString balanceComparison = BitcoinUnits::formatWithUnit(unit, balance, false, BitcoinUnits::separatorAlways);
     QCOMPARE(balanceText, balanceComparison);
 
-    std::cout<< "Check Request Payment button\n";
     // Check Request Payment button
     ReceiveCoinsDialog receiveCoinsDialog(platformStyle.get());
     receiveCoinsDialog.setModel(&walletModel);
@@ -234,7 +206,6 @@ void TestGUI()
     amountInput->setValue(1);
 
     // Message input
-    std::cout<< "Message input\n";
     QLineEdit* messageInput = receiveCoinsDialog.findChild<QLineEdit*>("reqMessage");
     messageInput->setText("TEST_MESSAGE_1");
     int initialRowCount = requestTableModel->rowCount({});
@@ -255,7 +226,6 @@ void TestGUI()
         }
     }
 
-    std::cout<< "Clear button\n";
     // Clear button
     QPushButton* clearButton = receiveCoinsDialog.findChild<QPushButton*>("clearButton");
     clearButton->click();
