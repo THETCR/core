@@ -2440,6 +2440,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             Misbehaving(pfrom->GetId(), 20, strprintf("message inv size() = %u", vInv.size()));
             return false;
         }
+        std::vector<CInv> vToFetch;
 
         bool fBlocksOnly = !fRelayTxes;
 
@@ -2474,6 +2475,9 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                     // then ask for the blocks we need.
                     connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexBestHeader), inv.hash));
                     LogPrint(BCLog::NET, "getheaders (%d) %s to peer=%d\n", pindexBestHeader->nHeight, inv.hash.ToString(), pfrom->GetId());
+                    if(pfrom->nVersion < SENDHEADERS_VERSION){
+                        vToFetch.emplace_back((const CInv) inv);
+                    }
                 }
             }
             else
@@ -2492,6 +2496,10 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 Misbehaving(pfrom->GetId(), 50);
                 return error("send buffer size() = %u", pfrom->nSendSize);
             }
+        }
+        if (!vToFetch.empty()) {
+            connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, vToFetch));
+            LogPrint(BCLog::NET, "getdata (%d) to old peer=%d\n", vToFetch.size(), pfrom->GetId());
         }
         return true;
     }
@@ -4037,7 +4045,11 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
                 if (pindexStart->pprev)
                     pindexStart = pindexStart->pprev;
                 LogPrint(BCLog::NET, "initial getheaders (%d) to peer=%d (startheight:%d)\n", pindexStart->nHeight, pto->GetId(), pto->nStartingHeight);
-                connman->PushMessage(pto, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexStart), uint256()));
+                if(pto->nVersion < SENDHEADERS_VERSION){
+                    connman->PushMessage(pto, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(chainActive.Tip()), uint256(0)));
+                }else{
+                    connman->PushMessage(pto, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexStart), uint256()));
+                }
             }
         }
 
