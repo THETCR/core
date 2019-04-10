@@ -5705,6 +5705,12 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
 {
     AssertLockNotHeld(cs_main);
 
+    CBlockIndex* pindex = LookupBlockIndex(pblock->GetHash());
+    if(pindex && pindex->nStatus & BLOCK_HAVE_DATA){
+        LogPrintf("%s : ALREADY processed Block %ld with height=%d\n", __func__, pblock->GetHash(), pindex->nHeight);
+        return true;
+    }
+
     int64_t nStartTime = GetTimeMillis();
 
     int nMints = 0;
