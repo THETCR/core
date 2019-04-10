@@ -779,7 +779,7 @@ public:
 //        RandAddSeedSleep();
 //        insecure_rand.rand32()
 //        GetRandBytes(buf.data(), 32);
-        buf = insecure_rand.randbytes(size)
+        buf = insecure_rand.randbytes(size);
 
         CBigNum ret(buf);
         if (ret < 0)
@@ -796,7 +796,7 @@ public:
 
         FastRandomContext insecure_rand;
 //        RandAddSeedSleep();
-        buf = insecure_rand.randbytes((k+7)/8)
+        buf = insecure_rand.randbytes((k+7)/8);
 //        GetRandBytes(buf.data(), 32);
 
         CBigNum ret(buf);
