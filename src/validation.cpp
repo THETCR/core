@@ -5707,7 +5707,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
 
     CBlockIndex* pindex = LookupBlockIndex(pblock->GetHash());
     if(pindex && pindex->nStatus & BLOCK_HAVE_DATA){
-        LogPrintf("%s : ALREADY processed Block %ld with height=%d\n", __func__, pblock->GetHash().ToString().c_str(), pindex->nHeight);
+//        LogPrintf("%s : ALREADY processed Block %ld with height=%d\n", __func__, pblock->GetHash().ToString().c_str(), pindex->nHeight);
         return true;
     }
 
