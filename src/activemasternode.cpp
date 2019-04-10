@@ -233,7 +233,7 @@ bool CActiveMasternode::SendMasternodePing(std::string& errorMessage)
 
         LogPrint(BCLog::MASTERNODE, "dseep - relaying from active mn, %s \n", vin.ToString().c_str());
 
-        g_connman->ForEachNode([&](CNode* pnode) {
+        g_connman->ForEachNode([this, vchMasterNodeSignature, masterNodeSignatureTime](CNode* pnode) {
           g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dseep", vin, vchMasterNodeSignature, masterNodeSignatureTime, false));
         });
 
@@ -342,7 +342,7 @@ bool CActiveMasternode::CreateBroadcast(CTxIn vin, CService service, CKey keyCol
         return false;
     }
 
-    g_connman->ForEachNode([&](CNode* pnode) {
+    g_connman->ForEachNode([vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, donationAddress, donationPercantage](CNode* pnode) {
       g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dsee", vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION, donationAddress, donationPercantage));
     });
 

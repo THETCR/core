@@ -718,7 +718,7 @@ void CMasternodeMan::ProcessMasternodeConnections()
     //we don't care about this for regtest
     if (Params().NetworkID() == CBaseChainParams::REGTEST) return;
 
-    g_connman->ForEachNode([&](CNode* pnode) {
+    g_connman->ForEachNode([](CNode* pnode) {
       if (pnode->fObfuScationMaster) {
           if (obfuScationPool.pSubmittedToMasternode != NULL && pnode->addr == obfuScationPool.pSubmittedToMasternode->addr) return;
           LogPrint(BCLog::MASTERNODE,"Closing Masternode connection peer=%i \n", pnode->GetId());
@@ -958,7 +958,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
                     pmn->nLastDsee = sigTime;
                     pmn->Check();
                     if (pmn->IsEnabled()) {
-                        connman->ForEachNode([&](CNode* pnode) {
+                        connman->ForEachNode([connman, msgMaker, vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage](CNode* pnode) {
                           if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto()){
                               connman->PushMessage(pnode, msgMaker.Make("dsee", vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage));
                           }
@@ -1047,7 +1047,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
                 Add(mn);
             }
             if (mn.IsEnabled()) {
-                connman->ForEachNode([&](CNode* pnode) {
+                connman->ForEachNode([connman, msgMaker, vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage](CNode* pnode) {
                   if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto()){
                       connman->PushMessage(pnode, msgMaker.Make("dsee", vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage));
                   }
@@ -1117,7 +1117,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
                 pmn->Check();
                 if (pmn->IsEnabled()) {
                     LogPrint(BCLog::MASTERNODE, "dseep - relaying %s \n", vin.prevout.hash.ToString());
-                    connman->ForEachNode([&](CNode* pnode) {
+                    connman->ForEachNode([connman, msgMaker, vin, vchSig, sigTime, stop](CNode* pnode) {
                       if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto()){
                           connman->PushMessage(pnode, msgMaker.Make("dseep", vin, vchSig, sigTime, stop));
                       }

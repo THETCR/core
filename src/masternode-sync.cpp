@@ -220,7 +220,7 @@ void CMasternodeSync::ProcessMessage(CNode* pfrom, const std::string& strCommand
 
 void CMasternodeSync::ClearFulfilledRequest()
 {
-    g_connman->ForEachNode([&](CNode* pnode) {
+    g_connman->ForEachNode([](CNode* pnode) {
       pnode->ClearFulfilledRequest("getspork");
       pnode->ClearFulfilledRequest("mnsync");
       pnode->ClearFulfilledRequest("mnwsync");
@@ -266,7 +266,7 @@ void CMasternodeSync::Process(CConnman* connman)
     }
     const CNetMsgMaker msgMaker(INIT_PROTO_VERSION);
 
-    connman->ForEachNode([&](CNode* pnode) {
+    connman->ForEachNode([this, connman, msgMaker](CNode* pnode) {
       if (Params().NetworkID() == CBaseChainParams::REGTEST) {
           if (RequestedMasternodeAttempt <= 2) {
               connman->PushMessage(pnode, msgMaker.Make(NetMsgType::GETSPORKS)); //get current network sporks

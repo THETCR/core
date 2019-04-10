@@ -955,7 +955,7 @@ void CBudgetManager::NewBlock(CConnman* connman)
             ResetSync();
         }
 
-        connman->ForEachNode([&](CNode* pnode) {
+        connman->ForEachNode([this, connman](CNode* pnode) {
           if (pnode->nVersion >= ActiveProtocol()){
               Sync(pnode, 0, connman, true);
           }

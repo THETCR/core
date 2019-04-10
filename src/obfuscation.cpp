@@ -2296,7 +2296,7 @@ bool CObfuscationQueue::Sign()
 
 bool CObfuscationQueue::Relay(CConnman* connman)
 {
-    connman->ForEachNode([&](CNode* pnode) {
+    connman->ForEachNode([this, connman](CNode* pnode) {
         // always relay to everyone
         CNetMsgMaker msgMaker(pnode->GetSendVersion());
         connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSQUEUE, (*this)));
@@ -2326,7 +2326,7 @@ bool CObfuscationQueue::CheckSignature()
 
 void CObfuscationPool::RelayFinalTransaction(const int sessionID, const CTransaction& txNew, CConnman* connman)
 {
-    connman->ForEachNode([&](CNode* pnode) {
+    connman->ForEachNode([connman, sessionID, txNew](CNode* pnode) {
       // always relay to everyone
       CNetMsgMaker msgMaker(pnode->GetSendVersion());
       connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSFINALTX, sessionID, txNew));
@@ -2356,7 +2356,7 @@ void CObfuscationPool::RelayIn(const std::vector<CTxDSIn>& vin, const int64_t& n
 
 void CObfuscationPool::RelayStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, CConnman* connman, const int errorID)
 {
-    connman->ForEachNode([&](CNode* pnode) {
+    connman->ForEachNode([connman, sessionID, newState, newEntriesCount, newAccepted, errorID](CNode* pnode) {
       // always relay to everyone
       CNetMsgMaker msgMaker(pnode->GetSendVersion());
       connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSSTATUSUPDATE, sessionID, newState, newEntriesCount, newAccepted, errorID));
@@ -2365,7 +2365,7 @@ void CObfuscationPool::RelayStatus(const int sessionID, const int newState, cons
 
 void CObfuscationPool::RelayCompletedTransaction(const int sessionID, const bool error, const int errorID, CConnman* connman)
 {
-    connman->ForEachNode([&](CNode* pnode) {
+    connman->ForEachNode([connman, sessionID, error, errorID](CNode* pnode) {
       // always relay to everyone
       CNetMsgMaker msgMaker(pnode->GetSendVersion());
       connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSCOMPLETE, sessionID, error, errorID));
