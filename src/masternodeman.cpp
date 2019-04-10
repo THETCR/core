@@ -718,15 +718,14 @@ void CMasternodeMan::ProcessMasternodeConnections()
     //we don't care about this for regtest
     if (Params().NetworkID() == CBaseChainParams::REGTEST) return;
 
-    LOCK(cs_vNodes);
-    for (CNode* pnode: vNodes) {
-        if (pnode->fObfuScationMaster) {
-            if (obfuScationPool.pSubmittedToMasternode != NULL && pnode->addr == obfuScationPool.pSubmittedToMasternode->addr) continue;
-            LogPrint(BCLog::MASTERNODE,"Closing Masternode connection peer=%i \n", pnode->GetId());
-            pnode->fObfuScationMaster = false;
-            pnode->Release();
-        }
-    }
+    g_connman->ForEachNode([&](CNode* pnode) {
+      if (pnode->fObfuScationMaster) {
+          if (obfuScationPool.pSubmittedToMasternode != NULL && pnode->addr == obfuScationPool.pSubmittedToMasternode->addr) return;
+          LogPrint(BCLog::MASTERNODE,"Closing Masternode connection peer=%i \n", pnode->GetId());
+          pnode->fObfuScationMaster = false;
+          pnode->Release();
+      }
+    });
 }
 
 void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman* connman)
@@ -767,7 +766,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
         //  - this is checked later by .check() in many places and by ThreadCheckObfuScationPool()
         if (mnb.CheckInputsAndAdd(nDoS)) {
             // use this as a peer
-            addrman.Add(CAddress(mnb.addr), pfrom->addr, 2 * 60 * 60);
+            connman->AddNewAddress(CAddress(mnb.addr), pfrom->addr, 2 * 60 * 60);
             masternodeSync.AddedMasternodeList(mnb.GetHash());
         } else {
             LogPrint(BCLog::MASTERNODE,"mnb - Rejected Masternode entry %s\n", mnb.vin.prevout.hash.ToString());
@@ -959,11 +958,11 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
                     pmn->nLastDsee = sigTime;
                     pmn->Check();
                     if (pmn->IsEnabled()) {
-                        TRY_LOCK(cs_vNodes, lockNodes);
-                        if (!lockNodes) return;
-                        for (CNode* pnode: vNodes)
-                            if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto())
-                                connman->PushMessage(pnode, msgMaker.Make("dsee", vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage));
+                        connman->ForEachNode([&](CNode* pnode) {
+                          if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto()){
+                              connman->PushMessage(pnode, msgMaker.Make("dsee", vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage));
+                          }
+                        });
                     }
                 }
             }
@@ -1028,7 +1027,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
             }
 
             // use this as a peer
-            addrman.Add(CAddress(addr), pfrom->addr, 2 * 60 * 60);
+            connman->AddNewAddress(CAddress(addr), pfrom->addr, 2 * 60 * 60);
 
             // add Masternode
             CMasternode mn = CMasternode();
@@ -1048,11 +1047,11 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
                 Add(mn);
             }
             if (mn.IsEnabled()) {
-                TRY_LOCK(cs_vNodes, lockNodes);
-                if (!lockNodes) return;
-                for (CNode* pnode: vNodes)
-                    if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto())
-                        connman->PushMessage(pnode, msgMaker.Make("dsee", vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage));
+                connman->ForEachNode([&](CNode* pnode) {
+                  if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto()){
+                      connman->PushMessage(pnode, msgMaker.Make("dsee", vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion, donationAddress, donationPercentage));
+                  }
+                });
             }
         } else {
             LogPrint(BCLog::MASTERNODE,"dsee - Rejected Masternode entry %s\n", vin.prevout.hash.ToString());
@@ -1117,12 +1116,12 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand,
                 pmn->nLastDseep = sigTime;
                 pmn->Check();
                 if (pmn->IsEnabled()) {
-                    TRY_LOCK(cs_vNodes, lockNodes);
-                    if (!lockNodes) return;
                     LogPrint(BCLog::MASTERNODE, "dseep - relaying %s \n", vin.prevout.hash.ToString());
-                    for (CNode* pnode: vNodes)
-                        if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto())
-                            connman->PushMessage(pnode, msgMaker.Make("dseep", vin, vchSig, sigTime, stop));
+                    connman->ForEachNode([&](CNode* pnode) {
+                      if (pnode->nVersion >= masternodePayments.GetMinMasternodePaymentsProto()){
+                          connman->PushMessage(pnode, msgMaker.Make("dseep", vin, vchSig, sigTime, stop));
+                      }
+                    });
                 }
             }
             return;

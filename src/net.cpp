@@ -91,11 +91,11 @@ static bool vfLimited[NET_MAX] GUARDED_BY(cs_mapLocalHost) = {};
 std::string strSubVersion;
 
 //!OLD
-limitedmap<CInv, int64_t> mapAlreadyAskedFor(MAX_INV_SZ);
-CAddrMan addrman;
-CCriticalSection cs_vNodes;
-std::vector<CNode*> vNodes GUARDED_BY(cs_vNodes);
-std::list<CNode*> vNodesDisconnected;
+//limitedmap<CInv, int64_t> mapAlreadyAskedFor(MAX_INV_SZ);
+//CAddrMan addrman;
+//CCriticalSection cs_vNodes;
+//std::vector<CNode*> vNodes GUARDED_BY(cs_vNodes);
+//std::list<CNode*> vNodesDisconnected;
 //
 
 void CConnman::AddOneShot(const std::string& strDest)
@@ -2773,6 +2773,10 @@ uint64_t CConnman::CalculateKeyedNetGroup(const CAddress& ad) const
 }
 
 //!WISPR
+void CConnman::AddNewAddress(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty)
+{
+    addrman.Add(addr, source, nTimePenalty);
+}
 std::vector<CNode*> CConnman::CopyNodeVector(std::function<bool(const CNode* pnode)> cond)
 {
     std::vector<CNode*> vecNodesCopy;
@@ -2807,37 +2811,37 @@ bool CConnman::ForNode(const CService& addr, std::function<bool(const CNode* pno
     return found != nullptr && cond(found) && func(found);
 }
 //!OLD
-void AddressCurrentlyConnected(const CService& addr)
-{
-    addrman.Connected(addr);
-}
+//void AddressCurrentlyConnected(const CService& addr)
+//{
+//    addrman.Connected(addr);
+//}
 unsigned int SendBufferSize() { return 1000 * gArgs.GetArg("-maxsendbuffer", 1 * 1000); }
-void CNode::AskFor(const CInv& inv)
-{
-    if (mapAskFor.size() > MAPASKFOR_MAX_SZ)
-        return;
-    // We're using mapAskFor as a priority queue,
-    // the key is the earliest time the request can be sent
-    int64_t nRequestTime;
-    limitedmap<CInv, int64_t>::const_iterator it = mapAlreadyAskedFor.find(inv);
-    if (it != mapAlreadyAskedFor.end())
-        nRequestTime = it->second;
-    else
-        nRequestTime = 0;
-//    LogPrint("net", "askfor %s  %d (%s) peer=%d\n", inv.ToString(), nRequestTime, DateTimeStrFormat("%H:%M:%S", nRequestTime / 1000000), id);
-
-    // Make sure not to reuse time indexes to keep things in the same order
-    int64_t nNow = GetTimeMicros() - 1000000;
-    static int64_t nLastTime;
-    ++nLastTime;
-    nNow = std::max(nNow, nLastTime);
-    nLastTime = nNow;
-
-    // Each retry is 2 minutes after the last
-    nRequestTime = std::max(nRequestTime + 2 * 60 * 1000000, nNow);
-    if (it != mapAlreadyAskedFor.end())
-        mapAlreadyAskedFor.update(it, nRequestTime);
-    else
-        mapAlreadyAskedFor.insert(std::make_pair(inv, nRequestTime));
-    mapAskFor.insert(std::make_pair(nRequestTime, inv));
-}
+//void CNode::AskFor(const CInv& inv)
+//{
+//    if (mapAskFor.size() > MAPASKFOR_MAX_SZ)
+//        return;
+//    // We're using mapAskFor as a priority queue,
+//    // the key is the earliest time the request can be sent
+//    int64_t nRequestTime;
+//    limitedmap<CInv, int64_t>::const_iterator it = mapAlreadyAskedFor.find(inv);
+//    if (it != mapAlreadyAskedFor.end())
+//        nRequestTime = it->second;
+//    else
+//        nRequestTime = 0;
+////    LogPrint("net", "askfor %s  %d (%s) peer=%d\n", inv.ToString(), nRequestTime, DateTimeStrFormat("%H:%M:%S", nRequestTime / 1000000), id);
+//
+//    // Make sure not to reuse time indexes to keep things in the same order
+//    int64_t nNow = GetTimeMicros() - 1000000;
+//    static int64_t nLastTime;
+//    ++nLastTime;
+//    nNow = std::max(nNow, nLastTime);
+//    nLastTime = nNow;
+//
+//    // Each retry is 2 minutes after the last
+//    nRequestTime = std::max(nRequestTime + 2 * 60 * 1000000, nNow);
+//    if (it != mapAlreadyAskedFor.end())
+//        mapAlreadyAskedFor.update(it, nRequestTime);
+//    else
+//        mapAlreadyAskedFor.insert(std::make_pair(inv, nRequestTime));
+//    mapAskFor.insert(std::make_pair(nRequestTime, inv));
+//}

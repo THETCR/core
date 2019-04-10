@@ -2296,12 +2296,11 @@ bool CObfuscationQueue::Sign()
 
 bool CObfuscationQueue::Relay(CConnman* connman)
 {
-    LOCK(cs_vNodes);
-    for (CNode* pnode: vNodes) {
+    connman->ForEachNode([&](CNode* pnode) {
         // always relay to everyone
         CNetMsgMaker msgMaker(pnode->GetSendVersion());
         connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSQUEUE, (*this)));
-    }
+    });
 
     return true;
 }
@@ -2327,11 +2326,11 @@ bool CObfuscationQueue::CheckSignature()
 
 void CObfuscationPool::RelayFinalTransaction(const int sessionID, const CTransaction& txNew, CConnman* connman)
 {
-    LOCK(cs_vNodes);
-    for (CNode* pnode: vNodes) {
-        CNetMsgMaker msgMaker(pnode->GetSendVersion());
-        connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSFINALTX, sessionID, txNew));
-    }
+    connman->ForEachNode([&](CNode* pnode) {
+      // always relay to everyone
+      CNetMsgMaker msgMaker(pnode->GetSendVersion());
+      connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSFINALTX, sessionID, txNew));
+    });
 }
 
 void CObfuscationPool::RelayIn(const std::vector<CTxDSIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxDSOut>& vout, CConnman* connman)
@@ -2357,20 +2356,20 @@ void CObfuscationPool::RelayIn(const std::vector<CTxDSIn>& vin, const int64_t& n
 
 void CObfuscationPool::RelayStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, CConnman* connman, const int errorID)
 {
-    LOCK(cs_vNodes);
-    for (CNode* pnode: vNodes){
-        CNetMsgMaker msgMaker(pnode->GetSendVersion());
-        connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSSTATUSUPDATE, sessionID, newState, newEntriesCount, newAccepted, errorID));
-    }
+    connman->ForEachNode([&](CNode* pnode) {
+      // always relay to everyone
+      CNetMsgMaker msgMaker(pnode->GetSendVersion());
+      connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSSTATUSUPDATE, sessionID, newState, newEntriesCount, newAccepted, errorID));
+    });
 }
 
 void CObfuscationPool::RelayCompletedTransaction(const int sessionID, const bool error, const int errorID, CConnman* connman)
 {
-    LOCK(cs_vNodes);
-    for (CNode* pnode: vNodes){
-        CNetMsgMaker msgMaker(pnode->GetSendVersion());
-        connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSCOMPLETE, sessionID, error, errorID));
-    }
+    connman->ForEachNode([&](CNode* pnode) {
+      // always relay to everyone
+      CNetMsgMaker msgMaker(pnode->GetSendVersion());
+      connman->PushMessage(pnode, msgMaker.Make(NetMsgType::DSCOMPLETE, sessionID, error, errorID));
+    });
 }
 
 //TODO: Rename/move to core

@@ -5778,7 +5778,7 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
 
     UniValue obj(UniValue::VOBJ);
     obj.pushKV("validtime", chainActive.Tip()->nTime > 1471482000);
-    obj.pushKV("haveconnections", !vNodes.empty());
+    obj.pushKV("haveconnections", g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) != 0);
     if (pwallet) {
         obj.pushKV("walletunlocked", !pwallet->IsLocked());
         obj.pushKV("mintablecoins", pwallet->MintableCoins());
@@ -6639,7 +6639,7 @@ UniValue getinfo(const JSONRPCRequest& request)
 #endif
     obj.pushKV("blocks", (int)chainActive.Height());
     obj.pushKV("timeoffset", GetTimeOffset());
-    obj.pushKV("connections", (int)vNodes.size());
+    obj.pushKV("connections", (int)g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL));
     obj.pushKV("testnet", Params().TestnetToBeDeprecatedFieldRPC());
 
     // During inital block verification chainActive.Tip() might be not yet initialized

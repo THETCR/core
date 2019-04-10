@@ -43,11 +43,11 @@ class CNode;
 class BanMan;
 
 //!OLD
-extern limitedmap<CInv, int64_t> mapAlreadyAskedFor;
-extern CAddrMan addrman;
-extern CCriticalSection cs_vNodes;
-extern std::vector<CNode*> vNodes GUARDED_BY(cs_vNodes);
-extern std::list<CNode*> vNodesDisconnected;
+//extern limitedmap<CInv, int64_t> mapAlreadyAskedFor;
+//extern CAddrMan addrman;
+//extern CCriticalSection cs_vNodes;
+//extern std::vector<CNode*> vNodes GUARDED_BY(cs_vNodes);
+//extern std::list<CNode*> vNodesDisconnected;
 //
 
 /** Time between pings automatically sent out for latency probing and keepalive (in seconds). */
@@ -62,9 +62,9 @@ static const unsigned int MAX_INV_SZ = 50000;
 static const unsigned int MAX_LOCATOR_SZ = 101;
 /** The maximum number of new addresses to accumulate before announcing. */
 static const unsigned int MAX_ADDR_TO_SEND = 1000;
-/** Maximum length of incoming protocol messages (no message over 2 MiB is currently acceptable). */
-static const unsigned int MAX_PROTOCOL_MESSAGE_LENGTH = 2 * 1024 * 1024;
-/** Maximum length of strSubVer in `version` message */
+/** Maximum length of incoming protocol messages (no message over 4 MB is currently acceptable). */
+static const unsigned int MAX_PROTOCOL_MESSAGE_LENGTH = 4 * 1000 * 1000;
+/** Maximum length of the user agent string in `version` message */
 static const unsigned int MAX_SUBVERSION_LENGTH = 256;
 /** Maximum number of automatic outgoing nodes */
 static const int MAX_OUTBOUND_CONNECTIONS = 8;
@@ -341,6 +341,9 @@ public:
         });
     }
 
+    //!WISPR
+    void AddNewAddress(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty = 0);
+
     //! TODO make private
     CNode* FindNode(const CNetAddr& ip);
     CNode* FindNode(const CSubNet& subNet);
@@ -424,9 +427,9 @@ private:
     CCriticalSection cs_vOneShots;
     std::vector<std::string> vAddedNodes GUARDED_BY(cs_vAddedNodes);
     CCriticalSection cs_vAddedNodes;
-//    std::vector<CNode*> vNodes GUARDED_BY(cs_vNodes);
-//    std::list<CNode*> vNodesDisconnected;
-//    mutable CCriticalSection cs_vNodes;
+    std::vector<CNode*> vNodes GUARDED_BY(cs_vNodes);
+    std::list<CNode*> vNodesDisconnected;
+    mutable CCriticalSection cs_vNodes;
     std::atomic<NodeId> nLastNodeId{0};
     unsigned int nPrevNodeCount{0};
 
@@ -783,13 +786,11 @@ public:
     std::set<uint256> orphan_work_set;
 
     //! Old
-    mruset<CInv> setInventoryKnown;
-    std::vector<CInv> vInventoryToSend;
-    std::multimap<int64_t, CInv> mapAskFor;
-    std::vector<uint256> vBlockRequested;
+//    std::multimap<int64_t, CInv> mapAskFor;
+//    std::vector<uint256> vBlockRequested;
 
     //! Make private
-    std::list<CNetMessage> vRecvMsg;  // Used only by SocketHandler thread
+//    std::list<CNetMessage> vRecvMsg;  // Used only by SocketHandler thread
 
     CNode(NodeId id, ServiceFlags nLocalServicesIn, int nMyStartingHeightIn, SOCKET hSocketIn, const CAddress &addrIn, uint64_t nKeyedNetGroupIn, uint64_t nLocalHostNonceIn, const CAddress &addrBindIn, const std::string &addrNameIn = "", bool fInboundIn = false);
     ~CNode();
@@ -803,6 +804,7 @@ private:
     const ServiceFlags nLocalServices;
     const int nMyStartingHeight;
     int nSendVersion{0};
+    std::list<CNetMessage> vRecvMsg;  // Used only by SocketHandler thread
 
     mutable CCriticalSection cs_addrName;
     std::string addrName GUARDED_BY(cs_addrName);
@@ -923,7 +925,7 @@ public:
     void MaybeSetAddrName(const std::string& addrNameIn);
 
     //!OLD
-    void AskFor(const CInv& inv);
+//    void AskFor(const CInv& inv);
     bool HasFulfilledRequest(std::string strRequest)
     {
         for (std::string& type: vecRequestsFulfilled) {
@@ -958,7 +960,7 @@ public:
 int64_t PoissonNextSend(int64_t now, int average_interval_seconds);
 
 //!OLD
-void AddressCurrentlyConnected(const CService& addr);
+//void AddressCurrentlyConnected(const CService& addr);
 unsigned int SendBufferSize();
 //
 #endif // BITCOIN_NET_H

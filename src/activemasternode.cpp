@@ -232,9 +232,10 @@ bool CActiveMasternode::SendMasternodePing(std::string& errorMessage)
         }
 
         LogPrint(BCLog::MASTERNODE, "dseep - relaying from active mn, %s \n", vin.ToString().c_str());
-        LOCK(cs_vNodes);
-        for (CNode* pnode: vNodes)
-            g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dseep", vin, vchMasterNodeSignature, masterNodeSignatureTime, false));
+
+        g_connman->ForEachNode([&](CNode* pnode) {
+          g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dseep", vin, vchMasterNodeSignature, masterNodeSignatureTime, false));
+        });
 
         /*
          * END OF "REMOVE"
@@ -284,7 +285,7 @@ bool CActiveMasternode::CreateBroadcast(std::string strService, std::string strK
         return false;
 
     ServiceFlags requiredServiceBits = GetDesirableServiceFlags(NODE_NONE);
-    addrman.Add(CAddress(service, requiredServiceBits), CNetAddr("127.0.0.1"), 2 * 60 * 60);
+    g_connman->AddNewAddress(CAddress(service, requiredServiceBits), CNetAddr("127.0.0.1"), 2 * 60 * 60);
 
     return CreateBroadcast(vin, CService(strService), keyCollateralAddress, pubKeyCollateralAddress, keyMasternode, pubKeyMasternode, errorMessage, mnb);
 }
@@ -341,9 +342,9 @@ bool CActiveMasternode::CreateBroadcast(CTxIn vin, CService service, CKey keyCol
         return false;
     }
 
-    LOCK(cs_vNodes);
-    for (CNode* pnode: vNodes)
-    g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dsee", vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION, donationAddress, donationPercantage));
+    g_connman->ForEachNode([&](CNode* pnode) {
+      g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dsee", vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION, donationAddress, donationPercantage));
+    });
 
     /*
      * END OF "REMOVE"
