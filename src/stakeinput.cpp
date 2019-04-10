@@ -252,13 +252,11 @@ CBlockIndex* CWspStake::GetIndexFrom()
 {
     uint256 hashBlock = 0;
     CTransactionRef tx;
-    CBlockIndex* pindex = nullptr;
-    if (GetTransaction(txFrom.GetHash(), tx, Params().GetConsensus(), hashBlock, pindex, true)) {
+    if (GetTransaction(txFrom.GetHash(), tx, Params().GetConsensus(), hashBlock, nullptr, true)) {
         // If the index is in the chain, then set it as the "index from"
-        if (mapBlockIndex.count(hashBlock)) {
-            pindex = mapBlockIndex.at(hashBlock);
-            if (chainActive.Contains(pindex))
-                pindexFrom = pindex;
+        CBlockIndex* block_index = LookupBlockIndex(hashBlock);
+        if (block_index && chainActive.Contains(block_index)) {
+                pindexFrom = block_index;
         }
     } else {
         LogPrintf("%s : failed to find tx %s\n", __func__, txFrom.GetHash().GetHex());

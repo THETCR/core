@@ -2288,7 +2288,7 @@ void AddInvalidSpendsToMap(const CBlock& block)
 
                         CTransactionRef txPrev;
                         uint256 hashBlock;
-                        if (!GetTransaction(txHash, txPrev, consensusParams, hashBlock))
+                        if (!GetTransaction(txHash, txPrev, consensusParams, hashBlock, nullptr, true))
                             continue;
 
                         //Record all txouts from txPrev as invalid
