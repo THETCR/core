@@ -168,12 +168,12 @@ static bool SelectBlockFromCandidates(
 // must hash with a future stake modifier to generate the proof.
 uint256 ComputeStakeModifier(const CBlockIndex *pindexPrev, const uint256 &kernel) {
     if (!pindexPrev)
-        return 0;  // genesis block's modifier is 0
-    LogPrintf("ComputeStakeModifier: kernel=%s, bnStakeModifierV2=%s\n", kernel.ToString().c_str(), pindexPrev->bnStakeModifierV2.ToString().c_str());
+        return uint256();  // genesis block's modifier is 0
+//    LogPrintf("ComputeStakeModifier: kernel=%s, bnStakeModifierV2=%s\n", kernel.ToString().c_str(), pindexPrev->bnStakeModifierV2.ToString().c_str());
     CDataStream ss(SER_GETHASH, 0);
     ss << kernel << pindexPrev->bnStakeModifierV2;
     uint256 hash = Hash(ss.begin(), ss.end());
-    LogPrintf("ComputeStakeModifier: hash=%s\n", hash.ToString().c_str());
+//    LogPrintf("ComputeStakeModifier: hash=%s\n", hash.ToString().c_str());
     return hash;
 }
 
