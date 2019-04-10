@@ -775,8 +775,11 @@ public:
         size_t size = (mpz_sizeinbase (range.bn, 2) + CHAR_BIT-1) / CHAR_BIT;
         std::vector<unsigned char> buf(size);
 
-        RandAddSeedSleep();
-        GetRandBytes(buf.data(), 32);
+        FastRandomContext insecure_rand;
+//        RandAddSeedSleep();
+//        insecure_rand.rand32()
+//        GetRandBytes(buf.data(), 32);
+        buf = insecure_rand.randbytes(size)
 
         CBigNum ret(buf);
         if (ret < 0)
@@ -791,8 +794,10 @@ public:
     static CBigNum RandKBitBigum(const uint32_t k){
         std::vector<unsigned char> buf((k+7)/8);
 
-        RandAddSeedSleep();
-        GetRandBytes(buf.data(), 32);
+        FastRandomContext insecure_rand;
+//        RandAddSeedSleep();
+        buf = insecure_rand.randbytes((k+7)/8)
+//        GetRandBytes(buf.data(), 32);
 
         CBigNum ret(buf);
         if (ret < 0)
