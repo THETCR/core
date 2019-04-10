@@ -5365,20 +5365,10 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     uint256 hash = block.GetHash();
     uint256 bn2Hash = block.IsProofOfWork() ? hash : block.vtx[1]->vin[0].prevout.hash;
 
-    // Get prev block index
-    CBlockIndex* pindexPrev = nullptr;
-    if (block.GetHash() != Params().GetConsensus().hashGenesisBlock) {
-        BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
-        if (mi == mapBlockIndex.end()){
-            return state.DoS(0, error("%s : prev block %s not found", __func__, block.hashPrevBlock.ToString().c_str()), 0, "bad-prevblk");
-        }
-        pindexPrev = (*mi).second;
-    }
-
     if (!AcceptBlockHeader(block, state, chainparams, &pindex))
         return false;
 
-    if(pindexPrev && Params().PivProtocolsStartHeightSmallerThen(pindexPrev->nHeight + 1)) {
+    if(Params().PivProtocolsStartHeightSmallerThen(pindex->nHeight)) {
         if (block.IsProofOfStake() && !CheckCoinStakeTimestamp(block.GetBlockTime(), (int64_t) block.vtx[1]->nTime)) {
             return state.DoS(50, error("AcceptBlock() : coinstake timestamp violation nTimeBlock=%d nTimeTx=%u\n",
                                        block.GetBlockTime(), block.vtx[1]->nTime));
@@ -5388,6 +5378,8 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
 //        return false;
 //    }
 
+    // Get prev block index
+    CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
 
     bool isPoS = false;
     if (block.IsProofOfStake()) {
