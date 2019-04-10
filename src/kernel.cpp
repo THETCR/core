@@ -440,7 +440,8 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
     } else {
         // First try finding the previous transaction in database
         uint256 hashBlock;
-        if (!GetTransaction(txin.prevout.hash, txPrev, Params().GetConsensus(), hashBlock))
+        CBlockIndex* block_index = LookupBlockIndex(block.GetHash());
+        if (!GetTransaction(txin.prevout.hash, txPrev, Params().GetConsensus(), hashBlock, block_index, true))
             return error("CheckProofOfStake() : INFO: read txPrev failed");
 
         //verify signature and script
