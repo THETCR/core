@@ -252,10 +252,11 @@ CBlockIndex* CWspStake::GetIndexFrom()
 {
     uint256 hashBlock = 0;
     CTransactionRef tx;
-    if (GetTransaction(txFrom.GetHash(), tx, Params().GetConsensus(), hashBlock)) {
+    CBlockIndex* pindex = nullptr;
+    if (GetTransaction(txFrom.GetHash(), tx, Params().GetConsensus(), hashBlock, pindex, true)) {
         // If the index is in the chain, then set it as the "index from"
         if (mapBlockIndex.count(hashBlock)) {
-            CBlockIndex* pindex = mapBlockIndex.at(hashBlock);
+            pindex = mapBlockIndex.at(hashBlock);
             if (chainActive.Contains(pindex))
                 pindexFrom = pindex;
         }
