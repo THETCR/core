@@ -776,7 +776,7 @@ public:
         std::vector<unsigned char> buf(size);
 
         RandAddSeedSleep();
-        GetStrongRandBytes(buf.data(), size);
+        GetRandBytes(buf.data(), 32);
 
         CBigNum ret(buf);
         if (ret < 0)
@@ -792,7 +792,7 @@ public:
         std::vector<unsigned char> buf((k+7)/8);
 
         RandAddSeedSleep();
-        GetStrongRandBytes(buf.data(), (k+7)/8);
+        GetRandBytes(buf.data(), (k+7)/8);
 
         CBigNum ret(buf);
         if (ret < 0)
