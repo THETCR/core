@@ -3272,6 +3272,10 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         vRecv >> *pblock;
 
         LogPrint(BCLog::NET, "received block %s peer=%d\n", pblock->GetHash().ToString(), pfrom->GetId());
+        CBlockIndex* pindexPrev = LookupBlockIndex(pblock->hashPrevBlock);
+        if(!pindexPrev){
+            return true;
+        }
         //sometimes we will be sent their most recent block and its not the one we want, in that case tell where we are
 //        if (!mapBlockIndex.count(pblock->hashPrevBlock)) {
 //            LogPrint(BCLog::NET, "asking for previous block %s peer=%d\n", pblock->hashPrevBlock.ToString(), pfrom->GetId());
