@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(getlocator_test)
     std::vector<uint256> vHashSide(50000);
     std::vector<CBlockIndex> vBlocksSide(50000);
     for (unsigned int i=0; i<vBlocksSide.size(); i++) {
-        vHashSide[i] = uint256(i + 50000 + (arith_uint256(1) << 128)); // Add 1<<128 to the hashes, so GetLow64() still returns the height.
+        vHashSide[i] = uint256(i + 50000 + (uint256(1) << 128)); // Add 1<<128 to the hashes, so GetLow64() still returns the height.
         vBlocksSide[i].nHeight = i + 50000;
         vBlocksSide[i].pprev = i ? &vBlocksSide[i - 1] : (vBlocksMain.data()+49999);
         vBlocksSide[i].phashBlock = &vHashSide[i];
