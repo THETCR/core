@@ -5414,7 +5414,7 @@ CAmount CWallet::GetUnlockedCoins() const
     CAmount nTotal = 0;
     {
         auto locked_chain = chain().lock();
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const CWalletTx* pcoin = &(*it).second;
 
@@ -5433,7 +5433,7 @@ CAmount CWallet::GetLockedCoins() const
     CAmount nTotal = 0;
     {
         auto locked_chain = chain().lock();
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const CWalletTx* pcoin = &(*it).second;
 
@@ -5468,7 +5468,7 @@ CAmount CWallet::GetAnonymizableBalance() const
     CAmount nTotal = 0;
     {
         auto locked_chain = chain().lock();
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const CWalletTx* pcoin = &(*it).second;
 
@@ -5487,7 +5487,7 @@ CAmount CWallet::GetAnonymizedBalance() const
     CAmount nTotal = 0;
     {
         auto locked_chain = chain().lock();
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const CWalletTx* pcoin = &(*it).second;
 
@@ -5510,7 +5510,7 @@ double CWallet::GetAverageAnonymizedRounds() const
 
     {
         auto locked_chain = chain().lock();
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const CWalletTx* pcoin = &(*it).second;
 
@@ -5543,7 +5543,7 @@ CAmount CWallet::GetNormalizedAnonymizedBalance() const
 
     {
         auto locked_chain = chain().lock();
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const CWalletTx* pcoin = &(*it).second;
 
@@ -5571,7 +5571,7 @@ CAmount CWallet::GetDenominatedBalance(bool unconfirmed) const
     CAmount nTotal = 0;
     {
         auto locked_chain = chain().lock();
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const CWalletTx* pcoin = &(*it).second;
 
@@ -5587,7 +5587,7 @@ CAmount CWallet::GetWatchOnlyBalance() const
     CAmount nTotal = 0;
     {
         auto locked_chain = chain().lock();
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const CWalletTx* pcoin = &(*it).second;
             if (pcoin->IsTrusted(*locked_chain))
@@ -5603,7 +5603,7 @@ CAmount CWallet::GetLockedWatchOnlyBalance() const
     CAmount nTotal = 0;
     {
         auto locked_chain = chain().lock();
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const CWalletTx* pcoin = &(*it).second;
             if (pcoin->IsTrusted(*locked_chain) && pcoin->GetDepthInMainChain(*locked_chain) > 0)
@@ -5622,7 +5622,7 @@ CAmount CWallet::GetLockedWatchOnlyBalance() const
 //    std::cout << "AvailableCoins lock\n";
 //    auto locked_chain = chain().lock();
 //    std::cout << "chain locked\n";
-//    LOCK2(cs_main, cs_wallet);
+//    LOCK(cs_wallet);
 //    vCoins.clear();
 //
 //    {
@@ -5793,7 +5793,7 @@ bool less_then_denom(const COutput& out1, const COutput& out2)
 bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount, bool fPrecompute)
 {
     auto locked_chain = chain().lock();
-    LOCK(cs_main);
+    LOCK(cs_wallet);
     //Add WSP
     std::vector<COutput> vCoins;
     AvailableCoins(*locked_chain, vCoins, true, nullptr, AvailableCoinsType::STAKABLE_COINS);
@@ -5867,7 +5867,7 @@ bool CWallet::MintableCoins()
 {
     auto locked_chain = chain().lock();
     int32_t const tip_height = locked_chain->getHeight().get_value_or(-1);
-    LOCK(cs_main);
+    LOCK(cs_wallet);
     CAmount nBalance = GetBalance().m_mine_trusted;
     CAmount nZwspBalance = GetZerocoinBalance(false);
 
@@ -6447,7 +6447,7 @@ bool CWallet::CreateTransaction(const std::vector<std::pair<CScript, CAmount> >&
 
     {
         auto locked_chain = chain().lock();
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         {
             nFeeRet = 0;
             if (nFeePay > 0) nFeeRet = nFeePay;
@@ -6848,7 +6848,7 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std:
 {
     {
         auto locked_chain = chain().lock();
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         LogPrintf("CommitTransaction:\n%s", wtxNew.tx->ToString());
         {
             // This is only to keep the database open to defeat the auto-flush for the
@@ -7322,7 +7322,7 @@ void CWallet::AutoCombineDust()
 {
     auto locked_chain = chain().lock();
     int64_t const tip_time = locked_chain->getBlockTime(locked_chain->getHeight().get_value_or(0));
-    LOCK2(cs_main, cs_wallet);
+    LOCK(cs_wallet);
     if (tip_time < (chain().getAdjustedTime() - 300) || IsLocked()) {
         return;
     }
@@ -7421,7 +7421,7 @@ bool CWallet::MultiSend()
     int32_t const tip_height = locked_chain->getHeight().get_value_or(0);
     int64_t const tip_time = locked_chain->getBlockTime(tip_height);
 
-    LOCK2(cs_main, cs_wallet);
+    LOCK(cs_wallet);
     // Stop the old blocks from sending multisends
     if (tip_time < (chain().getAdjustedTime() - 300) || IsLocked()) {
         return false;
@@ -7984,7 +7984,7 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, CWalletTx& wtxNew, 
     CMutableTransaction txNew;
     wtxNew.BindWallet(this);
     {
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         {
             txNew.vin.clear();
             txNew.vout.clear();
