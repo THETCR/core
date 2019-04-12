@@ -5780,10 +5780,13 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
 
+    auto locked_chain = pwallet->chain().lock();
     LOCK(pwallet->cs_wallet);
+    uint32_t const tip_height = locked_chain->getHeight().get_value_or(0);
+    int64_t const tip_time = locked_chain->getBlockTime(tip_height);
 
     UniValue obj(UniValue::VOBJ);
-    obj.pushKV("validtime", chainActive.Tip()->nTime > 1471482000);
+    obj.pushKV("validtime", tip_time > 1471482000);
     obj.pushKV("haveconnections", g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) != 0);
     if (pwallet) {
         obj.pushKV("walletunlocked", !pwallet->IsLocked());
@@ -5793,9 +5796,9 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
     obj.pushKV("mnsync", masternodeSync.IsSynced());
 
     bool nStaking = false;
-    if (mapHashedBlocks.count(chainActive.Tip()->nHeight))
+    if (mapHashedBlocks.count(tip_height))
         nStaking = true;
-    else if (mapHashedBlocks.count(chainActive.Tip()->nHeight - 1) && nLastCoinStakeSearchInterval)
+    else if (mapHashedBlocks.count(tip_height - 1) && nLastCoinStakeSearchInterval)
         nStaking = true;
     obj.pushKV("staking status", nStaking);
 
