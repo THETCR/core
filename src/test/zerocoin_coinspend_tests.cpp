@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_wrapped_serial_spend_test)
     string strWalletFile = "unittestwallet.dat";
     std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
     WalletLocation m_location = WalletLocation(strWalletFile);
-    std::shared_ptr<CWallet> pwallet(new CWallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath())));
+    std::shared_ptr<CWallet> pwallet(new CWallet(m_chain.get(), m_location, WalletDatabase::Create(m_location.GetPath())));
     WalletBatch walletdb(pwallet->GetDBHandle(), "cr+");
     CzWSPWallet *czWSPWallet = new CzWSPWallet(pwallet->chain(), pwallet->GetLocation(), pwallet->GetDBHandle(), *pwallet);
 

@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test)
 {
     std::unique_ptr<interfaces::Chain> m_chain = interfaces::MakeChain();
     WalletLocation m_location = WalletLocation("unlocked.dat");
-    std::shared_ptr<CWallet> pwallet(new CWallet(*m_chain, m_location, WalletDatabase::Create(m_location.GetPath())));
+    std::shared_ptr<CWallet> pwallet(new CWallet(m_chain.get(), m_location, WalletDatabase::Create(m_location.GetPath())));
 
     SelectParams(CBaseChainParams::MAIN);
     ZerocoinParams *ZCParams = Params().Zerocoin_Params(false);
