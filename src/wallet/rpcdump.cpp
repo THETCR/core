@@ -919,7 +919,7 @@ UniValue bip38encrypt(const JSONRPCRequest& request)
             HelpExampleCli("bip38encrypt", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" \"mypasphrase\"") +
             HelpExampleRpc("bip38encrypt", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" \"mypasphrase\""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet);
 
@@ -972,7 +972,7 @@ UniValue bip38decrypt(const JSONRPCRequest& request)
             HelpExampleCli("bip38decrypt", "\"encryptedkey\" \"mypassphrase\"") +
             HelpExampleRpc("bip38decrypt", "\"encryptedkey\" \"mypassphrase\""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet);
 

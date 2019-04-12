@@ -4493,7 +4493,7 @@ UniValue getzerocoinbalance(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("getzerocoinbalance", "") + HelpExampleRpc("getzerocoinbalance", ""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet, true);
 
@@ -4551,7 +4551,7 @@ UniValue listmintedzerocoins(const JSONRPCRequest& request)
     bool fVerbose = (request.params.size() > 0) ? request.params[0].get_bool() : false;
     bool fMatureOnly = (request.params.size() > 1) ? request.params[1].get_bool() : false;
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet, true);
 
@@ -4610,7 +4610,7 @@ UniValue listzerocoinamounts(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("listzerocoinamounts", "") + HelpExampleRpc("listzerocoinamounts", ""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet, true);
 
@@ -4657,7 +4657,7 @@ UniValue listspentzerocoins(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("listspentzerocoins", "") + HelpExampleRpc("listspentzerocoins", ""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet, true);
 
@@ -4720,7 +4720,7 @@ UniValue mintzerocoin(const JSONRPCRequest& request)
             "\nAs a json rpc call\n" +
             HelpExampleRpc("mintzerocoin", "13, \"[{\\\"txid\\\":\\\"a08e6907dbbd3d809776dbfc5d82e371b764ed838b5655e72f463568df1aadf0\\\",\\\"vout\\\":1}]\""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     if (request.params.size() == 1)
     {
@@ -4903,7 +4903,8 @@ UniValue spendzerocoin(const JSONRPCRequest& request)
             HelpExampleCli("spendzerocoin", "5000 false true \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\"") +
             HelpExampleRpc("spendzerocoin", "5000 false true \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    auto locked_chain = pwallet->chain().lock();
+    LOCK(pwallet->cs_wallet);
 
     if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
         throw JSONRPCError(RPC_WALLET_ERROR, "zWSP is currently disabled due to maintenance.");
@@ -4966,7 +4967,7 @@ UniValue spendzerocoinmints(const JSONRPCRequest& request)
             HelpExampleCli("spendzerocoinmints", "'[\"0d8c16eee7737e3cc1e4e70dc006634182b175e039700931283b202715a0818f\", \"dfe585659e265e6a509d93effb906d3d2a0ac2fe3464b2c3b6d71a3ef34c8ad7\"]' \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\"") +
             HelpExampleRpc("spendzerocoinmints", "[\"0d8c16eee7737e3cc1e4e70dc006634182b175e039700931283b202715a0818f\", \"dfe585659e265e6a509d93effb906d3d2a0ac2fe3464b2c3b6d71a3ef34c8ad7\"], \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
         throw JSONRPCError(RPC_WALLET_ERROR, "zWSP is currently disabled due to maintenance.");
@@ -5055,7 +5056,7 @@ UniValue resetmintzerocoin(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("resetmintzerocoin", "true") + HelpExampleRpc("resetmintzerocoin", "true"));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     WalletBatch walletdb(pwallet->GetDBHandle());
     CzWSPTracker* zwspTracker = pwallet->zwspTracker.get();
@@ -5115,7 +5116,7 @@ UniValue resetspentzerocoin(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("resetspentzerocoin", "") + HelpExampleRpc("resetspentzerocoin", ""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     WalletBatch walletdb(pwallet->GetDBHandle());
     CzWSPTracker* zwspTracker = pwallet->zwspTracker.get();
@@ -5187,7 +5188,7 @@ UniValue getarchivedzerocoin(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("getarchivedzerocoin", "") + HelpExampleRpc("getarchivedzerocoin", ""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet);
 
@@ -5258,7 +5259,7 @@ UniValue exportzerocoins(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("exportzerocoins", "false 5") + HelpExampleRpc("exportzerocoins", "false 5"));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet);
 
@@ -5332,7 +5333,7 @@ UniValue importzerocoins(const JSONRPCRequest& request)
             HelpExampleCli("importzerocoins", "\'[{\"d\":100,\"p\":\"mypubcoin\",\"s\":\"myserial\",\"r\":\"randomness_hex\",\"t\":\"mytxid\",\"h\":104923, \"u\":false},{\"d\":5,...}]\'") +
             HelpExampleRpc("importzerocoins", "[{\"d\":100,\"p\":\"mypubcoin\",\"s\":\"myserial\",\"r\":\"randomness_hex\",\"t\":\"mytxid\",\"h\":104923, \"u\":false},{\"d\":5,...}]"));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet);
 
@@ -5427,7 +5428,7 @@ UniValue reconsiderzerocoins(const JSONRPCRequest& request)
             "\nExamples\n" +
             HelpExampleCli("reconsiderzerocoins", "") + HelpExampleRpc("reconsiderzerocoins", ""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet, true);
 
@@ -5779,7 +5780,7 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
 
-    LOCK2(cs_main, pwallet ? &pwallet->cs_wallet : NULL);
+    LOCK(pwallet->cs_wallet);
 
     UniValue obj(UniValue::VOBJ);
     obj.pushKV("validtime", chainActive.Tip()->nTime > 1471482000);
@@ -5829,7 +5830,7 @@ UniValue spendrawzerocoin(const JSONRPCRequest& request)
                 HelpExampleCli("spendrawzerocoin", "\"f80892e78c30a393ef4ab4d5a9d5a2989de6ebc7b976b241948c7f489ad716a2\" \"a4fd4d7248e6a51f1d877ddd2a4965996154acc6b8de5aa6c83d4775b283b600\" 100 \"xxx\"") +
                 HelpExampleRpc("spendrawzerocoin", "\"f80892e78c30a393ef4ab4d5a9d5a2989de6ebc7b976b241948c7f489ad716a2\", \"a4fd4d7248e6a51f1d877ddd2a4965996154acc6b8de5aa6c83d4775b283b600\", 100, \"xxx\""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     if (GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
         throw JSONRPCError(RPC_WALLET_ERROR, "zPIV is currently disabled due to maintenance.");
@@ -5945,7 +5946,7 @@ UniValue getaccount(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("getaccount", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\"") + HelpExampleRpc("getaccount", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     std::string address = request.params[0].get_str();
     if (!IsValidDestinationString(address))
@@ -6016,7 +6017,7 @@ UniValue getaccountaddress(const JSONRPCRequest& request)
             HelpExampleCli("getaccountaddress", "") + HelpExampleCli("getaccountaddress", "\"\"") +
             HelpExampleCli("getaccountaddress", "\"myaccount\"") + HelpExampleRpc("getaccountaddress", "\"myaccount\""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     // Parse the account first so we don't generate a key if there's an error
     std::string strAccount = LabelFromValue(request.params[0]);
@@ -6092,7 +6093,7 @@ UniValue listaccounts(const JSONRPCRequest& request)
             HelpExampleRpc("listaccounts", "6"));
 
     auto locked_chain = pwallet->chain().lock();
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     int nMinDepth = 1;
     if (request.params.size() > 0)
@@ -6173,7 +6174,7 @@ UniValue movecmd(const JSONRPCRequest& request)
             "\nAs a json rpc call\n" +
             HelpExampleRpc("move", "\"timotei\", \"akiko\", 0.01, 1, \"happy birthday!\""));
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     std::string strFrom = LabelFromValue(request.params[0]);
     std::string strTo = LabelFromValue(request.params[1]);
@@ -6604,11 +6605,7 @@ UniValue getinfo(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("getinfo", "") + HelpExampleRpc("getinfo", ""));
 
-#ifdef ENABLE_WALLET
-    LOCK2(cs_main, pwallet ? &pwallet->cs_wallet : NULL);
-#else
-    LOCK(cs_main);
-#endif
+    LOCK(pwallet->cs_wallet);
 
     std::string services;
     for (int i = 0; i < 8; i++) {
@@ -6762,11 +6759,8 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
                                                  "\nExamples:\n" +
             HelpExampleCli("signrawtransaction", "\"myhex\"") + HelpExampleRpc("signrawtransaction", "\"myhex\""));
 
-#ifdef ENABLE_WALLET
-    LOCK2(cs_main, pwallet ? &pwallet->cs_wallet : NULL);
-#else
-    LOCK(cs_main);
-#endif
+    LOCK(pwallet->cs_wallet);
+
     RPCTypeCheck(request.params, boost::assign::list_of(UniValue::VSTR)(UniValue::VARR)(UniValue::VARR)(UniValue::VSTR), true);
 
     std::vector<unsigned char> txData(ParseHexV(request.params[0], "argument 1"));
@@ -7018,7 +7012,7 @@ UniValue createrawzerocoinstake(const JSONRPCRequest& request)
 
 
     assert(pwallet != nullptr);
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK(pwallet->cs_wallet);
 
     if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
         throw JSONRPCError(RPC_WALLET_ERROR, "zPIV is currently disabled due to maintenance.");
