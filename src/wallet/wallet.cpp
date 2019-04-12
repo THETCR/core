@@ -7533,14 +7533,14 @@ bool CWallet::MultiSend()
     return true;
 }
 
-//bool CWalletTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool ignoreFees)
-//{
-//    CValidationState state;
-//    bool fAccepted = ::AcceptToMemoryPool(mempool, state, *tx, fLimitFree, NULL, fRejectInsaneFee, ignoreFees);
-//    if (!fAccepted)
-//        LogPrintf("%s : %s\n", __func__, state.GetRejectReason());
-//    return fAccepted;
-//}
+bool CWalletTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool ignoreFees)
+{
+    CValidationState state;
+    bool fAccepted = ::AcceptToMemoryPool(mempool, state, *tx, fLimitFree, NULL, fRejectInsaneFee, ignoreFees);
+    if (!fAccepted)
+        LogPrintf("%s : %s\n", __func__, state.GetRejectReason());
+    return fAccepted;
+}
 
 int CMerkleTx::GetTransactionLockSignatures() const
 {
