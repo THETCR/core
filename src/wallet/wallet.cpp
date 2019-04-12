@@ -7217,7 +7217,7 @@ void CWallet::CreateAutoMintTransaction(const CAmount& nMintAmount, CCoinControl
         CAmount nBalance = GetUnlockedCoins();
         CAmount dPercentage = 100 * (double)nZerocoinBalance / (double)(nZerocoinBalance + nBalance);
         LogPrintf("CWallet::AutoZeromint() @ block %ld: successfully minted %ld zWSP. Current percentage of zWSP: %lf%%\n",
-                  chain().lock()->getHeight(), nMintAmount, dPercentage);
+                  chain().lock()->getHeight().get_value_or(0), nMintAmount, dPercentage);
         // Re-adjust startup time to delay next Automint for 5 minutes
         nStartupTime = GetAdjustedTime();
     }
@@ -7271,7 +7271,7 @@ void CWallet::AutoZeromint()
     // Check if minting is actually needed
     if(dPercentage >= nZeromintPercentage){
         LogPrint(BCLog::ZERO, "CWallet::AutoZeromint() @block %ld: percentage of existing zWSP (%lf%%) already >= configured percentage (%d%%). No minting needed...\n",
-                 chain().lock()->getHeight(), dPercentage, nZeromintPercentage);
+                 chain().lock()->getHeight().get_value_or(0), dPercentage, nZeromintPercentage);
         return;
     }
 
