@@ -903,7 +903,7 @@ UniValue bip38encrypt(const JSONRPCRequest& request)
     }
 
     if (request.fHelp || request.params.size() != 2)
-        throw runtime_error(
+        throw std::runtime_error(
             "bip38encrypt \"wispraddress\" \"passphrase\"\n"
             "\nEncrypts a private key corresponding to 'wispraddress'.\n" +
             HelpRequiringPassphrase(pwallet) + "\n"
@@ -956,7 +956,7 @@ UniValue bip38decrypt(const JSONRPCRequest& request)
     }
 
     if (request.fHelp || request.params.size() != 2)
-        throw runtime_error(
+        throw std::runtime_error(
             "bip38decrypt \"wispraddress\" \"passphrase\"\n"
             "\nDecrypts and then imports password protected private key.\n" +
             HelpRequiringPassphrase(pwallet) + "\n"

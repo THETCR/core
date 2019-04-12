@@ -26,7 +26,7 @@
 UniValue getpoolinfo(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
-        throw runtime_error(
+        throw std::runtime_error(
             "getpoolinfo\n"
             "\nReturns anonymous pool-related information\n"
 
@@ -56,7 +56,7 @@ UniValue listmasternodes(const JSONRPCRequest& request)
     if (request.params.size() == 1) strFilter = request.params[0].get_str();
 
     if (request.fHelp || (request.params.size() > 1))
-        throw runtime_error(
+        throw std::runtime_error(
             "listmasternodes ( \"filter\" )\n"
             "\nGet a ranked list of masternodes\n"
 
@@ -138,7 +138,7 @@ UniValue listmasternodes(const JSONRPCRequest& request)
 UniValue masternodeconnect(const JSONRPCRequest& request)
 {
     if (request.fHelp || (request.params.size() != 1))
-        throw runtime_error(
+        throw std::runtime_error(
             "masternodeconnect \"address\"\n"
             "\nAttempts to connect to specified masternode address\n"
 
@@ -165,7 +165,7 @@ UniValue masternodeconnect(const JSONRPCRequest& request)
 UniValue getmasternodecount (const JSONRPCRequest& request)
 {
     if (request.fHelp || (request.params.size() > 0))
-        throw runtime_error(
+        throw std::runtime_error(
             "getmasternodecount\n"
             "\nGet masternode count values\n"
 
@@ -205,7 +205,7 @@ UniValue getmasternodecount (const JSONRPCRequest& request)
 UniValue masternodecurrent (const JSONRPCRequest& request)
 {
     if (request.fHelp || (request.params.size() != 0))
-        throw runtime_error(
+        throw std::runtime_error(
             "masternodecurrent\n"
             "\nGet current masternode winner\n"
 
@@ -233,13 +233,13 @@ UniValue masternodecurrent (const JSONRPCRequest& request)
         return obj;
     }
 
-    throw runtime_error("unknown");
+    throw std::runtime_error("unknown");
 }
 
 UniValue masternodedebug (const JSONRPCRequest& request)
 {
     if (request.fHelp || (request.params.size() != 0))
-        throw runtime_error(
+        throw std::runtime_error(
             "masternodedebug\n"
             "\nPrint masternode status\n"
 
@@ -256,7 +256,7 @@ UniValue masternodedebug (const JSONRPCRequest& request)
     CPubKey pubkey;
     CKey key;
     if (!activeMasternode.GetMasterNodeVin(vin, pubkey, key))
-        throw runtime_error("Missing masternode input, please look at the documentation for instructions on masternode creation\n");
+        throw std::runtime_error("Missing masternode input, please look at the documentation for instructions on masternode creation\n");
     else
         return activeMasternode.GetStatus();
 }
@@ -286,7 +286,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 3 ||
         (request.params.size() == 2 && (strCommand != "local" && strCommand != "all" && strCommand != "many" && strCommand != "missing" && strCommand != "disabled")) ||
         (request.params.size() == 3 && strCommand != "alias"))
-        throw runtime_error(
+        throw std::runtime_error(
             "startmasternode \"local|all|many|missing|disabled|alias\" lockwallet ( \"alias\" )\n"
             "\nAttempts to start one or more masternode(s)\n"
 
@@ -319,7 +319,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
     EnsureWalletIsUnlocked(pwallet);
 
     if (strCommand == "local") {
-        if (!fMasterNode) throw runtime_error("you must set masternode=1 in the configuration\n");
+        if (!fMasterNode) throw std::runtime_error("you must set masternode=1 in the configuration\n");
 
         if (activeMasternode.status != ACTIVE_MASTERNODE_STARTED) {
             activeMasternode.status = ACTIVE_MASTERNODE_INITIAL; // TODO: consider better way
@@ -335,7 +335,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
         if ((strCommand == "missing" || strCommand == "disabled") &&
             (masternodeSync.RequestedMasternodeAssets <= MASTERNODE_SYNC_LIST ||
                 masternodeSync.RequestedMasternodeAssets == MASTERNODE_SYNC_FAILED)) {
-            throw runtime_error("You can't use this command until masternode list is synced\n");
+            throw std::runtime_error("You can't use this command until masternode list is synced\n");
         }
 
         std::vector<CMasternodeConfig::CMasternodeEntry> mnEntries;
@@ -442,7 +442,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
 UniValue createmasternodekey (const JSONRPCRequest& request)
 {
     if (request.fHelp || (request.params.size() != 0))
-        throw runtime_error(
+        throw std::runtime_error(
             "createmasternodekey\n"
             "\nCreate a new masternode private key\n"
 
@@ -461,7 +461,7 @@ UniValue createmasternodekey (const JSONRPCRequest& request)
 UniValue getmasternodeoutputs (const JSONRPCRequest& request)
 {
     if (request.fHelp || (request.params.size() != 0))
-        throw runtime_error(
+        throw std::runtime_error(
             "getmasternodeoutputs\n"
             "\nPrint all masternode transaction outputs\n"
 
@@ -498,7 +498,7 @@ UniValue listmasternodeconf (const JSONRPCRequest& request)
     if (request.params.size() == 1) strFilter = request.params[0].get_str();
 
     if (request.fHelp || (request.params.size() > 1))
-        throw runtime_error(
+        throw std::runtime_error(
             "listmasternodeconf ( \"filter\" )\n"
             "\nPrint masternode.conf in JSON format\n"
 
@@ -556,7 +556,7 @@ UniValue listmasternodeconf (const JSONRPCRequest& request)
 UniValue getmasternodestatus (const JSONRPCRequest& request)
 {
     if (request.fHelp || (request.params.size() != 0))
-        throw runtime_error(
+        throw std::runtime_error(
             "getmasternodestatus\n"
             "\nPrint masternode status\n"
 
@@ -573,7 +573,7 @@ UniValue getmasternodestatus (const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("getmasternodestatus", "") + HelpExampleRpc("getmasternodestatus", ""));
 
-    if (!fMasterNode) throw runtime_error("This is not a masternode");
+    if (!fMasterNode) throw std::runtime_error("This is not a masternode");
 
     CMasternode* pmn = mnodeman.Find(activeMasternode.vin);
 
@@ -587,14 +587,14 @@ UniValue getmasternodestatus (const JSONRPCRequest& request)
         mnObj.pushKV("message", activeMasternode.GetStatus());
         return mnObj;
     }
-    throw runtime_error("Masternode not found in the list of available masternodes. Current status: "
+    throw std::runtime_error("Masternode not found in the list of available masternodes. Current status: "
                         + activeMasternode.GetStatus());
 }
 
 UniValue getmasternodewinners (const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 3)
-        throw runtime_error(
+        throw std::runtime_error(
             "getmasternodewinners ( blocks \"filter\" )\n"
             "\nPrint the masternode winners for the last n blocks\n"
 
@@ -696,7 +696,7 @@ UniValue getmasternodewinners (const JSONRPCRequest& request)
 UniValue getmasternodescores (const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 1)
-        throw runtime_error(
+        throw std::runtime_error(
             "getmasternodescores ( blocks )\n"
             "\nPrint list of winning masternode by score\n"
 
@@ -718,7 +718,7 @@ UniValue getmasternodescores (const JSONRPCRequest& request)
         try {
             nLast = std::stoi(request.params[0].get_str());
         } catch (const std::invalid_argument&) {
-            throw runtime_error("Exception on param 2");
+            throw std::runtime_error("Exception on param 2");
         }
     }
     UniValue obj(UniValue::VOBJ);
@@ -770,7 +770,7 @@ UniValue createmasternodebroadcast(const JSONRPCRequest& request)
     if (request.params.size() >= 1)
         strCommand = request.params[0].get_str();
     if (request.fHelp || (strCommand != "alias" && strCommand != "all") || (strCommand == "alias" && request.params.size() < 2))
-        throw runtime_error(
+        throw std::runtime_error(
             "createmasternodebroadcast \"command\" ( \"alias\")\n"
             "\nCreates a masternode broadcast message for one or all masternodes configured in masternode.conf\n" +
             HelpRequiringPassphrase(pwallet) + "\n"
@@ -898,7 +898,7 @@ UniValue createmasternodebroadcast(const JSONRPCRequest& request)
 UniValue decodemasternodebroadcast(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
-        throw runtime_error(
+        throw std::runtime_error(
             "decodemasternodebroadcast \"hexstring\"\n"
             "\nCommand to decode masternode broadcast messages\n"
 
@@ -958,7 +958,7 @@ UniValue decodemasternodebroadcast(const JSONRPCRequest& request)
 UniValue relaymasternodebroadcast(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
-        throw runtime_error(
+        throw std::runtime_error(
             "relaymasternodebroadcast \"hexstring\"\n"
             "\nCommand to relay masternode broadcast messages\n"
 
@@ -996,7 +996,7 @@ UniValue masternode(const JSONRPCRequest& request)
          strCommand != "start-disabled" && strCommand != "list" && strCommand != "list-conf" && strCommand != "count" && strCommand != "enforce" &&
          strCommand != "debug" && strCommand != "current" && strCommand != "winners" && strCommand != "genkey" && strCommand != "connect" &&
          strCommand != "outputs" && strCommand != "status" && strCommand != "calcscore"))
-        throw runtime_error(
+        throw std::runtime_error(
             "masternode \"command\"...\n"
             "\nSet of commands to execute masternode related actions\n"
             "This command is depreciated, please see individual command documentation for future reference\n\n"

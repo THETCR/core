@@ -5811,7 +5811,7 @@ UniValue spendrawzerocoin(const JSONRPCRequest& request)
     }
 
     if (request.fHelp || request.params.size() < 4 || request.params.size() > 5)
-        throw runtime_error(
+        throw std::runtime_error(
                 "spendrawzerocoin \"serialHex\" denom \"randomnessHex\" [\"address\"]\n"
                 "\nCreate and broadcast a TX spending the provided zericoin.\n"
 
@@ -5877,7 +5877,7 @@ UniValue clearspendcache(const JSONRPCRequest& request)
     }
 
     if(request.fHelp || request.params.size() != 0)
-        throw runtime_error(
+        throw std::runtime_error(
                 "clearspendcache\n"
                 "\nClear the pre-computed zPIV spend cache, and database.\n" +
                 HelpRequiringPassphrase(pwallet) + "\n"
@@ -6562,7 +6562,7 @@ UniValue getinfo(const JSONRPCRequest& request)
     }
 
     if (request.fHelp || request.params.size() != 0)
-        throw runtime_error(
+        throw std::runtime_error(
             "getinfo\n"
             "\nReturns an object containing various state info.\n"
 
@@ -6998,7 +6998,7 @@ UniValue createrawzerocoinstake(const JSONRPCRequest& request)
     }
 
     if (request.fHelp || request.params.size() != 1)
-        throw runtime_error(
+        throw std::runtime_error(
             "createrawzerocoinstake mint_input \n"
             "\nCreates raw zPIV coinstakes (without MN output).\n" +
             HelpRequiringPassphrase(pwallet) + "\n"

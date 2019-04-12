@@ -64,7 +64,7 @@ UniValue preparebudget(const JSONRPCRequest& request)
     CBlockIndex* pindexPrev = chainActive.Tip();
 
     if (request.fHelp || request.params.size() != 6)
-        throw runtime_error(
+        throw std::runtime_error(
             "preparebudget \"proposal-name\" \"url\" payment-count block-start \"wispr-address\" monthy-payment\n"
             "\nPrepare proposal for network by signing and creating tx\n"
 
@@ -89,15 +89,15 @@ UniValue preparebudget(const JSONRPCRequest& request)
 
     std::string strProposalName = SanitizeString(request.params[0].get_str());
     if (strProposalName.size() > 20)
-        throw runtime_error("Invalid proposal name, limit of 20 characters.");
+        throw std::runtime_error("Invalid proposal name, limit of 20 characters.");
 
     std::string strURL = SanitizeString(request.params[1].get_str());
     if (strURL.size() > 64)
-        throw runtime_error("Invalid url, limit of 64 characters.");
+        throw std::runtime_error("Invalid url, limit of 64 characters.");
 
     int nPaymentCount = request.params[2].get_int();
     if (nPaymentCount < 1)
-        throw runtime_error("Invalid payment count, must be more than zero.");
+        throw std::runtime_error("Invalid payment count, must be more than zero.");
 
     // Start must be in the next budget cycle
     if (pindexPrev != nullptr) nBlockMin = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
@@ -105,16 +105,16 @@ UniValue preparebudget(const JSONRPCRequest& request)
     int nBlockStart = request.params[3].get_int();
     if (nBlockStart % GetBudgetPaymentCycleBlocks() != 0) {
         int nNext = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
-        throw runtime_error(strprintf("Invalid block start - must be a budget cycle block. Next valid block: %d", nNext));
+        throw std::runtime_error(strprintf("Invalid block start - must be a budget cycle block. Next valid block: %d", nNext));
     }
 
     int nBlockEnd = nBlockStart + GetBudgetPaymentCycleBlocks() * nPaymentCount; // End must be AFTER current cycle
 
     if (nBlockStart < nBlockMin)
-        throw runtime_error("Invalid block start, must be more than current height.");
+        throw std::runtime_error("Invalid block start, must be more than current height.");
 
     if (nBlockEnd < pindexPrev->nHeight)
-        throw runtime_error("Invalid ending block, starting block + (payment_cycle*payments) must be more than current height.");
+        throw std::runtime_error("Invalid ending block, starting block + (payment_cycle*payments) must be more than current height.");
 
     CTxDestination address = DecodeDestination(request.params[4].get_str());
     if (!IsValidDestination(address))
@@ -131,7 +131,7 @@ UniValue preparebudget(const JSONRPCRequest& request)
 
     std::string strError = "";
     if (!budgetProposalBroadcast.IsValid(strError, false))
-        throw runtime_error("Proposal is not valid - " + budgetProposalBroadcast.GetHash().ToString() + " - " + strError);
+        throw std::runtime_error("Proposal is not valid - " + budgetProposalBroadcast.GetHash().ToString() + " - " + strError);
 
     bool useIX = false; //true;
     // if (request.params.size() > 7) {
@@ -142,7 +142,7 @@ UniValue preparebudget(const JSONRPCRequest& request)
 
     CWalletTx wtx;
     if (!pwallet->GetBudgetSystemCollateralTX(wtx, budgetProposalBroadcast.GetHash(), useIX)) { // 50 WSP collateral for proposal
-        throw runtime_error("Error making collateral transaction for proposal. Please check your wallet balance.");
+        throw std::runtime_error("Error making collateral transaction for proposal. Please check your wallet balance.");
     }
 
     // make our change address
@@ -159,7 +159,7 @@ UniValue submitbudget(const JSONRPCRequest& request)
     CBlockIndex* pindexPrev = chainActive.Tip();
 
     if (request.fHelp || request.params.size() != 7)
-        throw runtime_error(
+        throw std::runtime_error(
             "submitbudget \"proposal-name\" \"url\" payment-count block-start \"wispr-address\" monthy-payment \"fee-tx\"\n"
             "\nSubmit proposal to the network\n"
 
@@ -184,15 +184,15 @@ UniValue submitbudget(const JSONRPCRequest& request)
 
     std::string strProposalName = SanitizeString(request.params[0].get_str());
     if (strProposalName.size() > 20)
-        throw runtime_error("Invalid proposal name, limit of 20 characters.");
+        throw std::runtime_error("Invalid proposal name, limit of 20 characters.");
 
     std::string strURL = SanitizeString(request.params[1].get_str());
     if (strURL.size() > 64)
-        throw runtime_error("Invalid url, limit of 64 characters.");
+        throw std::runtime_error("Invalid url, limit of 64 characters.");
 
     int nPaymentCount = request.params[2].get_int();
     if (nPaymentCount < 1)
-        throw runtime_error("Invalid payment count, must be more than zero.");
+        throw std::runtime_error("Invalid payment count, must be more than zero.");
 
     // Start must be in the next budget cycle
     if (pindexPrev != nullptr) nBlockMin = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
@@ -200,16 +200,16 @@ UniValue submitbudget(const JSONRPCRequest& request)
     int nBlockStart = request.params[3].get_int();
     if (nBlockStart % GetBudgetPaymentCycleBlocks() != 0) {
         int nNext = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
-        throw runtime_error(strprintf("Invalid block start - must be a budget cycle block. Next valid block: %d", nNext));
+        throw std::runtime_error(strprintf("Invalid block start - must be a budget cycle block. Next valid block: %d", nNext));
     }
 
     int nBlockEnd = nBlockStart + (GetBudgetPaymentCycleBlocks() * nPaymentCount); // End must be AFTER current cycle
 
     if (nBlockStart < nBlockMin)
-        throw runtime_error("Invalid block start, must be more than current height.");
+        throw std::runtime_error("Invalid block start, must be more than current height.");
 
     if (nBlockEnd < pindexPrev->nHeight)
-        throw runtime_error("Invalid ending block, starting block + (payment_cycle*payments) must be more than current height.");
+        throw std::runtime_error("Invalid ending block, starting block + (payment_cycle*payments) must be more than current height.");
 
     CTxDestination address = DecodeDestination(request.params[4].get_str());
     if (!IsValidDestination(address))
@@ -226,11 +226,11 @@ UniValue submitbudget(const JSONRPCRequest& request)
     std::string strError = "";
     int nConf = 0;
     if (!IsBudgetCollateralValid(hash, budgetProposalBroadcast.GetHash(), strError, budgetProposalBroadcast.nTime, nConf)) {
-        throw runtime_error("Proposal FeeTX is not valid - " + hash.ToString() + " - " + strError);
+        throw std::runtime_error("Proposal FeeTX is not valid - " + hash.ToString() + " - " + strError);
     }
 
     if (!masternodeSync.IsBlockchainSynced()) {
-        throw runtime_error("Must wait for client to sync with masternode network. Try again in a minute or so.");
+        throw std::runtime_error("Must wait for client to sync with masternode network. Try again in a minute or so.");
     }
 
     // if(!budgetProposalBroadcast.IsValid(strError)){
@@ -242,7 +242,7 @@ UniValue submitbudget(const JSONRPCRequest& request)
     if(budget.AddProposal(budgetProposalBroadcast)) {
         return budgetProposalBroadcast.GetHash().ToString();
     }
-    throw runtime_error("Invalid proposal, see debug.log for details.");
+    throw std::runtime_error("Invalid proposal, see debug.log for details.");
 }
 
 UniValue mnbudgetvote(const JSONRPCRequest& request)
@@ -259,7 +259,7 @@ UniValue mnbudgetvote(const JSONRPCRequest& request)
 
     if (request.fHelp || (request.params.size() == 3 && (strCommand != "local" && strCommand != "many")) || (request.params.size() == 4 && strCommand != "alias") ||
         request.params.size() > 4 || request.params.size() < 3)
-        throw runtime_error(
+        throw std::runtime_error(
             "mnbudgetvote \"local|many|alias\" \"votehash\" \"yes|no\" ( \"alias\" )\n"
             "\nVote on a budget proposal\n"
 
@@ -509,7 +509,7 @@ UniValue mnbudgetvote(const JSONRPCRequest& request)
 UniValue getbudgetvotes(const JSONRPCRequest& request)
 {
     if (request.params.size() != 1)
-        throw runtime_error(
+        throw std::runtime_error(
             "getbudgetvotes \"proposal-name\"\n"
             "\nPrint vote information for a budget proposal\n"
 
@@ -537,7 +537,7 @@ UniValue getbudgetvotes(const JSONRPCRequest& request)
 
     CBudgetProposal* pbudgetProposal = budget.FindProposal(strProposalName);
 
-    if (pbudgetProposal == nullptr) throw runtime_error("Unknown proposal name");
+    if (pbudgetProposal == nullptr) throw std::runtime_error("Unknown proposal name");
 
     std::map<uint256, CBudgetVote>::iterator it = pbudgetProposal->mapVotes.begin();
     while (it != pbudgetProposal->mapVotes.end()) {
@@ -559,7 +559,7 @@ UniValue getbudgetvotes(const JSONRPCRequest& request)
 UniValue getnextsuperblock(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
-        throw runtime_error(
+        throw std::runtime_error(
             "getnextsuperblock\n"
             "\nPrint the next super block height\n"
 
@@ -579,7 +579,7 @@ UniValue getnextsuperblock(const JSONRPCRequest& request)
 UniValue getbudgetprojection(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
-        throw runtime_error(
+        throw std::runtime_error(
             "getbudgetprojection\n"
             "\nShow the projection of which proposals will be paid the next cycle\n"
 
@@ -640,7 +640,7 @@ UniValue getbudgetprojection(const JSONRPCRequest& request)
 UniValue getbudgetinfo(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 1)
-        throw runtime_error(
+        throw std::runtime_error(
             "getbudgetinfo ( \"proposal\" )\n"
             "\nShow current masternode budgets\n"
 
@@ -682,7 +682,7 @@ UniValue getbudgetinfo(const JSONRPCRequest& request)
     if (request.params.size() == 1) {
         std::string strProposalName = SanitizeString(request.params[0].get_str());
         CBudgetProposal* pbudgetProposal = budget.FindProposal(strProposalName);
-        if (pbudgetProposal == nullptr) throw runtime_error("Unknown proposal name");
+        if (pbudgetProposal == nullptr) throw std::runtime_error("Unknown proposal name");
         UniValue bObj(UniValue::VOBJ);
         budgetToJSON(pbudgetProposal, bObj);
         ret.push_back(bObj);
@@ -705,7 +705,7 @@ UniValue getbudgetinfo(const JSONRPCRequest& request)
 UniValue mnbudgetrawvote(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 6)
-        throw runtime_error(
+        throw std::runtime_error(
             "mnbudgetrawvote \"masternode-tx-hash\" masternode-tx-index \"proposal-hash\" yes|no time \"vote-sig\"\n"
             "\nCompile and relay a proposal vote with provided external signature instead of signing vote internally\n"
 
@@ -774,7 +774,7 @@ UniValue mnfinalbudget(const JSONRPCRequest& request)
 
     if (request.fHelp ||
         (strCommand != "suggest" && strCommand != "vote-many" && strCommand != "vote" && strCommand != "show" && strCommand != "getvotes"))
-        throw runtime_error(
+        throw std::runtime_error(
             "mnfinalbudget \"command\"... ( \"passphrase\" )\n"
             "\nVote or show current budgets\n"
 
@@ -786,7 +786,7 @@ UniValue mnfinalbudget(const JSONRPCRequest& request)
 
     if (strCommand == "vote-many") {
         if (request.params.size() != 2)
-            throw runtime_error("Correct usage is 'mnfinalbudget vote-many BUDGET_HASH'");
+            throw std::runtime_error("Correct usage is 'mnfinalbudget vote-many BUDGET_HASH'");
 
         std::string strHash = request.params[1].get_str();
         uint256 hash(strHash);
@@ -858,7 +858,7 @@ UniValue mnfinalbudget(const JSONRPCRequest& request)
 
     if (strCommand == "vote") {
         if (request.params.size() != 2)
-            throw runtime_error("Correct usage is 'mnfinalbudget vote BUDGET_HASH'");
+            throw std::runtime_error("Correct usage is 'mnfinalbudget vote BUDGET_HASH'");
 
         std::string strHash = request.params[1].get_str();
         uint256 hash(strHash);
@@ -916,7 +916,7 @@ UniValue mnfinalbudget(const JSONRPCRequest& request)
 
     if (strCommand == "getvotes") {
         if (request.params.size() != 2)
-            throw runtime_error("Correct usage is 'mnbudget getvotes budget-hash'");
+            throw std::runtime_error("Correct usage is 'mnbudget getvotes budget-hash'");
 
         std::string strHash = request.params[1].get_str();
         uint256 hash(strHash);
@@ -948,7 +948,7 @@ UniValue mnfinalbudget(const JSONRPCRequest& request)
 UniValue checkbudgets(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
-        throw runtime_error(
+        throw std::runtime_error(
             "checkbudgets\n"
             "\nInitiates a buddget check cycle manually\n"
 
@@ -970,7 +970,7 @@ UniValue mnbudget(const JSONRPCRequest& request)
 
     if (request.fHelp ||
         (strCommand != "vote-alias" && strCommand != "vote-many" && strCommand != "prepare" && strCommand != "submit" && strCommand != "vote" && strCommand != "getvotes" && strCommand != "getinfo" && strCommand != "show" && strCommand != "projection" && strCommand != "check" && strCommand != "nextblock"))
-        throw runtime_error(
+        throw std::runtime_error(
             "mnbudget \"command\"... ( \"passphrase\" )\n"
             "\nVote or show current budgets\n"
             "This command is depreciated, please see individual command documentation for future reference\n\n"
@@ -1020,7 +1020,7 @@ UniValue mnbudget(const JSONRPCRequest& request)
 
     if (strCommand == "vote" || strCommand == "vote-many" || strCommand == "vote-alias") {
         if (strCommand == "vote-alias")
-            throw runtime_error(
+            throw std::runtime_error(
                 "vote-alias is not supported with this command\n"
                 "Please use mnbudgetvote instead.\n"
             );

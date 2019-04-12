@@ -2296,7 +2296,7 @@ UniValue analyzepsbt(const JSONRPCRequest& request)
 //    }
 //
 //    if (request.fHelp || request.params.size() != 1)
-//        throw runtime_error(
+//        throw std::runtime_error(
 //                "createrawzerocoinstake mint_input \n"
 //                "\nCreates raw zPIV coinstakes (without MN output).\n" +
 //                HelpRequiringPassphrase(pwallet) + "\n"

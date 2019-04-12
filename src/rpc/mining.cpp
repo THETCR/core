@@ -1005,7 +1005,7 @@ static UniValue estimaterawfee(const JSONRPCRequest& request)
 UniValue estimatefee(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
-        throw runtime_error(
+        throw std::runtime_error(
             "estimatefee nblocks\n"
             "\nEstimates the approximate fee per kilobyte\n"
             "needed for a transaction to begin confirmation\n"
@@ -1039,7 +1039,7 @@ UniValue estimatefee(const JSONRPCRequest& request)
 UniValue estimatepriority(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
-        throw runtime_error(
+        throw std::runtime_error(
             "estimatepriority nblocks\n"
             "\nEstimates the approximate priority\n"
             "a zero-fee transaction needs to begin confirmation\n"

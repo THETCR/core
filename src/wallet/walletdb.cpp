@@ -79,7 +79,7 @@ void WalletBatch::LoadAutoConvertKeys(std::set<std::string>& setAddresses)
     setAddresses.clear();
     Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
-        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+        throw std::runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
     for (;;)
     {
@@ -95,7 +95,7 @@ void WalletBatch::LoadAutoConvertKeys(std::set<std::string>& setAddresses)
         else if (ret != 0)
         {
             pcursor->close();
-            throw runtime_error(std::string(__func__)+" : error scanning DB");
+            throw std::runtime_error(std::string(__func__)+" : error scanning DB");
         }
 
         // Unserialize
@@ -339,7 +339,7 @@ void WalletBatch::ListAccountCreditDebit(const std::string& strAccount, std::lis
 
     Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
-        throw runtime_error("WalletBatch::ListAccountCreditDebit() : cannot create DB cursor");
+        throw std::runtime_error("WalletBatch::ListAccountCreditDebit() : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
     while (true) {
         // Read next record
@@ -353,7 +353,7 @@ void WalletBatch::ListAccountCreditDebit(const std::string& strAccount, std::lis
             break;
         else if (ret != 0) {
             pcursor->close();
-            throw runtime_error("WalletBatch::ListAccountCreditDebit() : error scanning DB");
+            throw std::runtime_error("WalletBatch::ListAccountCreditDebit() : error scanning DB");
         }
 
         // Unserialize
@@ -1263,7 +1263,7 @@ std::map<uint256, std::vector<std::pair<uint256, uint32_t> > > WalletBatch::MapM
     std::map<uint256, std::vector<std::pair<uint256, uint32_t> > > mapPool;
     Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
-        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+        throw std::runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
     for (;;)
     {
@@ -1279,7 +1279,7 @@ std::map<uint256, std::vector<std::pair<uint256, uint32_t> > > WalletBatch::MapM
         else if (ret != 0)
         {
             pcursor->close();
-            throw runtime_error(std::string(__func__)+" : error scanning DB");
+            throw std::runtime_error(std::string(__func__)+" : error scanning DB");
         }
 
         // Unserialize
@@ -1319,7 +1319,7 @@ std::list<CDeterministicMint> WalletBatch::ListDeterministicMints()
     std::list<CDeterministicMint> listMints;
     Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
-        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+        throw std::runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
     for (;;)
     {
@@ -1335,7 +1335,7 @@ std::list<CDeterministicMint> WalletBatch::ListDeterministicMints()
         else if (ret != 0)
         {
             pcursor->close();
-            throw runtime_error(std::string(__func__)+" : error scanning DB");
+            throw std::runtime_error(std::string(__func__)+" : error scanning DB");
         }
 
         // Unserialize
@@ -1362,7 +1362,7 @@ std::list<CZerocoinMint> WalletBatch::ListMintedCoins()
     std::list<CZerocoinMint> listPubCoin;
     Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
-        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+        throw std::runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
     std::vector<CZerocoinMint> vOverWrite;
     std::vector<CZerocoinMint> vArchive;
@@ -1380,7 +1380,7 @@ std::list<CZerocoinMint> WalletBatch::ListMintedCoins()
         else if (ret != 0)
         {
             pcursor->close();
-            throw runtime_error(std::string(__func__)+" : error scanning DB");
+            throw std::runtime_error(std::string(__func__)+" : error scanning DB");
         }
 
         // Unserialize
@@ -1407,7 +1407,7 @@ std::list<CZerocoinSpend> WalletBatch::ListSpentCoins()
     std::list<CZerocoinSpend> listCoinSpend;
     Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
-        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+        throw std::runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
     for (;;)
     {
@@ -1423,7 +1423,7 @@ std::list<CZerocoinSpend> WalletBatch::ListSpentCoins()
         else if (ret != 0)
         {
             pcursor->close();
-            throw runtime_error(std::string(__func__)+" : error scanning DB");
+            throw std::runtime_error(std::string(__func__)+" : error scanning DB");
         }
 
         // Unserialize
@@ -1462,7 +1462,7 @@ std::list<CZerocoinMint> WalletBatch::ListArchivedZerocoins()
     std::list<CZerocoinMint> listMints;
     Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
-        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+        throw std::runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
     for (;;)
     {
@@ -1478,7 +1478,7 @@ std::list<CZerocoinMint> WalletBatch::ListArchivedZerocoins()
         else if (ret != 0)
         {
             pcursor->close();
-            throw runtime_error(std::string(__func__)+" : error scanning DB");
+            throw std::runtime_error(std::string(__func__)+" : error scanning DB");
         }
 
         // Unserialize
@@ -1505,7 +1505,7 @@ std::list<CDeterministicMint> WalletBatch::ListArchivedDeterministicMints()
     std::list<CDeterministicMint> listMints;
     Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
-        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+        throw std::runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
     for (;;)
     {
@@ -1521,7 +1521,7 @@ std::list<CDeterministicMint> WalletBatch::ListArchivedDeterministicMints()
         else if (ret != 0)
         {
             pcursor->close();
-            throw runtime_error(std::string(__func__)+" : error scanning DB");
+            throw std::runtime_error(std::string(__func__)+" : error scanning DB");
         }
 
         // Unserialize
@@ -1548,7 +1548,7 @@ void WalletBatch::LoadPrecomputes(std::list<std::pair<uint256, CoinWitnessCacheD
 
     Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
-        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+        throw std::runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
     for (;;)
     {
@@ -1564,7 +1564,7 @@ void WalletBatch::LoadPrecomputes(std::list<std::pair<uint256, CoinWitnessCacheD
         else if (ret != 0)
         {
             pcursor->close();
-            throw runtime_error(std::string(__func__)+" : error scanning precompute DB");
+            throw std::runtime_error(std::string(__func__)+" : error scanning precompute DB");
         }
 
         // Unserialize
@@ -1593,7 +1593,7 @@ void WalletBatch::LoadPrecomputes(set<uint256> setHashes)
 {
     Dbc* pcursor = m_batch.GetCursor();
     if (!pcursor)
-        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+        throw std::runtime_error(std::string(__func__)+" : cannot create DB cursor");
     unsigned int fFlags = DB_SET_RANGE;
     for (;;)
     {
@@ -1609,7 +1609,7 @@ void WalletBatch::LoadPrecomputes(set<uint256> setHashes)
         else if (ret != 0)
         {
             pcursor->close();
-            throw runtime_error(std::string(__func__)+" : error scanning precompute DB");
+            throw std::runtime_error(std::string(__func__)+" : error scanning precompute DB");
         }
 
         // Unserialize

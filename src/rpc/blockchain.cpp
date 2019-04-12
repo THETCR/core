@@ -1546,7 +1546,7 @@ static UniValue getchaintips(const JSONRPCRequest& request)
 UniValue getfeeinfo(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
-        throw runtime_error(
+        throw std::runtime_error(
             "getfeeinfo blocks\n"
             "\nReturns details of transaction fees over the last n blocks.\n"
 
@@ -2442,7 +2442,7 @@ UniValue scantxoutset(const JSONRPCRequest& request)
 UniValue findserial(const JSONRPCRequest& request)
 {
     if(request.fHelp || request.params.size() != 1)
-        throw runtime_error(
+        throw std::runtime_error(
             "findserial \"serial\"\n"
             "\nSearches the zerocoin database for a zerocoin spend transaction that contains the specified serial\n"
 
@@ -2476,7 +2476,7 @@ UniValue findserial(const JSONRPCRequest& request)
 UniValue getaccumulatorvalues(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)
-        throw runtime_error(
+        throw std::runtime_error(
             "getaccumulatorvalues \"height\"\n"
                     "\nReturns the accumulator values associated with a block height\n"
 
@@ -2510,7 +2510,7 @@ UniValue getaccumulatorvalues(const JSONRPCRequest& request)
 UniValue getaccumulatorwitness(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 2)
-        throw runtime_error(
+        throw std::runtime_error(
                 "getaccumulatorwitness \"commitmentCoinValue, coinDenomination\"\n"
                 "\nReturns the accumulator witness value associated with the coin\n"
 
@@ -2563,7 +2563,7 @@ UniValue getaccumulatorwitness(const JSONRPCRequest& request)
 
 UniValue getmintsinblocks(const JSONRPCRequest& request) {
     if (request.fHelp || request.params.size() != 3)
-        throw runtime_error(
+        throw std::runtime_error(
                 "getmintsinblocks \"height\" \"range\" \"coinDenomination\"\n"
                 "\nReturns the number of mints of a certain denomination"
                 "\noccurred in blocks [height, height+1, height+2, ..., height+range-1]\n"
@@ -2624,7 +2624,7 @@ UniValue getmintsinblocks(const JSONRPCRequest& request) {
 
 UniValue getserials(const JSONRPCRequest& request) {
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 3)
-        throw runtime_error(
+        throw std::runtime_error(
                 "getserials \"hash\"\n"
                 "\nLook the inputs of any tx in a range of blocks and returns the serial numbers for any coinspend.\n"
 

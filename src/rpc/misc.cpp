@@ -605,7 +605,7 @@ UniValue mnsync(const JSONRPCRequest& request)
         strMode = request.params[0].get_str();
 
     if (request.fHelp || request.params.size() != 1 || (strMode != "status" && strMode != "reset")) {
-        throw runtime_error(
+        throw std::runtime_error(
             "mnsync \"status|reset\"\n"
             "\nReturns the sync status or resets sync.\n"
 
@@ -705,7 +705,7 @@ UniValue spork(const JSONRPCRequest& request)
         }
     }
 
-    throw runtime_error(
+    throw std::runtime_error(
         "spork \"name\" ( value )\n"
         "\nReturn spork values or their active state.\n"
 
