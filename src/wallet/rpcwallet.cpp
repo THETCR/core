@@ -4731,7 +4731,7 @@ UniValue mintzerocoin(const JSONRPCRequest& request)
     }
 
     int64_t nTime = GetTimeMillis();
-    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
+    if(pwallet->chain().getAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
         throw JSONRPCError(RPC_WALLET_ERROR, "zWSP is currently disabled due to maintenance.");
 
     EnsureWalletIsUnlocked(pwallet, true);
@@ -4906,7 +4906,7 @@ UniValue spendzerocoin(const JSONRPCRequest& request)
     auto locked_chain = pwallet->chain().lock();
     LOCK(pwallet->cs_wallet);
 
-    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
+    if(pwallet->chain().getAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
         throw JSONRPCError(RPC_WALLET_ERROR, "zWSP is currently disabled due to maintenance.");
 
     EnsureWalletIsUnlocked(pwallet);
@@ -4969,7 +4969,7 @@ UniValue spendzerocoinmints(const JSONRPCRequest& request)
 
     LOCK(pwallet->cs_wallet);
 
-    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
+    if(pwallet->chain().getAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
         throw JSONRPCError(RPC_WALLET_ERROR, "zWSP is currently disabled due to maintenance.");
 
     std::string address_str = "";
@@ -5832,7 +5832,7 @@ UniValue spendrawzerocoin(const JSONRPCRequest& request)
 
     LOCK(pwallet->cs_wallet);
 
-    if (GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
+    if (pwallet->chain().getAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
         throw JSONRPCError(RPC_WALLET_ERROR, "zPIV is currently disabled due to maintenance.");
 
     CBigNum serial;
@@ -6190,7 +6190,7 @@ UniValue movecmd(const JSONRPCRequest& request)
     if (!walletdb.TxnBegin())
         throw JSONRPCError(RPC_DATABASE_ERROR, "database error");
 
-    int64_t nNow = GetAdjustedTime();
+    int64_t nNow = pwallet->chain().getAdjustedTime();
 
     // Debit
     CAccountingEntry debit;
@@ -7014,7 +7014,7 @@ UniValue createrawzerocoinstake(const JSONRPCRequest& request)
     assert(pwallet != nullptr);
     LOCK(pwallet->cs_wallet);
 
-    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
+    if(pwallet->chain().getAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
         throw JSONRPCError(RPC_WALLET_ERROR, "zPIV is currently disabled due to maintenance.");
 
     std::string serial_hash = request.params[0].get_str();
