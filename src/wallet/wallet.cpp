@@ -2572,7 +2572,7 @@ CWallet::Balance CWallet::GetBalance(const int min_depth) const
             ret.m_mine_immature += wtx.GetImmatureCredit(*locked_chain);
             ret.m_watchonly_immature += wtx.GetImmatureWatchOnlyCredit(*locked_chain);
         }
-        ret.m_zerocoin_trusted = GetZerocoinBalance(true);
+        ret.m_zerocoin_trusted = GetZerocoinBalance(false);
         ret.m_zerocoin_untrusted_pending = GetUnconfirmedZerocoinBalance();
         ret.m_zerocoin_immature = GetImmatureZerocoinBalance();
     }
