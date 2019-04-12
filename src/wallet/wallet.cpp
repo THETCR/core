@@ -2150,10 +2150,11 @@ bool CWalletTx::RelayWalletTransaction(interfaces::Chain::Lock& locked_chain, st
     pwallet->WalletLogPrintf("Relaying wtx %s\n", GetHash().ToString());
 
     if (strCommand == NetMsgType::TXLOCKREQUEST) {
-        mapTxLockReq.insert(std::make_pair(GetHash(), (CTransaction) * tx));
-        CreateNewLock(((CTransaction) * tx));
-        RelayTransactionLockReq((CTransaction) * tx,  g_connman.get(), true);
-        return true;
+        pwallet->chain().relayTransactionLock(GetHash(), tx);
+//        mapTxLockReq.insert(std::make_pair(GetHash(), (CTransaction) * tx));
+//        CreateNewLock(((CTransaction) * tx));
+//        RelayTransactionLockReq((CTransaction) * tx,  g_connman.get(), true);
+//        return true;
     }else{
         pwallet->chain().relayTransaction(GetHash());
     }

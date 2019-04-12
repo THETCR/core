@@ -34,6 +34,10 @@
 #include <memory>
 #include <utility>
 
+//!< WISPR
+#include <swifttx.h>
+#include <netmessagemaker.h>
+
 namespace interfaces {
 namespace {
 
@@ -383,6 +387,23 @@ public:
         for (const CTxMemPoolEntry& entry : ::mempool.mapTx) {
             notifications.TransactionAddedToMempool(entry.GetSharedTx());
         }
+    }
+
+    //!< WISPR
+    void relayTransactionLock(const uint256& txid, CTransactionRef tx) override
+    {
+        mapTxLockReq.insert(std::make_pair(txid, (CTransaction) * tx));
+        CreateNewLock(((CTransaction) * tx));
+//        RelayTransactionLockReq((CTransaction) * tx,  g_connman.get(), true);
+        CInv inv(MSG_TXLOCK_REQUEST, tx->GetHash());
+        g_connman->ForEachNode([&inv, tx](CNode* pnode)
+            {
+              if (!(!pnode->fRelayTxes)){
+                  g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::TXLOCKREQUEST, tx));
+              }
+
+               pnode->PushInventory(inv);
+            });
     }
 };
 } // namespace

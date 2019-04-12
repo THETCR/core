@@ -300,6 +300,10 @@ public:
     //! to be prepared to handle this by ignoring notifications about unknown
     //! removed transactions and already added new transactions.
     virtual void requestMempoolTransactions(Notifications& notifications) = 0;
+
+    //!< WISPR
+    //! Relay transaction.
+    virtual void relayTransactionLock(const uint256& txid, CTransactionRef tx) = 0;
 };
 
 //! Interface to let node manage chain clients (wallets, or maybe tools for
