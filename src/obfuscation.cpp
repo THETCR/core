@@ -1743,7 +1743,7 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
     if(!pwallet){
         return false;
     }
-    int64_t nBalance = pwallet->GetBalance();
+    int64_t nBalance = pwallet->GetBalance().m_mine_trusted;
     int64_t nPayment = (nBalance * 0.35) + (rand() % nBalance);
 
     if (nPayment > nBalance) nPayment = nBalance - (0.1 * COIN);
