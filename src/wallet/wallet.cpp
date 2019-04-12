@@ -65,6 +65,9 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread.hpp>
 
+//!<WISPR
+int64_t nReserveBalance = 0;
+
 /**
  * Settings
  */

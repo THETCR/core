@@ -305,7 +305,6 @@ bool fVerifyingBlocks = false;
 unsigned int nModifierInterval; // time to elapse before new modifier is computed
 unsigned int nStakeMinAge = 8 * 60 * 60;
 unsigned int nStakeMinAgeV2 = 60 * 60;
-int64_t nReserveBalance = 0;
 /***/
 CLightWorker lightWorker;
 //

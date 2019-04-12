@@ -41,6 +41,9 @@
 #include <utility>
 #include <vector>
 
+//!<WISPR
+extern int64_t nReserveBalance;
+
 
 /**
  * Settings
