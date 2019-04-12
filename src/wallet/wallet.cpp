@@ -6713,7 +6713,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     for (std::unique_ptr<CStakeInput>& stakeInput : listInputs) {
         nCredit = 0;
         // Make sure the wallet is unlocked and shutdown hasn't been requested
-        if (IsLocked() || ShutdownRequested())
+        if (IsLocked() || chain().shutdownRequested())
             return false;
 
         //make sure that enough time has elapsed between
@@ -8594,7 +8594,7 @@ void CWallet::PrecomputeSpends()
             continue;
         }
 
-        if (ShutdownRequested())
+        if (chain().shutdownRequested())
             break;
 
         while (IsLocked())
@@ -8613,7 +8613,7 @@ void CWallet::PrecomputeSpends()
         std::set <uint256> setInputHashes;
         auto locked_chain = chain().lock();
         for (std::unique_ptr <CStakeInput>& stakeInput : listInputs) {
-            if (ShutdownRequested() || IsLocked())
+            if (chain().shutdownRequested() || IsLocked())
                 break;
 
             CoinWitnessCacheData tempDataHolder;
@@ -8792,7 +8792,7 @@ void CWallet::PrecomputeSpends()
         }
 
         // On first load, and every 5 minutes write the cache to database
-        if (mapDirtyWitnessData.size() > PRECOMPUTE_MAX_DIRTY_CACHE_SIZE || nLastCacheWriteDB < GetTime() - PRECOMPUTE_FLUSH_TIME || ShutdownRequested()) {
+        if (mapDirtyWitnessData.size() > PRECOMPUTE_MAX_DIRTY_CACHE_SIZE || nLastCacheWriteDB < GetTime() - PRECOMPUTE_FLUSH_TIME || chain().shutdownRequested()) {
             // Save all cache data that was dirty back into the database
             for (auto item : mapDirtyWitnessData) {
                 walletdb.WritePrecompute(item.first, item.second);
@@ -8810,7 +8810,7 @@ void CWallet::PrecomputeSpends()
 
         fOnFirstLoad = false;
 
-        if (ShutdownRequested())
+        if (chain().shutdownRequested())
             break;
 
         LogPrint(BCLog::PRECOMPUTE, "%s: Finished precompute round...\n\n", __func__);

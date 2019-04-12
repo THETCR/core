@@ -344,6 +344,7 @@ libbitcoin_server_a_SOURCES = \
   shutdown.cpp \
   spork.cpp \
   sporkdb.cpp \
+  stakeinput.cpp \
   timedata.cpp \
   torcontrol.cpp \
   txdb.cpp \
@@ -399,7 +400,6 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/walletdb.cpp \
   wallet/walletutil.cpp \
   wallet/coinselection.cpp \
-  stakeinput.cpp \
   zpiv/deterministicmint.cpp \
   zpiv/mintpool.cpp \
   zpiv/witness.cpp \
