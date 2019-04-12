@@ -25,8 +25,6 @@
 #include <boost/assign/list_of.hpp>
 #include <openssl/rand.h>
 
-using namespace std;
-
 // The main object for accessing Obfuscation
 CObfuscationPool obfuScationPool;
 // A helper object for signing messages from Masternodes

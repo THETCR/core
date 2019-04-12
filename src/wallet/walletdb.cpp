@@ -86,7 +86,7 @@ void WalletBatch::LoadAutoConvertKeys(std::set<std::string>& setAddresses)
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(string("automint"), CKeyID());
+            ssKey << std::make_pair(string("automint"), CKeyID());
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = m_batch.ReadAtCursor(pcursor, ssKey, ssValue);
         fFlags = DB_NEXT;
@@ -1254,7 +1254,7 @@ bool WalletBatch::ReadZWSPCount(uint32_t& nCount)
 
 bool WalletBatch::WriteMintPoolPair(const uint256& hashMasterSeed, const uint256& hashPubcoin, const uint32_t& nCount)
 {
-    return WriteIC(std::make_pair(string("mintpool"), hashPubcoin), make_pair(hashMasterSeed, nCount));
+    return WriteIC(std::make_pair(string("mintpool"), hashPubcoin), std::make_pair(hashMasterSeed, nCount));
 }
 
 //! map with hashMasterSeed as the key, paired with vector of hashPubcoins and their count
@@ -1270,7 +1270,7 @@ std::map<uint256, std::vector<std::pair<uint256, uint32_t> > > WalletBatch::MapM
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(string("mintpool"), uint256(0));
+            ssKey << std::make_pair(string("mintpool"), uint256(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = m_batch.ReadAtCursor(pcursor, ssKey, ssValue);
         fFlags = DB_NEXT;
@@ -1326,7 +1326,7 @@ std::list<CDeterministicMint> WalletBatch::ListDeterministicMints()
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(string("dzwsp"), uint256(0));
+            ssKey << std::make_pair(string("dzwsp"), uint256(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = m_batch.ReadAtCursor(pcursor, ssKey, ssValue);
         fFlags = DB_NEXT;
@@ -1371,7 +1371,7 @@ std::list<CZerocoinMint> WalletBatch::ListMintedCoins()
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(string("zerocoin"), uint256(0));
+            ssKey << std::make_pair(string("zerocoin"), uint256(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = m_batch.ReadAtCursor(pcursor, ssKey, ssValue);
         fFlags = DB_NEXT;
@@ -1555,7 +1555,7 @@ void WalletBatch::LoadPrecomputes(std::list<std::pair<uint256, CoinWitnessCacheD
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(string("precompute"), uint256(0));
+            ssKey << std::make_pair(string("precompute"), uint256(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = m_batch.ReadAtCursor(pcursor, ssKey, ssValue);
         fFlags = DB_NEXT;
@@ -1580,7 +1580,7 @@ void WalletBatch::LoadPrecomputes(std::list<std::pair<uint256, CoinWitnessCacheD
         ssValue >> cacheData;
 
         itemList.push_front(std::make_pair(hash, cacheData));
-        itemMap.insert(make_pair(hash, itemList.begin()));
+        itemMap.insert(std::make_pair(hash, itemList.begin()));
 
         if (itemMap.size() == PRECOMPUTE_LRU_CACHE_SIZE)
             break;
@@ -1600,7 +1600,7 @@ void WalletBatch::LoadPrecomputes(set<uint256> setHashes)
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(string("precompute"), uint256(0));
+            ssKey << std::make_pair(string("precompute"), uint256(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = m_batch.ReadAtCursor(pcursor, ssKey, ssValue);
         fFlags = DB_NEXT;

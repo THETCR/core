@@ -15,7 +15,6 @@
 #include "obfuscation.h"
 #include "protocol.h"
 
-using namespace std;
 /*
     Don't ever reuse these IDs for other sporks
     - This would result in old clients getting confused about which spork is for what

@@ -10,7 +10,6 @@
 #include <validation.h>
 #include "walletmodel.h"
 
-using namespace std;
 using namespace libzerocoin;
 
 std::set<std::string> ZWspControlDialog::setSelectedMints;

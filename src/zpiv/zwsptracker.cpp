@@ -13,8 +13,6 @@
 #include <zpiv/zwspwallet.h>
 #include "witness.h"
 
-using namespace std;
-
 CzWSPTracker::CzWSPTracker(interfaces::Chain& chain, const WalletLocation& location, WalletDatabase& database, CWallet& pwallet) : m_chain(chain), m_location(location), database(database), pwallet(pwallet)
 {
     mapSerialHashes.clear();

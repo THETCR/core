@@ -18,8 +18,6 @@
 #include <util/moneystr.h>
 #include "zwspchain.h"
 
-using namespace std;
-
 bool fTestNet = false; //Params().NetworkID() == CBaseChainParams::TESTNET;
 
 // Modifier interval: time to elapse before new modifier is computed

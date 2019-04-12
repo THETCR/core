@@ -24,8 +24,6 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/thread.hpp>
 
-using namespace std;
-
 map<uint256, CAlert> mapAlerts;
 CCriticalSection cs_mapAlerts;
 

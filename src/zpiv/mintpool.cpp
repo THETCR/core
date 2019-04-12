@@ -5,8 +5,6 @@
 #include <zpiv/mintpool.h>
 #include <util/system.h>
 
-using namespace std;
-
 CMintPool::CMintPool()
 {
     this->nCountLastGenerated = 0;

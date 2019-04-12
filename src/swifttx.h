@@ -25,8 +25,6 @@
 #define SWIFTTX_SIGNATURES_REQUIRED 6
 #define SWIFTTX_SIGNATURES_TOTAL 10
 
-using namespace std;
-
 class CConsensusVote;
 class CTransaction;
 class CTransactionLock;

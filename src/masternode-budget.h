@@ -14,8 +14,6 @@
 #include <util/system.h>
 #include <fs.h>
 
-using namespace std;
-
 extern CCriticalSection cs_budget;
 
 class CBudgetManager;

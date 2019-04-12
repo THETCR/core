@@ -22,8 +22,6 @@
 #define MASTERNODE_REMOVAL_SECONDS (130 * 60)
 #define MASTERNODE_CHECK_SECONDS 5
 
-using namespace std;
-
 class CMasternode;
 class CMasternodeBroadcast;
 class CMasternodePing;

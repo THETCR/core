@@ -16,8 +16,6 @@
 #include "netmessagemaker.h"
 #include <util/system.h>
 
-using namespace std;
-
 class CSporkMessage;
 class CSporkManager;
 
