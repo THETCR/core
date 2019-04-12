@@ -6466,7 +6466,7 @@ bool CWallet::CreateTransaction(const std::vector<std::pair<CScript, CAmount> >&
                 if (coinControl && !coinControl->fSplitBlock) {
                     for (const std::pair<CScript, CAmount> & s: vecSend) {
                         CTxOut txout(s.second, s.first);
-                        if (IsDust(txout, ::minRelayTxFee)) {
+                        if (IsDust(txout, chain().relayMinFee())) {
                             strFailReason = _("Transaction amount too small");
                             return false;
                         }
@@ -6584,7 +6584,7 @@ bool CWallet::CreateTransaction(const std::vector<std::pair<CScript, CAmount> >&
 
                         // Never create dust outputs; if we would, just
                         // add the dust to the fee.
-                        if (IsDust(newTxOut, ::minRelayTxFee)) {
+                        if (IsDust(newTxOut, chain().relayMinFee())) {
                             nFeeRet += nChange;
                             nChange = 0;
                             reservekey.ReturnKey();
@@ -6639,7 +6639,7 @@ bool CWallet::CreateTransaction(const std::vector<std::pair<CScript, CAmount> >&
 
                 // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
                 // because we must be at the maximum allowed fee.
-                if (nFeeNeeded < ::minRelayTxFee.GetFee(nBytes)) {
+                if (nFeeNeeded < chain().relayMinFee().GetFee(nBytes)) {
                     strFailReason = _("Transaction too large for fee policy");
                     return false;
                 }
