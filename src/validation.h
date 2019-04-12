@@ -190,15 +190,12 @@ static const bool DEFAULT_PEERBLOOMFILTERS_ZC = false;
 
 extern bool fAlerts;
 extern bool fVerifyingBlocks;
-extern bool fClearSpendCache;
 
 //extern bool fLargeWorkForkFound; moved to warnings
 //extern bool fLargeWorkInvalidChainFound;
 
 extern unsigned int nStakeMinAge;
 extern unsigned int nStakeMinAgeV2;
-extern int64_t nLastCoinStakeSearchInterval;
-extern int64_t nLastCoinStakeSearchTime;
 
 extern std::map<uint256, int64_t> mapRejectedBlocks;
 extern std::map<unsigned int, unsigned int> mapHashedBlocks;

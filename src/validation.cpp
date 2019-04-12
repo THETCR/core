@@ -300,7 +300,6 @@ set<pair<COutPoint, unsigned int> > setStakeSeen;
 map<COutPoint, int> mapStakeSpent;
 map<unsigned int, unsigned int> mapHashedBlocks;
 bool fAlerts = DEFAULT_ALERTS;
-bool fClearSpendCache = false;
 bool fVerifyingBlocks = false;
 unsigned int nModifierInterval; // time to elapse before new modifier is computed
 unsigned int nStakeMinAge = 8 * 60 * 60;

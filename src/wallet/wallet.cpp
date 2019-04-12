@@ -67,6 +67,7 @@
 
 //!<WISPR
 int64_t nReserveBalance = 0;
+bool fClearSpendCache = false;
 
 /**
  * Settings

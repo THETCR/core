@@ -43,6 +43,9 @@
 
 //!<WISPR
 extern int64_t nReserveBalance;
+extern bool fClearSpendCache;
+extern int64_t nLastCoinStakeSearchInterval;
+extern int64_t nLastCoinStakeSearchTime;
 
 
 /**
