@@ -342,6 +342,8 @@ libbitcoin_server_a_SOURCES = \
   rpc/server.cpp \
   script/sigcache.cpp \
   shutdown.cpp \
+  spork.cpp \
+  sporkdb.cpp \
   timedata.cpp \
   torcontrol.cpp \
   txdb.cpp \
@@ -560,12 +562,8 @@ libbitcoin_common_a_SOURCES = \
   script/sign.cpp \
   script/standard.cpp \
   versionbitsinfo.cpp \
-  spork.cpp \
-  sporkdb.cpp \
   warnings.cpp \
-  zpiv/accumulators.cpp \
   zpiv/accumulatorcheckpoints.cpp \
-  zpiv/accumulatormap.cpp \
   zpiv/deterministicmint.cpp \
   zpiv/zerocoin.cpp \
   $(BITCOIN_CORE_H)
