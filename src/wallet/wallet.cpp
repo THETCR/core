@@ -841,7 +841,7 @@ void CWallet::AddToSpends(const uint256& wtxid)
 bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& keyRet, std::string strTxHash, std::string strOutputIndex)
 {
     // wait for reindex and/or import to finish
-    if (fImporting || fReindex) return false;
+    if (!chain().isReadyToBroadcast()) return false;
 
     // Find possible candidates
     auto locked_chain = chain().lock();
@@ -877,7 +877,7 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
 bool CWallet::GetVinAndKeysFromOutput(COutput out, CTxIn& txinRet, CPubKey& pubKeyRet, CKey& keyRet)
 {
     // wait for reindex and/or import to finish
-    if (fImporting || fReindex) return false;
+    if (!chain().isReadyToBroadcast()) return false;
 
     CScript pubScript;
 
