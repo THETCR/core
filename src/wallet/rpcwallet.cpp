@@ -5787,7 +5787,7 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
     if (pwallet) {
         obj.pushKV("walletunlocked", !pwallet->IsLocked());
         obj.pushKV("mintablecoins", pwallet->MintableCoins());
-        obj.pushKV("enoughcoins", nReserveBalance <= pwallet->GetBalance());
+        obj.pushKV("enoughcoins", nReserveBalance <= pwallet->GetBalance().m_mine_trusted);
     }
     obj.pushKV("mnsync", masternodeSync.IsSynced());
 
@@ -6638,7 +6638,7 @@ UniValue getinfo(const JSONRPCRequest& request)
 #ifdef ENABLE_WALLET
     if (pwallet) {
         obj.pushKV("walletversion", pwallet->GetVersion());
-        obj.pushKV("balance", ValueFromAmount(pwallet->GetBalance()));
+        obj.pushKV("balance", ValueFromAmount(pwallet->GetBalance().m_mine_trusted));
         obj.pushKV("zerocoinbalance", ValueFromAmount(pwallet->GetZerocoinBalance(true)));
     }
 #endif
