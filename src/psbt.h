@@ -7,6 +7,8 @@
 
 #include <attributes.h>
 #include <node/transaction.h>
+#include <optional.h>
+#include <policy/feerate.h>
 #include <primitives/transaction.h>
 #include <pubkey.h>
 #include <script/sign.h>
@@ -142,112 +144,112 @@ struct PSBTInput
 
             // Do stuff based on type
             switch(type) {
-                case PSBT_IN_NON_WITNESS_UTXO:
-                {
-                    if (non_witness_utxo) {
-                        throw std::ios_base::failure("Duplicate Key, input non-witness utxo already provided");
-                    } else if (key.size() != 1) {
-                        throw std::ios_base::failure("Non-witness utxo key is more than one byte type");
-                    }
-                    // Set the stream to unserialize with witness since this is always a valid network transaction
-                    OverrideStream<Stream> os(&s, s.GetType(), s.GetVersion() & ~SERIALIZE_TRANSACTION_NO_WITNESS);
-                    UnserializeFromVector(os, non_witness_utxo);
-                    break;
+            case PSBT_IN_NON_WITNESS_UTXO:
+            {
+                if (non_witness_utxo) {
+                    throw std::ios_base::failure("Duplicate Key, input non-witness utxo already provided");
+                } else if (key.size() != 1) {
+                    throw std::ios_base::failure("Non-witness utxo key is more than one byte type");
                 }
-                case PSBT_IN_WITNESS_UTXO:
-                    if (!witness_utxo.IsNull()) {
-                        throw std::ios_base::failure("Duplicate Key, input witness utxo already provided");
-                    } else if (key.size() != 1) {
-                        throw std::ios_base::failure("Witness utxo key is more than one byte type");
-                    }
-                    UnserializeFromVector(s, witness_utxo);
-                    break;
-                case PSBT_IN_PARTIAL_SIG:
-                {
-                    // Make sure that the key is the size of pubkey + 1
-                    if (key.size() != CPubKey::PUBLIC_KEY_SIZE + 1 && key.size() != CPubKey::COMPRESSED_PUBLIC_KEY_SIZE + 1) {
-                        throw std::ios_base::failure("Size of key was not the expected size for the type partial signature pubkey");
-                    }
-                    // Read in the pubkey from key
-                    CPubKey pubkey(key.begin() + 1, key.end());
-                    if (!pubkey.IsFullyValid()) {
-                       throw std::ios_base::failure("Invalid pubkey");
-                    }
-                    if (partial_sigs.count(pubkey.GetID()) > 0) {
-                        throw std::ios_base::failure("Duplicate Key, input partial signature for pubkey already provided");
-                    }
+                // Set the stream to unserialize with witness since this is always a valid network transaction
+                OverrideStream<Stream> os(&s, s.GetType(), s.GetVersion() & ~SERIALIZE_TRANSACTION_NO_WITNESS);
+                UnserializeFromVector(os, non_witness_utxo);
+                break;
+            }
+            case PSBT_IN_WITNESS_UTXO:
+                if (!witness_utxo.IsNull()) {
+                    throw std::ios_base::failure("Duplicate Key, input witness utxo already provided");
+                } else if (key.size() != 1) {
+                    throw std::ios_base::failure("Witness utxo key is more than one byte type");
+                }
+                UnserializeFromVector(s, witness_utxo);
+                break;
+            case PSBT_IN_PARTIAL_SIG:
+            {
+                // Make sure that the key is the size of pubkey + 1
+                if (key.size() != CPubKey::PUBLIC_KEY_SIZE + 1 && key.size() != CPubKey::COMPRESSED_PUBLIC_KEY_SIZE + 1) {
+                    throw std::ios_base::failure("Size of key was not the expected size for the type partial signature pubkey");
+                }
+                // Read in the pubkey from key
+                CPubKey pubkey(key.begin() + 1, key.end());
+                if (!pubkey.IsFullyValid()) {
+                    throw std::ios_base::failure("Invalid pubkey");
+                }
+                if (partial_sigs.count(pubkey.GetID()) > 0) {
+                    throw std::ios_base::failure("Duplicate Key, input partial signature for pubkey already provided");
+                }
 
-                    // Read in the signature from value
-                    std::vector<unsigned char> sig;
-                    s >> sig;
+                // Read in the signature from value
+                std::vector<unsigned char> sig;
+                s >> sig;
 
-                    // Add to list
-                    partial_sigs.emplace(pubkey.GetID(), SigPair(pubkey, std::move(sig)));
-                    break;
+                // Add to list
+                partial_sigs.emplace(pubkey.GetID(), SigPair(pubkey, std::move(sig)));
+                break;
+            }
+            case PSBT_IN_SIGHASH:
+                if (sighash_type > 0) {
+                    throw std::ios_base::failure("Duplicate Key, input sighash type already provided");
+                } else if (key.size() != 1) {
+                    throw std::ios_base::failure("Sighash type key is more than one byte type");
                 }
-                case PSBT_IN_SIGHASH:
-                    if (sighash_type > 0) {
-                        throw std::ios_base::failure("Duplicate Key, input sighash type already provided");
-                    } else if (key.size() != 1) {
-                        throw std::ios_base::failure("Sighash type key is more than one byte type");
-                    }
-                    UnserializeFromVector(s, sighash_type);
-                    break;
-                case PSBT_IN_REDEEMSCRIPT:
-                {
-                    if (!redeem_script.empty()) {
-                        throw std::ios_base::failure("Duplicate Key, input redeemScript already provided");
-                    } else if (key.size() != 1) {
-                        throw std::ios_base::failure("Input redeemScript key is more than one byte type");
-                    }
-                    s >> redeem_script;
-                    break;
+                UnserializeFromVector(s, sighash_type);
+                break;
+            case PSBT_IN_REDEEMSCRIPT:
+            {
+                if (!redeem_script.empty()) {
+                    throw std::ios_base::failure("Duplicate Key, input redeemScript already provided");
+                } else if (key.size() != 1) {
+                    throw std::ios_base::failure("Input redeemScript key is more than one byte type");
                 }
-                case PSBT_IN_WITNESSSCRIPT:
-                {
-                    if (!witness_script.empty()) {
-                        throw std::ios_base::failure("Duplicate Key, input witnessScript already provided");
-                    } else if (key.size() != 1) {
-                        throw std::ios_base::failure("Input witnessScript key is more than one byte type");
-                    }
-                    s >> witness_script;
-                    break;
+                s >> redeem_script;
+                break;
+            }
+            case PSBT_IN_WITNESSSCRIPT:
+            {
+                if (!witness_script.empty()) {
+                    throw std::ios_base::failure("Duplicate Key, input witnessScript already provided");
+                } else if (key.size() != 1) {
+                    throw std::ios_base::failure("Input witnessScript key is more than one byte type");
                 }
-                case PSBT_IN_BIP32_DERIVATION:
-                {
-                    DeserializeHDKeypaths(s, key, hd_keypaths);
-                    break;
+                s >> witness_script;
+                break;
+            }
+            case PSBT_IN_BIP32_DERIVATION:
+            {
+                DeserializeHDKeypaths(s, key, hd_keypaths);
+                break;
+            }
+            case PSBT_IN_SCRIPTSIG:
+            {
+                if (!final_script_sig.empty()) {
+                    throw std::ios_base::failure("Duplicate Key, input final scriptSig already provided");
+                } else if (key.size() != 1) {
+                    throw std::ios_base::failure("Final scriptSig key is more than one byte type");
                 }
-                case PSBT_IN_SCRIPTSIG:
-                {
-                    if (!final_script_sig.empty()) {
-                        throw std::ios_base::failure("Duplicate Key, input final scriptSig already provided");
-                    } else if (key.size() != 1) {
-                        throw std::ios_base::failure("Final scriptSig key is more than one byte type");
-                    }
-                    s >> final_script_sig;
-                    break;
+                s >> final_script_sig;
+                break;
+            }
+            case PSBT_IN_SCRIPTWITNESS:
+            {
+                if (!final_script_witness.IsNull()) {
+                    throw std::ios_base::failure("Duplicate Key, input final scriptWitness already provided");
+                } else if (key.size() != 1) {
+                    throw std::ios_base::failure("Final scriptWitness key is more than one byte type");
                 }
-                case PSBT_IN_SCRIPTWITNESS:
-                {
-                    if (!final_script_witness.IsNull()) {
-                        throw std::ios_base::failure("Duplicate Key, input final scriptWitness already provided");
-                    } else if (key.size() != 1) {
-                        throw std::ios_base::failure("Final scriptWitness key is more than one byte type");
-                    }
-                    UnserializeFromVector(s, final_script_witness.stack);
-                    break;
-                }
+                UnserializeFromVector(s, final_script_witness.stack);
+                break;
+            }
                 // Unknown stuff
-                default:
-                    if (unknown.count(key) > 0) {
-                        throw std::ios_base::failure("Duplicate Key, key for unknown value already provided");
-                    }
-                    // Read in the value
-                    std::vector<unsigned char> val_bytes;
-                    s >> val_bytes;
-                    unknown.emplace(std::move(key), std::move(val_bytes));
-                    break;
+            default:
+                if (unknown.count(key) > 0) {
+                    throw std::ios_base::failure("Duplicate Key, key for unknown value already provided");
+                }
+                // Read in the value
+                std::vector<unsigned char> val_bytes;
+                s >> val_bytes;
+                unknown.emplace(std::move(key), std::move(val_bytes));
+                break;
             }
         }
 
@@ -325,42 +327,42 @@ struct PSBTOutput
 
             // Do stuff based on type
             switch(type) {
-                case PSBT_OUT_REDEEMSCRIPT:
-                {
-                    if (!redeem_script.empty()) {
-                        throw std::ios_base::failure("Duplicate Key, output redeemScript already provided");
-                    } else if (key.size() != 1) {
-                        throw std::ios_base::failure("Output redeemScript key is more than one byte type");
-                    }
-                    s >> redeem_script;
-                    break;
+            case PSBT_OUT_REDEEMSCRIPT:
+            {
+                if (!redeem_script.empty()) {
+                    throw std::ios_base::failure("Duplicate Key, output redeemScript already provided");
+                } else if (key.size() != 1) {
+                    throw std::ios_base::failure("Output redeemScript key is more than one byte type");
                 }
-                case PSBT_OUT_WITNESSSCRIPT:
-                {
-                    if (!witness_script.empty()) {
-                        throw std::ios_base::failure("Duplicate Key, output witnessScript already provided");
-                    } else if (key.size() != 1) {
-                        throw std::ios_base::failure("Output witnessScript key is more than one byte type");
-                    }
-                    s >> witness_script;
-                    break;
+                s >> redeem_script;
+                break;
+            }
+            case PSBT_OUT_WITNESSSCRIPT:
+            {
+                if (!witness_script.empty()) {
+                    throw std::ios_base::failure("Duplicate Key, output witnessScript already provided");
+                } else if (key.size() != 1) {
+                    throw std::ios_base::failure("Output witnessScript key is more than one byte type");
                 }
-                case PSBT_OUT_BIP32_DERIVATION:
-                {
-                    DeserializeHDKeypaths(s, key, hd_keypaths);
-                    break;
-                }
+                s >> witness_script;
+                break;
+            }
+            case PSBT_OUT_BIP32_DERIVATION:
+            {
+                DeserializeHDKeypaths(s, key, hd_keypaths);
+                break;
+            }
                 // Unknown stuff
-                default: {
-                    if (unknown.count(key) > 0) {
-                        throw std::ios_base::failure("Duplicate Key, key for unknown value already provided");
-                    }
-                    // Read in the value
-                    std::vector<unsigned char> val_bytes;
-                    s >> val_bytes;
-                    unknown.emplace(std::move(key), std::move(val_bytes));
-                    break;
+            default: {
+                if (unknown.count(key) > 0) {
+                    throw std::ios_base::failure("Duplicate Key, key for unknown value already provided");
                 }
+                // Read in the value
+                std::vector<unsigned char> val_bytes;
+                s >> val_bytes;
+                unknown.emplace(std::move(key), std::move(val_bytes));
+                break;
+            }
             }
         }
 
@@ -464,36 +466,36 @@ struct PartiallySignedTransaction
 
             // Do stuff based on type
             switch(type) {
-                case PSBT_GLOBAL_UNSIGNED_TX:
-                {
-                    if (tx) {
-                        throw std::ios_base::failure("Duplicate Key, unsigned tx already provided");
-                    } else if (key.size() != 1) {
-                        throw std::ios_base::failure("Global unsigned tx key is more than one byte type");
-                    }
-                    CMutableTransaction mtx;
-                    // Set the stream to serialize with non-witness since this should always be non-witness
-                    OverrideStream<Stream> os(&s, s.GetType(), s.GetVersion() | SERIALIZE_TRANSACTION_NO_WITNESS);
-                    UnserializeFromVector(os, mtx);
-                    tx = std::move(mtx);
-                    // Make sure that all scriptSigs and scriptWitnesses are empty
-                    for (const CTxIn& txin : tx->vin) {
-                        if (!txin.scriptSig.empty() || !txin.scriptWitness.IsNull()) {
-                            throw std::ios_base::failure("Unsigned tx does not have empty scriptSigs and scriptWitnesses.");
-                        }
-                    }
-                    break;
+            case PSBT_GLOBAL_UNSIGNED_TX:
+            {
+                if (tx) {
+                    throw std::ios_base::failure("Duplicate Key, unsigned tx already provided");
+                } else if (key.size() != 1) {
+                    throw std::ios_base::failure("Global unsigned tx key is more than one byte type");
                 }
+                CMutableTransaction mtx;
+                // Set the stream to serialize with non-witness since this should always be non-witness
+                OverrideStream<Stream> os(&s, s.GetType(), s.GetVersion() | SERIALIZE_TRANSACTION_NO_WITNESS);
+                UnserializeFromVector(os, mtx);
+                tx = std::move(mtx);
+                // Make sure that all scriptSigs and scriptWitnesses are empty
+                for (const CTxIn& txin : tx->vin) {
+                    if (!txin.scriptSig.empty() || !txin.scriptWitness.IsNull()) {
+                        throw std::ios_base::failure("Unsigned tx does not have empty scriptSigs and scriptWitnesses.");
+                    }
+                }
+                break;
+            }
                 // Unknown stuff
-                default: {
-                    if (unknown.count(key) > 0) {
-                        throw std::ios_base::failure("Duplicate Key, key for unknown value already provided");
-                    }
-                    // Read in the value
-                    std::vector<unsigned char> val_bytes;
-                    s >> val_bytes;
-                    unknown.emplace(std::move(key), std::move(val_bytes));
+            default: {
+                if (unknown.count(key) > 0) {
+                    throw std::ios_base::failure("Duplicate Key, key for unknown value already provided");
                 }
+                // Read in the value
+                std::vector<unsigned char> val_bytes;
+                s >> val_bytes;
+                unknown.emplace(std::move(key), std::move(val_bytes));
+            }
             }
         }
 
@@ -548,8 +550,17 @@ struct PartiallySignedTransaction
     }
 };
 
+enum class PSBTRole {
+    UPDATER,
+    SIGNER,
+    FINALIZER,
+    EXTRACTOR
+};
+
+std::string PSBTRoleName(PSBTRole role);
+
 /** Checks whether a PSBTInput is already signed. */
-bool PSBTInputSigned(PSBTInput& input);
+bool PSBTInputSigned(const PSBTInput& input);
 
 /** Signs a PSBTInput, verifying that all provided data matches what is being signed. */
 bool SignPSBTInput(const SigningProvider& provider, PartiallySignedTransaction& psbt, int index, int sighash = SIGHASH_ALL, SignatureData* out_sigdata = nullptr, bool use_dummy = false);
@@ -579,5 +590,10 @@ bool FinalizeAndExtractPSBT(PartiallySignedTransaction& psbtx, CMutableTransacti
  * @return error (OK if we successfully combined the transactions, other error if they were not compatible)
  */
 NODISCARD TransactionError CombinePSBTs(PartiallySignedTransaction& out, const std::vector<PartiallySignedTransaction>& psbtxs);
+
+//! Decode a base64ed PSBT into a PartiallySignedTransaction
+NODISCARD bool DecodeBase64PSBT(PartiallySignedTransaction& decoded_psbt, const std::string& base64_psbt, std::string& error);
+//! Decode a raw (binary blob) PSBT into a PartiallySignedTransaction
+NODISCARD bool DecodeRawPSBT(PartiallySignedTransaction& decoded_psbt, const std::string& raw_psbt, std::string& error);
 
 #endif // BITCOIN_PSBT_H

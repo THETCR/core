@@ -31,7 +31,11 @@
 #include <timedata.h>
 #include <txmempool.h>
 #include <util/bip32.h>
+#include <util/error.h>
+#include <util/fees.h>
 #include <util/moneystr.h>
+#include <util/rbf.h>
+#include <util/validation.h>
 #include <wallet/fees.h>
 
 //!WISPR
@@ -1453,10 +1457,13 @@ void CWallet::BlockDisconnected(const CBlock& block) {
     }
 }
 
+void CWallet::UpdatedBlockTip()
+{
+    m_best_block_time = GetTime();
+}
 
 
 void CWallet::BlockUntilSyncedToCurrentChain() {
-    AssertLockNotHeld(cs_main);
     AssertLockNotHeld(cs_wallet);
 
     {
@@ -2122,28 +2129,35 @@ void CWallet::ReacceptWalletTransactions(interfaces::Chain::Lock& locked_chain)
 
 bool CWalletTx::RelayWalletTransaction(interfaces::Chain::Lock& locked_chain, std::string strCommand)
 {
-    assert(pwallet->GetBroadcastTransactions());
-    if (!IsCoinBase() && !isAbandoned() && GetDepthInMainChain(locked_chain) == 0)
-    {
-        CValidationState state;
-        /* GetDepthInMainChain already catches known conflicts. */
-        if (InMempool() || AcceptToMemoryPool(locked_chain, state)) {
-            pwallet->WalletLogPrintf("Relaying wtx %s\n", GetHash().ToString());
-            if (strCommand == NetMsgType::TXLOCKREQUEST) {
-                mapTxLockReq.insert(std::make_pair(GetHash(), (CTransaction) * tx));
-                CreateNewLock(((CTransaction) * tx));
-                RelayTransactionLockReq((CTransaction) * tx,  g_connman.get(), true);
-                return true;
-            } else {
-                if (pwallet->chain().p2pEnabled()) {
-                    pwallet->chain().relayTransaction(GetHash());
-                    return true;
-                }
-            }
-        }
+    // Can't relay if wallet is not broadcasting
+    if (!pwallet->GetBroadcastTransactions()) return false;
+    // Don't relay coinbase transactions outside blocks
+    if (IsCoinBase()) return false;
+    // Don't relay abandoned transactions
+    if (isAbandoned()) return false;
+    // Don't relay conflicted or already confirmed transactions
+    if (GetDepthInMainChain(locked_chain) != 0) return false;
+    // Don't relay transactions that aren't accepted to the mempool
+    CValidationState unused_state;
+    if (!InMempool() && !AcceptToMemoryPool(locked_chain, unused_state)) return false;
+    // Don't try to relay if the node is not connected to the p2p network
+    if (!pwallet->chain().p2pEnabled()) return false;
+
+    // Try to relay the transaction
+    pwallet->WalletLogPrintf("Relaying wtx %s\n", GetHash().ToString());
+
+    if (strCommand == NetMsgType::TXLOCKREQUEST) {
+        mapTxLockReq.insert(std::make_pair(GetHash(), (CTransaction) * tx));
+        CreateNewLock(((CTransaction) * tx));
+        RelayTransactionLockReq((CTransaction) * tx,  g_connman.get(), true);
+        return true;
+    }else{
+        pwallet->chain().relayTransaction(GetHash());
     }
-    return false;
+
+    return true;
 }
+
 bool CWalletTx::RelayWalletTransaction(std::string strCommand)
 {
     return RelayWalletTransaction(*pwallet->chain().lock(), strCommand);
@@ -2350,8 +2364,21 @@ bool CWalletTx::IsEquivalentTo(const CWalletTx& _tx) const
         return CTransaction(tx1) == CTransaction(tx2);
 }
 
-void CWallet::ResendWalletTransactions(interfaces::Chain::Lock& locked_chain, int64_t nBestBlockTime)
+// Rebroadcast transactions from the wallet. We do this on a random timer
+// to slightly obfuscate which transactions come from our wallet.
+//
+// Ideally, we'd only resend transactions that we think should have been
+// mined in the most recent block. Any transaction that wasn't in the top
+// blockweight of transactions in the mempool shouldn't have been mined,
+// and so is probably just sitting in the mempool waiting to be confirmed.
+// Rebroadcasting does nothing to speed up confirmation and only damages
+// privacy.
+void CWallet::ResendWalletTransactions()
 {
+    // During reindex, importing and IBD, old wallet transactions become
+    // unconfirmed. Don't resend them as that would spam other nodes.
+    if (!chain().isReadyToBroadcast()) return;
+
     // Do this infrequently and randomly to avoid giving away
     // that these are our transactions.
     if (GetTime() < nNextResend || !fBroadcastTransactions) return;
@@ -2360,12 +2387,13 @@ void CWallet::ResendWalletTransactions(interfaces::Chain::Lock& locked_chain, in
     if (fFirst) return;
 
     // Only do it if there's been a new block since last time
-    if (nBestBlockTime < nLastResend) return;
+    if (m_best_block_time < nLastResend) return;
     nLastResend = GetTime();
 
     int relayed_tx_count = 0;
 
-    { // cs_wallet scope
+    { // locked_chain and cs_wallet scope
+        auto locked_chain = chain().lock();
         LOCK(cs_wallet);
 
         // Relay transactions
@@ -2373,10 +2401,10 @@ void CWallet::ResendWalletTransactions(interfaces::Chain::Lock& locked_chain, in
             CWalletTx& wtx = item.second;
             // only rebroadcast unconfirmed txes older than 5 minutes before the
             // last block was found
-            if (wtx.nTimeReceived > nBestBlockTime - 5 * 60) continue;
-            relayed_tx_count += wtx.RelayWalletTransaction(locked_chain) ? 1 : 0;
+            if (wtx.nTimeReceived > m_best_block_time - 5 * 60) continue;
+            if (wtx.RelayWalletTransaction(*locked_chain)) ++relayed_tx_count;
         }
-    } // cs_wallet
+    } // locked_chain and cs_wallet
 
     if (relayed_tx_count > 0) {
         WalletLogPrintf("%s: rebroadcast %u unconfirmed transactions\n", __func__, relayed_tx_count);
@@ -2385,6 +2413,12 @@ void CWallet::ResendWalletTransactions(interfaces::Chain::Lock& locked_chain, in
 
 /** @} */ // end of mapWallet
 
+void MaybeResendWalletTxs()
+{
+    for (const std::shared_ptr<CWallet>& pwallet : GetWallets()) {
+        pwallet->ResendWalletTransactions();
+    }
+}
 
 
 
@@ -2394,23 +2428,23 @@ void CWallet::ResendWalletTransactions(interfaces::Chain::Lock& locked_chain, in
  */
 
 
-CAmount CWallet::GetBalance(const isminefilter& filter, const int min_depth) const
-{
-    CAmount nTotal = 0;
-    {
-        auto locked_chain = chain().lock();
-        LOCK(cs_wallet);
-        for (const auto& entry : mapWallet)
-        {
-            const CWalletTx* pcoin = &entry.second;
-            if (pcoin->IsTrusted(*locked_chain) && pcoin->GetDepthInMainChain(*locked_chain) >= min_depth) {
-                nTotal += pcoin->GetAvailableCredit(*locked_chain, true, filter);
-            }
-        }
-    }
-
-    return nTotal;
-}
+//CAmount CWallet::GetBalance(const isminefilter& filter, const int min_depth) const
+//{
+//    CAmount nTotal = 0;
+//    {
+//        auto locked_chain = chain().lock();
+//        LOCK(cs_wallet);
+//        for (const auto& entry : mapWallet)
+//        {
+//            const CWalletTx* pcoin = &entry.second;
+//            if (pcoin->IsTrusted(*locked_chain) && pcoin->GetDepthInMainChain(*locked_chain) >= min_depth) {
+//                nTotal += pcoin->GetAvailableCredit(*locked_chain, true, filter);
+//            }
+//        }
+//    }
+//
+//    return nTotal;
+//}
 
 CAmount CWallet::GetUnconfirmedBalance() const
 {
@@ -2512,6 +2546,37 @@ CAmount CWallet::GetLegacyBalance(const isminefilter& filter, int minDepth) cons
     }
 
     return balance;
+}
+//TODO Remove above CAmount functions
+CWallet::Balance CWallet::GetBalance(const int min_depth) const
+{
+    Balance ret;
+    {
+        auto locked_chain = chain().lock();
+        LOCK(cs_wallet);
+        for (const auto& entry : mapWallet)
+        {
+            const CWalletTx& wtx = entry.second;
+            const bool is_trusted{wtx.IsTrusted(*locked_chain)};
+            const int tx_depth{wtx.GetDepthInMainChain(*locked_chain)};
+            const CAmount tx_credit_mine{wtx.GetAvailableCredit(*locked_chain, /* fUseCache */ true, ISMINE_SPENDABLE)};
+            const CAmount tx_credit_watchonly{wtx.GetAvailableCredit(*locked_chain, /* fUseCache */ true, ISMINE_WATCH_ONLY)};
+            if (is_trusted && tx_depth >= min_depth) {
+                ret.m_mine_trusted += tx_credit_mine;
+                ret.m_watchonly_trusted += tx_credit_watchonly;
+            }
+            if (!is_trusted && tx_depth == 0 && wtx.InMempool()) {
+                ret.m_mine_untrusted_pending += tx_credit_mine;
+                ret.m_watchonly_untrusted_pending += tx_credit_watchonly;
+            }
+            ret.m_mine_immature += wtx.GetImmatureCredit(*locked_chain);
+            ret.m_watchonly_immature += wtx.GetImmatureWatchOnlyCredit(*locked_chain);
+        }
+        ret.m_zerocoin_trusted = GetZerocoinBalance(true);
+        ret.m_zerocoin_untrusted_pending = GetUnconfirmedZerocoinBalance();
+        ret.m_zerocoin_immature = GetImmatureZerocoinBalance();
+    }
+    return ret;
 }
 
 CAmount CWallet::GetAvailableBalance(const CCoinControl* coinControl) const
@@ -3444,7 +3509,6 @@ bool CWallet::CommitTransaction(CTransactionRef tx, mapValue_t mapValue, std::ve
 
 DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
 {
-    auto locked_chain = chain().lock();
     LOCK(cs_wallet);
 
     fFirstRunRet = false;
@@ -4309,7 +4373,7 @@ bool CWallet::Verify(interfaces::Chain& chain, const WalletLocation& location, b
 
     if (salvage_wallet) {
         // Recover readable keypairs:
-        CWallet dummyWallet(chain, WalletLocation(), WalletDatabase::CreateDummy());
+        CWallet dummyWallet(&chain, WalletLocation(), WalletDatabase::CreateDummy());
         std::string backup_filename;
         if (!WalletBatch::Recover(wallet_path, (void *)&dummyWallet, WalletBatch::RecoverKeysOnlyFilter, backup_filename)) {
             return false;
@@ -4329,7 +4393,7 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
     if (gArgs.GetBoolArg("-zapwallettxes", false)) {
         chain.initMessage(_("Zapping all transactions from wallet..."));
 
-        std::unique_ptr<CWallet> tempWallet = MakeUnique<CWallet>(chain, location, WalletDatabase::Create(location.GetPath()));
+        std::unique_ptr<CWallet> tempWallet = MakeUnique<CWallet>(&chain, location, WalletDatabase::Create(location.GetPath()));
         DBErrors nZapWalletRet = tempWallet->ZapWalletTx(vWtx);
         if (nZapWalletRet != DBErrors::LOAD_OK) {
             chain.initError(strprintf(_("Error loading %s: Wallet corrupted"), walletFile));
@@ -4343,7 +4407,7 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
     bool fFirstRun = true;
     // TODO: Can't use std::make_shared because we need a custom deleter but
     // should be possible to use std::allocate_shared.
-    std::shared_ptr<CWallet> walletInstance(new CWallet(chain, location, WalletDatabase::Create(location.GetPath())), ReleaseWallet);
+    std::shared_ptr<CWallet> walletInstance(new CWallet(&chain, location, WalletDatabase::Create(location.GetPath())), ReleaseWallet);
     DBErrors nLoadWalletRet = walletInstance->LoadWallet(fFirstRun);
     if (nLoadWalletRet != DBErrors::LOAD_OK)
     {
@@ -4652,20 +4716,6 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
 void CWallet::postInitProcess()
 {
     CreateZWspWallet();
-//    CzWSPWallet* zwalletMain = new CzWSPWallet(chain(), GetLocation(), GetDBHandle(), *this);
-//    setZWallet(zwalletMain);
-//    //Inititalize zWSPWallet
-//    chain().initMessage(_("Syncing zWSP wallet..."));
-//
-//    InitAutoConvertAddresses();
-//
-//    bool fEnableZWspBackups = gArgs.GetBoolArg("-backupzwsp", true);
-//    setZWspAutoBackups(fEnableZWspBackups);
-//
-//    //Load zerocoin mint hashes to memory
-//    zwspTracker->Init();
-//    zwalletMain->LoadMintPoolFromDB();
-//    zwalletMain->SyncWithChain();
     // Generate coins in the background
 //    GenerateBitcoins(gArgs.GetBoolArg("-gen", false), this, gArgs.GetArg("-genproclimit", 1));
     auto locked_chain = chain().lock();
@@ -4677,6 +4727,11 @@ void CWallet::postInitProcess()
 
     // Update wallet transactions with current mempool transactions.
     chain().requestMempoolTransactions(*this);
+
+    if (gArgs.GetBoolArg("-precompute", true)) {
+        // Run a thread to precompute any zPIV spends
+//        threadGroup.create_thread(boost::bind(&ThreadPrecomputeSpends));
+    }
 }
 
 bool CWallet::BackupWallet(const std::string& strDest)
@@ -5810,7 +5865,7 @@ bool CWallet::MintableCoins()
 {
     auto locked_chain = chain().lock();
     LOCK(cs_main);
-    CAmount nBalance = GetBalance();
+    CAmount nBalance = GetBalance().m_mine_trusted;
     CAmount nZwspBalance = GetZerocoinBalance(false);
 
     // Regular WSP
@@ -6617,7 +6672,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     txNew.vout.push_back(CTxOut(0, scriptEmpty));
 
     // Choose coins to use
-    CAmount nBalance = GetBalance();
+    CAmount nBalance = GetBalance().m_mine_trusted;
 
     if (gArgs.IsArgSet("-reservebalance") && !ParseMoney(gArgs.GetArg("-reservebalance", ""), nReserveBalance))
         return error("CreateCoinStake : invalid reserve balance amount");
@@ -8258,7 +8313,7 @@ string CWallet::MintZerocoin(CAmount nValue, CWalletTx& wtxNew, std::vector<CDet
     if (nValue <= 0)
         return _("Invalid amount");
 
-    CAmount nBalance = GetBalance();
+    CAmount nBalance = GetBalance().m_mine_trusted;
     if (nValue + Params().Zerocoin_MintFee() > nBalance) {
         LogPrintf("%s: balance=%s fee=%s nValue=%s\n", __func__, FormatMoney(nBalance), FormatMoney(Params().Zerocoin_MintFee()), FormatMoney(nValue));
         return _("Insufficient funds");
@@ -8276,7 +8331,7 @@ string CWallet::MintZerocoin(CAmount nValue, CWalletTx& wtxNew, std::vector<CDet
     std::string strError;
     CMutableTransaction txNew;
     if (!CreateZerocoinMintTransaction(nValue, txNew, vDMints, &reservekey, nFeeRequired, strError, coinControl)) {
-        if (nValue + nFeeRequired > GetBalance())
+        if (nValue + nFeeRequired > GetBalance().m_mine_trusted)
             return strprintf(_("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!"), FormatMoney(nFeeRequired).c_str());
         return strError;
     }
@@ -8469,7 +8524,7 @@ bool CWallet::DatabaseMint(CDeterministicMint& dMint)
 void CWallet::setZWallet(CzWSPWallet* zwallet)
 {
     zwalletMain = zwallet;
-    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(m_chain, GetLocation(), GetDBHandle(), *this));
+    zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(*m_chain, GetLocation(), GetDBHandle(), *this));
 }
 
 void ThreadPrecomputeSpends()

@@ -29,6 +29,7 @@
 #include <wallet/feebumper.h>
 #include <wallet/fees.h>
 #include <wallet/rpcwallet.h>
+#include <wallet/load.h>
 #include <wallet/wallet.h>
 #include <wallet/walletutil.h>
 #include <zpiv/zerocoin.h>
@@ -391,6 +392,7 @@ public:
     }
     WalletBalances getBalances() override
     {
+        const auto bal = m_wallet->GetBalance();
         WalletBalances result;
         result.balance = m_wallet->GetBalance();
         result.unconfirmed_balance = m_wallet->GetUnconfirmedBalance();
@@ -429,7 +431,7 @@ public:
         num_blocks = locked_chain->getHeight().get_value_or(-1);
         return true;
     }
-    CAmount getBalance() override { return m_wallet->GetBalance(); }
+    CAmount getBalance() override { return m_wallet->GetBalance().m_mine_trusted; }
     CAmount getAvailableBalance(const CCoinControl& coin_control) override
     {
         return m_wallet->GetAvailableBalance(&coin_control);

@@ -7,7 +7,6 @@
 #include <chain.h>
 #include <consensus/validation.h>
 #include <core_io.h>
-#include <httpserver.h>
 #include <init.h>
 #include <interfaces/chain.h>
 #include <validation.h>
@@ -19,7 +18,7 @@
 #include <policy/fees.h>
 #include <policy/policy.h>
 #include <policy/rbf.h>
-#include <rpc/rawtransaction.h>
+#include <rpc/rawtransaction_util.h>
 #include <rpc/server.h>
 #include <rpc/util.h>
 #include <script/descriptor.h>
@@ -27,8 +26,11 @@
 #include <shutdown.h>
 #include <timedata.h>
 #include <util/bip32.h>
+#include <util/fees.h>
 #include <util/system.h>
 #include <util/moneystr.h>
+#include <util/url.h>
+#include <util/validation.h>
 #include <wallet/coincontrol.h>
 #include <wallet/feebumper.h>
 #include <wallet/psbtwallet.h>
@@ -319,7 +321,7 @@ static UniValue setlabel(const JSONRPCRequest& request)
 
 static CTransactionRef SendMoney(interfaces::Chain::Lock& locked_chain, CWallet * const pwallet, const CTxDestination &address, CAmount nValue, bool fSubtractFeeFromAmount, const CCoinControl& coin_control, mapValue_t mapValue, bool fUseIX = false)
 {
-    CAmount curBalance = pwallet->GetBalance();
+    CAmount curBalance = pwallet->GetBalance().m_mine_trusted;
 
     // Check amount
     if (nValue <= 0)
@@ -772,12 +774,14 @@ static UniValue getbalance(const JSONRPCRequest& request)
         min_depth = request.params[1].get_int();
     }
 
-    isminefilter filter = ISMINE_SPENDABLE;
+    bool include_watchonly = false;
     if (!request.params[2].isNull() && request.params[2].get_bool()) {
-        filter = filter | ISMINE_WATCH_ONLY;
+        include_watchonly = true;
     }
 
-    return ValueFromAmount(pwallet->GetBalance(filter, min_depth));
+    const auto bal = pwallet->GetBalance(min_depth);
+
+    return ValueFromAmount(bal.m_mine_trusted + (include_watchonly ? bal.m_watchonly_trusted : 0));
 }
 
 static UniValue getunconfirmedbalance(const JSONRPCRequest &request)
@@ -805,7 +809,7 @@ static UniValue getunconfirmedbalance(const JSONRPCRequest &request)
     auto locked_chain = pwallet->chain().lock();
     LOCK(pwallet->cs_wallet);
 
-    return ValueFromAmount(pwallet->GetUnconfirmedBalance());
+    return ValueFromAmount(pwallet->GetBalance().m_mine_untrusted_pending);
 }
 
 
@@ -1771,7 +1775,7 @@ static UniValue gettransaction(const JSONRPCRequest& request)
     ListTransactions(*locked_chain, pwallet, wtx, 0, false, details, filter, nullptr /* filter_label */);
     entry.pushKV("details", details);
 
-    std::string strHex = EncodeHexTx(*wtx.tx, RPCSerializationFlags());
+    std::string strHex = EncodeHexTx(*wtx.tx, pwallet->chain().rpcSerializationFlags());
     entry.pushKV("hex", strHex);
 
     return entry;
@@ -1997,7 +2001,7 @@ static UniValue walletpassphrase(const JSONRPCRequest& request)
     // wallet before the following callback is called. If a valid shared pointer
     // is acquired in the callback then the wallet is still loaded.
     std::weak_ptr<CWallet> weak_wallet = wallet;
-    RPCRunLater(strprintf("lockwallet(%s)", pwallet->GetName()), [weak_wallet] {
+    pwallet->chain().rpcRunLater(strprintf("lockwallet(%s)", pwallet->GetName()), [weak_wallet] {
         if (auto shared_wallet = weak_wallet.lock()) {
             LOCK(shared_wallet->cs_wallet);
             shared_wallet->Lock();
@@ -2444,11 +2448,12 @@ static UniValue getwalletinfo(const JSONRPCRequest& request)
     UniValue obj(UniValue::VOBJ);
 
     size_t kpExternalSize = pwallet->KeypoolCountExternalKeys();
+    const auto bal = pwallet->GetBalance();
     obj.pushKV("walletname", pwallet->GetName());
     obj.pushKV("walletversion", pwallet->GetVersion());
-    obj.pushKV("balance",       ValueFromAmount(pwallet->GetBalance()));
-    obj.pushKV("unconfirmed_balance", ValueFromAmount(pwallet->GetUnconfirmedBalance()));
-    obj.pushKV("immature_balance",    ValueFromAmount(pwallet->GetImmatureBalance()));
+    obj.pushKV("balance", ValueFromAmount(bal.m_mine_trusted));
+    obj.pushKV("unconfirmed_balance", ValueFromAmount(bal.m_mine_untrusted_pending));
+    obj.pushKV("immature_balance", ValueFromAmount(bal.m_mine_immature));
     obj.pushKV("txcount",       (int)pwallet->mapWallet.size());
     obj.pushKV("keypoololdest", pwallet->GetOldestKeyPoolTime());
     obj.pushKV("keypoolsize", (int64_t)kpExternalSize);
@@ -3495,7 +3500,7 @@ public:
         UniValue obj(UniValue::VOBJ);
         CScript subscript;
         if (pwallet && pwallet->GetCScript(scriptID, subscript)) {
-            ProcessSubScript(subscript, obj, IsDeprecatedRPCEnabled("validateaddress"));
+            ProcessSubScript(subscript, obj, pwallet->chain().rpcEnableDeprecated("validateaddress"));
         }
         return obj;
     }

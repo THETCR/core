@@ -29,7 +29,7 @@
 #include <util/system.h>
 #include <util/moneystr.h>
 #include <util/strencodings.h>
-
+#include <util/validation.h>
 
 #include "validationinterface.h"
 #include "spork.h"
@@ -188,8 +188,6 @@ namespace {
     MapRelay mapRelay GUARDED_BY(cs_main);
     /** Expiration-time ordered list of (expire time, relay map entry) pairs. */
     std::deque<std::pair<int64_t, MapRelay::iterator>> vRelayExpiration GUARDED_BY(cs_main);
-
-    std::atomic<int64_t> nTimeBestReceived(0); // Used only to inform the wallet of when we last received a block
 
     struct IteratorComparator
     {
@@ -1155,8 +1153,6 @@ void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CB
         });
         connman->WakeMessageHandler();
     }
-
-    nTimeBestReceived = GetTime();
 }
 
 /**
@@ -4054,14 +4050,6 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
                     connman->PushMessage(pto, msgMaker.Make(NetMsgType::GETHEADERS, chainActive.GetLocator(pindexStart), uint256()));
                 }
             }
-        }
-
-        // Resend wallet transactions that haven't gotten in a block yet
-        // Except during reindex, importing and IBD, when old wallet
-        // transactions become unconfirmed and spams other nodes.
-        if (!fReindex && !fImporting && !IsInitialBlockDownload())
-        {
-            GetMainSignals().Broadcast(nTimeBestReceived, connman);
         }
 
         //

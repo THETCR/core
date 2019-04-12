@@ -2,8 +2,13 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <coins.h>
+#include <consensus/tx_verify.h>
+#include <policy/policy.h>
 #include <psbt.h>
 #include <util/strencodings.h>
+
+#include <numeric>
 
 PartiallySignedTransaction::PartiallySignedTransaction(const CMutableTransaction& tx) : tx(tx)
 {
@@ -205,7 +210,7 @@ void PSBTOutput::Merge(const PSBTOutput& output)
     if (redeem_script.empty() && !output.redeem_script.empty()) redeem_script = output.redeem_script;
     if (witness_script.empty() && !output.witness_script.empty()) witness_script = output.witness_script;
 }
-bool PSBTInputSigned(PSBTInput& input)
+bool PSBTInputSigned(const PSBTInput& input)
 {
     return !input.final_script_sig.empty() || !input.final_script_witness.IsNull();
 }
@@ -324,4 +329,40 @@ TransactionError CombinePSBTs(PartiallySignedTransaction& out, const std::vector
     }
 
     return TransactionError::OK;
+}
+
+std::string PSBTRoleName(PSBTRole role) {
+    switch (role) {
+    case PSBTRole::UPDATER: return "updater";
+    case PSBTRole::SIGNER: return "signer";
+    case PSBTRole::FINALIZER: return "finalizer";
+    case PSBTRole::EXTRACTOR: return "extractor";
+    }
+}
+
+bool DecodeBase64PSBT(PartiallySignedTransaction& psbt, const std::string& base64_tx, std::string& error)
+{
+    bool invalid;
+    std::string tx_data = DecodeBase64(base64_tx, &invalid);
+    if (invalid) {
+        error = "invalid base64";
+        return false;
+    }
+    return DecodeRawPSBT(psbt, tx_data, error);
+}
+
+bool DecodeRawPSBT(PartiallySignedTransaction& psbt, const std::string& tx_data, std::string& error)
+{
+    CDataStream ss_data(tx_data.data(), tx_data.data() + tx_data.size(), SER_NETWORK, PROTOCOL_VERSION);
+    try {
+        ss_data >> psbt;
+        if (!ss_data.empty()) {
+            error = "extra data after PSBT";
+            return false;
+        }
+    } catch (const std::exception& e) {
+        error = e.what();
+        return false;
+    }
+    return true;
 }

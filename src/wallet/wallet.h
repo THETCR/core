@@ -70,26 +70,6 @@ static const bool DEFAULT_AUTOCONVERTADDRESS = true;
 // 6666 = 1*5000 + 1*1000 + 1*500 + 1*100 + 1*50 + 1*10 + 1*5 + 1
 static const int ZQ_6666 = 6666;
 
-//! Responsible for reading and validating the -wallet arguments and verifying the wallet database.
-//! This function will perform salvage on the wallet if requested, as long as only one wallet is
-//! being loaded (WalletParameterInteraction forbids -salvagewallet, -zapwallettxes or -upgradewallet with multiwallet).
-bool VerifyWallets(interfaces::Chain& chain, const std::vector<std::string>& wallet_files);
-
-//! Load wallet databases.
-bool LoadWallets(interfaces::Chain& chain, const std::vector<std::string>& wallet_files);
-
-//! Complete startup of wallets.
-void StartWallets(CScheduler& scheduler);
-
-//! Flush all wallets in preparation for shutdown.
-void FlushWallets();
-
-//! Stop all wallets. Wallets will be flushed first.
-void StopWallets();
-
-//! Close all wallets.
-void UnloadWallets();
-
 //! Explicitly unload and delete the wallet.
 //! Blocks the current thread after signaling the unload intent so that all
 //! wallet clients release the wallet.
@@ -687,7 +667,7 @@ public:
     int64_t GetComputedTxTime(interfaces::Chain::Lock& locked_chain) const;
     int GetRequestCount() const;
 
-    // RelayWalletTransaction may only be called if fBroadcastTransactions!
+    // Pass this transaction to the node to relay to its peers
     bool RelayWalletTransaction(interfaces::Chain::Lock& locked_chain, std::string strCommand = "tx");
     bool RelayWalletTransaction(std::string strCommand = "tx");
 
@@ -939,6 +919,8 @@ private:
     int64_t nNextResend = 0;
     int64_t nLastResend = 0;
     bool fBroadcastTransactions = false;
+    // Local time that the tip block was received. Used to schedule wallet rebroadcasts.
+    std::atomic<int64_t> m_best_block_time {0};
 
     /**
      * Used to keep track of spent outpoints, and
@@ -1004,7 +986,7 @@ private:
     bool AddWatchOnly(const CScript& dest) override EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
     /** Interface for accessing chain state. */
-    interfaces::Chain& m_chain;
+    interfaces::Chain* m_chain;
 
     /** Wallet location which includes wallet name (see WalletLocation). */
     WalletLocation m_location;
@@ -1142,7 +1124,7 @@ public:
     unsigned int nMasterKeyMaxID = 0;
 
     /** Construct wallet with specified name and database implementation. */
-    CWallet(interfaces::Chain& chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database) : m_chain(chain), m_location(location), database(std::move(database))
+    CWallet(interfaces::Chain* chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database) : m_chain(chain), m_location(location), database(std::move(database))
     {
         fFileBacked = true;
     }
@@ -1207,7 +1189,7 @@ public:
     std::unique_ptr<interfaces::Handler> m_chain_notifications_handler;
 
     /** Interface for accessing chain state. */
-    interfaces::Chain& chain() const { return m_chain; }
+    interfaces::Chain& chain() const { assert(m_chain); return *m_chain; }
 
     const CWalletTx* GetWalletTx(const uint256& hash) const;
 
@@ -1339,6 +1321,7 @@ public:
     void TransactionAddedToMempool(const CTransactionRef& tx) override;
     void BlockConnected(const CBlock& block, const std::vector<CTransactionRef>& vtxConflicted) override;
     void BlockDisconnected(const CBlock& block) override;
+    void UpdatedBlockTip() override;
     int64_t RescanFromTime(int64_t startTime, const WalletRescanReserver& reserver, bool update);
 
     bool AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pblock, bool fUpdate);
@@ -1362,8 +1345,22 @@ public:
     ScanResult ScanForWalletTransactions(const uint256& first_block, const uint256& last_block, const WalletRescanReserver& reserver, bool fUpdate);
     void TransactionRemovedFromMempool(const CTransactionRef &ptx) override;
     void ReacceptWalletTransactions(interfaces::Chain::Lock& locked_chain) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
-    void ResendWalletTransactions(interfaces::Chain::Lock& locked_chain, int64_t nBestBlockTime) override;
-    CAmount GetBalance(const isminefilter& filter=ISMINE_SPENDABLE, const int min_depth=0) const;
+    void ResendWalletTransactions();
+    struct Balance {
+        CAmount m_mine_trusted{0};           //!< Trusted, at depth=GetBalance.min_depth or more
+        CAmount m_mine_untrusted_pending{0}; //!< Untrusted, but in mempool (pending)
+        CAmount m_mine_immature{0};          //!< Immature coinbases in the main chain
+        CAmount m_watchonly_trusted{0};
+        CAmount m_watchonly_untrusted_pending{0};
+        CAmount m_watchonly_immature{0};
+
+        //!< WISPR
+        CAmount m_zerocoin_trusted{0};
+        CAmount m_zerocoin_untrusted_pending{0};
+        CAmount m_zerocoin_immature{0};
+    };
+    Balance GetBalance(int min_depth = 0) const;
+//    CAmount GetBalance(const isminefilter& filter=ISMINE_SPENDABLE, const int min_depth=0) const;
     CAmount GetZerocoinBalance(bool fMatureOnly) const;
     CAmount GetUnconfirmedZerocoinBalance() const;
     CAmount GetImmatureZerocoinBalance() const;
@@ -1753,6 +1750,12 @@ public:
         fWalletUnlockAnonymizeOnly = fWalletUnlockAnonymizeOnlyIn;
     }
 };
+
+/**
+ * Called periodically by the schedule thread. Prompts individual wallets to resend
+ * their transactions. Actual rebroadcast schedule is managed by the wallets themselves.
+ */
+void MaybeResendWalletTxs();
 
 /** A key allocated from the key pool. */
 class CReserveKey final : public CReserveScript
