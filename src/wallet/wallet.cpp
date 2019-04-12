@@ -5813,7 +5813,7 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
             }
 
             //check for min age
-            if (GetAdjustedTime() - nTxTime < GetStakeMinAge())
+            if (chain().getAdjustedTime() - nTxTime < GetStakeMinAge())
                 continue;
 
             //check that it is matured
@@ -5835,9 +5835,9 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
         //Only update zWSP set once per update interval
         bool fUpdate = false;
         static int64_t nTimeLastUpdate = 0;
-        if (GetAdjustedTime() - nTimeLastUpdate > nStakeSetUpdateTime) {
+        if (chain().getAdjustedTime() - nTimeLastUpdate > nStakeSetUpdateTime) {
             fUpdate = true;
-            nTimeLastUpdate = GetAdjustedTime();
+            nTimeLastUpdate = chain().getAdjustedTime();
         }
 
         set<CMintMeta> setMints = zwspTracker->ListMints(true, true, fUpdate);
@@ -5889,7 +5889,7 @@ bool CWallet::MintableCoins()
                 nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
             }
 
-            if (GetAdjustedTime() - nTxTime > GetStakeMinAge())
+            if (chain().getAdjustedTime() - nTxTime > GetStakeMinAge())
                 return true;
         }
     }
@@ -6700,7 +6700,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     int64_t const tip_time = locked_chain->getBlockTime(tip_height);
     int64_t const tip_mediantimepast = locked_chain->getBlockMedianTimePast(tip_height);
 
-    if (GetAdjustedTime() - tip_time < 60) {
+    if (chain().getAdjustedTime() - tip_time < 60) {
         if (Params().NetworkID() == CBaseChainParams::REGTEST) {
             MilliSleep(1000);
         }
@@ -6726,7 +6726,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         // Read block header
         CBlockHeader block = pindex->GetBlockHeader();
         uint256 hashProofOfStake = 0;
-        nTxNewTime = GetAdjustedTime();
+        nTxNewTime = chain().getAdjustedTime();
         nAttempts++;
         //iterates each utxo inside of CheckStakeKernelHash()
         if (Stake(stakeInput.get(), nBits, block.GetBlockTime(), nTxNewTime, hashProofOfStake)) {
@@ -7219,7 +7219,7 @@ void CWallet::CreateAutoMintTransaction(const CAmount& nMintAmount, CCoinControl
         LogPrintf("CWallet::AutoZeromint() @ block %ld: successfully minted %ld zWSP. Current percentage of zWSP: %lf%%\n",
                   chain().lock()->getHeight().get_value_or(0), nMintAmount, dPercentage);
         // Re-adjust startup time to delay next Automint for 5 minutes
-        nStartupTime = GetAdjustedTime();
+        nStartupTime = chain().getAdjustedTime();
     }
     else {
         LogPrintf("CWallet::AutoZeromint(): Nothing minted because either not enough funds available or the requested denomination size (%d) is not yet reached.\n", nPreferredDenom);
@@ -7230,17 +7230,17 @@ void CWallet::CreateAutoMintTransaction(const CAmount& nMintAmount, CCoinControl
 void CWallet::AutoZeromint()
 {
     // Don't bother Autominting if Zerocoin Protocol isn't active
-    if (GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) return;
+    if (chain().getAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) return;
 
     // Wait until blockchain + masternodes are fully synced and wallet is unlocked.
     if (IsInitialBlockDownload() || IsLocked()){
         // Re-adjust startup time in case syncing needs a long time.
-        nStartupTime = GetAdjustedTime();
+        nStartupTime = chain().getAdjustedTime();
         return;
     }
 
     // After sync wait even more to reduce load when wallet was just started
-    int64_t nWaitTime = GetAdjustedTime() - nStartupTime;
+    int64_t nWaitTime = chain().getAdjustedTime() - nStartupTime;
     if (nWaitTime < AUTOMINT_DELAY){
         LogPrint(BCLog::ZERO, "CWallet::AutoZeromint(): time since sync-completion or last Automint (%ld sec) < default waiting time (%ld sec). Waiting again...\n", nWaitTime, AUTOMINT_DELAY);
         return;
@@ -7323,7 +7323,7 @@ void CWallet::AutoCombineDust()
     auto locked_chain = chain().lock();
     int64_t const tip_time = locked_chain->getBlockTime(locked_chain->getHeight().get_value_or(0));
     LOCK2(cs_main, cs_wallet);
-    if (tip_time < (GetAdjustedTime() - 300) || IsLocked()) {
+    if (tip_time < (chain().getAdjustedTime() - 300) || IsLocked()) {
         return;
     }
 
@@ -7423,7 +7423,7 @@ bool CWallet::MultiSend()
 
     LOCK2(cs_main, cs_wallet);
     // Stop the old blocks from sending multisends
-    if (tip_time < (GetAdjustedTime() - 300) || IsLocked()) {
+    if (tip_time < (chain().getAdjustedTime() - 300) || IsLocked()) {
         return false;
     }
 
@@ -8075,7 +8075,7 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, CWalletTx& wtxNew, 
             wtxNew = CWalletTx(this, tx);
             wtxNew.fFromMe = true;
             wtxNew.fTimeReceivedIsTxTime = true;
-            wtxNew.nTimeReceived = GetAdjustedTime();
+            wtxNew.nTimeReceived = chain().getAdjustedTime();
         }
     }
 
