@@ -7,6 +7,9 @@
 #include <primitives/transaction.h>
 #include <consensus/validation.h>
 
+//!< WISPR
+#include <validation.h> // For CheckZerocoinMint && CheckZerocoinSpend
+
 bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fCheckDuplicateInputs, bool fZerocoinActive, bool fRejectBadUTXO, bool fFakeSerialAttack)
 {
     // Basic checks that don't depend on any context
@@ -42,7 +45,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
     }
 
     if (fZerocoinActive) {
-        if (nZCSpendCount > Params().Zerocoin_MaxSpendsPerTransaction())
+        if (nZCSpendCount > MAX_ZEROCOINSPENDS_PER_TRANSACTION)
             return state.DoS(100, error("CheckTransaction() : there are more zerocoin spends than are allowed in one transaction"));
 
         if (tx.IsZerocoinSpend()) {
@@ -54,8 +57,8 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
             }
 
             // Do not require signature verification if this is initial sync and a block over 24 hours old
-            bool fVerifySignature = !IsInitialBlockDownload() && (GetTime() - chainActive.Tip()->GetBlockTime() < (60*60*24));
-            if (!CheckZerocoinSpend(tx, fVerifySignature, state, fFakeSerialAttack))
+//            bool fVerifySignature = !IsInitialBlockDownload() && (GetTime() - chainActive.Tip()->GetBlockTime() < (60*60*24));
+            if (!CheckZerocoinSpend(tx, true, state, fFakeSerialAttack))
                 return state.DoS(100, error("CheckTransaction() : invalid zerocoin spend"));
         }
     }
@@ -83,7 +86,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
     }
     else if (fZerocoinActive && tx.IsZerocoinSpend())
     {
-        if(tx.vin.size() < 1 || static_cast<int>(tx.vin.size()) > Params().Zerocoin_MaxSpendsPerTransaction())
+        if(tx.vin.size() < 1 || static_cast<int>(tx.vin.size()) > MAX_ZEROCOINSPENDS_PER_TRANSACTION)
             return state.DoS(10, error("CheckTransaction() : Zerocoin Spend has more than allowed txin's"), REJECT_INVALID, "bad-zerocoinspend");
     }
     else
