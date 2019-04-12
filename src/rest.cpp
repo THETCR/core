@@ -75,7 +75,7 @@ static bool RESTERR(HTTPRequest* req, enum HTTPStatusCode status, std::string me
     return false;
 }
 
-static enum RetFormat ParseDataFormat(std::vector<string>& params, const std::string& strReq)
+static enum RetFormat ParseDataFormat(std::vector<std::string>& params, const std::string& strReq)
 {
     boost::split(params, strReq, boost::is_any_of("."));
     if (params.size() > 1) {
@@ -116,9 +116,9 @@ static bool rest_headers(HTTPRequest* req,
 {
     if (!CheckWarmup(req))
         return false;
-    std::vector<string> params;
+    std::vector<std::string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
-    std::vector<string> path;
+    std::vector<std::string> path;
     boost::split(path, params[0], boost::is_any_of("/"));
 
     if (path.size() != 2)
@@ -192,7 +192,7 @@ static bool rest_block(HTTPRequest* req,
 {
     if (!CheckWarmup(req))
         return false;
-    std::vector<string> params;
+    std::vector<std::string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
 
     std::string hashStr = params[0];
@@ -271,7 +271,7 @@ static bool rest_chaininfo(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    std::vector<string> params;
+    std::vector<std::string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
 
     switch (rf) {
@@ -297,7 +297,7 @@ static bool rest_mempool_info(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    std::vector<string> params;
+    std::vector<std::string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
 
     switch (rf) {
@@ -322,7 +322,7 @@ static bool rest_mempool_contents(HTTPRequest* req, const std::string& strURIPar
 {
     if (!CheckWarmup(req))
         return false;
-    std::vector<string> params;
+    std::vector<std::string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
 
     switch (rf) {
@@ -347,7 +347,7 @@ static bool rest_tx(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    std::vector<string> params;
+    std::vector<std::string> params;
     const RetFormat rf = ParseDataFormat(params, strURIPart);
 
     std::string hashStr = params[0];
@@ -404,10 +404,10 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    std::vector<string> params;
+    std::vector<std::string> params;
     enum RetFormat rf = ParseDataFormat(params, strURIPart);
 
-    std::vector<string> uriParts;
+    std::vector<std::string> uriParts;
     if (params.size() > 0 && params[0].length() > 1)
     {
         std::string strUriParams = params[0].substr(1);
