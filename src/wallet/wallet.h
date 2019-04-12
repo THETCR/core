@@ -314,8 +314,6 @@ private:
   /** Constant used in hashBlock to indicate tx has been abandoned */
     static const uint256 ABANDON_HASH;
 
-    int GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const;
-
 public:
     CTransactionRef tx;
     uint256 hashBlock;
@@ -376,11 +374,6 @@ public:
      */
     int GetDepthInMainChain(interfaces::Chain::Lock& locked_chain, bool enableIX = true) const;
     bool IsInMainChain(interfaces::Chain::Lock& locked_chain) const { return GetDepthInMainChain(locked_chain) > 0; }
-    bool IsInMainChain() const
-    {
-        const CBlockIndex* pindexRet;
-        return GetDepthInMainChainINTERNAL(pindexRet) > 0;
-    }
     int GetTransactionLockSignatures() const;
     bool IsTransactionLockTimedOut() const;
 
@@ -1507,6 +1500,7 @@ public:
     std::set<CTxDestination> GetLabelAddresses(const std::string& label) const;
 
     isminetype IsMine(const CTxIn& txin) const;
+    bool IsMintInChain(const uint256& hashPubcoin, uint256& txid, int& nHeight);
     bool IsMyZerocoinSpend(const CBigNum& bnSerial) const;
     bool IsMyMint(const CBigNum& bnValue) const;
     /**

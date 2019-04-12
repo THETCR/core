@@ -5377,15 +5377,17 @@ std::map<libzerocoin::CoinDenomination, int> mapMintMaturity;
 int nLastMaturityCheck = 0;
 CAmount CWallet::GetZerocoinBalance(bool fMatureOnly) const
 {
+    auto locked_chain = chain().lock();
+    uint32_t const tip_height = locked_chain->getHeight().get_value_or(-1);
     if (fMatureOnly) {
-        if (chainActive.Height() > nLastMaturityCheck)
+        if (tip_height > nLastMaturityCheck)
             mapMintMaturity = GetMintMaturityHeight();
-        nLastMaturityCheck = chainActive.Height();
+        nLastMaturityCheck = tip_height;
 
         CAmount nBalance = 0;
         std::vector<CMintMeta> vMints = zwspTracker->GetMints(true);
         for (auto meta : vMints) {
-            if (meta.nHeight >= mapMintMaturity.at(meta.denom) || meta.nHeight >= chainActive.Height() || meta.nHeight == 0)
+            if (meta.nHeight >= mapMintMaturity.at(meta.denom) || meta.nHeight >= tip_height || meta.nHeight == 0)
                 continue;
             nBalance += libzerocoin::ZerocoinDenominationToAmount(meta.denom);
         }
@@ -5828,7 +5830,8 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
     }
 
     //zWSP
-    if ((gArgs.GetBoolArg("-zwspstake", true) || fPrecompute) && chainActive.Height() > Params().NEW_PROTOCOLS_STARTHEIGHT() && !IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
+    uint32_t const tip_height = locked_chain->getHeight().get_value_or(-1);
+    if ((gArgs.GetBoolArg("-zwspstake", true) || fPrecompute) && tip_height > Params().NEW_PROTOCOLS_STARTHEIGHT() && !IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
         //Only update zWSP set once per update interval
         bool fUpdate = false;
         static int64_t nTimeLastUpdate = 0;
@@ -5850,7 +5853,7 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
             }
             if (meta.nVersion < CZerocoinMint::STAKABLE_VERSION)
                 continue;
-            if (meta.nHeight < chainActive.Height() - Params().Zerocoin_RequiredStakeDepth()) {
+            if (meta.nHeight < tip_height - Params().Zerocoin_RequiredStakeDepth()) {
                 std::unique_ptr<CZWspStake> input(new CZWspStake(meta.denom, meta.hashStake));
                 listInputs.emplace_back(std::move(input));
             }
@@ -5863,6 +5866,7 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
 bool CWallet::MintableCoins()
 {
     auto locked_chain = chain().lock();
+    int32_t const tip_height = locked_chain->getHeight().get_value_or(-1);
     LOCK(cs_main);
     CAmount nBalance = GetBalance().m_mine_trusted;
     CAmount nZwspBalance = GetZerocoinBalance(false);
@@ -5896,7 +5900,7 @@ bool CWallet::MintableCoins()
         for (auto mint : setMints) {
             if (mint.nVersion < CZerocoinMint::STAKABLE_VERSION)
                 continue;
-            if (mint.nHeight > chainActive.Height() - Params().Zerocoin_RequiredStakeDepth())
+            if (mint.nHeight > tip_height - Params().Zerocoin_RequiredStakeDepth())
                 continue;
            return true;
         }
@@ -6690,12 +6694,17 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         return false;
     }
 
-    if (GetAdjustedTime() - chainActive.Tip()->GetBlockTime() < 60) {
+
+    auto locked_chain = chain().lock();
+    int32_t const tip_height = locked_chain->getHeight().get_value_or(-1);
+    int64_t const tip_time = locked_chain->getBlockTime(tip_height);
+    int64_t const tip_mediantimepast = locked_chain->getBlockMedianTimePast(tip_height);
+
+    if (GetAdjustedTime() - tip_time < 60) {
         if (Params().NetworkID() == CBaseChainParams::REGTEST) {
             MilliSleep(1000);
         }
     }
-
 
     CAmount nCredit;
     CScript scriptPubKeyKernel;
@@ -6722,7 +6731,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         //iterates each utxo inside of CheckStakeKernelHash()
         if (Stake(stakeInput.get(), nBits, block.GetBlockTime(), nTxNewTime, hashProofOfStake)) {
             //Double check that this will pass time requirements
-            if (nTxNewTime <= chainActive.Tip()->GetMedianTimePast()) {
+            if (nTxNewTime <= tip_mediantimepast) {
                 LogPrintf("CreateCoinStake() : kernel found, but it is too far in the past \n");
                 continue;
             }
@@ -6733,7 +6742,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
             // Calculate reward
             CAmount nReward;
-            nReward = GetBlockSubsidy(chainActive.Height() + 1, Params().GetConsensus());
+            nReward = GetBlockSubsidy(tip_height + 1, Params().GetConsensus());
             nCredit += nReward;
 
             // Create the output transaction(s)
@@ -6822,7 +6831,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
             CMintMeta meta = zwspTracker->GetMetaFromPubcoin(hashPubcoin);
             meta.txid = txNew.GetHash();
-            meta.nHeight = chainActive.Height() + 1;
+            meta.nHeight = tip_height + 1;
             if (!zwspTracker->UpdateState(meta))
                 return error("%s: failed to update metadata in tracker", __func__);
         }
@@ -7208,7 +7217,7 @@ void CWallet::CreateAutoMintTransaction(const CAmount& nMintAmount, CCoinControl
         CAmount nBalance = GetUnlockedCoins();
         CAmount dPercentage = 100 * (double)nZerocoinBalance / (double)(nZerocoinBalance + nBalance);
         LogPrintf("CWallet::AutoZeromint() @ block %ld: successfully minted %ld zWSP. Current percentage of zWSP: %lf%%\n",
-                  chainActive.Tip()->nHeight, nMintAmount, dPercentage);
+                  chain().lock()->getHeight(), nMintAmount, dPercentage);
         // Re-adjust startup time to delay next Automint for 5 minutes
         nStartupTime = GetAdjustedTime();
     }
@@ -7262,7 +7271,7 @@ void CWallet::AutoZeromint()
     // Check if minting is actually needed
     if(dPercentage >= nZeromintPercentage){
         LogPrint(BCLog::ZERO, "CWallet::AutoZeromint() @block %ld: percentage of existing zWSP (%lf%%) already >= configured percentage (%d%%). No minting needed...\n",
-                  chainActive.Tip()->nHeight, dPercentage, nZeromintPercentage);
+                 chain().lock()->getHeight(), dPercentage, nZeromintPercentage);
         return;
     }
 
@@ -7312,8 +7321,9 @@ void CWallet::AutoZeromint()
 void CWallet::AutoCombineDust()
 {
     auto locked_chain = chain().lock();
+    int64_t const tip_time = locked_chain->getBlockTime(locked_chain->getHeight().get_value_or(0));
     LOCK2(cs_main, cs_wallet);
-    if (chainActive.Tip()->nTime < (GetAdjustedTime() - 300) || IsLocked()) {
+    if (tip_time < (GetAdjustedTime() - 300) || IsLocked()) {
         return;
     }
 
@@ -7408,13 +7418,16 @@ void CWallet::AutoCombineDust()
 bool CWallet::MultiSend()
 {
     auto locked_chain = chain().lock();
+    int32_t const tip_height = locked_chain->getHeight().get_value_or(0);
+    int64_t const tip_time = locked_chain->getBlockTime(tip_height);
+
     LOCK2(cs_main, cs_wallet);
     // Stop the old blocks from sending multisends
-    if (chainActive.Tip()->nTime < (GetAdjustedTime() - 300) || IsLocked()) {
+    if (tip_time < (GetAdjustedTime() - 300) || IsLocked()) {
         return false;
     }
 
-    if (chainActive.Tip()->nHeight <= nLastMultiSendHeight) {
+    if (tip_height <= nLastMultiSendHeight) {
         LogPrintf("Multisend: lastmultisendheight is higher than current best height\n");
         return false;
     }
@@ -7500,7 +7513,7 @@ bool CWallet::MultiSend()
 
         //write nLastMultiSendHeight to DB
         WalletBatch walletdb(*database);
-        nLastMultiSendHeight = chainActive.Tip()->nHeight;
+        nLastMultiSendHeight = tip_height;
         if (!walletdb.WriteMSettings(fMultiSendStake, fMultiSendMasternodeReward, nLastMultiSendHeight))
             LogPrintf("Failed to write MultiSend setting to DB\n");
 
@@ -7519,26 +7532,6 @@ bool CWallet::MultiSend()
 
     return true;
 }
-
-int CMerkleTx::GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const
-{
-    if (hashBlock == 0 || nIndex == -1)
-        return 0;
-    AssertLockHeld(cs_main);
-
-    // Find the block it claims to be in
-    BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
-    if (mi == mapBlockIndex.end())
-        return 0;
-    CBlockIndex* pindex = (*mi).second;
-    if (!pindex || !chainActive.Contains(pindex))
-        return 0;
-
-
-    pindexRet = pindex;
-    return chainActive.Height() - pindex->nHeight + 1;
-}
-
 
 bool CWalletTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool ignoreFees)
 {
@@ -8164,7 +8157,7 @@ string CWallet::ResetSpentZerocoin()
     return strResult;
 }
 
-bool IsMintInChain(const uint256& hashPubcoin, uint256& txid, int& nHeight)
+bool CWallet::IsMintInChain(const uint256& hashPubcoin, uint256& txid, int& nHeight)
 {
     if (!IsPubcoinInBlockchain(hashPubcoin, txid))
         return false;
@@ -8174,7 +8167,7 @@ bool IsMintInChain(const uint256& hashPubcoin, uint256& txid, int& nHeight)
     if (!GetTransaction(txid, tx, Params().GetConsensus(), hashBlock))
         return false;
 
-    if (!mapBlockIndex.count(hashBlock) || !chainActive.Contains(mapBlockIndex.at(hashBlock)))
+    if (!mapBlockIndex.count(hashBlock) || !chain().lock()->getBlockHeight(hashBlock))
         return false;
 
     nHeight = mapBlockIndex.at(hashBlock)->nHeight;
@@ -8618,12 +8611,14 @@ void CWallet::PrecomputeSpends()
 
         // Do some precomputing of zerocoin spend knowledge proofs
         std::set <uint256> setInputHashes;
+        auto locked_chain = chain().lock();
         for (std::unique_ptr <CStakeInput>& stakeInput : listInputs) {
             if (ShutdownRequested() || IsLocked())
                 break;
 
             CoinWitnessCacheData tempDataHolder;
 
+            int32_t const tip_height = locked_chain->getHeight().get_value_or(-1);
             {
                 TRY_LOCK(zwspTracker->cs_spendcache, fLocked);
                 if (!fLocked)
@@ -8647,7 +8642,7 @@ void CWallet::PrecomputeSpends()
                 int nHeightStop = 0;
 
                 if (witnessData->nHeightAccStart) { // Witness is already valid
-                    nHeightStop = std::min(chainActive.Height() - nRequiredStakeDepthBuffer,
+                    nHeightStop = std::min(tip_height - nRequiredStakeDepthBuffer,
                                            (witnessData->nHeightAccEnd ? witnessData->nHeightAccEnd
                                                                        : witnessData->nHeightAccStart) +
                                            nAdjustableCacheLength);
@@ -8659,7 +8654,7 @@ void CWallet::PrecomputeSpends()
                     *witnessData = CoinWitnessData(it->second->second);
 
                     // Set the stop height from the variables received from the database cache
-                    nHeightStop = std::min(chainActive.Height() - nRequiredStakeDepthBuffer,
+                    nHeightStop = std::min(tip_height - nRequiredStakeDepthBuffer,
                                            (witnessData->nHeightAccEnd ? witnessData->nHeightAccEnd
                                                                        : witnessData->nHeightAccStart) +
                                            nAdjustableCacheLength);
@@ -8680,7 +8675,7 @@ void CWallet::PrecomputeSpends()
                     }
 
                     // Set the stop height from the variables received from the database cache
-                    nHeightStop = std::min(chainActive.Height() - nRequiredStakeDepthBuffer,
+                    nHeightStop = std::min(tip_height - nRequiredStakeDepthBuffer,
                                            (witnessData->nHeightAccEnd ? witnessData->nHeightAccEnd
                                                                        : witnessData->nHeightAccStart) +
                                            nAdjustableCacheLength);
@@ -8704,7 +8699,7 @@ void CWallet::PrecomputeSpends()
                     if (!GetMintFromStakeHash(serialHash, mint))
                         continue;
                     *witnessData = CoinWitnessData(mint);
-                    nHeightStop = std::min(chainActive.Height() - nRequiredStakeDepthBuffer,
+                    nHeightStop = std::min(tip_height - nRequiredStakeDepthBuffer,
                                            mint.GetHeight() + nAdjustableCacheLength);
                 }
 
