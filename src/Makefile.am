@@ -310,6 +310,7 @@ libbitcoin_server_a_SOURCES = \
   interfaces/node.cpp \
   init.cpp \
   dbwrapper.cpp \
+  kernel.cpp \
   masternode.cpp \
   masternode-budget.cpp \
   masternode-payments.cpp \
@@ -380,7 +381,6 @@ libbitcoin_wallet_a_SOURCES = \
   interfaces/wallet.cpp \
   bip38.cpp \
   denomination_functions.cpp \
-  kernel.cpp \
   wallet/coincontrol.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \
