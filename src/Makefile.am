@@ -353,6 +353,9 @@ libbitcoin_server_a_SOURCES = \
   genwit.cpp \
   lightzwspthread.cpp \
   zwspchain.cpp \
+  zpiv/accumulators.cpp \
+  zpiv/accumulatorcheckpoints.cpp \
+  zpiv/accumulatormap.cpp \
   $(BITCOIN_CORE_H)
 
 if ENABLE_WALLET
