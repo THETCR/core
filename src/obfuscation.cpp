@@ -17,6 +17,7 @@
 #include <wallet/wallet.h>
 #include "reverse_iterator.h"
 #include <fs.h>
+#include <util/validation.h>
 
 #include <boost/algorithm/string/replace.hpp>
 
