@@ -337,6 +337,7 @@ std::string PSBTRoleName(PSBTRole role) {
     case PSBTRole::SIGNER: return "signer";
     case PSBTRole::FINALIZER: return "finalizer";
     case PSBTRole::EXTRACTOR: return "extractor";
+    default: return "ERROR";
     }
 }
 
