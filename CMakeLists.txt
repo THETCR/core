@@ -21,23 +21,22 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
-set(OPENSSL_ROOT_DIR D:/Development/Libraries/CPP/openssl)
-set(OPENSSL_INCLUDE_DIR D:/Development/Libraries/CPP/openssl/include)
-set(EVENT_LIBRARY D:/Development/Libraries/CPP/libevent/libevent.lib)
-set(EVENT_INCLUDE_DIR D:/Development/Libraries/CPP/libevent/include)
 set(BDB_LIBRARY D:/Development/Libraries/CPP/bdb/lib/libdb48.lib)
 set(BDB_INCLUDE_DIR D:/Development/Libraries/CPP/bdb/include)
 set(BDBXX_LIBRARY D:/Development/Libraries/CPP/bdb/lib/libdb48d.lib)
-set(ZMQ_LIBRARY D:/Development/Libraries/CPP/ZeroMQ 4.0.4/lib/libzmq-v120-mt-4_0_4.lib)
-set(ZMQ_INCLUDE_DIR D:/Development/Libraries/CPP/ZeroMQ 4.0.4/include)
-set(SHLWAPI_INCLUDE_DIR D:/Development/Compilers/C++/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/include)
-set(GMP_INCLUDE_DIRS D:/Development/Libraries/CPP/gmp/include)
-set(GMP_DIR D:/Development/Libraries/CPP/gmp)
-set(GMP_LIBRARIES D:/Development/Libraries/CPP/gmp/include/libgmp-10.dll)
-set(GMPXX_LIBRARY D:/Development/Libraries/CPP/gmp/cxx/libgmpxx-4.dll)
+set(BDBXX_INCLUDE_DIR D:/Development/Libraries/CPP/bdb/include)
+set(EVENT_LIBRARY D:/Development/Libraries/CPP/libevent/libevent.lib)
+set(EVENT_INCLUDE_DIR D:/Development/Libraries/CPP/libevent/include)
+set(GMP_INCLUDE_DIR D:/Development/Libraries/CPP/gmp/include)
+set(GMP_LIBRARY D:/Development/Libraries/CPP/gmp/include/libgmp-10.dll)
+set(OPENSSL_ROOT_DIR D:/Development/Libraries/CPP/openssl)
+set(OPENSSL_INCLUDE_DIR D:/Development/Libraries/CPP/openssl/include)
 set(Protobuf_LIBRARIES D:/Development/Libraries/CPP/protoc/lib/libprotobuf.lib)
 set(Protobuf_INCLUDE_DIR D:/Development/Libraries/CPP/protoc/include)
 set(Protobuf_PROTOC_EXECUTABLE D:/Development/Libraries/CPP/protoc/bin/protoc.exe)
+set(SHLWAPI_INCLUDE_DIR D:/Development/Compilers/C++/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/include)
+set(ZMQ_LIBRARY D:/Development/Libraries/CPP/ZeroMQ 4.0.4/lib/libzmq-v120-mt-4_0_4.lib)
+set(ZMQ_INCLUDE_DIR D:/Development/Libraries/CPP/ZeroMQ 4.0.4/include)
 
 set(Boost_NO_SYSTEM_PATHS true)
 #set(Boost_USE_STATIC_LIBS OFF CACHE BOOL "use static libraries from Boost")
@@ -62,8 +61,16 @@ add_custom_target(check)
 
 #Libraries to link to. The :: is for convenience
 set(QT_LIBRARIES Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Test Qt5::Network)
-find_package(Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test CONFIG REQUIRED )
+
+find_package(BerkeleyDB REQUIRED)
+find_package(Boost REQUIRED)
+find_package(Event REQUIRED)
 find_package(GMP REQUIRED)
+find_package(OpenSSL REQUIRED)
+find_package(Protobuf REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets UiPlugin Network Gui Test CONFIG REQUIRED)
+find_package(SHLWAPI REQUIRED)
+find_package(ZeroMQ REQUIRED)
 
 include_directories(
         src
@@ -71,12 +78,14 @@ include_directories(
         src/leveldb/include
         src/secp256k1/include
         src/univalue/include
-        ${Boost_INCLUDE_DIR}
         ${BDB_INCLUDE_DIR}
-        ${OPENSSL_INCLUDE_DIR}
+        ${BDBXX_INCLUDE_DIR}
+        ${Boost_INCLUDE_DIR}
         ${EVENT_INCLUDE_DIR}
-        ${Protobuf_INCLUDE_DIR}
         ${GMP_INCLUDE_DIR}
+        ${OPENSSL_INCLUDE_DIR}
+        ${Protobuf_INCLUDE_DIR}
+        ${SHLWAPI_INCLUDE_DIR}
         ${ZMQ_INCLUDE_DIR}
 )
 
@@ -173,4 +182,4 @@ file(GLOB SOURCE_FILES
         )
 
 add_executable(WISPR WIN32 ${SOURCE_FILES})
-target_link_libraries(WISPR ${Boost_LIBRARIES} ${Protobuf_LIBRARIES} Event zmq GMP Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Test Qt5::Network)
+target_link_libraries(WISPR BerkeleyDB Boost Event GMP OpenSSL Protobuf SHLWAPI ZeroMQ Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Test Qt5::Network)
