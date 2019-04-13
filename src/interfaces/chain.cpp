@@ -166,6 +166,25 @@ class LockImpl : public Chain::Lock
         return AcceptToMemoryPool(::mempool, state, tx, nullptr /* missing inputs */, nullptr /* txn replaced */,
             false /* bypass limits */, absurd_fee);
     }
+
+    int getTransactionLockSignatures(const uint256& txid) override {
+        //compile consessus vote
+        std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(txid);
+        if (i != mapTxLocks.end()) {
+            return (*i).second.CountSignatures();
+        }
+
+        return -1;
+    };
+    bool isTransactionLockTimedOut(const uint256& txid) override {
+        //compile consessus vote
+        std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(txid);
+        if (i != mapTxLocks.end()) {
+            return GetTime() > (*i).second.nTimeout;
+        }
+
+        return false;
+    };
 };
 
 class LockingStateImpl : public LockImpl, public UniqueLock<CCriticalSection>

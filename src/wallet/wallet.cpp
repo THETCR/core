@@ -4783,7 +4783,7 @@ int CMerkleTx::GetDepthInMainChain(interfaces::Chain::Lock& locked_chain, bool e
     int nResult = locked_chain.getBlockDepth(hashBlock) * (nIndex == -1 ? -1 : 1);
     if (enableIX) {
         if (nResult < 6) {
-            int signatures = GetTransactionLockSignatures();
+            int signatures = GetTransactionLockSignatures(locked_chain);
             if (signatures >= SWIFTTX_SIGNATURES_REQUIRED) {
                 return nSwiftTXDepth + nResult;
             }
@@ -7547,32 +7547,34 @@ bool CWalletTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool 
     return fAccepted;
 }
 
-int CMerkleTx::GetTransactionLockSignatures() const
+int CMerkleTx::GetTransactionLockSignatures(interfaces::Chain::Lock& locked_chain) const
 {
     if (GetfLargeWorkForkFound() || GetfLargeWorkInvalidChainFound()) return -2;
     if (!IsSporkActive(SPORK_2_SWIFTTX)) return -3;
     if (!fEnableSwiftTX) return -1;
 
     //compile consessus vote
-    std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(tx->GetHash());
-    if (i != mapTxLocks.end()) {
-        return (*i).second.CountSignatures();
-    }
-
-    return -1;
+    return locked_chain.getTransactionLockSignatures(tx->GetHash());
+//    std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(tx->GetHash());
+//    if (i != mapTxLocks.end()) {
+//        return (*i).second.CountSignatures();
+//    }
+//
+//    return -1;
 }
 
-bool CMerkleTx::IsTransactionLockTimedOut() const
+bool CMerkleTx::IsTransactionLockTimedOut(interfaces::Chain::Lock& locked_chain) const
 {
     if (!fEnableSwiftTX) return 0;
 
     //compile consessus vote
-    std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(tx->GetHash());
-    if (i != mapTxLocks.end()) {
-        return GetTime() > (*i).second.nTimeout;
-    }
-
-    return false;
+    return locked_chain.isTransactionLockTimedOut(tx->GetHash());
+//    std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(tx->GetHash());
+//    if (i != mapTxLocks.end()) {
+//        return GetTime() > (*i).second.nTimeout;
+//    }
+//
+//    return false;
 }
 
 // Given a set of inputs, find the public key that contributes the most coins to the input set

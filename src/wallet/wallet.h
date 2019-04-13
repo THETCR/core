@@ -380,8 +380,8 @@ public:
      */
     int GetDepthInMainChain(interfaces::Chain::Lock& locked_chain, bool enableIX = true) const;
     bool IsInMainChain(interfaces::Chain::Lock& locked_chain) const { return GetDepthInMainChain(locked_chain) > 0; }
-    int GetTransactionLockSignatures() const;
-    bool IsTransactionLockTimedOut() const;
+    int GetTransactionLockSignatures(interfaces::Chain::Lock& locked_chain) const;
+    bool IsTransactionLockTimedOut(interfaces::Chain::Lock& locked_chain) const;
 
     /**
      * @return number of blocks to maturity for this transaction:

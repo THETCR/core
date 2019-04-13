@@ -152,6 +152,11 @@ public:
         //! amount specified by absurd_fee. Returns false if the transaction
         //! could not be added due to the fee or for another reason.
         virtual bool submitToMemoryPool(const CTransactionRef& tx, CAmount absurd_fee, CValidationState& state) = 0;
+
+        //!< WISPR
+        virtual int getTransactionLockSignatures(const uint256& txid) = 0;
+        virtual bool isTransactionLockTimedOut(const uint256& txid) = 0;
+
     };
 
     //! Return Lock interface. Chain is locked when this is called, and
