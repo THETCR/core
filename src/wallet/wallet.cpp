@@ -68,6 +68,7 @@
 //!<WISPR
 int64_t nReserveBalance = 0;
 bool fClearSpendCache = false;
+int64_t nLastCoinStakeSearchInterval = 0;
 
 /**
  * Settings
