@@ -145,8 +145,9 @@ std::vector<uint256> CzWSPTracker::GetSerialHashes()
     return vHashes;
 }
 
-CAmount CzWSPTracker::GetBalance(bool fConfirmedOnly, bool fUnconfirmedOnly) const
+CAmount CzWSPTracker::GetBalance(interfaces::Chain::Lock& locked_chain, bool fConfirmedOnly, bool fUnconfirmedOnly) const
 {
+    std::cout << "GetBalance nTotal\n";
     CAmount nTotal = 0;
     //! zerocoin specific fields
     std::map<libzerocoin::CoinDenomination, unsigned int> myZerocoinSupply;
@@ -155,13 +156,17 @@ CAmount CzWSPTracker::GetBalance(bool fConfirmedOnly, bool fUnconfirmedOnly) con
     }
 
     {
-        //LOCK(cs_wsptracker);
+//        LOCK(cs_wsptracker);
         // Get Unused coins
+        std::cout << "GetBalance mapSerialHashes\n";
         for (auto& it : mapSerialHashes) {
+            std::cout << "GetBalance CMintMeta meta\n";
             CMintMeta meta = it.second;
             if (meta.isUsed || meta.isArchived)
                 continue;
-            bool fConfirmed = ((meta.nHeight < chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations()) && !(meta.nHeight == 0));
+            std::cout << "GetBalance fConfirmed\n";
+            bool fConfirmed = ((meta.nHeight < locked_chain.getHeight().get_value_or(0) - Params().Zerocoin_MintRequiredConfirmations()) && !(meta.nHeight == 0));
+            std::cout << "GetBalance fConfirmedOnly\n";
             if (fConfirmedOnly && !fConfirmed)
                 continue;
             if (fUnconfirmedOnly && fConfirmed)
@@ -177,9 +182,9 @@ CAmount CzWSPTracker::GetBalance(bool fConfirmedOnly, bool fUnconfirmedOnly) con
     return nTotal;
 }
 
-CAmount CzWSPTracker::GetUnconfirmedBalance() const
+CAmount CzWSPTracker::GetUnconfirmedBalance(interfaces::Chain::Lock& locked_chain) const
 {
-    return GetBalance(false, true);
+    return GetBalance(locked_chain, false, true);
 }
 
 std::vector<CMintMeta> CzWSPTracker::GetMints(bool fConfirmedOnly) const
@@ -386,14 +391,14 @@ bool CzWSPTracker::UpdateStatusInternal(const std::set<uint256>& setMempool, CMi
     //! Check whether this mint has been spent and is considered 'pending' or 'confirmed'
     // If there is not a record of the block height, then look it up and assign it
     uint256 txidMint;
-    bool isMintInChain = zerocoinDB->ReadCoinMint(mint.hashPubcoin, txidMint);
+    bool isMintInChain = m_chain.readCoinMint(mint.hashPubcoin, txidMint);
 
     //See if there is internal record of spending this mint (note this is memory only, would reset on restart)
     bool isPendingSpend = static_cast<bool>(mapPendingSpends.count(mint.hashSerial));
 
     // See if there is a blockchain record of spending this mint
     uint256 txidSpend;
-    bool isConfirmedSpend = zerocoinDB->ReadCoinSpend(mint.hashSerial, txidSpend);
+    bool isConfirmedSpend = m_chain.readCoinSpend(mint.hashSerial, txidSpend);
 
     // Double check the mempool for pending spend
     if (isPendingSpend) {
@@ -426,7 +431,7 @@ bool CzWSPTracker::UpdateStatusInternal(const std::set<uint256>& setMempool, CMi
             return true;
 
         // Check the transaction associated with this mint
-        if (!IsInitialBlockDownload() && !GetTransaction(mint.txid, tx, Params().GetConsensus(), hashBlock)) {
+        if (!m_chain.isInitialBlockDownload() && !GetTransaction(mint.txid, tx, Params().GetConsensus(), hashBlock)) {
             LogPrintf("%s : Failed to find tx for mint txid=%s\n", __func__, mint.txid.GetHex());
             mint.isArchived = true;
             Archive(mint);
@@ -434,7 +439,7 @@ bool CzWSPTracker::UpdateStatusInternal(const std::set<uint256>& setMempool, CMi
         }
 
         // An orphan tx if hashblock is in mapBlockIndex but not in chain active
-        if (mapBlockIndex.count(hashBlock) && !chainActive.Contains(mapBlockIndex.at(hashBlock))) {
+        if (m_chain.lock()->isBlockInIndex(hashBlock) && m_chain.lock()->getBlockHeight(hashBlock).get_value_or(-1) != -1) {
             LogPrintf("%s : Found orphaned mint txid=%s\n", __func__, mint.txid.GetHex());
             mint.isUsed = false;
             mint.nHeight = 0;

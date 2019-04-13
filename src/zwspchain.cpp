@@ -253,7 +253,7 @@ bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& tx
     if (!zerocoinDB->ReadCoinSpend(hashSerial, txidSpend))
         return false;
 
-    return IsTransactionInChain(txidSpend, nHeightTx, tx, Params().GetConsensus());
+    return IsTransactionInChain(txidSpend, nHeightTx, tx);
 }
 
 std::string ReindexZerocoinDB()

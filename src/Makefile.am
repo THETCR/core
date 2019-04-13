@@ -132,6 +132,7 @@ BITCOIN_CORE_H = \
   consensus/consensus.h \
   consensus/tx_check.h \
   consensus/tx_verify.h \
+  consensus/zerocoin_verify.h \
   core_io.h \
   core_memusage.h \
   cuckoocache.h \
@@ -301,6 +302,8 @@ libbitcoin_server_a_SOURCES = \
   chain.cpp \
   checkpoints.cpp \
   consensus/tx_verify.cpp \
+  consensus/tx_check.cpp \
+  consensus/zerocoin_verify.cpp \
   flatfile.cpp \
   httprpc.cpp \
   httpserver.cpp \
@@ -388,6 +391,7 @@ libbitcoin_wallet_a_SOURCES = \
   interfaces/wallet.cpp \
   bip38.cpp \
   denomination_functions.cpp \
+  stakeinput.cpp \
   wallet/coincontrol.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \
@@ -405,9 +409,10 @@ libbitcoin_wallet_a_SOURCES = \
   zpiv/accumulatorcheckpoints.cpp \
   zpiv/accumulatormap.cpp \
   zpiv/deterministicmint.cpp \
+  zpiv/zerocoin.cpp \
+  zpiv/accumulators.cpp \
   zpiv/mintpool.cpp \
   zpiv/witness.cpp \
-  zpiv/zerocoin.cpp \
   zpiv/zwsptracker.cpp \
   zpiv/zwspwallet.cpp \
   $(BITCOIN_CORE_H)
@@ -502,7 +507,6 @@ libbitcoin_consensus_a_SOURCES = \
   consensus/merkle.cpp \
   consensus/merkle.h \
   consensus/params.h \
-  consensus/tx_check.cpp \
   consensus/validation.h \
   hash.cpp \
   hash.h \
@@ -704,6 +708,7 @@ endif
 wispr_wallet_LDADD = \
   $(LIBBITCOIN_WALLET_TOOL) \
   $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_ZEROCOIN) \
   $(LIBBITCOIN_CONSENSUS) \

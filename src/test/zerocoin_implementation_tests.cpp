@@ -11,6 +11,7 @@
 #include "chainparams.h"
 #include "consensus/params.h"
 #include "consensus/validation.h"
+#include "consensus/zerocoin_verify.h"
 #include <validation.h>
 #include "txdb.h"
 #include "zpiv/deterministicmint.h"

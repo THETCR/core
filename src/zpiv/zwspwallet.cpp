@@ -125,7 +125,7 @@ void CzWSPWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
     LogPrintf("%s : n=%d nStop=%d\n", __func__, n, nStop - 1);
     for (uint32_t i = n; i < nStop; ++i) {
-        if (ShutdownRequested())
+        if (m_chain.shutdownRequested())
             return;
 
         fFound = false;
@@ -200,7 +200,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                 return;
             setChecked.insert(pMint.first);
 
-            if (ShutdownRequested())
+            if (m_chain.shutdownRequested())
                 return;
 
             if (pwallet.zwspTracker->HasPubcoinHash(pMint.first)) {
@@ -210,7 +210,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
 
             uint256 txHash;
             CZerocoinMint mint;
-            if (zerocoinDB->ReadCoinMint(pMint.first, txHash)) {
+            if (m_chain.readCoinMint(pMint.first, txHash)) {
                 //this mint has already occurred on the chain, increment counter's state to reflect this
                 LogPrintf("%s : Found wallet coin mint=%s count=%d tx=%s\n", __func__, pMint.first.GetHex(), pMint.second, txHash.GetHex());
                 found = true;
@@ -262,7 +262,7 @@ void CzWSPWallet::SyncWithChain(bool fGenerateMintPool)
                 if (!setAddedTx.count(txHash)) {
                     CBlock block;
                     CWalletTx wtx(&pwallet, tx);
-                    if (pindex && ReadBlockFromDisk(block, pindex, Params().GetConsensus())){
+                    if (pindex && m_chain.findBlock(hashBlock, &block)){
                         int posInBlock = 0;
                         for (; posInBlock < (int)block.vtx.size(); posInBlock++){
                             if (block.vtx[posInBlock] == tx)
@@ -322,9 +322,8 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
         //Find transaction details and make a wallettx and add to wallet
         dMint.SetUsed(true);
         CWalletTx wtx(&pwallet, txSpend);
-        CBlockIndex* pindex = chainActive[nHeightTx];
         CBlock block;
-        if (ReadBlockFromDisk(block, pindex, Params().GetConsensus())){
+        if (m_chain.findBlock(wtx.hashBlock, &block)){
             int posInBlock = 0;
             for (; posInBlock < (int)block.vtx.size(); posInBlock++){
                 if (block.vtx[posInBlock] == txSpend)
@@ -333,7 +332,7 @@ bool CzWSPWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
             wtx.SetMerkleBranch(block.GetHash(), posInBlock);
         }
 
-        wtx.nTimeReceived = pindex->nTime;
+        wtx.nTimeReceived = block.GetBlockTime();
         pwallet.AddToWallet(wtx);
     }
 

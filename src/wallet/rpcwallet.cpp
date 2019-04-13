@@ -108,7 +108,7 @@ void EnsureWalletIsUnlocked(CWallet * const pwallet, bool fAllowAnonOnly)
 static void WalletTxToJSON(interfaces::Chain& chain, interfaces::Chain::Lock& locked_chain, const CWalletTx& wtx, UniValue& entry)
 {
     int confirms = wtx.GetDepthInMainChain(locked_chain, false);
-    int confirmsTotal = GetIXConfirmations(wtx.tx->GetHash()) + confirms;
+    int confirmsTotal = locked_chain.getIXConfirmations(wtx.tx->GetHash()) + confirms;
     entry.pushKV("confirmations", confirmsTotal);
     entry.pushKV("bcconfirmations", confirms);
     if (wtx.IsCoinBase() || wtx.IsCoinStake())
@@ -4497,11 +4497,12 @@ UniValue getzerocoinbalance(const JSONRPCRequest& request)
 
     EnsureWalletIsUnlocked(pwallet, true);
 
+    auto locked_chain = pwallet->chain().lock();
         UniValue ret(UniValue::VOBJ);
-        ret.pushKV("Total", ValueFromAmount(pwallet->GetZerocoinBalance(false)));
-        ret.pushKV("Mature", ValueFromAmount(pwallet->GetZerocoinBalance(true)));
-        ret.pushKV("Unconfirmed", ValueFromAmount(pwallet->GetUnconfirmedZerocoinBalance()));
-        ret.pushKV("Immature", ValueFromAmount(pwallet->GetImmatureZerocoinBalance()));
+        ret.pushKV("Total", ValueFromAmount(pwallet->GetZerocoinBalance(*locked_chain, false)));
+        ret.pushKV("Mature", ValueFromAmount(pwallet->GetZerocoinBalance(*locked_chain, true)));
+        ret.pushKV("Unconfirmed", ValueFromAmount(pwallet->GetUnconfirmedZerocoinBalance(*locked_chain)));
+        ret.pushKV("Immature", ValueFromAmount(pwallet->GetImmatureZerocoinBalance(*locked_chain)));
         return ret;
 
 }

@@ -81,6 +81,10 @@ public:
     }
 
     bool IsSpent() const {
+        return out.IsNull();
+    }
+
+    bool IsAvalaible() const {
         return (out.IsNull() || out.scriptPubKey.IsZerocoinMint());
     }
 

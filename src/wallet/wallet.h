@@ -1360,9 +1360,9 @@ public:
     };
     Balance GetBalance(int min_depth = 0) const;
 //    CAmount GetBalance(const isminefilter& filter=ISMINE_SPENDABLE, const int min_depth=0) const;
-    CAmount GetZerocoinBalance(bool fMatureOnly) const;
-    CAmount GetUnconfirmedZerocoinBalance() const;
-    CAmount GetImmatureZerocoinBalance() const;
+    CAmount GetZerocoinBalance(interfaces::Chain::Lock& locked_chain, bool fMatureOnly) const;
+    CAmount GetUnconfirmedZerocoinBalance(interfaces::Chain::Lock& locked_chain) const;
+    CAmount GetImmatureZerocoinBalance(interfaces::Chain::Lock& locked_chain) const;
     CAmount GetLockedCoins() const;
     CAmount GetUnlockedCoins() const;
     std::map<libzerocoin::CoinDenomination, CAmount> GetMyZerocoinDistribution() const;

@@ -50,6 +50,7 @@ BOOST_FIXTURE_TEST_CASE(scan_for_wallet_transactions, TestChain100Setup)
     // Verify ScanForWalletTransactions accommodates a null start block.
     {
         CWallet wallet(chain.get(), WalletLocation(), WalletDatabase::CreateDummy());
+        wallet.CreateZWspWallet();
         AddKey(wallet, coinbaseKey);
         WalletRescanReserver reserver(&wallet);
         reserver.reserve();
@@ -58,22 +59,29 @@ BOOST_FIXTURE_TEST_CASE(scan_for_wallet_transactions, TestChain100Setup)
         BOOST_CHECK(result.last_failed_block.IsNull());
         BOOST_CHECK(result.last_scanned_block.IsNull());
         BOOST_CHECK(!result.last_scanned_height);
+        std::cout << "GetBalance\n";
         BOOST_CHECK_EQUAL(wallet.GetBalance().m_mine_immature, 0);
     }
 
     // Verify ScanForWalletTransactions picks up transactions in both the old
     // and new block files.
     {
+        std::cout << "wallet\n";
         CWallet wallet(chain.get(), WalletLocation(), WalletDatabase::CreateDummy());
+        std::cout << "CreateZWspWallet\n";
+        wallet.CreateZWspWallet();
+        std::cout << "AddKey\n";
         AddKey(wallet, coinbaseKey);
+        std::cout << "WalletRescanReserver\n";
         WalletRescanReserver reserver(&wallet);
         reserver.reserve();
+        std::cout << "ScanForWalletTransactions\n";
         CWallet::ScanResult result = wallet.ScanForWalletTransactions(oldTip->GetBlockHash(), {} /* stop_block */, reserver, false /* update */);
         BOOST_CHECK_EQUAL(result.status, CWallet::ScanResult::SUCCESS);
         BOOST_CHECK(result.last_failed_block.IsNull());
         BOOST_CHECK_EQUAL(result.last_scanned_block, newTip->GetBlockHash());
         BOOST_CHECK_EQUAL(*result.last_scanned_height, newTip->nHeight);
-        BOOST_CHECK_EQUAL(wallet.GetBalance().m_mine_immature, 100 * COIN);
+        BOOST_CHECK_EQUAL(wallet.GetBalance().m_mine_immature, 250000 * COIN);
     }
 
     // Prune the older block file.
@@ -84,6 +92,8 @@ BOOST_FIXTURE_TEST_CASE(scan_for_wallet_transactions, TestChain100Setup)
     // file.
     {
         CWallet wallet(chain.get(), WalletLocation(), WalletDatabase::CreateDummy());
+        std::cout << "CreateZWspWallet\n";
+        wallet.CreateZWspWallet();
         AddKey(wallet, coinbaseKey);
         WalletRescanReserver reserver(&wallet);
         reserver.reserve();
@@ -92,7 +102,7 @@ BOOST_FIXTURE_TEST_CASE(scan_for_wallet_transactions, TestChain100Setup)
         BOOST_CHECK_EQUAL(result.last_failed_block, oldTip->GetBlockHash());
         BOOST_CHECK_EQUAL(result.last_scanned_block, newTip->GetBlockHash());
         BOOST_CHECK_EQUAL(*result.last_scanned_height, newTip->nHeight);
-        BOOST_CHECK_EQUAL(wallet.GetBalance().m_mine_immature, 50 * COIN);
+        BOOST_CHECK_EQUAL(wallet.GetBalance().m_mine_immature, 125000 * COIN);
     }
 
     // Prune the remaining block file.
@@ -102,6 +112,8 @@ BOOST_FIXTURE_TEST_CASE(scan_for_wallet_transactions, TestChain100Setup)
     // Verify ScanForWalletTransactions scans no blocks.
     {
         CWallet wallet(chain.get(), WalletLocation(), WalletDatabase::CreateDummy());
+        std::cout << "CreateZWspWallet\n";
+        wallet.CreateZWspWallet();
         AddKey(wallet, coinbaseKey);
         WalletRescanReserver reserver(&wallet);
         reserver.reserve();
@@ -260,7 +272,7 @@ BOOST_FIXTURE_TEST_CASE(coin_mark_dirty_immature_credit, TestChain100Setup)
     // credit amount is calculated.
     wtx.MarkDirty();
     wallet.AddKeyPubKey(coinbaseKey, coinbaseKey.GetPubKey());
-    BOOST_CHECK_EQUAL(wtx.GetImmatureCredit(*locked_chain), 50*COIN);
+    BOOST_CHECK_EQUAL(wtx.GetImmatureCredit(*locked_chain), 125000*COIN);
 }
 
 static int64_t AddTx(CWallet& wallet, uint32_t lockTime, int64_t mockTime, int64_t blockTime)

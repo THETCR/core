@@ -37,6 +37,7 @@
 //!< WISPR
 #include <swifttx.h>
 #include <netmessagemaker.h>
+#include <txdb.h>
 
 namespace interfaces {
 namespace {
@@ -176,6 +177,7 @@ class LockImpl : public Chain::Lock
 
         return -1;
     };
+
     bool isTransactionLockTimedOut(const uint256& txid) override {
         //compile consessus vote
         std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(txid);
@@ -185,14 +187,50 @@ class LockImpl : public Chain::Lock
 
         return false;
     };
+
     bool isSporkActive(int nSporkID) override
     {
         return IsSporkActive(nSporkID);
     }
+
     int64_t getSporkValue(int nSporkID) override
     {
         return GetSporkValue(nSporkID);
     }
+
+    int getIXConfirmations(const uint256& txid) override {
+        int sigs = 0;
+
+        std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(txid);
+        if (i != mapTxLocks.end()) {
+            sigs = (*i).second.CountSignatures();
+        }
+        if (sigs >= SWIFTTX_SIGNATURES_REQUIRED) {
+            return nSwiftTXDepth;
+        }
+
+        return 0;
+    };
+    bool isBlockInIndex(const uint256 hash) override
+    {
+        CBlockIndex* block = LookupBlockIndex(hash);
+        if (block) {
+            return true;
+        }
+        return false;
+    };
+     bool isTransactionInChain(const uint256& txId, int& nHeightTx, CTransactionRef& tx) override
+     {
+         return IsTransactionInChain(txId, nHeightTx, tx);
+     }
+     bool isTransactionInChain(const uint256& txId, int& nHeightTx) override
+     {
+         return IsTransactionInChain(txId, nHeightTx);
+     }
+     bool isBlockHashInChain(const uint256& hashBlock) override
+     {
+         return IsBlockHashInChain(hashBlock);
+     }
 };
 
 class LockingStateImpl : public LockImpl, public UniqueLock<CCriticalSection>
@@ -431,6 +469,15 @@ public:
 
                pnode->PushInventory(inv);
             });
+    }
+
+    bool readCoinMint(const uint256& hashPubcoin, uint256& hashTx) override
+    {
+      return zerocoinDB->ReadCoinMint(hashPubcoin, hashTx);
+    }
+    bool readCoinSpend(const uint256& hashSerial, uint256 &txHash) override
+    {
+        return zerocoinDB->ReadCoinSpend(hashSerial, txHash);
     }
 };
 } // namespace

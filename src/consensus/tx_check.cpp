@@ -8,7 +8,7 @@
 #include <consensus/validation.h>
 
 //!< WISPR
-#include <validation.h> // For CheckZerocoinMint && CheckZerocoinSpend
+#include <consensus/zerocoin_verify.h> // For CheckZerocoinMint && CheckZerocoinSpend
 
 bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fCheckDuplicateInputs, bool fZerocoinActive, bool fRejectBadUTXO, bool fFakeSerialAttack)
 {

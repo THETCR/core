@@ -2014,7 +2014,7 @@ CWallet::ScanResult CWallet::ScanForWalletTransactions(const uint256& start_bloc
                 result.last_scanned_height = *block_height;
 
                 //If this is a zapwallettx, need to readd zwsp
-                if (fCheckZWSP && block_height >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
+                if (fCheckZWSP && *block_height >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
                     std::list<CZerocoinMint> listMints;
                     BlockToZerocoinMintList(block, listMints, true);
 
@@ -2048,12 +2048,13 @@ CWallet::ScanResult CWallet::ScanForWalletTransactions(const uint256& start_bloc
                                     continue;
 
                                 CWalletTx wtx(this, txSpend);
-                                CBlockIndex* pindexSpend = chainActive[nHeightSpend];
+//                                CBlockIndex* pindexSpend = chainActive[nHeightSpend];
                                 CBlock blockSpend;
-                                if (ReadBlockFromDisk(blockSpend, pindexSpend, Params().GetConsensus()))
+                                if (chain().findBlock(block_hash, &blockSpend)){
                                     wtx.SetMerkleBranch(block_hash, posInBlock);
+                                }
 
-                                wtx.nTimeReceived = pindexSpend->nTime;
+                                wtx.nTimeReceived = blockSpend.GetBlockTime();
                                 AddToWallet(wtx);
                                 setAddedToWallet.emplace(txidSpend);
                             }
@@ -2577,9 +2578,12 @@ CWallet::Balance CWallet::GetBalance(const int min_depth) const
             ret.m_mine_immature += wtx.GetImmatureCredit(*locked_chain);
             ret.m_watchonly_immature += wtx.GetImmatureWatchOnlyCredit(*locked_chain);
         }
-        ret.m_zerocoin_trusted = GetZerocoinBalance(false);
-        ret.m_zerocoin_untrusted_pending = GetUnconfirmedZerocoinBalance();
-        ret.m_zerocoin_immature = GetImmatureZerocoinBalance();
+        std::cout << "GetZerocoinBalance\n";
+//        ret.m_zerocoin_trusted = GetZerocoinBalance(*locked_chain, false);
+        std::cout << "GetUnconfirmedZerocoinBalance\n";
+//        ret.m_zerocoin_untrusted_pending = GetUnconfirmedZerocoinBalance(*locked_chain);
+        std::cout << "GetImmatureZerocoinBalance\n";
+//        ret.m_zerocoin_immature = GetImmatureZerocoinBalance(*locked_chain);
     }
     return ret;
 }
@@ -5060,10 +5064,9 @@ bool CWallet::IsDenominatedAmount(CAmount nInputAmount) const
 
 int64_t CWalletTx::GetComputedTxTime(interfaces::Chain::Lock& locked_chain) const
 {
-    LOCK(cs_main);
     if (tx->IsZerocoinSpend() || tx->IsZerocoinMint()) {
         if (IsInMainChain(locked_chain))
-            return mapBlockIndex.at(hashBlock)->GetBlockTime();
+            return locked_chain.getBlockTime(locked_chain.getBlockHeight(hashBlock).get_value_or(-1));
         else
             return nTimeReceived;
     }
@@ -5243,7 +5246,7 @@ CAmount CWalletTx::GetDenominatedCredit(interfaces::Chain::Lock& locked_chain, b
     int nDepth = GetDepthInMainChain(locked_chain, false);
     if (nDepth < 0) return 0;
 
-    bool isUnconfirmed = !CheckFinalTx(*tx) || (!IsTrusted(locked_chain) && nDepth == 0);
+    bool isUnconfirmed = !locked_chain.checkFinalTx(*tx) || (!IsTrusted(locked_chain) && nDepth == 0);
     if (unconfirmed != isUnconfirmed) return 0;
 
     if (fUseCache) {
@@ -5381,16 +5384,22 @@ void CWalletTx::GetAccountAmounts(const std::string& strAccount, CAmount& nRecei
 
 std::map<libzerocoin::CoinDenomination, int> mapMintMaturity;
 int nLastMaturityCheck = 0;
-CAmount CWallet::GetZerocoinBalance(bool fMatureOnly) const
+CAmount CWallet::GetZerocoinBalance(interfaces::Chain::Lock& locked_chain, bool fMatureOnly) const
 {
-    auto locked_chain = chain().lock();
-    uint32_t const tip_height = locked_chain->getHeight().get_value_or(-1);
+    std::cout << "GetZerocoinBalance tip_height\n";
+    int32_t tip_height = locked_chain.getHeight().get_value_or(0);
+    std::cout << "GetZerocoinBalance fMatureOnly\n";
     if (fMatureOnly) {
-        if (tip_height > nLastMaturityCheck)
+        std::cout << "GetZerocoinBalance if tip_height\n";
+        if (tip_height > nLastMaturityCheck){
+            std::cout << "GetZerocoinBalance GetMintMaturityHeight\n";
             mapMintMaturity = GetMintMaturityHeight();
+        }
+        std::cout << "GetZerocoinBalance nLastMaturityCheck\n";
         nLastMaturityCheck = tip_height;
 
         CAmount nBalance = 0;
+        std::cout << "GetZerocoinBalance GetMints\n";
         std::vector<CMintMeta> vMints = zwspTracker->GetMints(true);
         for (auto meta : vMints) {
             if (meta.nHeight >= mapMintMaturity.at(meta.denom) || meta.nHeight >= tip_height || meta.nHeight == 0)
@@ -5399,18 +5408,18 @@ CAmount CWallet::GetZerocoinBalance(bool fMatureOnly) const
         }
         return nBalance;
     }
-
-    return zwspTracker->GetBalance(false, false);
+    std::cout << "GetZerocoinBalance zwspTracker->GetBalance\n";
+    return zwspTracker->GetBalance(locked_chain, false, false);
 }
 
-CAmount CWallet::GetImmatureZerocoinBalance() const
+CAmount CWallet::GetImmatureZerocoinBalance(interfaces::Chain::Lock& locked_chain) const
 {
-    return GetZerocoinBalance(false) - GetZerocoinBalance(true) - GetUnconfirmedZerocoinBalance();
+    return GetZerocoinBalance(locked_chain, false) - GetZerocoinBalance(locked_chain, true) - GetUnconfirmedZerocoinBalance(locked_chain);
 }
 
-CAmount CWallet::GetUnconfirmedZerocoinBalance() const
+CAmount CWallet::GetUnconfirmedZerocoinBalance(interfaces::Chain::Lock& locked_chain) const
 {
-    return zwspTracker->GetUnconfirmedBalance();
+    return zwspTracker->GetUnconfirmedBalance(locked_chain);
 }
 
 CAmount CWallet::GetUnlockedCoins() const
@@ -5875,7 +5884,7 @@ bool CWallet::MintableCoins()
     int32_t const tip_height = locked_chain->getHeight().get_value_or(-1);
     LOCK(cs_wallet);
     CAmount nBalance = GetBalance().m_mine_trusted;
-    CAmount nZwspBalance = GetZerocoinBalance(false);
+    CAmount nZwspBalance = GetZerocoinBalance(*locked_chain, false);
 
     // Regular WSP
     if (nBalance > 0) {
@@ -7208,6 +7217,7 @@ void CWallet::AutoZeromintForAddress()
 
 void CWallet::CreateAutoMintTransaction(const CAmount& nMintAmount, CCoinControl* coinControl)
 {
+    auto locked_chain = chain().lock();
     if (nMintAmount > 0){
         CWalletTx wtx;
         std::vector<CDeterministicMint> vDMints;
@@ -7219,7 +7229,7 @@ void CWallet::CreateAutoMintTransaction(const CAmount& nMintAmount, CCoinControl
             LogPrintf("CWallet::AutoZeromint(): auto minting failed with error: %s\n", strError);
             return;
         }
-        CAmount nZerocoinBalance = GetZerocoinBalance(false);
+        CAmount nZerocoinBalance = GetZerocoinBalance(*locked_chain, false);
         CAmount nBalance = GetUnlockedCoins();
         CAmount dPercentage = 100 * (double)nZerocoinBalance / (double)(nZerocoinBalance + nBalance);
         LogPrintf("CWallet::AutoZeromint() @ block %ld: successfully minted %ld zWSP. Current percentage of zWSP: %lf%%\n",
@@ -7235,8 +7245,9 @@ void CWallet::CreateAutoMintTransaction(const CAmount& nMintAmount, CCoinControl
 // CWallet::AutoZeromint() gets called with each new incoming block
 void CWallet::AutoZeromint()
 {
+    auto locked_chain = chain().lock();
     // Don't bother Autominting if Zerocoin Protocol isn't active
-    if (chain().getAdjustedTime() > chain().lock()->getSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) return;
+    if (chain().getAdjustedTime() > locked_chain->getSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) return;
 
     // Wait until blockchain + masternodes are fully synced and wallet is unlocked.
     if (chain().isInitialBlockDownload() || IsLocked()){
@@ -7259,7 +7270,7 @@ void CWallet::AutoZeromint()
     if (!fEnableZeromint)
         return;
 
-    CAmount nZerocoinBalance = GetZerocoinBalance(false); //false includes both pending and mature zerocoins. Need total balance for this so nothing is overminted.
+    CAmount nZerocoinBalance = GetZerocoinBalance(*locked_chain, false); //false includes both pending and mature zerocoins. Need total balance for this so nothing is overminted.
     CAmount nBalance = GetUnlockedCoins(); // We only consider unlocked coins, this also excludes masternode-vins
                                            // from being accidentally minted
     CAmount nMintAmount = 0;
@@ -7542,9 +7553,10 @@ bool CWallet::MultiSend()
 bool CWalletTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool ignoreFees)
 {
     CValidationState state;
-    bool fAccepted = ::AcceptToMemoryPool(mempool, state, *tx, fLimitFree, NULL, fRejectInsaneFee, ignoreFees);
+    bool fAccepted = false;
+//    bool fAccepted = ::AcceptToMemoryPool(mempool, state, *tx, fLimitFree, NULL, fRejectInsaneFee, ignoreFees);
     if (!fAccepted)
-        LogPrintf("%s : %s\n", __func__, state.GetRejectReason());
+        LogPrintf("%s : %s\n", __func__, "This function is deprecated");
     return fAccepted;
 }
 
@@ -7868,9 +7880,10 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
 
 bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, CWalletTx& wtxNew, CReserveKey& reserveKey, CZerocoinSpendReceipt& receipt, vector<CZerocoinMint>& vSelectedMints, vector<CDeterministicMint>& vNewMints, bool fMintChange,  bool fMinimizeChange, std::string* address)
 {
+    auto locked_chain = chain().lock();
     // Check available funds
     int nStatus = ZWSP_TRX_FUNDS_PROBLEMS;
-    if (nValue > GetZerocoinBalance(true)) {
+    if (nValue > GetZerocoinBalance(*locked_chain, true)) {
         receipt.SetStatus(_("You don't have enough Zerocoins in your wallet"), nStatus);
         return false;
     }

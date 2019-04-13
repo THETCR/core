@@ -158,6 +158,12 @@ public:
         virtual bool isTransactionLockTimedOut(const uint256& txid) = 0;
         virtual bool isSporkActive(int nSporkID) = 0;
         virtual int64_t getSporkValue(int nSporkID) = 0;
+        virtual int getIXConfirmations(const uint256& txid) = 0;
+        virtual bool isBlockInIndex(const uint256 hash) = 0;
+
+        virtual bool isTransactionInChain(const uint256& txId, int& nHeightTx, CTransactionRef& tx) = 0;
+        virtual bool isTransactionInChain(const uint256& txId, int& nHeightTx) = 0;
+        virtual bool isBlockHashInChain(const uint256& hashBlock) = 0;
 
     };
 
@@ -311,6 +317,10 @@ public:
     //!< WISPR
     //! Relay transaction.
     virtual void relayTransactionLock(const uint256& txid, CTransactionRef tx) = 0;
+
+    //! ZEROCOIN
+    virtual bool readCoinMint(const uint256& hashPubcoin, uint256& hashTx) =0;
+    virtual bool readCoinSpend(const uint256& hashSerial, uint256 &txHash) =0;
 };
 
 //! Interface to let node manage chain clients (wallets, or maybe tools for
