@@ -732,6 +732,142 @@ UniValue spork(const JSONRPCRequest& request)
         "\nExamples:\n" +
         HelpExampleCli("spork", "show") + HelpExampleRpc("spork", "show"));
 }
+/**
+ * @note Do not add or change anything in the information returned by this
+ * method. `getinfo` exists for backwards-compatibility only. It combines
+ * information from wildly different sources in the program, which is a mess,
+ * and is thus planned to be deprecated eventually.
+ *
+ * Based on the source of the information, new information should be added to:
+ * - `getblockchaininfo`,
+ * - `getnetworkinfo` or
+ * - `getwalletinfo`
+ *
+ * Or alternatively, create a specific query method for the information.
+ **/
+//UniValue getinfo(const JSONRPCRequest& request)
+//{
+//    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+//    CWallet* const pwallet = wallet.get();
+//
+//    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+//        return NullUniValue;
+//    }
+//
+//    if (request.fHelp || request.params.size() != 0)
+//        throw std::runtime_error(
+//            "getinfo\n"
+//            "\nReturns an object containing various state info.\n"
+//
+//            "\nResult:\n"
+//            "{\n"
+//            "  \"version\": xxxxx,           (numeric) the server version\n"
+//            "  \"protocolversion\": xxxxx,   (numeric) the protocol version\n"
+//            "  \"walletversion\": xxxxx,     (numeric) the wallet version\n"
+//            "  \"balance\": xxxxxxx,         (numeric) the total wispr balance of the wallet (excluding zerocoins)\n"
+//            "  \"zerocoinbalance\": xxxxxxx, (numeric) the total zerocoin balance of the wallet\n"
+//            "  \"blocks\": xxxxxx,           (numeric) the current number of blocks processed in the server\n"
+//            "  \"timeoffset\": xxxxx,        (numeric) the time offset\n"
+//            "  \"connections\": xxxxx,       (numeric) the number of connections\n"
+//            "  \"proxy\": \"host:port\",     (string, optional) the proxy used by the server\n"
+//            "  \"difficulty\": xxxxxx,       (numeric) the current difficulty\n"
+//            "  \"testnet\": true|false,      (boolean) if the server is using testnet or not\n"
+//            "  \"moneysupply\" : \"supply\"       (numeric) The money supply when this block was added to the blockchain\n"
+//            "  \"zWSPsupply\" :\n"
+//            "  {\n"
+//            "     \"1\" : n,            (numeric) supply of 1 zWSP denomination\n"
+//            "     \"5\" : n,            (numeric) supply of 5 zWSP denomination\n"
+//            "     \"10\" : n,           (numeric) supply of 10 zWSP denomination\n"
+//            "     \"50\" : n,           (numeric) supply of 50 zWSP denomination\n"
+//            "     \"100\" : n,          (numeric) supply of 100 zWSP denomination\n"
+//            "     \"500\" : n,          (numeric) supply of 500 zWSP denomination\n"
+//            "     \"1000\" : n,         (numeric) supply of 1000 zWSP denomination\n"
+//            "     \"5000\" : n,         (numeric) supply of 5000 zWSP denomination\n"
+//            "     \"total\" : n,        (numeric) The total supply of all zWSP denominations\n"
+//            "  }\n"
+//            "  \"keypoololdest\": xxxxxx,    (numeric) the timestamp (seconds since GMT epoch) of the oldest pre-generated key in the key pool\n"
+//            "  \"keypoolsize\": xxxx,        (numeric) how many new keys are pre-generated\n"
+//            "  \"unlocked_until\": ttt,      (numeric) the timestamp in seconds since epoch (midnight Jan 1 1970 GMT) that the wallet is unlocked for transfers, or 0 if the wallet is locked\n"
+//            "  \"paytxfee\": x.xxxx,         (numeric) the transaction fee set in wispr/kb\n"
+//            "  \"relayfee\": x.xxxx,         (numeric) minimum relay fee for non-free transactions in wispr/kb\n"
+//            "  \"staking status\": true|false,  (boolean) if the wallet is staking or not\n"
+//            "  \"errors\": \"...\"           (string) any error messages\n"
+//            "}\n"
+//
+//            "\nExamples:\n" +
+//            HelpExampleCli("getinfo", "") + HelpExampleRpc("getinfo", ""));
+//
+//    LOCK(pwallet->cs_wallet);
+//
+//    std::string services;
+//    for (int i = 0; i < 8; i++) {
+//        uint64_t check = 1 << i;
+//        if (g_connman->GetLocalServices() & check) {
+//            switch (check) {
+//            case NODE_NETWORK:
+//                services+= "NETWORK/";
+//                break;
+//            case NODE_BLOOM:
+//                services+= "BLOOM/";
+//                break;
+//            case NODE_BLOOM_WITHOUT_MN:
+//            case NODE_BLOOM_LIGHT_ZC:
+//                services+= "BLOOM_ZC/";
+//                break;
+//            default:
+//                services+= "UNKNOWN/";
+//            }
+//        }
+//    }
+//
+//    UniValue obj(UniValue::VOBJ);
+//    obj.pushKV("version", CLIENT_VERSION);
+//    obj.pushKV("protocolversion", PROTOCOL_VERSION);
+//    obj.pushKV("services", services);
+//#ifdef ENABLE_WALLET
+//    if (pwallet) {
+//        obj.pushKV("walletversion", pwallet->GetVersion());
+//        obj.pushKV("balance", ValueFromAmount(pwallet->GetBalance().m_mine_trusted));
+//        obj.pushKV("zerocoinbalance", ValueFromAmount(pwallet->GetZerocoinBalance(true)));
+//    }
+//#endif
+//    obj.pushKV("blocks", (int)chainActive.Height());
+//    obj.pushKV("timeoffset", GetTimeOffset());
+//    obj.pushKV("connections", (int)g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL));
+//    obj.pushKV("testnet", Params().TestnetToBeDeprecatedFieldRPC());
+//
+//    // During inital block verification chainActive.Tip() might be not yet initialized
+//    if (chainActive.Tip() == nullptr) {
+//        obj.pushKV("status", "Blockchain information not yet available");
+//        return obj;
+//    }
+//
+//    obj.pushKV("moneysupply",ValueFromAmount(chainActive.Tip()->nMoneySupply));
+//    UniValue zwspObj(UniValue::VOBJ);
+//    for (auto denom : libzerocoin::zerocoinDenomList) {
+//        zwspObj.pushKV(to_string(denom), ValueFromAmount(chainActive.Tip()->mapZerocoinSupply.at(denom) * (denom*COIN)));
+//    }
+//    zwspObj.pushKV("total", ValueFromAmount(chainActive.Tip()->GetZerocoinSupply()));
+//    obj.pushKV("zWSPsupply", zwspObj);
+//
+//#ifdef ENABLE_WALLET
+//    if (pwallet) {
+//        obj.pushKV("keypoololdest", pwallet->GetOldestKeyPoolTime());
+//        obj.pushKV("keypoolsize", (int)pwallet->GetKeyPoolSize());
+//    }
+//    if (pwallet && pwallet->IsCrypted())
+//        obj.pushKV("unlocked_until", pwallet->nRelockTime);
+//    obj.pushKV("paytxfee", ValueFromAmount(payTxFee.GetFeePerK()));
+//#endif
+//    obj.pushKV("relayfee", ValueFromAmount(pwallet->chain().relayMinFee().GetFeePerK()));
+//    bool nStaking = false;
+//    if (mapHashedBlocks.count(chainActive.Tip()->nHeight))
+//        nStaking = true;
+//    else if (mapHashedBlocks.count(chainActive.Tip()->nHeight - 1) && nLastCoinStakeSearchInterval)
+//        nStaking = true;
+//    obj.pushKV("staking status", (nStaking ? "Staking Active" : "Staking Not Active"));
+//    return obj;
+//}
 
 // clang-format off
 static const CRPCCommand commands[] =
@@ -754,6 +890,8 @@ static const CRPCCommand commands[] =
     //!WISPR
     {"wispr", "mnsync", &mnsync,{}},
     {"wispr", "spork", &spork,{}},
+//    { "control",            "getinfo",                &getinfo,                {} }, /* uses wallet if enabled */
+
 
 };
 // clang-format on

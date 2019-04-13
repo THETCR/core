@@ -340,6 +340,7 @@ libbitcoin_server_a_SOURCES = \
   rpc/net.cpp \
   rpc/rawtransaction.cpp \
   rpc/server.cpp \
+  rpc/zerocoin.cpp \
   script/sigcache.cpp \
   shutdown.cpp \
   spork.cpp \

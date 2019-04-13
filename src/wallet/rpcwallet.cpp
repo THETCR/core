@@ -4506,83 +4506,6 @@ UniValue getzerocoinbalance(const JSONRPCRequest& request)
 
 }
 
-UniValue listmintedzerocoins(const JSONRPCRequest& request)
-{
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
-    if (request.fHelp || request.params.size() > 2)
-        throw std::runtime_error(
-            "listmintedzerocoins (fVerbose) (fMatureOnly)\n"
-            "\nList all zWSP mints in the wallet.\n" +
-            HelpRequiringPassphrase(pwallet) + "\n"
-
-            "\nArguments:\n"
-            "1. fVerbose      (boolean, optional, default=false) Output mints metadata.\n"
-            "2. fMatureOnly      (boolean, optional, default=false) List only mature mints. (Set only if fVerbose is specified)\n"
-
-            "\nResult (with fVerbose=false):\n"
-            "[\n"
-            "  \"xxx\"      (string) Pubcoin in hex format.\n"
-            "  ,...\n"
-            "]\n"
-
-            "\nResult (with fVerbose=true):\n"
-            "[\n"
-            "  {\n"
-            "    \"serial hash\": \"xxx\",   (string) Mint serial hash in hex format.\n"
-            "    \"version\": n,   (numeric) Zerocoin version number.\n"
-            "    \"zWSP ID\": \"xxx\",   (string) Pubcoin in hex format.\n"
-            "    \"denomination\": n,   (numeric) Coin denomination.\n"
-            "    \"confirmations\": n   (numeric) Number of confirmations.\n"
-            "  }\n"
-            "  ,..."
-            "]\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("listmintedzerocoins", "") + HelpExampleRpc("listmintedzerocoins", "") +
-            HelpExampleCli("listmintedzerocoins", "true") + HelpExampleRpc("listmintedzerocoins", "true") +
-            HelpExampleCli("listmintedzerocoins", "true true") + HelpExampleRpc("listmintedzerocoins", "true, true"));
-
-    bool fVerbose = (request.params.size() > 0) ? request.params[0].get_bool() : false;
-    bool fMatureOnly = (request.params.size() > 1) ? request.params[1].get_bool() : false;
-
-    LOCK(pwallet->cs_wallet);
-
-    EnsureWalletIsUnlocked(pwallet, true);
-
-    WalletBatch walletdb(pwallet->GetDBHandle());
-    set<CMintMeta> setMints = pwallet->zwspTracker->ListMints(true, fMatureOnly, true);
-
-    int nBestHeight = chainActive.Height();
-
-    UniValue jsonList(UniValue::VARR);
-    if (fVerbose) {
-        for (const CMintMeta& m : setMints) {
-            // Construct mint object
-            UniValue objMint(UniValue::VOBJ);
-            objMint.pushKV("serial hash", m.hashSerial.GetHex());  // Serial hah
-            objMint.pushKV("version", m.nVersion);                 // Zerocoin versin
-            objMint.pushKV("zWSP ID", m.hashPubcoin.GetHex());     // PubCon
-            int denom = libzerocoin::ZerocoinDenominationToInt(m.denom);
-            objMint.pushKV("denomination", denom);                 // Denominatin
-            int nConfirmations = (m.nHeight && nBestHeight > m.nHeight) ? nBestHeight - m.nHeight : 0;
-            objMint.pushKV("confirmations", nConfirmations);       // Confirmatios
-            // Push back mint object
-            jsonList.push_back(objMint);
-        }
-    } else {
-        for (const CMintMeta& m : setMints)
-            // Push back PubCoin
-            jsonList.push_back(m.hashPubcoin.GetHex());
-    }
-    return jsonList;
-}
-
 UniValue listzerocoinamounts(const JSONRPCRequest& request)
 {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
@@ -5019,142 +4942,6 @@ UniValue spendzerocoinmints(const JSONRPCRequest& request)
     }
 
     return DoZwspSpend(pwallet, nAmount, false, true, vMintsSelected, address_str);
-}
-
-UniValue resetmintzerocoin(const JSONRPCRequest& request)
-{
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
-    if (request.fHelp || request.params.size() > 1)
-        throw std::runtime_error(
-            "resetmintzerocoin ( fullscan )\n"
-            "\nScan the blockchain for all of the zerocoins that are held in the wallet.dat.\n"
-            "Update any meta-data that is incorrect. Archive any mints that are not able to be found.\n" +
-            HelpRequiringPassphrase(pwallet) + "\n"
-
-            "\nArguments:\n"
-            "1. fullscan          (boolean, optional) Rescan each block of the blockchain.\n"
-            "                               WARNING - may take 30+ minutes!\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"updated\": [       (array) JSON array of updated mints.\n"
-            "    \"xxx\"            (string) Hex encoded mint.\n"
-            "    ,...\n"
-            "  ],\n"
-            "  \"archived\": [      (array) JSON array of archived mints.\n"
-            "    \"xxx\"            (string) Hex encoded mint.\n"
-            "    ,...\n"
-            "  ]\n"
-            "}\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("resetmintzerocoin", "true") + HelpExampleRpc("resetmintzerocoin", "true"));
-
-    LOCK(pwallet->cs_wallet);
-
-    WalletBatch walletdb(pwallet->GetDBHandle());
-    CzWSPTracker* zwspTracker = pwallet->zwspTracker.get();
-    set<CMintMeta> setMints = zwspTracker->ListMints(false, false, true);
-    std::vector<CMintMeta> vMintsToFind(setMints.begin(), setMints.end());
-    std::vector<CMintMeta> vMintsMissing;
-    std::vector<CMintMeta> vMintsToUpdate;
-
-    // search all of our available data for these mints
-    FindMints(vMintsToFind, vMintsToUpdate, vMintsMissing);
-
-    // update the meta data of mints that were marked for updating
-    UniValue arrUpdated(UniValue::VARR);
-    for (CMintMeta meta : vMintsToUpdate) {
-        zwspTracker->UpdateState(meta);
-        arrUpdated.push_back(meta.hashPubcoin.GetHex());
-    }
-
-    // delete any mints that were unable to be located on the blockchain
-    UniValue arrDeleted(UniValue::VARR);
-    for (CMintMeta mint : vMintsMissing) {
-        zwspTracker->Archive(mint);
-        arrDeleted.push_back(mint.hashPubcoin.GetHex());
-    }
-
-    UniValue obj(UniValue::VOBJ);
-    obj.pushKV("updated", arrUpdated);
-    obj.pushKV("archived", arrDeleted);
-    return obj;
-}
-
-UniValue resetspentzerocoin(const JSONRPCRequest& request)
-{
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
-    if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "resetspentzerocoin\n"
-            "\nScan the blockchain for all of the zerocoins that are held in the wallet.dat.\n"
-            "Reset mints that are considered spent that did not make it into the blockchain.\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"restored\": [        (array) JSON array of restored objects.\n"
-            "    {\n"
-            "      \"serial\": \"xxx\"  (string) Serial in hex format.\n"
-            "    }\n"
-            "    ,...\n"
-            "  ]\n"
-            "}\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("resetspentzerocoin", "") + HelpExampleRpc("resetspentzerocoin", ""));
-
-    LOCK(pwallet->cs_wallet);
-
-    WalletBatch walletdb(pwallet->GetDBHandle());
-    CzWSPTracker* zwspTracker = pwallet->zwspTracker.get();
-    set<CMintMeta> setMints = zwspTracker->ListMints(false, false, false);
-    std::list<CZerocoinSpend> listSpends = walletdb.ListSpentCoins();
-    std::list<CZerocoinSpend> listUnconfirmedSpends;
-
-    for (CZerocoinSpend spend : listSpends) {
-        CTransactionRef tx;
-        uint256 hashBlock = 0;
-        if (!GetTransaction(spend.GetTxHash(), tx, Params().GetConsensus(), hashBlock)) {
-            listUnconfirmedSpends.push_back(spend);
-            continue;
-        }
-
-        //no confirmations
-        if (hashBlock == 0)
-            listUnconfirmedSpends.push_back(spend);
-    }
-
-    UniValue objRet(UniValue::VOBJ);
-    UniValue arrRestored(UniValue::VARR);
-    for (CZerocoinSpend spend : listUnconfirmedSpends) {
-        for (auto& meta : setMints) {
-            if (meta.hashSerial == GetSerialHash(spend.GetSerial())) {
-                zwspTracker->SetPubcoinNotUsed(meta.hashPubcoin);
-                walletdb.EraseZerocoinSpendSerialEntry(spend.GetSerial());
-                RemoveSerialFromDB(spend.GetSerial());
-                UniValue obj(UniValue::VOBJ);
-                obj.pushKV("serial", spend.GetSerial().GetHex());
-                arrRestored.push_back(obj);
-                continue;
-            }
-        }
-    }
-
-    objRet.pushKV("restored", arrRestored);
-    return objRet;
 }
 
 UniValue getarchivedzerocoin(const JSONRPCRequest& request)
@@ -5750,59 +5537,6 @@ UniValue createautomintaddress(const JSONRPCRequest& request)
     LOCK(pwallet->cs_wallet);
     std::string address = pwallet->GenerateNewAutoMintKey();
     return address;
-}
-
-UniValue getstakingstatus(const JSONRPCRequest& request)
-{
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
-    if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "getstakingstatus\n"
-            "\nReturns an object containing various staking information.\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"validtime\": true|false,          (boolean) if the chain tip is within staking phases\n"
-            "  \"haveconnections\": true|false,    (boolean) if network connections are present\n"
-            "  \"walletunlocked\": true|false,     (boolean) if the wallet is unlocked\n"
-            "  \"mintablecoins\": true|false,      (boolean) if the wallet has mintable coins\n"
-            "  \"enoughcoins\": true|false,        (boolean) if available coins are greater than reserve balance\n"
-            "  \"mnsync\": true|false,             (boolean) if masternode data is synced\n"
-            "  \"staking status\": true|false,     (boolean) if the wallet is staking or not\n"
-            "}\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
-
-    auto locked_chain = pwallet->chain().lock();
-    LOCK(pwallet->cs_wallet);
-    uint32_t const tip_height = locked_chain->getHeight().get_value_or(0);
-    int64_t const tip_time = locked_chain->getBlockTime(tip_height);
-
-    UniValue obj(UniValue::VOBJ);
-    obj.pushKV("validtime", tip_time > 1471482000);
-    obj.pushKV("haveconnections", g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) != 0);
-    if (pwallet) {
-        obj.pushKV("walletunlocked", !pwallet->IsLocked());
-        obj.pushKV("mintablecoins", pwallet->MintableCoins());
-        obj.pushKV("enoughcoins", nReserveBalance <= pwallet->GetBalance().m_mine_trusted);
-    }
-    obj.pushKV("mnsync", masternodeSync.IsSynced());
-
-    bool nStaking = false;
-    if (mapHashedBlocks.count(tip_height))
-        nStaking = true;
-    else if (mapHashedBlocks.count(tip_height - 1) && nLastCoinStakeSearchInterval)
-        nStaking = true;
-    obj.pushKV("staking status", nStaking);
-
-    return obj;
 }
 
 UniValue spendrawzerocoin(const JSONRPCRequest& request)
@@ -6409,121 +6143,6 @@ UniValue sendtoaddressix(const JSONRPCRequest& request)
     return tx->GetHash().GetHex();
 }
 
-UniValue getgenerate(const JSONRPCRequest& request)
-{
-    if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "getgenerate\n"
-            "\nReturn if the server is set to generate coins or not. The default is false.\n"
-            "It is set with the command line argument -gen (or wispr.conf setting gen)\n"
-            "It can also be set with the setgenerate call.\n"
-
-            "\nResult\n"
-            "true|false      (boolean) If the server is set to generate coins or not\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("getgenerate", "") + HelpExampleRpc("getgenerate", ""));
-
-    LOCK(cs_main);
-    return gArgs.GetBoolArg("-gen", false);
-}
-
-
-UniValue setgenerate(const JSONRPCRequest& request)
-{
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
-    if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
-        throw std::runtime_error(
-            "setgenerate generate ( genproclimit )\n"
-            "\nSet 'generate' true or false to turn generation on or off.\n"
-            "Generation is limited to 'genproclimit' processors, -1 is unlimited.\n"
-            "See the getgenerate call for the current setting.\n"
-
-            "\nArguments:\n"
-            "1. generate         (boolean, required) Set to true to turn on generation, false to turn off.\n"
-            "2. genproclimit     (numeric, optional) Set the processor limit for when generation is on. Can be -1 for unlimited.\n"
-            "                    Note: in -regtest mode, genproclimit controls how many blocks are generated immediately.\n"
-
-            "\nResult\n"
-            "[ blockhashes ]     (array, -regtest only) hashes of blocks generated\n"
-
-            "\nExamples:\n"
-            "\nSet the generation on with a limit of one processor\n" +
-            HelpExampleCli("setgenerate", "true 1") +
-            "\nCheck the setting\n" + HelpExampleCli("getgenerate", "") +
-            "\nTurn off generation\n" + HelpExampleCli("setgenerate", "false") +
-            "\nUsing json rpc\n" + HelpExampleRpc("setgenerate", "true, 1"));
-
-    if (pwallet == nullptr)
-        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found (disabled)");
-
-    bool fGenerate = true;
-    if (request.params.size() > 0)
-        fGenerate = request.params[0].get_bool();
-
-    int nGenProcLimit = -1;
-    if (request.params.size() > 1) {
-        nGenProcLimit = request.params[1].get_int();
-        if (nGenProcLimit == 0)
-            fGenerate = false;
-    }
-
-    // -regtest mode: don't return until nGenProcLimit blocks are generated
-    if (fGenerate && Params().MineBlocksOnDemand()) {
-        int nHeightStart = 0;
-        int nHeightEnd = 0;
-        int nHeight = 0;
-        int nGenerate = (nGenProcLimit > 0 ? nGenProcLimit : 1);
-        CReserveKey reservekey(pwallet);
-
-        { // Don't keep cs_main locked
-            LOCK(cs_main);
-            nHeightStart = chainActive.Height();
-            nHeight = nHeightStart;
-            nHeightEnd = nHeightStart + nGenerate;
-        }
-
-        unsigned int nExtraNonce = 0;
-        UniValue blockHashes(UniValue::VARR);
-        while (nHeight < nHeightEnd) {
-            std::unique_ptr<CBlockTemplate> pblocktemplate(BlockAssembler(Params()).CreateNewBlock(reservekey.reserveScript));
-//            unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwallet, false));
-            if (!pblocktemplate.get())
-                throw JSONRPCError(RPC_INTERNAL_ERROR, "Wallet keypool empty");
-            CBlock* pblock = &pblocktemplate->block;
-            {
-                LOCK(cs_main);
-                IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
-            }
-            while (!CheckProofOfWork(pblock->GetPoWHash(), pblock->nBits, Params().GetConsensus())) {
-                // Yes, there is a chance every nonce could fail to satisfy the -regtest
-                // target -- 1 in 2^(2^32). That ain't gonna happen.
-                ++pblock->nNonce;
-            }
-            bool new_block;
-            std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
-            if (!ProcessNewBlock(Params(), shared_pblock, true, &new_block))
-                throw JSONRPCError(RPC_INTERNAL_ERROR, "ProcessNewBlock, block not accepted");
-            ++nHeight;
-            blockHashes.push_back(pblock->GetHash().GetHex());
-        }
-        return blockHashes;
-    } else // Not -regtest: start generate thread, return immediately
-    {
-        gArgs.SoftSetArg("-gen", (fGenerate ? "1" : "0"));
-        gArgs.SoftSetArg("-genproclimit", itostr(nGenProcLimit));
-//        GenerateBitcoins(fGenerate, pwallet, nGenProcLimit);
-    }
-
-    return NullUniValue;
-}
-
 UniValue gethashespersec(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
@@ -6541,143 +6160,6 @@ UniValue gethashespersec(const JSONRPCRequest& request)
 //    if (GetTimeMillis() - nHPSTimerStart > 8000)
         return (int64_t)0;
 //    return (int64_t)dHashesPerSec;
-}
-
-/**
- * @note Do not add or change anything in the information returned by this
- * method. `getinfo` exists for backwards-compatibility only. It combines
- * information from wildly different sources in the program, which is a mess,
- * and is thus planned to be deprecated eventually.
- *
- * Based on the source of the information, new information should be added to:
- * - `getblockchaininfo`,
- * - `getnetworkinfo` or
- * - `getwalletinfo`
- *
- * Or alternatively, create a specific query method for the information.
- **/
-UniValue getinfo(const JSONRPCRequest& request)
-{
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
-    if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "getinfo\n"
-            "\nReturns an object containing various state info.\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"version\": xxxxx,           (numeric) the server version\n"
-            "  \"protocolversion\": xxxxx,   (numeric) the protocol version\n"
-            "  \"walletversion\": xxxxx,     (numeric) the wallet version\n"
-            "  \"balance\": xxxxxxx,         (numeric) the total wispr balance of the wallet (excluding zerocoins)\n"
-            "  \"zerocoinbalance\": xxxxxxx, (numeric) the total zerocoin balance of the wallet\n"
-            "  \"blocks\": xxxxxx,           (numeric) the current number of blocks processed in the server\n"
-            "  \"timeoffset\": xxxxx,        (numeric) the time offset\n"
-            "  \"connections\": xxxxx,       (numeric) the number of connections\n"
-            "  \"proxy\": \"host:port\",     (string, optional) the proxy used by the server\n"
-            "  \"difficulty\": xxxxxx,       (numeric) the current difficulty\n"
-            "  \"testnet\": true|false,      (boolean) if the server is using testnet or not\n"
-            "  \"moneysupply\" : \"supply\"       (numeric) The money supply when this block was added to the blockchain\n"
-            "  \"zWSPsupply\" :\n"
-            "  {\n"
-            "     \"1\" : n,            (numeric) supply of 1 zWSP denomination\n"
-            "     \"5\" : n,            (numeric) supply of 5 zWSP denomination\n"
-            "     \"10\" : n,           (numeric) supply of 10 zWSP denomination\n"
-            "     \"50\" : n,           (numeric) supply of 50 zWSP denomination\n"
-            "     \"100\" : n,          (numeric) supply of 100 zWSP denomination\n"
-            "     \"500\" : n,          (numeric) supply of 500 zWSP denomination\n"
-            "     \"1000\" : n,         (numeric) supply of 1000 zWSP denomination\n"
-            "     \"5000\" : n,         (numeric) supply of 5000 zWSP denomination\n"
-            "     \"total\" : n,        (numeric) The total supply of all zWSP denominations\n"
-            "  }\n"
-            "  \"keypoololdest\": xxxxxx,    (numeric) the timestamp (seconds since GMT epoch) of the oldest pre-generated key in the key pool\n"
-            "  \"keypoolsize\": xxxx,        (numeric) how many new keys are pre-generated\n"
-            "  \"unlocked_until\": ttt,      (numeric) the timestamp in seconds since epoch (midnight Jan 1 1970 GMT) that the wallet is unlocked for transfers, or 0 if the wallet is locked\n"
-            "  \"paytxfee\": x.xxxx,         (numeric) the transaction fee set in wispr/kb\n"
-            "  \"relayfee\": x.xxxx,         (numeric) minimum relay fee for non-free transactions in wispr/kb\n"
-            "  \"staking status\": true|false,  (boolean) if the wallet is staking or not\n"
-            "  \"errors\": \"...\"           (string) any error messages\n"
-            "}\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("getinfo", "") + HelpExampleRpc("getinfo", ""));
-
-    LOCK(pwallet->cs_wallet);
-
-    std::string services;
-    for (int i = 0; i < 8; i++) {
-        uint64_t check = 1 << i;
-        if (g_connman->GetLocalServices() & check) {
-            switch (check) {
-            case NODE_NETWORK:
-                services+= "NETWORK/";
-                break;
-            case NODE_BLOOM:
-                services+= "BLOOM/";
-                break;
-            case NODE_BLOOM_WITHOUT_MN:
-            case NODE_BLOOM_LIGHT_ZC:
-                services+= "BLOOM_ZC/";
-                break;
-            default:
-                services+= "UNKNOWN/";
-            }
-        }
-    }
-
-    UniValue obj(UniValue::VOBJ);
-    obj.pushKV("version", CLIENT_VERSION);
-    obj.pushKV("protocolversion", PROTOCOL_VERSION);
-    obj.pushKV("services", services);
-#ifdef ENABLE_WALLET
-    if (pwallet) {
-        obj.pushKV("walletversion", pwallet->GetVersion());
-        obj.pushKV("balance", ValueFromAmount(pwallet->GetBalance().m_mine_trusted));
-        obj.pushKV("zerocoinbalance", ValueFromAmount(pwallet->GetZerocoinBalance(true)));
-    }
-#endif
-    obj.pushKV("blocks", (int)chainActive.Height());
-    obj.pushKV("timeoffset", GetTimeOffset());
-    obj.pushKV("connections", (int)g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL));
-    obj.pushKV("testnet", Params().TestnetToBeDeprecatedFieldRPC());
-
-    // During inital block verification chainActive.Tip() might be not yet initialized
-    if (chainActive.Tip() == nullptr) {
-        obj.pushKV("status", "Blockchain information not yet available");
-        return obj;
-    }
-
-    obj.pushKV("moneysupply",ValueFromAmount(chainActive.Tip()->nMoneySupply));
-    UniValue zwspObj(UniValue::VOBJ);
-    for (auto denom : libzerocoin::zerocoinDenomList) {
-        zwspObj.pushKV(to_string(denom), ValueFromAmount(chainActive.Tip()->mapZerocoinSupply.at(denom) * (denom*COIN)));
-    }
-    zwspObj.pushKV("total", ValueFromAmount(chainActive.Tip()->GetZerocoinSupply()));
-    obj.pushKV("zWSPsupply", zwspObj);
-
-#ifdef ENABLE_WALLET
-    if (pwallet) {
-        obj.pushKV("keypoololdest", pwallet->GetOldestKeyPoolTime());
-        obj.pushKV("keypoolsize", (int)pwallet->GetKeyPoolSize());
-    }
-    if (pwallet && pwallet->IsCrypted())
-        obj.pushKV("unlocked_until", pwallet->nRelockTime);
-    obj.pushKV("paytxfee", ValueFromAmount(payTxFee.GetFeePerK()));
-#endif
-    obj.pushKV("relayfee", ValueFromAmount(pwallet->chain().relayMinFee().GetFeePerK()));
-    bool nStaking = false;
-    if (mapHashedBlocks.count(chainActive.Tip()->nHeight))
-        nStaking = true;
-    else if (mapHashedBlocks.count(chainActive.Tip()->nHeight - 1) && nLastCoinStakeSearchInterval)
-        nStaking = true;
-    obj.pushKV("staking status", (nStaking ? "Staking Active" : "Staking Not Active"));
-    return obj;
 }
 
 /** Pushes a JSON object for script verification or signing errors to vErrorsRet. */
@@ -6943,47 +6425,6 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
     return result;
 }
 
-UniValue getspentzerocoinamount(const JSONRPCRequest& request)
-{
-    if (request.fHelp || request.params.size() != 2)
-        throw std::runtime_error(
-            "getspentzerocoinamount hexstring index\n"
-            "\nReturns value of spent zerocoin output designated by transaction hash and input index.\n"
-
-            "\nArguments:\n"
-            "1. hash          (hexstring) Transaction hash\n"
-            "2. index         (int) Input index\n"
-
-            "\nResult:\n"
-            "\"value\"        (int) Spent output value, -1 if error\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("getspentzerocoinamount", "78021ebf92a80dfccef1413067f1222e37535399797cce029bb40ad981131706 0"));
-
-    LOCK(cs_main);
-
-    uint256 txHash = ParseHashV(request.params[0], "parameter 1");
-    int inputIndex = request.params[1].get_int();
-    if (inputIndex < 0)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter for transaction input");
-
-    CTransactionRef tx;
-    uint256 hashBlock = 0;
-    if (!GetTransaction(txHash, tx, Params().GetConsensus(), hashBlock))
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available about transaction");
-
-    if (inputIndex >= (int)tx->vin.size())
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter for transaction input");
-
-    const CTxIn& input = tx->vin[inputIndex];
-    if (!input.scriptSig.IsZerocoinSpend())
-        return -1;
-
-    libzerocoin::CoinSpend spend = TxInToZerocoinSpend(input);
-    CAmount nValue = libzerocoin::ZerocoinDenominationToAmount(spend.getDenomination());
-    return FormatMoney(nValue);
-}
-
 #ifdef ENABLE_WALLET
 UniValue createrawzerocoinstake(const JSONRPCRequest& request)
 {
@@ -7139,14 +6580,10 @@ static const CRPCCommand commands[] =
 
 
     //!WISPR
-    { "control",            "getinfo",                &getinfo,                {} }, /* uses wallet if enabled */
-
     {"mining", "reservebalance", &reservebalance,{}},
 
     /* Coin generation */
-    {"generating", "getgenerate", &getgenerate, {}},
     {"generating", "gethashespersec", &gethashespersec, {}},
-    {"generating", "setgenerate", &setgenerate,{}},
 
         /* Wallet */
     {"wallet", "autocombinerewards", &autocombinerewards, {}},
@@ -7156,7 +6593,6 @@ static const CRPCCommand commands[] =
     {"wallet", "bip38decrypt", &bip38decrypt, {}},
     {"wallet", "getaccountaddress", &getaccountaddress, {}},
     {"wallet", "getaccount", &getaccount, {}},
-    {"wallet", "getstakingstatus", &getstakingstatus, {}},
     {"wallet", "getstakesplitthreshold", &getstakesplitthreshold, {}},
     {"wallet", "move", &movecmd, {}},
 
@@ -7166,14 +6602,11 @@ static const CRPCCommand commands[] =
     {"wallet", "setstakesplitthreshold", &setstakesplitthreshold, {}},
 
     {"zerocoin", "getzerocoinbalance", &getzerocoinbalance, {}},
-    {"zerocoin", "listmintedzerocoins", &listmintedzerocoins, {}},
     {"zerocoin", "listspentzerocoins", &listspentzerocoins, {}},
     {"zerocoin", "listzerocoinamounts", &listzerocoinamounts, {}},
     {"zerocoin", "mintzerocoin", &mintzerocoin, {}},
     {"zerocoin", "spendzerocoin", &spendzerocoin, {}},
     {"zerocoin", "spendzerocoinmints", &spendzerocoinmints, {}},
-    {"zerocoin", "resetmintzerocoin", &resetmintzerocoin, {}},
-    {"zerocoin", "resetspentzerocoin", &resetspentzerocoin, {}},
     {"zerocoin", "getarchivedzerocoin", &getarchivedzerocoin, {}},
     {"zerocoin", "importzerocoins", &importzerocoins, {}},
     {"zerocoin", "exportzerocoins", &exportzerocoins, {}},
@@ -7184,7 +6617,6 @@ static const CRPCCommand commands[] =
     {"zerocoin", "searchdzwsp", &searchdzwsp, {}},
     {"zerocoin", "dzwspstate", &dzwspstate, {}},
     {"zerocoin", "clearspendcache", &clearspendcache, {}},
-    {"zerocoin", "getspentzerocoinamount", &getspentzerocoinamount, {}},
     {"zerocoin", "createrawzerocoinstake", &createrawzerocoinstake, {}},
 
     { "hidden",             "signrawtransaction",           &signrawtransaction,        {"hexstring","prevtxs","privkeys","sighashtype"} },
