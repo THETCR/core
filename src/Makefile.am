@@ -400,6 +400,9 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/walletdb.cpp \
   wallet/walletutil.cpp \
   wallet/coinselection.cpp \
+  zpiv/accumulators.cpp \
+  zpiv/accumulatorcheckpoints.cpp \
+  zpiv/accumulatormap.cpp \
   zpiv/deterministicmint.cpp \
   zpiv/mintpool.cpp \
   zpiv/witness.cpp \
