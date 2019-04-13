@@ -5837,7 +5837,7 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
 
     //zWSP
     uint32_t const tip_height = locked_chain->getHeight().get_value_or(-1);
-    if ((gArgs.GetBoolArg("-zwspstake", true) || fPrecompute) && tip_height > Params().NEW_PROTOCOLS_STARTHEIGHT() && !IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
+    if ((gArgs.GetBoolArg("-zwspstake", true) || fPrecompute) && tip_height > Params().NEW_PROTOCOLS_STARTHEIGHT() && !locked_chain->isSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
         //Only update zWSP set once per update interval
         bool fUpdate = false;
         static int64_t nTimeLastUpdate = 0;
@@ -7236,7 +7236,7 @@ void CWallet::CreateAutoMintTransaction(const CAmount& nMintAmount, CCoinControl
 void CWallet::AutoZeromint()
 {
     // Don't bother Autominting if Zerocoin Protocol isn't active
-    if (chain().getAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) return;
+    if (chain().getAdjustedTime() > chain().lock()->getSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) return;
 
     // Wait until blockchain + masternodes are fully synced and wallet is unlocked.
     if (chain().isInitialBlockDownload() || IsLocked()){
@@ -7551,7 +7551,7 @@ bool CWalletTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool 
 int CMerkleTx::GetTransactionLockSignatures(interfaces::Chain::Lock& locked_chain) const
 {
     if (GetfLargeWorkForkFound() || GetfLargeWorkInvalidChainFound()) return -2;
-    if (!IsSporkActive(SPORK_2_SWIFTTX)) return -3;
+    if (!locked_chain.isSporkActive(SPORK_2_SWIFTTX)) return -3;
     if (!fEnableSwiftTX) return -1;
 
     //compile consessus vote

@@ -39,6 +39,9 @@
 #include <atomic>
 #include <univalue.h>
 
+//!<WISPR
+#include <spork.h>
+
 class CWallet;
 fs::path GetWalletDir();
 std::vector<fs::path> ListWalletDir();
@@ -320,6 +323,8 @@ public:
             }));
     }
     InitInterfaces m_interfaces;
+
+    //!<WISPR
 };
 
 } // namespace

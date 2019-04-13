@@ -185,6 +185,14 @@ class LockImpl : public Chain::Lock
 
         return false;
     };
+    bool isSporkActive(int nSporkID) override
+    {
+        return IsSporkActive(nSporkID);
+    }
+    int64_t getSporkValue(int nSporkID) override
+    {
+        return GetSporkValue(nSporkID);
+    }
 };
 
 class LockingStateImpl : public LockImpl, public UniqueLock<CCriticalSection>

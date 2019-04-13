@@ -156,6 +156,8 @@ public:
         //!< WISPR
         virtual int getTransactionLockSignatures(const uint256& txid) = 0;
         virtual bool isTransactionLockTimedOut(const uint256& txid) = 0;
+        virtual bool isSporkActive(int nSporkID) = 0;
+        virtual int64_t getSporkValue(int nSporkID) = 0;
 
     };
 
