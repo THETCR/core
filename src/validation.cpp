@@ -2771,7 +2771,7 @@ bool RecalculateWSPSupply(int nHeightStart)
                 COutPoint prevout = tx->vin[i].prevout;
                 CTransactionRef txPrev;
                 uint256 hashBlock;
-                assert(GetTransaction(prevout.hash, txPrev, consensusParams, hashBlock, pindex));
+                assert(GetTransaction(prevout.hash, txPrev, consensusParams, hashBlock, pindex, true));
                 nValueIn += txPrev->vout[prevout.n].nValue;
             }
 
