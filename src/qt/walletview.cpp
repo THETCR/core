@@ -47,7 +47,7 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     platformStyle(_platformStyle)
 {
     // Create tabs
-    overviewPage = new OverviewPage(platformStyle, this);
+    overviewPage = new OverviewPage(platformStyle);
     explorerWindow = new BlockExplorer(this);
     transactionsPage = new QWidget(this);
 
@@ -125,6 +125,9 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     receiveCoinsPage = new ReceiveCoinsDialog(platformStyle);
     sendCoinsPage = new SendCoinsDialog(platformStyle);
 
+    usedSendingAddressesPage = new AddressBookPage(platformStyle, AddressBookPage::ForEditing, AddressBookPage::SendingTab, this);
+    usedReceivingAddressesPage = new AddressBookPage(platformStyle, AddressBookPage::ForEditing, AddressBookPage::ReceivingTab, this);
+
     addWidget(overviewPage);
     addWidget(transactionsPage);
     addWidget(privacyPage);
@@ -150,7 +153,7 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     connect(transactionView, SIGNAL(trxAmount(QString)), this, SLOT(trxAmount(QString)));
 
     // Highlight transaction after send
-//    connect(sendCoinsPage, &SendCoinsDialog::coinsSent, transactionView, static_cast<void (TransactionView::*)(const uint256&)>(&TransactionView::focusTransaction));
+    connect(sendCoinsPage, &SendCoinsDialog::coinsSent, transactionView, static_cast<void (TransactionView::*)(const uint256&)>(&TransactionView::focusTransaction));
 
     // Clicking on "Export" allows to export the transaction list
     connect(exportButton, &QPushButton::clicked, transactionView, &TransactionView::exportClicked);
@@ -217,6 +220,8 @@ void WalletView::setWalletModel(WalletModel *_walletModel)
     privacyPage->setModel(_walletModel);
     receiveCoinsPage->setModel(_walletModel);
     sendCoinsPage->setModel(_walletModel);
+    usedReceivingAddressesPage->setModel(_walletModel ? _walletModel->getAddressTableModel() : nullptr);
+    usedSendingAddressesPage->setModel(_walletModel ? _walletModel->getAddressTableModel() : nullptr);
 
     if (_walletModel)
     {
@@ -370,8 +375,8 @@ void WalletView::encryptWallet(bool status)
     if(!walletModel)
         return;
     AskPassphraseDialog dlg(status ? AskPassphraseDialog::Mode::Encrypt : AskPassphraseDialog::Mode::Decrypt, this, 
-                            walletModel, AskPassphraseDialog::Context::Encrypt);
-//    dlg.setModel(walletModel);
+                             AskPassphraseDialog::Context::Encrypt);
+    dlg.setModel(walletModel);
     dlg.exec();
 
     updateEncryptionStatus();
@@ -398,7 +403,8 @@ void WalletView::backupWallet()
 
 void WalletView::changePassphrase()
 {
-    AskPassphraseDialog dlg(AskPassphraseDialog::Mode::ChangePass, this, walletModel, AskPassphraseDialog::Context::ChangePass);
+    AskPassphraseDialog dlg(AskPassphraseDialog::Mode::ChangePass, this, AskPassphraseDialog::Context::ChangePass);
+    dlg.setModel(walletModel);
     dlg.exec();
 }
 
@@ -409,7 +415,8 @@ void WalletView::unlockWallet(AskPassphraseDialog::Context context)
     // Unlock wallet when requested by wallet model
 
     if (walletModel->getEncryptionStatus() == WalletModel::Locked || walletModel->getEncryptionStatus() == WalletModel::UnlockedForAnonymizationOnly) {
-        AskPassphraseDialog dlg(AskPassphraseDialog::Mode::UnlockAnonymize, this, walletModel, context);
+        AskPassphraseDialog dlg(AskPassphraseDialog::Mode::UnlockAnonymize, this, context);
+        dlg.setModel(walletModel);
         dlg.exec();
     }
 }
@@ -444,20 +451,16 @@ void WalletView::usedSendingAddresses()
 {
     if (!walletModel)
         return;
-    AddressBookPage* dlg = new AddressBookPage(platformStyle, AddressBookPage::ForEditing, AddressBookPage::SendingTab, this);
-    dlg->setAttribute(Qt::WA_DeleteOnClose);
-    dlg->setModel(walletModel->getAddressTableModel());
-    dlg->show();
+
+    GUIUtil::bringToFront(usedSendingAddressesPage);
 }
 
 void WalletView::usedReceivingAddresses()
 {
     if (!walletModel)
         return;
-    AddressBookPage* dlg = new AddressBookPage(platformStyle, AddressBookPage::ForEditing, AddressBookPage::ReceivingTab, this);
-    dlg->setAttribute(Qt::WA_DeleteOnClose);
-    dlg->setModel(walletModel->getAddressTableModel());
-    dlg->show();
+
+    GUIUtil::bringToFront(usedReceivingAddressesPage);
 }
 
 void WalletView::showProgress(const QString& title, int nProgress)

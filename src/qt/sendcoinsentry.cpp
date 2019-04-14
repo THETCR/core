@@ -17,7 +17,6 @@
 
 #include <QApplication>
 #include <QClipboard>
-#include <QPushButton>
 
 SendCoinsEntry::SendCoinsEntry(const PlatformStyle *_platformStyle, QWidget *parent) :
     QStackedWidget(parent),
@@ -46,9 +45,11 @@ SendCoinsEntry::SendCoinsEntry(const PlatformStyle *_platformStyle, QWidget *par
 
     // Connect signals
     connect(ui->payAmount, &BitcoinAmountField::valueChanged, this, &SendCoinsEntry::payAmountChanged);
+    connect(ui->checkboxSubtractFeeFromAmount, &QCheckBox::toggled, this, &SendCoinsEntry::subtractFeeFromAmountChanged);
     connect(ui->deleteButton, &QPushButton::clicked, this, &SendCoinsEntry::deleteClicked);
     connect(ui->deleteButton_is, &QPushButton::clicked, this, &SendCoinsEntry::deleteClicked);
     connect(ui->deleteButton_s, &QPushButton::clicked, this, &SendCoinsEntry::deleteClicked);
+    connect(ui->useAvailableBalanceButton, &QPushButton::clicked, this, &SendCoinsEntry::useAvailableBalanceClicked);
 }
 
 SendCoinsEntry::~SendCoinsEntry()
@@ -96,14 +97,15 @@ void SendCoinsEntry::clear()
     ui->payTo->clear();
     ui->addAsLabel->clear();
     ui->payAmount->clear();
+    ui->checkboxSubtractFeeFromAmount->setCheckState(Qt::Unchecked);
     ui->messageTextLabel->clear();
     ui->messageTextLabel->hide();
     ui->messageLabel->hide();
-    // clear UI elements for insecure payment request
+    // clear UI elements for unauthenticated payment request
     ui->payTo_is->clear();
     ui->memoTextLabel_is->clear();
     ui->payAmount_is->clear();
-    // clear UI elements for secure payment request
+    // clear UI elements for authenticated payment request
     ui->payTo_s->clear();
     ui->memoTextLabel_s->clear();
     ui->payAmount_s->clear();
@@ -114,7 +116,7 @@ void SendCoinsEntry::clear()
 
 void SendCoinsEntry::checkSubtractFeeFromAmount()
 {
-//    ui->checkboxSubtractFeeFromAmount->setChecked(true);
+    ui->checkboxSubtractFeeFromAmount->setChecked(true);
 }
 
 void SendCoinsEntry::deleteClicked()
@@ -135,9 +137,11 @@ bool SendCoinsEntry::validate(interfaces::Node& node)
     // Check input validity
     bool retval = true;
 
+#ifdef ENABLE_BIP70
     // Skip checks for payment request
     if (recipient.paymentRequest.IsInitialized())
         return retval;
+#endif
 
     if (!model->validateAddress(ui->payTo->text()))
     {
@@ -168,15 +172,18 @@ bool SendCoinsEntry::validate(interfaces::Node& node)
 
 SendCoinsRecipient SendCoinsEntry::getValue()
 {
+#ifdef ENABLE_BIP70
     // Payment request
     if (recipient.paymentRequest.IsInitialized())
         return recipient;
+#endif
 
     // Normal payment
     recipient.address = ui->payTo->text();
     recipient.label = ui->addAsLabel->text();
     recipient.amount = ui->payAmount->value();
     recipient.message = ui->messageTextLabel->text();
+    recipient.fSubtractFeeFromAmount = (ui->checkboxSubtractFeeFromAmount->checkState() == Qt::Checked);
 
     return recipient;
 }
@@ -186,7 +193,8 @@ QWidget* SendCoinsEntry::setupTabChain(QWidget* prev)
     QWidget::setTabOrder(prev, ui->payTo);
     QWidget::setTabOrder(ui->payTo, ui->addAsLabel);
     QWidget* w = ui->payAmount->setupTabChain(ui->addAsLabel);
-    QWidget::setTabOrder(w, ui->addressBookButton);
+    QWidget::setTabOrder(w, ui->checkboxSubtractFeeFromAmount);
+    QWidget::setTabOrder(ui->checkboxSubtractFeeFromAmount, ui->addressBookButton);
     QWidget::setTabOrder(ui->addressBookButton, ui->pasteButton);
     QWidget::setTabOrder(ui->pasteButton, ui->deleteButton);
     return ui->deleteButton;
@@ -196,24 +204,27 @@ void SendCoinsEntry::setValue(const SendCoinsRecipient& value)
 {
     recipient = value;
 
+#ifdef ENABLE_BIP70
     if (recipient.paymentRequest.IsInitialized()) // payment request
     {
-        if (recipient.authenticatedMerchant.isEmpty()) // insecure
+        if (recipient.authenticatedMerchant.isEmpty()) // unauthenticated
         {
             ui->payTo_is->setText(recipient.address);
             ui->memoTextLabel_is->setText(recipient.message);
             ui->payAmount_is->setValue(recipient.amount);
             ui->payAmount_is->setReadOnly(true);
-            setCurrentWidget(ui->SendCoins_InsecurePaymentRequest);
-        } else // secure
+            setCurrentWidget(ui->SendCoins_UnauthenticatedPaymentRequest);
+        }
+        else // authenticated
         {
             ui->payTo_s->setText(recipient.authenticatedMerchant);
             ui->memoTextLabel_s->setText(recipient.message);
             ui->payAmount_s->setValue(recipient.amount);
             ui->payAmount_s->setReadOnly(true);
-            setCurrentWidget(ui->SendCoins_SecurePaymentRequest);
+            setCurrentWidget(ui->SendCoins_AuthenticatedPaymentRequest);
         }
     } else // normal payment
+#endif
     {
         // message
         ui->messageTextLabel->setText(recipient.message);

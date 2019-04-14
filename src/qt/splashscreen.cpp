@@ -60,6 +60,21 @@ SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const Netw
     QPainter pixPaint(&pixmap);
     pixPaint.setPen(QColor(100, 100, 100));
 
+    // draw a slightly radial gradient
+    QRadialGradient gradient(QPoint(0,0), splashSize.width()/devicePixelRatio);
+    gradient.setColorAt(0, Qt::white);
+    gradient.setColorAt(1, QColor(247,247,247));
+    QRect rGradient(QPoint(0,0), splashSize);
+    pixPaint.fillRect(rGradient, gradient);
+
+    // draw the bitcoin icon, expected size of PNG: 1024x1024
+    QRect rectIcon(QPoint(-150,-122), QSize(430,430));
+
+    const QSize requiredSize(1024,1024);
+    QPixmap icon(networkStyle->getAppIcon().pixmap(requiredSize));
+
+    pixPaint.drawPixmap(rectIcon, icon);
+
     // check font size and drawing with
     pixPaint.setFont(QFont(font, 28 * fontFactor));
     QFontMetrics fm = pixPaint.fontMetrics();
@@ -75,15 +90,23 @@ SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const Netw
     pixPaint.drawText(paddingLeft, paddingTop, titleText);
 
     pixPaint.setFont(QFont(font, 15 * fontFactor));
+    // if the version string is too long, reduce size
+    fm = pixPaint.fontMetrics();
+    int versionTextWidth  = fm.width(versionText);
+    if(versionTextWidth > titleTextWidth+paddingLeft-10) {
+        pixPaint.setFont(QFont(font, 10*fontFactor));
+        titleVersionVSpace -= 5;
+    }
     pixPaint.drawText(paddingLeft, paddingTop + titleVersionVSpace, versionText);
 
     // draw copyright stuff
-    pixPaint.setFont(QFont(font, 10 * fontFactor));
-    pixPaint.drawText(paddingLeft, paddingTop + titleCopyrightVSpace, copyrightTextBtc);
-    pixPaint.drawText(paddingLeft, paddingTop + titleCopyrightVSpace + 12, copyrightTextDash);
-    pixPaint.drawText(paddingLeft, paddingTop + titleCopyrightVSpace + 24, copyrightTextPIVX);
-    pixPaint.drawText(paddingLeft, paddingTop + titleCopyrightVSpace + 36, copyrightTextWISPR);
-
+    {
+        pixPaint.setFont(QFont(font, 10 * fontFactor));
+        pixPaint.drawText(paddingLeft, paddingTop + titleCopyrightVSpace, copyrightTextBtc);
+        pixPaint.drawText(paddingLeft, paddingTop + titleCopyrightVSpace + 12, copyrightTextDash);
+        pixPaint.drawText(paddingLeft, paddingTop + titleCopyrightVSpace + 24, copyrightTextPIVX);
+        pixPaint.drawText(paddingLeft, paddingTop + titleCopyrightVSpace + 36, copyrightTextWISPR);
+    }
     // draw additional text if special network
     if (!titleAddText.isEmpty()) {
         QFont boldFont = QFont(font, 10 * fontFactor);
@@ -100,7 +123,7 @@ SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const Netw
     setWindowTitle(titleText + " " + titleAddText);
 
     // Resize window and move to center of desktop, disallow resizing
-    QRect r(QPoint(), pixmap.size());
+    QRect r(QPoint(), QSize(pixmap.size().width()/devicePixelRatio,pixmap.size().height()/devicePixelRatio));
     resize(r.size());
     setFixedSize(r.size());
     move(QApplication::desktop()->screenGeometry().center() - r.center());

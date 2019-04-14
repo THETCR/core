@@ -1,27 +1,27 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Copyright (c) 2017 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "receivecoinsdialog.h"
+#include <wallet/wallet.h>
+
+#include <qt/receivecoinsdialog.h>
 #include <qt/forms/ui_receivecoinsdialog.h>
 
-#include "addressbookpage.h"
-#include "addresstablemodel.h"
-#include "bitcoinunits.h"
-#include "guiutil.h"
-#include "optionsmodel.h"
-#include "receiverequestdialog.h"
-#include "recentrequeststablemodel.h"
-#include "walletmodel.h"
+#include <qt/addressbookpage.h>
+#include <qt/addresstablemodel.h>
+#include <qt/bitcoinunits.h>
+#include <qt/guiutil.h>
+#include <qt/optionsmodel.h>
+#include <qt/platformstyle.h>
+#include <qt/receiverequestdialog.h>
+#include <qt/recentrequeststablemodel.h>
+#include <qt/walletmodel.h>
 
 #include <QAction>
 #include <QCursor>
-#include <QItemSelection>
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QTextDocument>
-#include <QSettings>
 
 ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *_platformStyle, QWidget *parent) :
     QDialog(parent),
@@ -32,33 +32,39 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *_platformStyle, QWid
 {
     ui->setupUi(this);
 
-#ifdef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
+    if (!_platformStyle->getImagesOnButtons()) {
     ui->clearButton->setIcon(QIcon());
     ui->receiveButton->setIcon(QIcon());
     ui->receivingAddressesButton->setIcon(QIcon());
     ui->showRequestButton->setIcon(QIcon());
     ui->removeRequestButton->setIcon(QIcon());
-#endif
+    } else {
+        ui->clearButton->setIcon(_platformStyle->SingleColorIcon(":/icons/remove"));
+        ui->receiveButton->setIcon(_platformStyle->SingleColorIcon(":/icons/receiving_addresses"));
+        ui->receivingAddressesButton->setIcon(_platformStyle->SingleColorIcon(":/icons/receiving_addresses"));
+        ui->showRequestButton->setIcon(_platformStyle->SingleColorIcon(":/icons/edit"));
+        ui->removeRequestButton->setIcon(_platformStyle->SingleColorIcon(":/icons/remove"));
+    }
 
     // context menu actions
+    QAction *copyURIAction = new QAction(tr("Copy URI"), this);
     QAction* copyLabelAction = new QAction(tr("Copy label"), this);
     QAction* copyMessageAction = new QAction(tr("Copy message"), this);
     QAction* copyAmountAction = new QAction(tr("Copy amount"), this);
-    QAction* copyAddressAction = new QAction(tr("Copy address"), this);
 
     // context menu
-    contextMenu = new QMenu();
+    contextMenu = new QMenu(this);
+    contextMenu->addAction(copyURIAction);
     contextMenu->addAction(copyLabelAction);
     contextMenu->addAction(copyMessageAction);
     contextMenu->addAction(copyAmountAction);
-    contextMenu->addAction(copyAddressAction);
 
     // context menu signals
     connect(ui->recentRequestsView, &QWidget::customContextMenuRequested, this, &ReceiveCoinsDialog::showMenu);
+    connect(copyURIAction, &QAction::triggered, this, &ReceiveCoinsDialog::copyURI);
     connect(copyLabelAction, &QAction::triggered, this, &ReceiveCoinsDialog::copyLabel);
     connect(copyMessageAction, &QAction::triggered, this, &ReceiveCoinsDialog::copyMessage);
     connect(copyAmountAction, &QAction::triggered, this, &ReceiveCoinsDialog::copyAmount);
-    connect(copyAddressAction, SIGNAL(triggered()), this, SLOT(copyAddress()));
 
     connect(ui->clearButton, &QPushButton::clicked, this, &ReceiveCoinsDialog::clear);
 }
@@ -91,31 +97,32 @@ void ReceiveCoinsDialog::setModel(WalletModel *_model)
         // Last 2 columns are set by the columnResizingFixer, when the table geometry is ready.
         columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tableView, AMOUNT_MINIMUM_COLUMN_WIDTH, DATE_COLUMN_WIDTH, this);
 
-        // Init address field
-        QSettings settings;
-        address = settings.value("current_receive_address").toString();
-        if (address.isEmpty())
-            address = getAddress();
-        ui->reqAddress->setText(address);
+        if (model->wallet().getDefaultAddressType() == OutputType::BECH32) {
+            ui->useLegacyAddress->setCheckState(Qt::Unchecked);
+        } else {
+            ui->useLegacyAddress->setCheckState(Qt::Checked);
+        }
 
-        connect(model, SIGNAL(notifyReceiveAddressChanged()), this, SLOT(receiveAddressUsed()));
+        // Set the button to be enabled or disabled based on whether the wallet can give out new addresses.
+        ui->receiveButton->setEnabled(model->canGetAddresses());
+
+        // Enable/disable the receive button if the wallet is now able/unable to give out new addresses.
+        connect(model, &WalletModel::canGetAddressesChanged, [this] {
+            ui->receiveButton->setEnabled(model->canGetAddresses());
+        });
     }
 }
 
 ReceiveCoinsDialog::~ReceiveCoinsDialog()
 {
-    QSettings settings;
-    settings.setValue("current_receive_address", address);
     delete ui;
 }
 
 void ReceiveCoinsDialog::clear()
 {
     ui->reqAmount->clear();
-    ui->reqAddress->setText(address);
     ui->reqLabel->setText("");
     ui->reqMessage->setText("");
-    ui->reuseAddress->setChecked(false);
     updateDisplayUnit();
 }
 
@@ -137,35 +144,24 @@ void ReceiveCoinsDialog::updateDisplayUnit()
     }
 }
 
-QString ReceiveCoinsDialog::getAddress(QString label)
-{
-    if (ui->reuseAddress->isChecked()) {
-        /* Choose existing receiving address */
-        AddressBookPage dlg(platformStyle, AddressBookPage::ForSelection, AddressBookPage::ReceivingTab, this);
-        dlg.setModel(model->getAddressTableModel());
-        if (dlg.exec()) {
-            return dlg.getReturnValue();
-        } else {
-            return "";
-        }
-    } else {
-        /* Generate new receiving address */
-        return model->getAddressTableModel()->addRow(AddressTableModel::Receive, label, "", model->wallet().getDefaultAddressType());
-    }
-}
-
 void ReceiveCoinsDialog::on_receiveButton_clicked()
 {
     if (!model || !model->getOptionsModel() || !model->getAddressTableModel() || !model->getRecentRequestsTableModel())
         return;
 
+    QString address;
     QString label = ui->reqLabel->text();
-    address = getAddress(label);
-    if (address.isEmpty())
-        return;
-    if (ui->reuseAddress->isChecked() && label.isEmpty()) {
-        label = model->getAddressTableModel()->labelForAddress(address);
+    /* Generate new receiving address */
+    OutputType address_type;
+    if (!ui->useLegacyAddress->isChecked()) {
+        address_type = OutputType::BECH32;
+    } else {
+        address_type = model->wallet().getDefaultAddressType();
+        if (address_type == OutputType::BECH32) {
+            address_type = OutputType::P2SH_SEGWIT;
     }
+    }
+    address = model->getAddressTableModel()->addRow(AddressTableModel::Receive, label, "", address_type);
     SendCoinsRecipient info(address, label,
         ui->reqAmount->value(), ui->reqMessage->text());
     ReceiveRequestDialog* dialog = new ReceiveRequestDialog(this);
@@ -177,15 +173,6 @@ void ReceiveCoinsDialog::on_receiveButton_clicked()
 
     /* Store request for later reference */
     model->getRecentRequestsTableModel()->addNewRequest(info);
-}
-
-void ReceiveCoinsDialog::on_receivingAddressesButton_clicked()
-{
-    if (!model)
-        return;
-    AddressBookPage dlg(platformStyle, AddressBookPage::ForEditing, AddressBookPage::ReceivingTab, this);
-    dlg.setModel(model->getAddressTableModel());
-    dlg.exec();
 }
 
 void ReceiveCoinsDialog::on_recentRequestsView_doubleClicked(const QModelIndex& index)
@@ -212,7 +199,7 @@ void ReceiveCoinsDialog::on_showRequestButton_clicked()
         return;
     QModelIndexList selection = ui->recentRequestsView->selectionModel()->selectedRows();
 
-    for (QModelIndex index: selection) {
+    for (const QModelIndex& index : selection) {
         on_recentRequestsView_doubleClicked(index);
     }
 }
@@ -266,24 +253,19 @@ QModelIndex ReceiveCoinsDialog::selectedRow()
 // copy column of selected row to clipboard
 void ReceiveCoinsDialog::copyColumnToClipboard(int column)
 {
-    if (!model || !model->getRecentRequestsTableModel() || !ui->recentRequestsView->selectionModel())
+    QModelIndex firstIndex = selectedRow();
+    if (!firstIndex.isValid()) {
         return;
-    QModelIndexList selection = ui->recentRequestsView->selectionModel()->selectedRows();
-    if (selection.empty())
-        return;
-    // correct for selection mode ContiguousSelection
-    QModelIndex firstIndex = selection.at(0);
+    }
     GUIUtil::setClipboard(model->getRecentRequestsTableModel()->data(firstIndex.child(firstIndex.row(), column), Qt::EditRole).toString());
 }
 
 // context menu
 void ReceiveCoinsDialog::showMenu(const QPoint& point)
 {
-    if (!model || !model->getRecentRequestsTableModel() || !ui->recentRequestsView->selectionModel())
+    if (!selectedRow().isValid()) {
         return;
-    QModelIndexList selection = ui->recentRequestsView->selectionModel()->selectedRows();
-    if (selection.empty())
-        return;
+    }
     contextMenu->exec(QCursor::pos());
 }
 
@@ -317,18 +299,3 @@ void ReceiveCoinsDialog::copyAmount()
 {
     copyColumnToClipboard(RecentRequestsTableModel::Amount);
 }
-
-// context menu action: copy address
-void ReceiveCoinsDialog::copyAddress()
-{
-    copyColumnToClipboard(RecentRequestsTableModel::Address);
-}
-
-void ReceiveCoinsDialog::receiveAddressUsed()
-{
-    if ((!ui->reuseAddress->isChecked()) && model && model->isUsed(address.toStdString())) {
-        address = getAddress();
-        clear();
-    }
-}
-
