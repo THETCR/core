@@ -438,7 +438,8 @@ void WalletView::toggleLockWallet()
 
     // Unlock the wallet when requested
     if (encStatus == walletModel->Locked) {
-        AskPassphraseDialog dlg(AskPassphraseDialog::Mode::UnlockAnonymize, this, walletModel, AskPassphraseDialog::Context::ToggleLock);
+        AskPassphraseDialog dlg(AskPassphraseDialog::Mode::UnlockAnonymize, this, AskPassphraseDialog::Context::ToggleLock);
+        dlg.setModel(walletModel);
         dlg.exec();
     }
 
