@@ -1,6 +1,5 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Copyright (c) 2017-2018 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_ASKPASSPHRASEDIALOG_H
@@ -46,10 +45,12 @@ public:
         Sign_Message    /** Sign/verify message dialog */
     };
 
-    explicit AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel* model, Context context);
+    explicit AskPassphraseDialog(Mode mode, QWidget* parent, Context context);
     ~AskPassphraseDialog();
 
     void accept();
+
+    void setModel(WalletModel *model);
 
 private:
     Ui::AskPassphraseDialog* ui;
@@ -60,6 +61,8 @@ private:
 
 private Q_SLOTS:
     void textChanged();
+    void secureClearPassFields();
+    void toggleShowPassword(bool);
 
 protected:
     bool event(QEvent* event);

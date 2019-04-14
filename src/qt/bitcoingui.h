@@ -1,6 +1,5 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Copyright (c) 2017-2018 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2019 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_BITCOINGUI_H
@@ -122,7 +121,6 @@ private:
     WalletFrame* walletFrame = nullptr;
 
     UnitDisplayStatusBarControl* unitDisplayControl = nullptr;
-    QLabel* labelWalletEncryptionIcon = nullptr;
     QLabel* labelWalletHDStatusIcon = nullptr;
     GUIUtil::ClickableLabel* labelProxyIcon = nullptr;
     GUIUtil::ClickableLabel* connectionsControl = nullptr;
@@ -131,11 +129,10 @@ private:
     GUIUtil::ClickableProgressBar* progressBar = nullptr;
     QProgressDialog* progressDialog = nullptr;
 
-    QLabel* labelStakingIcon;
-    GUIUtil::ClickableLabel* labelAutoMintIcon;
-    GUIUtil::ClickableLabel* labelEncryptionIcon;
-    QLabel* labelTorIcon;
-    GUIUtil::ClickableLabel* labelConnectionsIcon;
+    QLabel* labelStakingIcon = nullptr;
+    GUIUtil::ClickableLabel* labelAutoMintIcon = nullptr;
+    GUIUtil::ClickableLabel* labelWalletEncryptionIcon = nullptr;
+    GUIUtil::ClickableLabel* labelConnectionsIcon = nullptr;
 
     QMenuBar* appMenuBar = nullptr;
     QToolBar* appToolBar = nullptr;
@@ -165,24 +162,24 @@ private:
     QAction* m_wallet_selector_label_action = nullptr;
     QAction* m_wallet_selector_action = nullptr;
 
-    QAction* masternodeAction = nullptr;;
-    QAction* bip38ToolAction = nullptr;;
-    QAction* multisigCreateAction = nullptr;;
-    QAction* multisigSpendAction = nullptr;;
-    QAction* multisigSignAction = nullptr;;
-    QAction* privacyAction = nullptr;;
-    QAction* openNetworkAction = nullptr;;
-    QAction* openPeersAction = nullptr;;
-    QAction* openRepairAction = nullptr;;
-    QAction* openConfEditorAction = nullptr;;
-    QAction* openMNConfEditorAction = nullptr;;
-    QAction* showBackupsAction = nullptr;;
-    QAction* unlockWalletAction = nullptr;;
-    QAction* lockWalletAction = nullptr;;
-    QAction* openBlockExplorerAction = nullptr;;
-    QAction* multiSendAction = nullptr;;
-    QAction* openInfoAction = nullptr;;
-    BlockExplorer* explorerWindow = nullptr;;
+    QAction* masternodeAction = nullptr;
+    QAction* bip38ToolAction = nullptr;
+    QAction* multisigCreateAction = nullptr;
+    QAction* multisigSpendAction = nullptr;
+    QAction* multisigSignAction = nullptr;
+    QAction* privacyAction = nullptr;
+    QAction* openNetworkAction = nullptr;
+    QAction* openPeersAction = nullptr;
+    QAction* openRepairAction = nullptr;
+    QAction* openConfEditorAction = nullptr;
+    QAction* openMNConfEditorAction = nullptr;
+    QAction* showBackupsAction = nullptr;
+    QAction* unlockWalletAction = nullptr;
+    QAction* lockWalletAction = nullptr;
+    QAction* openBlockExplorerAction = nullptr;
+    QAction* multiSendAction = nullptr;
+    QAction* openInfoAction = nullptr;
+    BlockExplorer* explorerWindow = nullptr;
 
     QLabel *m_wallet_selector_label = nullptr;
     QComboBox* m_wallet_selector = nullptr;
@@ -290,8 +287,6 @@ private:
     /** Set the proxy-enabled icon as shown in the UI. */
     void updateProxyIcon();
     void updateWindowTitle();
-    /** Set the Tor-enabled icon as shown in the UI. */
-    void updateTorIcon();
 
 public Q_SLOTS:
 #ifdef ENABLE_WALLET

@@ -329,21 +329,3 @@ bool ClientModel::getProxyInfo(std::string& ip_port) const
     }
     return false;
 }
-
-bool ClientModel::getTorInfo(std::string& ip_port) const
-{
-    proxyType onion;
-    if (GetProxy((Network) 3, onion) && IsReachable((Network) 3)) {
-        {
-            LOCK(cs_mapLocalHost);
-            for (const std::pair<const CNetAddr, LocalServiceInfo>& item : mapLocalHost) {
-                if (item.first.IsTor()) {
-                     CService addrOnion = CService(item.first.ToString(), item.second.nPort);
-                     ip_port = addrOnion.ToStringIPPort();
-                     return true;
-                }
-            }
-        }
-    }
-    return false;
-}

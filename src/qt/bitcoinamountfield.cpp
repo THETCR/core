@@ -6,12 +6,11 @@
 
 #include <qt/bitcoinunits.h>
 #include <qt/guiconstants.h>
-#include "guiutil.h"
+#include <qt/guiutil.h>
 #include <qt/qvaluecombobox.h>
 
 #include <QApplication>
 #include <QAbstractSpinBox>
-#include <QApplication>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLineEdit>

@@ -74,7 +74,6 @@ public:
     QString dataDir() const;
     QString blocksDir() const;
 
-    bool getTorInfo(std::string& ip_port) const;
     bool getProxyInfo(std::string& ip_port) const;
 
     // caches for the best header

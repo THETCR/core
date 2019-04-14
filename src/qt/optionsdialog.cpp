@@ -12,10 +12,10 @@
 
 #include <qt/bitcoinunits.h>
 #include <qt/guiconstants.h>
-#include "obfuscation.h"
 #include <qt/guiutil.h>
 #include <qt/optionsmodel.h>
 
+#include <obfuscation.h>
 #include <interfaces/node.h>
 #include <validation.h> // for DEFAULT_SCRIPTCHECK_THREADS and MAX_SCRIPTCHECK_THREADS
 #include <netbase.h>
@@ -207,7 +207,7 @@ void OptionsDialog::setModel(OptionsModel *_model)
         ui->pruneSize->setRange(nMinDiskSpace, _model->node().getAssumedBlockchainSize());
 
         /* keep consistency for action triggered elsewhere */
-        connect(model, SIGNAL(hideOrphansChanged(bool)), this, SLOT(updateHideOrphans(bool)));
+        connect(model, &OptionsModel::hideOrphansChanged, this, &OptionsDialog::updateHideOrphans);
     }
 
     /* warn when one of the following settings changes by user action (placed here so init via mapper doesn't trigger them) */
@@ -223,7 +223,7 @@ void OptionsDialog::setModel(OptionsModel *_model)
     /* Network */
     connect(ui->allowIncoming, &QCheckBox::clicked, this, &OptionsDialog::showRestartWarning);
     connect(ui->connectSocks, &QCheckBox::clicked, this, &OptionsDialog::showRestartWarning);
-//    connect(ui->connectSocksTor, &QCheckBox::clicked, this, &OptionsDialog::showRestartWarning);
+    connect(ui->connectSocksTor, &QCheckBox::clicked, this, &OptionsDialog::showRestartWarning);
     /* Display */
     connect(ui->digits, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->theme, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));

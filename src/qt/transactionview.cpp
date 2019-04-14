@@ -221,7 +221,7 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
     connect(copyTxPlainText, &QAction::triggered, this, &TransactionView::copyTxPlainText);
     connect(editLabelAction, &QAction::triggered, this, &TransactionView::editLabel);
     connect(showDetailsAction, &QAction::triggered, this, &TransactionView::showDetails);
-    connect(hideOrphansAction, SIGNAL(toggled(bool)), this, SLOT(updateHideOrphans(bool)));
+    connect(hideOrphansAction, &QAction::toggled, this, &TransactionView::updateHideOrphans);
 
     // Double-clicking on a transaction on the transaction history page shows details
     connect(this, &TransactionView::doubleClicked, this, &TransactionView::showDetails);
@@ -280,7 +280,7 @@ void TransactionView::setModel(WalletModel *_model)
                 }
             }
 
-            connect(model->getOptionsModel(), SIGNAL(hideOrphansChanged(bool)), this, SLOT(updateHideOrphans(bool)));
+            connect(model->getOptionsModel(), &OptionsModel::hideOrphansChanged, this, &TransactionView::updateHideOrphans);
         }
 
         // show/hide column Watch-only
