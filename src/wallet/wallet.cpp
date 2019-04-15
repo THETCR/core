@@ -70,6 +70,7 @@
 int64_t nReserveBalance = 0;
 bool fClearSpendCache = false;
 int64_t nLastCoinStakeSearchInterval = 0;
+static boost::thread_group threadGroup;
 
 /**
  * Settings
@@ -4748,7 +4749,7 @@ void CWallet::postInitProcess()
 
     if (gArgs.GetBoolArg("-precompute", true)) {
         // Run a thread to precompute any zPIV spends
-//        threadGroup.create_thread(boost::bind(&ThreadPrecomputeSpends));
+        threadGroup.create_thread(boost::bind(&ThreadPrecomputeSpends, this));
     }
 }
 
@@ -8549,15 +8550,10 @@ void CWallet::setZWallet(CzWSPWallet* zwallet)
     zwspTracker = std::unique_ptr<CzWSPTracker>(new CzWSPTracker(*m_chain, GetLocation(), GetDBHandle(), *this));
 }
 
-void ThreadPrecomputeSpends()
+void ThreadPrecomputeSpends(CWallet* pwallet)
 {
     boost::this_thread::interruption_point();
     LogPrintf("ThreadPrecomputeSpends started\n");
-    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    CWallet* pwallet = nullptr;
-    if(!wallets.empty()){
-        pwallet = wallets.at(0).get();
-    }
     try {
         pwallet->PrecomputeSpends();
         boost::this_thread::interruption_point();

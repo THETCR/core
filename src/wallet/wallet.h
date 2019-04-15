@@ -1125,6 +1125,7 @@ public:
     /** Construct wallet with specified name and database implementation. */
     CWallet(interfaces::Chain* chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database) : m_chain(chain), m_location(location), database(std::move(database))
     {
+        pc_database = WalletDatabase::CreatePrecompute();
         fFileBacked = true;
     }
 
@@ -1830,6 +1831,6 @@ public:
 int64_t CalculateMaximumSignedTxSize(const CTransaction &tx, const CWallet *wallet, bool use_max_sig = false) EXCLUSIVE_LOCKS_REQUIRED(wallet->cs_wallet);
 int64_t CalculateMaximumSignedTxSize(const CTransaction &tx, const CWallet *wallet, const std::vector<CTxOut>& txouts, bool use_max_sig = false);
 
-void ThreadPrecomputeSpends();
+void ThreadPrecomputeSpends(CWallet* pwallet);
 
 #endif // BITCOIN_WALLET_WALLET_H
