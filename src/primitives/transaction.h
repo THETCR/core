@@ -187,7 +187,7 @@ public:
         return (nValue == -1);
     }
 
-    void SetEmpty()
+    void SetEmpty() const
     {
         nValue = 0;
         scriptPubKey.clear();
