@@ -189,6 +189,7 @@ BITCOIN_CORE_H = \
   policy/rbf.h \
   policy/settings.h \
   pow.h \
+  pos/miner.h \
   protocol.h \
   psbt.h \
   random.h \
@@ -391,6 +392,7 @@ libbitcoin_wallet_a_SOURCES = \
   interfaces/wallet.cpp \
   bip38.cpp \
   denomination_functions.cpp \
+  pos/miner.cpp \
   stakeinput.cpp \
   wallet/coincontrol.cpp \
   wallet/crypter.cpp \

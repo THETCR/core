@@ -56,6 +56,7 @@
 #include <zpiv/deterministicmint.h>
 #include <zwspchain.h>
 #include <zpiv/witness.h>
+#include <pos/miner.h>
 
 #include <algorithm>
 #include <assert.h>
@@ -95,6 +96,12 @@ static const size_t OUTPUT_GROUP_MAX_ENTRIES = 10;
 
 static CCriticalSection cs_wallets;
 static std::vector<std::shared_ptr<CWallet>> vpwallets GUARDED_BY(cs_wallets);
+
+void RestartStakingThreads()
+{
+    StopThreadStakeMiner();
+    StartThreadStakeMiner();
+};
 
 bool AddWallet(const std::shared_ptr<CWallet>& wallet)
 {
@@ -199,6 +206,8 @@ std::shared_ptr<CWallet> LoadWallet(interfaces::Chain& chain, const WalletLocati
     }
     AddWallet(wallet);
     wallet->postInitProcess();
+    RestartStakingThreads();
+
     return wallet;
 }
 
@@ -8864,3 +8873,58 @@ bool CWallet::HasZerocoinFeatures()
 {
     return (zwalletMain && zwspTracker);
 }
+
+//bool CWallet::SignBlock(CBlockTemplate *pblocktemplate, int nHeight, int64_t nSearchTime)
+//{
+//    if (LogAcceptCategory(BCLog::POS)) {
+//        WalletLogPrintf("%s, Height %d\n", __func__, nHeight);
+//    }
+//
+//    assert(pblocktemplate);
+//    CBlock *pblock = &pblocktemplate->block;
+//    assert(pblock);
+//    if (pblock->vtx.size() < 1) {
+//        return werror("%s: Malformed block.", __func__);
+//    }
+//
+//    int64_t nFees = -pblocktemplate->vTxFees[0];
+//    CBlockIndex *pindexPrev = chainActive.Tip();
+//
+//    CKey key;
+//    pblock->nVersion = PARTICL_BLOCK_VERSION;
+//    pblock->nBits = GetNextTargetRequired(pindexPrev);
+//    if (LogAcceptCategory(BCLog::POS)) {
+//        WalletLogPrintf("%s, nBits %d\n", __func__, pblock->nBits);
+//    }
+//
+//    CMutableTransaction txCoinStake;
+//    if (CreateCoinStake(pblock->nBits, nSearchTime, nHeight, nFees, txCoinStake, key)) {
+//        if (LogAcceptCategory(BCLog::POS)) {
+//            WalletLogPrintf("%s: Kernel found.\n", __func__);
+//        }
+//
+//        if (nSearchTime >= chainActive.Tip()->GetPastTimeLimit()+1) {
+//            // make sure coinstake would meet timestamp protocol
+//            //    as it would be the same as the block timestamp
+//            pblock->nTime = nSearchTime;
+//
+//            // Remove coinbasetxn
+//            pblock->vtx[0].reset();
+//            pblock->vtx.erase(pblock->vtx.begin());
+//
+//            // Insert coinstake as txn0
+//            pblock->vtx.insert(pblock->vtx.begin(), MakeTransactionRef(txCoinStake));
+//
+//            bool mutated;
+//            pblock->hashMerkleRoot = BlockMerkleRoot(*pblock, &mutated);
+//            pblock->hashWitnessMerkleRoot = BlockWitnessMerkleRoot(*pblock, &mutated);
+//
+//            // Append a signature to the block
+//            return key.Sign(pblock->GetHash(), pblock->vchBlockSig);
+//        }
+//    }
+//
+//    nLastCoinStakeSearchTime = nSearchTime;
+//
+//    return false;
+//};

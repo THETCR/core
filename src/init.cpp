@@ -79,6 +79,8 @@
 #include <boost/thread.hpp>
 #include <openssl/crypto.h>
 
+#include <pos/miner.h>
+
 #if ENABLE_WALLET
 #include <wallet/wallet.h>
 #endif
@@ -237,6 +239,9 @@ void PrepareShutdown(InitInterfaces& interfaces)
     StopREST();
     StopRPC();
     StopHTTPServer();
+#ifdef ENABLE_WALLET
+    StopThreadStakeMiner();
+#endif
     for (const auto& client : interfaces.chain_clients) {
         client->flush();
     }
@@ -2169,6 +2174,10 @@ bool AppInitMain(InitInterfaces& interfaces)
         lightWorker.StartLightZwspThread();
     }
 
+    // ********************************************************* Step 12.5: start staking
+#ifdef ENABLE_WALLET
+    StartThreadStakeMiner();
+#endif
     // ********************************************************* Step 13: finished
 
     SetRPCWarmupFinished();

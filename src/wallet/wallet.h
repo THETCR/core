@@ -45,7 +45,7 @@
 extern int64_t nReserveBalance;
 extern bool fClearSpendCache;
 extern int64_t nLastCoinStakeSearchInterval;
-extern int64_t nLastCoinStakeSearchTime;
+//extern int64_t nLastCoinStakeSearchTime;
 
 
 /**
@@ -1143,6 +1143,8 @@ public:
 
     void CreateZWspWallet();
     bool HasZerocoinFeatures();
+//    bool SignBlock(CBlockTemplate *pblocktemplate, int nHeight, int64_t nSearchTime);
+    void RestartStakingThreads();
     void setZWallet(CzWSPWallet* zwallet);
 
     CzWSPWallet* getZWallet() { return zwalletMain; }
@@ -1721,23 +1723,23 @@ public:
     bool AddKeyOrigin(const CPubKey& pubkey, const KeyOriginInfo& info);
 
 
-//    std::atomic<bool> fStakingEnabled{false};
-//    enum eStakingState {
-//        NOT_STAKING = 0,
-//        IS_STAKING = 1,
-//        NOT_STAKING_BALANCE = -1,
-//        NOT_STAKING_DEPTH = -2,
-//        NOT_STAKING_LOCKED = -3,
-//        NOT_STAKING_LIMITED = -4,
-//        NOT_STAKING_DISABLED = -5,
-//    };
+    std::atomic<bool> fStakingEnabled{false};
+    enum eStakingState {
+        NOT_STAKING = 0,
+        IS_STAKING = 1,
+        NOT_STAKING_BALANCE = -1,
+        NOT_STAKING_DEPTH = -2,
+        NOT_STAKING_LOCKED = -3,
+        NOT_STAKING_LIMITED = -4,
+        NOT_STAKING_DISABLED = -5,
+    };
 
-//    std::atomic<eStakingState> m_is_staking {NOT_STAKING};
-//    int64_t nLastCoinStakeSearchTime = 0;
-//    int64_t nReserveBalance = 0;
-//    size_t nStakeThread = 9999999; // unset
-//    mutable int m_greatest_txn_depth = 0; // depth of most deep txn
-//    int nStakeLimitHeight = 0; // for regtest, don't stake above nStakeLimitHeight
+    std::atomic<eStakingState> m_is_staking {NOT_STAKING};
+    int64_t nLastCoinStakeSearchTime = 0;
+    int64_t nReserveBalance = 0;
+    size_t nStakeThread = 9999999; // unset
+    mutable int m_greatest_txn_depth = 0; // depth of most deep txn
+    int nStakeLimitHeight = 0; // for regtest, don't stake above nStakeLimitHeight
 
     friend struct WalletTestingSetup;
 //    friend class CzWSPWallet;
