@@ -9,14 +9,6 @@
 void CCoinControl::SetNull()
 {
     destChange = CNoDestination();
-    setSelected.clear();
-    useSwiftTX = false;
-    useObfuScation = false;
-    fAllowOtherInputs = false;
-    fAllowWatchOnly = true;
-    fSplitBlock = false;
-    nSplitBlock = 1;
-    destChange = CNoDestination();
     m_change_type.reset();
     fAllowOtherInputs = false;
     fAllowWatchOnly = false;
@@ -27,5 +19,10 @@ void CCoinControl::SetNull()
     m_confirm_target.reset();
     m_signal_bip125_rbf.reset();
     m_fee_mode = FeeEstimateMode::UNSET;
+    m_min_depth = 0;
+    useSwiftTX = false;
+    useObfuScation = false;
+    fSplitBlock = false;
+    nSplitBlock = 1;
 }
 

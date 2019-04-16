@@ -2486,6 +2486,7 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
         const CTransaction &tx = *(block.vtx[i]);
         uint256 hash = tx.GetHash();
         bool is_coinbase = tx.IsCoinBase();
+        bool is_coinstake = tx.IsCoinStake();
 
         /** UNDO ZEROCOIN DATABASING
          * note we only undo zerocoin databasing in the following statement, value to and from WISPR
@@ -2533,6 +2534,7 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
                 }
             }
         }
+        //TODO fix coin height for genesis
 
         // Check that all outputs are available and match the outputs in the block itself
         // exactly.
@@ -2544,11 +2546,36 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
                 if (!is_spent || tx.vout[o] != coin.out || pindex->nHeight != coin.nHeight || is_coinbase != coin.fCoinBase) {
                     fClean = false; // transaction output mismatch
                 }
+                if (!is_spent) {
+                    std::cout << "transaction output mismatch : not spendable\n";
+                }
+                if (tx.vout[o] != coin.out) {
+                    std::cout << "transaction output mismatch : out mismatch\n";
+                    std::cout << "tx.vout[o] = " << tx.vout[o].ToString().c_str() << "\n";
+                    std::cout << "coin.out = " << coin.out.ToString().c_str() << "\n";
+                }
+                if (pindex->nHeight != coin.nHeight) {
+                    std::cout << "transaction output mismatch : nHeight mismatch\n";
+                    std::cout << "pindex->nHeight = " << pindex->nHeight << "\n";
+                    std::cout << "coin.nHeight = " << coin.nHeight << "\n";
+                }
+                if (is_coinbase != coin.fCoinBase && is_coinstake != coin.fCoinStake) {
+                    std::cout << "transaction output mismatch : coinbase or coinstake mismatch\n";
+                    std::cout << "place = " << o << "\n";
+                    std::cout << "is_coinbase = " << is_coinbase << "\n";
+                    std::cout << "coin.fCoinBase = " << coin.fCoinBase << "\n";
+                    std::cout << "is_coinstake = " << is_coinstake << "\n";
+                    std::cout << "coin.fCoinStake = " << coin.fCoinStake << "\n";
+                    std::cout << "pindex->nHeight = " << pindex->nHeight << "\n";
+                    std::cout << "coin.nHeight = " << coin.nHeight << "\n";
+                    std::cout << "tx.vout[o] = " << tx.vout[o].ToString().c_str() << "\n";
+                    std::cout << "coin.out = " << coin.out.ToString().c_str() << "\n";
+                }
             }
         }
 
         // restore inputs
-        if (i > 0 && !tx.IsZerocoinSpend()) { // not coinbases or zerocoinspend because they dont have traditional inputs
+        if (!tx.IsCoinBase() && !tx.IsZerocoinSpend()) { // not coinbases or zerocoinspend because they dont have traditional inputs
             CTxUndo &txundo = blockUndo.vtxundo[i-1];
             if (txundo.vprevout.size() != tx.vin.size()) {
                 error("DisconnectBlock(): transaction and undo data inconsistent");
@@ -3351,6 +3378,11 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 return state.DoS(100, error("%s: contains a non-BIP68-final transaction", __func__),
                                  REJECT_INVALID, "bad-txns-nonfinal");
             }
+
+            if (!tx.IsCoinStake()){
+                nFees = view.GetValueIn(tx) - tx.GetValueOut();
+            }
+            nValueIn += view.GetValueIn(tx);
         }
 
         nValueOut += tx.GetValueOut();
@@ -3366,10 +3398,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         txdata.emplace_back(tx);
         if (!tx.IsCoinBase())
         {
-            if (!tx.IsCoinStake())
-                nFees += view.GetValueIn(tx) - tx.GetValueOut();
-            nValueIn += view.GetValueIn(tx);
-
             std::vector<CScriptCheck> vChecks;
             bool fCacheResults = fJustCheck; /* Don't cache results if we're actually connecting blocks (still consult the cache, though) */
             if (!CheckInputs(tx, state, view, fScriptChecks, flags, fCacheResults, fCacheResults, txdata[i], nScriptCheckThreads ? &vChecks : nullptr))
@@ -3726,8 +3754,10 @@ void static UpdateTip(const CBlockIndex *pindexNew, const CChainParams& chainPar
                 ++nUpgraded;
             pindex = pindex->pprev;
         }
-        if (nUpgraded > 0)
-            AppendWarning(warningMessages, strprintf(_("%d of last 100 blocks have unexpected version"), nUpgraded));
+        if (nUpgraded > 0){
+            int32_t nExpectedVersion = ComputeBlockVersion(pindex->pprev, chainParams.GetConsensus());
+            AppendWarning(warningMessages, strprintf(_("%d of last 100 blocks have unexpected version. version=%d, expected=%d"), nUpgraded, pindex->nVersion, nExpectedVersion));
+        }
     }
     LogPrintf("%s: new best=%s height=%d version=0x%08x log2_work=%.8g tx=%lu date='%s' progress=%f cache=%.1fMiB(%utxo)", __func__, /* Continued */
       pindexNew->GetBlockHash().ToString(), pindexNew->nHeight, pindexNew->nVersion,

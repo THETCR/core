@@ -176,6 +176,10 @@ CAmount CTransaction::GetValueOut() const
         nValueOut += tx_out.nValue;
         if (!MoneyRange(tx_out.nValue) || !MoneyRange(nValueOut))
             throw std::runtime_error(std::string(__func__) + ": value out of range");
+
+        if ((nValueOut + tx_out.nValue) < nValueOut)
+            throw std::runtime_error("CTransaction::GetValueOut() : value out of range : wraps the int64_t boundary");
+
     }
     return nValueOut;
 }

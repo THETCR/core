@@ -8,7 +8,7 @@
 
 
 
-#include <test/test_wispr.h>
+#include <test/setup_common.h>
 
 #include "clientversion.h"
 #include "consensus/validation.h"

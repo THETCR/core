@@ -4,7 +4,7 @@
 
 #include <uint256.h>
 #include <version.h>
-#include <test/test_wispr.h>
+#include <test/setup_common.h>
 
 #include <boost/test/unit_test.hpp>
 #include <stdint.h>

@@ -8,7 +8,7 @@
 #include <boost/test/unit_test.hpp>
 #include <limits.h>
 #include <stdint.h>
-#include <test/test_wispr.h>
+#include <test/setup_common.h>
 
 BOOST_FIXTURE_TEST_SUITE(scriptnum_tests, BasicTestingSetup)
 

@@ -2,7 +2,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <test/test_wispr.h>
+#include <test/setup_common.h>
 #include "masternode-budget.h"
 #include "tinyformat.h"
 #include "util/moneystr.h"
