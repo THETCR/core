@@ -94,6 +94,7 @@ struct Params {
     CAmount nMaxMoneyOut;
     bool fSkipProofOfWorkCheck;
     int nPoolMaxTransactions;
+    int nBudgetCycleBlocks;
     std::string strSporkKey;
     std::string strObfuscationPoolDummyAddress;
     int64_t nStartMasternodePayments;

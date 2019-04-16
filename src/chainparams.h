@@ -168,6 +168,8 @@ public:
     /** In the future use NetworkIDString() for RPC fields */
     bool TestnetToBeDeprecatedFieldRPC() const { return fTestnetToBeDeprecatedFieldRPC; }
     int PoolMaxTransactions() const { return consensus.nPoolMaxTransactions; }
+    /** Return the number of blocks in a budget cycle */
+    int GetBudgetCycleBlocks() const { return consensus.nBudgetCycleBlocks; }
 
     /** Spork key and Masternode Handling **/
     std::string SporkKey() const { return consensus.strSporkKey; }

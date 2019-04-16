@@ -183,6 +183,7 @@ public:
         fHeadersFirstSyncingActive = true;
 
         consensus.nPoolMaxTransactions = 3;
+        consensus.nBudgetCycleBlocks = 43200; //!< Amount of blocks in a months period of time (using 1 minutes per) = (60*24*30)
         consensus.strSporkKey = "04ac60266c909c22b95415270278b8ea90bec852922d3b2bd110cfba62fc4da20f7d5d6c7f109c9604a421c6e75e47a3c8963dcd1b9b7ca71aaeef3d410e4cc65a";
         consensus.strObfuscationPoolDummyAddress = "WYCSnxDBqGkcruCwreLtBfpXtSMgoo5yUJ";
         consensus.nStartMasternodePayments = consensus.nNewProtocolStartTime; // July 2, 2018
@@ -343,6 +344,7 @@ public:
         fTestnetToBeDeprecatedFieldRPC = true;
 
         consensus.nPoolMaxTransactions = 2;
+        consensus.nBudgetCycleBlocks = 144; //!< Ten cycles per day on testnet
         consensus.strSporkKey = "04e175173ea919f973cf4bf00d10e1c29c8ef75568c59056630d5a5cce8f6d8ac6edf0bb21baa2a24ecff17ce83b9863a88a54c54ca87c709c8a3f1dfef9d268e6";
         consensus.strObfuscationPoolDummyAddress = "mbTYaNZm7TaPt5Du65aPsL8FNTktufYydC";
         consensus.nStartMasternodePayments = consensus.nNewProtocolStartTime;
@@ -507,6 +509,7 @@ public:
         fHeadersFirstSyncingActive = true;
 
         consensus.nPoolMaxTransactions = 3;
+        consensus.nBudgetCycleBlocks = 144; //!< Ten cycles per day on testnet
         consensus.strSporkKey = "04ac60266c909c22b95415270278b8ea90bec852922d3b2bd110cfba62fc4da20f7d5d6c7f109c9604a421c6e75e47a3c8963dcd1b9b7ca71aaeef3d410e4cc65a";
         consensus.strObfuscationPoolDummyAddress = "WYCSnxDBqGkcruCwreLtBfpXtSMgoo5yUJ";
         consensus.nStartMasternodePayments = consensus.nNewProtocolStartTime; // July 2, 2018

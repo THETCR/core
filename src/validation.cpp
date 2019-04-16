@@ -2635,10 +2635,11 @@ void AddWrappedSerialsInflation()
     if (pindex->nHeight > chainActive.Height())
         return;
 
+    uiInterface.ShowProgress(_("Adding Wrapped Serials supply..."), 0, false);
     while (true) {
         if (pindex->nHeight % 1000 == 0) {
             LogPrintf("%s : block %d...\n", __func__, pindex->nHeight);
-            int percent = (int)( (double)(pindex->nHeight - Params().Zerocoin_Block_EndFakeSerial()) * 100 / (chainActive.Height() - Params().Zerocoin_Block_EndFakeSerial()) );
+            int percent = std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().Zerocoin_Block_EndFakeSerial()) * 100 / (chainActive.Height() - Params().Zerocoin_Block_EndFakeSerial()))));
             uiInterface.ShowProgress(_("Adding Wrapped Serials supply..."), percent, true);
         }
 
@@ -2661,11 +2662,12 @@ void RecalculateZWSPMinted()
 {
     CBlockIndex *pindex = chainActive[Params().NEW_PROTOCOLS_STARTHEIGHT()];
     const Consensus::Params& consensusParams = Params().GetConsensus();
+    uiInterface.ShowProgress(_("Recalculating minted ZWSP..."), 0, false);
     while (true) {
         // Log Message and feedback message every 1000 blocks
         if (pindex->nHeight % 1000 == 0) {
             LogPrintf("%s : block %d...\n", __func__, pindex->nHeight);
-            int percent = (int)( (double)(pindex->nHeight - Params().NEW_PROTOCOLS_STARTHEIGHT()) * 100 / (chainActive.Height() - Params().NEW_PROTOCOLS_STARTHEIGHT()) );
+            int percent = std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().NEW_PROTOCOLS_STARTHEIGHT()) * 100 / (chainActive.Height() - Params().NEW_PROTOCOLS_STARTHEIGHT()))));
             uiInterface.ShowProgress(_("Recalculating minted ZWSP..."), percent, true);
         }
 
@@ -2686,17 +2688,19 @@ void RecalculateZWSPMinted()
         else
             break;
     }
+    uiInterface.ShowProgress("", 100, false);
 }
 
 void RecalculateZWSPSpent()
 {
     const Consensus::Params& consensusParams = Params().GetConsensus();
     CBlockIndex* pindex = chainActive[Params().NEW_PROTOCOLS_STARTHEIGHT()];
+    uiInterface.ShowProgress(_("Recalculating spent ZWSP..."), 0, false);
     while (true) {
         if (pindex->nHeight % 1000 == 0) {
             LogPrintf("%s : block %d...\n", __func__, pindex->nHeight);
-            int percent = (int)( (double)(pindex->nHeight - Params().NEW_PROTOCOLS_STARTHEIGHT()) * 100 / (chainActive.Height() - Params().NEW_PROTOCOLS_STARTHEIGHT()) );
-            uiInterface.ShowProgress(_("Recalculating spent ZPIV..."), percent, true);
+            int percent = std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().NEW_PROTOCOLS_STARTHEIGHT()) * 100 / (chainActive.Height() - Params().NEW_PROTOCOLS_STARTHEIGHT()))));
+            uiInterface.ShowProgress(_("Recalculating spent ZWSP..."), percent, true);
         }
 
         //Rewrite zWSP supply
@@ -2746,10 +2750,11 @@ bool RecalculateWSPSupply(int nHeightStart)
     if (nHeightStart == Params().NEW_PROTOCOLS_STARTHEIGHT())
         nSupplyPrev = CAmount(5449796547496199);
 
+    uiInterface.ShowProgress(_("Recalculating WSP supply..."), 0, false);
     while (true) {
         if (pindex->nHeight % 1000 == 0) {
             LogPrintf("%s : block %d...\n", __func__, pindex->nHeight);
-            int percent = (int)( (double)((pindex->nHeight - nHeightStart) * 100) / (chainActive.Height() - nHeightStart) );
+            int percent = std::max(1, std::min(99, (int)((double)((pindex->nHeight - nHeightStart) * 100) / (chainActive.Height() - nHeightStart))));
             uiInterface.ShowProgress(_("Recalculating WSP supply..."), percent, true);
         }
 
@@ -3418,10 +3423,13 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
     AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().NEW_PROTOCOLS_STARTHEIGHT()));
-    if (!ValidateAccumulatorCheckpoint(block, pindex, mapAccumulators))
-        return state.DoS(100, error("%s: Failed to validate accumulator checkpoint for block=%s height=%d", __func__,
-                                    block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID, "bad-acc-checkpoint");
-
+    if (!ValidateAccumulatorCheckpoint(block, pindex, mapAccumulators)) {
+        if (!ShutdownRequested()) {
+            return state.DoS(100, error("%s: Failed to validate accumulator checkpoint for block=%s height=%d", __func__, block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID, "bad-acc-checkpoint");
+        }
+        return error("%s: Failed to validate accumulator checkpoint for block=%s height=%d because wallet is shutting down", __func__,
+                     block.GetHash().GetHex(), pindex->nHeight);
+    }
     if (!control.Wait())
         return state.DoS(100, error("%s: CheckQueue failed", __func__), REJECT_INVALID, "block-validation-failed");
     int64_t nTime4 = GetTimeMicros(); nTimeVerify += nTime4 - nTime2;

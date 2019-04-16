@@ -27,15 +27,6 @@ std::vector<CFinalizedBudgetBroadcast> vecImmatureFinalizedBudgets;
 
 int nSubmittedFinalBudget;
 
-int GetBudgetPaymentCycleBlocks()
-{
-    // Amount of blocks in a months period of time (using 1 minutes per) = (60*24*30)
-    if (Params().NetworkID() == CBaseChainParams::MAIN) return 43200;
-    //for testing purposes
-
-    return 144; //ten times per day
-}
-
 bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, std::string& strError, int64_t& nTime, int& nConf, bool fBudgetFinalization)
 {
     CTransactionRef txCollateral;
@@ -165,14 +156,14 @@ void CBudgetManager::SubmitFinalBudget()
         nCurrentHeight = chainActive.Height();
     }
 
-    int nBlockStart = nCurrentHeight - nCurrentHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
+    int nBlockStart = nCurrentHeight - nCurrentHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
     if (nSubmittedHeight >= nBlockStart){
         LogPrint(BCLog::MNBUDGET,"CBudgetManager::SubmitFinalBudget - nSubmittedHeight(=%ld) < nBlockStart(=%ld) condition not fulfilled.\n", nSubmittedHeight, nBlockStart);
         return;
     }
 
      // Submit final budget during the last 2 days (2880 blocks) before payment for Mainnet, about 9 minutes (9 blocks) for Testnet
-    int finalizationWindow = ((GetBudgetPaymentCycleBlocks() / 30) * 2);
+    int finalizationWindow = ((Params().GetBudgetCycleBlocks() / 30) * 2);
 
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
         // NOTE: 9 blocks for testnet is way to short to have any masternode submit an automatic vote on the finalized(!) budget,
@@ -810,8 +801,8 @@ std::vector<CBudgetProposal*> CBudgetManager::GetBudget()
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (pindexPrev == NULL) return vBudgetProposalsRet;
 
-    int nBlockStart = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
-    int nBlockEnd = nBlockStart + GetBudgetPaymentCycleBlocks() - 1;
+    int nBlockStart = pindexPrev->nHeight - pindexPrev->nHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
+    int nBlockEnd = nBlockStart + Params().GetBudgetCycleBlocks() - 1;
     CAmount nTotalBudget = GetTotalBudget(nBlockStart);
 
 
@@ -1530,9 +1521,9 @@ bool CBudgetProposal::IsValid(std::string& strError, bool fCheckCollateral)
     }
 
     // Calculate maximum block this proposal will be valid, which is start of proposal + (number of payments * cycle)
-    int nProposalEnd = GetBlockStart() + (GetBudgetPaymentCycleBlocks() * GetTotalPaymentCount());
+    int nProposalEnd = GetBlockStart() + (Params().GetBudgetCycleBlocks() * GetTotalPaymentCount());
 
-    // if (GetBlockEnd() < pindexPrev->nHeight - GetBudgetPaymentCycleBlocks() / 2) {
+    // if (GetBlockEnd() < pindexPrev->nHeight - Params().GetBudgetCycleBlocks() / 2) {
     if(nProposalEnd < pindexPrev->nHeight){
         strError = "Proposal " + strProposalName + ": Invalid nBlockEnd (" + std::to_string(nProposalEnd) + ") < current height (" + std::to_string(pindexPrev->nHeight) + ")";
         return false;
@@ -1646,7 +1637,7 @@ int CBudgetProposal::GetBlockStartCycle()
 {
     //end block is half way through the next cycle (so the proposal will be removed much after the payment is sent)
 
-    return nBlockStart - nBlockStart % GetBudgetPaymentCycleBlocks();
+    return nBlockStart - nBlockStart % Params().GetBudgetCycleBlocks();
 }
 
 int CBudgetProposal::GetBlockCurrentCycle()
@@ -1656,7 +1647,7 @@ int CBudgetProposal::GetBlockCurrentCycle()
 
     if (pindexPrev->nHeight >= GetBlockEndCycle()) return -1;
 
-    return pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks();
+    return pindexPrev->nHeight - pindexPrev->nHeight % Params().GetBudgetCycleBlocks();
 }
 
 int CBudgetProposal::GetBlockEndCycle()
@@ -1664,7 +1655,7 @@ int CBudgetProposal::GetBlockEndCycle()
     // Right now single payment proposals have nBlockEnd have a cycle too early!
     // switch back if it break something else
     // end block is half way through the next cycle (so the proposal will be removed much after the payment is sent)
-    // return nBlockEnd - GetBudgetPaymentCycleBlocks() / 2;
+    // return nBlockEnd - Params().GetBudgetCycleBlocks() / 2;
 
     // End block is half way through the next cycle (so the proposal will be removed much after the payment is sent)
     return nBlockEnd;
@@ -1673,13 +1664,13 @@ int CBudgetProposal::GetBlockEndCycle()
 
 int CBudgetProposal::GetTotalPaymentCount()
 {
-    return (GetBlockEndCycle() - GetBlockStartCycle()) / GetBudgetPaymentCycleBlocks();
+    return (GetBlockEndCycle() - GetBlockStartCycle()) / Params().GetBudgetCycleBlocks();
 }
 
 int CBudgetProposal::GetRemainingPaymentCount()
 {
     // If this budget starts in the future, this value will be wrong
-    int nPayments = (GetBlockEndCycle() - GetBlockCurrentCycle()) / GetBudgetPaymentCycleBlocks() - 1;
+    int nPayments = (GetBlockEndCycle() - GetBlockCurrentCycle()) / Params().GetBudgetCycleBlocks() - 1;
     // Take the lowest value
     return std::min(nPayments, GetTotalPaymentCount());
 }
@@ -1691,15 +1682,15 @@ CBudgetProposalBroadcast::CBudgetProposalBroadcast(std::string strProposalNameIn
 
     nBlockStart = nBlockStartIn;
 
-    int nCycleStart = nBlockStart - nBlockStart % GetBudgetPaymentCycleBlocks();
+    int nCycleStart = nBlockStart - nBlockStart % Params().GetBudgetCycleBlocks();
 
     // Right now single payment proposals have nBlockEnd have a cycle too early!
     // switch back if it break something else
     // calculate the end of the cycle for this vote, add half a cycle (vote will be deleted after that block)
-    // nBlockEnd = nCycleStart + GetBudgetPaymentCycleBlocks() * nPaymentCount + GetBudgetPaymentCycleBlocks() / 2;
+    // nBlockEnd = nCycleStart + Params().GetBudgetCycleBlocks() * nPaymentCount + Params().GetBudgetCycleBlocks() / 2;
 
     // Calculate the end of the cycle for this vote, vote will be deleted after next cycle
-    nBlockEnd = nCycleStart + (GetBudgetPaymentCycleBlocks() + 1)  * nPaymentCount;
+    nBlockEnd = nCycleStart + (Params().GetBudgetCycleBlocks() + 1)  * nPaymentCount;
 
     address = addressIn;
     nAmount = nAmountIn;
@@ -2029,7 +2020,7 @@ bool CFinalizedBudget::IsValid(std::string& strError, bool fCheckCollateral)
     std::string strProposals = GetProposals();
     
     // Must be the correct block for payment to happen (once a month)
-    if (nBlockStart % GetBudgetPaymentCycleBlocks() != 0) {
+    if (nBlockStart % Params().GetBudgetCycleBlocks() != 0) {
         strError = "Invalid BlockStart";
         return false;
     }
@@ -2080,10 +2071,10 @@ bool CFinalizedBudget::IsValid(std::string& strError, bool fCheckCollateral)
 
     // Get start of current budget-cycle
     int nCurrentHeight = chainActive.Height();
-    int nBlockStart = nCurrentHeight - nCurrentHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
+    int nBlockStart = nCurrentHeight - nCurrentHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
 
     // Remove budgets where the last payment (from max. 100) ends before 2 budget-cycles before the current one
-    int nMaxAge = nBlockStart - (2 * GetBudgetPaymentCycleBlocks());
+    int nMaxAge = nBlockStart - (2 * Params().GetBudgetCycleBlocks());
     
     if (GetBlockEnd() < nMaxAge) {
         strError = strprintf("Budget " + strBudgetName + " (" + strProposals + ") (ends at block %ld) too old and obsolete", GetBlockEnd());

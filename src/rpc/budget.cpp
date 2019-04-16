@@ -100,15 +100,15 @@ UniValue preparebudget(const JSONRPCRequest& request)
         throw std::runtime_error("Invalid payment count, must be more than zero.");
 
     // Start must be in the next budget cycle
-    if (pindexPrev != nullptr) nBlockMin = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
+    if (pindexPrev != nullptr) nBlockMin = pindexPrev->nHeight - pindexPrev->nHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
 
     int nBlockStart = request.params[3].get_int();
-    if (nBlockStart % GetBudgetPaymentCycleBlocks() != 0) {
-        int nNext = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
+    if (nBlockStart % Params().GetBudgetCycleBlocks() != 0) {
+        int nNext = pindexPrev->nHeight - pindexPrev->nHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
         throw std::runtime_error(strprintf("Invalid block start - must be a budget cycle block. Next valid block: %d", nNext));
     }
 
-    int nBlockEnd = nBlockStart + GetBudgetPaymentCycleBlocks() * nPaymentCount; // End must be AFTER current cycle
+    int nBlockEnd = nBlockStart + Params().GetBudgetCycleBlocks() * nPaymentCount; // End must be AFTER current cycle
 
     if (nBlockStart < nBlockMin)
         throw std::runtime_error("Invalid block start, must be more than current height.");
@@ -195,15 +195,15 @@ UniValue submitbudget(const JSONRPCRequest& request)
         throw std::runtime_error("Invalid payment count, must be more than zero.");
 
     // Start must be in the next budget cycle
-    if (pindexPrev != nullptr) nBlockMin = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
+    if (pindexPrev != nullptr) nBlockMin = pindexPrev->nHeight - pindexPrev->nHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
 
     int nBlockStart = request.params[3].get_int();
-    if (nBlockStart % GetBudgetPaymentCycleBlocks() != 0) {
-        int nNext = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
+    if (nBlockStart % Params().GetBudgetCycleBlocks() != 0) {
+        int nNext = pindexPrev->nHeight - pindexPrev->nHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
         throw std::runtime_error(strprintf("Invalid block start - must be a budget cycle block. Next valid block: %d", nNext));
     }
 
-    int nBlockEnd = nBlockStart + (GetBudgetPaymentCycleBlocks() * nPaymentCount); // End must be AFTER current cycle
+    int nBlockEnd = nBlockStart + (Params().GetBudgetCycleBlocks() * nPaymentCount); // End must be AFTER current cycle
 
     if (nBlockStart < nBlockMin)
         throw std::runtime_error("Invalid block start, must be more than current height.");
@@ -572,7 +572,7 @@ UniValue getnextsuperblock(const JSONRPCRequest& request)
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (!pindexPrev) return "unknown";
 
-    int nNext = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
+    int nNext = pindexPrev->nHeight - pindexPrev->nHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
     return nNext;
 }
 
