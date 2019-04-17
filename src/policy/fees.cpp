@@ -867,7 +867,7 @@ bool CBlockPolicyEstimator::Write(CAutoFile& fileout) const
 {
     try {
         LOCK(m_cs_fee_estimator);
-        fileout << 149900; // version required to read: 0.14.99 or later
+        fileout << 40000; // version required to read: 0.14.99 or later
         fileout << CLIENT_VERSION; // version that wrote the file
         fileout << nBestSeenHeight;
         if (BlockSpan() > HistoricalBlockSpan()/2) {
@@ -895,7 +895,7 @@ bool CBlockPolicyEstimator::Read(CAutoFile& filein)
         int nVersionRequired, nVersionThatWrote;
         filein >> nVersionRequired >> nVersionThatWrote;
         if (nVersionRequired > CLIENT_VERSION)
-            return error("CBlockPolicyEstimator::Read(): up-version (%d) fee estimate file", nVersionRequired);
+            return error("CBlockPolicyEstimator::Read(): up-version (%d) fee estimate file, client-version (%d)", nVersionRequired, CLIENT_VERSION);
 
         // Read fee estimates file into temporary variables so existing data
         // structures aren't corrupted if there is an exception.

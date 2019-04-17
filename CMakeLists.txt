@@ -5,7 +5,7 @@
 # the run/debug configuration as otherwise CLion will try to build this project with cmake, failing horribly.
 # You'll also have to manually change the executable in the configuration to the correct path of the already built executable
 
-cmake_minimum_required(VERSION 3.13.4)
+cmake_minimum_required(VERSION 3.14.2)
 project(WISPR)
 
 set(CMAKE_PREFIX_PATH D:/Development/Libraries/CPP/Qt/5.9.7/mingw53_32)

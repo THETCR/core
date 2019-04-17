@@ -35,7 +35,7 @@ public:
     //! whether containing transaction was a coinbase
     unsigned int fCoinBase : 1;
     //! whether containing transaction was a coinstake
-    unsigned int fCoinStake : 2;
+    unsigned int fCoinStake : 1;
 
     //! at which height this containing transaction was included in the active block chain
     uint32_t nHeight : 31;
@@ -66,7 +66,7 @@ public:
     template<typename Stream>
     void Serialize(Stream &s) const {
         assert(!IsSpent());
-        uint32_t code = nHeight * 2 + fCoinBase + fCoinStake;
+        uint32_t code = nHeight * 4 + (fCoinBase ? 1 : 0) + (fCoinStake ? 2 : 0);
         ::Serialize(s, VARINT(code));
         ::Serialize(s, CTxOutCompressor(REF(out)));
     }
@@ -75,7 +75,7 @@ public:
     void Unserialize(Stream &s) {
         uint32_t code = 0;
         ::Unserialize(s, VARINT(code));
-        nHeight = code >> 1;
+        nHeight = code >> 2;
         fCoinBase = code & 1;
         fCoinStake = (code & 2) != 0; //0010 coinstake
         ::Unserialize(s, CTxOutCompressor(out));

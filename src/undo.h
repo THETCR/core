@@ -27,7 +27,7 @@ class TxInUndoSerializer
 public:
     template<typename Stream>
     void Serialize(Stream &s) const {
-        ::Serialize(s, VARINT(txout->nHeight * 2 + (txout->fCoinBase ? 1u : 0u)));
+        ::Serialize(s, VARINT(txout->nHeight * 4 + (txout->fCoinBase ? 1u : 0u) + (txout->fCoinStake ? 2u : 0u)));
         if (txout->nHeight > 0) {
             // Required to maintain compatibility with older undo format.
             ::Serialize(s, (unsigned char)0);
@@ -47,8 +47,9 @@ public:
     void Unserialize(Stream &s) {
         unsigned int nCode = 0;
         ::Unserialize(s, VARINT(nCode));
-        txout->nHeight = nCode / 2;
+        txout->nHeight = nCode / 4;
         txout->fCoinBase = nCode & 1;
+        txout->fCoinStake = nCode & 2;
         if (txout->nHeight > 0) {
             // Old versions stored the version number for the last spend of
             // a transaction's outputs. Non-final spends were indicated with
@@ -60,53 +61,6 @@ public:
     }
 
     explicit TxInUndoDeserializer(Coin* coin) : txout(coin) {}
-};
-/** Undo information for a CTxIn
- *
- *  Contains the prevout's CTxOut being spent, and if this was the
- *  last output of the affected transaction, its metadata as well
- *  (coinbase or not, height, transaction version)
- */
-class CTxInUndo
-{
-public:
-    CTxOut txout;   // the txout data before being spent
-    bool fCoinBase; // if the outpoint was the last unspent: whether it belonged to a coinbase
-    bool fCoinStake;
-    unsigned int nHeight; // if the outpoint was the last unspent: its height
-    int nVersion;         // if the outpoint was the last unspent: its version
-
-    CTxInUndo() : txout(), fCoinBase(false), fCoinStake(false), nHeight(0), nVersion(0) {}
-    CTxInUndo(const CTxOut& txoutIn, bool fCoinBaseIn = false, bool fCoinStakeIn = false, unsigned int nHeightIn = 0, int nVersionIn = 0) : txout(txoutIn), fCoinBase(fCoinBaseIn), fCoinStake(fCoinStakeIn), nHeight(nHeightIn), nVersion(nVersionIn) {}
-
-    unsigned int GetSerializeSize(int nType, int nVersion) const
-    {
-        return ::GetSerializeSize(VARINT(nHeight * 4 + (fCoinBase ? 2 : 0) + (fCoinStake ? 1 : 0))) +
-               (nHeight > 0 ? ::GetSerializeSize(VARINT(this->nVersion, VarIntMode::NONNEGATIVE_SIGNED)) : 0) +
-               ::GetSerializeSize(CTxOutCompressor(REF(txout)));
-    }
-
-    template <typename Stream>
-    void Serialize(Stream& s) const
-    {
-        ::Serialize(s, VARINT(nHeight * 4 + (fCoinBase ? 2 : 0) + (fCoinStake ? 1 : 0)));
-        if (nHeight > 0)
-            ::Serialize(s, VARINT(this->nVersion, VarIntMode::NONNEGATIVE_SIGNED));
-        ::Serialize(s, CTxOutCompressor(REF(txout)));
-    }
-
-    template <typename Stream>
-    void Unserialize(Stream& s)
-    {
-        unsigned int nCode = 0;
-        ::Unserialize(s, VARINT(nCode));
-        nHeight = nCode >> 2;
-        fCoinBase = nCode & 2;
-        fCoinStake = nCode & 1;
-        if (nHeight > 0)
-            ::Unserialize(s, VARINT(this->nVersion, VarIntMode::NONNEGATIVE_SIGNED));
-        ::Unserialize(s, REF(CTxOutCompressor(REF(txout))));
-    }
 };
 
 static const size_t MIN_TRANSACTION_INPUT_WEIGHT = WITNESS_SCALE_FACTOR * ::GetSerializeSize(CTxIn(), PROTOCOL_VERSION);

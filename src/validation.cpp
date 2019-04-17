@@ -6220,7 +6220,7 @@ bool CChainState::RollforwardBlock(const CBlockIndex* pindex, CCoinsViewCache& i
     }
 
     for (const CTransactionRef& tx : block.vtx) {
-        if (!tx->IsCoinBase()) {
+        if (!tx->IsCoinBase() && !tx->IsZerocoinSpend()) {
             for (const CTxIn &txin : tx->vin) {
                 inputs.SpendCoin(txin.prevout);
             }
