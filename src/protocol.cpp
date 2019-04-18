@@ -77,36 +77,6 @@ const char *GENWIT="genwit";
 const char *ACCVALUE="accvalue";
 } // namespace NetMsgType
 
-static const char* ppszTypeName[] =
-    {
-        "ERROR", // Should never occur
-        NetMsgType::TX,
-        NetMsgType::BLOCK,
-        "filtered block", // Should never occur
-        // Dash message types
-        // NOTE: include non-implmented here, we must keep this list in sync with enum in protocol.h
-        NetMsgType::TXLOCKREQUEST,
-        NetMsgType::TXLOCKVOTE,
-        NetMsgType::SPORK,
-        NetMsgType::MASTERNODEPAYMENTVOTE,
-        NetMsgType::MASTERNODEPAYMENTBLOCK, // reusing, was MNSCANERROR previousely, was NOT used in 12.0, we need this for inv
-        NetMsgType::MNBUDGETVOTE, // deprecated since 12.1
-        NetMsgType::MNBUDGETPROPOSAL, // deprecated since 12.1
-        NetMsgType::MNBUDGETFINAL, // deprecated since 12.1
-        NetMsgType::MNBUDGETFINALVOTE, // deprecated since 12.1
-        NetMsgType::MNQUORUM, // not implemented
-        NetMsgType::MNANNOUNCE,
-        NetMsgType::MNPING,
-        NetMsgType::DSTX,
-        NetMsgType::MNGOVERNANCEOBJECT,
-        NetMsgType::MNGOVERNANCEOBJECTVOTE,
-        NetMsgType::MNVERIFY,
-        "compact block", // Should never occur
-        NetMsgType::PUBCOINS,
-        NetMsgType::GENWIT,
-        NetMsgType::ACCVALUE
-    };
-
 /** All known message types. Keep this in the same order as the list of
  * messages above and in protocol.h.
  */
@@ -268,13 +238,13 @@ CInv::CInv(int typeIn, const uint256& hashIn) : type(typeIn), hash(hashIn) {}
 CInv::CInv(const std::string& strType, const uint256& hashIn)
 {
     unsigned int i;
-    for (i = 1; i < ARRAYLEN(ppszTypeName); i++) {
-        if (strType == ppszTypeName[i]) {
+    for (i = 1; i < ARRAYLEN(allNetMessageTypes); i++) {
+        if (strType == allNetMessageTypes[i]) {
             type = i;
             break;
         }
     }
-    if (i == ARRAYLEN(ppszTypeName))
+    if (i == ARRAYLEN(allNetMessageTypes))
         LogPrint(BCLog::NET, "CInv::CInv(string, uint256) : unknown type '%s'", strType);
     hash = hashIn;
 }
@@ -286,7 +256,8 @@ bool operator<(const CInv& a, const CInv& b)
 
 bool CInv::IsKnownType() const
 {
-    return (type >= 1 && type < (int)ARRAYLEN(ppszTypeName));
+    std::cout << "CInv::IsKnownType = " << (type >= 1 && type < (int)ARRAYLEN(allNetMessageTypes)) << "\n";
+    return (type >= 1 && type < (int)ARRAYLEN(allNetMessageTypes));
 }
 
 bool CInv::IsMasterNodeType() const{
@@ -306,18 +277,28 @@ bool CInv::IsMasterNodeType() const{
 std::string CInv::GetCommand() const
 {
     std::string cmd;
-    if (type & MSG_WITNESS_FLAG)
+    if (type & MSG_WITNESS_FLAG){
+        LogPrint(BCLog::NET, "CInv::GetCommand() : type=%d with witness flag", type);
         cmd.append("witness-");
-    int masked = type & MSG_TYPE_MASK;
-    switch (masked)
-    {
-    case MSG_TX:             return cmd.append(NetMsgType::TX);
-    case MSG_BLOCK:          return cmd.append(NetMsgType::BLOCK);
-    case MSG_FILTERED_BLOCK: return cmd.append(NetMsgType::MERKLEBLOCK);
-    case MSG_CMPCT_BLOCK:    return cmd.append(NetMsgType::CMPCTBLOCK);
-    default:
-        throw std::out_of_range(strprintf("CInv::GetCommand(): type=%d unknown type", type));
+        int masked = type & MSG_TYPE_MASK;
+        switch (masked)
+        {
+        case MSG_TX:             return cmd.append(NetMsgType::TX);
+        case MSG_BLOCK:          return cmd.append(NetMsgType::BLOCK);
+        case MSG_FILTERED_BLOCK: return cmd.append(NetMsgType::MERKLEBLOCK);
+        case MSG_CMPCT_BLOCK:    return cmd.append(NetMsgType::CMPCTBLOCK);
+        default:
+            throw std::out_of_range(strprintf("CInv::GetCommand(): type=%d unknown type", type));
+        }
     }
+
+    if (!IsKnownType()) {
+        LogPrint(BCLog::NET, "CInv::GetCommand() : type=%d unknown type", type);
+        return "UNKNOWN";
+    }
+
+    return allNetMessageTypes[type];
+
 }
 
 std::string CInv::ToString() const
@@ -332,4 +313,13 @@ std::string CInv::ToString() const
 const std::vector<std::string> &getAllNetMessageTypes()
 {
     return allNetMessageTypesVec;
+}
+
+bool isNetMsgTypeKnown(std::string strCommand){
+    for(const auto type : allNetMessageTypes){
+        if(type == strCommand){
+            return true;
+        }
+    }
+    return false;
 }

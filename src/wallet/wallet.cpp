@@ -2053,7 +2053,7 @@ CWallet::ScanResult CWallet::ScanForWalletTransactions(const uint256& start_bloc
                             int nHeightSpend = 0;
                             uint256 txidSpend;
                             CTransactionRef txSpend;
-                            if (IsSerialInBlockchain(GetSerialHash(m.GetSerialNumber()), nHeightSpend, txidSpend, txSpend)) {
+                            if (locked_chain->isSerialInBlockchain(GetSerialHash(m.GetSerialNumber()), nHeightSpend, txidSpend, txSpend)) {
                                 if (setAddedToWallet.count(txidSpend) || mapWallet.count(txidSpend))
                                     continue;
 
@@ -5387,20 +5387,14 @@ std::map<libzerocoin::CoinDenomination, int> mapMintMaturity;
 int nLastMaturityCheck = 0;
 CAmount CWallet::GetZerocoinBalance(interfaces::Chain::Lock& locked_chain, bool fMatureOnly) const
 {
-    std::cout << "GetZerocoinBalance tip_height\n";
     int32_t tip_height = locked_chain.getHeight().get_value_or(0);
-    std::cout << "GetZerocoinBalance fMatureOnly\n";
     if (fMatureOnly) {
-        std::cout << "GetZerocoinBalance if tip_height\n";
         if (tip_height > nLastMaturityCheck){
-            std::cout << "GetZerocoinBalance GetMintMaturityHeight\n";
             mapMintMaturity = GetMintMaturityHeight();
         }
-        std::cout << "GetZerocoinBalance nLastMaturityCheck\n";
         nLastMaturityCheck = tip_height;
 
         CAmount nBalance = 0;
-        std::cout << "GetZerocoinBalance GetMints\n";
         std::vector<CMintMeta> vMints = zwspTracker->GetMints(true);
         for (auto meta : vMints) {
             if (meta.nHeight >= mapMintMaturity.at(meta.denom) || meta.nHeight >= tip_height || meta.nHeight == 0)
@@ -5409,7 +5403,6 @@ CAmount CWallet::GetZerocoinBalance(interfaces::Chain::Lock& locked_chain, bool 
         }
         return nBalance;
     }
-    std::cout << "GetZerocoinBalance zwspTracker->GetBalance\n";
     return zwspTracker->GetBalance(locked_chain, false, false);
 }
 
@@ -5846,7 +5839,7 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
     }
 
     //zWSP
-    uint32_t const tip_height = locked_chain->getHeight().get_value_or(-1);
+    int32_t const tip_height = locked_chain->getHeight().get_value_or(0);
     if ((gArgs.GetBoolArg("-zwspstake", true) || fPrecompute) && tip_height > Params().NEW_PROTOCOLS_STARTHEIGHT() && !locked_chain->isSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
         //Only update zWSP set once per update interval
         bool fUpdate = false;
@@ -6970,8 +6963,8 @@ string CWallet::PrepareObfuscationDenominate(int minRounds, int maxRounds)
     if (IsLocked())
         return _("Error: Wallet locked, unable to create transaction!");
 
-    if (obfuScationPool.GetState() != POOL_STATUS_ERROR && obfuScationPool.GetState() != POOL_STATUS_SUCCESS)
-        if (obfuScationPool.GetEntriesCount() > 0)
+    if (::obfuScationPool.GetState() != POOL_STATUS_ERROR && ::obfuScationPool.GetState() != POOL_STATUS_SUCCESS)
+        if (::obfuScationPool.GetEntriesCount() > 0)
             return _("Error: You already have pending entries in the Obfuscation pool");
 
     // ** find the coins we'll use
@@ -6987,7 +6980,7 @@ string CWallet::PrepareObfuscationDenominate(int minRounds, int maxRounds)
         if minRounds >= 0 it means only denominated inputs are going in and coming out
     */
     if (minRounds >= 0) {
-        if (!SelectCoinsByDenominations(obfuScationPool.sessionDenom, 0.1 * COIN, OBFUSCATION_POOL_MAX, vCoins, vCoins2, nValueIn, minRounds, maxRounds))
+        if (!SelectCoinsByDenominations(::obfuScationPool.sessionDenom, 0.1 * COIN, OBFUSCATION_POOL_MAX, vCoins, vCoins2, nValueIn, minRounds, maxRounds))
             return _("Error: Can't select current denominated inputs");
     }
 
@@ -7016,17 +7009,17 @@ string CWallet::PrepareObfuscationDenominate(int minRounds, int maxRounds)
         for (CAmount v: obfuScationDenominations) {
             // only use the ones that are approved
             bool fAccepted = false;
-            if ((obfuScationPool.sessionDenom & (1 << 0)) && v == ((10000 * COIN) + 10000000)) {
+            if ((::obfuScationPool.sessionDenom & (1 << 0)) && v == ((10000 * COIN) + 10000000)) {
                 fAccepted = true;
-            } else if ((obfuScationPool.sessionDenom & (1 << 1)) && v == ((1000 * COIN) + 1000000)) {
+            } else if ((::obfuScationPool.sessionDenom & (1 << 1)) && v == ((1000 * COIN) + 1000000)) {
                 fAccepted = true;
-            } else if ((obfuScationPool.sessionDenom & (1 << 2)) && v == ((100 * COIN) + 100000)) {
+            } else if ((::obfuScationPool.sessionDenom & (1 << 2)) && v == ((100 * COIN) + 100000)) {
                 fAccepted = true;
-            } else if ((obfuScationPool.sessionDenom & (1 << 3)) && v == ((10 * COIN) + 10000)) {
+            } else if ((::obfuScationPool.sessionDenom & (1 << 3)) && v == ((10 * COIN) + 10000)) {
                 fAccepted = true;
-            } else if ((obfuScationPool.sessionDenom & (1 << 4)) && v == ((1 * COIN) + 1000)) {
+            } else if ((::obfuScationPool.sessionDenom & (1 << 4)) && v == ((1 * COIN) + 1000)) {
                 fAccepted = true;
-            } else if ((obfuScationPool.sessionDenom & (1 << 5)) && v == ((.1 * COIN) + 100)) {
+            } else if ((::obfuScationPool.sessionDenom & (1 << 5)) && v == ((.1 * COIN) + 100)) {
                 fAccepted = true;
             }
             if (!fAccepted) continue;
@@ -7079,7 +7072,7 @@ string CWallet::PrepareObfuscationDenominate(int minRounds, int maxRounds)
             UnlockCoin(v.prevout);
     }
 
-    if (obfuScationPool.GetDenominations(vOut) != obfuScationPool.sessionDenom) {
+    if (::obfuScationPool.GetDenominations(vOut) != ::obfuScationPool.sessionDenom) {
         // unlock used coins on failure
         LOCK(cs_wallet);
         for (CTxIn v: vCoinsResult)
@@ -7091,7 +7084,7 @@ string CWallet::PrepareObfuscationDenominate(int minRounds, int maxRounds)
     std::random_shuffle(vOut.begin(), vOut.end());
 
     // We also do not care about full amount as long as we have right denominations, just pass what we found
-    obfuScationPool.SendObfuscationDenominate(vCoinsResult, vOut, nValueIn - nValueLeft, g_connman.get());
+    ::obfuScationPool.SendObfuscationDenominate(vCoinsResult, vOut, nValueIn - nValueLeft, g_connman.get());
 
     return "";
 }
@@ -7949,7 +7942,7 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, CWalletTx& wtxNew, 
     for (CZerocoinMint mint : vSelectedMints) {
         // see if this serial has already been spent
         int nHeightSpend;
-        if (IsSerialInBlockchain(mint.GetSerialNumber(), nHeightSpend)) {
+        if (locked_chain->isSerialInBlockchain(mint.GetSerialNumber(), nHeightSpend)) {
             receipt.SetStatus(_("Trying to spend an already spent serial #, try again."), nStatus);
             uint256 hashSerial = GetSerialHash(mint.GetSerialNumber());
             if (!zwspTracker->HasSerialHash(hashSerial))
@@ -8198,6 +8191,7 @@ bool CWallet::IsMintInChain(const uint256& hashPubcoin, uint256& txid, int& nHei
 
 void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, std::list<CDeterministicMint>& listDMintsRestored)
 {
+    auto locked_chain = chain().lock();
     WalletBatch walletdb(GetDBHandle());
     std::list<CZerocoinMint> listMints = walletdb.ListArchivedZerocoins();
     std::list<CDeterministicMint> listDMints = walletdb.ListArchivedDeterministicMints();
@@ -8214,7 +8208,7 @@ void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, s
 
         mint.SetTxHash(txid);
         mint.SetHeight(nHeight);
-        mint.SetUsed(IsSerialInBlockchain(mint.GetSerialNumber(), nHeight));
+        mint.SetUsed(locked_chain->isSerialInBlockchain(mint.GetSerialNumber(), nHeight));
 
         if (!zwspTracker->UnArchive(hashPubcoin, false)) {
             LogPrintf("%s : failed to unarchive mint %s\n", __func__, mint.GetValue().GetHex());
@@ -8233,7 +8227,7 @@ void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, s
         dMint.SetTxHash(txid);
         dMint.SetHeight(nHeight);
         uint256 txidSpend;
-        dMint.SetUsed(IsSerialInBlockchain(dMint.GetSerialHash(), nHeight, txidSpend));
+        dMint.SetUsed(locked_chain->isSerialInBlockchain(dMint.GetSerialHash(), nHeight, txidSpend));
 
         if (!zwspTracker->UnArchive(dMint.GetPubcoinHash(), true)) {
             LogPrintf("%s : failed to unarchive deterministic mint %s\n", __func__, dMint.GetPubcoinHash().GetHex());

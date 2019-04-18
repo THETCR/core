@@ -1,7 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2015-2017 The PIVX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2009-2018 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <primitives/block.h>
@@ -15,10 +14,8 @@
 
 uint256 CBlockHeader::GetHash() const
 {
-    if(nVersion > 7){
-        return Hash(BEGIN(nVersion), END(nAccumulatorCheckpoint));
-    } else if ( nVersion == 7 ) {
-        return  Hash(BEGIN(nVersion), END(nNonce));
+    if(nVersion > 6){
+        return SerializeHash(*this);
     } else {
         return GetPoWHash();
     }
@@ -32,7 +29,7 @@ uint256 CBlockHeader::GetPoWHash() const
 std::string CBlock::ToString() const
 {
     std::stringstream s;
-    s << strprintf("CBlock(hash=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%u)\n",
+    s << strprintf("CBlock(hash=%s, ver=0x%08x, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%u)\n",
         GetHash().ToString(),
         nVersion,
         hashPrevBlock.ToString(),

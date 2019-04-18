@@ -125,6 +125,7 @@ public:
         }
     }
     const uint256& HashGenesisBlock() const { return consensus.hashGenesisBlock; }
+
     const std::vector<unsigned char>& AlertKey() const { return vAlertPubKey; }
     /** Make miner wait to have peers to avoid wasting work */
     bool MiningRequiresPeers() const { return fMiningRequiresPeers; }

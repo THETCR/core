@@ -547,34 +547,6 @@ public:
     void UpdateVersionBitsParametersFromArgs(const ArgsManager& args);
 };
 
-/**
- * Unit test
- */
-class CUnitTestParams : public CMainParams
-{
-public:
-    CUnitTestParams()
-    {
-        strNetworkID = "unittest";
-        nDefaultPort = 17005;
-        nPruneAfterHeight = 100000;
-        vFixedSeeds.clear(); //! Unit test mode doesn't have any fixed seeds.
-        vSeeds.clear();      //! Unit test mode doesn't have any DNS seeds.
-
-        fMiningRequiresPeers = false;
-        fDefaultConsistencyChecks = true;
-        consensus.fAllowMinDifficultyBlocks = true;
-        fMineBlocksOnDemand = true;
-        consensus.fSkipProofOfWorkCheck = true;
-        consensus.nNewProtocolStartHeight = 400000;
-        consensus.nNewProtocolStartTime = 1537830552;
-        consensus.nZerocoinStartHeight = consensus.nNewProtocolStartHeight;
-        consensus.nZerocoinStartTime = consensus.nNewProtocolStartTime; // July 2, 2018
-        /* enable fallback fee on unittest */
-        m_fallback_fee_enabled = true;
-    }
-};
-
 void CRegTestParams::UpdateVersionBitsParametersFromArgs(const ArgsManager& args)
 {
     if (!args.IsArgSet("-vbparams")) return;
@@ -622,8 +594,6 @@ std::unique_ptr<const CChainParams> CreateChainParams(const std::string& chain)
         return std::unique_ptr<CChainParams>(new CTestNetParams());
     else if (chain == CBaseChainParams::REGTEST)
         return std::unique_ptr<CChainParams>(new CRegTestParams(gArgs));
-    else if (chain == CBaseChainParams::UNITTEST)
-        return std::unique_ptr<CChainParams>(new CUnitTestParams());
     throw std::runtime_error(strprintf("%s: Unknown chain %s.", __func__, chain));
 }
 

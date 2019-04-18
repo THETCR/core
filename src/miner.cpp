@@ -47,13 +47,8 @@ int64_t UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParam
         pblock->nTime = nNewTime;
 
     // Updating time can change work required on testnet:
-    if (consensusParams.fAllowMinDifficultyBlocks){
-        if (pblock->nVersion > 7) {
-            pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, consensusParams);
-        } else {
-            pblock->nBits = GetNextTargetRequired(pindexPrev, false);
-        }
-    }
+    if (consensusParams.fAllowMinDifficultyBlocks)
+        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, consensusParams);
 
     return nNewTime - nOldTime;
 }
@@ -126,7 +121,6 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     CBlockIndex* pindexPrev = chainActive.Tip();
     assert(pindexPrev != nullptr);
     nHeight = pindexPrev->nHeight + 1;
-    bool fZerocoinActive = nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT();
 
     pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
     // -regtest only: allow overriding block.nVersion with
@@ -135,10 +129,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         pblock->nVersion = gArgs.GetArg("-blockversion", pblock->nVersion);
 
     // Make sure to create the correct block version after zerocoin is enabled
-    if (fZerocoinActive)
-        pblock->nVersion = 8;
-    else
-        pblock->nVersion = 7;
+    pblock->nVersion = 8;
 
     pblock->nTime = GetAdjustedTime();
     const int64_t nMedianTimePast = pindexPrev->GetMedianTimePast();
@@ -194,11 +185,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     // Fill in header
     pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
     UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev);
-    if (pblock->nVersion > 7) {
-        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, chainparams.GetConsensus());
-    } else {
-        pblock->nBits = GetNextTargetRequired(pindexPrev, fProofOfStake);
-    }
+    pblock->nBits          = GetNextWorkRequired(pindexPrev, pblock, chainparams.GetConsensus());
     pblock->nNonce         = 0;
 
     //Calculate the accumulator checkpoint only if the previous cached checkpoint need to be updated
@@ -212,9 +199,9 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     if (nHeight >= pCheckpointCache.first || pCheckpointCache.second.first != hashBlockLastAccumulated) {
         //For the period before v2 activation, zWSP will be disabled and previous block's checkpoint is all that will be needed
         pCheckpointCache.second.second = pindexPrev->nAccumulatorCheckpoint;
-        if (pindexPrev->nHeight + 1 >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
-            AccumulatorMap mapAccumulators(Params().Zerocoin_Params(false));
-            if (fZerocoinActive && !CalculateAccumulatorCheckpoint(nHeight, nCheckpoint, mapAccumulators)) {
+        if (pindexPrev->nHeight + 1 >= chainparams.NEW_PROTOCOLS_STARTHEIGHT()) {
+            AccumulatorMap mapAccumulators(chainparams.Zerocoin_Params(false));
+            if (!CalculateAccumulatorCheckpoint(nHeight, nCheckpoint, mapAccumulators)) {
                 LogPrintf("%s: failed to get accumulator checkpoint\n", __func__);
             } else {
                 // the next time the accumulator checkpoint should be recalculated ( the next height that is multiple of 10)
@@ -531,7 +518,6 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewPoSBlock(const CScript&
     CBlockIndex* pindexPrev = chainActive.Tip();
     assert(pindexPrev != nullptr);
     nHeight = pindexPrev->nHeight + 1;
-    bool fZerocoinActive = nHeight >= Params().NEW_PROTOCOLS_STARTHEIGHT();
 
     pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
     // -regtest only: allow overriding block.nVersion with
@@ -540,10 +526,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewPoSBlock(const CScript&
         pblock->nVersion = gArgs.GetArg("-blockversion", pblock->nVersion);
 
     // Make sure to create the correct block version after zerocoin is enabled
-    if (fZerocoinActive)
-        pblock->nVersion = 8;
-    else
-        pblock->nVersion = 7;
+    pblock->nVersion = 8;
 
     pblock->nTime = GetAdjustedTime();
     const int64_t nMedianTimePast = pindexPrev->GetMedianTimePast();
@@ -584,7 +567,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewPoSBlock(const CScript&
     pblocktemplate->vTxFees[0] = -nFees;
 
     pblock->nTime = GetAdjustedTime();
-    pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, Params().GetConsensus());
+    pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, chainparams.GetConsensus());
     CMutableTransaction txCoinStake;
     int64_t nSearchTime = pblock->nTime; // search to current time
     bool fStakeFound = false;
@@ -609,11 +592,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewPoSBlock(const CScript&
 
     // Fill in header
     pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
-    if (pblock->nVersion > 7) {
-        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, chainparams.GetConsensus());
-    } else {
-        pblock->nBits = GetNextTargetRequired(pindexPrev, fProofOfStake);
-    }
+    pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, chainparams.GetConsensus());
     pblock->nNonce         = 0;
     //Calculate the accumulator checkpoint only if the previous cached checkpoint need to be updated
     uint256 nCheckpoint;
@@ -621,9 +600,9 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewPoSBlock(const CScript&
     if (nHeight >= pCheckpointCache.first || pCheckpointCache.second.first != hashBlockLastAccumulated) {
         //For the period before v2 activation, zWSP will be disabled and previous block's checkpoint is all that will be needed
         pCheckpointCache.second.second = pindexPrev->nAccumulatorCheckpoint;
-        if (pindexPrev->nHeight + 1 >= Params().NEW_PROTOCOLS_STARTHEIGHT()) {
-            AccumulatorMap mapAccumulators(Params().Zerocoin_Params(false));
-            if (fZerocoinActive && !CalculateAccumulatorCheckpoint(nHeight, nCheckpoint, mapAccumulators)) {
+        if (pindexPrev->nHeight + 1 >= chainparams.NEW_PROTOCOLS_STARTHEIGHT()) {
+            AccumulatorMap mapAccumulators(chainparams.Zerocoin_Params(false));
+            if (!CalculateAccumulatorCheckpoint(nHeight, nCheckpoint, mapAccumulators)) {
                 LogPrintf("%s: failed to get accumulator checkpoint\n", __func__);
             } else {
                 // the next time the accumulator checkpoint should be recalculated ( the next height that is multiple of 10)

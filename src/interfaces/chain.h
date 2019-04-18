@@ -164,6 +164,10 @@ public:
         virtual bool isTransactionInChain(const uint256& txId, int& nHeightTx, CTransactionRef& tx) = 0;
         virtual bool isTransactionInChain(const uint256& txId, int& nHeightTx) = 0;
         virtual bool isBlockHashInChain(const uint256& hashBlock) = 0;
+        virtual bool isSerialInBlockchain(const CBigNum& bnSerial, int& nHeightTx) = 0;
+        virtual bool isSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend) = 0;
+        virtual bool isSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend, CTransactionRef& tx) = 0;
+
 
     };
 

@@ -350,7 +350,7 @@ void ThreadStakeMiner(size_t nThreadID, std::vector<std::shared_ptr<CWallet>> &v
         if(!masternodeSync.IsSynced()) {
             fIsStaking = false;
             LogPrint(BCLog::POS, "%s: masternodes arent's synced\n", __func__);
-            condWaitFor(nThreadID, nMinerSleep * 4);
+            condWaitFor(nThreadID, 60000);
             continue;
         }
 

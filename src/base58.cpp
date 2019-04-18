@@ -86,7 +86,9 @@ bool DecodeBase58(const char* psz, std::vector<unsigned char>& vch)
 std::string DecodeBase58(const char* psz)
 {
     std::vector<unsigned char> vch;
-    DecodeBase58(psz, vch);
+    if(!DecodeBase58(psz, vch)){
+        return "ERROR";
+    }
     std::stringstream ss;
     ss << std::hex;
 

@@ -2543,33 +2543,12 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
                 COutPoint out(hash, o);
                 Coin coin;
                 bool is_spent = view.SpendCoin(out, &coin);
-                if (!is_spent || tx.vout[o] != coin.out || pindex->nHeight != coin.nHeight || is_coinbase != coin.fCoinBase) {
+                if (!is_spent || tx.vout[o] != coin.out || pindex->nHeight != coin.nHeight || is_coinbase != coin.fCoinBase || is_coinstake != coin.fCoinStake) {
+                    std::cout << "transaction output mismatch\n";
+                    std::cout << "coin height = " << coin.nHeight << " pindex height =" << pindex->nHeight << "\n";
+                    std::cout << "fCoinBase = " << coin.fCoinBase << " is_coinbase =" << is_coinbase << "\n";
+                    std::cout << "fCoinStake = " << coin.fCoinStake << " is_coinstake = " << is_coinstake << "\n";
                     fClean = false; // transaction output mismatch
-                }
-                if (!is_spent) {
-                    std::cout << "transaction output mismatch : not spendable\n";
-                }
-                if (tx.vout[o] != coin.out) {
-                    std::cout << "transaction output mismatch : out mismatch\n";
-                    std::cout << "tx.vout[o] = " << tx.vout[o].ToString().c_str() << "\n";
-                    std::cout << "coin.out = " << coin.out.ToString().c_str() << "\n";
-                }
-                if (pindex->nHeight != coin.nHeight) {
-                    std::cout << "transaction output mismatch : nHeight mismatch\n";
-                    std::cout << "pindex->nHeight = " << pindex->nHeight << "\n";
-                    std::cout << "coin.nHeight = " << coin.nHeight << "\n";
-                }
-                if (is_coinbase != coin.fCoinBase && is_coinstake != coin.fCoinStake) {
-                    std::cout << "transaction output mismatch : coinbase or coinstake mismatch\n";
-                    std::cout << "place = " << o << "\n";
-                    std::cout << "is_coinbase = " << is_coinbase << "\n";
-                    std::cout << "coin.fCoinBase = " << coin.fCoinBase << "\n";
-                    std::cout << "is_coinstake = " << is_coinstake << "\n";
-                    std::cout << "coin.fCoinStake = " << coin.fCoinStake << "\n";
-                    std::cout << "pindex->nHeight = " << pindex->nHeight << "\n";
-                    std::cout << "coin.nHeight = " << coin.nHeight << "\n";
-                    std::cout << "tx.vout[o] = " << tx.vout[o].ToString().c_str() << "\n";
-                    std::cout << "coin.out = " << coin.out.ToString().c_str() << "\n";
                 }
             }
         }
@@ -4947,19 +4926,18 @@ bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
     }else{
         nBitsRequired  = GetNextTargetRequired(pindexPrev, block.IsProofOfStake());
     }
-    printf("Block hashProof=%s, hashTarget=%s\n", hashProof.ToString().c_str(), hashTarget.ToString().c_str());
-    LogPrintf("Block hashProof=%s, hashTarget=%s\n", hashProof.ToString(), hashTarget.ToString());
-    LogPrintf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
-    printf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
+//    printf("Block nVersion=%d\n", block.nVersion);
     if (block.IsProofOfWork() && !consensusParams.fSkipProofOfWorkCheck) {
         if (hashProof > hashTarget){
+//             std::cout << "Incorrect proof of work\n";
             return error("%s : incorrect proof of work - at %d", __func__, pindexPrev->nHeight + 1);
         }
         return true;
     }
 
     if (block.nBits != nBitsRequired){
-        LogPrintf("Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
+//        std::cout << "CheckWork Block nBits= " << block.nBits << " nBitsRequired= " << nBitsRequired << "\n";
+//        printf("CheckWork Block nBits=%08x, nBitsRequired=%08x\n", block.nBits, nBitsRequired);
         return error("%s : incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
     }
 
@@ -4981,16 +4959,17 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     const int nHeight = pindexPrev->nHeight + 1;
 
     // Check proof of work
-    const Consensus::Params& consensusParams = params.GetConsensus();
-    unsigned int nBitsRequired;
-    if(block.nVersion > 7){
-        nBitsRequired  = GetNextWorkRequired(pindexPrev, &block, consensusParams);
-    }else{
-        nBitsRequired  = GetNextTargetRequired(pindexPrev, false);
-    }
-//    if (block.nBits != nBitsRequired)
+//    const Consensus::Params& consensusParams = params.GetConsensus();
+//    unsigned int nBitsRequired;
+//    if(block.nVersion > 7){
+//        nBitsRequired  = GetNextWorkRequired(pindexPrev, &block, consensusParams);
+//    }else{
+//        nBitsRequired  = GetNextTargetRequired(pindexPrev, nHeight > consensusParams.nLastPOWBlock);
+//    }
+//    if (block.nBits != nBitsRequired) {
+//        printf("ContextualCheckBlockHeader Block nBits=%08x, nBitsRequired=%08x, nVersion=%d\n", block.nBits, nBitsRequired, block.nVersion);
 //        return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
-
+//    }
     // Check against checkpoints
     if (fCheckpointsEnabled) {
         // Don't accept any forks from the main chain prior to last checkpoint.
@@ -5315,12 +5294,13 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
                                        block.GetBlockTime(), block.vtx[1]->nTime));
         }
     }
-//    if (block.GetHash() != Params().GetConsensus().hashGenesisBlock && !CheckWork(block, pindexPrev)){
-//        return false;
-//    }
 
     // Get prev block index
     CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
+
+    if (block.GetHash() != chainparams.GetConsensus().hashGenesisBlock && !CheckWork(block, pindexPrev)){
+        return false;
+    }
 
     bool isPoS = false;
     if (block.IsProofOfStake()) {

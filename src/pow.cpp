@@ -20,21 +20,15 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 {
     assert(pindexLast != nullptr);
     /* current difficulty formula, wispr - DarkGravity v3, written by Evan Duffield - evan@dashpay.io */
-    const CBlockIndex* BlockLastSolved = pindexLast;
-    const CBlockIndex* BlockReading = pindexLast;
-    int64_t nActualTimespan = 0;
-    int64_t LastBlockTime = 0;
-    int64_t PastBlocksMin = 24;
-    int64_t PastBlocksMax = 24;
-    int64_t CountBlocks = 0;
+    int nHeight = pindexLast->nHeight;
     uint256 PastDifficultyAverage;
     uint256 PastDifficultyAveragePrev;
 
-    if (BlockLastSolved == nullptr || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMin) {
-        return Params().ProofOfWorkLimit().GetCompact();
-    }
+//    if (BlockLastSolved == nullptr || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMin) {
+//        return params.powLimit.GetCompact();
+//    }
 
-    if (pindexLast->nHeight > Params().LAST_POW_BLOCK()) {
+    if (nHeight > params.nLastPOWBlock) {
         uint256 bnTargetLimit = (~uint256(0) >> 24);
         int64_t nTargetSpacing = 60;
         int64_t nTargetTimespan = 60 * 40;
@@ -61,50 +55,96 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         return bnNew.GetCompact();
     }
 
-    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
-        if (PastBlocksMax > 0 && i > PastBlocksMax) {
-            break;
-        }
-        CountBlocks++;
+    unsigned int nProofOfWorkLimit = params.powLimit.GetCompact();
 
-        if (CountBlocks <= PastBlocksMin) {
-            if (CountBlocks == 1) {
-                PastDifficultyAverage.SetCompact(BlockReading->nBits);
-            } else {
-                PastDifficultyAverage = ((PastDifficultyAveragePrev * CountBlocks) + (uint256().SetCompact(BlockReading->nBits))) / (CountBlocks + 1);
+    // Only change once per difficulty adjustment interval
+    if ((pindexLast->nHeight+1) % params.DifficultyAdjustmentInterval() != 0)
+    {
+        if (params.fPowAllowMinDifficultyBlocks)
+        {
+            // Special difficulty rule for testnet:
+            // If the new block's timestamp is more than 2* 10 minutes
+            // then allow mining of a min-difficulty block.
+            if (pblock->GetBlockTime() > pindexLast->GetBlockTime() + params.nTargetSpacingV2*2)
+                return nProofOfWorkLimit;
+            else
+            {
+                // Return the last non-special-min-difficulty-rules-block
+                const CBlockIndex* pindex = pindexLast;
+                while (pindex->pprev && pindex->nHeight % params.DifficultyAdjustmentInterval() != 0 && pindex->nBits == nProofOfWorkLimit)
+                    pindex = pindex->pprev;
+                return pindex->nBits;
             }
-            PastDifficultyAveragePrev = PastDifficultyAverage;
         }
-
-        if (LastBlockTime > 0) {
-            int64_t Diff = (LastBlockTime - BlockReading->GetBlockTime());
-            nActualTimespan += Diff;
-        }
-        LastBlockTime = BlockReading->GetBlockTime();
-
-        if (BlockReading->pprev == nullptr) {
-            assert(BlockReading);
-            break;
-        }
-        BlockReading = BlockReading->pprev;
+        return pindexLast->nBits;
     }
 
-    uint256 bnNew(PastDifficultyAverage);
+    // Go back by what we want to be 14 days worth of blocks
+    int nHeightFirst = pindexLast->nHeight - (params.DifficultyAdjustmentInterval()-1);
+    assert(nHeightFirst >= 0);
+    const CBlockIndex* pindexFirst = pindexLast->GetAncestor(nHeightFirst);
+    assert(pindexFirst);
 
-    int64_t _nTargetTimespan = CountBlocks * Params().TargetSpacingV2();
+    return CalculateNextWorkRequired(pindexLast, pindexFirst->GetBlockTime(), params);
+}
 
-    if (nActualTimespan < _nTargetTimespan / 3)
-        nActualTimespan = _nTargetTimespan / 3;
-    if (nActualTimespan > _nTargetTimespan * 3)
-        nActualTimespan = _nTargetTimespan * 3;
+//unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
+//{
+//    assert(pindexLast != nullptr);
+//    unsigned int nProofOfWorkLimit = params.powLimit.GetCompact();
+//
+//    // Only change once per difficulty adjustment interval
+//    if ((pindexLast->nHeight+1) % params.DifficultyAdjustmentInterval() != 0)
+//    {
+//        if (params.fPowAllowMinDifficultyBlocks)
+//        {
+//            // Special difficulty rule for testnet:
+//            // If the new block's timestamp is more than 2* 10 minutes
+//            // then allow mining of a min-difficulty block.
+//            if (pblock->GetBlockTime() > pindexLast->GetBlockTime() + params.nTargetSpacingV2*2)
+//                return nProofOfWorkLimit;
+//            else
+//            {
+//                // Return the last non-special-min-difficulty-rules-block
+//                const CBlockIndex* pindex = pindexLast;
+//                while (pindex->pprev && pindex->nHeight % params.DifficultyAdjustmentInterval() != 0 && pindex->nBits == nProofOfWorkLimit)
+//                    pindex = pindex->pprev;
+//                return pindex->nBits;
+//            }
+//        }
+//        return pindexLast->nBits;
+//    }
+//
+//    // Go back by what we want to be 14 days worth of blocks
+//    int nHeightFirst = pindexLast->nHeight - (params.DifficultyAdjustmentInterval()-1);
+//    assert(nHeightFirst >= 0);
+//    const CBlockIndex* pindexFirst = pindexLast->GetAncestor(nHeightFirst);
+//    assert(pindexFirst);
+//
+//    return CalculateNextWorkRequired(pindexLast, pindexFirst->GetBlockTime(), params);
+//}
+
+unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nFirstBlockTime, const Consensus::Params& params)
+{
+    if (params.fPowNoRetargeting)
+        return pindexLast->nBits;
+
+    // Limit adjustment step
+    int64_t nActualTimespan = pindexLast->GetBlockTime() - nFirstBlockTime;
+    if (nActualTimespan < params.nTargetTimespanV2/3)
+        nActualTimespan = params.nTargetTimespanV2/3;
+    if (nActualTimespan > params.nTargetTimespanV2*3)
+        nActualTimespan = params.nTargetTimespanV2*3;
 
     // Retarget
+    const uint256 bnPowLimit = params.powLimit;
+    uint256 bnNew;
+    bnNew.SetCompact(pindexLast->nBits);
     bnNew *= nActualTimespan;
-    bnNew /= _nTargetTimespan;
+    bnNew /= params.nTargetTimespanV2;
 
-    if (bnNew > Params().ProofOfWorkLimit()) {
-        bnNew = Params().ProofOfWorkLimit();
-    }
+    if (bnNew > bnPowLimit)
+        bnNew = bnPowLimit;
 
     return bnNew.GetCompact();
 }
@@ -162,20 +202,20 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
     bool fOverflow;
     uint256 bnTarget;
 
-    if (Params().SkipProofOfWorkCheck())
+    if (params.fSkipProofOfWorkCheck){
         return true;
+    }
 
-    if(hash == uint256("41ddd599aa4bd28e5941b1e51cda473d78f829b84966f8d044ee92df8e2721d3"))
+    if(hash == params.hashGenesisBlock){
         return true;
-
-    if(hash == uint256("4045ff29d80ae2fa80e38b52a691424c3aa0b30112d5c5acd40e4111e69613a6"))
-        return true;
+    }
 
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
 
     // Check range
-    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > Params().ProofOfWorkLimit())
+    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > params.powLimit){
         return false;
+    }
 
     // Check proof of work matches claimed amount
     if (hash > bnTarget){

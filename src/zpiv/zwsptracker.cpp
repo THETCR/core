@@ -147,7 +147,6 @@ std::vector<uint256> CzWSPTracker::GetSerialHashes()
 
 CAmount CzWSPTracker::GetBalance(interfaces::Chain::Lock& locked_chain, bool fConfirmedOnly, bool fUnconfirmedOnly) const
 {
-    std::cout << "GetBalance nTotal\n";
     CAmount nTotal = 0;
     //! zerocoin specific fields
     std::map<libzerocoin::CoinDenomination, unsigned int> myZerocoinSupply;
@@ -158,15 +157,11 @@ CAmount CzWSPTracker::GetBalance(interfaces::Chain::Lock& locked_chain, bool fCo
     {
 //        LOCK(cs_wsptracker);
         // Get Unused coins
-        std::cout << "GetBalance mapSerialHashes\n";
         for (auto& it : mapSerialHashes) {
-            std::cout << "GetBalance CMintMeta meta\n";
             CMintMeta meta = it.second;
             if (meta.isUsed || meta.isArchived)
                 continue;
-            std::cout << "GetBalance fConfirmed\n";
             bool fConfirmed = ((meta.nHeight < locked_chain.getHeight().get_value_or(0) - Params().Zerocoin_MintRequiredConfirmations()) && !(meta.nHeight == 0));
-            std::cout << "GetBalance fConfirmedOnly\n";
             if (fConfirmedOnly && !fConfirmed)
                 continue;
             if (fUnconfirmedOnly && fConfirmed)

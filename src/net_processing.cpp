@@ -595,26 +595,6 @@ static bool PeerHasHeader(CNodeState *state, const CBlockIndex *pindex) EXCLUSIV
     return false;
 }
 
-/** Find the last common ancestor two blocks have.
- *  Both pa and pb must be non-NULL. */
-CBlockIndex* LastCommonAncestor(CBlockIndex* pa, CBlockIndex* pb)
-{
-    if (pa->nHeight > pb->nHeight) {
-        pa = pa->GetAncestor(pb->nHeight);
-    } else if (pb->nHeight > pa->nHeight) {
-        pb = pb->GetAncestor(pa->nHeight);
-    }
-
-    while (pa != pb && pa && pb) {
-        pa = pa->pprev;
-        pb = pb->pprev;
-    }
-
-    // Eventually all chain branches meet at the genesis block.
-    assert(pa == pb);
-    return pa;
-}
-
 /** Update pindexLastCommonBlock and add not-in-flight missing successors to vBlocks, until it has
  *  at most count entries. */
 static void FindNextBlocksToDownload(NodeId nodeid, unsigned int count, std::vector<const CBlockIndex*>& vBlocks, NodeId& nodeStaller, const Consensus::Params& consensusParams) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
@@ -1533,9 +1513,7 @@ void static ProcessGetData(CNode* pfrom, const CChainParams& chainparams, CConnm
     {
         LOCK(cs_main);
 
-        while (it != pfrom->vRecvGetData.end() && (it->type == MSG_TX || it->type == MSG_WITNESS_TX || it->type == MSG_PUBCOINS || it->type == MSG_TXLOCK_VOTE || it->type == MSG_TXLOCK_REQUEST
-        || it->type == MSG_SPORK  || it->type == MSG_BUDGET_PROPOSAL || it->type == MSG_BUDGET_VOTE || it->type == MSG_BUDGET_FINALIZED|| it->type == MSG_BUDGET_FINALIZED_VOTE
-        || it->type == MSG_MASTERNODE_ANNOUNCE || it->type == MSG_MASTERNODE_PING || it->type == MSG_MASTERNODE_WINNER || it->type == MSG_DSTX)) {
+        while (it != pfrom->vRecvGetData.end() && (it->type != MSG_BLOCK && it->type != MSG_FILTERED_BLOCK && it->type != MSG_CMPCT_BLOCK && it->type != MSG_WITNESS_BLOCK)) {
             if (interruptMsgProc)
                 return;
             // Don't bother if send buffer is too full to respond anyway
@@ -1551,6 +1529,7 @@ void static ProcessGetData(CNode* pfrom, const CChainParams& chainparams, CConnm
                  auto mi = mapRelay.find(inv.hash);
                  int nSendFlags = (inv.type == MSG_TX ? SERIALIZE_TRANSACTION_NO_WITNESS : 0);
                  if (mi != mapRelay.end()) {
+                     std::cout << "inv command = " << inv.GetCommand() << "\n";
                      connman->PushMessage(pfrom, msgMaker.Make(nSendFlags, inv.GetCommand(), *mi->second));
                      push = true;
                  } else if (pfrom->timeLastMempoolReq && inv.type == MSG_TX ) {
@@ -3607,19 +3586,21 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         return true;
     }
 
-
-    //probably one the extensions
-    obfuScationPool.ProcessMessageObfuscation(pfrom, strCommand, vRecv, connman);
-    mnodeman.ProcessMessage(pfrom, strCommand, vRecv, connman);
-    budget.ProcessMessage(pfrom, strCommand, vRecv, connman);
-    masternodePayments.ProcessMessageMasternodePayments(pfrom, strCommand, vRecv, connman);
-    ProcessMessageSwiftTX(pfrom, strCommand, vRecv, connman);
-    ProcessSpork(pfrom, strCommand, vRecv, connman);
-    masternodeSync.ProcessMessage(pfrom, strCommand, vRecv, connman);
-
-    // Ignore unknown commands for extensibility
-    LogPrint(BCLog::NET, "Unknown command \"%s\" from peer=%d\n", SanitizeString(strCommand), pfrom->GetId());
-    return true;
+    if(isNetMsgTypeKnown(strCommand)){
+        //probably one the extensions
+        obfuScationPool.ProcessMessageObfuscation(pfrom, strCommand, vRecv, connman);
+        mnodeman.ProcessMessage(pfrom, strCommand, vRecv, connman);
+        budget.ProcessMessage(pfrom, strCommand, vRecv, connman);
+        masternodePayments.ProcessMessageMasternodePayments(pfrom, strCommand, vRecv, connman);
+        ProcessMessageSwiftTX(pfrom, strCommand, vRecv, connman);
+        ProcessSpork(pfrom, strCommand, vRecv, connman);
+        masternodeSync.ProcessMessage(pfrom, strCommand, vRecv, connman);
+        return true;
+    }else{
+        // Ignore unknown commands for extensibility
+        LogPrint(BCLog::NET, "Unknown command \"%s\" from peer=%d\n", SanitizeString(strCommand), pfrom->GetId());
+        return true;
+    }
 }
 
 bool PeerLogicValidation::SendRejectsAndCheckIfBanned(CNode* pnode, bool enable_bip61) EXCLUSIVE_LOCKS_REQUIRED(cs_main)

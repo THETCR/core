@@ -304,15 +304,15 @@ enum ServiceFlags : uint64_t {
   // Indicates that a node can be asked for blocks and transactions including
   // witness data.
       NODE_WITNESS = (1 << 3),
-  // NODE_XTHIN means the node supports Xtreme Thinblocks
-  // If this is turned off then the node will not service nor make xthin requests
-      NODE_XTHIN = (1 << 6),
   // NODE_BLOOM_WITHOUT_MN means the node has the same features as NODE_BLOOM with the only difference
   // that the node doens't want to receive master nodes messages. (the 1<<3 was not picked as constant because on bitcoin 0.14 is witness and we want that update here )
       NODE_BLOOM_WITHOUT_MN = (1 << 4),
   // NODE_BLOOM_LIGHT_ZC means the node has the same feature as NODE_BLOOM_WITHOUT_MN with the addition of
   // support for the light zerocoin protocol.
       NODE_BLOOM_LIGHT_ZC = (1 << 5),
+  // NODE_XTHIN means the node supports Xtreme Thinblocks
+  // If this is turned off then the node will not service nor make xthin requests
+      NODE_XTHIN = (1 << 6),
   // NODE_NETWORK_LIMITED means the same as NODE_NETWORK with the limitation of only
     // serving the last 288 (2 day) blocks
     // See BIP159 for details on how this is implemented.
@@ -326,35 +326,6 @@ enum ServiceFlags : uint64_t {
     // do not actually support. Other service bits should be allocated via the
     // BIP process.
 };
-
-
-/** Old nServices flags */
-//enum {
-//    NODE_NETWORK = (1 << 0),
-//
-//    // NODE_BLOOM means the node is capable and willing to handle bloom-filtered connections.
-//    // Bitcoin Core nodes used to support this by default, without advertising this bit,
-//    // but no longer do as of protocol version 70011 (= NO_BLOOM_VERSION)
-//    NODE_BLOOM = (1 << 2),
-//
-//	// NODE_BLOOM_WITHOUT_MN means the node has the same features as NODE_BLOOM with the only difference
-//	// that the node doens't want to receive master nodes messages. (the 1<<3 was not picked as constant because on bitcoin 0.14 is witness and we want that update here )
-//
-//    NODE_BLOOM_WITHOUT_MN = (1 << 5),
-//
-//
-//    // NODE_BLOOM_LIGHT_ZC means the node has the same feature as NODE_BLOOM_WITHOUT_MN with the addition of
-//    // support for the light zerocoin protocol.
-//    NODE_BLOOM_LIGHT_ZC = (1 << 6),
-//
-//    // Bits 24-31 are reserved for temporary experiments. Just pick a bit that
-//    // isn't getting used, or one not being used much, and notify the
-//    // bitcoin-development mailing list. Remember that service bits are just
-//    // unauthenticated advertisements, so your code must be robust against
-//    // collisions and other cases where nodes may be advertising a service they
-//    // do not actually support. Other service bits should be allocated via the
-//    // BIP process.
-//};
 
 /**
  * Gets the set of service flags which are "desirable" for a given peer.
@@ -475,15 +446,6 @@ enum GetDataMsg
     MSG_WITNESS_BLOCK = MSG_BLOCK | MSG_WITNESS_FLAG, //!< Defined in BIP144
     MSG_WITNESS_TX = MSG_TX | MSG_WITNESS_FLAG,       //!< Defined in BIP144
     MSG_FILTERED_WITNESS_BLOCK = MSG_FILTERED_BLOCK | MSG_WITNESS_FLAG,
-//    UNDEFINED = 0,
-//    MSG_TX = 1,
-//    MSG_BLOCK = 2,
-//    // The following can only occur in getdata. Invs always use TX or BLOCK.
-//    MSG_FILTERED_BLOCK = 3,  //!< Defined in BIP37
-//    MSG_CMPCT_BLOCK = 4,     //!< Defined in BIP152
-//    MSG_WITNESS_BLOCK = MSG_BLOCK | MSG_WITNESS_FLAG, //!< Defined in BIP144
-//    MSG_WITNESS_TX = MSG_TX | MSG_WITNESS_FLAG,       //!< Defined in BIP144
-//    MSG_FILTERED_WITNESS_BLOCK = MSG_FILTERED_BLOCK | MSG_WITNESS_FLAG,
 };
 
 /** inv message data */
@@ -517,36 +479,5 @@ public:
     uint256 hash;
 };
 
-/** getdata message type flags */
-//const uint32_t MSG_WITNESS_FLAG = 1 << 30;
-//const uint32_t MSG_TYPE_MASK    = 0xffffffff >> 2;
-
-//enum {
-//    MSG_TX = 1,
-//    MSG_BLOCK,
-//    // Nodes may always request a MSG_FILTERED_BLOCK in a getdata, however,
-//    // MSG_FILTERED_BLOCK should not appear in any invs except as a part of getdata.
-//    MSG_FILTERED_BLOCK, //!< Defined in BIP37
-//    MSG_TXLOCK_REQUEST,
-//    MSG_TXLOCK_VOTE,
-//    MSG_SPORK,
-//    MSG_MASTERNODE_WINNER,
-//    MSG_MASTERNODE_SCANNING_ERROR,
-//    MSG_BUDGET_VOTE,
-//    MSG_BUDGET_PROPOSAL,
-//    MSG_BUDGET_FINALIZED,
-//    MSG_BUDGET_FINALIZED_VOTE,
-//    MSG_MASTERNODE_QUORUM,
-//    MSG_MASTERNODE_ANNOUNCE,
-//    MSG_MASTERNODE_PING,
-//    MSG_DSTX,
-//    MSG_PUBCOINS,
-//    MSG_GENWIT,
-//    MSG_ACC_VALUE,
-//    MSG_CMPCT_BLOCK ,     //!< Defined in BIP152
-//    MSG_WITNESS_BLOCK = MSG_BLOCK | MSG_WITNESS_FLAG, //!< Defined in BIP144
-//    MSG_WITNESS_TX = MSG_TX | MSG_WITNESS_FLAG,       //!< Defined in BIP144
-//    MSG_FILTERED_WITNESS_BLOCK = MSG_FILTERED_BLOCK | MSG_WITNESS_FLAG,
-//};
-
+bool isNetMsgTypeKnown(std::string strCommand);
 #endif // BITCOIN_PROTOCOL_H

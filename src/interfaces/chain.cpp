@@ -38,6 +38,7 @@
 #include <swifttx.h>
 #include <netmessagemaker.h>
 #include <txdb.h>
+#include <zwspchain.h>
 
 namespace interfaces {
 namespace {
@@ -231,6 +232,18 @@ class LockImpl : public Chain::Lock
      {
          return IsBlockHashInChain(hashBlock);
      }
+    bool isSerialInBlockchain(const CBigNum& bnSerial, int& nHeightTx) override
+    {
+        return IsSerialInBlockchain(bnSerial, nHeightTx);
+    }
+     bool isSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend) override
+    {
+         return IsSerialInBlockchain(hashSerial, nHeightTx, txidSpend);
+    }
+    bool isSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend, CTransactionRef& tx) override
+    {
+        return IsSerialInBlockchain (hashSerial, nHeightTx, txidSpend, tx);
+    }
 };
 
 class LockingStateImpl : public LockImpl, public UniqueLock<CCriticalSection>

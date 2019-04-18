@@ -264,7 +264,7 @@ void CMasternodeSync::Process(CConnman* connman)
         RequestedMasternodeAssets = MASTERNODE_SYNC_FINISHED;
         return;
     }
-    const CNetMsgMaker msgMaker(INIT_PROTO_VERSION);
+    const CNetMsgMaker msgMaker(PROTOCOL_VERSION);
 
     connman->ForEachNode([this, connman, msgMaker](CNode* pnode) {
       if (Params().NetworkID() == CBaseChainParams::REGTEST) {

@@ -902,7 +902,7 @@ bool CBlockPolicyEstimator::Read(CAutoFile& filein)
         unsigned int nFileBestSeenHeight;
         filein >> nFileBestSeenHeight;
 
-        if (nVersionRequired < 149900) {
+        if (nVersionRequired < 40000) {
             LogPrintf("%s: incompatible old fee estimation data (non-fatal). Version: %d\n", __func__, nVersionRequired);
         } else { // New format introduced in 149900
             unsigned int nFileHistoricalFirst, nFileHistoricalBest;
