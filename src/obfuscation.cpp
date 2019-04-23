@@ -603,7 +603,7 @@ void CObfuscationPool::CheckFinalTransaction(CConnman* connman)
     if(!pwallet){
         return;
     }
-    CWalletTx txNew = CWalletTx(pwallet, CTransaction(finalTransaction));
+    CWalletTx txNew = CWalletTx(pwallet, MakeTransactionRef(finalTransaction));
 
     LOCK2(cs_main, pwallet->cs_wallet);
     {
@@ -758,7 +758,7 @@ void CObfuscationPool::ChargeFees()
             if (!found && r > target) {
                 LogPrintf("CObfuscationPool::ChargeFees -- found uncooperative node (didn't send transaction). charging fees.\n");
 
-                CWalletTx wtxCollateral = CWalletTx(pwallet, txCollateral);
+                CWalletTx wtxCollateral = CWalletTx(pwallet, MakeTransactionRef(txCollateral));
 
                 // Broadcast
                 if (!wtxCollateral.AcceptToMemoryPool(true)) {
@@ -778,7 +778,7 @@ void CObfuscationPool::ChargeFees()
                 if (!s.fHasSig && r > target) {
                     LogPrintf("CObfuscationPool::ChargeFees -- found uncooperative node (didn't sign). charging fees.\n");
 
-                    CWalletTx wtxCollateral = CWalletTx(pwallet, v.collateral);
+                    CWalletTx wtxCollateral = CWalletTx(pwallet, MakeTransactionRef(v.collateral));
 
                     // Broadcast
                     if (!wtxCollateral.AcceptToMemoryPool(false)) {
@@ -823,7 +823,7 @@ void CObfuscationPool::ChargeRandomFees()
             if (r <= 10) {
                 LogPrintf("CObfuscationPool::ChargeRandomFees -- charging random fees. %u\n", i);
 
-                CWalletTx wtxCollateral = CWalletTx(pwallet, txCollateral);
+                CWalletTx wtxCollateral = CWalletTx(pwallet, MakeTransactionRef(txCollateral));
 
                 // Broadcast
                 if (!wtxCollateral.AcceptToMemoryPool(true)) {
@@ -1755,7 +1755,7 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
     assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
     scriptChange = GetScriptForDestination(vchPubKey.GetID());
 
-    CWalletTx wtx;
+    CWalletTx wtx(nullptr, nullptr);
     CAmount nFeeRet = 0;
     std::string strFail = "";
     std::vector<std::pair<CScript, CAmount> > vecSend;
@@ -1788,7 +1788,7 @@ bool CObfuscationPool::MakeCollateralAmounts()
     if(!pwallet){
         return false;
     }
-    CWalletTx wtx;
+    CWalletTx wtx(nullptr, nullptr);
     CAmount nFeeRet = 0;
     std::string strFail = "";
     std::vector<std::pair<CScript, CAmount> > vecSend;
@@ -1850,7 +1850,7 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
     if(!pwallet){
         return false;
     }
-    CWalletTx wtx;
+    CWalletTx wtx(nullptr, nullptr);
     CAmount nFeeRet = 0;
     std::string strFail = "";
     std::vector<std::pair<CScript, CAmount> > vecSend;

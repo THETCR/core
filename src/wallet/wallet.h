@@ -13,16 +13,16 @@
 #include <interfaces/handler.h>
 #include <outputtype.h>
 #include <policy/feerate.h>
+#include <script/ismine.h>
+#include <script/sign.h>
 #include <streams.h>
 #include <tinyformat.h>
 #include <ui_interface.h>
 #include <util/strencodings.h>
-#include <validationinterface.h>
-#include <script/ismine.h>
-#include <script/sign.h>
 #include <util/system.h>
-#include <wallet/crypter.h>
+#include <validationinterface.h>
 #include <wallet/coinselection.h>
+#include <wallet/crypter.h>
 #include <wallet/walletdb.h>
 #include <wallet/walletutil.h>
 
@@ -492,25 +492,6 @@ public:
     mutable CAmount nAvailableWatchCreditCached;
     mutable CAmount nChangeCached;
 
-    CWalletTx()
-    {
-        Init(nullptr);
-    }
-
-    CWalletTx(const CWallet* pwalletIn)
-    {
-        Init(pwalletIn);
-    }
-
-    CWalletTx(const CWallet* pwalletIn, const CMerkleTx& txIn) : CMerkleTx(txIn)
-    {
-        Init(pwalletIn);
-    }
-
-    CWalletTx(const CWallet* pwalletIn, const CTransaction& txIn) : CMerkleTx(txIn)
-    {
-        Init(pwalletIn);
-    }
     CWalletTx(const CWallet* pwalletIn, CTransactionRef arg) : CMerkleTx(std::move(arg))
     {
         Init(pwalletIn);
