@@ -4370,6 +4370,7 @@ bool CWallet::Verify(interfaces::Chain& chain, const WalletLocation& location, b
 
     // Keep same database environment instance across Verify/Recover calls below.
     std::unique_ptr<WalletDatabase> database = WalletDatabase::Create(wallet_path);
+//    std::cout << "CWallet::Verify CreatePrecompute \n";
     std::unique_ptr<WalletDatabase> pc_database = WalletDatabase::CreatePrecompute(wallet_path);
 
     try {
@@ -6413,9 +6414,9 @@ bool CWallet::ConvertList(std::vector<CTxIn> vCoins, std::vector<CAmount>& vecAm
 {
     for (CTxIn i: vCoins) {
         if (mapWallet.count(i.prevout.hash)) {
-            CWalletTx wtx(&mapWallet[i.prevout.hash]);
-            if (i.prevout.n < wtx.tx->vout.size()) {
-                vecAmounts.push_back(wtx.tx->vout[i.prevout.n].nValue);
+            auto tx = mapWallet.find(i.prevout.hash)->second.tx;
+            if (i.prevout.n < tx->vout.size()) {
+                vecAmounts.push_back(tx->vout[i.prevout.n].nValue);
             }
         } else {
             LogPrintf("ConvertList -- Couldn't find transaction\n");
@@ -8554,7 +8555,7 @@ void ThreadPrecomputeSpends(CWallet* pwallet)
 void CWallet::PrecomputeSpends()
 {
     LogPrintf("Precomputer started\n");
-    RenameThread("pivx-precomputer");
+    RenameThread("wispr-precomputer");
 
     WalletBatch walletdb(*pc_database, "cr+");
 

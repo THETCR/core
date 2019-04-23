@@ -62,7 +62,7 @@ static constexpr int32_t MAX_OUTBOUND_PEERS_TO_PROTECT_FROM_DISCONNECT = 4;
 /** Timeout for (unprotected) outbound peers to sync to our chainwork, in seconds */
 static constexpr int64_t CHAIN_SYNC_TIMEOUT = 20 * 60; // 20 minutes
 /** How frequently to check for stale tips, in seconds */
-static constexpr int64_t STALE_CHECK_INTERVAL = 1 * 60; // 10 minutes
+static constexpr int64_t STALE_CHECK_INTERVAL = 10 * 60; // 10 minutes
 /** How frequently to check for extra outbound peers and disconnect, in seconds */
 static constexpr int64_t EXTRA_PEER_CHECK_INTERVAL = 45;
 /** Minimum time an outbound-peer-eviction candidate must be connected for, in order to evict, in seconds */
@@ -578,7 +578,7 @@ static bool TipMayBeStale(const Consensus::Params &consensusParams) EXCLUSIVE_LO
     if (g_last_tip_update == 0) {
         g_last_tip_update = GetTime();
     }
-    return g_last_tip_update < GetTime() - consensusParams.nTargetSpacingV2 * 3 && mapBlocksInFlight.empty();
+    return g_last_tip_update < GetTime() - consensusParams.nTargetSpacingV2 * 20 && mapBlocksInFlight.empty();
 }
 
 static bool CanDirectFetch(const Consensus::Params &consensusParams) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
@@ -1523,13 +1523,13 @@ void static ProcessGetData(CNode* pfrom, const CChainParams& chainparams, CConnm
             const CInv &inv = *it;
             it++;
 
-             if (inv.IsKnownType()) {
+            std::cout << "inv command = " << inv.GetCommand() << "\n";
+            if (inv.IsKnownType()) {
                  // Send stream from relay memory
                  bool push = false;
                  auto mi = mapRelay.find(inv.hash);
                  int nSendFlags = (inv.type == MSG_TX ? SERIALIZE_TRANSACTION_NO_WITNESS : 0);
                  if (mi != mapRelay.end()) {
-                     std::cout << "inv command = " << inv.GetCommand() << "\n";
                      connman->PushMessage(pfrom, msgMaker.Make(nSendFlags, inv.GetCommand(), *mi->second));
                      push = true;
                  } else if (pfrom->timeLastMempoolReq && inv.type == MSG_TX ) {
@@ -2261,7 +2261,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         // If the peer is old enough to have the old alert system, send it the final alert.
         if (pfrom->nVersion <= 70012) {
             CDataStream finalAlert(ParseHex("60010000000000000000000000ffffff7f00000000ffffff7ffeffff7f01ffffff7f00000000ffffff7f00ffffff7f002f555247454e543a20416c657274206b657920636f6d70726f6d697365642c2075706772616465207265717569726564004630440220653febd6410f470f6bae11cad19c48413becb1ac2c17f908fd0fd53bdc3abd5202206d0e9c96fe88d4a0f01ed9dedae2b6f9e00da94cad0fecaae66ecf689bf71b50"), SER_NETWORK, PROTOCOL_VERSION);
-            connman->PushMessage(pfrom, CNetMsgMaker(nSendVersion).Make("alert", finalAlert));
+            connman->PushMessage(pfrom, CNetMsgMaker(nSendVersion).Make(NetMsgType::ALERT, finalAlert));
         }
 
         // Feeler connections exist only to verify if address is online.

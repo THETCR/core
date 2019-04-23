@@ -261,7 +261,7 @@ bool CInv::IsKnownType() const
 }
 
 bool CInv::IsMasterNodeType() const{
- 	return (type >= 6);
+ 	return (type >= 30);
 }
 
 //const char* CInv::GetCommand() const

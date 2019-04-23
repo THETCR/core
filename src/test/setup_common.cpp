@@ -34,7 +34,7 @@ std::ostream& operator<<(std::ostream& os, const uint256& num)
 }
 
 BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
-    : m_path_root(fs::temp_directory_path() / "test_wispr" / strprintf("%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(1 << 30))))
+    : m_path_root(fs::temp_directory_path() / "test_common_" PACKAGE_NAME / strprintf("%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(1 << 30))))
 {
     SHA256AutoDetect();
     ECC_Start();
@@ -44,7 +44,11 @@ BasicTestingSetup::BasicTestingSetup(const std::string& chainName)
     InitScriptExecutionCache();
     fCheckBlockIndex = true;
     SelectParams(chainName);
-    noui_connect();
+    static bool noui_connected = false;
+    if (!noui_connected) {
+        noui_connect();
+        noui_connected = true;
+    }
 }
 
 BasicTestingSetup::~BasicTestingSetup()
