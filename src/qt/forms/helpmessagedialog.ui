@@ -52,7 +52,7 @@
         </size>
        </property>
        <property name="pixmap">
-        <pixmap resource="../wispr.qrc">:/images/about</pixmap>
+        <pixmap resource="../wispr.qrc">:/icons/wispr</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
