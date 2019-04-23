@@ -21,6 +21,7 @@ class CScheduler;
 class CValidationState;
 class Coin;
 class uint256;
+class CConnman;
 enum class RBFTransactionState;
 struct CBlockLocator;
 struct FeeCalculation;
@@ -167,6 +168,11 @@ public:
         virtual bool isSerialInBlockchain(const CBigNum& bnSerial, int& nHeightTx) = 0;
         virtual bool isSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend) = 0;
         virtual bool isSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend, CTransactionRef& tx) = 0;
+        virtual void sendObfuscationDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, CAmount amount, CConnman* connman) =0;
+        virtual int getObfuscationEntriesCount() =0;
+        virtual int getObfuscationState() =0;
+        virtual int getObfuscationSessionDenom() =0;
+        virtual int getObfuscationDenominations(const std::vector<CTxOut>& vout, bool fSingleRandomDenom = false) = 0;
 
 
     };

@@ -38,6 +38,7 @@
 #include <swifttx.h>
 #include <netmessagemaker.h>
 #include <txdb.h>
+#include <net.h>
 #include <zwspchain.h>
 
 namespace interfaces {
@@ -243,6 +244,26 @@ class LockImpl : public Chain::Lock
     bool isSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend, CTransactionRef& tx) override
     {
         return IsSerialInBlockchain (hashSerial, nHeightTx, txidSpend, tx);
+    }
+    void sendObfuscationDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, CAmount amount, CConnman* connman) override
+    {
+        return obfuScationPool.SendObfuscationDenominate(vin, vout, amount, connman);
+    }
+    int getObfuscationEntriesCount() override
+    {
+        return obfuScationPool.GetEntriesCount();
+    }
+    int getObfuscationState() override
+    {
+         return obfuScationPool.GetState();
+    }
+    int getObfuscationSessionDenom() override
+    {
+        return obfuScationPool.sessionDenom;
+    }
+    int getObfuscationDenominations(const std::vector<CTxOut>& vout, bool fSingleRandomDenom) override
+    {
+         return obfuScationPool.GetDenominations(vout, fSingleRandomDenom);
     }
 };
 
