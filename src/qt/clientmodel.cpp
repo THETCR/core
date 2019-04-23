@@ -274,6 +274,8 @@ static void BlockTipChanged(ClientModel *clientmodel, bool initialSync, int heig
     // during initial sync, only update the UI if the last update
     // was > 250ms (MODEL_UPDATE_DELAY) ago
     int64_t now = 0;
+    static int prevAttempt = -1;
+    static int prevAssets = -1;
     if (initialSync)
         now = GetTimeMillis();
 
@@ -285,7 +287,8 @@ static void BlockTipChanged(ClientModel *clientmodel, bool initialSync, int heig
         clientmodel->cachedBestHeaderTime = blockTime;
     }
     // if we are in-sync or if we notify a header update, update the UI regardless of last update time
-    if (fHeader || !initialSync || now - nLastUpdateNotification > MODEL_UPDATE_DELAY) {
+    if (fHeader || !initialSync || now - nLastUpdateNotification > MODEL_UPDATE_DELAY ||
+        masternodeSync.RequestedMasternodeAttempt != prevAttempt || masternodeSync.RequestedMasternodeAssets != prevAssets) {
         //pass an async signal to the UI thread
         QMetaObject::invokeMethod(clientmodel, "numBlocksChanged", Qt::QueuedConnection,
                                   Q_ARG(int, height),
