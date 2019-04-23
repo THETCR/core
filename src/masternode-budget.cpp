@@ -117,7 +117,7 @@ void CBudgetManager::CheckOrphanVotes()
     std::string strError = "";
     std::map<uint256, CBudgetVote>::iterator it1 = mapOrphanMasternodeBudgetVotes.begin();
     while (it1 != mapOrphanMasternodeBudgetVotes.end()) {
-        if (budget.UpdateProposal(((*it1).second), NULL, strError, NULL)) {
+        if (budget.UpdateProposal(((*it1).second), nullptr, strError, nullptr)) {
             LogPrint(BCLog::MNBUDGET,"CBudgetManager::CheckOrphanVotes - Proposal/Budget is known, activating and removing orphan vote\n");
             mapOrphanMasternodeBudgetVotes.erase(it1++);
         } else {
@@ -126,7 +126,7 @@ void CBudgetManager::CheckOrphanVotes()
     }
     std::map<uint256, CFinalizedBudgetVote>::iterator it2 = mapOrphanFinalizedBudgetVotes.begin();
     while (it2 != mapOrphanFinalizedBudgetVotes.end()) {
-        if (budget.UpdateFinalizedBudget(((*it2).second), NULL, strError, NULL)) {
+        if (budget.UpdateFinalizedBudget(((*it2).second), nullptr, strError, nullptr)) {
             LogPrint(BCLog::MNBUDGET,"CBudgetManager::CheckOrphanVotes - Proposal/Budget is known, activating and removing orphan vote\n");
             mapOrphanFinalizedBudgetVotes.erase(it2++);
         } else {
@@ -799,7 +799,7 @@ std::vector<CBudgetProposal*> CBudgetManager::GetBudget()
 
     CAmount nBudgetAllocated = 0;
     CBlockIndex* pindexPrev = chainActive.Tip();
-    if (pindexPrev == NULL) return vBudgetProposalsRet;
+    if (pindexPrev == nullptr) return vBudgetProposalsRet;
 
     int nBlockStart = pindexPrev->nHeight - pindexPrev->nHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
     int nBlockEnd = nBlockStart + Params().GetBudgetCycleBlocks() - 1;
@@ -1516,7 +1516,7 @@ bool CBudgetProposal::IsValid(std::string& strError, bool fCheckCollateral)
 
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (pindexPrev == nullptr) {
-        strError = "Proposal " + strProposalName + ": Tip is NULL";
+        strError = "Proposal " + strProposalName + ": Tip is nullptr";
         return true;
     }
 
@@ -2186,7 +2186,7 @@ void CFinalizedBudget::SubmitVote(CConnman* connman)
     }
 
     std::string strError = "";
-    if (budget.UpdateFinalizedBudget(vote, NULL, strError, NULL)) {
+    if (budget.UpdateFinalizedBudget(vote, nullptr, strError, nullptr)) {
         LogPrint(BCLog::MNBUDGET,"CFinalizedBudget::SubmitVote  - new finalized budget vote - %s\n", vote.GetHash().ToString());
 
         budget.mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));

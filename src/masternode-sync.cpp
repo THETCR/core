@@ -356,7 +356,7 @@ void CMasternodeSync::Process(CConnman* connman)
               if (RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD * 3) return;
 
               CBlockIndex* pindexPrev = chainActive.Tip();
-              if (pindexPrev == NULL) return;
+              if (pindexPrev == nullptr) return;
 
               int nMnCount = mnodeman.CountEnabled();
               connman->PushMessage(pnode, msgMaker.Make(NetMsgType::MASTERNODEPAYMENTSYNC, nMnCount)); //sync payees

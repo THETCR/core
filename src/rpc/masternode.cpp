@@ -323,7 +323,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
 
         if (activeMasternode.status != ACTIVE_MASTERNODE_STARTED) {
             activeMasternode.status = ACTIVE_MASTERNODE_INITIAL; // TODO: consider better way
-            activeMasternode.ManageStatus();
+            activeMasternode.ManageStatus(g_connman.get());
             if (fLock)
                 pwallet->Lock();
         }
@@ -360,7 +360,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
                 if (strCommand == "disabled" && pmn->IsEnabled()) continue;
             }
 
-            bool result = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb);
+            bool result = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb, g_connman.get());
 
             UniValue statusObj(UniValue::VOBJ);
             statusObj.pushKV("alias", mne.getAlias());
@@ -403,7 +403,7 @@ UniValue startmasternode (const JSONRPCRequest& request)
                 std::string errorMessage;
                 CMasternodeBroadcast mnb;
 
-                bool result = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb);
+                bool result = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb, g_connman.get());
 
                 statusObj.pushKV("result", result ? "successful" : "failed");
 
@@ -824,7 +824,7 @@ UniValue createmasternodebroadcast(const JSONRPCRequest& request)
                 std::string errorMessage;
                 CMasternodeBroadcast mnb;
 
-                bool success = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb, true);
+                bool success = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb, g_connman.get(), true);
 
                 statusObj.pushKV("success", success);
                 if(success) {
@@ -867,7 +867,7 @@ UniValue createmasternodebroadcast(const JSONRPCRequest& request)
             CTxIn vin = CTxIn(uint256S(mne.getTxHash()), uint32_t(atoi(mne.getOutputIndex().c_str())));
             CMasternodeBroadcast mnb;
 
-            bool success = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb, true);
+            bool success = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb, g_connman.get(), true);
 
             UniValue statusObj(UniValue::VOBJ);
             statusObj.pushKV("alias", mne.getAlias());

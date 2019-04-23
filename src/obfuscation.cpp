@@ -1367,7 +1367,7 @@ bool CObfuscationPool::SignFinalTransaction(CTransaction& finalTransactionNew, C
     }
 
     // push all of our signatures to the Masternode
-    if (sigs.size() > 0 && node != NULL){
+    if (sigs.size() > 0 && node != nullptr){
         CNetMsgMaker msgMaker(node->GetSendVersion());
         connman->PushMessage(node, msgMaker.Make(NetMsgType::DSSIGNFINALTX, sigs));
     }
@@ -1614,7 +1614,7 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
                 }
 
                 CMasternode* pmn = mnodeman.Find(dsq.vin);
-                if (pmn == NULL) {
+                if (pmn == nullptr) {
                     LogPrintf("DoAutomaticDenominating --- dsq vin %s is not in masternode list!", dsq.vin.ToString());
                     continue;
                 }
@@ -1623,8 +1623,8 @@ bool CObfuscationPool::DoAutomaticDenominating(CConnman* connman, bool fDryRun)
                 lastTimeChanged = GetTimeMillis();
 
                 // connect to Masternode and submit the queue request
-                CNode* pnode = connman->ConnectNode((CAddress)addr, NULL, false, true);
-                if (pnode != NULL) {
+                CNode* pnode = connman->ConnectNode((CAddress)addr, nullptr, false, true);
+                if (pnode != nullptr) {
                     pSubmittedToMasternode = pmn;
                     vecMasternodesUsed.push_back(dsq.vin);
                     sessionDenom = dsq.nDenom;

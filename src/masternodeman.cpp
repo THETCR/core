@@ -720,7 +720,7 @@ void CMasternodeMan::ProcessMasternodeConnections(CConnman* connman)
 
     connman->ForEachNode([](CNode* pnode) {
       if (pnode->fObfuScationMaster) {
-          if (obfuScationPool.pSubmittedToMasternode != NULL && pnode->addr == obfuScationPool.pSubmittedToMasternode->addr) return;
+          if (obfuScationPool.pSubmittedToMasternode != nullptr && pnode->addr == obfuScationPool.pSubmittedToMasternode->addr) return;
           LogPrint(BCLog::MASTERNODE,"Closing Masternode connection peer=%i \n", pnode->GetId());
           pnode->fObfuScationMaster = false;
           pnode->Release();

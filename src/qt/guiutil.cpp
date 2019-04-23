@@ -1063,4 +1063,19 @@ void PolishProgressDialog(QProgressDialog* dialog)
 #endif
 }
 
+void restoreWindowGeometry(const QString& strSetting, const QSize& defaultSize, QWidget* parent)
+{
+    QSettings settings;
+    QPoint pos = settings.value(strSetting + "Pos").toPoint();
+    QSize size = settings.value(strSetting + "Size", defaultSize).toSize();
+
+    if (!pos.x() && !pos.y()) {
+        QRect screen = QApplication::desktop()->screenGeometry();
+        pos.setX((screen.width() - size.width()) / 2);
+        pos.setY((screen.height() - size.height()) / 2);
+    }
+
+    parent->resize(size);
+    parent->move(pos);
+}
 } // namespace GUIUtil

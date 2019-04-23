@@ -245,9 +245,6 @@ void PrepareShutdown(InitInterfaces& interfaces)
     for (const auto& client : interfaces.chain_clients) {
         client->flush();
     }
-#ifdef ENABLE_WALLET
-//    GenerateBitcoins(false, nullptr, 0);
-#endif
     StopMapPort();
 
     // Shutdown witness thread if it's enabled
@@ -2177,10 +2174,6 @@ bool AppInitMain(InitInterfaces& interfaces)
     // ********************************************************* Step 12.5: start staking
 #ifdef ENABLE_WALLET
     StartThreadStakeMiner();
-//    if (gArgs.GetBoolArg("-precompute", true)) {
-//        // Run a thread to precompute any zPIV spends
-//        threadGroup.create_thread(std::bind(&ThreadPrecomputeSpends));
-//    }
 #endif
     // ********************************************************* Step 13: finished
 
