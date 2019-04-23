@@ -438,22 +438,16 @@ bool CObfuscationPool::SetCollateralAddress(std::string strAddress)
 //
 void CObfuscationPool::UnlockCoins()
 {
-    const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    CWallet* pwallet = nullptr;
-    if(!wallets.empty()){
-        pwallet = wallets.at(0).get();
-    }
-    if(!pwallet){
-        return;
-    }
     while (true) {
-        TRY_LOCK(pwallet->cs_wallet, lockWallet);
-        if (!lockWallet) {
-            MilliSleep(50);
-            continue;
+        for(auto pwallet : GetWallets()) {
+            TRY_LOCK(pwallet->cs_wallet, lockWallet);
+            if (!lockWallet) {
+                MilliSleep(50);
+                continue;
+            }
+            for (CTxIn v : lockedCoins)
+                pwallet->UnlockCoin(v.prevout);
         }
-        for (CTxIn v: lockedCoins)
-            pwallet->UnlockCoin(v.prevout);
         break;
     }
 
