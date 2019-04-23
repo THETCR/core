@@ -6413,7 +6413,7 @@ bool CWallet::ConvertList(std::vector<CTxIn> vCoins, std::vector<CAmount>& vecAm
 {
     for (CTxIn i: vCoins) {
         if (mapWallet.count(i.prevout.hash)) {
-            CWalletTx& wtx = mapWallet[i.prevout.hash];
+            CWalletTx wtx(&mapWallet[i.prevout.hash]);
             if (i.prevout.n < wtx.tx->vout.size()) {
                 vecAmounts.push_back(wtx.tx->vout[i.prevout.n].nValue);
             }
@@ -6879,8 +6879,8 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std:
                     // notify only once
                     if (updated_hahes.find(txin.prevout.hash) != updated_hahes.end()) continue;
 
-                    CWalletTx& coin = mapWallet[txin.prevout.hash];
-                    coin.BindWallet(this);
+                    auto coin = mapWallet.find(txin.prevout.hash);
+                    coin->second.BindWallet(this);
                     NotifyTransactionChanged(this, txin.prevout.hash, CT_UPDATED);
                     updated_hahes.insert(txin.prevout.hash);
                 }
@@ -6944,12 +6944,11 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std:
 CAmount CWallet::GetTotalValue(std::vector<CTxIn> vCoins)
 {
     CAmount nTotalValue = 0;
-    CWalletTx wtx;
     for (CTxIn i: vCoins) {
         if (mapWallet.count(i.prevout.hash)) {
-            CWalletTx& wtx = mapWallet[i.prevout.hash];
-            if (i.prevout.n < wtx.tx->vout.size()) {
-                nTotalValue += wtx.tx->vout[i.prevout.n].nValue;
+            auto tx = mapWallet.find(i.prevout.hash)->second.tx;
+            if (i.prevout.n < tx->vout.size()) {
+                nTotalValue += tx->vout[i.prevout.n].nValue;
             }
         } else {
             LogPrintf("GetTotalValue -- Couldn't find transaction\n");
@@ -7215,7 +7214,7 @@ void CWallet::CreateAutoMintTransaction(const CAmount& nMintAmount, CCoinControl
 {
     auto locked_chain = chain().lock();
     if (nMintAmount > 0){
-        CWalletTx wtx;
+        CWalletTx wtx(this, MakeTransactionRef());
         std::vector<CDeterministicMint> vDMints;
         LogPrintf("%s: autominting request amount %s\n", __func__, FormatMoney(nMintAmount));
         std::string strError = MintZerocoin(nMintAmount, wtx, vDMints, coinControl);
@@ -7400,7 +7399,7 @@ void CWallet::AutoCombineDust()
         coinControl->destChange = destMyAddress;
 
         // Create the transaction and commit it to the network
-        CWalletTx wtx;
+        CWalletTx wtx(this, MakeTransactionRef());
         CReserveKey keyChange(this); // this change address does not end up being used, because change is returned with coin control switch
         std::string strErr;
         CAmount nFeeRet = 0;
@@ -7484,7 +7483,7 @@ bool CWallet::MultiSend()
         cControl.Select(outpt);
         cControl.destChange = destMyAddress;
 
-        CWalletTx wtx;
+        CWalletTx wtx(this, MakeTransactionRef());
         CReserveKey keyChange(this); // this change address does not end up being used, because change is returned with coin control switch
         CAmount nFeeRet = 0;
         std::vector<std::pair<CScript, CAmount> > vecSend;
@@ -7502,7 +7501,7 @@ bool CWallet::MultiSend()
         }
 
         //get the fee amount
-        CWalletTx wtxdummy;
+        CWalletTx wtxdummy(this, MakeTransactionRef());
         std::string strErr;
         CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, strErr, &cControl, AvailableCoinsType::ALL_COINS, false, CAmount(0));
         CAmount nLastSendAmount = vecSend[vecSend.size() - 1].second;

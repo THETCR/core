@@ -4660,7 +4660,7 @@ UniValue mintzerocoin(const JSONRPCRequest& request)
 
     CAmount nAmount = request.params[0].get_int() * COIN;
 
-    CWalletTx wtx;
+    CWalletTx wtx(pwallet, MakeTransactionRef());
     std::vector<CDeterministicMint> vDMints;
     std::string strError;
     std::vector<COutPoint> vOutpts;
@@ -4720,7 +4720,7 @@ static UniValue DoZwspSpend(CWallet * const pwallet, const CAmount nAmount, bool
 {
     int64_t nTimeStart = GetTimeMillis();
     std::string address = std::string(); // Optional sending address. Dummy initialization here.
-    CWalletTx wtx;
+    CWalletTx wtx(pwallet, MakeTransactionRef());
     CZerocoinSpendReceipt receipt;
     bool fSuccess;
 
@@ -6008,7 +6008,7 @@ UniValue sendfrom(const JSONRPCRequest& request)
     if (request.params.size() > 3)
         nMinDepth = request.params[3].get_int();
 
-    CWalletTx wtx;
+    CWalletTx wtx(pwallet, MakeTransactionRef());
     wtx.strFromAccount = strAccount;
     mapValue_t mapValue;
     if (request.params.size() > 4 && !request.params[4].isNull() && !request.params[4].get_str().empty())

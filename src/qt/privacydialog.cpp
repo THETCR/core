@@ -195,7 +195,7 @@ void PrivacyDialog::on_pushButtonMintzWSP_clicked()
 
     int64_t nTime = GetTimeMillis();
 
-    CWalletTx wtx;
+    CWalletTx wtx(nullptr, MakeTransactionRef());
     std::vector<CDeterministicMint> vMints;
     std::string strError = walletModel->wallet().getWisprWallet()->MintZerocoin(nAmount, wtx, vMints, CoinControlDialog::coinControl());
 
@@ -427,7 +427,7 @@ void PrivacyDialog::sendzWSP()
     }
 
     // Spend zWSP
-    CWalletTx wtxNew;
+    CWalletTx wtxNew(walletModel->wallet().getWisprWallet().get(), MakeTransactionRef());
     CZerocoinSpendReceipt receipt;
     bool fSuccess = false;
     if(ui->payTo->text().isEmpty()){

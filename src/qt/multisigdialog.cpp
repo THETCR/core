@@ -747,7 +747,7 @@ void MultisigDialog::commitMultisigTx()
     CMutableTransaction tx(multisigTx);
     try{
 #ifdef ENABLE_WALLET
-        CWalletTx wtx(&*model->wallet().getWisprWallet(), CTransaction(tx));
+        CWalletTx wtx(&*model->wallet().getWisprWallet(), MakeTransactionRef(tx));
         CReserveKey keyChange(&*model->wallet().getWisprWallet());
         if (!model->wallet().getWisprWallet()->CommitTransaction(wtx, keyChange))
             throw std::runtime_error(std::string("Transaction rejected - Failed to commit"));

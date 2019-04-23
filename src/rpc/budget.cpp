@@ -140,7 +140,7 @@ UniValue preparebudget(const JSONRPCRequest& request)
     //     useIX = request.params[7].get_str() == "true" ? true : false;
     // }
 
-    CWalletTx wtx;
+    CWalletTx wtx(nullptr, MakeTransactionRef());
     if (!pwallet->GetBudgetSystemCollateralTX(wtx, budgetProposalBroadcast.GetHash(), useIX)) { // 50 WSP collateral for proposal
         throw std::runtime_error("Error making collateral transaction for proposal. Please check your wallet balance.");
     }

@@ -1749,7 +1749,7 @@ bool CObfuscationPool::SendRandomPaymentToSelf()
     assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
     scriptChange = GetScriptForDestination(vchPubKey.GetID());
 
-    CWalletTx wtx(nullptr, nullptr);
+    CWalletTx wtx(nullptr, MakeTransactionRef());
     CAmount nFeeRet = 0;
     std::string strFail = "";
     std::vector<std::pair<CScript, CAmount> > vecSend;
@@ -1782,7 +1782,7 @@ bool CObfuscationPool::MakeCollateralAmounts()
     if(!pwallet){
         return false;
     }
-    CWalletTx wtx(nullptr, nullptr);
+    CWalletTx wtx(nullptr, MakeTransactionRef());
     CAmount nFeeRet = 0;
     std::string strFail = "";
     std::vector<std::pair<CScript, CAmount> > vecSend;
@@ -1844,7 +1844,7 @@ bool CObfuscationPool::CreateDenominated(CAmount nTotalValue)
     if(!pwallet){
         return false;
     }
-    CWalletTx wtx(nullptr, nullptr);
+    CWalletTx wtx(nullptr, MakeTransactionRef());
     CAmount nFeeRet = 0;
     std::string strFail = "";
     std::vector<std::pair<CScript, CAmount> > vecSend;
