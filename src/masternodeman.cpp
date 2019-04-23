@@ -713,12 +713,12 @@ CMasternode* CMasternodeMan::GetMasternodeByRank(int nRank, int64_t nBlockHeight
     return nullptr;
 }
 
-void CMasternodeMan::ProcessMasternodeConnections()
+void CMasternodeMan::ProcessMasternodeConnections(CConnman* connman)
 {
     //we don't care about this for regtest
     if (Params().NetworkID() == CBaseChainParams::REGTEST) return;
 
-    g_connman->ForEachNode([](CNode* pnode) {
+    connman->ForEachNode([](CNode* pnode) {
       if (pnode->fObfuScationMaster) {
           if (obfuScationPool.pSubmittedToMasternode != NULL && pnode->addr == obfuScationPool.pSubmittedToMasternode->addr) return;
           LogPrint(BCLog::MASTERNODE,"Closing Masternode connection peer=%i \n", pnode->GetId());

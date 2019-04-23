@@ -18,7 +18,7 @@
 //
 // Bootup the Masternode, look for a 125000 WISPR input and register on the network
 //
-void CActiveMasternode::ManageStatus()
+void CActiveMasternode::ManageStatus(CConnman* connman)
 {
     std::string errorMessage;
 
@@ -122,7 +122,7 @@ void CActiveMasternode::ManageStatus()
             }
 
             CMasternodeBroadcast mnb;
-            if (!CreateBroadcast(vin, service, keyCollateralAddress, pubKeyCollateralAddress, keyMasternode, pubKeyMasternode, errorMessage, mnb)) {
+            if (!CreateBroadcast(vin, service, keyCollateralAddress, pubKeyCollateralAddress, keyMasternode, pubKeyMasternode, errorMessage, mnb, connman)) {
                 notCapableReason = "Error on Register: " + errorMessage;
                 LogPrintf("CActiveMasternode::ManageStatus() - %s\n", notCapableReason);
                 return;
@@ -144,7 +144,7 @@ void CActiveMasternode::ManageStatus()
     }
 
     //send to all peers
-    if (!SendMasternodePing(errorMessage)) {
+    if (!SendMasternodePing(errorMessage, connman)) {
         LogPrintf("CActiveMasternode::ManageStatus() - Error on Ping: %s\n", errorMessage);
     }
 }
@@ -167,7 +167,7 @@ std::string CActiveMasternode::GetStatus()
     }
 }
 
-bool CActiveMasternode::SendMasternodePing(std::string& errorMessage)
+bool CActiveMasternode::SendMasternodePing(std::string& errorMessage, CConnman* connman)
 {
     if (status != ACTIVE_MASTERNODE_STARTED) {
         errorMessage = "Masternode is not in a running status";
@@ -233,8 +233,8 @@ bool CActiveMasternode::SendMasternodePing(std::string& errorMessage)
 
         LogPrint(BCLog::MASTERNODE, "dseep - relaying from active mn, %s \n", vin.ToString().c_str());
 
-        g_connman->ForEachNode([this, vchMasterNodeSignature, masterNodeSignatureTime](CNode* pnode) {
-          g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dseep", vin, vchMasterNodeSignature, masterNodeSignatureTime, false));
+        connman->ForEachNode([connman, this, vchMasterNodeSignature, masterNodeSignatureTime](CNode* pnode) {
+          connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dseep", vin, vchMasterNodeSignature, masterNodeSignatureTime, false));
         });
 
         /*
@@ -251,7 +251,7 @@ bool CActiveMasternode::SendMasternodePing(std::string& errorMessage)
     }
 }
 
-bool CActiveMasternode::CreateBroadcast(std::string strService, std::string strKeyMasternode, std::string strTxHash, std::string strOutputIndex, std::string& errorMessage, CMasternodeBroadcast &mnb, bool fOffline)
+bool CActiveMasternode::CreateBroadcast(std::string strService, std::string strKeyMasternode, std::string strTxHash, std::string strOutputIndex, std::string& errorMessage, CMasternodeBroadcast &mnb, CConnman* connman, bool fOffline)
 {
     CTxIn vin;
     CPubKey pubKeyCollateralAddress;
@@ -285,12 +285,12 @@ bool CActiveMasternode::CreateBroadcast(std::string strService, std::string strK
         return false;
 
     ServiceFlags requiredServiceBits = GetDesirableServiceFlags(NODE_NONE);
-    g_connman->AddNewAddress(CAddress(service, requiredServiceBits), CNetAddr("127.0.0.1"), 2 * 60 * 60);
+    connman->AddNewAddress(CAddress(service, requiredServiceBits), CNetAddr("127.0.0.1"), 2 * 60 * 60);
 
-    return CreateBroadcast(vin, CService(strService), keyCollateralAddress, pubKeyCollateralAddress, keyMasternode, pubKeyMasternode, errorMessage, mnb);
+    return CreateBroadcast(vin, CService(strService), keyCollateralAddress, pubKeyCollateralAddress, keyMasternode, pubKeyMasternode, errorMessage, mnb, connman);
 }
 
-bool CActiveMasternode::CreateBroadcast(CTxIn vin, CService service, CKey keyCollateralAddress, CPubKey pubKeyCollateralAddress, CKey keyMasternode, CPubKey pubKeyMasternode, std::string& errorMessage, CMasternodeBroadcast &mnb)
+bool CActiveMasternode::CreateBroadcast(CTxIn vin, CService service, CKey keyCollateralAddress, CPubKey pubKeyCollateralAddress, CKey keyMasternode, CPubKey pubKeyMasternode, std::string& errorMessage, CMasternodeBroadcast &mnb, CConnman* connman)
 {
     // wait for reindex and/or import to finish
     if (fImporting || fReindex) return false;
@@ -342,8 +342,8 @@ bool CActiveMasternode::CreateBroadcast(CTxIn vin, CService service, CKey keyCol
         return false;
     }
 
-    g_connman->ForEachNode([vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, donationAddress, donationPercantage](CNode* pnode) {
-      g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dsee", vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION, donationAddress, donationPercantage));
+    connman->ForEachNode([connman, vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, donationAddress, donationPercantage](CNode* pnode) {
+      connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make("dsee", vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION, donationAddress, donationPercantage));
     });
 
     /*

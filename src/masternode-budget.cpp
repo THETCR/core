@@ -136,7 +136,7 @@ void CBudgetManager::CheckOrphanVotes()
     LogPrint(BCLog::MNBUDGET,"CBudgetManager::CheckOrphanVotes - Done\n");
 }
 
-void CBudgetManager::SubmitFinalBudget()
+void CBudgetManager::SubmitFinalBudget(CConnman* connman)
 {
     const std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
     CWallet* pwallet = nullptr;
@@ -268,7 +268,7 @@ void CBudgetManager::SubmitFinalBudget()
 
     LOCK(cs);
     mapSeenFinalizedBudgets.insert(std::make_pair(finalizedBudgetBroadcast.GetHash(), finalizedBudgetBroadcast));
-    finalizedBudgetBroadcast.Relay();
+    finalizedBudgetBroadcast.Relay(connman);
     budget.AddFinalizedBudget(finalizedBudgetBroadcast);
     nSubmittedHeight = nCurrentHeight;
     LogPrint(BCLog::MNBUDGET,"CBudgetManager::SubmitFinalBudget - Done! %s\n", finalizedBudgetBroadcast.GetHash().ToString());
@@ -394,7 +394,7 @@ CBudgetDB::ReadResult CBudgetDB::Read(CBudgetManager& objToLoad, bool fDryRun)
     LogPrint(BCLog::MNBUDGET,"  %s\n", objToLoad.ToString());
     if (!fDryRun) {
         LogPrint(BCLog::MNBUDGET,"Budget manager - cleaning....\n");
-        objToLoad.CheckAndRemove();
+        objToLoad.CheckAndRemove(g_connman.get());
         LogPrint(BCLog::MNBUDGET,"Budget manager - result:\n");
         LogPrint(BCLog::MNBUDGET,"  %s\n", objToLoad.ToString());
     }
@@ -460,7 +460,7 @@ bool CBudgetManager::AddProposal(CBudgetProposal& budgetProposal)
     return true;
 }
 
-void CBudgetManager::CheckAndRemove()
+void CBudgetManager::CheckAndRemove(CConnman* connman)
 {
     int nHeight = 0;
 
@@ -497,7 +497,7 @@ void CBudgetManager::CheckAndRemove()
         }
 
         if (pfinalizedBudget->fValid) {
-            pfinalizedBudget->CheckAndVote();
+            pfinalizedBudget->CheckAndVote(connman);
             tmpMapFinalizedBudgets.insert(std::make_pair(pfinalizedBudget->GetHash(), *pfinalizedBudget));
         }
 
@@ -932,7 +932,7 @@ void CBudgetManager::NewBlock(CConnman* connman)
     if (masternodeSync.RequestedMasternodeAssets <= MASTERNODE_SYNC_BUDGET) return;
 
     if (strBudgetMode == "suggest") { //suggest the budget we see
-        SubmitFinalBudget();
+        SubmitFinalBudget(connman);
     }
 
     //this function should be called 1/14 blocks, allowing up to 100 votes per day on all proposals
@@ -956,7 +956,7 @@ void CBudgetManager::NewBlock(CConnman* connman)
     }
 
 
-    CheckAndRemove();
+    CheckAndRemove(connman);
 
     //remove invalid votes once in a while (we have to check the signatures and validity of every vote, somewhat CPU intensive)
 
@@ -1002,7 +1002,7 @@ void CBudgetManager::NewBlock(CConnman* connman)
 
         CBudgetProposal budgetProposal((*it4));
         if (AddProposal(budgetProposal)) {
-            (*it4).Relay();
+            (*it4).Relay(connman);
         }
 
         LogPrint(BCLog::MNBUDGET,"mprop (immature) - new budget - %s\n", (*it4).GetHash().ToString());
@@ -1029,7 +1029,7 @@ void CBudgetManager::NewBlock(CConnman* connman)
 
         CFinalizedBudget finalizedBudget((*it5));
         if (AddFinalizedBudget(finalizedBudget)) {
-            (*it5).Relay();
+            (*it5).Relay(connman);
         }
 
         it5 = vecImmatureFinalizedBudgets.erase(it5);
@@ -1090,7 +1090,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, const std::string& strCommand,
 
         CBudgetProposal budgetProposal(budgetProposalBroadcast);
         if (AddProposal(budgetProposal)) {
-            budgetProposalBroadcast.Relay();
+            budgetProposalBroadcast.Relay(connman);
         }
         masternodeSync.AddedBudgetItem(budgetProposalBroadcast.GetHash());
 
@@ -1131,7 +1131,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, const std::string& strCommand,
 
         std::string strError = "";
         if (UpdateProposal(vote, pfrom, strError, connman)) {
-            vote.Relay();
+            vote.Relay(connman);
             masternodeSync.AddedBudgetItem(vote.GetHash());
         }
 
@@ -1167,7 +1167,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, const std::string& strCommand,
 
         CFinalizedBudget finalizedBudget(finalizedBudgetBroadcast);
         if (AddFinalizedBudget(finalizedBudget)) {
-            finalizedBudgetBroadcast.Relay();
+            finalizedBudgetBroadcast.Relay(connman);
         }
         masternodeSync.AddedBudgetItem(finalizedBudgetBroadcast.GetHash());
 
@@ -1205,7 +1205,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, const std::string& strCommand,
 
         std::string strError = "";
         if (UpdateFinalizedBudget(vote, pfrom, strError, connman)) {
-            vote.Relay();
+            vote.Relay(connman);
             masternodeSync.AddedBudgetItem(vote.GetHash());
 
             LogPrint(BCLog::MNBUDGET,"fbvote - new finalized budget vote - %s from masternode %s\n", vote.GetHash().ToString(), HexStr(pmn->pubKeyMasternode));
@@ -1698,10 +1698,10 @@ CBudgetProposalBroadcast::CBudgetProposalBroadcast(std::string strProposalNameIn
     nFeeTXHash = nFeeTXHashIn;
 }
 
-void CBudgetProposalBroadcast::Relay()
+void CBudgetProposalBroadcast::Relay(CConnman* connman)
 {
     CInv inv(MSG_BUDGET_PROPOSAL, GetHash());
-    RelayInv(inv, &*g_connman);
+    RelayInv(inv, connman);
 }
 
 CBudgetVote::CBudgetVote()
@@ -1724,10 +1724,10 @@ CBudgetVote::CBudgetVote(CTxIn vinIn, uint256 nProposalHashIn, int nVoteIn)
     fSynced = false;
 }
 
-void CBudgetVote::Relay()
+void CBudgetVote::Relay(CConnman* connman)
 {
     CInv inv(MSG_BUDGET_VOTE, GetHash());
-    RelayInv(inv, &*g_connman);
+    RelayInv(inv, connman);
 }
 
 bool CBudgetVote::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
@@ -1847,7 +1847,7 @@ struct sortPaymentsByHash  {
 };
 
 // Check finalized budget and vote on it if correct. Masternodes only
-void CFinalizedBudget::CheckAndVote()
+void CFinalizedBudget::CheckAndVote(CConnman* connman)
 {
     LOCK(cs);
 
@@ -1933,7 +1933,7 @@ void CFinalizedBudget::CheckAndVote()
         }
 
         LogPrint(BCLog::MNBUDGET,"CFinalizedBudget::AutoCheck - Finalized Budget Matches! Submitting Vote.\n");
-        SubmitVote();
+        SubmitVote(connman);
     }
 }
 
@@ -2168,7 +2168,7 @@ TrxValidationStatus CFinalizedBudget::IsTransactionValid(const CTransaction& txN
     return transactionStatus;
 }
 
-void CFinalizedBudget::SubmitVote()
+void CFinalizedBudget::SubmitVote(CConnman* connman)
 {
     CPubKey pubKeyMasternode;
     CKey keyMasternode;
@@ -2190,7 +2190,7 @@ void CFinalizedBudget::SubmitVote()
         LogPrint(BCLog::MNBUDGET,"CFinalizedBudget::SubmitVote  - new finalized budget vote - %s\n", vote.GetHash().ToString());
 
         budget.mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
-        vote.Relay();
+        vote.Relay(connman);
     } else {
         LogPrint(BCLog::MNBUDGET,"CFinalizedBudget::SubmitVote : Error submitting vote - %s\n", strError);
     }
@@ -2226,10 +2226,10 @@ CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(std::string strBudgetNameIn
     nFeeTXHash = nFeeTXHashIn;
 }
 
-void CFinalizedBudgetBroadcast::Relay()
+void CFinalizedBudgetBroadcast::Relay(CConnman* connman)
 {
     CInv inv(MSG_BUDGET_FINALIZED, GetHash());
-    RelayInv(inv, &*g_connman);
+    RelayInv(inv, connman);
 }
 
 CFinalizedBudgetVote::CFinalizedBudgetVote()
@@ -2252,10 +2252,10 @@ CFinalizedBudgetVote::CFinalizedBudgetVote(CTxIn vinIn, uint256 nBudgetHashIn)
     fSynced = false;
 }
 
-void CFinalizedBudgetVote::Relay()
+void CFinalizedBudgetVote::Relay(CConnman* connman)
 {
     CInv inv(MSG_BUDGET_FINALIZED_VOTE, GetHash());
-    RelayInv(inv, &*g_connman);
+    RelayInv(inv, connman);
 }
 
 bool CFinalizedBudgetVote::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)

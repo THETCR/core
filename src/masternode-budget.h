@@ -69,7 +69,7 @@ public:
 
     bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
     bool SignatureValid(bool fSignatureCheck);
-    void Relay();
+    void Relay(CConnman* connman);
 
     std::string GetVoteString()
     {
@@ -121,7 +121,7 @@ public:
 
     bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
     bool SignatureValid(bool fSignatureCheck);
-    void Relay();
+    void Relay(CConnman* connman);
 
     uint256 GetHash()
     {
@@ -230,7 +230,7 @@ public:
     bool IsBudgetPaymentBlock(int nBlockHeight);
     bool AddProposal(CBudgetProposal& budgetProposal);
     bool AddFinalizedBudget(CFinalizedBudget& finalizedBudget);
-    void SubmitFinalBudget();
+    void SubmitFinalBudget(CConnman* connman);
 
     bool UpdateProposal(CBudgetVote& vote, CNode* pfrom, std::string& strError, CConnman* connman);
     bool UpdateFinalizedBudget(CFinalizedBudgetVote& vote, CNode* pfrom, std::string& strError, CConnman* connman);
@@ -254,7 +254,7 @@ public:
         mapOrphanMasternodeBudgetVotes.clear();
         mapOrphanFinalizedBudgetVotes.clear();
     }
-    void CheckAndRemove();
+    void CheckAndRemove(CConnman* connman);
     std::string ToString() const;
 
 
@@ -362,11 +362,11 @@ public:
     }
 
     // Verify and vote on finalized budget
-    void CheckAndVote();
+    void CheckAndVote(CConnman* connman);
     //total wispr paid out by this budget
     CAmount GetTotalPayout();
     //vote on this finalized budget as a masternode
-    void SubmitVote();
+    void SubmitVote(CConnman* connman);
 
     //checks the hashes to make sure we know about them
     std::string GetStatus();
@@ -431,7 +431,7 @@ public:
         return *this;
     }
 
-    void Relay();
+    void Relay(CConnman* connman);
 
     ADD_SERIALIZE_METHODS;
 
@@ -586,7 +586,7 @@ public:
         return *this;
     }
 
-    void Relay();
+    void Relay(CConnman* connman);
 
     ADD_SERIALIZE_METHODS;
 

@@ -134,12 +134,12 @@ bool CMasternodeSync::IsBudgetFinEmpty()
     return sumBudgetItemFin == 0 && countBudgetItemFin > 0;
 }
 
-void CMasternodeSync::GetNextAsset()
+void CMasternodeSync::GetNextAsset(CConnman* connman)
 {
     switch (RequestedMasternodeAssets) {
     case (MASTERNODE_SYNC_INITIAL):
     case (MASTERNODE_SYNC_FAILED): // should never be used here actually, use Reset() instead
-        ClearFulfilledRequest();
+        ClearFulfilledRequest(connman);
         RequestedMasternodeAssets = MASTERNODE_SYNC_SPORKS;
         break;
     case (MASTERNODE_SYNC_SPORKS):
@@ -218,9 +218,9 @@ void CMasternodeSync::ProcessMessage(CNode* pfrom, const std::string& strCommand
     }
 }
 
-void CMasternodeSync::ClearFulfilledRequest()
+void CMasternodeSync::ClearFulfilledRequest(CConnman* connman)
 {
-    g_connman->ForEachNode([](CNode* pnode) {
+    connman->ForEachNode([](CNode* pnode) {
       pnode->ClearFulfilledRequest("getspork");
       pnode->ClearFulfilledRequest("mnsync");
       pnode->ClearFulfilledRequest("mnwsync");
@@ -254,7 +254,7 @@ void CMasternodeSync::Process(CConnman* connman)
 
     LogPrint(BCLog::MASTERNODE, "CMasternodeSync::Process() - tick %d RequestedMasternodeAssets %d\n", tick, RequestedMasternodeAssets);
 
-    if (RequestedMasternodeAssets == MASTERNODE_SYNC_INITIAL) GetNextAsset();
+    if (RequestedMasternodeAssets == MASTERNODE_SYNC_INITIAL) GetNextAsset(connman);
 
     // sporks synced but blockchain is not, wait until we're almost at a recent block to continue
     if (Params().NetworkID() != CBaseChainParams::REGTEST &&
@@ -290,7 +290,7 @@ void CMasternodeSync::Process(CConnman* connman)
           pnode->FulfilledRequest("getspork");
 
           connman->PushMessage(pnode, msgMaker.Make(NetMsgType::GETSPORKS)); //get current network sporks
-          if (RequestedMasternodeAttempt >= 2) GetNextAsset();
+          if (RequestedMasternodeAttempt >= 2) GetNextAsset(connman);
           RequestedMasternodeAttempt++;
 
           return;
@@ -300,7 +300,7 @@ void CMasternodeSync::Process(CConnman* connman)
           if (RequestedMasternodeAssets == MASTERNODE_SYNC_LIST) {
               LogPrint(BCLog::MASTERNODE, "CMasternodeSync::Process() - lastMasternodeList %lld (GetTime() - MASTERNODE_SYNC_TIMEOUT) %lld\n", lastMasternodeList, GetTime() - MASTERNODE_SYNC_TIMEOUT);
               if (lastMasternodeList > 0 && lastMasternodeList < GetTime() - MASTERNODE_SYNC_TIMEOUT * 2 && RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD) { //hasn't received a new item in the last five seconds, so we'll move to the
-                  GetNextAsset();
+                  GetNextAsset(connman);
                   return;
               }
 
@@ -317,7 +317,7 @@ void CMasternodeSync::Process(CConnman* connman)
                       lastFailure = GetTime();
                       nCountFailures++;
                   } else {
-                      GetNextAsset();
+                      GetNextAsset(connman);
                   }
                   return;
               }
@@ -331,7 +331,7 @@ void CMasternodeSync::Process(CConnman* connman)
 
           if (RequestedMasternodeAssets == MASTERNODE_SYNC_MNW) {
               if (lastMasternodeWinner > 0 && lastMasternodeWinner < GetTime() - MASTERNODE_SYNC_TIMEOUT * 2 && RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD) { //hasn't received a new item in the last five seconds, so we'll move to the
-                  GetNextAsset();
+                  GetNextAsset(connman);
                   return;
               }
 
@@ -348,7 +348,7 @@ void CMasternodeSync::Process(CConnman* connman)
                       lastFailure = GetTime();
                       nCountFailures++;
                   } else {
-                      GetNextAsset();
+                      GetNextAsset(connman);
                   }
                   return;
               }
@@ -373,10 +373,10 @@ void CMasternodeSync::Process(CConnman* connman)
               if (lastBudgetItem > 0 && lastBudgetItem < GetTime() - MASTERNODE_SYNC_TIMEOUT * 2 && RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD) {
 
                   // Hasn't received a new item in the last five seconds, so we'll move to the
-                  GetNextAsset();
+                  GetNextAsset(connman);
 
                   // Try to activate our masternode if possible
-                  activeMasternode.ManageStatus();
+                  activeMasternode.ManageStatus(connman);
 
                   return;
               }
@@ -385,8 +385,8 @@ void CMasternodeSync::Process(CConnman* connman)
               if (lastBudgetItem == 0 &&
                   (RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD * 3 || GetTime() - nAssetSyncStarted > MASTERNODE_SYNC_TIMEOUT * 5)) {
                   // maybe there is no budgets at all, so just finish syncing
-                  GetNextAsset();
-                  activeMasternode.ManageStatus();
+                  GetNextAsset(connman);
+                  activeMasternode.ManageStatus(connman);
                   return;
               }
 

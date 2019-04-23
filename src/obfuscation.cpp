@@ -2387,11 +2387,11 @@ void ThreadCheckObfuScationPool()
 
             // check if we should activate or ping every few minutes,
             // start right after sync is considered to be done
-            if (c % MASTERNODE_PING_SECONDS == 1) activeMasternode.ManageStatus();
+            if (c % MASTERNODE_PING_SECONDS == 1) activeMasternode.ManageStatus(g_connman.get());
 
             if (c % 60 == 0) {
                 mnodeman.CheckAndRemove();
-                mnodeman.ProcessMasternodeConnections();
+                mnodeman.ProcessMasternodeConnections(g_connman.get());
                 masternodePayments.CleanPaymentList();
                 CleanTransactionLocksList();
             }

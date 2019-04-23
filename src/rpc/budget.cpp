@@ -238,7 +238,7 @@ UniValue submitbudget(const JSONRPCRequest& request)
     // }
 
     budget.mapSeenMasternodeBudgetProposals.insert(std::make_pair(budgetProposalBroadcast.GetHash(), budgetProposalBroadcast));
-    budgetProposalBroadcast.Relay();
+    budgetProposalBroadcast.Relay(g_connman.get());
     if(budget.AddProposal(budgetProposalBroadcast)) {
         return budgetProposalBroadcast.GetHash().ToString();
     }
@@ -340,7 +340,7 @@ UniValue mnbudgetvote(const JSONRPCRequest& request)
             if (budget.UpdateProposal(vote, NULL, strError, g_connman.get())) {
                 success++;
                 budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
-                vote.Relay();
+                vote.Relay(g_connman.get());
                 statusObj.pushKV("node", "local");
                 statusObj.pushKV("result", "success");
                 statusObj.pushKV("error", "");
@@ -406,7 +406,7 @@ UniValue mnbudgetvote(const JSONRPCRequest& request)
             std::string strError = "";
             if (budget.UpdateProposal(vote, NULL, strError, g_connman.get())) {
                 budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
-                vote.Relay();
+                vote.Relay(g_connman.get());
                 success++;
                 statusObj.pushKV("node", mne.getAlias());
                 statusObj.pushKV("result", "success");
@@ -481,7 +481,7 @@ UniValue mnbudgetvote(const JSONRPCRequest& request)
             std::string strError = "";
             if(budget.UpdateProposal(vote, NULL, strError, g_connman.get())) {
                 budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
-                vote.Relay();
+                vote.Relay(g_connman.get());
                 success++;
                 statusObj.pushKV("node", mne.getAlias());
                 statusObj.pushKV("result", "success");
@@ -759,7 +759,7 @@ UniValue mnbudgetrawvote(const JSONRPCRequest& request)
     std::string strError = "";
     if (budget.UpdateProposal(vote, NULL, strError, g_connman.get())) {
         budget.mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
-        vote.Relay();
+        vote.Relay(g_connman.get());
         return "Voted successfully";
     } else {
         return "Error voting : " + strError;
@@ -838,7 +838,7 @@ UniValue mnfinalbudget(const JSONRPCRequest& request)
             std::string strError = "";
             if (budget.UpdateFinalizedBudget(vote, NULL, strError, g_connman.get())) {
                 budget.mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
-                vote.Relay();
+                vote.Relay(g_connman.get());
                 success++;
                 statusObj.pushKV("result", "success");
             } else {
@@ -883,7 +883,7 @@ UniValue mnfinalbudget(const JSONRPCRequest& request)
         std::string strError = "";
         if (budget.UpdateFinalizedBudget(vote, NULL, strError, g_connman.get())) {
             budget.mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
-            vote.Relay();
+            vote.Relay(g_connman.get());
             return "success";
         } else {
             return "Error voting : " + strError;
@@ -955,7 +955,7 @@ UniValue checkbudgets(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("checkbudgets", "") + HelpExampleRpc("checkbudgets", ""));
 
-    budget.CheckAndRemove();
+    budget.CheckAndRemove(g_connman.get());
 
     return NullUniValue;
 }
