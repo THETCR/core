@@ -707,8 +707,10 @@ wispr_wallet_SOURCES += wispr-wallet-res.rc
 endif
 
 wispr_wallet_LDADD = \
+  $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_WALLET_TOOL) \
   $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_ZEROCOIN) \
   $(LIBBITCOIN_CONSENSUS) \

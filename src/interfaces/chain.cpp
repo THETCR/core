@@ -172,8 +172,8 @@ class LockImpl : public Chain::Lock
 
     int getTransactionLockSignatures(const uint256& txid) override {
         //compile consessus vote
-        std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(txid);
-        if (i != mapTxLocks.end()) {
+        std::map<uint256, CTransactionLock>::iterator i = ::mapTxLocks.find(txid);
+        if (i != ::mapTxLocks.end()) {
             return (*i).second.CountSignatures();
         }
 
@@ -182,8 +182,8 @@ class LockImpl : public Chain::Lock
 
     bool isTransactionLockTimedOut(const uint256& txid) override {
         //compile consessus vote
-        std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(txid);
-        if (i != mapTxLocks.end()) {
+        std::map<uint256, CTransactionLock>::iterator i = ::mapTxLocks.find(txid);
+        if (i != ::mapTxLocks.end()) {
             return GetTime() > (*i).second.nTimeout;
         }
 
@@ -203,8 +203,8 @@ class LockImpl : public Chain::Lock
     int getIXConfirmations(const uint256& txid) override {
         int sigs = 0;
 
-        std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(txid);
-        if (i != mapTxLocks.end()) {
+        std::map<uint256, CTransactionLock>::iterator i = ::mapTxLocks.find(txid);
+        if (i != ::mapTxLocks.end()) {
             sigs = (*i).second.CountSignatures();
         }
         if (sigs >= SWIFTTX_SIGNATURES_REQUIRED) {
@@ -247,23 +247,23 @@ class LockImpl : public Chain::Lock
     }
     void sendObfuscationDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, CAmount amount, CConnman* connman) override
     {
-        return obfuScationPool.SendObfuscationDenominate(vin, vout, amount, connman);
+        return ::obfuScationPool.SendObfuscationDenominate(vin, vout, amount, connman);
     }
     int getObfuscationEntriesCount() override
     {
-        return obfuScationPool.GetEntriesCount();
+        return ::obfuScationPool.GetEntriesCount();
     }
     int getObfuscationState() override
     {
-         return obfuScationPool.GetState();
+         return ::obfuScationPool.GetState();
     }
     int getObfuscationSessionDenom() override
     {
-        return obfuScationPool.sessionDenom;
+        return ::obfuScationPool.sessionDenom;
     }
     int getObfuscationDenominations(const std::vector<CTxOut>& vout, bool fSingleRandomDenom) override
     {
-         return obfuScationPool.GetDenominations(vout, fSingleRandomDenom);
+         return ::obfuScationPool.GetDenominations(vout, fSingleRandomDenom);
     }
 };
 
@@ -491,11 +491,11 @@ public:
     //!< WISPR
     void relayTransactionLock(const uint256& txid, CTransactionRef tx) override
     {
-        mapTxLockReq.insert(std::make_pair(txid, (CTransaction) * tx));
+        ::mapTxLockReq.insert(std::make_pair(txid, (CTransaction) * tx));
         CreateNewLock(((CTransaction) * tx));
 //        RelayTransactionLockReq((CTransaction) * tx,  g_connman.get(), true);
         CInv inv(MSG_TXLOCK_REQUEST, tx->GetHash());
-        g_connman->ForEachNode([&inv, tx](CNode* pnode)
+        ::g_connman->ForEachNode([&inv, tx](CNode* pnode)
             {
               if (!(!pnode->fRelayTxes)){
                   g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::TXLOCKREQUEST, tx));
@@ -507,11 +507,11 @@ public:
 
     bool readCoinMint(const uint256& hashPubcoin, uint256& hashTx) override
     {
-      return zerocoinDB->ReadCoinMint(hashPubcoin, hashTx);
+      return ::zerocoinDB->ReadCoinMint(hashPubcoin, hashTx);
     }
     bool readCoinSpend(const uint256& hashSerial, uint256 &txHash) override
     {
-        return zerocoinDB->ReadCoinSpend(hashSerial, txHash);
+        return ::zerocoinDB->ReadCoinSpend(hashSerial, txHash);
     }
 };
 } // namespace
