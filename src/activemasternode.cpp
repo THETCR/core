@@ -87,14 +87,18 @@ void CActiveMasternode::ManageStatus(CConnman* connman)
 
         LogPrintf("CActiveMasternode::ManageStatus() - Checking inbound connection to '%s'\n", service.ToString());
 
-        SOCKET hSocket;
-        bool fConnected = ConnectSocket(service, hSocket, nConnectTimeout) && IsSelectableSocket(hSocket);
-        CloseSocket(hSocket);
-        if (!fConnected) {
+//        SOCKET hSocket;
+//        bool fConnected = ConnectSocket(service, hSocket, nConnectTimeout) && IsSelectableSocket(hSocket);
+//        CloseSocket(hSocket);
+        CNode* pnode = connman->ConnectNode((CAddress)service, nullptr, false, false);
+
+//        if (!fConnected) {
+        if (!pnode) {
             notCapableReason = "Could not connect to " + service.ToString();
             LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason);
             return;
         }
+        pnode->Release();
 
         // Choose coins to use
         CPubKey pubKeyCollateralAddress;

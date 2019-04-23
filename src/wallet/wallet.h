@@ -1106,7 +1106,7 @@ public:
     /** Construct wallet with specified name and database implementation. */
     CWallet(interfaces::Chain* chain, const WalletLocation& location, std::unique_ptr<WalletDatabase> database) : m_chain(chain), m_location(location), database(std::move(database))
     {
-        pc_database = WalletDatabase::CreatePrecompute();
+        pc_database = WalletDatabase::CreatePrecompute(location.GetPath());
         fFileBacked = true;
     }
 

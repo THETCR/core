@@ -81,7 +81,7 @@ bool CObfuScationRelay::VerifyMessage(std::string strSharedKey)
     return true;
 }
 
-void CObfuScationRelay::Relay()
+void CObfuScationRelay::Relay(CConnman* connman)
 {
     int nCount = std::min(mnodeman.CountEnabled(ActiveProtocol()), 20);
     int nRank1 = (rand() % nCount) + 1;
@@ -94,11 +94,11 @@ void CObfuScationRelay::Relay()
     //printf("rank 1 - rank2 %d %d \n", nRank1, nRank2);
 
     //relay this message through 2 separate nodes for redundancy
-    RelayThroughNode(nRank1);
-    RelayThroughNode(nRank2);
+    RelayThroughNode(nRank1, connman);
+    RelayThroughNode(nRank2, connman);
 }
 
-void CObfuScationRelay::RelayThroughNode(int nRank)
+void CObfuScationRelay::RelayThroughNode(int nRank, CConnman* connman)
 {
     CMasternode* pmn = mnodeman.GetMasternodeByRank(nRank, nBlockHeight, ActiveProtocol());
 
@@ -108,7 +108,7 @@ void CObfuScationRelay::RelayThroughNode(int nRank)
         if (pnode) {
             //printf("Connected\n");
             const CNetMsgMaker msgMaker(pnode->GetSendVersion());
-            g_connman->PushMessage(pnode, msgMaker.Make("dsr", (*this)));
+            connman->PushMessage(pnode, msgMaker.Make("dsr", (*this)));
             pnode->Release();
             return;
         }

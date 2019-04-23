@@ -4370,7 +4370,7 @@ bool CWallet::Verify(interfaces::Chain& chain, const WalletLocation& location, b
 
     // Keep same database environment instance across Verify/Recover calls below.
     std::unique_ptr<WalletDatabase> database = WalletDatabase::Create(wallet_path);
-    std::unique_ptr<WalletDatabase> pc_database = WalletDatabase::CreatePrecompute();
+    std::unique_ptr<WalletDatabase> pc_database = WalletDatabase::CreatePrecompute(wallet_path);
 
     try {
         if (!WalletBatch::VerifyEnvironment(wallet_path, error_string)) {

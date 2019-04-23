@@ -154,9 +154,11 @@ public:
     }
 
     /** Return object for accessing temporary in-memory database. */
-    static std::unique_ptr<BerkeleyDatabase> CreatePrecompute()
+    static std::unique_ptr<BerkeleyDatabase> CreatePrecompute(const fs::path& path)
     {
-        return MakeUnique<BerkeleyDatabase>(std::make_shared<BerkeleyEnvironment>(), "precomputes.dat");
+        path.filename() = "precomputes.dat";
+        std::string filename = "precomputes.dat";
+        return MakeUnique<BerkeleyDatabase>(GetWalletEnv(path, filename), "precomputes.dat");
     }
 
     /** Rewrite the entire database on disk, with the exception of key pszSkip if non-zero

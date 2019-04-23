@@ -42,8 +42,8 @@ public:
 
     bool Sign(std::string strSharedKey);
     bool VerifyMessage(std::string strSharedKey);
-    void Relay();
-    void RelayThroughNode(int nRank);
+    void Relay(CConnman* connman);
+    void RelayThroughNode(int nRank, CConnman* connman);
 };
 
 
