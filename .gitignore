@@ -2,6 +2,7 @@
 .idea
 .idea/*
 *.exe
+CMakeLists.txt
 src/wispr
 src/wisprd
 src/wispr-cli
