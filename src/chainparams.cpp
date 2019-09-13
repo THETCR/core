@@ -15,6 +15,7 @@
 #include <cassert>
 
 #include <boost/assign/list_of.hpp>
+#include <limits>
 
 
 struct SeedSpec6 {
@@ -114,6 +115,17 @@ libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params(bool useModulusV1) co
     return &ZCParamsDec;
 }
 
+bool CChainParams::HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime,
+        const int utxoFromBlockHeight, const uint32_t utxoFromBlockTime) const
+{
+    // before stake modifier V2, the age required was 60 * 60 (1 hour) / not required on regtest
+    if (!IsStakeModifierV2(contextHeight))
+        return (NetworkID() == CBaseChainParams::REGTEST || (utxoFromBlockTime + 3600 <= contextTime));
+
+    // after stake modifier V2, we require the utxo to be nStakeMinDepth deep in the chain
+    return (contextHeight - utxoFromBlockHeight >= nStakeMinDepth);
+}
+
 class CMainParams : public CChainParams
 {
 public:
@@ -163,6 +175,10 @@ public:
         consensus.nPivxBadBlocknBits = 0; // Skip nBit validation of Block 259201 per PR #915
         consensus.nStakeMinAge = 8 * 60 * 60;
         consensus.nStakeMinAgeV2 = 60 * 60;   // PIVX: 1 hour
+        consensus.nStakeMinDepth = 600;
+        consensus.nFutureTimeDriftPoW = 7200;
+        consensus.nFutureTimeDriftPoS = 180;
+        consensus.nBlockStakeModifierlV2 = 1967000;
 
         // Public coin spend enforcement
         consensus.nPublicZCSpends = 900000;
@@ -258,6 +274,7 @@ public:
     {
         return data;
     }
+
 };
 static CMainParams mainParams;
 
@@ -314,7 +331,8 @@ public:
 
         // Public coin spend enforcement
         consensus.nPublicZCSpends = 1106100;
-
+        consensus.nStakeMinDepth = 600;
+        consensus.nBlockStakeModifierlV2 = 1967000;
         // Fake Serial Attack
         consensus.nFakeSerialBlockheightEnd = -1;
         consensus.nSupplyBeforeFakeSerial = 0;
@@ -408,6 +426,8 @@ public:
 
         // Public coin spend enforcement
         consensus.nPublicZCSpends = 350;
+        consensus.nStakeMinDepth = 0;
+        consensus.nBlockStakeModifierlV2 = std::numeric_limits<int>::max(); // max integer value (never switch on regtest)
 
         // Fake Serial Attack
         consensus.nFakeSerialBlockheightEnd = -1;
@@ -489,7 +509,6 @@ public:
     virtual void setSkipProofOfWorkCheck(bool afSkipProofOfWorkCheck) { consensus.fSkipProofOfWorkCheck = afSkipProofOfWorkCheck; }
 };
 static CUnitTestParams unitTestParams;
-
 
 static CChainParams* pCurrentParams = nullptr;
 

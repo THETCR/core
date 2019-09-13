@@ -101,17 +101,17 @@ public:
     /** Number of confirmation recommended for accepting a transaction */
     static const int RecommendedNumConfirmations = 6;
 
-    TransactionRecord() : hash(), time(0), type(Other), address(""), debit(0), credit(0), idx(0)
+    TransactionRecord(unsigned int size) : hash(), time(0), type(Other), address(""), debit(0), credit(0), size(size), idx(0)
     {
     }
 
-    TransactionRecord(uint256 hash, qint64 time) : hash(std::move(hash)), time(time), type(Other), address(""), debit(0),
-                                                   credit(0), idx(0)
+    TransactionRecord(uint256 hash, qint64 time, unsigned int size) : hash(std::move(hash)), time(time), type(Other), address(""), debit(0),
+                                                   credit(0), size(size), idx(0)
     {
     }
 
-    TransactionRecord(uint256 hash, qint64 time, Type type, std::string  address, const CAmount& debit, const CAmount& credit) : hash(std::move(hash)), time(time), type(type), address(std::move(address)), debit(debit), credit(credit),
-                                                                                                                                       idx(0)
+    TransactionRecord(uint256 hash, qint64 time, unsigned int size, Type type, const std::string& address, const CAmount& debit, const CAmount& credit) : hash(std::move(hash)), time(time), type(type), address(std::move(address)), debit(debit), credit(credit),
+                                                                                                                                       size(size), idx(0)
     {
     }
 
@@ -128,6 +128,7 @@ public:
     std::string address;
     CAmount debit;
     CAmount credit;
+    unsigned int size;
     /**@}*/
 
     /** Subtransaction index, for sort key */
@@ -152,6 +153,10 @@ public:
     /** Return whether a status update is needed.
      */
     bool statusUpdateNeeded();
+
+    /** Return transaction status
+     */
+    std::string statusToString();
 };
 
 #endif // BITCOIN_QT_TRANSACTIONRECORD_H

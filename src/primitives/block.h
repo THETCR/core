@@ -12,8 +12,6 @@
 #include "serialize.h"
 #include "uint256.h"
 
-
-
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE_CURRENT = 2000000;
 static const unsigned int MAX_BLOCK_SIZE_LEGACY = 1000000;
@@ -29,7 +27,7 @@ class CBlockHeader
 {
 public:
     // header
-    static const int32_t CURRENT_VERSION=9;     // Version 9 supports CLTV activation
+    static const int32_t CURRENT_VERSION=10;     //!> Version 10 supports V2 Stake Modifiers
     int32_t nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;

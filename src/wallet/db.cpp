@@ -265,8 +265,9 @@ CDB::CDB(const std::string& strFilename, const char* pszMode) : pdb(nullptr), ac
                 delete pdb;
                 pdb = nullptr;
                 --bitdb.mapFileUseCount[strFile];
+                std::string tempCopy(strFile);
                 strFile = "";
-                throw std::runtime_error(strprintf("CDB : Error %d, can't open database %s", ret, strFile));
+                throw std::runtime_error(strprintf("CDB : Error %d, can't open database %s", ret, tempCopy));
             }
 
             if (fCreate && !Exists(std::string("version"))) {

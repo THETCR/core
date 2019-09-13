@@ -636,3 +636,6 @@ TRANSLATIONS += src/qt/locale/wispr_bg.ts \
                 src/qt/locale/wispr_vi.ts \
                 src/qt/locale/wispr_zh_CN.ts \
                 src/qt/locale/wispr_zh_TW.ts
+
+DISTFILES += \
+    README.md

@@ -44,7 +44,6 @@ public:
 private:
     Ui::ZWspControlDialog *ui;
     WalletModel* model;
-    PrivacyDialog* privacyDialog;
 
     void updateList();
     void updateLabels();

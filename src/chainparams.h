@@ -100,7 +100,16 @@ public:
     int64_t IntervalV2() const {
         return consensus.nTargetTimespanV2 / consensus.nTargetSpacingV2;
     }
+        /** returns the coinbase maturity **/
     int COINBASE_MATURITY() const { return consensus.nMaturity; }
+        /** returns the coinstake maturity (min depth required) **/
+    int COINSTAKE_MIN_DEPTH() const { return nStakeMinDepth; }
+    bool HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime, const int utxoFromBlockHeight, const uint32_t utxoFromBlockTime) const;
+
+    /** returns the max future time (and drift in seconds) allowed for a block in the future **/
+    int FutureBlockTimeDrift(const bool isPoS) const { return isPoS ? nFutureTimeDriftPoS : nFutureTimeDriftPoW; }
+    uint32_t MaxFutureBlockTime(uint32_t time, const bool isPoS) const { return time + FutureBlockTimeDrift(isPoS); }
+
     CAmount MaxMoneyOut() const { return consensus.nMaxMoneyOut; }
     /** The masternode count that we will allow the see-saw reward payments to be off by */
     int MasternodeCountDrift() const { return consensus.nMasternodeCountDrift; }
@@ -149,6 +158,7 @@ public:
     int Zerocoin_StartTime() const { return consensus.nZerocoinStartTime; }
     int Block_Enforce_Invalid() const { return consensus.nBlockEnforceInvalidUTXO; }
     int Zerocoin_Block_V2_Start() const { return consensus.nBlockZerocoinV2; }
+    bool IsStakeModifierV2(const int nHeight) const { return nHeight >= nBlockStakeModifierlV2; }
 
     // fake serial attack
     int Zerocoin_Block_EndFakeSerial() const { return consensus.nFakeSerialBlockheightEnd; }
@@ -193,7 +203,14 @@ protected:
     std::string strObfuscationPoolDummyAddress;
     int64_t nStartMasternodePayments;
     std::string zerocoinModulus;
+    int nBlockStakeModifierlV2;
+    int nMaturity;
+    int nStakeMinDepth;
+    int nFutureTimeDriftPoW;
+    int nFutureTimeDriftPoS;
 
+    int nModifierUpdateBlock;
+    CAmount nMaxMoneyOut;
 
 };
 

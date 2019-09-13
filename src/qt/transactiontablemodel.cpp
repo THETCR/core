@@ -70,6 +70,7 @@ public:
      * this is sorted by sha256.
      */
     QList<TransactionRecord> cachedWallet;
+    bool hasZcTxes = false;
 
     /* Query entire wallet anew from core.
      */
@@ -79,10 +80,26 @@ public:
         cachedWallet.clear();
         {
             LOCK2(cs_main, wallet->cs_wallet);
-            for (std::map<uint256, CWalletTx>::iterator it = wallet->mapWallet.begin(); it != wallet->mapWallet.end(); ++it) {
-                if (TransactionRecord::showTransaction(it->second))
-                    cachedWallet.append(TransactionRecord::decomposeTransaction(wallet, it->second));
+            for (auto it = wallet->mapWallet.begin(); it != wallet->mapWallet.end(); ++it) {
+                if (TransactionRecord::showTransaction(it->second)) {
+                    QList<TransactionRecord> records = TransactionRecord::decomposeTransaction(wallet, it->second);
+                    for (const TransactionRecord& record : records) {
+                        updateHasZcTxesIfNeeded(record);
+                        if (hasZcTxes) break;
+                    }
+                    cachedWallet.append(records);
+                }
             }
+        }
+    }
+
+    void updateHasZcTxesIfNeeded(const TransactionRecord& record) {
+        if (hasZcTxes) return;
+        if (record.type == TransactionRecord::ZerocoinMint ||
+            record.type == TransactionRecord::ZerocoinSpend ||
+            record.type == TransactionRecord::ZerocoinSpend_Change_zPiv ||
+            record.type == TransactionRecord::ZerocoinSpend_FromMe) {
+            hasZcTxes = true;
         }
     }
 
@@ -138,6 +155,7 @@ public:
                     int insert_idx = lowerIndex;
                     for (const TransactionRecord& rec: toInsert) {
                         cachedWallet.insert(insert_idx, rec);
+                        updateHasZcTxesIfNeeded(rec);
                         insert_idx += 1;
                     }
                     parent->endInsertRows();
@@ -164,6 +182,11 @@ public:
     int size()
     {
         return cachedWallet.size();
+    }
+
+    bool containsZcTxes()
+    {
+        return hasZcTxes;
     }
 
     TransactionRecord* index(int idx)
@@ -240,6 +263,8 @@ void TransactionTableModel::updateTransaction(const QString& hash, int status, b
     updated.SetHex(hash.toStdString());
 
     priv->updateWallet(updated, status, showTransaction);
+
+    emit txArrived(hash);
 }
 
 void TransactionTableModel::updateConfirmations()
@@ -262,6 +287,14 @@ int TransactionTableModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return columns.length();
+}
+
+int TransactionTableModel::size() const{
+    return priv->size();
+}
+
+bool TransactionTableModel::hasZcTxes() {
+    return priv->containsZcTxes();
 }
 
 QString TransactionTableModel::formatTxStatus(const TransactionRecord* wtx) const
@@ -320,10 +353,10 @@ QString TransactionTableModel::lookupAddress(const std::string& address, bool to
     QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(address));
     QString description;
     if (!label.isEmpty()) {
-        description += label;
+        description += label + QString(" ");
     }
     if (label.isEmpty() || tooltip) {
-        description += QString(" (") + QString::fromStdString(address) + QString(")");
+        description += QString::fromStdString(address);
     }
     return description;
 }
@@ -370,7 +403,6 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
         return tr("Minted Change as zWSP from zWSP Spend");
     case TransactionRecord::ZerocoinSpend_FromMe:
         return tr("Converted zWSP to WSP");
-
     default:
         return QString();
     }
@@ -392,7 +424,7 @@ QVariant TransactionTableModel::txAddressDecoration(const TransactionRecord* wtx
     case TransactionRecord::SendToAddress:
     case TransactionRecord::SendToOther:
     case TransactionRecord::ZerocoinSpend:
-        return QIcon(":/icons/tx_output");
+        return QIcon("://ic-transaction-sent");
     default:
         return QIcon(":/icons/tx_inout");
     }
@@ -425,12 +457,19 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord* wtx, b
         return QString::fromStdString(wtx->address) + watchAddress;
     case TransactionRecord::ZerocoinMint:
     case TransactionRecord::ZerocoinSpend_Change_zWsp:
-        return tr("Anonymous (zWSP Transaction)");
     case TransactionRecord::StakeZWSP:
-        return tr("Anonymous (zWSP Stake)");
-    case TransactionRecord::SendToSelf:
-    default:
-        return tr("(n/a)") + watchAddress;
+        return tr("Anonymous");
+    case TransactionRecord::SendToSelf: {
+        QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(wtx->address));
+        return label.isEmpty() ? "" : label;
+    }
+    default: {
+        if (watchAddress.isEmpty()) {
+            return tr("No information");
+        } else {
+            return tr("(n/a)") + watchAddress;
+        }
+    }
     }
 }
 
@@ -602,6 +641,8 @@ QVariant TransactionTableModel::data(const QModelIndex& index, int role) const
         return COLOR_BLACK;
     case TypeRole:
         return rec->type;
+    case SizeRole:
+        return rec->size;
     case DateRole:
         return QDateTime::fromTime_t(static_cast<uint>(rec->time));
     case WatchonlyRole:
