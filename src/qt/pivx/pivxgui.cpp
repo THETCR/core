@@ -28,9 +28,9 @@
 #include "util.h"
 
 
-const QString PIVXGUI::DEFAULT_WALLET = "~Default";
+const QString WISPRGUI::DEFAULT_WALLET = "~Default";
 
-PIVXGUI::PIVXGUI(const NetworkStyle* networkStyle, QWidget* parent) :
+WISPRGUI::WISPRGUI(const NetworkStyle* networkStyle, QWidget* parent) :
         QMainWindow(parent),
         clientModel(0){
 
@@ -156,7 +156,7 @@ PIVXGUI::PIVXGUI(const NetworkStyle* networkStyle, QWidget* parent) :
 
 }
 
-void PIVXGUI::createActions(const NetworkStyle* networkStyle){
+void WISPRGUI::createActions(const NetworkStyle* networkStyle){
     toggleHideAction = new QAction(networkStyle->getAppIcon(), tr("&Show / Hide"), this);
     toggleHideAction->setStatusTip(tr("Show or hide the main Window"));
 
@@ -172,7 +172,7 @@ void PIVXGUI::createActions(const NetworkStyle* networkStyle){
 /**
  * Here add every event connection
  */
-void PIVXGUI::connectActions() {
+void WISPRGUI::connectActions() {
     QShortcut *consoleShort = new QShortcut(this);
     consoleShort->setKey(QKeySequence(SHORT_KEY + Qt::Key_C));
     connect(consoleShort, &QShortcut::activated, [this](){
@@ -180,20 +180,20 @@ void PIVXGUI::connectActions() {
         settingsWidget->showDebugConsole();
         goToSettings();
     });
-    connect(topBar, &TopBar::showHide, this, &PIVXGUI::showHide);
-    connect(topBar, &TopBar::themeChanged, this, &PIVXGUI::changeTheme);
-    connect(settingsWidget, &SettingsWidget::showHide, this, &PIVXGUI::showHide);
-    connect(sendWidget, &SendWidget::showHide, this, &PIVXGUI::showHide);
-    connect(receiveWidget, &ReceiveWidget::showHide, this, &PIVXGUI::showHide);
-    connect(addressesWidget, &AddressesWidget::showHide, this, &PIVXGUI::showHide);
-    connect(privacyWidget, &PrivacyWidget::showHide, this, &PIVXGUI::showHide);
-    connect(masterNodesWidget, &MasterNodesWidget::showHide, this, &PIVXGUI::showHide);
-    connect(masterNodesWidget, &MasterNodesWidget::execDialog, this, &PIVXGUI::execDialog);
-    connect(settingsWidget, &SettingsWidget::execDialog, this, &PIVXGUI::execDialog);
+    connect(topBar, &TopBar::showHide, this, &WISPRGUI::showHide);
+    connect(topBar, &TopBar::themeChanged, this, &WISPRGUI::changeTheme);
+    connect(settingsWidget, &SettingsWidget::showHide, this, &WISPRGUI::showHide);
+    connect(sendWidget, &SendWidget::showHide, this, &WISPRGUI::showHide);
+    connect(receiveWidget, &ReceiveWidget::showHide, this, &WISPRGUI::showHide);
+    connect(addressesWidget, &AddressesWidget::showHide, this, &WISPRGUI::showHide);
+    connect(privacyWidget, &PrivacyWidget::showHide, this, &WISPRGUI::showHide);
+    connect(masterNodesWidget, &MasterNodesWidget::showHide, this, &WISPRGUI::showHide);
+    connect(masterNodesWidget, &MasterNodesWidget::execDialog, this, &WISPRGUI::execDialog);
+    connect(settingsWidget, &SettingsWidget::execDialog, this, &WISPRGUI::execDialog);
 }
 
 
-void PIVXGUI::createTrayIcon(const NetworkStyle* networkStyle) {
+void WISPRGUI::createTrayIcon(const NetworkStyle* networkStyle) {
 #ifndef Q_OS_MAC
     trayIcon = new QSystemTrayIcon(this);
     QString toolTip = tr("PIVX Core client") + " " + networkStyle->getTitleAddText();
@@ -205,7 +205,7 @@ void PIVXGUI::createTrayIcon(const NetworkStyle* networkStyle) {
 }
 
 //
-PIVXGUI::~PIVXGUI() {
+WISPRGUI::~WISPRGUI() {
     // Unsubscribe from notifications from core
     unsubscribeFromCoreSignals();
 
@@ -219,13 +219,13 @@ PIVXGUI::~PIVXGUI() {
 
 
 /** Get restart command-line parameters and request restart */
-void PIVXGUI::handleRestart(QStringList args){
+void WISPRGUI::handleRestart(QStringList args){
     if (!ShutdownRequested())
         emit requestedRestart(args);
 }
 
 
-void PIVXGUI::setClientModel(ClientModel* clientModel) {
+void WISPRGUI::setClientModel(ClientModel* clientModel) {
     this->clientModel = clientModel;
     if(this->clientModel) {
 
@@ -262,7 +262,7 @@ void PIVXGUI::setClientModel(ClientModel* clientModel) {
     }
 }
 
-void PIVXGUI::createTrayIconMenu() {
+void WISPRGUI::createTrayIconMenu() {
 #ifndef Q_OS_MAC
     // return if trayIcon is unset (only on non-Mac OSes)
     if (!trayIcon)
@@ -291,7 +291,7 @@ void PIVXGUI::createTrayIconMenu() {
 }
 
 #ifndef Q_OS_MAC
-void PIVXGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
+void WISPRGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::Trigger) {
         // Click on system tray icon triggers show/hide of the main window
@@ -300,7 +300,7 @@ void PIVXGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
 }
 #endif
 
-void PIVXGUI::changeEvent(QEvent* e)
+void WISPRGUI::changeEvent(QEvent* e)
 {
     QMainWindow::changeEvent(e);
 #ifndef Q_OS_MAC // Ignored on Mac
@@ -316,7 +316,7 @@ void PIVXGUI::changeEvent(QEvent* e)
 #endif
 }
 
-void PIVXGUI::closeEvent(QCloseEvent* event)
+void WISPRGUI::closeEvent(QCloseEvent* event)
 {
 #ifndef Q_OS_MAC // Ignored on Mac
     if (clientModel && clientModel->getOptionsModel()) {
@@ -329,7 +329,7 @@ void PIVXGUI::closeEvent(QCloseEvent* event)
 }
 
 
-void PIVXGUI::messageInfo(const QString& text){
+void WISPRGUI::messageInfo(const QString& text){
     if(!this->snackBar) this->snackBar = new SnackBar(this, this);
     this->snackBar->setText(text);
     this->snackBar->resize(this->width(), snackBar->height());
@@ -337,7 +337,7 @@ void PIVXGUI::messageInfo(const QString& text){
 }
 
 
-void PIVXGUI::message(const QString& title, const QString& message, unsigned int style, bool* ret) {
+void WISPRGUI::message(const QString& title, const QString& message, unsigned int style, bool* ret) {
     QString strTitle =  tr("PIVX Core"); // default title
     // Default to information icon
     int nNotifyIcon = Notificator::Information;
@@ -395,7 +395,7 @@ void PIVXGUI::message(const QString& title, const QString& message, unsigned int
     }
 }
 
-bool PIVXGUI::openStandardDialog(QString title, QString body, QString okBtn, QString cancelBtn){
+bool WISPRGUI::openStandardDialog(QString title, QString body, QString okBtn, QString cancelBtn){
     DefaultDialog *dialog;
     if (isVisible()) {
         showHide(true);
@@ -417,7 +417,7 @@ bool PIVXGUI::openStandardDialog(QString title, QString body, QString okBtn, QSt
 }
 
 
-void PIVXGUI::showNormalIfMinimized(bool fToggleHidden) {
+void WISPRGUI::showNormalIfMinimized(bool fToggleHidden) {
     if (!clientModel)
         return;
     // activateWindow() (sometimes) helps with keyboard focus on Windows
@@ -434,11 +434,11 @@ void PIVXGUI::showNormalIfMinimized(bool fToggleHidden) {
         hide();
 }
 
-void PIVXGUI::toggleHidden() {
+void WISPRGUI::toggleHidden() {
     showNormalIfMinimized(true);
 }
 
-void PIVXGUI::detectShutdown() {
+void WISPRGUI::detectShutdown() {
     if (ShutdownRequested()) {
         if (rpcConsole)
             rpcConsole->hide();
@@ -446,45 +446,45 @@ void PIVXGUI::detectShutdown() {
     }
 }
 
-void PIVXGUI::goToDashboard(){
+void WISPRGUI::goToDashboard(){
     if(stackedContainer->currentWidget() != dashboard){
         stackedContainer->setCurrentWidget(dashboard);
         topBar->showBottom();
     }
 }
 
-void PIVXGUI::goToSend(){
+void WISPRGUI::goToSend(){
     showTop(sendWidget);
 }
 
-void PIVXGUI::goToAddresses(){
+void WISPRGUI::goToAddresses(){
     showTop(addressesWidget);
 }
 
-void PIVXGUI::goToPrivacy(){
+void WISPRGUI::goToPrivacy(){
     showTop(privacyWidget);
 }
 
-void PIVXGUI::goToMasterNodes(){
+void WISPRGUI::goToMasterNodes(){
     showTop(masterNodesWidget);
 }
 
-void PIVXGUI::goToSettings(){
+void WISPRGUI::goToSettings(){
     showTop(settingsWidget);
 }
 
-void PIVXGUI::goToReceive(){
+void WISPRGUI::goToReceive(){
     showTop(receiveWidget);
 }
 
-void PIVXGUI::showTop(QWidget* view){
+void WISPRGUI::showTop(QWidget* view){
     if(stackedContainer->currentWidget() != view){
         stackedContainer->setCurrentWidget(view);
         topBar->showTop();
     }
 }
 
-void PIVXGUI::changeTheme(bool isLightTheme){
+void WISPRGUI::changeTheme(bool isLightTheme){
 
     QString css = GUIUtil::loadStyleSheet();
     this->setStyleSheet(css);
@@ -496,7 +496,7 @@ void PIVXGUI::changeTheme(bool isLightTheme){
     updateStyle(this);
 }
 
-void PIVXGUI::resizeEvent(QResizeEvent* event){
+void WISPRGUI::resizeEvent(QResizeEvent* event){
     // Parent..
     QMainWindow::resizeEvent(event);
     // background
@@ -505,11 +505,11 @@ void PIVXGUI::resizeEvent(QResizeEvent* event){
     emit windowResizeEvent(event);
 }
 
-bool PIVXGUI::execDialog(QDialog *dialog, int xDiv, int yDiv){
+bool WISPRGUI::execDialog(QDialog *dialog, int xDiv, int yDiv){
     return openDialogWithOpaqueBackgroundY(dialog, this);
 }
 
-void PIVXGUI::showHide(bool show){
+void WISPRGUI::showHide(bool show){
     if(!op) op = new QLabel(this);
     if(!show){
         op->setVisible(false);
@@ -536,11 +536,11 @@ void PIVXGUI::showHide(bool show){
     }
 }
 
-int PIVXGUI::getNavWidth(){
+int WISPRGUI::getNavWidth(){
     return this->navMenu->width();
 }
 
-void PIVXGUI::openFAQ(int section){
+void WISPRGUI::openFAQ(int section){
     showHide(true);
     SettingsFaqWidget* dialog = new SettingsFaqWidget(this);
     if (section > 0) dialog->setSection(section);
@@ -550,7 +550,7 @@ void PIVXGUI::openFAQ(int section){
 
 
 #ifdef ENABLE_WALLET
-bool PIVXGUI::addWallet(const QString& name, WalletModel* walletModel)
+bool WISPRGUI::addWallet(const QString& name, WalletModel* walletModel)
 {
     // Single wallet supported for now..
     if(!stackedContainer || !clientModel || !walletModel)
@@ -571,13 +571,13 @@ bool PIVXGUI::addWallet(const QString& name, WalletModel* walletModel)
     settingsWidget->setWalletModel(walletModel);
 
     // Connect actions..
-    connect(privacyWidget, &PrivacyWidget::message, this, &PIVXGUI::message);
-    connect(masterNodesWidget, &MasterNodesWidget::message, this, &PIVXGUI::message);
-    connect(topBar, &TopBar::message, this, &PIVXGUI::message);
-    connect(sendWidget, &SendWidget::message,this, &PIVXGUI::message);
-    connect(receiveWidget, &ReceiveWidget::message,this, &PIVXGUI::message);
-    connect(addressesWidget, &AddressesWidget::message,this, &PIVXGUI::message);
-    connect(settingsWidget, &SettingsWidget::message, this, &PIVXGUI::message);
+    connect(privacyWidget, &PrivacyWidget::message, this, &WISPRGUI::message);
+    connect(masterNodesWidget, &MasterNodesWidget::message, this, &WISPRGUI::message);
+    connect(topBar, &TopBar::message, this, &WISPRGUI::message);
+    connect(sendWidget, &SendWidget::message,this, &WISPRGUI::message);
+    connect(receiveWidget, &ReceiveWidget::message,this, &WISPRGUI::message);
+    connect(addressesWidget, &AddressesWidget::message,this, &WISPRGUI::message);
+    connect(settingsWidget, &SettingsWidget::message, this, &WISPRGUI::message);
 
     // Pass through transaction notifications
     connect(dashboard, SIGNAL(incomingTransaction(QString, int, CAmount, QString, QString)), this, SLOT(incomingTransaction(QString, int, CAmount, QString, QString)));
@@ -585,16 +585,16 @@ bool PIVXGUI::addWallet(const QString& name, WalletModel* walletModel)
     return true;
 }
 
-bool PIVXGUI::setCurrentWallet(const QString& name) {
+bool WISPRGUI::setCurrentWallet(const QString& name) {
     // Single wallet supported.
     return true;
 }
 
-void PIVXGUI::removeAllWallets() {
+void WISPRGUI::removeAllWallets() {
     // Single wallet supported.
 }
 
-void PIVXGUI::incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address) {
+void WISPRGUI::incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address) {
     // Only send notifications when not disabled
     if(!bdisableSystemnotifications){
         // On new transaction, make an info balloon
@@ -616,7 +616,7 @@ void PIVXGUI::incomingTransaction(const QString& date, int unit, const CAmount& 
 #endif // ENABLE_WALLET
 
 
-static bool ThreadSafeMessageBox(PIVXGUI* gui, const std::string& message, const std::string& caption, unsigned int style)
+static bool ThreadSafeMessageBox(WISPRGUI* gui, const std::string& message, const std::string& caption, unsigned int style)
 {
     bool modal = (style & CClientUIInterface::MODAL);
     // The SECURE flag has no effect in the Qt GUI.
@@ -635,13 +635,13 @@ static bool ThreadSafeMessageBox(PIVXGUI* gui, const std::string& message, const
 }
 
 
-void PIVXGUI::subscribeToCoreSignals()
+void WISPRGUI::subscribeToCoreSignals()
 {
     // Connect signals to client
     uiInterface.ThreadSafeMessageBox.connect(boost::bind(ThreadSafeMessageBox, this, _1, _2, _3));
 }
 
-void PIVXGUI::unsubscribeFromCoreSignals()
+void WISPRGUI::unsubscribeFromCoreSignals()
 {
     // Disconnect signals from client
     uiInterface.ThreadSafeMessageBox.disconnect(boost::bind(ThreadSafeMessageBox, this, _1, _2, _3));

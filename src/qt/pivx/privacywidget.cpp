@@ -17,7 +17,7 @@
 #define DECORATION_SIZE 65
 #define NUM_ITEMS 3
 
-PrivacyWidget::PrivacyWidget(PIVXGUI* parent) :
+PrivacyWidget::PrivacyWidget(WISPRGUI* parent) :
     PWidget(parent),
     ui(new Ui::PrivacyWidget)
 {

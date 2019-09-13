@@ -16,11 +16,8 @@
 #include "zwspchain.h"
 
 // v1 modifier interval.
-static const int64_t OLD_MODIFIER_INTERVAL = 2087;
+//static const int64_t OLD_MODIFIER_INTERVAL = 2087;
 
-    }
-    return Params().StakeMinAge();
-}
 // Hard checkpoints of stake modifiers to ensure they are deterministic
 static std::map<int, unsigned int> mapStakeModifierCheckpoints =
         boost::assign::map_list_of(0, 0xfd11f4e7u);
@@ -342,7 +339,7 @@ bool GetHashProofOfStake(const CBlockIndex* pindexPrev, CStakeInput* stake, cons
         LogPrint("staking", "%s :{ nStakeModifier=%s\n"
                             "nStakeModifierHeight=%s\n"
                             "}\n",
-            __func__, HexStr(modifier_ss), ((stake->IsZPIV()) ? "Not available" : std::to_string(stake->getStakeModifierHeight())));
+            __func__, HexStr(modifier_ss), ((stake->IsZWSP()) ? "Not available" : std::to_string(stake->getStakeModifierHeight())));
     }
     return true;
 }
@@ -459,7 +456,7 @@ bool initStakeInput(const CBlock block, std::unique_ptr<CStakeInput>& stake, int
 }
 
 // Check kernel hash target and coinstake signature
-bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::unique_ptr<CStakeInput>& stake, int nPreviousBlockHeight)
+bool CheckProofOfStake(const CBlock& block, uint256& hashProofOfStake, std::unique_ptr<CStakeInput>& stake, int nPreviousBlockHeight)
 {
     // Initialize the stake object
     if(!initStakeInput(block, stake, nPreviousBlockHeight))

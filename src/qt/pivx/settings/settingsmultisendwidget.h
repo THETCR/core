@@ -10,7 +10,7 @@
 #include "qt/pivx/pwidget.h"
 #include "qt/pivx/furabstractlistitemdelegate.h"
 
-class PIVXGUI;
+class WISPRGUI;
 
 namespace Ui {
 class SettingsMultisendWidget;

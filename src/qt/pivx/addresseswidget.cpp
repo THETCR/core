@@ -57,7 +57,7 @@ public:
 
 #include "qt/pivx/moc_addresseswidget.cpp"
 
-AddressesWidget::AddressesWidget(PIVXGUI* parent) :
+AddressesWidget::AddressesWidget(WISPRGUI* parent) :
     PWidget(parent),
     ui(new Ui::AddressesWidget)
 {

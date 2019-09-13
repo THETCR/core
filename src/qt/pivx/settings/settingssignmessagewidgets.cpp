@@ -19,7 +19,7 @@
 
 #include <QClipboard>
 
-SettingsSignMessageWidgets::SettingsSignMessageWidgets(PIVXGUI* _window, QWidget *parent) :
+SettingsSignMessageWidgets::SettingsSignMessageWidgets(WISPRGUI* _window, QWidget *parent) :
     PWidget(_window, parent),
     ui(new Ui::SettingsSignMessageWidgets)
 {

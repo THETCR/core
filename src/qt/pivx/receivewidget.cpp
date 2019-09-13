@@ -52,7 +52,7 @@ public:
 
 #include "qt/pivx/moc_receivewidget.cpp"
 
-ReceiveWidget::ReceiveWidget(PIVXGUI* parent) :
+ReceiveWidget::ReceiveWidget(WISPRGUI* parent) :
     PWidget(parent),
     ui(new Ui::ReceiveWidget)
 {

@@ -12,7 +12,7 @@
 #include "qt/pivx/tooltipmenu.h"
 #include <QTimer>
 
-class PIVXGUI;
+class WISPRGUI;
 
 namespace Ui {
 class MasterNodesWidget;
@@ -28,7 +28,7 @@ class MasterNodesWidget : public PWidget
 
 public:
 
-    explicit MasterNodesWidget(PIVXGUI *parent = nullptr);
+    explicit MasterNodesWidget(WISPRGUI *parent = nullptr);
     ~MasterNodesWidget();
 
     void loadWalletModel() override;

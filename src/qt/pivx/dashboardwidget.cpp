@@ -25,7 +25,7 @@
 
 #include "moc_dashboardwidget.cpp"
 
-DashboardWidget::DashboardWidget(PIVXGUI* parent) :
+DashboardWidget::DashboardWidget(WISPRGUI* parent) :
     PWidget(parent),
     ui(new Ui::DashboardWidget)
 {

@@ -103,11 +103,11 @@ public:
         /** returns the coinbase maturity **/
     int COINBASE_MATURITY() const { return consensus.nMaturity; }
         /** returns the coinstake maturity (min depth required) **/
-    int COINSTAKE_MIN_DEPTH() const { return nStakeMinDepth; }
+    int COINSTAKE_MIN_DEPTH() const { return consensus.nStakeMinDepth; }
     bool HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime, const int utxoFromBlockHeight, const uint32_t utxoFromBlockTime) const;
 
     /** returns the max future time (and drift in seconds) allowed for a block in the future **/
-    int FutureBlockTimeDrift(const bool isPoS) const { return isPoS ? nFutureTimeDriftPoS : nFutureTimeDriftPoW; }
+    int FutureBlockTimeDrift(const bool isPoS) const { return isPoS ? consensus.nFutureTimeDriftPoS : consensus.nFutureTimeDriftPoW; }
     uint32_t MaxFutureBlockTime(uint32_t time, const bool isPoS) const { return time + FutureBlockTimeDrift(isPoS); }
 
     CAmount MaxMoneyOut() const { return consensus.nMaxMoneyOut; }
@@ -158,7 +158,7 @@ public:
     int Zerocoin_StartTime() const { return consensus.nZerocoinStartTime; }
     int Block_Enforce_Invalid() const { return consensus.nBlockEnforceInvalidUTXO; }
     int Zerocoin_Block_V2_Start() const { return consensus.nBlockZerocoinV2; }
-    bool IsStakeModifierV2(const int nHeight) const { return nHeight >= nBlockStakeModifierlV2; }
+    bool IsStakeModifierV2(const int nHeight) const { return nHeight >= consensus.nBlockStakeModifierlV2; }
 
     // fake serial attack
     int Zerocoin_Block_EndFakeSerial() const { return consensus.nFakeSerialBlockheightEnd; }
@@ -190,27 +190,10 @@ protected:
     std::vector<CAddress> vFixedSeeds;
     bool fMiningRequiresPeers;
     bool fDefaultConsistencyChecks;
-    bool fDefaultCheckMemPool;
     bool fRequireStandard;
     bool fMineBlocksOnDemand;
     bool fTestnetToBeDeprecatedFieldRPC;
     bool fHeadersFirstSyncingActive;
-    int nPoolMaxTransactions;
-    std::string strSporkKey;
-    std::string strSporkKeyOld;
-    int64_t nEnforceNewSporkKey;
-    int64_t nRejectOldSporkKey;
-    std::string strObfuscationPoolDummyAddress;
-    int64_t nStartMasternodePayments;
-    std::string zerocoinModulus;
-    int nBlockStakeModifierlV2;
-    int nMaturity;
-    int nStakeMinDepth;
-    int nFutureTimeDriftPoW;
-    int nFutureTimeDriftPoS;
-
-    int nModifierUpdateBlock;
-    CAmount nMaxMoneyOut;
 
 };
 

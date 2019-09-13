@@ -7,7 +7,7 @@
 
 #include <QWidget>
 
-class PIVXGUI;
+class WISPRGUI;
 
 namespace Ui {
 class NavMenuWidget;
@@ -18,7 +18,7 @@ class NavMenuWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit NavMenuWidget(PIVXGUI* mainWindow, QWidget *parent = nullptr);
+    explicit NavMenuWidget(WISPRGUI* mainWindow, QWidget *parent = nullptr);
     ~NavMenuWidget();
 
 public slots:
@@ -35,7 +35,7 @@ private slots:
     void updateButtonStyles();
 private:
     Ui::NavMenuWidget *ui;
-    PIVXGUI* window;
+    WISPRGUI* window;
     QList<QWidget*> btns;
 
     void connectActions();

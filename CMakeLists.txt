@@ -398,15 +398,15 @@ set(BITCOIN_CRYPTO_SOURCES
         ./src/crypto/scrypt.cpp
         ./src/crypto/ripemd160.cpp
         ./src/crypto/aes_helper.c
-        ./src/crypto/common
-        ./src/crypto/sha256
-        ./src/crypto/sha512
-        ./src/crypto/hmac_sha256
-        ./src/crypto/rfc6979_hmac_sha256
-        ./src/crypto/hmac_sha512
-        ./src/crypto/scrypt
-        ./src/crypto/sha1
-        ./src/crypto/ripemd160
+        ./src/crypto/common.h
+        ./src/crypto/sha256.h
+        ./src/crypto/sha512.h
+        ./src/crypto/hmac_sha256.h
+        ./src/crypto/rfc6979_hmac_sha256.h
+        ./src/crypto/hmac_sha512.h
+        ./src/crypto/scrypt.h
+        ./src/crypto/sha1.h
+        ./src/crypto/ripemd160.h
         ./src/crypto/sph_types.h
         )
 add_library(BITCOIN_CRYPTO_A STATIC ${BITCOIN_CRYPTO_SOURCES})

@@ -22,7 +22,7 @@
 #include "guiinterface.h"
 
 
-TopBar::TopBar(PIVXGUI* _mainWindow, QWidget *parent) :
+TopBar::TopBar(WISPRGUI* _mainWindow, QWidget *parent) :
     PWidget(_mainWindow, parent),
     ui(new Ui::TopBar)
 {

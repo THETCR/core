@@ -10,7 +10,7 @@
 #include <QString>
 #include "qt/pivx/prunnable.h"
 
-class PIVXGUI;
+class WISPRGUI;
 class ClientModel;
 class WalletModel;
 
@@ -22,13 +22,13 @@ class PWidget : public QWidget, public Runnable
 {
     Q_OBJECT
 public:
-    explicit PWidget(PIVXGUI* _window = nullptr, QWidget *parent = nullptr);
+    explicit PWidget(WISPRGUI* _window = nullptr, QWidget *parent = nullptr);
     explicit PWidget(PWidget *parent = nullptr);
 
     void setClientModel(ClientModel* model);
     void setWalletModel(WalletModel* model);
 
-    PIVXGUI* getWindow() { return this->window; }
+    WISPRGUI* getWindow() { return this->window; }
 
     void run(int type) override;
     void onError(int type, QString error) override;
@@ -43,7 +43,7 @@ protected slots:
     void onChangeTheme(bool isLightTheme, QString &theme);
 
 protected:
-    PIVXGUI* window = nullptr;
+    WISPRGUI* window = nullptr;
     ClientModel* clientModel = nullptr;
     WalletModel* walletModel = nullptr;
 

@@ -252,8 +252,7 @@ bool CSporkManager::SetPrivKey(std::string strPrivKey)
 
     Sign(msg);
 
-    bool fRequireNew = GetTime() >= Params().NewSporkStart();
-    if (CheckSignature(msg, fRequireNew)) {
+    if (CheckSignature(msg, true)) {
         LogPrintf("CSporkManager::SetPrivKey - Successfully initialized as spork signer\n");
         return true;
     } else {

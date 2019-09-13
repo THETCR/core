@@ -117,6 +117,24 @@ AC_DEFUN([BITCOIN_QT_CONFIGURE],[
   if test "x$bitcoin_cv_static_qt" = xyes; then
     _BITCOIN_QT_FIND_STATIC_PLUGINS
     AC_DEFINE(QT_STATICPLUGIN, 1, [Define this symbol if qt plugins are static])
+    AC_CACHE_CHECK(for Qt < 5.4, bitcoin_cv_need_acc_widget,[
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+          #include <QtCore/qconfig.h>
+          #ifndef QT_VERSION
+          #  include <QtCore/qglobal.h>
+          #endif
+        ]],
+        [[
+          #if QT_VERSION >= 0x050400
+          choke
+          #endif
+        ]])],
+      [bitcoin_cv_need_acc_widget=yes],
+      [bitcoin_cv_need_acc_widget=no])
+    ])
+    if test "x$bitcoin_cv_need_acc_widget" = xyes; then
+      _BITCOIN_QT_CHECK_STATIC_PLUGINS([Q_IMPORT_PLUGIN(AccessibleFactory)], [-lqtaccessiblewidgets])
+    fi
     _BITCOIN_QT_CHECK_STATIC_PLUGINS([Q_IMPORT_PLUGIN(QMinimalIntegrationPlugin)],[-lqminimal])
     AC_DEFINE(QT_QPA_PLATFORM_MINIMAL, 1, [Define this symbol if the minimal qt platform exists])
     _BITCOIN_QT_CHECK_STATIC_PLUGINS([Q_IMPORT_PLUGIN(QSvgPlugin)],[-lqsvg])
@@ -474,6 +492,7 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS_WITHOUT_PKGCONFIG],[
   ])
 
   BITCOIN_QT_CHECK(AC_CHECK_LIB([z] ,[main],,AC_MSG_WARN([zlib not found. Assuming qt has it built-in])))
+  BITCOIN_QT_CHECK(AC_SEARCH_LIBS([jpeg_create_decompress] ,[qtjpeg jpeg],,AC_MSG_WARN([libjpeg not found. Assuming qt has it built-in])))
   if test x$bitcoin_cv_qt58 = xno; then
     BITCOIN_QT_CHECK(AC_SEARCH_LIBS([png_error] ,[qtpng png],,AC_MSG_WARN([libpng not found. Assuming qt has it built-in])))
     BITCOIN_QT_CHECK(AC_SEARCH_LIBS([pcre16_exec], [qtpcre pcre16],,AC_MSG_WARN([libpcre16 not found. Assuming qt has it built-in])))

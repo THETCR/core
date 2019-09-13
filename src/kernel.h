@@ -14,8 +14,8 @@
 // Supposed to be 2^n-1
 static const int STAKE_TIMESTAMP_MASK = 15;
 // MODIFIER_INTERVAL: time to elapse before new modifier is computed
-static const unsigned int MODIFIER_INTERVALV1 = 10 * 60;
-static const unsigned int MODIFIER_INTERVALV2 = 60;
+static const unsigned int OLD_MODIFIER_INTERVAL = 10 * 60;
+static const unsigned int MODIFIER_INTERVAL = 60;
 extern unsigned int getIntervalVersion();
 
 // MODIFIER_INTERVAL_RATIO:
@@ -24,7 +24,6 @@ static const int MODIFIER_INTERVAL_RATIO = 3;
 
 // Compute the hash modifier for proof-of-stake
 bool GetKernelStakeModifier(const uint256& hashBlockFrom, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake);
-uint256 ComputeStakeModifier(const CBlockIndex* pindexPrev, const uint256& kernel);
 bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeModifier, bool& fGeneratedStakeModifier);
 uint256 ComputeStakeModifier(const CBlockIndex* pindexPrev, const uint256& kernel);
 bool Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int nBits, unsigned int& nTimeTx, uint256& hashProofOfStake);

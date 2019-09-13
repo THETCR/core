@@ -22,7 +22,7 @@
 #include <QScrollBar>
 #include <QDataWidgetMapper>
 
-SettingsWidget::SettingsWidget(PIVXGUI* parent) :
+SettingsWidget::SettingsWidget(WISPRGUI* parent) :
     PWidget(parent),
     ui(new Ui::SettingsWidget)
 {

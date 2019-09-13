@@ -19,7 +19,7 @@
 #include "openuridialog.h"
 #include "zpivcontroldialog.h"
 
-SendWidget::SendWidget(PIVXGUI* parent) :
+SendWidget::SendWidget(WISPRGUI* parent) :
     PWidget(parent),
     ui(new Ui::send),
     coinIcon(new QPushButton()),

@@ -19,7 +19,7 @@
 
 static const int MAX_SEND_POPUP_ENTRIES = 8;
 
-class PIVXGUI;
+class WISPRGUI;
 class ClientModel;
 class WalletModel;
 class WalletModelTransaction;
@@ -34,7 +34,7 @@ class SendWidget : public PWidget
     Q_OBJECT
 
 public:
-    explicit SendWidget(PIVXGUI* parent);
+    explicit SendWidget(WISPRGUI* parent);
     ~SendWidget();
 
     void addEntry();

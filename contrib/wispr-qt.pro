@@ -24,6 +24,10 @@ DEPENDPATH += . \
               src/leveldb/table \
               src/leveldb/util \
               src/qt/forms \
+              src/qt/pivx \
+              src/qt/pivx/forms \
+              src/qt/pivx/settings \
+              src/qt/pivx/settings/forms \
               src/qt/locale \
               src/qt/test \
               src/secp256k1/include \
@@ -46,6 +50,10 @@ INCLUDEPATH += . \
                src/json \
                src/qt \
                src/qt/forms \
+               src/qt/pivx \
+               src/qt/pivx/forms \
+               src/qt/pivx/settings \
+               src/qt/pivx/settings/forms \
                src/compat \
                src/secp256k1/include \
                src/leveldb/helpers/memenv \
@@ -204,6 +212,66 @@ HEADERS += src/activemasternode.h \
            src/qt/walletmodeltransaction.h \
            src/qt/walletview.h \
            src/qt/winshutdownmonitor.h \
+           src/qt/pivx/pivxgui.h \
+           src/qt/pivx/prunnable.h \
+           src/qt/pivx/loadingdialog.h \
+           src/qt/zwspcontroldialog.h \
+           src/qt/pivx/pwidget.h \
+           src/qt/pivx/snackbar.h \
+           src/qt/pivx/navmenuwidget.h \
+           src/qt/pivx/lockunlock.h \
+           src/qt/pivx/receivedialog.h \
+           src/qt/pivx/furlistrow.h \
+           src/qt/pivx/furabstractlistitemdelegate.h \
+           src/qt/pivx/txviewholder.h \
+           src/qt/pivx/qtutils.h \
+           src/qt/pivx/expandablebutton.h \
+           src/qt/pivx/walletpassworddialog.h \
+           src/qt/pivx/topbar.h \
+           src/qt/pivx/txrow.h \
+           src/qt/pivx/addressfilterproxymodel.h \
+           src/qt/pivx/dashboardwidget.h \
+           src/qt/pivx/coincontrolpivwidget.h \
+           src/qt/pivx/addresslabelrow.h \
+           src/qt/pivx/contactdropdownrow.h \
+           src/qt/pivx/mninfodialog.h \
+           src/qt/pivx/optionbutton.h \
+           src/qt/pivx/mnmodel.h \
+           src/qt/pivx/masternodewizarddialog.h \
+           src/qt/pivx/mnrow.h \
+           src/qt/pivx/masternodeswidget.h \
+           src/qt/pivx/myaddressrow.h \
+           src/qt/pivx/contactsdropdown.h \
+           src/qt/pivx/sendchangeaddressdialog.h \
+           src/qt/pivx/sendconfirmdialog.h \
+           src/qt/pivx/sendcustomfeedialog.h \
+           src/qt/pivx/sendchangeaddressdialog.h \
+           src/qt/pivx/sendmultirow.h \
+           src/qt/pivx/send.h \
+           src/qt/pivx/addnewaddressdialog.h \
+           src/qt/pivx/addnewcontactdialog.h \
+           src/qt/pivx/requestdialog.h \
+           src/qt/pivx/receivewidget.h \
+           src/qt/pivx/tooltipmenu.h \
+           src/qt/pivx/addresseswidget.h \
+           src/qt/pivx/defaultdialog.h \
+           src/qt/pivx/denomgenerationdialog.h \
+           src/qt/pivx/privacywidget.h \
+           src/qt/pivx/settings/settingsbackupwallet.h \
+           src/qt/pivx/settings/settingsbittoolwidget.h \
+           src/qt/pivx/settings/settingsconsolewidget.h \
+           src/qt/pivx/settings/settingsdisplayoptionswidget.h \
+           src/qt/pivx/settings/settingsfaqwidget.h \
+           src/qt/pivx/settings/settingsinformationwidget.h \
+           src/qt/pivx/settings/settingsmainoptionswidget.h \
+           src/qt/pivx/settings/settingsmultisenddialog.h \
+           src/qt/pivx/settings/settingsmultisendwidget.h \
+           src/qt/pivx/settings/settingssignmessagewidgets.h \
+           src/qt/pivx/settings/settingswalletoptionswidget.h \
+           src/qt/pivx/settings/settingswalletrepairwidget.h \
+           src/qt/pivx/settings/settingswidget.h \
+           src/qt/pivx/welcomecontentwidget.h \
+           src/qt/pivx/splash.h \
            src/script/bitcoinconsensus.h \
            src/script/interpreter.h \
            src/script/script.h \
@@ -342,7 +410,57 @@ FORMS += src/qt/forms/addressbookpage.ui \
          src/qt/forms/sendcoinsdialog.ui \
          src/qt/forms/sendcoinsentry.ui \
          src/qt/forms/signverifymessagedialog.ui \
-         src/qt/forms/transactiondescdialog.ui
+         src/qt/forms/transactiondescdialog.ui \
+         src/qt/pivx/forms/loadingdialog.ui \
+         src/qt/forms/zwspcontroldialog.ui \
+         src/qt/pivx/forms/snackbar.ui \
+         src/qt/pivx/forms/navmenuwidget.ui \
+         src/qt/pivx/forms/lockunlock.ui \
+         src/qt/pivx/forms/expandablebutton.ui \
+         src/qt/pivx/forms/receivedialog.ui \
+         src/qt/pivx/forms/walletpassworddialog.ui \
+         src/qt/pivx/forms/topbar.ui \
+         src/qt/pivx/forms/txrow.ui \
+         src/qt/pivx/forms/dashboardwidget.ui \
+         src/qt/pivx/forms/coincontrolpivwidget.ui \
+         src/qt/pivx/forms/addresslabelrow.ui \
+         src/qt/pivx/forms/contactdropdownrow.ui \
+         src/qt/pivx/forms/mninfodialog.ui \
+         src/qt/pivx/forms/optionbutton.ui \
+         src/qt/pivx/forms/masternodewizarddialog.ui \
+         src/qt/pivx/forms/mnrow.ui \
+         src/qt/pivx/forms/masternodeswidget.ui \
+         src/qt/pivx/forms/myaddressrow.ui \
+         src/qt/pivx/forms/sendchangeaddressdialog.ui \
+         src/qt/pivx/forms/sendconfirmdialog.ui \
+         src/qt/pivx/forms/sendcustomfeedialog.ui \
+         src/qt/pivx/forms/sendchangeaddressdialog.ui \
+         src/qt/pivx/forms/sendmultirow.ui \
+         src/qt/pivx/forms/send.ui \
+         src/qt/pivx/forms/addnewaddressdialog.ui \
+         src/qt/pivx/forms/addnewcontactdialog.ui \
+         src/qt/pivx/forms/requestdialog.ui \
+         src/qt/pivx/forms/receivewidget.ui \
+         src/qt/pivx/forms/tooltipmenu.ui \
+         src/qt/pivx/forms/addresseswidget.ui \
+         src/qt/pivx/forms/defaultdialog.ui \
+         src/qt/pivx/forms/denomgenerationdialog.ui \
+         src/qt/pivx/forms/privacywidget.ui \
+         src/qt/pivx/settings/forms/settingsbackupwallet.ui \
+         src/qt/pivx/settings/forms/settingsbittoolwidget.ui \
+         src/qt/pivx/settings/forms/settingsconsolewidget.ui \
+         src/qt/pivx/settings/forms/settingsdisplayoptionswidget.ui \
+         src/qt/pivx/settings/forms/settingsfaqwidget.ui \
+         src/qt/pivx/settings/forms/settingsinformationwidget.ui \
+         src/qt/pivx/settings/forms/settingsmainoptionswidget.ui \
+         src/qt/pivx/settings/forms/settingsmultisenddialog.ui \
+         src/qt/pivx/settings/forms/settingsmultisendwidget.ui \
+         src/qt/pivx/settings/forms/settingssignmessagewidgets.ui \
+         src/qt/pivx/settings/forms/settingswalletoptionswidget.ui \
+         src/qt/pivx/settings/forms/settingswalletrepairwidget.ui \
+         src/qt/pivx/settings/forms/settingswidget.ui \
+         src/qt/pivx/forms/welcomecontentwidget.ui \
+         src/qt/pivx/forms/splash.ui
 SOURCES += src/activemasternode.cpp \
            src/addrman.cpp \
            src/alert.cpp \
@@ -486,6 +604,64 @@ SOURCES += src/activemasternode.cpp \
            src/qt/walletmodeltransaction.cpp \
            src/qt/walletview.cpp \
            src/qt/winshutdownmonitor.cpp \
+           src/qt/pivx/pivxgui.cpp \
+           src/qt/pivx/loadingdialog.cpp \
+           src/qt/zwspcontroldialog.cpp \
+           src/qt/pivx/pwidget.cpp \
+           src/qt/pivx/snackbar.cpp \
+           src/qt/pivx/navmenuwidget.cpp \
+           src/qt/pivx/lockunlock.cpp \
+           src/qt/pivx/receivedialog.cpp \
+           src/qt/pivx/furabstractlistitemdelegate.cpp \
+           src/qt/pivx/txviewholder.cpp \
+           src/qt/pivx/qtutils.cpp \
+           src/qt/pivx/expandablebutton.cpp \
+           src/qt/pivx/walletpassworddialog.cpp \
+           src/qt/pivx/topbar.cpp \
+           src/qt/pivx/txrow.cpp \
+           src/qt/pivx/addressfilterproxymodel.cpp \
+           src/qt/pivx/dashboardwidget.cpp \
+           src/qt/pivx/coincontrolpivwidget.cpp \
+           src/qt/pivx/addresslabelrow.cpp \
+           src/qt/pivx/contactdropdownrow.cpp \
+           src/qt/pivx/contactsdropdown.cpp \
+           src/qt/pivx/optionbutton.cpp \
+           src/qt/pivx/mninfodialog.cpp \
+           src/qt/pivx/mnmodel.cpp \
+           src/qt/pivx/masternodewizarddialog.cpp \
+           src/qt/pivx/mnrow.cpp \
+           src/qt/pivx/masternodeswidget.cpp \
+           src/qt/pivx/myaddressrow.cpp \
+           src/qt/pivx/sendchangeaddressdialog.cpp \
+           src/qt/pivx/sendconfirmdialog.cpp \
+           src/qt/pivx/sendcustomfeedialog.cpp \
+           src/qt/pivx/sendchangeaddressdialog.cpp \
+           src/qt/pivx/sendmultirow.cpp \
+           src/qt/pivx/send.cpp \
+           src/qt/pivx/addnewaddressdialog.cpp \
+           src/qt/pivx/addnewcontactdialog.cpp \
+           src/qt/pivx/requestdialog.cpp \
+           src/qt/pivx/receivewidget.cpp \
+           src/qt/pivx/tooltipmenu.cpp \
+           src/qt/pivx/addresseswidget.cpp \
+           src/qt/pivx/defaultdialog.cpp \
+           src/qt/pivx/denomgenerationdialog.cpp \
+           src/qt/pivx/privacywidget.cpp \
+           src/qt/pivx/settings/settingsbackupwallet.cpp \
+           src/qt/pivx/settings/settingsbittoolwidget.cpp \
+           src/qt/pivx/settings/settingsconsolewidget.cpp \
+           src/qt/pivx/settings/settingsdisplayoptionswidget.cpp \
+           src/qt/pivx/settings/settingsfaqwidget.cpp \
+           src/qt/pivx/settings/settingsinformationwidget.cpp \
+           src/qt/pivx/settings/settingsmainoptionswidget.cpp \
+           src/qt/pivx/settings/settingsmultisenddialog.cpp \
+           src/qt/pivx/settings/settingsmultisendwidget.cpp \
+           src/qt/pivx/settings/settingssignmessagewidgets.cpp \
+           src/qt/pivx/settings/settingswalletoptionswidget.cpp \
+           src/qt/pivx/settings/settingswalletrepairwidget.cpp \
+           src/qt/pivx/settings/settingswidget.cpp \
+           src/qt/pivx/welcomecontentwidget.cpp \
+           src/qt/pivx/splash.cpp \
            src/script/bitcoinconsensus.cpp \
            src/script/interpreter.cpp \
            src/script/script.cpp \

@@ -76,6 +76,11 @@ struct Params {
     unsigned int nPivxBadBlocknBits;
     int nStakeMinAge;
     int nStakeMinAgeV2;
+    int nBlockStakeModifierlV2;
+    int nStakeMinDepth;
+    int nFutureTimeDriftPoW;
+    int nFutureTimeDriftPoS;
+
 };
 } // namespace Consensus
 

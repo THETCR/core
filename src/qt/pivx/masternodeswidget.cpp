@@ -63,7 +63,7 @@ public:
 
 #include "qt/pivx/moc_masternodeswidget.cpp"
 
-MasterNodesWidget::MasterNodesWidget(PIVXGUI *parent) :
+MasterNodesWidget::MasterNodesWidget(WISPRGUI *parent) :
     PWidget(parent),
     ui(new Ui::MasterNodesWidget)
 {

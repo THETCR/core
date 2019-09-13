@@ -565,7 +565,7 @@ case $host in
      fi
 
      AX_CHECK_LINK_FLAG([[-Wl,-headerpad_max_install_names]], [LDFLAGS="$LDFLAGS -Wl,-headerpad_max_install_names"])
-     CPPFLAGS="$CPPFLAGS -DMAC_OSX"
+     CPPFLAGS="$CPPFLAGS -DMAC_OSX -DOBJC_OLD_DISPATCH_PROTOTYPES=0"
      OBJCXXFLAGS="$CXXFLAGS"
      ;;
    *android*)
@@ -1360,6 +1360,7 @@ if test x$have_miniupnpc = xno; then
      AC_MSG_ERROR("UPnP requested but cannot be built. use --without-miniupnpc")
   fi
   AC_MSG_RESULT(no)
+  use_upnp=no
 else
   if test x$use_upnp != xno; then
     AC_MSG_RESULT(yes)

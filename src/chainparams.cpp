@@ -123,7 +123,7 @@ bool CChainParams::HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t
         return (NetworkID() == CBaseChainParams::REGTEST || (utxoFromBlockTime + 3600 <= contextTime));
 
     // after stake modifier V2, we require the utxo to be nStakeMinDepth deep in the chain
-    return (contextHeight - utxoFromBlockHeight >= nStakeMinDepth);
+    return (contextHeight - utxoFromBlockHeight >= COINSTAKE_MIN_DEPTH());
 }
 
 class CMainParams : public CChainParams
@@ -178,7 +178,7 @@ public:
         consensus.nStakeMinDepth = 600;
         consensus.nFutureTimeDriftPoW = 7200;
         consensus.nFutureTimeDriftPoS = 180;
-        consensus.nBlockStakeModifierlV2 = 1967000;
+        consensus.nBlockStakeModifierlV2 = 950000;
 
         // Public coin spend enforcement
         consensus.nPublicZCSpends = 900000;
@@ -237,7 +237,6 @@ public:
         fMiningRequiresPeers = true;
         consensus.fAllowMinDifficultyBlocks = false;
         fDefaultConsistencyChecks = false;
-        fDefaultCheckMemPool = false;
         fRequireStandard = true;
         fMineBlocksOnDemand = false;
         consensus.fSkipProofOfWorkCheck = false;
@@ -371,7 +370,6 @@ public:
         fMiningRequiresPeers = true;
         consensus.fAllowMinDifficultyBlocks = true;
         fDefaultConsistencyChecks = false;
-        fDefaultCheckMemPool = false;
         fRequireStandard = true;
         fMineBlocksOnDemand = false;
         fTestnetToBeDeprecatedFieldRPC = true;
@@ -453,7 +451,6 @@ public:
         fMiningRequiresPeers = false;
         consensus.fAllowMinDifficultyBlocks = true;
         fDefaultConsistencyChecks = true;
-        fDefaultCheckMemPool = true;
         fRequireStandard = false;
         fMineBlocksOnDemand = true;
         consensus.fSkipProofOfWorkCheck = true;

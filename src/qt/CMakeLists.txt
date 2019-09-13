@@ -79,6 +79,56 @@ set(GUI_FORMS
         ${CMAKE_CURRENT_SOURCE_DIR}/forms/sendcoinsentry.ui
         ${CMAKE_CURRENT_SOURCE_DIR}/forms/signverifymessagedialog.ui
         ${CMAKE_CURRENT_SOURCE_DIR}/forms/transactiondescdialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/loadingdialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/forms/zwspcontroldialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/snackbar.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/navmenuwidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/lockunlock.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/expandablebutton.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/receivedialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/walletpassworddialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/topbar.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/txrow.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/dashboardwidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/coincontrolpivwidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/addresslabelrow.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/contactdropdownrow.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/mninfodialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/optionbutton.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/masternodewizarddialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/mnrow.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/masternodeswidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/myaddressrow.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/sendchangeaddressdialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/sendconfirmdialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/sendcustomfeedialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/sendchangeaddressdialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/sendmultirow.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/send.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/addnewaddressdialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/addnewcontactdialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/requestdialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/receivewidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/tooltipmenu.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/addresseswidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/defaultdialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/denomgenerationdialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/privacywidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingsbackupwallet.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingsbittoolwidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingsconsolewidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingsdisplayoptionswidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingsfaqwidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingsinformationwidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingsmainoptionswidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingsmultisenddialog.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingsmultisendwidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingssignmessagewidgets.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingswalletoptionswidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingswalletrepairwidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/forms/settingswidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/welcomecontentwidget.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/forms/splash.ui
         )
 
 SET(QT_SOURCES
@@ -139,6 +189,63 @@ SET(QT_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/walletmodel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/walletmodeltransaction.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/walletview.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/pivxgui.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/loadingdialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/pwidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/snackbar.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/navmenuwidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/lockunlock.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/receivedialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/furabstractlistitemdelegate.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/txviewholder.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/qtutils.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/expandablebutton.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/walletpassworddialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/topbar.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/txrow.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/addressfilterproxymodel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/dashboardwidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/coincontrolpivwidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/addresslabelrow.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/contactdropdownrow.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/contactsdropdown.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/optionbutton.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/mninfodialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/mnmodel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/masternodewizarddialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/mnrow.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/masternodeswidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/myaddressrow.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/sendchangeaddressdialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/sendconfirmdialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/sendcustomfeedialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/sendchangeaddressdialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/sendmultirow.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/send.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/addnewaddressdialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/addnewcontactdialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/requestdialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/receivewidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/tooltipmenu.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/addresseswidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/defaultdialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/denomgenerationdialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/privacywidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingsbackupwallet.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingsbittoolwidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingsconsolewidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingsdisplayoptionswidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingsfaqwidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingsinformationwidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingsmainoptionswidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingsmultisenddialog.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingsmultisendwidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingssignmessagewidgets.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingswalletoptionswidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingswalletrepairwidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/settings/settingswidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/welcomecontentwidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/pivx/splash.cpp
         )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
