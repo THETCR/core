@@ -43,7 +43,7 @@ public:
     CSporkMessage(SporkId nSporkID, int64_t nValue, int64_t nTimeSigned) : nSporkID(nSporkID), nValue(nValue), nTimeSigned(nTimeSigned) {}
     CSporkMessage() : nSporkID((SporkId)0), nValue(0), nTimeSigned(0) {}
 
-    uint256 GetHash() { return HashQuark(BEGIN(nSporkID), END(nTimeSigned)); }
+    uint256 GetHash() { return SerializeHash(*this); }
     bool Sign(std::string strSignKey);
     bool CheckSignature(bool fRequireNew = false);
     void Relay();
