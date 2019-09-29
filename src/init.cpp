@@ -64,7 +64,6 @@
 #include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/thread.hpp>
 #include <boost/foreach.hpp>
-#include <openssl/crypto.h>
 
 #if ENABLE_ZMQ
 #include "zmq/zmqnotificationinterface.h"
@@ -722,8 +721,14 @@ bool InitSanityCheck(void)
         InitError("Elliptic curve cryptography sanity check failure. Aborting.");
         return false;
     }
+
     if (!glibc_sanity_test() || !glibcxx_sanity_test())
         return false;
+
+    if (!Random_SanityCheck()) {
+        InitError("OS cryptographic RNG sanity check failure. Aborting.");
+        return false;
+    }
 
     return true;
 }
@@ -1023,6 +1028,7 @@ bool AppInit2()
     // ********************************************************* Step 4: application initialization: dir lock, daemonize, pidfile, debug log
 
     // Initialize elliptic curve code
+    RandomInit();
     ECC_Start();
     globalVerifyHandle.reset(new ECCVerifyHandle());
 
@@ -1053,7 +1059,6 @@ bool AppInit2()
         ShrinkDebugFile();
     LogPrintf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     LogPrintf("WISPR version %s (%s)\n", FormatFullVersion(), CLIENT_DATE);
-    LogPrintf("Using OpenSSL version %s\n", SSLeay_version(SSLEAY_VERSION));
 #ifdef ENABLE_WALLET
     LogPrintf("Using BerkeleyDB version %s\n", DbEnv::version(nullptr, nullptr, nullptr));
 #endif
@@ -1121,7 +1126,7 @@ bool AppInit2()
                     try {
                         boost::filesystem::copy_file(sourceFile, backupFile);
                         LogPrintf("Creating backup of %s -> %s\n", sourceFile, backupFile);
-                    } catch (boost::filesystem::filesystem_error& error) {
+                    } catch (const boost::filesystem::filesystem_error& error) {
                         LogPrintf("Failed to create backup %s\n", error.what());
                     }
 #else
@@ -1157,7 +1162,7 @@ bool AppInit2()
                         try {
                             boost::filesystem::remove(file.second);
                             LogPrintf("Old backup deleted: %s\n", file.second);
-                        } catch (boost::filesystem::filesystem_error& error) {
+                        } catch (const boost::filesystem::filesystem_error& error) {
                             LogPrintf("Failed to delete backup %s\n", error.what());
                         }
                     }
@@ -1195,7 +1200,7 @@ bool AppInit2()
                     boost::filesystem::remove_all(zerocoinDir);
                     LogPrintf("-resync: folder deleted: %s\n", zerocoinDir.string().c_str());
                 }
-            } catch (boost::filesystem::filesystem_error& error) {
+            } catch (const boost::filesystem::filesystem_error& error) {
                 LogPrintf("Failed to delete blockchain folders %s\n", error.what());
             }
         }
@@ -1210,7 +1215,7 @@ bool AppInit2()
             try {
                 boost::filesystem::rename(pathDatabase, pathDatabaseBak);
                 LogPrintf("Moved old %s to %s. Retrying.\n", pathDatabase.string(), pathDatabaseBak.string());
-            } catch (boost::filesystem::filesystem_error& error) {
+            } catch (const boost::filesystem::filesystem_error& error) {
                 // failure is ok (well, not really, but it's not worse than what we started with)
             }
 
@@ -1409,7 +1414,7 @@ bool AppInit2()
     nCoinCacheSize = nTotalCache / 300; // coins in memory require around 300 bytes
 
     bool fLoaded = false;
-    while (!fLoaded) {
+    while (!fLoaded && !ShutdownRequested()) {
         bool fReset = fReindex;
         std::string strLoadError;
 
@@ -1438,13 +1443,17 @@ bool AppInit2()
                 if (fReindex)
                     pblocktree->WriteReindexing(true);
 
+                // End loop if shutdown was requested
+                if (ShutdownRequested()) break;
+
                 // WISPR: load previous sessions sporks if we have them.
                 uiInterface.InitMessage(_("Loading sporks..."));
-                LoadSporksFromDB();
+                sporkManager.LoadSporksFromDB();
 
                 uiInterface.InitMessage(_("Loading block index..."));
                 std::string strBlockIndexError = "";
                 if (!LoadBlockIndex(strBlockIndexError)) {
+                    if (ShutdownRequested()) break;
                     strLoadError = _("Error loading block database");
                     strLoadError = strprintf("%s : %s", strLoadError, strBlockIndexError);
                     break;
@@ -1574,7 +1583,7 @@ bool AppInit2()
                         break;
                     }
                 }
-            } catch (std::exception& e) {
+            } catch (const std::exception& e) {
                 if (fDebug) LogPrintf("%s\n", e.what());
                 strLoadError = _("Error opening block database");
                 fVerifyingBlocks = false;
@@ -1585,7 +1594,7 @@ bool AppInit2()
             fLoaded = true;
         } while (false);
 
-        if (!fLoaded) {
+        if (!fLoaded && !ShutdownRequested()) {
             // first suggest a reindex
             if (!fReset) {
                 bool fRet = uiInterface.ThreadSafeMessageBox(
@@ -1607,7 +1616,7 @@ bool AppInit2()
     // As LoadBlockIndex can take several minutes, it's possible the user
     // requested to kill the GUI during the last operation. If so, exit.
     // As the program has not fully started yet, Shutdown() is possibly overkill.
-    if (fRequestShutdown) {
+    if (ShutdownRequested()) {
         LogPrintf("Shutdown requested. Exiting.\n");
         return false;
     }
@@ -1692,8 +1701,6 @@ bool AppInit2()
 
         if (fFirstRun) {
             // Create new keyUser and set as default key
-            RandAddSeedPerfmon();
-
             CPubKey newDefaultKey;
             if (pwalletMain->GetKeyFromPool(newDefaultKey)) {
                 pwalletMain->SetDefaultKey(newDefaultKey);
@@ -1946,6 +1953,11 @@ bool AppInit2()
 
     threadGroup.create_thread(boost::bind(&ThreadCheckObfuScationPool));
 
+    if (ShutdownRequested()) {
+        LogPrintf("Shutdown requested. Exiting.\n");
+        return false;
+    }
+
     // ********************************************************* Step 11: start node
 
     if (!CheckDiskSpace())
@@ -1953,8 +1965,6 @@ bool AppInit2()
 
     if (!strErrors.str().empty())
         return InitError(strErrors.str());
-
-    RandAddSeedPerfmon();
 
     //// debug print
     LogPrintf("mapBlockIndex.size() = %u\n", mapBlockIndex.size());

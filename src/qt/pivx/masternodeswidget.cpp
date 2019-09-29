@@ -61,8 +61,6 @@ public:
     MNRow* cachedRow = nullptr;
 };
 
-#include "qt/pivx/moc_masternodeswidget.cpp"
-
 MasterNodesWidget::MasterNodesWidget(WISPRGUI *parent) :
     PWidget(parent),
     ui(new Ui::MasterNodesWidget)

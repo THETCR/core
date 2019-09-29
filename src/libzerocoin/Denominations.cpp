@@ -14,14 +14,14 @@ CoinDenomination IntToZerocoinDenomination(int64_t amount)
 {
     libzerocoin::CoinDenomination denomination;
     switch (amount) {
-    case 1:		denomination = libzerocoin::CoinDenomination::ZQ_ONE; break;
-    case 5:	denomination = libzerocoin::CoinDenomination::ZQ_FIVE; break;
-    case 10:	denomination = libzerocoin::CoinDenomination::ZQ_TEN; break;
-    case 50:	denomination = libzerocoin::CoinDenomination::ZQ_FIFTY; break;
-    case 100: denomination = libzerocoin::CoinDenomination::ZQ_ONE_HUNDRED; break;
-    case 500: denomination = libzerocoin::CoinDenomination::ZQ_FIVE_HUNDRED; break;
-    case 1000: denomination = libzerocoin::CoinDenomination::ZQ_ONE_THOUSAND; break;
-    case 5000: denomination = libzerocoin::CoinDenomination::ZQ_FIVE_THOUSAND; break;
+    case 1:        denomination = CoinDenomination::ZQ_ONE; break;
+    case 5:    denomination = CoinDenomination::ZQ_FIVE; break;
+    case 10:    denomination = CoinDenomination::ZQ_TEN; break;
+    case 50:    denomination = CoinDenomination::ZQ_FIFTY; break;
+    case 100: denomination = CoinDenomination::ZQ_ONE_HUNDRED; break;
+    case 500: denomination = CoinDenomination::ZQ_FIVE_HUNDRED; break;
+    case 1000: denomination = CoinDenomination::ZQ_ONE_THOUSAND; break;
+    case 5000: denomination = CoinDenomination::ZQ_FIVE_THOUSAND; break;
     default:
         //not a valid denomination
         denomination = libzerocoin::CoinDenomination::ZQ_ERROR; break;

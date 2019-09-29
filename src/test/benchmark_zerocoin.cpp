@@ -147,30 +147,30 @@ Testb_CalcParamSizes()
 
 	uint32_t pLen, qLen;
 
-	try {
-		calculateGroupParamLengths(4000, 80, &pLen, &qLen);
-		if (pLen < 1024 || qLen < 256) {
-			result = false;
-		}
-		calculateGroupParamLengths(4000, 96, &pLen, &qLen);
-		if (pLen < 2048 || qLen < 256) {
-			result = false;
-		}
-		calculateGroupParamLengths(4000, 112, &pLen, &qLen);
-		if (pLen < 3072 || qLen < 320) {
-			result = false;
-		}
-		calculateGroupParamLengths(4000, 120, &pLen, &qLen);
-		if (pLen < 3072 || qLen < 320) {
-			result = false;
-		}
-		calculateGroupParamLengths(4000, 128, &pLen, &qLen);
-		if (pLen < 3072 || qLen < 320) {
-			result = false;
-		}
-	} catch (std::exception &e) {
-		result = false;
-	}
+    try {
+        calculateGroupParamLengths(4000, 80, &pLen, &qLen);
+        if (pLen < 1024 || qLen < 256) {
+            result = false;
+        }
+        calculateGroupParamLengths(4000, 96, &pLen, &qLen);
+        if (pLen < 2048 || qLen < 256) {
+            result = false;
+        }
+        calculateGroupParamLengths(4000, 112, &pLen, &qLen);
+        if (pLen < 3072 || qLen < 320) {
+            result = false;
+        }
+        calculateGroupParamLengths(4000, 120, &pLen, &qLen);
+        if (pLen < 3072 || qLen < 320) {
+            result = false;
+        }
+        calculateGroupParamLengths(4000, 128, &pLen, &qLen);
+        if (pLen < 3072 || qLen < 320) {
+            result = false;
+        }
+    } catch (const std::exception &e) {
+        result = false;
+    }
 #endif
 
 	return result;
@@ -184,12 +184,12 @@ Testb_GenerateGroupParams()
 
 	for (count = 0; count < 1; count++) {
 
-		try {
-			group = libzerocoin::deriveIntegerGroupParams(libzerocoin::calculateSeed(gGetTestModulus(), "test", ZEROCOIN_DEFAULT_SECURITYLEVEL, "TEST GROUP"), pLen, qLen);
-		} catch (std::runtime_error e) {
-			std::cout << "Caught exception " << e.what() << std::endl;
-			return false;
-		}
+        try {
+            group = libzerocoin::deriveIntegerGroupParams(libzerocoin::calculateSeed(gGetTestModulus(), "test", ZEROCOIN_DEFAULT_SECURITYLEVEL, "TEST GROUP"), pLen, qLen);
+        } catch (const std::runtime_error& e) {
+            std::cout << "Caught exception " << e.what() << std::endl;
+            return false;
+        }
 
 		// Now perform some simple tests on the resulting parameters
 		if ((uint32_t)group.groupOrder.bitSize() < qLen || (uint32_t)group.modulus.bitSize() < pLen) {
@@ -219,11 +219,11 @@ Testb_ParamGen()
 		libzerocoin::ZerocoinParams testParams(gGetTestModulus(),ZEROCOIN_DEFAULT_SECURITYLEVEL);
 		timer.stop();
 
-		std::cout << "\tPARAMGEN ELAPSED TIME: " << timer.duration() << " ms\t" << timer.duration()*0.001 << " s" << std::endl;
-	} catch (std::runtime_error e) {
-		std::cout << e.what() << std::endl;
-		result = false;
-	}
+        std::cout << "\tPARAMGEN ELAPSED TIME: " << timer.duration() << " ms\t" << timer.duration()*0.001 << " s" << std::endl;
+    } catch (const std::runtime_error& e) {
+        std::cout << e.what() << std::endl;
+        result = false;
+    }
 
 	return result;
 }
@@ -271,8 +271,8 @@ Testb_Accumulator()
 			return false;
 		}
 
-	} catch (std::runtime_error e) {
-		std::cout << e.what() << std::endl;
+    } catch (const std::runtime_error& e) {
+        std::cout << e.what() << std::endl;
         return false;
 	}
 
@@ -282,16 +282,16 @@ Testb_Accumulator()
 bool
 Testb_MintCoin()
 {
-	try {
-		// Generate a list of coins
-		timer.start();
-		for (uint32_t i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
-            ggCoins[i] = new libzerocoin::PrivateCoin(gg_Params,libzerocoin::CoinDenomination::ZQ_ONE);
-		}
-		timer.stop();
-	} catch (std::exception &e) {
-		return false;
-	}
+    try {
+        // Generate a list of coins
+        timer.start();
+        for (uint32_t i = 0; i < TESTS_COINS_TO_ACCUMULATE; i++) {
+            ggCoins[i] = new libzerocoin::PrivateCoin(gg_Params, libzerocoin::CoinDenomination::ZQ_ONE);
+        }
+        timer.stop();
+    } catch (const std::exception& e) {
+        return false;
+    }
 
 	std::cout << "\tMINT ELAPSED TIME:\n\t\tTotal: " << timer.duration() << " ms\t" << timer.duration()*0.001 << " s\n\t\tPer Coin: " << timer.duration()/TESTS_COINS_TO_ACCUMULATE << " ms\t" << (timer.duration()/TESTS_COINS_TO_ACCUMULATE)*0.001 << " s" << std::endl;
 
@@ -359,11 +359,11 @@ Testb_MintAndSpend()
 
 		std::cout << "\tSPEND VERIFY ELAPSED TIME: " << timer.duration() << " ms\t" << timer.duration()*0.001 << " s" << std::endl;
 
-		return ret;
-	} catch (std::runtime_error &e) {
-		std::cout << e.what() << std::endl;
-		return false;
-	}
+        return ret;
+    } catch (const std::runtime_error& e) {
+        std::cout << e.what() << std::endl;
+        return false;
+    }
 
 	return false;
 }

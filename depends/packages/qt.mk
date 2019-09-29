@@ -7,7 +7,7 @@ $(package)_sha256_hash=9b9dec1f67df1f94bce2955c5604de992d529dde72050239154c56352
 $(package)_dependencies=openssl zlib
 $(package)_linux_dependencies=freetype fontconfig libxcb
 $(package)_build_subdir=qtbase
-$(package)_qt_libs=corelib network widgets gui plugins testlib
+$(package)_qt_libs=corelib network widgets gui plugins testlib concurrent
 $(package)_patches=fix_qt_pkgconfig.patch mac-qmake.conf fix_configure_mac.patch fix_no_printer.patch fix_rcc_determinism.patch fix_riscv64_arch.patch fix_s390x_powerpc_mips_mipsel_architectures.patch xkb-default.patch no-xlib.patch
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
@@ -84,7 +84,7 @@ $(package)_config_opts += -no-feature-lcdnumber
 $(package)_config_opts += -no-feature-pdf
 $(package)_config_opts += -no-feature-printer
 $(package)_config_opts += -no-feature-printdialog
-$(package)_config_opts += -no-feature-concurrent
+$(package)_config_opts += -feature-concurrent
 $(package)_config_opts += -no-feature-sql
 $(package)_config_opts += -no-feature-statemachine
 $(package)_config_opts += -no-feature-syntaxhighlighter

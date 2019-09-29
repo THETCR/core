@@ -245,7 +245,7 @@ public:
 
         consensus.nPoolMaxTransactions = 3;
         consensus.nBudgetCycleBlocks = 43200; //!< Amount of blocks in a months period of time (using 1 minutes per) = (60*24*30)
-        consensus.strSporkKey = "04ac60266c909c22b95415270278b8ea90bec852922d3b2bd110cfba62fc4da20f7d5d6c7f109c9604a421c6e75e47a3c8963dcd1b9b7ca71aaeef3d410e4cc65a";
+        consensus.strSporkPubKey = "04ac60266c909c22b95415270278b8ea90bec852922d3b2bd110cfba62fc4da20f7d5d6c7f109c9604a421c6e75e47a3c8963dcd1b9b7ca71aaeef3d410e4cc65a";
         consensus.strObfuscationPoolDummyAddress = "WYCSnxDBqGkcruCwreLtBfpXtSMgoo5yUJ";
         consensus.nStartMasternodePayments = consensus.nNewProtocolStartTime; // July 2, 2018
 
@@ -376,7 +376,7 @@ public:
 
         consensus.nPoolMaxTransactions = 2;
         consensus.nBudgetCycleBlocks = 144; //!< Ten cycles per day on testnet
-        consensus.strSporkKey = "04e175173ea919f973cf4bf00d10e1c29c8ef75568c59056630d5a5cce8f6d8ac6edf0bb21baa2a24ecff17ce83b9863a88a54c54ca87c709c8a3f1dfef9d268e6";
+        consensus.strSporkPubKey = "04e175173ea919f973cf4bf00d10e1c29c8ef75568c59056630d5a5cce8f6d8ac6edf0bb21baa2a24ecff17ce83b9863a88a54c54ca87c709c8a3f1dfef9d268e6";
         consensus.strObfuscationPoolDummyAddress = "mbTYaNZm7TaPt5Du65aPsL8FNTktufYydC";
         consensus.nStartMasternodePayments = consensus.nNewProtocolStartTime;
         consensus.nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
@@ -461,7 +461,7 @@ public:
         private key hex: bd4960dcbd9e7f2223f24e7164ecb6f1fe96fc3a416f5d3a830ba5720c84b8ca
         Address: yCvUVd72w7xpimf981m114FSFbmAmne7j9
         */
-        consensus.strSporkKey = "02161ea61cdeacc91ac87728a98966b6e6ebda46c50644d954e03a6ba5426a78d5";
+        consensus.strSporkPubKey = "02161ea61cdeacc91ac87728a98966b6e6ebda46c50644d954e03a6ba5426a78d5";
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {

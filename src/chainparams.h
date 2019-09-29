@@ -129,7 +129,7 @@ public:
     int64_t GetProposalEstablishmentTime() const { return consensus.nProposalEstablishmentTime; }
 
     /** Spork key and Masternode Handling **/
-    std::string SporkKey() const { return consensus.strSporkKey; }
+    std::string SporkPubKey() const { return consensus.strSporkPubKey; }
     std::string ObfuscationPoolDummyAddress() const { return consensus.strObfuscationPoolDummyAddress; }
     int64_t StartMasternodePayments() const { return consensus.nStartMasternodePayments; }
     int64_t Budget_Fee_Confirmations() const { return consensus.nBudget_Fee_Confirmations; }

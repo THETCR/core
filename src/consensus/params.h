@@ -36,7 +36,7 @@ struct Params {
     CAmount nMaxMoneyOut;
     bool fSkipProofOfWorkCheck;
     int nPoolMaxTransactions;
-    std::string strSporkKey;
+    std::string strSporkPubKey;
     std::string strObfuscationPoolDummyAddress;
     int64_t nStartMasternodePayments;
     std::string zerocoinModulus;

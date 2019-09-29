@@ -597,11 +597,11 @@ bool GenerateAccumulatorWitness(CoinWitnessData* coinWitness, AccumulatorMap& ma
         return true;
 
         // TODO: I know that could merge all of this exception but maybe it's not really good.. think if we should have a different treatment for each one
-    } catch (searchMintHeightException e) {
+    } catch (const searchMintHeightException& e) {
         return error("%s: searchMintHeightException: %s", __func__, e.message);
-    } catch (ChecksumInDbNotFoundException e) {
+    } catch (const ChecksumInDbNotFoundException& e) {
         return error("%s: ChecksumInDbNotFoundException: %s", __func__, e.message);
-    } catch (GetPubcoinException e) {
+    } catch (const GetPubcoinException& e) {
         return error("%s: GetPubcoinException: %s", __func__, e.message);
     }
 }
@@ -795,9 +795,9 @@ bool CalculateAccumulatorWitnessFor(
 
         return true;
 
-    } catch (ChecksumInDbNotFoundException e) {
+    } catch (const ChecksumInDbNotFoundException& e) {
         return error("%s: ChecksumInDbNotFoundException: %s", __func__, e.message);
-    } catch (GetPubcoinException e) {
+    } catch (const GetPubcoinException& e) {
         return error("%s: GetPubcoinException: %s", __func__, e.message);
     }
 }
@@ -882,11 +882,11 @@ bool GenerateAccumulatorWitness(
         return true;
 
     // TODO: I know that could merge all of this exception but maybe it's not really good.. think if we should have a different treatment for each one
-    } catch (searchMintHeightException e) {
+    } catch (const searchMintHeightException& e) {
         return error("%s: searchMintHeightException: %s", __func__, e.message);
-    } catch (ChecksumInDbNotFoundException e) {
+    } catch (const ChecksumInDbNotFoundException& e) {
         return error("%s: ChecksumInDbNotFoundException: %s", __func__, e.message);
-    } catch (GetPubcoinException e) {
+    } catch (const GetPubcoinException& e) {
         return error("%s: GetPubcoinException: %s", __func__, e.message);
     }
 }
